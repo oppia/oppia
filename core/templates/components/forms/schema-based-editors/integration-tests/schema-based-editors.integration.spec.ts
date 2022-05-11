@@ -67,8 +67,7 @@ export class MockTranslateService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Schema based editor', () => {
+describe('Schema based editor', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
