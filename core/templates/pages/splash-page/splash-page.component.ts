@@ -127,7 +127,7 @@ export class SplashPageComponent implements OnInit {
     }, {
       quote: 'I18N_SPLASH_TESTIMONIAL_3',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_3',
-      imageUrl: this.getImageSet('/splash/same', 'png'),
+      imageUrl: this.getImageSet('/splash/sama', 'png'),
       imageUrlWebp: this.getImageSet('/splash/sama', 'webp'),
       borderPresent: false
     }, {
