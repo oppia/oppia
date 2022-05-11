@@ -68,6 +68,11 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             exp_fetchers.get_new_exploration_id()
         )
 
+    def test_get_new_unique_progress_url_id(self):
+        self.assertIsNotNone(
+            exp_fetchers.get_new_unique_progress_url_id()
+        )
+
     def test_get_exploration_summary_by_id(self):
         fake_eid = 'fake_eid'
         fake_exp = exp_fetchers.get_exploration_summary_by_id(

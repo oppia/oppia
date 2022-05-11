@@ -19,6 +19,8 @@
 from __future__ import annotations
 
 import datetime
+import random
+import string
 
 from core import feconf
 from core import utils
@@ -31,6 +33,10 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services  # pylint: disable=unused-import
+
+# Constants used for generating ids.
+MAX_RETRIES = 10
+MAX_ID_LENGTH = 6
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -965,6 +971,29 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
             id=unique_progress_url_id,
             exploration_id=exploration_id,
             unique_progress_url_id=unique_progress_url_id)
+
+    @classmethod
+    def get_new_progress_id(cls) -> str:
+        """Gets a new unique progress url id for the logged-out user.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Returns:
+            str. New unique progress url id.
+
+        Raises:
+            Exception. An ID cannot be generated within a reasonable number
+                of attempts.
+        """
+        for _ in range(MAX_RETRIES):
+            new_id = '%s' % ''.join(
+                random.choice(string.ascii_letters)
+                for _ in range(MAX_ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
 
 
 class ExpSummaryModel(base_models.BaseModel):

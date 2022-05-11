@@ -1448,6 +1448,20 @@ class SaveTransientCheckpointProgressHandler(base.BaseHandler):
         },
     }
     HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            }
+        },
         'PUT': {
             'exploration_id': {
                 'schema': editor.SCHEMA_FOR_EXPLORATION_ID
@@ -1473,10 +1487,38 @@ class SaveTransientCheckpointProgressHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_play_exploration
-    def put(self):
+    def post(self, exploration_id):
+        """Handles POST requests. Creates a new unique progress
+        url ID and a new corresponding TransientCheckpointUrl model.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        # Create a new unique_progress_url_id.
+        new_unique_progress_url_id = (
+            exp_fetchers.get_new_unique_progress_url_id())
+
+        # Create a new model corresponding to the new progress id.
+        exp_services.update_logged_out_user_progress(
+            exploration_id,
+            new_unique_progress_url_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
+        self.render_json({
+            'unique_progress_url_id': new_unique_progress_url_id
+        })
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
         """"Handles the PUT requests. Saves the logged-out user's progress."""
-        exploration_id = (
-            self.normalized_payload.get('exploration_id'))
         unique_progress_url_id = (
             self.normalized_payload.get('unique_progress_url_id'))
         most_recently_reached_checkpoint_state_name = (

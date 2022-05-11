@@ -90,6 +90,15 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
+def get_new_unique_progress_url_id() -> str:
+    """Returns a new unique progress url id.
+
+    Returns:
+        str. A new unique progress url id.
+    """
+    return exp_models.TransientCheckpointUrlModel.get_new_progress_id()
+
+
 def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
         exp_id, version_numbers):
     """Returns a list of VersionedExplorationInteractionIdsMapping domain
