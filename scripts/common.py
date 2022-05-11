@@ -134,6 +134,8 @@ FIREBASE_EMULATOR_CACHE_DIR = (
 
 sys.path.insert(0, PY_GITHUB_PATH)
 MYPY = False
+# By specifying this condition, we are importing the below module only while
+# type checking, not in runtime.
 if MYPY:  # pragma: no cover
     import github
 
