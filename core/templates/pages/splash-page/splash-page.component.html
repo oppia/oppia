@@ -17,14 +17,16 @@
     </div>
     <div class="oppia-splash-section-one-right">
       <picture class="oppia-splash-main-image image-desktop">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainDesktop.webp')">
-        <source type="image/jpeg" [srcset]="getStaticImageUrl('/splash/splashMainDesktop.png')">
-        <img [src]="getStaticImageUrl('/splash/splashMainDesktop.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/splashMainDesktop', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/splashMainDesktop', 'png')">
+        <img [src]="getStaticImageUrl('/splash/splashMainDesktop1x.png')"
+             alt="Photo of two kids and a tutor">
       </picture>
       <picture class="oppia-splash-main-image image-mobile">
         <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainMobile.webp')">
-        <source type="image/jpeg" [srcset]="getStaticImageUrl('/splash/splashMainMobile.png')">
-        <img [src]="getStaticImageUrl('/splash/splashMainMobile.png')" alt="">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/splashMainMobile.png')">
+        <img [src]="getStaticImageUrl('/splash/splashMainMobile.png')"
+             alt="Photo of a girl in front of computer">
       </picture>
     </div>
   </div>
@@ -55,9 +57,10 @@
     <div class="oppia-splash-section-three-left">
       <h3 *ngIf="isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
       <picture class="splash-matthew-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
-        <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/matthew_fractions', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/matthew_fractions', 'png')">
+        <img [src]="getStaticImageUrl('/splash/matthew_fractions1x.png')"
+             alt="Illustration of a kid with cupcakes in front of questions about fractions">
       </picture>
     </div>
     <div class="oppia-splash-section-three-right">
@@ -98,9 +101,10 @@
     </div>
     <div class="oppia-splash-section-four-right" *ngIf="!isWindowNarrow">
       <picture class="splash-student-desk-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/student_desk.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/student_desk.png')">
-        <img [src]="getStaticImageUrl('/splash/student_desk.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/student_desk', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/student_desk', 'png')">
+        <img [src]="getStaticImageUrl('/splash/student_desk1x.png')"
+             alt="Photo of a kid thinking about fractions">
       </picture>
     </div>
   </div>
@@ -139,9 +143,10 @@
   <div class="oppia-splash-section-six">
     <div class="oppia-splash-section-six-left">
       <picture class="splash-books-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/books_dsk.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/books_dsk.png')">
-        <img [src]="getStaticImageUrl('/splash/books_dsk.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/books_dsk', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/books_dsk', 'png')">
+        <img [src]="getStaticImageUrl('/splash/books_dsk1x.png')"
+             alt="Illustration of a book">
       </picture>
     </div>
     <div class="oppia-splash-section-six-right">
@@ -160,9 +165,10 @@
   <div class="oppia-splash-section-seven" [ngStyle]="{'background-image': 'getCommunityBackgroundUrl()'}">
     <div class="oppia-splash-section-seven-image" *ngIf="isWindowNarrow">
       <picture class="splash-vol-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/volunteer_section.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/volunteer_section.png')">
-        <img [src]="getStaticImageUrl('/splash/volunteer_section.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
+        <img [src]="getStaticImageUrl('/splash/volunteer_section1x.png')"
+             alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
     <div class="oppia-splash-section-seven-left">
@@ -178,9 +184,10 @@
     </div>
     <div class="oppia-splash-section-seven-right" *ngIf="!isWindowNarrow">
       <picture class="splash-vol-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/volunteer_section.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/volunteer_section.png')">
-        <img [src]="getStaticImageUrl('/splash/volunteer_section.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
+        <img [src]="getStaticImageUrl('/splash/volunteer_section1x.png')"
+             alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
   </div>
