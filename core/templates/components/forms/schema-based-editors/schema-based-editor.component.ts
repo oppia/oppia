@@ -83,7 +83,7 @@ implements AfterViewInit, ControlValueAccessor, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
-    return this.form ? {} : this.form.errors;
+    return this.form ? this.form.errors : {};
   }
 
   ngAfterViewInit(): void {
