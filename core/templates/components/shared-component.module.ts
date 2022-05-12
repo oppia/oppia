@@ -460,5 +460,3 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 })
 
 export class SharedComponentsModule { }
-
-

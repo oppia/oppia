@@ -62,10 +62,10 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
-    // The validation is currently handled by the apply-validation directive.
-    // But to wire up the forms using NgModel, we implement this interface.
-    // But when we move to reactive forms, the validate function will not
-    // return empty object.
+    // Currently, the validation for this component is handled by the
+    // apply-validation directive, so this method returns an empty
+    // object. However, when we move to reactive forms, that validation should
+    // be moved here instead (see the TODO below).
     // TODO(#15458): Move template driven validation into code.
     return {};
   }
@@ -73,6 +73,7 @@ implements ControlValueAccessor, OnInit, Validator {
   ngOnInit(): void { }
 
   updateValue(value: string): void {
+    this.localValue = value;
     this.onChange(value);
     setTimeout(() => {
       this.onChange(value);
