@@ -22,9 +22,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ContextService } from 'services/context.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExternalSaveService } from 'services/external-save.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Subscription } from 'rxjs';
 
@@ -59,6 +60,7 @@ export class StateContentEditorComponent implements OnInit {
     private contextService: ContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private externalSaveService: ExternalSaveService,
+    private htmlEscaperService: HtmlEscaperService,
     private stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
   ) {}
@@ -129,6 +131,20 @@ export class StateContentEditorComponent implements OnInit {
       let contentId = this.stateContentService.displayed.contentId;
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
     }
+
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(
+      this.stateContentService.displayed.html, 'text/html');
+    var imageFilenameList: string[] = [];
+    var elements = doc.getElementsByTagName(
+      'oppia-noninteractive-image');
+    for (let i = 0; i < elements.length; i++) {
+      imageFilenameList.push(
+        String(this.htmlEscaperService.escapedStrToUnescapedStr(
+          elements[i].getAttribute('filepath-with-value'))
+        ).replace('"', ''));
+    }
+    this.stateContentService.displayed._image_list = imageFilenameList;
     this.saveContent();
   }
 

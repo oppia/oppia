@@ -385,6 +385,8 @@ def apply_change_list(exploration_id, change_list):
                 exploration.delete_state(change.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state = exploration.states[change.state_name]
+                print('Change new value: ', change.property_name)
+                print(change.new_value)
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(list(map(

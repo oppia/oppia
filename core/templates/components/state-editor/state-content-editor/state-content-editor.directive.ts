@@ -121,7 +121,8 @@ angular.module('oppia').directive('stateContentEditor', [
               imageFilenameList.push(
                 elements[i].getAttribute('filepath-with-value'));
             }
-            StateContentService.displayed._image_list = imageFilenameList;
+            console.log(imageFilenameList);
+            StateContentService.displayed.image_list = imageFilenameList;
 
             saveContent();
           };

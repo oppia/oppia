@@ -4011,16 +4011,6 @@ class State(translation_domain.BaseTranslatableObject):
         if interaction_id is None:
             return state_dict
 
-        if interaction_id == 'MathExpressionInput':
-            if state_dict['interaction']['solution']:
-                state_dict['interaction']['solution'][
-                    'explanation']['image_filenames_in_html'] = (
-                    html_cleaner.get_image_filenames_from_html_strings(
-                        state_dict['interaction']['solution']['explanation'][
-                            'html']))
-
-            return state_dict
-
         # Interactions solution.
         if state_dict['interaction']['solution']:
             state_dict['interaction']['solution'] = (
