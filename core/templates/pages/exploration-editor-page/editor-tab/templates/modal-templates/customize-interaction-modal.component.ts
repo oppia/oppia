@@ -365,7 +365,6 @@ export class CustomizeInteractionModalComponent
         schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
 
       if (schemaIsSubtitledHtml) {
-        console.log('Schema beautiful')
         var parser = new DOMParser();
         var doc = parser.parseFromString(
           (value as SubtitledHtml)._html, 'text/html');
