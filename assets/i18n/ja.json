@@ -1,4 +1,5 @@
 {
+	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "Oppia財団について | Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "探検を作る",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "気になるトピックで",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "フィードバックをもらう",
@@ -444,5 +445,6 @@
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "サブスクライブしている人は合計<[totalSubscribers]>人です。",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "サブスクライブ解除",
+	"I18N_VOLUNTEER_PAGE_TITLE": "ボランティア | Oppia",
 	"I18N_YES": "はい"
 }
