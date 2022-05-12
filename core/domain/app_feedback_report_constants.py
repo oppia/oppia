@@ -61,58 +61,46 @@ class ReportType(enum.Enum):
     CRASH = 'crash'
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class Category(enum.Enum): # pylint: disable=invalid-name
+class Category(enum.Enum):
     """Enum for categories."""
 
-    FEATURE_SUGGESTION = 'feature_suggestion' # pylint: disable=invalid-name
-    LANGUAGE_SUGGESTION = 'language_suggestion' # pylint: disable=invalid-name
-    OTHER_SUGGESTION = 'other_suggestion' # pylint: disable=invalid-name
-    LESSON_QUESTION_ISSUE = 'lesson_question_issue' # pylint: disable=invalid-name
-    LANGUAGE_GENERAL_ISSUE = 'language_general_issue' # pylint: disable=invalid-name
-    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue' # pylint: disable=invalid-name
-    LANGUAGE_TEXT_ISSUE = 'language_text_issue' # pylint: disable=invalid-name
-    TOPICS_ISSUE = 'topics_issue' # pylint: disable=invalid-name
-    PROFILE_ISSUE = 'profile_issue' # pylint: disable=invalid-name
-    OTHER_ISSUE = 'other_issue' # pylint: disable=invalid-name
-    LESSON_PLAYER_CRASH = 'lesson_player_crash' # pylint: disable=invalid-name
-    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash' # pylint: disable=invalid-name
-    OPTIONS_PAGE_CRASH = 'options_page_crash' # pylint: disable=invalid-name
-    PROFILE_PAGE_CRASH = 'profile_page_crash' # pylint: disable=invalid-name
-    OTHER_CRASH = 'other_crash' # pylint: disable=invalid-name
+    FEATURE_SUGGESTION = 'feature_suggestion'
+    LANGUAGE_SUGGESTION = 'language_suggestion'
+    OTHER_SUGGESTION = 'other_suggestion'
+    LESSON_QUESTION_ISSUE = 'lesson_question_issue'
+    LANGUAGE_GENERAL_ISSUE = 'language_general_issue'
+    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue'
+    LANGUAGE_TEXT_ISSUE = 'language_text_issue'
+    TOPICS_ISSUE = 'topics_issue'
+    PROFILE_ISSUE = 'profile_issue'
+    OTHER_ISSUE = 'other_issue'
+    LESSON_PLAYER_CRASH = 'lesson_player_crash'
+    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash'
+    OPTIONS_PAGE_CRASH = 'options_page_crash'
+    PROFILE_PAGE_CRASH = 'profile_page_crash'
+    OTHER_CRASH = 'other_crash'
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class EntryPoint(enum.Enum): # pylint: disable=invalid-name
+class EntryPoint(enum.Enum):
     """Enum for entry points."""
 
-    NAVIGATION_DRAWER = 'navigation_drawer' # pylint: disable=invalid-name
-    LESSON_PLAYER = 'lesson_player' # pylint: disable=invalid-name
-    REVISION_CARD = 'revision_card' # pylint: disable=invalid-name
-    CRASH = 'crash' # pylint: disable=invalid-name
+    NAVIGATION_DRAWER = 'navigation_drawer'
+    LESSON_PLAYER = 'lesson_player'
+    REVISION_CARD = 'revision_card'
+    CRASH = 'crash'
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class StatsParameterNames(enum.Enum): # pylint: disable=invalid-name
+class StatsParameterNames(enum.Enum):
     """Enum for stats parameter names."""
 
-    PLATFORM = 'platform' # pylint: disable=invalid-name
-    REPORT_TYPE = 'report_type' # pylint: disable=invalid-name
-    COUNTRY_LOCALE_CODE = 'country_locale_code' # pylint: disable=invalid-name
-    ENTRY_POINT_NAME = 'entry_point_name' # pylint: disable=invalid-name
-    TEXT_LANGUAGE_CODE = 'text_language_code' # pylint: disable=invalid-name
-    AUDIO_LANGUAGE_CODE = 'audio_language_code' # pylint: disable=invalid-name
-    ANDROID_SDK_VERSION = 'android_sdk_version' # pylint: disable=invalid-name
-    VERSION_NAME = 'version_name' # pylint: disable=invalid-name
+    PLATFORM = 'platform'
+    REPORT_TYPE = 'report_type'
+    COUNTRY_LOCALE_CODE = 'country_locale_code'
+    ENTRY_POINT_NAME = 'entry_point_name'
+    TEXT_LANGUAGE_CODE = 'text_language_code'
+    AUDIO_LANGUAGE_CODE = 'audio_language_code'
+    ANDROID_SDK_VERSION = 'android_sdk_version'
+    VERSION_NAME = 'version_name'
 
 
 class AndroidTextSize(enum.Enum):
