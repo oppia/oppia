@@ -234,7 +234,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
     await users.logout();
 
     // Validate the contribution status changed.
