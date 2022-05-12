@@ -287,13 +287,15 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
     def test_run_with_single_valid_model(self) -> None:
         self.put_multi([self.exp_1, self.opportunity_1])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1')
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('CURATED EXPS SUCCESS: 1')
         ])
 
     def test_run_with_single_invalid_model(self) -> None:
         self.put_multi([self.exp_2, self.opportunity_2])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('CURATED EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout(
                 'INVALID STATE CLASSIFIER SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
@@ -333,6 +335,7 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                 self.opportunity_1, self.opportunity_2, self.opportunity_3])
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('CURATED EXPS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stdout(
                 'INVALID STATE CLASSIFIER SUCCESS: 2'),
             job_run_result.JobRunResult.as_stderr(
