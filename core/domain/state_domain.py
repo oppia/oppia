@@ -263,8 +263,8 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
     @staticmethod
     def update_image_filenames_from_html(answer_group_dict):
         """Parses HTML fields in an answer group dict and introduces a new
-        attribute image_filenames_in_html in SubtitledHtml structure which stores the list
-        of rich text image filenames.
+        attribute image_filenames_in_html in SubtitledHtml structure which
+        stores the list of rich text image filenames.
 
         Args:
             answer_group_dict: dict. The answer group dict.
@@ -386,8 +386,8 @@ class Hint(translation_domain.BaseTranslatableObject):
 
     @staticmethod
     def update_image_filenames_from_html(hint_dict):
-        """Updates the image_filenames_in_html attribute in the SubtitledHtml in hint to
-         store the list of rich text image filenames.
+        """Updates the image_filenames_in_html attribute in the
+        SubtitledHtml in hint to store the list of rich text image filenames.
 
         Args:
             hint_dict: dict. The hints dict.
@@ -567,9 +567,9 @@ class Solution(translation_domain.BaseTranslatableObject):
 
     @staticmethod
     def update_image_filenames_from_html(interaction_id, solution_dict):
-        """Updates the image_filenames_in_html attribute for all SubtitledHtmls in
-         the solutions dict, to store the list of image filenames for
-         all rich text images.
+        """Updates the image_filenames_in_html attribute for all SubtitledHtmls
+         in the solutions dict, to store the list of image filenames for all
+        rich text images.
 
         Args:
             interaction_id: str. The interaction ID.
@@ -1075,8 +1075,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             interaction_id,
             cust_arg_dict):
         """Checks for the HTML fields in the interaction, updates the
-        image_filenames_in_html attribute with the list of the rich text image filenames
-        contained in the html.
+        image_filenames_in_html attribute with the list of the rich text image
+        filenames contained in the html.
 
         Args:
             interaction_id: str. The ID of the interaction.
@@ -1261,7 +1261,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 
             if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 return SubtitledHtml(
-                    ca_value['content_id'], ca_value['html'], ca_value['image_filenames_in_html'])
+                    ca_value['content_id'], ca_value['html'],
+                    ca_value['image_filenames_in_html'])
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
@@ -1399,8 +1400,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     def traverse_by_schema_and_update_image_list(schema, value):
         """Helper function that recursively traverses an interaction
         customization argument spec to locate any SubtitledHtml and updates
-        the image_filenames_in_html attribute with the file names of all the rich text
-        images present in the html string.
+        the image_filenames_in_html attribute with the file names of all the
+        rich text images present in the html string.
 
         Args:
             schema: dict. The customization dict to be modified: dict with
@@ -1679,8 +1680,8 @@ class Outcome(translation_domain.BaseTranslatableObject):
 
     @staticmethod
     def update_image_filenames_from_html(outcome_dict):
-        """Updates the image_filenames_in_html attribute with the image filenames in the
-        outcome's SubtitledHtml.
+        """Updates the image_filenames_in_html attribute with the image
+        filenames in the outcome's SubtitledHtml.
 
         Args:
             outcome_dict: dict. The outcome dict.
@@ -2639,8 +2640,8 @@ class SubtitledHtml:
             html: str. A piece of user-submitted HTML. Note that this is NOT
                 cleaned in such a way as to contain a restricted set of HTML
                 tags. To clean it, the validate() method must be called.
-            image_filenames_in_html: list. A list which stores the image filenames of all
-                rich text images present in the html.
+            image_filenames_in_html: list. A list which stores the image
+                filenames of all rich text images present in the html.
         """
         self.content_id = content_id
         self.html = html
@@ -3965,20 +3966,21 @@ class State(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def update_image_lists_in_state(cls, state_dict):
-        """Updates the image_filenames_in_html attribute for all the SubtitledHtml
-        and WrittenTranslation contents within a states dict.
-        This method is ONLY used in BEAM jobs to migrate the existing explorations
-        to the latest version with the image_filenames_in_html attribute.
-        This method is NOT to be used in regular update flow of state, the updates
-        for different state contents are handled independently in their update
-        methods.
+        """Updates the image_filenames_in_html attribute for all the
+        SubtitledHtml and WrittenTranslation contents within a states dict.
+        This method is ONLY used in BEAM jobs to migrate the existing
+        explorations to the latest version with the image_filenames_in_html
+        attribute. This method is NOT to be used in regular update flow of
+        state, the updates for different state contents are handled
+        independently in their update methods.
 
         Args:
             state_dict: dict. The dict representation of State object.
 
         Returns:
             dict. The updated state_dict, which includes the list of rich
-            text image filenames in image_filenames_in_html attribute of SubtitledHtml.
+            text image filenames in image_filenames_in_html attribute of
+            SubtitledHtml.
         """
 
         # Update image_sizes_in_bytes for content html.
@@ -4001,7 +4003,8 @@ class State(translation_domain.BaseTranslatableObject):
         if 'written_translations' in state_dict.keys():
             state_dict['written_translations'] = (
                 WrittenTranslations
-                .update_image_filenames_from_html(state_dict['written_translations']))
+                .update_image_filenames_from_html(
+                    state_dict['written_translations']))
 
         for hint_index, hint in enumerate(state_dict['interaction']['hints']):
             state_dict['interaction']['hints'][hint_index] = (

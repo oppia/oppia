@@ -132,7 +132,7 @@ describe('State Interaction Stats Service', () => {
               feedback: {
                 content_id: 'feedback_1',
                 html: '¡Buen trabajo!',
-                image_filenames_in_html: []
+                image_filenames_in_html: [],
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -155,7 +155,10 @@ describe('State Interaction Stats Service', () => {
         },
         default_outcome: {
           dest: 'Hola',
-          feedback: {content_id: 'default_outcome', html: '', image_filenames_in_html: []},
+          feedback: {
+            content_id: 'default_outcome',
+            html: '',
+            image_filenames_in_html: []},
           labelled_as_correct: true,
           param_changes: [],
           refresher_exploration_id: null,

@@ -20,7 +20,7 @@
 export interface SubtitledHtmlBackendDict {
   'content_id': string | null;
   'html': string;
-  'image_filenames_in_html': string[];
+  'image_filenames_in_html': readonly string[];
 }
 
 export class SubtitledHtml {

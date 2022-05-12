@@ -91,14 +91,16 @@ export class AddHintModalComponent
     // Close the modal and save it afterwards.
     var parser = new DOMParser();
     var doc = parser.parseFromString(this.tmpHint, 'text/html');
-    var imageFilenameList: string[] = [];
+    var imageFilenameList = [];
     var elements = doc.getElementsByTagName('oppia-noninteractive-image');
     for (let i = 0; i < elements.length; i++) {
-      imageFilenameList.push(
-        String(this.htmlEscaperService.escapedStrToUnescapedStr(
-          elements[i].getAttribute('filepath-with-value'))
-        ).replace('"', ''));
-      // Replaces only first ", need to fix for second ".
+      var attr = elements[i].getAttribute('filepath-with-value');
+      if (attr !== null) {
+        imageFilenameList.push(
+          String(
+            this.htmlEscaperService.escapedStrToUnescapedStr(
+              attr)).replace('"', ''));
+      }
     }
     this.ngbActiveModal.close({
       hint: cloneDeep(
