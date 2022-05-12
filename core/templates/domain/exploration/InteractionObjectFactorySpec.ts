@@ -740,10 +740,12 @@ describe('Interaction object factory', () => {
         choices: {
           value: [{
             html: '<p>Choice 1</p>',
-            content_id: 'ca_choices_0'
+            content_id: 'ca_choices_0',
+            image_filenames_in_html: []
           }, {
             html: '<p>Choice 2</p>',
-            content_id: 'ca_choices_1'
+            content_id: 'ca_choices_1',
+            image_filenames_in_html: []
           }]
         }
       },

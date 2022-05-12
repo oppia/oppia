@@ -36,7 +36,8 @@ describe('Hint object factory', () => {
     expect(testHint.toBackendDict()).toEqual({
       hint_content: {
         html: '<p>Some Hint</p>',
-        content_id: 'content_id'
+        content_id: 'content_id',
+        image_filenames_in_html: []
       }
     });
     expect(hof.createFromBackendDict({

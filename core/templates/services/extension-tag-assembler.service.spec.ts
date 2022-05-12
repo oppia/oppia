@@ -68,7 +68,7 @@ describe('Extension Tag Assembler Service', () => {
     const interactionCustomizationArgs = {
       test: {
         value: {
-          attr: [new SubtitledHtml('html', 'ca_id')]
+          attr: [new SubtitledHtml('html', 'ca_id', [])]
         }
       }
     };

@@ -29,7 +29,8 @@ describe('Subtopic page contents object factory', () => {
   const expectedDefaultObject = {
     subtitled_html: {
       html: '',
-      content_id: 'content'
+      content_id: 'content',
+      image_filenames_in_html: []
     },
     recorded_voiceovers: {
       voiceovers_mapping: {

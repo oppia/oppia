@@ -80,7 +80,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is the correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
+          html: 'This is the explanation to the answer',
+          image_filenames_in_html: []
         }
       };
 
@@ -141,7 +142,7 @@ describe('Solution object factory', () => {
     it('should get oppia short answer', () => {
       const interaction = new Interaction([], [], {
         choices: {
-          value: [new SubtitledHtml('This is a choice', 'id1')]
+          value: [new SubtitledHtml('This is a choice', 'id1', [])]
         }
       }, null, [], '0', null);
       const expectedShortAnswerHtml = {
