@@ -355,7 +355,7 @@ export class CustomizeInteractionModalComponent
     }
   }
 
-  populateImageList(): void {
+  populateImageFilenamesInHtml(): void {
     let traverseSchemaAndAssignImageIds = (
         value: Object | Object[],
         schema: Schema,
@@ -377,7 +377,7 @@ export class CustomizeInteractionModalComponent
             ).replace('"', ''));
           // Replaces only first ", need to fix for second ".
         }
-        (value as SubtitledHtml)._image_list = imageFilenameList;
+        (value as SubtitledHtml)._imageFilenamesInHtml = imageFilenameList;
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (
           let i = 0;
@@ -474,7 +474,7 @@ export class CustomizeInteractionModalComponent
     });
     this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
       contentIdsWithModifiedContent);
-    this.populateImageList();
+    this.populateImageFilenamesInHtml();
     this.populateNullContentIds();
     this.editorFirstTimeEventsService.registerFirstSaveInteractionEvent();
     this.ngbActiveModal.close();

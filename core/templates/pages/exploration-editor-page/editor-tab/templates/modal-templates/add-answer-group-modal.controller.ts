@@ -136,7 +136,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
           ).replace('"', ''));
         // Replaces only first ", need to fix for second ".
       }
-      ($scope.tmpOutcome.feedback as SubtitledHtml)._image_list = (
+      ($scope.tmpOutcome.feedback as SubtitledHtml)._imageFilenamesInHtml = (
         imageFilenameList);
       StateEditorService.onSaveOutcomeDestDetails.emit();
 

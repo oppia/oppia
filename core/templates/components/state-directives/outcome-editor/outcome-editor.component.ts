@@ -191,7 +191,7 @@ angular.module('oppia').component('outcomeEditor', {
               ).replace('"', ''));
             // Replaces only first ", need to fix for second ".
           }
-          ctrl.savedOutcome.feedback._image_list = imageFilenameList;
+          ctrl.savedOutcome.feedback._imageFilenamesInHtml = imageFilenameList;
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
         }
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);

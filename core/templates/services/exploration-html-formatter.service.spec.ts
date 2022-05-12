@@ -157,7 +157,8 @@ describe('Exploration Html Formatter Service', () => {
     };
     var expectedHtmlTag = '<oppia-response-sample-id answer="&amp;quot;' +
       answer + '&amp;quot;" choices="[{&amp;quot;_html&amp;quot;:&amp;' +
-      'quot;sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;' +
+      'quot;sampleChoice&amp;quot;,&amp;quot;imageFilenamesInHtml&amp;quot;' +
+      ':[],&amp;quot;_contentId&amp;quot;:&amp;' +
       'quot;&amp;quot;}]"></oppia-response-sample-id>';
     expect(ehfs.getAnswerHtml(
       answer, interactionId, interactionCustomizationArgs)
@@ -181,7 +182,8 @@ describe('Exploration Html Formatter Service', () => {
     var expectedHtmlTag = '<oppia-short-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
       'choices="[{&amp;quot;_html&amp;quot;:&amp;' +
-      'quot;sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;' +
+      'quot;sampleChoice&amp;quot;,&amp;quot;imageFilenamesInHtml&amp;quot;' +
+      ':[],&amp;quot;_contentId&amp;quot;:&amp;' +
       'quot;&amp;quot;}]"></oppia-short-response-sample-id>';
     expect(ehfs.getShortAnswerHtml(
       answer, interactionId, interactionCustomizationArgs)

@@ -98,7 +98,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
           ).replace('"', ''));
         // Replaces only first ", need to fix for second ".
       }
-      this.hint.hintContent._image_list = imageFilenameList;
+      this.hint.hintContent._imageFilenamesInHtml = imageFilenameList;
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [hintContentId]);
     }

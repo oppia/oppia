@@ -74,7 +74,8 @@ describe('Extension Tag Assembler Service', () => {
     };
     const expectedElement = '<p test-with-value="{&amp;quot;attr&amp;quot;:' +
       '[{&amp;quot;html&amp;quot;:&amp;quot;html&amp;quot;,&amp;quot;' +
-      'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;}]}"></p>';
+      'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;,&amp;quot;' +
+      'image_filenames_in_html&amp;quot;:[]}]}"></p>';
 
     expect(
       etas.formatCustomizationArgAttrs(

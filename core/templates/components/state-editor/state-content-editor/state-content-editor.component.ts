@@ -146,7 +146,8 @@ export class StateContentEditorComponent implements OnInit {
           elements[i].getAttribute('filepath-with-value'))
         ).replace('"', ''));
     }
-    this.stateContentService.displayed._image_list = imageFilenameList;
+    this.stateContentService.displayed._imageFilenamesInHtml = (
+      imageFilenameList);
     this.saveContent();
   }
 

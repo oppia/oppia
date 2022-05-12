@@ -29,20 +29,21 @@ export class SubtitledHtml {
   // but not saved. Before the 'SubtitledHtml' object is saved into a State,
   // the 'content_id' should be set to a string.
   _contentId: string | null;
-  _image_list: string[] = [];
+  _imageFilenamesInHtml: string[] = [];
 
   constructor(
-      html: string, contentId: string | null, imageList: string[] = []) {
+      html: string, contentId: string | null,
+      imageFilenamesInHtml: string[] = []) {
     this._html = html;
     this._contentId = contentId;
-    this._image_list = imageList;
+    this._imageFilenamesInHtml = imageFilenamesInHtml;
   }
 
   toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
       content_id: this._contentId,
-      image_filenames_in_html: this._image_list
+      image_filenames_in_html: this._imageFilenamesInHtml
     };
   }
 
@@ -77,7 +78,7 @@ export class SubtitledHtml {
   static createDefault(
       html: string,
       contentId: string,
-      imageList: string[] = []): SubtitledHtml {
-    return new SubtitledHtml(html, contentId, imageList);
+      imageFilenamesInHtml: string[] = []): SubtitledHtml {
+    return new SubtitledHtml(html, contentId, imageFilenamesInHtml);
   }
 }
