@@ -361,6 +361,13 @@ class Rubric:
                     'Expected each explanation to be a string, received %s' %
                     explanation)
 
+        if (
+                self.difficulty == constants.SKILL_DIFFICULTIES[1] and
+                len(self.explanations) == 0
+        ):
+            raise utils.ValidationError(
+                'Expected at least one explanation in medium level rubrics')
+
 
 class WorkedExample:
     """Domain object for representing the worked_example dict."""
