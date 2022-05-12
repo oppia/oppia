@@ -151,7 +151,7 @@ describe('Solution object factory', () => {
         answer: '<oppia-short-response-0 answer="&amp;quot;' +
         'This is a correct answer!&amp;quot;" choices="' +
         '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
-        '&amp;quot;,&amp;quot;imageFilenamesInHtml&amp;quot;' +
+        '&amp;quot;,&amp;quot;_imageFilenamesInHtml&amp;quot;' +
         ':[],&amp;quot;_contentId&amp;quot;:&amp;quot;id1&amp;quot;' +
         '}]"></oppia-short-response-0>'
       };
