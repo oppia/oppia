@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.domain import platform_parameter_list as params
 
 
-ParamNames = params.ParamNames # pylint: disable=invalid-name
+ParamNames = params.ParamNames
 
 # Names of feature objects defined in domain/platform_parameter_list.py
 # should be added to one of the following lists:
