@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.rtl.css" as="style">
+
 <mat-card class="mat-padding">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)" class="oppia-info-card-bg-image">
@@ -13,7 +16,7 @@
 
     <ul *ngIf="!explorationIsPrivate" class="card-metrics row space-between center">
       <li class="protractor-test-info-card-rating row-item">
-        <span class="fas fa-star fa-lg" [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate" placement="top">
+        <span class="fas fa-star fa-lg learn-info-card-star" [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate" placement="top">
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_RATINGS_TOOLTIP' | translate }}</span>
         </span>
         <span *ngIf="!averageRating">{{ 'I18N_PLAYER_UNRATED' | translate }}</span>
@@ -55,7 +58,7 @@
     </ul>
 
     <div *ngIf="!explorationIsPrivate" class="oppia-info-card-bottom-row">
-      <div class="row center">
+      <div class="fx-row">
         <div class="oppia-info-card-tag-icon">
           <span class="fas fa-tags oppia-info-card-modal-tooltip"
                 [ngbTooltip]="'I18N_PLAYER_TAGS_TOOLTIP' | translate"
@@ -94,53 +97,6 @@
   </button>
 </mat-card>
 
-<style>
-  .oppia-info-card-content .private-card-info {
-    color: red;
-  }
-  .oppia-info-card-bottom-row em {
-    font-size: 0.75rem;
-  }
-  .oppia-info-card-content .oppia-contributors-icon {
-    cursor: default;
-    margin-right: 0.3125rem;
-  }
-  .oppia-info-card-content p {
-    line-height: 1.5;
-    padding-bottom: 0.5rem;
-  }
-  .oppia-info-card-bottom-row {
-    line-height: 1.5;
-  }
-  .fas.fa-tags.oppia-info-card-modal-tooltip {
-    margin-left: 0.0625rem;
-    margin-right: 0.1875rem;
-  }
-  .mat-padding {
-    padding: 0;
-  }
-  .row.center {
-    display: flex;
-    flex-direction: row;
-  }
-  .space-between {
-    justify-content: space-between;
-  }
-  .center {
-    align-content: center;
-    align-items: center;
-  }
-  .row-item {
-    flex-grow: 1;
-  }
-  .card-metrics {
-    box-sizing: border-box  ;
-    max-width: 100%;
-  }
-  .oppia-info-card-exploration-contributors-profile {
-    justify-content: flex-end;
-  }
-  .exploration-tags {
-    max-width: 90%;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/information-card-modal.component.rtl.css">

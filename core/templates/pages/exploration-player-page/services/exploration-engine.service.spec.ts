@@ -564,7 +564,7 @@ describe('Exploration engine service ', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.returnValue();
+        alertsService, 'addWarning').and.callThrough();
 
       explorationEngineService.init(
         explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -606,7 +606,7 @@ describe('Exploration engine service ', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.returnValue();
+        alertsService, 'addWarning').and.callThrough();
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
       spyOn(explorationEngineService, 'makeParams')
         .and.returnValue(null);
@@ -653,7 +653,7 @@ describe('Exploration engine service ', () => {
       spyOn(explorationEngineService, 'makeQuestion')
         .and.returnValue(null);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.returnValue();
+        alertsService, 'addWarning').and.callThrough();
 
       explorationEngineService.init(
         explorationDict, 1, null, true, ['en'], initSuccessCb);

@@ -52,6 +52,12 @@ class ValidCmdDict(TypedDict):
     deprecated_values: Dict[str, List[str]]
 
 
+# Supported object types for ParamSpec.
+SUPPORTED_OBJ_TYPES = {
+    'UnicodeString',
+}
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -563,7 +569,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.4'
+OPPIA_VERSION = '3.2.5'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer

@@ -34,8 +34,8 @@
         </div>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" id="tutorialTranslationTab" class="nav-item icon nav-list-item protractor-test-translation-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.selectTranslationTab()" uib-tooltip="Translations does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation', 'oppia-disabled-tab': !$ctrl.connectedToInternet || $ctrl.EditabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item protractor-test-translation-tab"
+          ng-click="!$ctrl.connectedToInternet || $ctrl.EditabilityService.isLockedByAdmin() || $ctrl.selectTranslationTab()" uib-tooltip="Translations does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
         <a class="nav-link navbar-tab" uib-tooltip="Translations" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'translation'}">&#xE029;</i>
         </a>
@@ -100,6 +100,7 @@
       </li>
     </div>
   </div>
+  <div ng-if="$ctrl.EditabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">This exploration is currently locked to new edits. Please contact an admin for assistance.</div>
 </div>
 <div class="exploration-editor-content" ng-cloak>
   <div class="container-fluid oppia-editor-page-container">
@@ -170,6 +171,13 @@
   exploration-editor-page .exploration-editor-content {
     margin-top: 95px;
   }
+
+  exploration-editor-page .exploration-locked-for-editing-banner {
+    background-color: #6c757d;
+    color: #fff;
+    padding: 5px;
+  }
+
   exploration-editor-page .navbar-helper {
     background-color: #00609c;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
