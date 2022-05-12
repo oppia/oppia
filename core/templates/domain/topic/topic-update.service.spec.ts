@@ -1004,7 +1004,8 @@ describe('Topic update service', function() {
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
+        image_filenames_in_html: []
       },
       recorded_voiceovers: {
         voiceovers_mapping: {

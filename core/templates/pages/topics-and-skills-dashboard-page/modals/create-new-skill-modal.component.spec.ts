@@ -139,7 +139,8 @@ describe('Create new skill modal', () => {
       .toEqual('test_html');
     expect(componentInstance.newExplanationObject).toEqual({
       html: 'test_html',
-      content_id: 'test_id'
+      content_id: 'test_id',
+      image_filenames_in_html: []
     });
   });
 

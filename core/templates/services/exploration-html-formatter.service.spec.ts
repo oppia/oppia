@@ -152,7 +152,7 @@ describe('Exploration Html Formatter Service', () => {
     var answer = 'sampleAnswer';
     var interactionCustomizationArgs = {
       choices: {
-        value: [new SubtitledHtml('sampleChoice', '')]
+        value: [new SubtitledHtml('sampleChoice', '', [])]
       }
     };
     var expectedHtmlTag = '<oppia-response-sample-id answer="&amp;quot;' +
