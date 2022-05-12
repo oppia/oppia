@@ -16,11 +16,14 @@
  * @fileoverview Component for the main page of the story viewer.
  */
 
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
@@ -43,9 +46,10 @@ interface IconParametersArray {
   selector: 'oppia-story-viewer-page',
   templateUrl: './story-viewer-page.component.html'
 })
-export class StoryViewerPageComponent implements OnInit {
+export class StoryViewerPageComponent implements OnInit, OnDestroy {
   @ViewChild('overlay') overlay: ElementRef<HTMLDivElement>;
   @ViewChild('skip') skipButton: ElementRef<HTMLButtonElement>;
+  directiveSubscriptions = new Subscription();
   showLoginOverlay: boolean = true;
   storyPlaythroughObject: StoryPlaythrough;
   storyId: string;
@@ -76,7 +80,8 @@ export class StoryViewerPageComponent implements OnInit {
     private loaderService: LoaderService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private translateService: TranslateService
   ) {}
 
   focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
@@ -160,6 +165,23 @@ export class StoryViewerPageComponent implements OnInit {
     return result;
   }
 
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_STORY_VIEWER_PAGE_TITLE', {
+        topicName: this.topicName,
+        storyTitle: this.storyTitle
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
   ngOnInit(): void {
     this.storyIsLoaded = false;
     this.isLoggedIn = false;
@@ -183,11 +205,16 @@ export class StoryViewerPageComponent implements OnInit {
         this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
         this.storyId = this.storyPlaythroughObject.getStoryId();
         this.topicName = this.storyPlaythroughObject.topicName;
-        this.pageTitleService.setDocumentTitle(
-          `Learn ${this.topicName} | ${storyDataDict.title} | Oppia`);
         this.pageTitleService.updateMetaTag(
           storyDataDict.getMetaTagContent());
         this.storyTitle = storyDataDict.title;
+
+        // The onLangChange event is initially fired before the story is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the story is loaded.
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
         this.storyTitleTranslationKey = (
           this.i18nLanguageCodeService
             .getStoryTranslationKey(
@@ -231,6 +258,10 @@ export class StoryViewerPageComponent implements OnInit {
     // background color and icon url for the icons generated on the
     // path.
     this.pathIconParameters = [];
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {
