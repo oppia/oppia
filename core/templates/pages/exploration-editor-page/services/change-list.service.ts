@@ -37,6 +37,10 @@ import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGr
 import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { ContextService } from 'services/context.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 export type StatePropertyValues = (
   AnswerGroup[] |
@@ -141,6 +145,8 @@ export class ChangeListService {
     private loaderService: LoaderService,
     private loggerService: LoggerService,
     private internetConnectivityService: InternetConnectivityService,
+    private contextService: ContextService,
+    private localStorageService: LocalStorageService
   ) {
     // We have added subscriptions in the constructor.
     // Since, ngOnInit does not work in angular services.
@@ -204,6 +210,7 @@ export class ChangeListService {
       return;
     }
     this.explorationChangeList.push(changeDict);
+    this.updateExplorationEditorBrowserTabsUnsavedChangesStatus();
     this.undoneChangeStack = [];
     this.autosaveInProgressEventEmitter.emit(true);
     if (this.changeListAddedTimeoutId) {
@@ -212,6 +219,26 @@ export class ChangeListService {
     this.changeListAddedTimeoutId = setTimeout(() => {
       this.autosaveChangeListOnChange(this.explorationChangeList);
     }, this.DEFAULT_WAIT_FOR_AUTOSAVE_MSEC);
+  }
+
+  private updateExplorationEditorBrowserTabsUnsavedChangesStatus() {
+    var explorationEditorBrowserTabsInfo:
+      EntityEditorBrowserTabsInfo = (
+        this.localStorageService.getEntityEditorBrowserTabsInfo(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
+          this.contextService.getExplorationId()));
+    if (
+      this.explorationChangeList.length > 0 &&
+      explorationEditorBrowserTabsInfo &&
+      !explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ) {
+      explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      this.localStorageService.updateEntityEditorBrowserTabsInfo(
+        explorationEditorBrowserTabsInfo,
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
+    }
   }
 
   /**

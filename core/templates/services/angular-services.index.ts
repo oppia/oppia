@@ -405,6 +405,7 @@ import { FaviconService } from './favicon.service';
 import { StalenessDetectionService } from './staleness-detection.service';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
 import { PlaythroughIssuesService } from './playthrough-issues.service';
+import { ExplorationEditorStalenessDetectionService } from 'pages/exploration-editor-page/services/exploration-editor-staleness-detection.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -517,6 +518,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationEditorStalenessDetectionService',
+    ExplorationEditorStalenessDetectionService],
   ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationRightsBackendApiService', ExplorationRightsBackendApiService],
   ['ExplorationPropertyService', ExplorationPropertyService],

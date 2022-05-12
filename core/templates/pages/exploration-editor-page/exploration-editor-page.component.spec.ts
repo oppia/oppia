@@ -58,6 +58,8 @@ import { ExplorationDataService } from './services/exploration-data.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { HelpModalComponent } from './modal-templates/help-modal.component';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -105,6 +107,8 @@ describe('Exploration editor page component', function() {
   var registerAcceptTutorialModalEventSpy;
   var registerDeclineTutorialModalEventSpy;
   var focusManagerService = null;
+  var localStorageService = null;
+  var explorationEditorStalenessDetectionService = null;
 
   let ngbModal: NgbModal;
 
@@ -297,6 +301,9 @@ describe('Exploration editor page component', function() {
     userService = $injector.get('UserService');
     ueps = $injector.get('UserExplorationPermissionsService');
     focusManagerService = $injector.get('FocusManagerService');
+    localStorageService = $injector.get('LocalStorageService');
+    explorationEditorStalenessDetectionService = $injector.get(
+      'ExplorationEditorStalenessDetectionService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage', {
@@ -772,6 +779,122 @@ describe('Exploration editor page component', function() {
 
       activeTabNameSpy.and.returnValue('history');
       expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('history');
+    });
+
+    it('should create exploration editor browser tabs info on local storage ' +
+    'when a new tab opens', () => {
+      let explorationEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'exploration', 'exp_id', 1, 1, false);
+      spyOn(EntityEditorBrowserTabsInfo, 'create').and.callThrough();
+      spyOn(
+        explorationEditorBrowserTabsInfo,
+        'setLatestVersion'
+      ).and.callThrough();
+      spyOn(
+        localStorageService, 'getEntityEditorBrowserTabsInfo'
+      ).and.returnValues(explorationEditorBrowserTabsInfo, null);
+
+      expect(
+        explorationEditorBrowserTabsInfo.getNumberOfOpenedTabs()
+      ).toEqual(1);
+
+      ctrl.createExplorationEditorBrowserTabsInfo(1);
+
+      expect(
+        explorationEditorBrowserTabsInfo.getNumberOfOpenedTabs()
+      ).toEqual(2);
+      expect(
+        explorationEditorBrowserTabsInfo.setLatestVersion
+      ).toHaveBeenCalled();
+
+      ctrl.createExplorationEditorBrowserTabsInfo(1);
+      expect(EntityEditorBrowserTabsInfo.create).toHaveBeenCalled();
+    });
+
+    it('should update exploration editor browser tabs info on local storage ' +
+    'when some new changes are saved', () => {
+      let explorationEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'exploration', 'exp_id', 1, 1, true);
+      spyOn(
+        explorationEditorBrowserTabsInfo,
+        'setLatestVersion'
+      ).and.callThrough();
+      spyOn(
+        localStorageService, 'getEntityEditorBrowserTabsInfo'
+      ).and.returnValue(explorationEditorBrowserTabsInfo);
+      spyOn(
+        localStorageService, 'updateEntityEditorBrowserTabsInfo'
+      ).and.callFake(() => {});
+
+      expect(
+        explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+      ).toEqual(true);
+      expect(explorationEditorBrowserTabsInfo.getLatestVersion()).toEqual(1);
+
+      ctrl.updateExplorationEditorBrowserTabsInfo(2);
+
+      expect(
+        explorationEditorBrowserTabsInfo.setLatestVersion
+      ).toHaveBeenCalled();
+      expect(explorationEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
+      expect(
+        explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+      ).toEqual(false);
+    });
+
+    it('should decrement number of opened exploration editor tabs when ' +
+    'a tab is closed', () => {
+      let explorationEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'exploration', 'exp_id', 1, 1, true);
+      spyOn(
+        localStorageService, 'getEntityEditorBrowserTabsInfo'
+      ).and.returnValue(explorationEditorBrowserTabsInfo);
+      spyOn(cls, 'getChangeList').and.returnValue([{
+        cmd: 'add_state',
+        state_name: 'state 1'
+      }]);
+
+      expect(
+        explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+      ).toBeTrue();
+      expect(
+        explorationEditorBrowserTabsInfo.getNumberOfOpenedTabs()
+      ).toEqual(1);
+
+      ctrl.onClosingExplorationEditorBrowserTab();
+
+      expect(
+        explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+      ).toBeFalse();
+      expect(
+        explorationEditorBrowserTabsInfo.getNumberOfOpenedTabs()
+      ).toEqual(0);
+    });
+
+    it('should emit the stale tab and presence of unsaved changes events ' +
+    'when the \'storage\' event is triggered', () => {
+      spyOn(
+        explorationEditorStalenessDetectionService.staleTabEventEmitter, 'emit'
+      ).and.callThrough();
+      spyOn(
+        explorationEditorStalenessDetectionService
+          .presenceOfUnsavedChangesEventEmitter, 'emit'
+      ).and.callThrough();
+
+      let storageEvent = new StorageEvent('storage', {
+        key: EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_EXPLORATION_EDITOR_BROWSER_TABS
+      });
+
+      ctrl.onCreateOrUpdateExplorationEditorBrowserTabsInfo(storageEvent);
+
+      expect(
+        explorationEditorStalenessDetectionService.staleTabEventEmitter.emit
+      ).toHaveBeenCalled();
+      expect(
+        explorationEditorStalenessDetectionService
+          .presenceOfUnsavedChangesEventEmitter.emit
+      ).toHaveBeenCalled();
     });
   });
 

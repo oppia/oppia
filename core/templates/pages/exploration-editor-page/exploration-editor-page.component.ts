@@ -148,11 +148,17 @@ require('services/internet-connectivity.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/ngb-modal.service.ts');
+require('services/local-storage.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-editor-staleness-detection.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { HelpModalComponent } from './modal-templates/help-modal.component';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
@@ -162,7 +168,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
-    'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
+    'ExplorationDataService', 'ExplorationEditorStalenessDetectionService',
+    'ExplorationFeaturesBackendApiService',
     'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
@@ -171,7 +178,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
     'FocusManagerService', 'GraphDataService', 'InternetConnectivityService',
-    'LoaderService', 'NgbModal',
+    'LoaderService', 'LocalStorageService', 'NgbModal',
     'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'PreventPageUnloadEventService',
     'RouterService', 'SiteAnalyticsService',
@@ -180,14 +187,15 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'UserService', 'WindowDimensionsService',
+    'UserService', 'WindowDimensionsService', 'WindowRef',
     function(
         $q, $rootScope, $scope, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
-        ExplorationDataService, ExplorationFeaturesBackendApiService,
+        ExplorationDataService, ExplorationEditorStalenessDetectionService,
+        ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService, ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
@@ -196,7 +204,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
         FocusManagerService, GraphDataService, InternetConnectivityService,
-        LoaderService, NgbModal, PageTitleService, ParamChangesObjectFactory,
+        LoaderService, LocalStorageService, NgbModal,
+        PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, PreventPageUnloadEventService,
         RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
@@ -204,13 +213,15 @@ angular.module('oppia').component('explorationEditorPage', {
         StateTutorialFirstTimeService,
         ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        UserService, WindowDimensionsService) {
+        UserService, WindowDimensionsService, WindowRef) {
       var ctrl = this;
       var reconnectedMessageTimeoutMilliseconds = 4000;
       var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
+      ctrl.isExplorationInitialized = false;
+      ctrl.explorationVersion = null;
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -232,6 +243,80 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.getExplorationUrl = function(explorationId) {
         return explorationId ? ('/explore/' + explorationId) : '';
+      };
+
+      ctrl.createExplorationEditorBrowserTabsInfo = function(version) {
+        var explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
+            ContextService.getExplorationId()));
+
+        if (explorationEditorBrowserTabsInfo) {
+          explorationEditorBrowserTabsInfo.setLatestVersion(version);
+          explorationEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+        } else {
+          explorationEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+            'exploration', ContextService.getExplorationId(),
+            version, 1, false);
+        }
+
+        ctrl.explorationVersion = version;
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          explorationEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
+      };
+
+      ctrl.updateExplorationEditorBrowserTabsInfo = function(version) {
+        var explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
+            ContextService.getExplorationId()));
+
+        explorationEditorBrowserTabsInfo.setLatestVersion(version);
+        explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+
+        ctrl.explorationVersion = version;
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          explorationEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
+      };
+
+      ctrl.onClosingExplorationEditorBrowserTab = function() {
+        var explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
+            ContextService.getExplorationId()));
+
+        if (
+          explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+          ChangeListService.getChangeList().length > 0
+        ) {
+          explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        }
+        explorationEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          explorationEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
+      };
+
+      ctrl.onCreateOrUpdateExplorationEditorBrowserTabsInfo = function(event) {
+        if (event.key === (
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS)
+        ) {
+          ExplorationEditorStalenessDetectionService
+            .staleTabEventEmitter.emit(ctrl.explorationVersion);
+          ExplorationEditorStalenessDetectionService
+            .presenceOfUnsavedChangesEventEmitter.emit();
+          $rootScope.$applyAsync();
+        }
       };
 
       // Initializes the exploration page using data from the backend.
@@ -283,6 +368,15 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.correctness_feedback_enabled);
           if (explorationData.edits_allowed) {
             EditabilityService.lockExploration(false);
+          }
+
+          if (!ctrl.isExplorationInitialized) {
+            ctrl.isExplorationInitialized = true;
+            ctrl.createExplorationEditorBrowserTabsInfo(
+              explorationData.version);
+          } else {
+            ctrl.updateExplorationEditorBrowserTabsInfo(
+              explorationData.version);
           }
 
 
@@ -595,6 +689,12 @@ angular.module('oppia').component('explorationEditorPage', {
             improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
           });
         ctrl.isImprovementsTabEnabled = () => improvementsTabIsEnabled;
+
+        ExplorationEditorStalenessDetectionService.init();
+        WindowRef.nativeWindow.addEventListener(
+          'beforeunload', ctrl.onClosingExplorationEditorBrowserTab);
+        LocalStorageService.registerNewStorageEventListener(
+          ctrl.onCreateOrUpdateExplorationEditorBrowserTabsInfo);
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

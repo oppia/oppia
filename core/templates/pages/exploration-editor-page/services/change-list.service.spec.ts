@@ -26,6 +26,9 @@ import { ExplorationDataService } from './exploration-data.service';
 import { AutosaveInfoModalsService } from './autosave-info-modals.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 
 class MockWindowRef {
   _window = {
@@ -110,12 +113,20 @@ class MockAutosaveInfoModalsService {
   }
 }
 
+class MockContextSerivce {
+  getExplorationId() {
+    return 'exp_id';
+  }
+}
+
 describe('Change List Service when changes are mergable', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let internetConnectivityService: InternetConnectivityService;
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
+  let mockContextService: MockContextSerivce;
+  let localStorageService: LocalStorageService;
 
   let alertsSpy = null;
   let mockExplorationDataService = null;
@@ -124,6 +135,7 @@ describe('Change List Service when changes are mergable', () => {
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService1();
+    mockContextService = new MockContextSerivce();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
@@ -140,6 +152,10 @@ describe('Change List Service when changes are mergable', () => {
           useValue: {
             onLoadingMessageChange: mockEventEmitter
           }
+        },
+        {
+          provide: ContextService,
+          useValue: mockContextService
         }
       ]
     });
@@ -150,6 +166,7 @@ describe('Change List Service when changes are mergable', () => {
     internetConnectivityService = TestBed.inject(InternetConnectivityService);
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     alertsService = TestBed.inject(AlertsService);
+    localStorageService = TestBed.inject(LocalStorageService);
 
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.returnValue(null);
@@ -321,6 +338,27 @@ describe('Change List Service when changes are mergable', () => {
       language_code: 'ar',
       state_name: 'Introduction'
     });
+  });
+
+  it('should update skill editor browser tabs unsaved changes status', () => {
+    let explorationEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'exploration', 'exp_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(explorationEditorBrowserTabsInfo);
+    spyOn(
+      localStorageService, 'updateEntityEditorBrowserTabsInfo'
+    ).and.callFake(() => {});
+
+    expect(
+      explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+
+    changeListService.addState('state');
+
+    expect(
+      explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
   });
 });
 
