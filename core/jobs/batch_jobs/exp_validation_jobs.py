@@ -114,9 +114,9 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
-        exp_models = list(exp_and_opp_models[1]['exp_model'])
-        opp_models = list(exp_and_opp_models[1]['exp_opportinity_model'])
-        return len(exp_models) == 1 and len(opp_models) == 1
+        exp_models_list = list(exp_and_opp_models[1]['exp_model'])
+        opp_models_list = list(exp_and_opp_models[1]['exp_opportinity_model'])
+        return len(exp_models_list) == 1 and len(opp_models_list) == 1
 
     def get_exploration_from_models(
         self, exp_and_opp_models: tuple[str, dict[str, list[object]]]):
@@ -127,8 +127,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             exp_and_opp_models: tuple. The pair of exp and opportunity models.
 
         Returns:
-            Exploration. Returns the exploration domain object from the curated
-                exploration model.
+            Exploration. The exploration domain object.
         """
         exp_model = list(exp_and_opp_models[1]['exp_model'])[0]
         return exp_fetchers.get_exploration_from_model(exp_model)
