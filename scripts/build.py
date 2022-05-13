@@ -232,7 +232,7 @@ def modify_constants(
     """
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
-    common.inplace_replace_file(  # type: ignore[no-untyped-call]
+    common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"DEV_MODE": (true|false)',
         dev_mode_variable,
@@ -240,7 +240,7 @@ def modify_constants(
     )
     emulator_mode_variable = (
         '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
-    common.inplace_replace_file(  # type: ignore[no-untyped-call]
+    common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"EMULATOR_MODE": (true|false)',
         emulator_mode_variable,
@@ -249,7 +249,7 @@ def modify_constants(
 
     enable_maintenance_mode_variable = (
         'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
-    common.inplace_replace_file(  # type: ignore[no-untyped-call]
+    common.inplace_replace_file(
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = (True|False)',
         enable_maintenance_mode_variable,
@@ -278,11 +278,11 @@ def _minify(source_path: str, target_path: str) -> None:
     # Use relative path to avoid java command line parameter parse error on
     # Windows. Convert to posix style path because the java program requires
     # the filepath arguments to be in posix path style.
-    target_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
+    target_path = common.convert_to_posixpath(
         os.path.relpath(target_path))
-    source_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
+    source_path = common.convert_to_posixpath(
         os.path.relpath(source_path))
-    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)  # type: ignore[no-untyped-call]
+    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
         yuicompressor_dir, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
@@ -767,7 +767,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                 target_path = source_path
                 # The path in hashes.json file is in posix style,
                 # see the comment above HASHES_JSON_FILENAME for details.
-                relative_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
+                relative_path = common.convert_to_posixpath(
                     os.path.relpath(source_path, start=source))
                 if (hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
@@ -865,9 +865,9 @@ def get_file_hashes(directory_path: str) -> Dict[str, str]:
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 # The path in hashes.json file is in posix style,
                 # see the comment above HASHES_JSON_FILENAME for details.
-                complete_filepath = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
+                complete_filepath = common.convert_to_posixpath(
                     os.path.join(root, filename))
-                relative_filepath = common.convert_to_posixpath(os.path.relpath(  # type: ignore[no-untyped-call]
+                relative_filepath = common.convert_to_posixpath(os.path.relpath(
                     complete_filepath, start=directory_path))
                 file_hashes[relative_filepath] = generate_md5_hash(
                     complete_filepath)
@@ -1060,7 +1060,7 @@ def generate_delete_tasks_to_remove_deleted_files(
                 # On Windows the path is on Windows-Style, while the path in
                 # hashes is in posix style, we need to convert it so the check
                 # can run correctly.
-                relative_path = common.convert_to_posixpath(  # type: ignore[no-untyped-call]
+                relative_path = common.convert_to_posixpath(
                     os.path.relpath(target_path, start=staging_directory))
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
@@ -1256,14 +1256,14 @@ def _verify_hashes(
     # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[common.convert_to_posixpath(  # type: ignore[no-untyped-call]
+        file_hashes[common.convert_to_posixpath(
             MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
     # The path in hashes.json (generated via file_hashes) file is in posix
     # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
-        file_hashes[common.convert_to_posixpath(  # type: ignore[no-untyped-call]
+        file_hashes[common.convert_to_posixpath(
             MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)])
 
     _ensure_files_exist([
