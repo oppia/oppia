@@ -5265,7 +5265,7 @@ export default {
     "decimal_separator": "."
   }, {
     "id": "fr",
-    "text": "français (French)",
+    "text": "français",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
@@ -5280,17 +5280,17 @@ export default {
     "decimal_separator": ","
   }, {
     "id": "uk",
-    "text": "украї́нська мо́ва (Ukrainian)",
+    "text": "украї́нська мо́ва",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
     "id": "sk",
-    "text": "slovenčina (Slovak)",
+    "text": "slovenčina",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
     "id": "nl",
-    "text": "Nederlands (Dutch)",
+    "text": "Nederlands",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
@@ -5305,7 +5305,7 @@ export default {
     "decimal_separator": ","
   }, {
     "id": "tr",
-    "text": "Türkçe (Turkish)",
+    "text": "Türkçe",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
