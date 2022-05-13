@@ -203,8 +203,6 @@ NOT_FULLY_COVERED_FILES = [
     'extensions/',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',
-    'scripts/common.py',
-    'scripts/common_test.py',
     'scripts/concurrent_task_utils.py',
     'scripts/concurrent_task_utils_test.py',
     'scripts/docstrings_checker.py',
