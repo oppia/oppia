@@ -1351,44 +1351,44 @@ class VersionedModel(BaseModel):
     @overload
     @classmethod
     def get_version(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            version_number: int,
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
     ) -> SELF_VERSIONED_MODEL: ...
 
     @overload
     @classmethod
     def get_version(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            version_number: int,
-            strict: Literal[True]
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: Literal[True]
     ) -> SELF_VERSIONED_MODEL: ...
 
     @overload
     @classmethod
     def get_version(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            version_number: int,
-            strict: Literal[False]
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: Literal[False]
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
     @overload
     @classmethod
     def get_version(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            version_number: int,
-            strict: bool = False
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: bool = False
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
     @classmethod
     def get_version(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            version_number: int,
-            strict: bool = True
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: bool = True
     ) -> Optional[SELF_VERSIONED_MODEL]:
         """Gets model instance representing the given version.
 
@@ -1485,45 +1485,45 @@ class VersionedModel(BaseModel):
     @overload
     @classmethod
     def get(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
     ) -> SELF_VERSIONED_MODEL: ...
 
     @overload
     @classmethod
     def get(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            strict: Literal[True],
-            version: Optional[int] = None
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: Literal[True],
+        version: Optional[int] = None
     ) -> SELF_VERSIONED_MODEL: ...
 
     @overload
     @classmethod
     def get(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            strict: Literal[False],
-            version: Optional[int] = None
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: Literal[False],
+        version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
     @overload
     @classmethod
     def get(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            strict: bool = False,
-            version: Optional[int] = None
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: bool = False,
+        version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
     # Here, the signature of get method is different from the get method in
     # superclass. Thus to avoid MyPy error, we used ignore here.
     @classmethod
     def get(  # type: ignore[override]
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            strict: bool = True,
-            version: Optional[int] = None
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: bool = True,
+        version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]:
         """Gets model instance.
 
