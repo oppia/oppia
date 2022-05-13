@@ -132,7 +132,7 @@ describe('Schema based float editor component', function() {
     expect(component.getMaxValue()).toBe(3.5);
   });
 
-  it('should not register keyboard event when user is typing', fakeAsync(() => {
+  it('should register that the user is typing on keypress', fakeAsync(() => {
     let evt = new KeyboardEvent('', {
       keyCode: 14
     });
@@ -232,7 +232,7 @@ describe('Schema based float editor component', function() {
   it('should parse the string to a number on input', ()=>{
     spyOn(numberConversionService, 'getInputValidationRegex')
       .and.returnValue(/[^e0-9\.\-]/g);
-    spyOn(component, 'currentDecimalSeparator').and.returnValues('.', ',');
+    spyOn(component, 'getCurrentDecimalSeparator').and.returnValues('.', ',');
 
     component.localStringValue = '';
     component.parseInput();
