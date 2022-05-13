@@ -28,15 +28,16 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { StaleTabInfoModalComponent } from 'components/stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from 'components/unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { ChangeListService } from './change-list.service';
-import { ContextService } from 'services/context.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationEditorStalenessDetectionService {
-  _staleTabEventEmitter = new EventEmitter<number>();
+  _staleTabEventEmitter = new EventEmitter<void>();
   _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
   unsavedChangesWarningModalRef: NgbModalRef = null;
+  explorationId: string = null;
+  explorationVersion: number = null;
 
   constructor(
     private ngbModal: NgbModal,
@@ -44,30 +45,35 @@ export class ExplorationEditorStalenessDetectionService {
     private stalenessDetectionService: StalenessDetectionService,
     private faviconService: FaviconService,
     private localStorageService: LocalStorageService,
-    private changeListService: ChangeListService,
-    private contextService: ContextService
+    private changeListService: ChangeListService
   ) {}
 
   init(): void {
-    this.staleTabEventEmitter.subscribe((version: number) => {
-      this.showStaleTabInfoModal(version);
+    this.staleTabEventEmitter.subscribe(() => {
+      this.showStaleTabInfoModal();
     });
     this.presenceOfUnsavedChangesEventEmitter.subscribe(() => {
       this.showPresenceOfUnsavedChangesModal();
     });
   }
 
-  showStaleTabInfoModal(version: number): void {
+  setExplorationIdAndVersion(id: string, version: number): void {
+    this.explorationId = id;
+    this.explorationVersion = version;
+  }
+
+  showStaleTabInfoModal(): void {
     const explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
-        this.contextService.getExplorationId()));
+        this.explorationId));
 
     if (
-      version &&
+      this.explorationVersion &&
       explorationEditorBrowserTabsInfo &&
-      explorationEditorBrowserTabsInfo.getLatestVersion() !== version
+      explorationEditorBrowserTabsInfo.getLatestVersion() !== (
+        this.explorationVersion)
     ) {
       this.faviconService.setFavicon(
         '/assets/images/favicon_alert/favicon_alert.ico');
@@ -90,7 +96,7 @@ export class ExplorationEditorStalenessDetectionService {
           .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
-            this.contextService.getExplorationId())
+            this.explorationId)
       ) {
         this.ngbModal.dismissAll();
         this.unsavedChangesWarningModalRef = this.ngbModal.open(
@@ -108,7 +114,7 @@ export class ExplorationEditorStalenessDetectionService {
     }
   }
 
-  get staleTabEventEmitter(): EventEmitter<number> {
+  get staleTabEventEmitter(): EventEmitter<void> {
     return this._staleTabEventEmitter;
   }
 

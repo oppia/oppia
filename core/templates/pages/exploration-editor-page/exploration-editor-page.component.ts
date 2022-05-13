@@ -221,7 +221,6 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
       ctrl.isExplorationInitialized = false;
-      ctrl.explorationVersion = null;
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -261,7 +260,6 @@ angular.module('oppia').component('explorationEditorPage', {
             version, 1, false);
         }
 
-        ctrl.explorationVersion = version;
         LocalStorageService.updateEntityEditorBrowserTabsInfo(
           explorationEditorBrowserTabsInfo,
           EntityEditorBrowserTabsInfoDomainConstants
@@ -278,7 +276,6 @@ angular.module('oppia').component('explorationEditorPage', {
         explorationEditorBrowserTabsInfo.setLatestVersion(version);
         explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
 
-        ctrl.explorationVersion = version;
         LocalStorageService.updateEntityEditorBrowserTabsInfo(
           explorationEditorBrowserTabsInfo,
           EntityEditorBrowserTabsInfoDomainConstants
@@ -312,7 +309,7 @@ angular.module('oppia').component('explorationEditorPage', {
             .OPENED_EXPLORATION_EDITOR_BROWSER_TABS)
         ) {
           ExplorationEditorStalenessDetectionService
-            .staleTabEventEmitter.emit(ctrl.explorationVersion);
+            .staleTabEventEmitter.emit();
           ExplorationEditorStalenessDetectionService
             .presenceOfUnsavedChangesEventEmitter.emit();
           $rootScope.$applyAsync();
@@ -341,6 +338,10 @@ angular.module('oppia').component('explorationEditorPage', {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
+
+          ExplorationEditorStalenessDetectionService.setExplorationIdAndVersion(
+            ContextService.getExplorationId(), explorationData.version
+          );
 
           ExplorationFeaturesService.init(explorationData, featuresData);
 

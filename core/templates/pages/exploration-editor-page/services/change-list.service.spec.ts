@@ -26,7 +26,6 @@ import { ExplorationDataService } from './exploration-data.service';
 import { AutosaveInfoModalsService } from './autosave-info-modals.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ContextService } from 'services/context.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 
@@ -113,19 +112,12 @@ class MockAutosaveInfoModalsService {
   }
 }
 
-class MockContextSerivce {
-  getExplorationId() {
-    return 'exp_id';
-  }
-}
-
 describe('Change List Service when changes are mergable', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let internetConnectivityService: InternetConnectivityService;
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
-  let mockContextService: MockContextSerivce;
   let localStorageService: LocalStorageService;
 
   let alertsSpy = null;
@@ -135,7 +127,6 @@ describe('Change List Service when changes are mergable', () => {
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService1();
-    mockContextService = new MockContextSerivce();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
@@ -152,10 +143,6 @@ describe('Change List Service when changes are mergable', () => {
           useValue: {
             onLoadingMessageChange: mockEventEmitter
           }
-        },
-        {
-          provide: ContextService,
-          useValue: mockContextService
         }
       ]
     });

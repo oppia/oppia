@@ -20,7 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { FaviconService } from 'services/favicon.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -37,12 +36,6 @@ class MockWindowRef {
   };
 }
 
-class MockContextSerivce {
-  getExplorationId() {
-    return 'exp_id';
-  }
-}
-
 class MockChangeListSerivce {
   getChangeList() {
     return [];
@@ -55,7 +48,6 @@ describe('Exploration editor staleness detection service', () => {
   let localStorageService: LocalStorageService;
   let changeListService: MockChangeListSerivce;
   let windowRef: MockWindowRef;
-  let contextService: MockContextSerivce;
   let faviconService: FaviconService;
   let ngbModal: NgbModal;
   let stalenessDetectionService: StalenessDetectionService;
@@ -63,7 +55,6 @@ describe('Exploration editor staleness detection service', () => {
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     changeListService = new MockChangeListSerivce();
-    contextService = new MockContextSerivce();
 
     TestBed.configureTestingModule({
       imports: [
@@ -73,7 +64,6 @@ describe('Exploration editor staleness detection service', () => {
         NgbModal,
         { provide: ChangeListService, useValue: changeListService },
         { provide: WindowRef, useValue: windowRef },
-        { provide: ContextService, useValue: contextService },
         StalenessDetectionService,
         FaviconService,
         LocalStorageService,
@@ -119,7 +109,9 @@ describe('Exploration editor staleness detection service', () => {
     spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
 
     explorationEditorStalenessDetectionService.init();
-    explorationEditorStalenessDetectionService.staleTabEventEmitter.emit(1);
+    explorationEditorStalenessDetectionService.setExplorationIdAndVersion(
+      'exp_id', 1);
+    explorationEditorStalenessDetectionService.staleTabEventEmitter.emit();
 
     expect(
       explorationEditorStalenessDetectionService.showStaleTabInfoModal
@@ -146,6 +138,8 @@ describe('Exploration editor staleness detection service', () => {
     spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
 
     explorationEditorStalenessDetectionService.init();
+    explorationEditorStalenessDetectionService.setExplorationIdAndVersion(
+      'exp_id', 2);
     explorationEditorStalenessDetectionService
       .presenceOfUnsavedChangesEventEmitter.emit();
 
