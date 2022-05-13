@@ -23,7 +23,10 @@ from __future__ import annotations
 import collections
 import os
 import sys
+
 from core import utils
+
+from typing import Dict, List, Set, Tuple
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -40,7 +43,12 @@ DIRECTORY_NAMES = ['core/templates', 'extensions']
 SERVICE_FILES_SUFFICES = ('.service.ts', 'Service.ts', 'Factory.ts')
 
 
-def dfs(node, topo_sort_stack, adj_list, visit_stack):
+def dfs(
+    node: str,
+    topo_sort_stack: List[str],
+    adj_list: Dict[str, List[str]],
+    visit_stack: List[str]
+) -> None:
     """Depth First Search starting with node.
 
     Args:
@@ -58,7 +66,7 @@ def dfs(node, topo_sort_stack, adj_list, visit_stack):
     topo_sort_stack.append(node)
 
 
-def make_graph():
+def make_graph() -> Tuple[Dict[str, List[str]], Set[str]]:
     """Creates an adjaceny list considering services as node and dependencies
     as edges.
 
@@ -127,13 +135,13 @@ def make_graph():
     return (adj_list, nodes_set)
 
 
-def main():
+def main() -> None:
     """Prints the topological order of the services based on the
     dependencies.
     """
     adj_list, nodes_set = make_graph()
-    visit_stack = []
-    topo_sort_stack = []
+    visit_stack: List[str] = []
+    topo_sort_stack: List[str] = []
 
     for unchecked_node in nodes_set:
         if unchecked_node not in visit_stack:

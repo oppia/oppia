@@ -232,6 +232,10 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
+    # An boolean indicating whether further edits can be made to the
+    # exploration.
+    edits_allowed = datastore_services.BooleanProperty(
+        default=True, indexed=True)
     # Size in bytes of Android Proto representation.
     android_proto_size_in_bytes = datastore_services.IntegerProperty(
         indexed=True)
@@ -266,6 +270,7 @@ class ExplorationModel(base_models.VersionedModel):
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'android_proto_size_in_bytes':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

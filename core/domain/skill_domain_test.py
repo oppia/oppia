@@ -92,6 +92,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
 
+    def test_valid_misconception_id_greater_than_zero(self):
+        self.skill.next_misconception_id = -12
+        self._assert_validation_error(
+            'Expected misconception ID to be >= 0')
+
     def test_get_all_html_content_strings(self):
         html_strings = self.skill.get_all_html_content_strings()
         self.assertEqual(len(html_strings), 8)
@@ -419,6 +424,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[0], ['<p>Another Explanation</p>'])
         ]
         self._assert_validation_error('Duplicate rubric found')
+
+        self.skill.rubrics = [
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[1], [])
+        ]
+        self._assert_validation_error(
+            'Expected at least one explanation in medium level rubrics')
 
     def test_valid_rubric_difficulty(self):
         self.skill.rubrics = [skill_domain.Rubric(

@@ -189,6 +189,7 @@ describe('Exploration editor page component', function() {
     param_changes: [],
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
+    edits_allowed: true,
     state_classifier_mapping: [],
     user: {},
     version: '1',
@@ -323,7 +324,7 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
       spyOn(userService, 'getUserInfoAsync')
@@ -551,7 +552,8 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
@@ -613,7 +615,8 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
       spyOn(userService, 'getUserInfoAsync')
@@ -789,8 +792,8 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync')
-        .and.returnValue(Promise.resolve(1));
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve({canEdit: true}));
       spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(

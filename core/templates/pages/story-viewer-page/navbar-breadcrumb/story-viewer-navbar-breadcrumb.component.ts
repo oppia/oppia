@@ -23,7 +23,9 @@ import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-b
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 
 @Component({
   selector: 'oppia-story-viewer-navbar-breadcrumb',
@@ -32,7 +34,9 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   topicName: string;
+  topicNameTranslationKey: string;
   storyTitle: string;
+  storyTitleTranslationKey: string;
   topicUrlFragment: string;
   classroomUrlFragment: string;
   storyUrlFragment: string;
@@ -40,7 +44,8 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private topicViewerBackendApiService: TopicViewerBackendApiService
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -66,8 +71,27 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
       this.storyUrlFragment).then(
       (storyDataObject) => {
         this.topicName = storyDataObject.topicName;
+        this.storyTitleTranslationKey = (
+          this.i18nLanguageCodeService.getStoryTranslationKey(
+            storyDataObject.id,
+            TranslationKeyType.TITLE
+          )
+        );
         this.storyTitle = storyDataObject.title;
-      });
+      }
+    );
+
+    this.topicViewerBackendApiService.fetchTopicDataAsync(
+      this.topicUrlFragment, this.classroomUrlFragment).then(
+      (readOnlyTopic: ReadOnlyTopic) => {
+        this.topicNameTranslationKey = (
+          this.i18nLanguageCodeService.getTopicTranslationKey(
+            readOnlyTopic.getTopicId(),
+            TranslationKeyType.TITLE
+          )
+        );
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -76,6 +100,22 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  isHackyTopicNameTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyStoryTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

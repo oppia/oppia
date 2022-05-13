@@ -91,7 +91,8 @@ class AdminHandler(base.BaseHandler):
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
-                        'update_feature_flag_rules'
+                        'update_feature_flag_rules',
+                        'rollback_exploration_to_safe_state'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -168,6 +169,12 @@ class AdminHandler(base.BaseHandler):
                         'type': 'object_dict',
                         'object_class': parameter_domain.PlatformParameterRule
                     }
+                },
+                'default_value': None
+            },
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
                 },
                 'default_value': None
             }
@@ -267,6 +274,13 @@ class AdminHandler(base.BaseHandler):
                         topic_id, delete_existing_opportunities=True))
                 result = {
                     'opportunities_count': opportunities_count
+                }
+            elif action == 'rollback_exploration_to_safe_state':
+                exp_id = self.normalized_payload.get('exp_id')
+                version = (
+                    exp_services.rollback_exploration_to_safe_state(exp_id))
+                result = {
+                    'version': version
                 }
             elif action == 'update_feature_flag_rules':
                 feature_name = self.normalized_payload.get('feature_name')
@@ -755,8 +769,8 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        username = self.payload.get('username')
-        role = self.payload.get('role')
+        username = self.normalized_payload.get('username')
+        role = self.normalized_payload.get('role')
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -775,8 +789,8 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self):
-        username = self.request.get('username')
-        role = self.request.get('role')
+        username = self.normalized_request.get('username')
+        role = self.normalized_request.get('role')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:

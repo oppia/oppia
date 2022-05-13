@@ -23,6 +23,7 @@ import itertools
 import operator
 
 from core import feconf
+from core.constants import constants
 from core.domain import improvements_domain
 from core.platform import models
 
@@ -90,7 +91,7 @@ def fetch_exploration_tasks(exploration):
     """
     composite_entity_id = (
         improvements_models.TaskEntryModel.generate_composite_entity_id(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             exploration.id, exploration.version))
     tasks_grouped_by_status = itertools.groupby(
         _yield_all_tasks_ordered_by_status(composite_entity_id),
@@ -99,9 +100,9 @@ def fetch_exploration_tasks(exploration):
     open_tasks = []
     resolved_task_types_by_state_name = collections.defaultdict(list)
     for status_group, tasks in tasks_grouped_by_status:
-        if status_group == improvements_models.TASK_STATUS_OPEN:
+        if status_group == constants.TASK_STATUS_OPEN:
             open_tasks.extend(tasks)
-        elif status_group == improvements_models.TASK_STATUS_RESOLVED:
+        elif status_group == constants.TASK_STATUS_RESOLVED:
             for t in tasks:
                 resolved_task_types_by_state_name[t.target_id].append(
                     t.task_type)
@@ -134,10 +135,10 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
     results, cursor, more = (
         improvements_models.TaskEntryModel.query(
             improvements_models.TaskEntryModel.entity_type == (
-                improvements_models.TASK_ENTITY_TYPE_EXPLORATION),
+                constants.TASK_ENTITY_TYPE_EXPLORATION),
             improvements_models.TaskEntryModel.entity_id == exploration.id,
             improvements_models.TaskEntryModel.status == (
-                improvements_models.TASK_STATUS_RESOLVED))
+                constants.TASK_STATUS_RESOLVED))
         .order(-improvements_models.TaskEntryModel.resolved_on)
         .fetch_page(
             feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor))

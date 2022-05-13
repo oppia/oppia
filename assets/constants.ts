@@ -5148,6 +5148,11 @@ export default {
     "direction": "rtl",
     "decimal_separator": ","
   }, {
+    "code": "pcm",
+    "description": "Naijá (Nigerian Pidgin)",
+    "direction": "ltr",
+    "decimal_separator": ","
+  }, {
     "code": "pl",
     "description": "polszczyzna (Polish)",
     "direction": "ltr",
@@ -5282,6 +5287,11 @@ export default {
   }, {
     "id": "id",
     "text": "Bahasa Indonesia",
+    "direction": "ltr",
+    "decimal_separator": ","
+  }, {
+    "id": "pcm",
+    "text": "Naijá (Nigerian Pidgin)",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
@@ -5530,6 +5540,11 @@ export default {
     "description": "فارسی (Persian)",
     "relatedLanguages": ["fa"],
     "direction": "rtl"
+  }, {
+    "id": "pcm",
+    "description": "Naijá (Nigerian Pidgin)",
+    "relatedLanguages": ["pcm"],
+    "direction": "ltr"
   }, {
     "id": "pl",
     "description": "polszczyzna (Polish)",

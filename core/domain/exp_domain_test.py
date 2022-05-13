@@ -2141,6 +2141,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
 
+    def test_validate_exploration_edits_allowed(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.edits_allowed = 1
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected edits_allowed to be a bool, received 1'):
+            exploration.validate()
+
     def test_validate_exploration_param_specs(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -2770,6 +2782,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3009,6 +3022,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3153,6 +3167,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3297,6 +3312,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3441,6 +3457,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3587,6 +3604,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3736,6 +3754,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3885,6 +3904,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4034,6 +4054,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4183,6 +4204,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4325,6 +4347,7 @@ auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4441,6 +4464,7 @@ auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4566,6 +4590,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4694,6 +4719,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4829,6 +4855,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4919,6 +4946,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''

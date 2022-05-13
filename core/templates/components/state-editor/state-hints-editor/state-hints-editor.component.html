@@ -17,7 +17,7 @@
         </div>
         <div class="state-hints-content-container oppia-mobile-collapsible-card-content" *ngIf="hintCardIsShown">
           <div class="oppia-add-hint-button-container">
-            <div *ngIf="editabilityService.isEditableOutsideTutorialMode()">
+            <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && editabilityService.isEditable()">
               <button type="button"
                       class="btn btn-primary oppia-add-hint-button protractor-test-oppia-add-hint-button"
                       (click)="openAddHintModal()"
@@ -64,7 +64,7 @@
                   <div class="oppia-editor-card-section protractor-test-hint-body-{{index}}">
                     <oppia-hint-editor [hint]="hint"
                                        [indexPlusOne]="index + 1"
-                                       (saveHint)="onSaveInlineHint"
+                                       (saveHint)="onSaveInlineHint()"
                                        (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </oppia-hint-editor>
                   </div>

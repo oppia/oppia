@@ -797,7 +797,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'content', '<p>old content html</p>').to_dict()
         exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state 1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>old content html</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
@@ -928,7 +938,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'content', '<p>old content html</p>').to_dict()
         exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state 1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>old content html</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',

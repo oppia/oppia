@@ -111,6 +111,15 @@ describe('Skill Concept Card Editor Component', () => {
     expect(component.skill).toBe(sampleSkill);
   });
 
+  it('should trigger concept card change when description is updated', () => {
+    component.ngOnInit();
+    spyOn(component.getConceptCardChange, 'emit').and.callThrough();
+
+    component.onSaveDescription();
+
+    expect(component.getConceptCardChange.emit).toHaveBeenCalled();
+  });
+
   it('should change list oder', () => {
     component.ngOnInit();
 
