@@ -334,7 +334,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with self.Popen_error_swap:
             with self.assertRaisesRegex(
                     Exception, 'Error compiling proto files at mock_path'):
-                install_third_party_libs.compile_protobuf_files(['mock_path'])
+                install_third_party_libs.compile_protobuf_files(
+                    mock_proto_file_req)
 
     def test_ensure_pip_library_is_installed_with_regular_package(self):
         exists_swap = self.swap_with_checks(
