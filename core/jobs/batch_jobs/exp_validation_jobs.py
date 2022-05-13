@@ -170,7 +170,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     'CURATED EXPS'))
         )
 
-        curated_exps_having_invalid_state_classifier_model_id: beam.PCollection = (
+        curated_exps_having_invalid_state_classifier_id: beam.PCollection = (
             curated_explorations
             | 'Filter curated exps having invalid state classifier model id' >>
                 beam.Filter(lambda exp: (
@@ -180,15 +180,17 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 ))
         )
 
-        report_number_of_exps_having_invalid_state_classifer_model_id: beam.PCollection = (
-            curated_exps_having_invalid_state_classifier_model_id
+        report_number_of_exps_having_invalid_state_classifer_id: (
+            beam.PCollection) = (
+            curated_exps_having_invalid_state_classifier_id
             | 'Count explorations having invalid state classifier model id' >>
                 job_result_transforms.CountObjectsToJobRunResult(
                     'INVALID STATE CLASSIFIER')
         )
 
-        report_details_of_exps_having_invalid_state_classifer_model_id: beam.PCollection = (
-            curated_exps_having_invalid_state_classifier_model_id
+        report_details_of_exps_having_invalid_state_classifer_id: (
+            beam.PCollection) = (
+            curated_exps_having_invalid_state_classifier_id
             | 'Save info on exps having invalid state classifier model id' >>
                 beam.Map(
                     lambda exp: job_run_result.JobRunResult.as_stderr(
@@ -215,7 +217,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     'INVALID PARAM CHANGES'))
         )
 
-        report_details_of_exps_having_invalid_param_changes: beam.PCollection = (
+        report_details_of_exps_having_invalid_param_changes: (
+            beam.PCollection) = (
             curated_exps_having_non_empty_param_changes
             | 'Save info on exps having invalid param changes' >>
                 beam.Map(
@@ -265,7 +268,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     'INVALID TRAINING DATA'))
         )
 
-        report_details_of_exps_having_invalid_training_data: beam.PCollection = (
+        report_details_of_exps_having_invalid_training_data: (
+            beam.PCollection) = (
             curated_exps_having_invalid_training_data
             | 'Save info on exps having invalid training data' >> beam.Map(
                 lambda exp: job_run_result.JobRunResult.as_stderr(
@@ -281,8 +285,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_number_of_curated_exps_queried,
-                report_number_of_exps_having_invalid_state_classifer_model_id,
-                report_details_of_exps_having_invalid_state_classifer_model_id,
+                report_number_of_exps_having_invalid_state_classifer_id,
+                report_details_of_exps_having_invalid_state_classifer_id,
                 report_number_of_exps_having_invalid_param_changes,
                 report_details_of_exps_having_invalid_param_changes,
                 report_number_of_exps_having_invalid_param_specs,
