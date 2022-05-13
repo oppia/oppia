@@ -626,7 +626,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
         self._cached_android_proto_size_is_stale = True
-        self._cached_android_proto_size_in_bytes = 0s
+        self._cached_android_proto_size_in_bytes = 0
 
     def get_translatable_contents_collection(
         self
