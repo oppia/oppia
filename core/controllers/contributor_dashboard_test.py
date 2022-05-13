@@ -73,7 +73,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             category='category%d' % i,
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in range(2)]
+        ) for i in range(3)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -84,6 +84,20 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
         self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
+
+        self._create_story_for_translation_opportunity(
+            'story_id_0', self.topic_id, '0')
+        self._create_story_for_translation_opportunity(
+            'story_id_1', self.topic_id, '1')
+
+        self.topic_id_1 = '1'
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id_1, 'topic1', 'url-fragment', 'description')
+        self.skill_id_2 = 'skill_id_2'
+        self._publish_valid_topic(topic, [self.skill_id_2])
+
+        self._create_story_for_translation_opportunity(
+            'story_id_2', self.topic_id_1, '2')
 
         # Add skill opportunity topic to a classroom.
         config_services.set_property(
@@ -107,54 +121,37 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'question_count': 0,
             'topic_name': 'topic'
         }
+        self.expected_skill_opportunity_dict_2 = {
+            'id': self.skill_id_2,
+            'skill_description': 'skill_description',
+            'question_count': 0,
+            'topic_name': 'topic1'
+        }
 
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d' % i,
-            'description %d' % i,
-            '0',
-            'title-%s' % chr(97 + i)
-        ) for i in range(2)]
-
-        for index, story in enumerate(stories):
-            story.language_code = 'en'
-            story_services.save_new_story(self.owner_id, story)
-            topic_services.add_canonical_story(
-                self.owner_id, topic.id, story.id)
-            topic_services.publish_story(
-                topic.id, story.id, self.admin_id)
-            story_services.update_story(
-                self.owner_id, story.id, [story_domain.StoryChange({
-                    'cmd': 'add_story_node',
-                    'node_id': 'node_1',
-                    'title': 'Node1',
-                }), story_domain.StoryChange({
-                    'cmd': 'update_story_node_property',
-                    'property_name': 'exploration_id',
-                    'node_id': 'node_1',
-                    'old_value': None,
-                    'new_value': explorations[index].id
-                })], 'Changes.')
-
-        # The content_count is 4 for the expected dicts below since a valid
-        # exploration with EndExploration is created above, so the content in
-        # the last state is also included in the count. This content includes:
-        # 2 content, 1 TextInput interaction customization argument
-        # (placeholder), and 1 outcome.
+        # The content_count is 2 for the expected dicts below since each
+        # corresponding exploration has one initial state and one end state.
         self.expected_opportunity_dict_1 = {
             'id': '0',
             'topic_name': 'topic',
-            'story_title': 'title 0',
+            'story_title': 'title story_id_0',
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {}
         }
-
         self.expected_opportunity_dict_2 = {
             'id': '1',
             'topic_name': 'topic',
-            'story_title': 'title 1',
+            'story_title': 'title story_id_1',
+            'chapter_title': 'Node1',
+            'content_count': 2,
+            'translation_counts': {},
+            'translation_in_review_counts': {}
+        }
+        self.expected_opportunity_dict_3 = {
+            'id': '2',
+            'topic_name': 'topic1',
+            'story_title': 'title story_id_2',
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {},
@@ -215,10 +212,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_translation_opportunity_data(self):
+    def test_get_translation_opportunities_fetches_matching_opportunities(self):
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'hi'})
+            params={'language_code': 'hi', 'topic_name': 'topic'})
 
         self.assertEqual(
             response['opportunities'], [
@@ -232,11 +229,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'language_code': 'en'})
 
-        self.assertEqual(len(response['opportunities']), 2)
+        self.assertEqual(len(response['opportunities']), 3)
         self.assertEqual(
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
-                self.expected_opportunity_dict_2])
+                self.expected_opportunity_dict_2,
+                self.expected_opportunity_dict_3])
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
@@ -261,6 +259,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_skill_opportunity_dict_1])
+            self.assertTrue(next_response['more'])
+            self.assertIsInstance(next_response['next_cursor'], str)
+
+            next_cursor = next_response['next_cursor']
+            next_response = self.get_json(
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={'cursor': next_cursor})
+
+            # Skill 2 is not part of a Classroom topic and so its corresponding
+            # opportunity is not returned.
+            self.assertEqual(len(next_response['opportunities']), 0)
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
@@ -270,16 +279,15 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.admin_id, 'classroom_pages_data')
 
         # Create a new topic.
-        topic_id = '1'
-        topic_name = 'topic1'
+        topic_id = '9'
+        topic_name = 'topic9'
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, topic_name, 'url-fragment', 'description')
-        skill_id_2 = 'skill_id_2'
+            topic_id, topic_name, 'url-fragment-nine', 'description')
         skill_id_3 = 'skill_id_3'
         skill_id_4 = 'skill_id_4'
         skill_id_5 = 'skill_id_5'
         self._publish_valid_topic(
-            topic, [skill_id_2, skill_id_3, skill_id_4, skill_id_5])
+            topic, [skill_id_3, skill_id_4, skill_id_5])
 
         # Add new topic to a classroom.
         config_services.set_property(
@@ -292,23 +300,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             }])
 
         # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
-        # fetched first. Since skill_id_0, skill_id_1 are not linked to a
-        # classroom, another fetch will be made to retrieve skill_id_3,
+        # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked
+        # to a classroom, another fetch will be made to retrieve skill_id_3,
         # skill_id_4, skill_id_5 to fulfill the page size.
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={})
-            self.assertEqual(len(response['opportunities']), 4)
+            self.assertEqual(len(response['opportunities']), 3)
             self.assertEqual(
                 response['opportunities'],
                 [
-                    {
-                        'id': skill_id_2,
-                        'skill_description': 'skill_description',
-                        'question_count': 0,
-                        'topic_name': topic_name
-                    },
                     {
                         'id': skill_id_3,
                         'skill_description': 'skill_description',
@@ -335,7 +337,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi'})
+                params={'language_code': 'hi', 'topic_name': 'topic'})
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
@@ -346,6 +348,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={
                     'language_code': 'hi',
+                    'topic_name': 'topic',
                     'cursor': response['next_cursor']
                 }
             )
@@ -376,6 +379,18 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
+            self.assertTrue(next_response['more'])
+            self.assertIsInstance(next_response['next_cursor'], str)
+
+            next_cursor = next_response['next_cursor']
+            next_response = self.get_json(
+                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={'language_code': 'en', 'cursor': next_cursor})
+
+            self.assertEqual(len(next_response['opportunities']), 1)
+            self.assertEqual(
+                next_response['opportunities'],
+                [self.expected_opportunity_dict_3])
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
@@ -404,6 +419,34 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
+
+    def test_get_translation_opportunities_without_topic_name_returns_all_topics( # pylint: disable=line-too-long
+            self):
+        response = self.get_json(
+            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'hi'})
+
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_opportunity_dict_1,
+                self.expected_opportunity_dict_2,
+                self.expected_opportunity_dict_3])
+        self.assertFalse(response['more'])
+        self.assertIsInstance(response['next_cursor'], str)
+
+    def test_get_translation_opportunities_with_empty_topic_name_returns_all_topics( # pylint: disable=line-too-long
+            self):
+        response = self.get_json(
+            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'hi', 'topic_name': ''})
+
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_opportunity_dict_1,
+                self.expected_opportunity_dict_2,
+                self.expected_opportunity_dict_3])
+        self.assertFalse(response['more'])
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_opportunity_for_invalid_opportunity_type(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -449,6 +492,42 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 skill_id, self.admin_id, description='skill_description')
             topic_services.add_uncategorized_skill(
                 self.admin_id, topic.id, skill_id)
+
+    def _create_story_for_translation_opportunity(
+            self, story_id, topic_id, exploration_id):
+        """Creates a story and links it to the supplied topic and exploration.
+
+        Args:
+            story_id: str. The ID of new story.
+            topic_id: str. The ID of the topic for which to link the story.
+            exploration_id: str. The ID of the exploration that will be added
+                as a node to the story.
+        """
+        story = story_domain.Story.create_default_story(
+            story_id,
+            'title %s' % story_id,
+            'description',
+            topic_id,
+            'url-fragment')
+
+        story.language_code = 'en'
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, topic_id, story.id)
+        topic_services.publish_story(
+            topic_id, story.id, self.admin_id)
+        story_services.update_story(
+            self.owner_id, story.id, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': exploration_id
+            })], 'Changes.')
 
 
 class TranslatableTextHandlerTest(test_utils.GenericTestBase):
