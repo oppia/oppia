@@ -227,7 +227,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults(
                     'EXPLORATION PROCESSED'))
         )
-        # Remove after backup server investigation completed
+        # Remove after backup server investigation completed.
         unmigrated_explorations = (
             migrated_exploration_results
             | 'Filter not oks' >> beam.Filter(
