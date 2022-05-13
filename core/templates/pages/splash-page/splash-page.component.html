@@ -63,12 +63,9 @@
   <div class="oppia-splash-section-three">
     <div class="oppia-splash-section-three-left">
       <h3 *ngIf="isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
-      <picture class="splash-matthew-image">
-        <source type="image/webp" [srcset]="getImageSet('/splash/matthew_fractions', 'webp')">
-        <source type="image/png" [srcset]="getImageSet('/splash/matthew_fractions', 'png')">
-        <img [src]="getStaticImageUrl('/splash/matthew_fractions1x.png')"
-             alt="Illustration of a kid with cupcakes in front of questions about fractions">
-      </picture>
+      <img class="splash-matthew-image"
+           [src]="getStaticImageUrl('/splash/matthew_fractions.svg')"
+           alt="Illustration of a kid with cupcakes in front of question about fractions">
     </div>
     <div class="oppia-splash-section-three-right">
       <h3 *ngIf="!isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
@@ -153,12 +150,9 @@
 
   <div class="oppia-splash-section-six">
     <div class="oppia-splash-section-six-left">
-      <picture class="splash-books-image">
-        <source type="image/webp" [srcset]="getImageSet('/splash/books_dsk', 'webp')">
-        <source type="image/png" [srcset]="getImageSet('/splash/books_dsk', 'png')">
-        <img [src]="getStaticImageUrl('/splash/books_dsk1x.png')"
-             alt="Illustration of a book">
-      </picture>
+      <img class="splash-books-image"
+           [src]="getStaticImageUrl('/splash/books_dsk.svg')"
+           alt="Illustration of a book">
     </div>
     <div class="oppia-splash-section-six-right">
       <h2 [innerHTML]="'I18N_SPLASH_FOR_TEACHERS' | translate"></h2>
