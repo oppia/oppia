@@ -45,6 +45,8 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
+    EXPLORATION_ID_4 = '4'
+    EXPLORATION_ID_5 = '5'
 
     STATE_1 = state_domain.State.create_default_state(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
@@ -90,7 +92,9 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                     'x': {
                         'contentId': 'rule_input_Equals',
                         'normalizedStrSet': ['Test']
-                        }})
+                    }
+                }
+            )
         ],
         [{
             'answer_group_index': 1,
@@ -119,7 +123,9 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                     'x': {
                         'contentId': 'rule_input_Equals',
                         'normalizedStrSet': ['Test']
-                        }})
+                    }
+                }
+            )
         ],
         [{
             'answer_group_index': 1,
@@ -223,6 +229,53 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                 'ExampleParamTwo': self.PARAM_SPECS
             },
             param_changes=self.PARAM_CHANGES_2,
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: self.STATE_3,
+                'second state': self.STATE_4,
+                'state 1': self.INVALID_STATE_1.to_dict(),
+                'state 2': self.INVALID_STATE_2.to_dict(),
+            }
+        )
+
+        # Valid non-curated exploration model.
+        self.exp_4 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_4,
+            title='title 4',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: self.STATE_1
+            }
+        )
+
+        # Invalid non-curated exploration model.
+        self.exp_5 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_5,
+            title='title 5',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
             states={
@@ -391,4 +444,10 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                     ['state 1', 'state 2']
                 )
             )
+        ])
+
+    def test_with_non_curated_explorations(self) -> None:
+        self.put_multi([self.exp_4, self.exp_5])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 2')
         ])
