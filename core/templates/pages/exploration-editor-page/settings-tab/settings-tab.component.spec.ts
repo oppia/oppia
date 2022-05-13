@@ -61,7 +61,7 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-describe('Settings Tab Component', () => {
+fdescribe('Settings Tab Component', () => {
   let ctrl = null;
   let $q = null;
   let $rootScope = null;
@@ -275,13 +275,15 @@ describe('Settings Tab Component', () => {
       });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
-        'broadcasted', () => {
-      routerService.onRefreshSettingsTab.emit();
-      $scope.$apply();
-
-      expect(ctrl.stateNames).toEqual(['Introduction']);
-      expect(ctrl.hasPageLoaded).toBe(true);
-    });
+        'broadcasted', fakeAsync(() => {
+          routerService.onRefreshSettingsTab.emit();
+          $scope.$apply();
+          
+          tick(1000);
+    
+          expect(ctrl.stateNames).toEqual(['Introduction']);
+          expect(ctrl.hasPageLoaded).toBe(true);
+        }));
 
     it('should get explore page url based on the exploration id', () => {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -914,6 +916,7 @@ describe('Settings Tab Component', () => {
         name: 'test',
       };
 
+      ctrl.refreshSettingsTab();
       expect(ctrl.areParametersUsed()).toBe(false);
       explorationDataService.data.param_changes.push(paramChangeBackendDict);
       expect(ctrl.areParametersUsed()).toBe(true);

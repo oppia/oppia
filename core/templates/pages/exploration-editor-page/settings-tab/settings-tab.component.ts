@@ -574,7 +574,9 @@ angular.module('oppia').component('settingsTab', {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshSettingsTab.subscribe(
             () => {
-              ctrl.refreshSettingsTab();
+              setTimeout(()=>{
+                ctrl.refreshSettingsTab();
+              }, 500)
             }
           )
         );
@@ -651,7 +653,9 @@ angular.module('oppia').component('settingsTab', {
           ExplorationParamChangesService);
         ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
 
-        ctrl.refreshSettingsTab();
+        setTimeout(()=>{
+          ctrl.refreshSettingsTab();
+        }, 500);
 
         ctrl.ROLES = [{
           name: 'Manager (can edit permissions)',
