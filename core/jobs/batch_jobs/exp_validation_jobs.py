@@ -18,7 +18,9 @@
 
 from __future__ import annotations
 
+from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -47,24 +49,26 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
           interaction having answer group(s) with non-empty training data.
     """
 
-    def get_states_having_invalid_state_classifier_id(self, states):
+    def get_states_having_invalid_state_classifier_id(
+        self, states: dict[str, state_domain.State]) -> list[str]:
         """Returns a list of state names that have not None
         classifier model id.
 
         Args:
-            states: list[States]. The list of states.
+            states: dict[str, State]. The mapping of state name to State.
 
         Returns:
             list[str]. Returns a list of state names that have not None
             classifier model id.
         """
-        invalid_state_names = []
+        invalid_state_names: list[str] = []
         for state_name in states:
             if states[state_name].classifier_model_id is not None:
                 invalid_state_names.append(state_name)
         return invalid_state_names
 
-    def filter_exps_having_invalid_state_classifier_model_id(self, states):
+    def filter_exps_having_invalid_state_classifier_model_id(
+        self, states: dict[str, state_domain.State]) -> bool:
         """Returns True if any state has classifier model id not None.
 
         Args:
@@ -77,20 +81,22 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             state.classifier_model_id is not None for state in states.values()
         )
 
-    def get_states_having_invalid_training_data(self, exploration):
+    def get_states_having_invalid_training_data(
+        self, exploration: exp_domain.Exploration) -> list[str]:
         """Returns state names having non-empty training data.
 
         Args:
             exploration: Exploration. Exploration to be checked.
 
         Returns:
-            list(str). Returns state names having non-empty training data.
+            list[str]. Returns state names having non-empty training data.
         """
-        state_names = []
-        for state_name in exploration.states:
-            for answer_group in exploration.states[
-                state_name
-            ].interaction.answer_groups:
+        state_names: list[str] = []
+        states: dict[str, state_domain.State] = exploration.states
+        for state_name in states:
+            answer_groups: list[state_domain.AnswerGroup] = (
+                states[state_name].interaction.answer_groups)
+            for answer_group in answer_groups:
                 if len(answer_group.training_data) > 0:
                     state_names.append(state_name)
                     # The below break is necessary to avoid duplicated
@@ -98,19 +104,9 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     break
         return state_names
 
-    def filter_curated_explorations(self, model_pair):
-        """Returns True if the exploration is curated.
-
-        Args:
-            model_pair: tuple. The pair of exp and opportunity models.
-
-        Returns:
-            bool. Returns True if opportinity model exists for the given id.
-        """
-        exp_and_opportunity_models = list(model_pair[1])
-        return len(exp_and_opportunity_models) == 2
-
-    def get_exploration_from_model_pair(self, model_pair):
+    def get_exploration_from_model_pair(
+        self, model_pair: tuple[str, list[object, object]]
+    ) -> exp_domain.Exploration:
         """Returns the exploration from the model pair.
 
         Args:
@@ -132,15 +128,15 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             PCollection[JobRunResult]. A PCollection of details of explorations
             which are invalid.
         """
-        all_explorations = (
+        all_explorations: beam.PCollection = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
-                  exp_models.ExplorationModel.get_all(include_deleted=False))
+                exp_models.ExplorationModel.get_all(include_deleted=False))
             | 'Create key-value pairs for exp models' >> beam.Map(
                 lambda exp_model: (exp_model.id, exp_model))
         )
 
-        all_exp_opportunities = (
+        all_exp_opportunities: beam.PCollection = (
             all_explorations
             | 'Get all ExplorationOpportunitySummaryModels' >>
                 ndb_io.GetModels(
@@ -151,30 +147,30 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     exp_opportunity_model.id, exp_opportunity_model))
         )
 
-        curated_explorations = (
+        curated_explorations: beam.PCollection = (
             (all_explorations, all_exp_opportunities)
             | 'Combine the two PCollections' >> beam.Flatten()
             | 'Group by key' >> beam.GroupByKey()
             | 'Get curated explorations' >> beam.Filter(
-                self.filter_curated_explorations)
+                lambda model_pair: len(list(model_pair[1])) == 2)
             | 'Get exploration from model' >> beam.Map(
                 self.get_exploration_from_model_pair)
         )
 
-        report_number_of_exps_queried = (
+        report_number_of_exps_queried: beam.PCollection = (
             all_explorations
             | 'Report count of exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult('EXPS'))
         )
 
-        report_number_of_curated_exps_queried = (
+        report_number_of_curated_exps_queried: beam.PCollection = (
             curated_explorations
             | 'Report count of curated exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'CURATED EXPS'))
         )
 
-        curated_exps_having_invalid_state_classifier_model_id = (
+        curated_exps_having_invalid_state_classifier_model_id: beam.PCollection = (
             curated_explorations
             | 'Filter curated exps having invalid state classifier model id' >>
                 beam.Filter(lambda exp: (
@@ -184,14 +180,14 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 ))
         )
 
-        report_number_of_exps_having_invalid_state_classifer_model_id = (
+        report_number_of_exps_having_invalid_state_classifer_model_id: beam.PCollection = (
             curated_exps_having_invalid_state_classifier_model_id
             | 'Count explorations having invalid state classifier model id' >>
                 job_result_transforms.CountObjectsToJobRunResult(
                     'INVALID STATE CLASSIFIER')
         )
 
-        report_details_of_exps_having_invalid_state_classifer_model_id = (
+        report_details_of_exps_having_invalid_state_classifer_model_id: beam.PCollection = (
             curated_exps_having_invalid_state_classifier_model_id
             | 'Save info on exps having invalid state classifier model id' >>
                 beam.Map(
@@ -206,20 +202,20 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     ))
         )
 
-        curated_exps_having_non_empty_param_changes = (
+        curated_exps_having_non_empty_param_changes: beam.PCollection = (
             curated_explorations
             | 'Filter explorations having non-empty param changes' >>
                 beam.Filter(lambda exp: len(exp.param_changes) > 0)
         )
 
-        report_number_of_exps_having_invalid_param_changes = (
+        report_number_of_exps_having_invalid_param_changes: beam.PCollection = (
             curated_exps_having_non_empty_param_changes
             | 'Count explorations having non-empty param changes' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'INVALID PARAM CHANGES'))
         )
 
-        report_details_of_exps_having_invalid_param_changes = (
+        report_details_of_exps_having_invalid_param_changes: beam.PCollection = (
             curated_exps_having_non_empty_param_changes
             | 'Save info on exps having invalid param changes' >>
                 beam.Map(
@@ -230,20 +226,20 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     ))
         )
 
-        curated_exps_having_non_empty_param_specs = (
+        curated_exps_having_non_empty_param_specs: beam.PCollection = (
             curated_explorations
             | 'Filter explorations having non-empty param specs' >>
                 beam.Filter(lambda exp: len(exp.param_specs) > 0)
         )
 
-        report_number_of_exps_having_invalid_param_specs = (
+        report_number_of_exps_having_invalid_param_specs: beam.PCollection = (
             curated_exps_having_non_empty_param_specs
             | 'Count explorations having non-empty param specs' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'INVALID PARAM SPECS'))
         )
 
-        report_details_of_exps_having_invalid_param_specs = (
+        report_details_of_exps_having_invalid_param_specs: beam.PCollection = (
             curated_exps_having_non_empty_param_specs
             | 'Save info on exps having invalid param specs' >>
                 beam.Map(
@@ -254,7 +250,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     ))
         )
 
-        curated_exps_having_invalid_training_data = (
+        curated_exps_having_invalid_training_data: beam.PCollection = (
             curated_explorations
             | 'Filter explorations having non-empty training data' >>
                 beam.Filter(lambda exp: (
@@ -262,14 +258,14 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 )
         )
 
-        report_number_of_exps_having_invalid_training_data = (
+        report_number_of_exps_having_invalid_training_data: beam.PCollection = (
             curated_exps_having_invalid_training_data
             | 'Count explorations having non-empty training data' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'INVALID TRAINING DATA'))
         )
 
-        report_details_of_exps_having_invalid_training_data = (
+        report_details_of_exps_having_invalid_training_data: beam.PCollection = (
             curated_exps_having_invalid_training_data
             | 'Save info on exps having invalid training data' >> beam.Map(
                 lambda exp: job_run_result.JobRunResult.as_stderr(
