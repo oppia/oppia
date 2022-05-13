@@ -207,7 +207,6 @@ class RatingServicesTests(test_utils.GenericTestBase):
         ) -> exp_models.ExpSummaryModel:
             """Assign None to exploration summary ratings."""
             exp_summary_model = exp_models.ExpSummaryModel.get(exp_id)
-
             exp_summary_model.ratings = None
             return exp_summary_model
 

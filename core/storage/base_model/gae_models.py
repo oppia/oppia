@@ -1362,6 +1362,24 @@ class VersionedModel(BaseModel):
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             version_number: int,
+            strict: Literal[True]
+    ) -> SELF_VERSIONED_MODEL: ...
+
+    @overload
+    @classmethod
+    def get_version(
+            cls: Type[SELF_VERSIONED_MODEL],
+            entity_id: str,
+            version_number: int,
+            strict: Literal[False]
+    ) -> Optional[SELF_VERSIONED_MODEL]: ...
+
+    @overload
+    @classmethod
+    def get_version(
+            cls: Type[SELF_VERSIONED_MODEL],
+            entity_id: str,
+            version_number: int,
             strict: bool = False
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
