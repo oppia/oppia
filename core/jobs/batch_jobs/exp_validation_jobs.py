@@ -104,21 +104,33 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     break
         return state_names
 
-    def get_exploration_from_model_pair(
-        self, model_pair: tuple[str, list[object, object]]
-    ) -> exp_domain.Exploration:
-        """Returns the exploration from the model pair.
+    def filter_curated_explorations(
+        self, exp_and_opp_models: tuple[str, dict[str, list[object]]]):
+        """Returns whether the exp model is curated or not.
 
         Args:
-            model_pair: tuple. The pair of exp and opportunity models.
+            exp_and_opp_models: tuple. The pair of exp id and models.
 
         Returns:
-            Exploration. The exploration domain object.
+            bool. Returns whether the exp model is curated or not.
         """
-        exp_and_opportunity_models = list(model_pair[1])
-        exp_model = exp_and_opportunity_models[0]
-        if not isinstance(exp_model, exp_models.ExplorationModel):
-            exp_model = exp_and_opportunity_models[1]
+        exp_models = list(exp_and_opp_models[1]['exp_model'])
+        opp_models = list(exp_and_opp_models[1]['exp_opportinity_model'])
+        return len(exp_models) == 1 and len(opp_models) == 1
+
+    def get_exploration_from_models(
+        self, exp_and_opp_models: tuple[str, dict[str, list[object]]]):
+        """Returns the exploration domain object from the curated
+        exploration model.
+
+        Args:
+            exp_and_opp_models: tuple. The pair of exp and opportunity models.
+
+        Returns:
+            Exploration. Returns the exploration domain object from the curated
+                exploration model.
+        """
+        exp_model = list(exp_and_opp_models[1]['exp_model'])[0]
         return exp_fetchers.get_exploration_from_model(exp_model)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -148,13 +160,15 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         curated_explorations: beam.PCollection = (
-            (all_explorations, all_exp_opportunities)
-            | 'Combine the two PCollections' >> beam.Flatten()
-            | 'Group by key' >> beam.GroupByKey()
-            | 'Get curated explorations' >> beam.Filter(
-                lambda model_pair: len(list(model_pair[1])) == 2)
+            ({
+                'exp_model': all_explorations,
+                'exp_opportinity_model': all_exp_opportunities
+            })
+            | 'Combine the PCollections' >> beam.CoGroupByKey()
+            | 'Filter curated explorations' >> beam.Filter(
+                self.filter_curated_explorations)
             | 'Get exploration from model' >> beam.Map(
-                self.get_exploration_from_model_pair)
+                self.get_exploration_from_models)
         )
 
         report_number_of_exps_queried: beam.PCollection = (
