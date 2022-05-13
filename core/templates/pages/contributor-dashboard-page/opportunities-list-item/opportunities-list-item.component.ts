@@ -40,6 +40,8 @@ export interface ExplorationOpportunity {
 })
 export class OpportunitiesListItemComponent {
   @Input() opportunity: ExplorationOpportunity;
+  targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
 
