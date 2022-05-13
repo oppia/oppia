@@ -22,7 +22,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import $ from 'jquery';
 
 @Injectable({
   providedIn: 'root'
@@ -34,21 +33,12 @@ export class CsrfTokenService {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
-    // TODO(#8035): Remove the use of $.ajax and hence the ts-ignore
-    // in csrf-token.service.spec.ts once all the services are migrated
-    // We use jQuery here instead of Angular's $http, since the latter creates
-    // a circular dependency.
-    this.tokenPromise = $.ajax({
-      url: '/csrfhandler',
-      type: 'GET',
-      dataType: 'text',
-      dataFilter: function(data: string) {
-        // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-        let actualData = data.substring(5);
-        return JSON.parse(actualData);
-      },
-    }).then(function(response: {token: string}) {
-      return response.token;
+    this.tokenPromise = fetch(
+      '/csrfhandler'
+    ).then((response: Response) => {
+      return response.text();
+    }).then((responseText: string) => {
+      return JSON.parse(responseText.substring(5)).token;
     });
   }
 
