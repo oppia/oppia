@@ -1566,7 +1566,7 @@ title: Title
             'New state')
 
         # Restart the exploration.
-        user_services.update_learner_checkpoint_progress_on_restart(
+        user_services.clear_learner_checkpoint_progress(
             self.viewer_id, self.EXP_ID)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)

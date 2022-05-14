@@ -989,6 +989,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             learner_progress_services.mark_exploration_as_completed(
                 user_id, exploration_id)
 
+            # Clear learner's checkpoint progress on completion of the
+            # exploration.
+            user_services.clear_learner_checkpoint_progress(
+                self.user_id, exploration_id)
+
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
@@ -1494,7 +1499,7 @@ class ExplorationRestartEventHandler(base.BaseHandler):
                 'most_recently_reached_checkpoint_state_name'))
 
         if most_recently_reached_checkpoint_state_name is None:
-            user_services.update_learner_checkpoint_progress_on_restart(
+            user_services.clear_learner_checkpoint_progress(
                 self.user_id, exploration_id)
 
         self.render_json(self.values)

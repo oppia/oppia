@@ -124,6 +124,36 @@ export class EditableExplorationBackendApiService {
       explorationId, explorationVersion, commitMessage, changeList);
   }
 
+  async recordMostRecentlyReachedCheckpointAsync(
+      explorationId: string,
+      mostRecentlyReachedCheckpointExpVersion: number,
+      mostRecentlyReachedCheckpointStateName: string,
+  ): Promise<void> {
+    const requestUrl =
+      '/explorehandler/checkpoint_reached/' + explorationId;
+    return this.httpClient.put<void>(requestUrl, {
+      most_recently_reached_checkpoint_exp_version:
+       mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+       mostRecentlyReachedCheckpointStateName
+    }).toPromise();
+  }
+
+  async resetExplorationProgressAsync(explorationId: string): Promise<void> {
+    const requestUrl =
+      '/explorehandler/restart/' + explorationId;
+    return this.httpClient.put<void>(requestUrl, {
+      most_recently_reached_checkpoint_state_name: null
+    }).toPromise();
+  }
+
+  async recordLearnerHasViewedLessonInfoModalOnce(): Promise<void> {
+    const requestUrl = '/userinfohandler/data';
+    return this.httpClient.put<void>(requestUrl, {
+      user_has_viewed_lesson_info_modal_once: true
+    }).toPromise();
+  }
+
   /**
    * Deletes an exploration in the backend with the provided exploration
    * ID. If successful, the exploration will also be deleted from the

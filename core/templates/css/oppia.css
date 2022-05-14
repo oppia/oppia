@@ -2241,9 +2241,8 @@ oppia-parameter {
 
 .oppia-modal-lesson-information-card .modal-dialog {
   margin: 100px auto;
-  max-width: 35%;
-  min-width: 270px;
-  width: 350px;
+  max-width: 430px;
+  min-width: 320px;
 }
 
 .skill-select-modal .modal-xl {
