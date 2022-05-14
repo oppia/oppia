@@ -18,15 +18,18 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from './lesson-information-card-modal.component';
 
@@ -37,21 +40,53 @@ class MockTruncteAndCapitalizePipe {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/learn/math',
+      href: '',
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
+    },
+    localStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
+    },
+    gtag: () => {},
+    history: {
+      pushState(data: object, title: string, url?: string | null) {}
+    },
+    document: {
+      body: {
+        style: {
+          overflowY: 'auto',
+        }
+      }
+    }
+  };
+}
+
 describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
   let urlService: UrlService;
+  let mockWindowRef: MockWindowRef;
+  let editableExplorationBackendApiService:
+  EditableExplorationBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
   let expDesc = 'Exploration Objective';
   let rating: ExplorationRatings;
   let storyId = 'storyId';
-  let nodeId = 'nodeId';
 
   beforeEach(waitForAsync(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -65,7 +100,12 @@ describe('Lesson Information card modal component', () => {
         NgbActiveModal,
         PlayerTranscriptService,
         ExplorationEngineService,
-        StoryViewerBackendApiService
+        StoryViewerBackendApiService,
+        EditableExplorationBackendApiService,
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -104,15 +144,54 @@ describe('Lesson Information card modal component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlService = TestBed.inject(UrlService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(true, true, false);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValues(false, false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
-  it('should initialize the component and set values', fakeAsync(() => {
+  it('should initialize the component and set values' +
+    ' when storyId is present', fakeAsync(() => {
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('');
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(
+        new StoryPlaythrough(storyId, [], 'storyTitle', '', '', '')));
+
+    expect(componentInstance.storyId).toEqual(undefined);
+    expect(componentInstance.storyTitleIsPresent).toEqual(undefined);
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).not.toHaveBeenCalled();
+    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).
+      not.toHaveBeenCalled();
+    expect(urlService.getStoryUrlFragmentFromLearnerUrl).
+      not.toHaveBeenCalled();
+    expect(storyViewerBackendApiService.fetchStoryDataAsync).
+      not.toHaveBeenCalled();
+    expect(componentInstance.storyTitleTranslationKey).toEqual(undefined);
+
     componentInstance.ngOnInit();
+    tick(1000);
+
+    expect(componentInstance.storyTitleIsPresent).toEqual(true);
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getStoryUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(storyViewerBackendApiService.fetchStoryDataAsync).toHaveBeenCalled();
+    expect(componentInstance.storyId).toEqual(storyId);
+    expect(componentInstance.storyTitleTranslationKey).toEqual(
+      'I18N_STORY_storyId_TITLE');
+
     expect(componentInstance.explorationId).toEqual(expId);
     expect(componentInstance.expTitle).toEqual(expTitle);
     expect(componentInstance.expDesc).toEqual(expDesc);
@@ -136,50 +215,10 @@ describe('Lesson Information card modal component', () => {
   }));
 
   it('should correctly set story title' +
-      ' when storyId is present',
-  fakeAsync(() => {
-    spyOn(urlService, 'getUrlParams').and.returnValue({
-      story_id: storyId,
-      node_id: nodeId
-    });
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('');
-    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
-    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
-      Promise.resolve(
-        new StoryPlaythrough(storyId, [], 'storyTitle', '', '', '')));
-
-    expect(componentInstance.storyId).toEqual(undefined);
-    expect(componentInstance.storyTitleIsPresent).toEqual(undefined);
-    expect(urlService.getTopicUrlFragmentFromLearnerUrl).not.toHaveBeenCalled();
-    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).
-      not.toHaveBeenCalled();
-    expect(urlService.getStoryUrlFragmentFromLearnerUrl).
-      not.toHaveBeenCalled();
-    expect(storyViewerBackendApiService.fetchStoryDataAsync).
-      not.toHaveBeenCalled();
-    expect(componentInstance.storyTitleTranslationKey).toEqual(undefined);
-
-    componentInstance.ngOnInit();
-
-    expect(componentInstance.storyId).toEqual(storyId);
-    expect(componentInstance.storyTitleIsPresent).toEqual(true);
-    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(urlService.getStoryUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(storyViewerBackendApiService.fetchStoryDataAsync).toHaveBeenCalled();
-    expect(componentInstance.storyTitleTranslationKey).toEqual(
-      'I18N_STORY_storyId_TITLE');
-  }));
-
-  it('should correctly set story title' +
       ' when storyId is not present',
   fakeAsync(() => {
-    spyOn(urlService, 'getUrlParams').and.returnValue({
-      story_id: undefined,
-      node_id: undefined
-    });
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(false);
     expect(componentInstance.storyId).toEqual(undefined);
     expect(componentInstance.storyTitleIsPresent).toEqual(undefined);
 
@@ -188,4 +227,30 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.storyId).toEqual(undefined);
     expect(componentInstance.storyTitleIsPresent).toBe(false);
   }));
+
+  it('should restart the exploration and reset the progress', fakeAsync(() => {
+    let resetSpy = spyOn(
+      editableExplorationBackendApiService, 'resetExplorationProgressAsync')
+      .and.returnValue(Promise.resolve());
+    spyOn(mockWindowRef.nativeWindow.location, 'reload');
+
+    componentInstance.restartExploration();
+
+    fixture.whenStable().then(() => {
+      expect(resetSpy).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    });
+  }));
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should toggle authors dropdown menu being shown correctly', () => {
+    expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(false);
+    componentInstance.toggleLessonAuthorsSubmenu();
+    expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(true);
+    componentInstance.toggleLessonAuthorsSubmenu();
+    expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(false);
+  });
 });
