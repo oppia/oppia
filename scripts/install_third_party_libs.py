@@ -39,7 +39,7 @@ PREREQUISITES = (
     # This library is used very frequently so we install it to default location.
     # If installed in third_party, it does not work correctly, unless we add
     # it to path in many different places.
-    ('typing-extensions', '4.0.1', '')
+    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
 )
 
 

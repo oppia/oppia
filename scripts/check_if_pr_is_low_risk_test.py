@@ -36,7 +36,7 @@ class MockResponse(io.StringIO):
             data: str. Response data.
             code: int. HTTP response code.
         """
-        super().__init__(self, data)
+        super().__init__(data)
         self.code = code
 
     def getcode(self):
