@@ -130,8 +130,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):  # type: ignore[no-untyped-call]
-        common.print_each_string_after_two_new_lines([  # type: ignore[no-untyped-call]
+    if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
+        common.print_each_string_after_two_new_lines([
             'WARNING',
             'Could not start new server. There is already an existing server '
             'running at port %s.' % PORT_NUMBER_FOR_GAE_SERVER,
@@ -183,14 +183,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))  # type: ignore[no-untyped-call]
 
         if managed_web_browser is None:
-            common.print_each_string_after_two_new_lines([  # type: ignore[no-untyped-call]
+            common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Local development server is ready! You can access it by '
                 'navigating to http://localhost:%s/ in a web '
                 'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
             ])
         else:
-            common.print_each_string_after_two_new_lines([  # type: ignore[no-untyped-call]
+            common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Local development server is ready! Opening a default web '
                 'browser window pointing to it: '

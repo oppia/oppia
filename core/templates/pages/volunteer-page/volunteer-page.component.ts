@@ -16,9 +16,11 @@
  * @fileoverview Component for the volunteer page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ViewEncapsulation } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from
@@ -32,7 +34,8 @@ import { UrlInterpolationService } from
   encapsulation: ViewEncapsulation.None,
   providers: [NgbCarouselConfig]
 })
-export class VolunteerPageComponent implements OnInit {
+export class VolunteerPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   mapImgPath = '';
   art = {};
   development = {};
@@ -42,7 +45,8 @@ export class VolunteerPageComponent implements OnInit {
   constructor(
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
-    private ngbCarouselConfig: NgbCarouselConfig
+    private ngbCarouselConfig: NgbCarouselConfig,
+    private translateService: TranslateService
   ) {}
 
   getWebpExtendedName(fileName: string): string {
@@ -53,8 +57,18 @@ export class VolunteerPageComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_VOLUNTEER_PAGE_TITLE');
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
   ngOnInit(): void {
-    this.pageTitleService.setDocumentTitle('Volunteer | Oppia');
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
     this.mapImgPath = '/volunteer/map.png';
 
     this.art = {
@@ -195,5 +209,9 @@ export class VolunteerPageComponent implements OnInit {
     this.ngbCarouselConfig.keyboard = true;
     this.ngbCarouselConfig.pauseOnHover = true;
     this.ngbCarouselConfig.pauseOnFocus = true;
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
