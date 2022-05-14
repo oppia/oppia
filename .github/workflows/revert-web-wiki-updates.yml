@@ -11,8 +11,8 @@ jobs:
         # SHA1 hash of the release-v0.0.1 commit.
         uses: oppia/get-github-app-token@8c3b19db0cdcd0f7fded7dd71e5e0429bf72df1a
         with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          app_id: ${{ secrets.OPPIA_WIKI_SYNCHRONIZER_APP_ID }}
+          private_key: ${{ secrets.OPPIA_WIKI_SYNCHRONIZER_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v2
         with:
           repository: ${{github.repository_owner}}/oppia.wiki
