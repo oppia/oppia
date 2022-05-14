@@ -17,11 +17,13 @@
  */
 
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+import { ElementRef, NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
@@ -39,6 +41,13 @@ class MockAssetsBackendApiService {
   }
 }
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
+
 describe('Story Viewer Page component', () => {
   let httpTestingController = null;
   let component: StoryViewerPageComponent;
@@ -50,6 +59,7 @@ describe('Story Viewer Page component', () => {
   let pageTitleService = null;
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let translateService: TranslateService;
   let _samplePlaythroughObject = null;
   const UserInfoObject = {
     roles: ['USER_ROLE'],
@@ -72,6 +82,10 @@ describe('Story Viewer Page component', () => {
         {
           provide: assetsBackendApiService,
           useClass: MockAssetsBackendApiService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -86,6 +100,7 @@ describe('Story Viewer Page component', () => {
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     windowRef = TestBed.get(WindowRef);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    translateService = TestBed.inject(TranslateService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
@@ -358,17 +373,12 @@ describe('Story Viewer Page component', () => {
       spyOn(
         storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         Promise.resolve(_samplePlaythroughObject));
-
-      spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
-      spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
+      spyOn(component, 'subscribeToOnLangChange');
       component.ngOnInit();
 
       flushMicrotasks();
 
-      expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-        'Learn Topic 1 | Story | Oppia');
-      expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
-        'Story meta tag content');
+      expect(component.subscribeToOnLangChange).toHaveBeenCalled();
       expect(component.pathIconParameters).toEqual([{
         thumbnailIconUrl: 'thumbnail-url',
         left: '225px',
@@ -380,6 +390,39 @@ describe('Story Viewer Page component', () => {
         top: '35px',
         thumbnailBgColor: '#bb8b2f' }]);
     }));
+
+  it('should obtain translated title and set it whenever the ' +
+    'selected language changes', () => {
+    component.subscribeToOnLangChange();
+    spyOn(component, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.topicName = 'dummy_topic_name';
+    component.storyTitle = 'dummy_story_title';
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_STORY_VIEWER_PAGE_TITLE', {
+        topicName: 'dummy_topic_name',
+        storyTitle: 'dummy_story_title'
+      });
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_STORY_VIEWER_PAGE_TITLE');
+  });
+
+  it('should unsubscribe upon component destruction', () => {
+    component.subscribeToOnLangChange();
+    expect(component.directiveSubscriptions.closed).toBe(false);
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
+  });
 
   it('should place empty values if Filename and BgColor are null',
     fakeAsync(() => {
