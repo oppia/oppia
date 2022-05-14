@@ -16,7 +16,7 @@
 
 """Files having imports from storage and platform for mypy checks.
 Mypy is not good with handling module imports as variable like we do using
-datastore and transaction services. So this will will be imported in every file
+datastore and transaction services. So this will be imported in every file
 which uses storage models and platform services. This file will be imported only
 in mypy checks not during runtime.
 """
