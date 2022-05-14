@@ -126,6 +126,14 @@ otherwise they will interfere with the iframed conversation skin directive. */
   color: #fff;
 }
 
+.oppia-exploration-checkpoints-message .toast-top-center {
+  top: 24px;
+}
+
+.oppia-exploration-checkpoints-message .checkpoints-toast-info {
+  background-color: #337ab7;
+}
+
 @media screen and (max-width: 959px) {
   .conversation-skin-cards-container {
     display: block;
