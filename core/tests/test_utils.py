@@ -46,9 +46,9 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import interaction_registry
+from core.domain import object_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -1057,8 +1057,11 @@ class TestBase(unittest.TestCase):
             except Exception as e:
                 raise Exception(
                     'Parameter %s not found' % param_change.name) from e
+
+            raw_value = param_change.get_value(new_param_dict)
             new_param_dict[param_change.name] = (
-                param_change.get_normalized_value(obj_type, new_param_dict))
+                object_registry.Registry.get_object_class_by_type(
+                    obj_type).normalize(raw_value))
         return new_param_dict
 
     def get_static_asset_filepath(self):
@@ -1764,6 +1767,7 @@ auto_tts_enabled: false
 blurb: ''
 category: Category
 correctness_feedback_enabled: true
+edits_allowed: true
 init_state_name: %s
 language_code: en
 objective: ''
@@ -3680,9 +3684,8 @@ class ClassifierTestBase(GenericEmailTestBase):
             FrozenModel. Protobuf object containing classifier data.
         """
         filename = classifier_training_job.classifier_data_filename
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id)
         classifier_data = utils.decompress_from_zlib(fs.get(filename))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.ParseFromString(classifier_data)

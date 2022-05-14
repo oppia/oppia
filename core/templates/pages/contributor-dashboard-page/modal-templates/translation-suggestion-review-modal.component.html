@@ -94,7 +94,7 @@
       Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>
   </div>
-  <div [hidden]="reviewable && !suggestionIsRejected" class="oppia-suggestion-review-message">
+  <div [hidden]="reviewable || !reviewMessage" class="oppia-suggestion-review-message">
     <strong>Review message: </strong>{{ reviewMessage }}
   </div>
 </div>

@@ -50,6 +50,9 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-edits-allowed-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -102,7 +105,8 @@ angular.module('oppia').component('settingsTab', {
     'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
-    'ExplorationDataService', 'ExplorationFeaturesService',
+    'ExplorationDataService', 'ExplorationEditsAllowedBackendApiService',
+    'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationRightsService',
@@ -119,7 +123,8 @@ angular.module('oppia').component('settingsTab', {
         EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
-        ExplorationDataService, ExplorationFeaturesService,
+        ExplorationDataService, ExplorationEditsAllowedBackendApiService,
+        ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
@@ -136,6 +141,7 @@ angular.module('oppia').component('settingsTab', {
 
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.explorationIsLinkedToStory = false;
+      ctrl.isSuperAdmin = false;
 
       ctrl.getExplorePageUrl = function() {
         return (
@@ -285,6 +291,30 @@ angular.module('oppia').component('settingsTab', {
       };
       ctrl.toggleCorrectnessFeedback = function() {
         ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
+      };
+
+      ctrl.isExplorationEditable = function() {
+        return ExplorationDataService.data?.edits_allowed || false;
+      };
+
+      ctrl.enableEdits = function() {
+        ExplorationEditsAllowedBackendApiService.setEditsAllowed(
+          true, ExplorationDataService.explorationId,
+          () => {
+            EditabilityService.lockExploration(false);
+            ExplorationDataService.data.edits_allowed = true;
+            $rootScope.$applyAsync();
+          });
+      };
+
+      ctrl.disableEdits = function() {
+        ExplorationEditsAllowedBackendApiService.setEditsAllowed(
+          false, ExplorationDataService.explorationId,
+          () => {
+            EditabilityService.lockExploration(true);
+            ExplorationDataService.data.edits_allowed = false;
+            $rootScope.$applyAsync();
+          });
       };
 
       // Methods for rights management.
@@ -595,6 +625,7 @@ angular.module('oppia').component('settingsTab', {
         ctrl.loggedInUser = null;
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.loggedInUser = userInfo.getUsername();
+          ctrl.isSuperAdmin = userInfo.isSuperAdmin();
         });
 
         UserExplorationPermissionsService.getPermissionsAsync()

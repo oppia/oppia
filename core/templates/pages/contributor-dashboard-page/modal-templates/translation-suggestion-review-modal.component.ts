@@ -118,7 +118,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   lastSuggestionToReview: boolean = false;
   resolvingSuggestion: boolean = false;
   reviewable: boolean = false;
-  suggestionIsRejected: boolean = false;
   canEditTranslation: boolean = false;
   userIsCurriculumAdmin: boolean = false;
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
@@ -229,11 +228,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     );
     this.reviewMessage = '';
     if (!this.reviewable) {
-      this.suggestionIsRejected = (
-        this.activeSuggestion.status === 'rejected');
-      if (this.suggestionIsRejected) {
-        this._getThreadMessagesAsync(this.activeSuggestionId);
-      }
+      this._getThreadMessagesAsync(this.activeSuggestionId);
     }
   }
 

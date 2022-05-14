@@ -322,6 +322,21 @@ export class AdminBackendApiService {
     });
   }
 
+  async rollbackExplorationToSafeState(expId: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.http.post<{version: number}>(
+        AdminPageConstants.ADMIN_HANDLER_URL, {
+          action: 'rollback_exploration_to_safe_state',
+          exp_id: expId
+        }
+      ).toPromise().then(response => {
+        resolve(response.version);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
   async uploadTopicSimilaritiesAsync(data: string):
   Promise<void> {
     let action = 'upload_topic_similarities';

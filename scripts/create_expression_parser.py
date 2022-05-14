@@ -42,7 +42,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     expression_parser_js = os.path.join(
         'core', 'templates', 'expressions', 'parser.js')
 
-    common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)  # type: ignore[no-untyped-call]
+    common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
     subprocess.check_call([
         os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
