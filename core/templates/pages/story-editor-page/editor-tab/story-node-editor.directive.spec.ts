@@ -190,11 +190,15 @@ describe('Story node editor directive', function() {
   });
 
   it('should fetch the descriptions for prerequisite skills', function() {
-    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValue('1');
+    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValues(['1', '0']);
 
     $scope.getPrerequisiteSkillsDescription();
     $rootScope.$apply();
     expect($scope.skillIdToSummaryMap).toEqual({1: 'test'});
+
+    $scope.getPrerequisiteSkillsDescription();
+    $rootScope.$apply();
+    expect($scope.skillIdToSummaryMap).toEqual({});
   });
 
   it('should call Alerts Service if getting skill desc. fails', function() {

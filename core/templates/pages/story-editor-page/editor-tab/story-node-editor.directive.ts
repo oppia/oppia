@@ -170,17 +170,19 @@ angular.module('oppia').directive('storyNodeEditor', [
 
           $scope.getPrerequisiteSkillsDescription = function() {
             const skills = $scope.getPrerequisiteSkillIds();
-            SkillBackendApiService.fetchMultiSkillsAsync(skills).then(
-              function(response) {
-                for (let idx in response) {
-                  $scope.skillIdToSummaryMap[response[idx].getId()] =
-                    response[idx].getDescription();
+            if (skills.length > 0) {
+              SkillBackendApiService.fetchMultiSkillsAsync(skills).then(
+                function(response) {
+                  for (let idx in response) {
+                    $scope.skillIdToSummaryMap[response[idx].getId()] =
+                      response[idx].getDescription();
+                  }
+                  $rootScope.$applyAsync();
+                }, function(error) {
+                  AlertsService.addWarning();
                 }
-                $rootScope.$applyAsync();
-              }, function(error) {
-                AlertsService.addWarning();
-              }
-            );
+              );
+            }
           };
 
           $scope.checkCanSaveExpId = function() {
