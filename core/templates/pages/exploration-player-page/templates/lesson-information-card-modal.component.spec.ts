@@ -245,4 +245,12 @@ describe('Lesson Information card modal component', () => {
   it('should get RTL language status correctly', () => {
     expect(componentInstance.isLanguageRTL()).toBeTrue();
   });
+
+  it('should toggle authors dropdown menu being shown correctly', () => {
+    expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(false);
+    componentInstance.toggleLessonAuthorsSubmenu();
+    expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(true);
+    componentInstance.toggleLessonAuthorsSubmenu();
+    expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(false);
+  });
 });

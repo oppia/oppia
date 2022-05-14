@@ -3,68 +3,128 @@
 
 <mat-card class="oppia-lesson-info-card">
   <div class="oppia-lesson-info-content" [ngClass]="{'oppia-non-story-mode' : !storyTitleIsPresent}">
-    <p class="oppia-story-title" *ngIf="storyTitleIsPresent && !isHackyStoryTitleTranslationDisplayed()">
-      {{ storyTitle }}
-    </p>
-    <p class="oppia-story-title" *ngIf="storyTitleIsPresent && isHackyStoryTitleTranslationDisplayed()">
-      {{ storyTitleTranslationKey | translate}}
-    </p>
-    <hr *ngIf="storyTitleIsPresent">
-    <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
-      {{ expTitle }}
-    </h3>
-    <hr *ngIf="!storyTitleIsPresent">
-    <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
-      {{ expTitleTranslationKey | translate }}
-    </h3>
-    <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
-      {{ expDesc | truncateAndCapitalize: 90 }}
-    </h4>
-    <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
-      {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
-    </h4>
-    <p class="progress-text">Progress</p>
-    <div class="progress" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
-      <div class="progress-bar-separator-container">
-        <div class="progress-bar-separator"
-             *ngFor="let i of separatorArray;"
-             [style.width.%]="100 / checkpointCount">
+    <div *ngIf="storyTitleIsPresent">
+      <p class="oppia-story-title" *ngIf="storyTitleIsPresent && !isHackyStoryTitleTranslationDisplayed()">
+        {{ storyTitle }}
+      </p>
+      <p class="oppia-story-title" *ngIf="storyTitleIsPresent && isHackyStoryTitleTranslationDisplayed()">
+        {{ storyTitleTranslationKey | translate}}
+      </p>
+      <hr *ngIf="storyTitleIsPresent">
+      <div class="oppia-lesson-info-content-inner-container">
+        <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+          {{ expTitle }}
+        </h3>
+        <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
+          {{ expTitleTranslationKey | translate }}
+        </h3>
+        <div class="oppia-lesson-exploration-progress-info">
+          <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
+            {{ expDesc | truncateAndCapitalize: 90 }}
+          </h4>
+          <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
+            {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
+          </h4>
+          <p class="progress-text">Progress</p>
+          <div class="progress" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
+            <div class="progress-bar-separator-container">
+              <div class="progress-bar-separator"
+                   *ngFor="let i of separatorArray;"
+                   [style.width.%]="100 / checkpointCount">
+              </div>
+            </div>
+            <div class="lesson-progress-bar completed-checkpoints-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="completedWidth">
+            </div>
+            <div *ngIf="completedWidth != 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="100 / checkpointCount">
+            </div>
+            <div *ngIf="completedWidth == 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="0">
+            </div>
+          </div>
+          <button type="button"
+                  class="btn btn-secondary restart-lesson-btn"
+                  *ngIf="userIsLoggedIn"
+                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                  (click)="restartExploration()">
+            {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+          </button>
+        </div>
+        <div class="oppia-lesson-info-card-authors">
+          <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
+          <div [hidden]="!lessonAuthorsSubmenuIsShown" class="authors-dropdown-menu">
+            <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+          </div>
         </div>
       </div>
-      <div class="lesson-progress-bar completed-checkpoints-progress-bar"
-           role="progressbar"
-           [style.width.%]="completedWidth">
-      </div>
-      <div *ngIf="completedWidth != 100"
-           class="lesson-progress-bar started-checkpoint-progress-bar"
-           role="progressbar"
-           [style.width.%]="100 / checkpointCount">
-      </div>
-      <div *ngIf="completedWidth == 100"
-           class="lesson-progress-bar started-checkpoint-progress-bar"
-           role="progressbar"
-           [style.width.%]="0">
+    </div>
+    <div *ngIf="!storyTitleIsPresent">
+      <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+        {{ expTitle }}
+      </h3>
+      <hr *ngIf="!storyTitleIsPresent">
+      <div class="oppia-lesson-info-content-inner-container">
+        <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
+          {{ expTitleTranslationKey | translate }}
+        </h3>
+        <div class="oppia-lesson-exploration-progress-info">
+          <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
+            {{ expDesc | truncateAndCapitalize: 90 }}
+          </h4>
+          <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
+            {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
+          </h4>
+          <p class="progress-text">Progress</p>
+          <div class="progress" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
+            <div class="progress-bar-separator-container">
+              <div class="progress-bar-separator"
+                   *ngFor="let i of separatorArray;"
+                   [style.width.%]="100 / checkpointCount">
+              </div>
+            </div>
+            <div class="lesson-progress-bar completed-checkpoints-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="completedWidth">
+            </div>
+            <div *ngIf="completedWidth != 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="100 / checkpointCount">
+            </div>
+            <div *ngIf="completedWidth == 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="0">
+            </div>
+          </div>
+          <button type="button"
+                  class="btn btn-secondary restart-lesson-btn"
+                  *ngIf="userIsLoggedIn"
+                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                  (click)="restartExploration()">
+            {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+          </button>
+        </div>
+        <div class="oppia-lesson-info-card-authors">
+          <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
+          <div [hidden]="!lessonAuthorsSubmenuIsShown" class="authors-dropdown-menu">
+            <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+          </div>
+        </div>
       </div>
     </div>
-    <button type="button"
-            class="btn btn-secondary restart-lesson-btn"
-            *ngIf="userIsLoggedIn"
-            [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
-            (click)="restartExploration()">
-        {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
-    </button>
   </div>
 </mat-card>
 <button type="button" class="oppia-close-popover-button" (click)="cancel()">
   <i class="material-icons md-18">&#xE5CD;</i>
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
-<div class="oppia-lesson-info-card-authors"  ngbDropdown>
-  <div ngbDropdownToggle class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
-  <div ngbDropdownMenu class="dropdown-menu authors-dropdown-menu">
-    <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
-  </div>
-</div>
 
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.css">

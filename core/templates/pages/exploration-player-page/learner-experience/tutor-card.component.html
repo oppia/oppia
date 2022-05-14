@@ -111,7 +111,7 @@
       </div>
     </div>
 
-    <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown">
+    <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
       <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
         <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
            [href]="OPPIA_AVATAR_LINK_URL"

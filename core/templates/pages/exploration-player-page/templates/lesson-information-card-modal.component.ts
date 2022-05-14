@@ -63,6 +63,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   completedWidth!: number;
   separatorArray: number[] = [];
   userIsLoggedIn: boolean = false;
+  lessonAuthorsSubmenuIsShown: boolean = false;
 
 
   constructor(
@@ -156,6 +157,10 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         this.expDescTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  toggleLessonAuthorsSubmenu(): void {
+    this.lessonAuthorsSubmenuIsShown = !this.lessonAuthorsSubmenuIsShown;
   }
 
   isLanguageRTL(): boolean {

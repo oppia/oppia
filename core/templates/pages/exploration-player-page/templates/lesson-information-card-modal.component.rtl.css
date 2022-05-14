@@ -8,39 +8,76 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
+.oppia-lesson-info {
+  cursor: pointer;
+  display: flex;
+  list-style-type: none;
+  padding-right: 0;
+  padding-top: 10px;
+}
+
+.oppia-lesson-info-h1 {
+  color: #fff;
+  display: inline;
+  font-size: 17px;
+  font-weight: normal;
+}
+
 .oppia-lesson-info-card-authors .authors-title {
+  border-top: 1px solid #707070;
   color: #00645c;
   cursor: pointer;
   font-size: 14px;
   margin-top: 5px;
   padding-bottom: 2px;
+  padding-top: 8px;
   text-align: center;
 }
 
 .oppia-lesson-info-card-authors .authors-dropdown-menu {
-  border: 0;
-  margin: 0;
-  max-height: 100px;
-  max-width: 440px;
-  min-width: 269px;
-  overflow-y: auto;
-  padding-top: 2px;
-  left: 0;
+  transition: all 1s ease-in-out;
   width: 100%;
 }
 
 .oppia-lesson-info-card .oppia-exploration-header {
   font-size: 17px;
   font-weight: normal;
-  margin: 10px 0 10px 0;
+  margin: 0 0 10px 0;
+  padding: 0 20px 0;
+}
+
+.oppia-lesson-info-card .oppia-non-story-mode .oppia-exploration-header {
+  margin: unset;
+  padding: 20px 20px 0;
 }
 
 .oppia-lesson-info-card {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  padding: 10px;
-  padding-bottom: 16px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  padding: 0 0 6px 0;
   text-align: right;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.oppia-lesson-info-content-inner-container {
+  max-height: 260px;
+  -ms-overflow-style: none;  /* IE and Edge */
+  overflow-y: auto;
+  scrollbar-width: none;  /* Firefox */
+}
+
+.oppia-non-story-mode .oppia-lesson-info-content-inner-container {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.oppia-lesson-info-content-inner-container::-webkit-scrollbar {
+  display: none;
+}
+
+.oppia-lesson-info-card .oppia-lesson-exploration-progress-info {
+  padding: 0 20px 20px 20px;
 }
 
 .oppia-lesson-info-card .oppia-story-title {
@@ -48,11 +85,21 @@
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 13px;
   margin-bottom: -10px;
+  padding: 20px 20px 0;
+  text-align: right;
 }
 
 .oppia-lesson-info-card .oppia-lesson-info-content {
-  padding: 12px;
   padding-bottom: 0;
+}
+
+.oppia-lesson-info-card hr {
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.oppia-lesson-info-card .oppia-non-story-mode hr {
+  margin-top: 8px;
 }
 
 .oppia-lesson-info-card .oppia-exploration-description {
@@ -62,11 +109,23 @@
   padding-bottom: 10px;
 }
 
+.oppia-lesson-info-card .progress {
+  background: #f0ffff;
+  border: 1px solid #707070;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  height: 10px;
+  position: relative;
+  transition: none;
+}
+
 .oppia-lesson-info-card .progress-text {
   color: #000;
   font-size: 12px;
   margin-bottom: 2px;
   margin-right: 5px;
+  text-align: right;
 }
 
 .oppia-close-popover-button {

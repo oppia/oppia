@@ -503,6 +503,7 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should get checkpoint index from state name', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
     const card = StateCard.createNewCard(
       'State A', '<p>Content</p>', '<interaction></interaction>',
