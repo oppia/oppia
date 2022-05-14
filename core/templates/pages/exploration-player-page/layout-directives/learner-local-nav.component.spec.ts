@@ -69,7 +69,12 @@ describe('Learner Local Nav Component ', () => {
     preferred_language_codes: [],
     auto_tts_enabled: false,
     correctness_feedback_enabled: true,
-    record_playthrough_probability: 1
+    record_playthrough_probability: 1,
+    has_viewed_lesson_info_modal_once: false,
+    furthest_completed_checkpoint_exp_version: 1,
+    furthest_completed_checkpoint_state_name: 'State B',
+    most_recently_reached_checkpoint_state_name: 'State A',
+    most_recently_reached_checkpoint_exp_version: 1
   };
 
   const userInfoForCollectionCreator = UserInfo.createDefault();
