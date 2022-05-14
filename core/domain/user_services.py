@@ -2321,10 +2321,6 @@ def _get_checkpoints_in_order(init_state_name, states):
             for answer_group in current_state.interaction.answer_groups:
                 queue.append(answer_group.outcome.dest)
 
-            # Add the default outcome destination in the queue.
-            if current_state.interaction.default_outcome is not None:
-                queue.append(current_state.interaction.default_outcome.dest)
-
     return checkpoint_state_names
 
 
@@ -2451,9 +2447,8 @@ def set_user_has_viewed_lesson_info_modal_once(user_id):
     _save_user_settings(user_settings)
 
 
-def clear_learner_checkpoint_progress(user_id, exploration_id):
-    """Clears learner's checkpoint progress through the exploration by
-    clearing the most recently reached checkpoint fields of the exploration.
+def update_learner_checkpoint_progress_on_restart(user_id, exploration_id):
+    """Sets the most recently reached checkpoint on restart exploration event.
 
     Args:
         user_id: str. The Id of the user.
@@ -2461,11 +2456,10 @@ def clear_learner_checkpoint_progress(user_id, exploration_id):
     """
     exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    if exp_user_model is not None:
-        exp_user_model.most_recently_reached_checkpoint_exp_version = None
-        exp_user_model.most_recently_reached_checkpoint_state_name = None
-        exp_user_model.update_timestamps()
-        exp_user_model.put()
+    exp_user_model.most_recently_reached_checkpoint_exp_version = None
+    exp_user_model.most_recently_reached_checkpoint_state_name = None
+    exp_user_model.update_timestamps()
+    exp_user_model.put()
 
 
 def sync_learner_checkpoint_progress_with_current_exp_version(

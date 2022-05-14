@@ -66,9 +66,6 @@ export class ProgressNavComponent {
   helpCardHasContinueButton: boolean;
   isIframed: boolean;
   lastDisplayedCard: StateCard;
-  explorationId: string;
-  newCardStateName: string;
-  currentCardIndex: number;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -142,7 +139,6 @@ export class ProgressNavComponent {
       }
     }
     this.helpCardHasContinueButton = false;
-    this.newCardStateName = this.displayedCard.getStateName();
   }
 
   doesInteractionHaveNavSubmitButton(): boolean {

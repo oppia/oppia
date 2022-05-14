@@ -70,12 +70,10 @@ css_files_list = [
     'progress-nav.component.css',
     'core/templates/pages/exploration-player-page/layout-directives/'
     'exploration-footer.component.css',
-    'core/templates/pages/exploration-player-page/layout-directives/'
-    'learner-view-info.component.css',
     'core/templates/pages/exploration-player-page/templates/'
     'information-card-modal.component.css',
-    'core/templates/pages/exploration-player-page/templates/'
-    'lesson-information-card-modal.component.css',
+    'core/templates/pages/exploration-player-page/layout-directives/'
+    'learner-view-info.component.css',
     'core/templates/pages/learner-dashboard-page/home-tab.component.css',
     'core/templates/pages/learner-dashboard-page/goals-tab.component.css',
     'core/templates/pages/learner-dashboard-page/'
