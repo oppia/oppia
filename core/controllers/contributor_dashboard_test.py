@@ -92,7 +92,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.topic_id_1 = '1'
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'topic1', 'url-fragment', 'description')
+            self.topic_id_1, 'topic1', 'url-fragment', 'description', 'fragm')
         self.skill_id_2 = 'skill_id_2'
         self._publish_valid_topic(topic, [self.skill_id_2])
 
