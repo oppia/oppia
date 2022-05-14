@@ -56,6 +56,7 @@ export class OpportunitiesListItemComponent {
   translatedProgressStyle!: { width: string };
   inReviewProgressStyle!: { width: string };
   untranslatedProgressStyle!: { width: string };
+  targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
