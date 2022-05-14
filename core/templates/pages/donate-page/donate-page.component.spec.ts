@@ -17,6 +17,9 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+
 import { DonatePageComponent } from './donate-page.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
@@ -25,10 +28,20 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { PageTitleService } from 'services/page-title.service';
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
 describe('Donate page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
 
   beforeEach(async() => {
     TestBed.configureTestingModule({
@@ -55,7 +68,12 @@ describe('Donate page', () => {
               gtag: () => {}
             }
           }
-        }
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
+        PageTitleService
       ]
     }).compileComponents();
   });
@@ -65,6 +83,8 @@ describe('Donate page', () => {
   beforeEach(() => {
     const donatePageComponent = TestBed.createComponent(DonatePageComponent);
     component = donatePageComponent.componentInstance;
+    translateService = TestBed.inject(TranslateService);
+    pageTitleService = TestBed.inject(PageTitleService);
   });
 
   it('should successfully instantiate the component from beforeEach block',
@@ -73,11 +93,33 @@ describe('Donate page', () => {
     });
 
   it('should set component properties when ngOnInit() is called', () => {
+    spyOn(translateService.onLangChange, 'subscribe');
     component.ngOnInit();
 
     expect(component.windowIsNarrow).toBe(true);
     expect(component.donateImgUrl).toBe(
       '/assets/images/general/opp_donate_text.svg');
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+  });
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', () => {
+    component.ngOnInit();
+    spyOn(component, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set new page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
   });
 
   it('should donate throught amazon sucessfully', (done) => {
@@ -103,5 +145,16 @@ describe('Donate page', () => {
     component.onDonateThroughPayPal();
     expect(siteAnalyticsServiceStub.registerGoToDonationSiteEvent)
       .toHaveBeenCalledWith('PayPal');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    component.directiveSubscriptions.add(
+      translateService.onLangChange.subscribe(() => {
+        component.setPageTitle();
+      })
+    );
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
   });
 });

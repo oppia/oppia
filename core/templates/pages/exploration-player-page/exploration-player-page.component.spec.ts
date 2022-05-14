@@ -13,8 +13,10 @@
 // limitations under the License.
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
@@ -26,6 +28,13 @@ import { ExplorationPlayerPageComponent } from './exploration-player-page.compon
  * @fileoverview Unit tests for exploration player page component.
  */
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
+
 describe('Exploration Player Page', () => {
   let fixture: ComponentFixture<ExplorationPlayerPageComponent>;
   let componentInstance: ExplorationPlayerPageComponent;
@@ -35,12 +44,19 @@ describe('Exploration Player Page', () => {
   let pageTitleService: PageTitleService;
   let readOnlyExplorationBackendApiService:
   ReadOnlyExplorationBackendApiService;
+  let translateService: TranslateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
         ExplorationPlayerPageComponent
+      ],
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -53,6 +69,7 @@ describe('Exploration Player Page', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
+    translateService = TestBed.inject(TranslateService);
   }));
 
   it('should create', () => {
@@ -72,7 +89,8 @@ describe('Exploration Player Page', () => {
     spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
       .and.returnValue(Promise.resolve(
         response as FetchExplorationBackendResponse));
-    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(componentInstance, 'setPageTitle');
+    spyOn(componentInstance, 'subscribeToOnLangChange');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
     spyOn(keyboardShortcutService, 'bindExplorationPlayerShortcuts');
 
@@ -82,8 +100,8 @@ describe('Exploration Player Page', () => {
     expect(contextService.getExplorationId).toHaveBeenCalled();
     expect(readOnlyExplorationBackendApiService.fetchExplorationAsync)
       .toHaveBeenCalledWith(expId, null);
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      response.exploration.title + ' - Oppia');
+    expect(componentInstance.setPageTitle).toHaveBeenCalled();
+    expect(componentInstance.subscribeToOnLangChange).toHaveBeenCalled();
     expect(metaTagCustomizationService.addOrReplaceMetaTags)
       .toHaveBeenCalledWith([
         {
@@ -110,4 +128,36 @@ describe('Exploration Player Page', () => {
     expect(keyboardShortcutService.bindExplorationPlayerShortcuts)
       .toHaveBeenCalled();
   }));
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', () => {
+    componentInstance.subscribeToOnLangChange();
+    spyOn(componentInstance, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(componentInstance.directiveSubscriptions.closed).toBe(false);
+    expect(componentInstance.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set new page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    componentInstance.explorationTitle = 'dummy_name';
+    componentInstance.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_EXPLORATION_PLAYER_PAGE_TITLE', {
+        explorationTitle: 'dummy_name'
+      });
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_EXPLORATION_PLAYER_PAGE_TITLE');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    componentInstance.subscribeToOnLangChange();
+    expect(componentInstance.directiveSubscriptions.closed).toBe(false);
+    componentInstance.ngOnDestroy();
+
+    expect(componentInstance.directiveSubscriptions.closed).toBe(true);
+  });
 });

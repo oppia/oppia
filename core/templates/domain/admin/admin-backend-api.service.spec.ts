@@ -654,6 +654,52 @@ describe('Admin backend api service', () => {
   }
   ));
 
+  it('should successfully rollback exploration', fakeAsync(() => {
+    let action = 'rollback_exploration_to_safe_state';
+    let expId = '123';
+    let payload = {
+      action: action,
+      exp_id: expId
+    };
+
+    abas.rollbackExplorationToSafeState(expId).then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should report failure when rolling back exploration', fakeAsync(() => {
+    let action = 'rollback_exploration_to_safe_state';
+    let expId = '123';
+    let payload = {
+      action: action,
+      exp_id: expId
+    };
+
+    abas.rollbackExplorationToSafeState(expId).then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }));
+
   it('should upload topic similarities when calling' +
     'uploadTopicSimilaritiesAsync', fakeAsync(() => {
     let action = 'upload_topic_similarities';
