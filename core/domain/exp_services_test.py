@@ -4896,6 +4896,358 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             composite_change_list_dict_expected, composite_change_list_dict)
 
+    def test_reverts_exp_to_safe_state_when_content_model_is_missing(self):
+        self.save_new_valid_exploration('0', self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 1')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 2')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 3')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 4')
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 5)
+
+        snapshot_content_model = (
+            exp_models.ExplorationSnapshotContentModel.get(
+                '0-5', strict=False))
+        snapshot_content_model.delete()
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 4)
+
+    def test_reverts_exp_to_safe_state_when_several_models_are_missing(self):
+        self.save_new_valid_exploration('0', self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 1')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 2')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 3')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 4')
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 5)
+
+        snapshot_content_model = (
+            exp_models.ExplorationSnapshotContentModel.get(
+                '0-5', strict=False))
+        snapshot_content_model.delete()
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '0-4', strict=False))
+        snapshot_metadata_model.delete()
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 3)
+
+    def test_reverts_exp_to_safe_state_when_metadata_model_is_missing(self):
+        self.save_new_valid_exploration('0', self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 1')
+        exp_services.update_exploration(
+                self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 2')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 3')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 4')
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 5)
+
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '0-5', strict=False))
+        snapshot_metadata_model.delete()
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 4)
+
+    def test_reverts_exp_to_safe_state_when_both_models_are_missing(self):
+        self.save_new_valid_exploration('0', self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 1')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 2')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 3')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 4')
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 5)
+
+        snapshot_content_model = (
+            exp_models.ExplorationSnapshotContentModel.get(
+                '0-5', strict=False))
+        snapshot_content_model.delete()
+
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '0-5', strict=False))
+        snapshot_metadata_model.delete()
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+        self.assertEqual(version, 4)
+
+    def test_does_not_revert_exp_when_no_models_are_missing(self):
+        self.save_new_valid_exploration('0', self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 1')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 2')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 3')
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+            })], 'Update 4')
+
+        version = exp_services.rollback_exploration_to_safe_state('0')
+
+        self.assertEqual(version, 5)
+
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to the exploration commit log."""
