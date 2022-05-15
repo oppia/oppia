@@ -474,7 +474,6 @@ angular.module('oppia').directive('storyNodeEditor', [
               )
             );
             _init();
-
             // The $timeout is required because at execution time,
             // the element may not be present in the DOM yet.Thus it ensure
             // that the element is visible before focussing.
