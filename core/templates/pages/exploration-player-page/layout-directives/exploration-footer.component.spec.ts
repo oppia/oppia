@@ -186,8 +186,6 @@ describe('ExplorationFooterComponent', () => {
     spyOnProperty(questionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
       .and.returnValue(mockResultsLoadedEventEmitter);
 
-    component.explorationId = explorationId;
-
     component.ngOnInit();
     mockResultsLoadedEventEmitter.emit(true);
 
@@ -457,7 +455,6 @@ describe('ExplorationFooterComponent', () => {
       .and.returnValue(Promise.resolve(sampleExpResponse));
 
     component.checkpointCount = 2;
-    component.explorationId = '0';
 
     spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
       .and.returnValue(2);
@@ -760,7 +757,6 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(
       questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
-    component.explorationId = explorationId;
 
     component.ngOnInit();
 
@@ -779,7 +775,6 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
       .returnValue(false);
     component.windowIsNarrow = true;
-    component.explorationId = 'exp1';
 
     component.ngOnInit();
     mockResizeEventEmitter.emit();
@@ -800,7 +795,6 @@ describe('ExplorationFooterComponent', () => {
     spyOn(
       explorationSummaryBackendApiService,
       'loadPublicAndPrivateExplorationSummariesAsync');
-    component.explorationId = 'exp1';
 
     component.ngOnInit();
 
