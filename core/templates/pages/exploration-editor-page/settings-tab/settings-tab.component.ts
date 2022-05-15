@@ -574,9 +574,11 @@ angular.module('oppia').component('settingsTab', {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshSettingsTab.subscribe(
             () => {
+              // TODO #15473: Remove this delay after this has been
+              // migrated to Angular 2+.
               setTimeout(()=>{
                 ctrl.refreshSettingsTab();
-              }, 500)
+              }, 500);
             }
           )
         );
@@ -653,6 +655,8 @@ angular.module('oppia').component('settingsTab', {
           ExplorationParamChangesService);
         ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
 
+        // TODO #15473: Remove this delay after this
+        // has been migrated to Angular 2+.
         setTimeout(()=>{
           ctrl.refreshSettingsTab();
         }, 500);

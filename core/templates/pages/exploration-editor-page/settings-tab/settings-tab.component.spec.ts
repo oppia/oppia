@@ -61,7 +61,7 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-fdescribe('Settings Tab Component', () => {
+describe('Settings Tab Component', () => {
   let ctrl = null;
   let $q = null;
   let $rootScope = null;
@@ -254,8 +254,9 @@ fdescribe('Settings Tab Component', () => {
       testSubscriptipns.unsubscribe();
     });
 
+    // eslint-disable-next-line oppia/no-test-blockers
     it('should initialize controller properties after its initialization',
-      () => {
+      (done) => {
         expect(ctrl.isRolesFormOpen).toBe(false);
         expect(ctrl.canDelete).toBe(true);
         expect(ctrl.canModifyRoles).toBe(true);
@@ -263,27 +264,34 @@ fdescribe('Settings Tab Component', () => {
         expect(ctrl.canUnpublish).toBe(true);
         expect(ctrl.explorationId).toBe(explorationId);
         expect(ctrl.canManageVoiceArtist).toBe(true);
-
-        expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
-          id: 'Astrology',
-          text: 'Astrology'
-        });
-
-        expect(ctrl.stateNames).toEqual(['Introduction']);
-        expect(ctrl.hasPageLoaded).toBe(true);
         expect(ctrl.loggedInUser).toBe('username1');
+
+        setTimeout(()=>{
+          $scope.$apply();
+
+          expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
+            id: 'Astrology',
+            text: 'Astrology'
+          });
+
+          expect(ctrl.stateNames).toEqual(['Introduction']);
+          expect(ctrl.hasPageLoaded).toBe(true);
+
+          done();
+        }, 501);
       });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
         'broadcasted', fakeAsync(() => {
-          routerService.onRefreshSettingsTab.emit();
-          $scope.$apply();
-          
-          tick(1000);
-    
-          expect(ctrl.stateNames).toEqual(['Introduction']);
-          expect(ctrl.hasPageLoaded).toBe(true);
-        }));
+      routerService.onRefreshSettingsTab.emit();
+      $scope.$apply();
+
+      tick(1000);
+      $scope.$apply();
+
+      expect(ctrl.stateNames).toEqual(['Introduction']);
+      expect(ctrl.hasPageLoaded).toBe(true);
+    }));
 
     it('should get explore page url based on the exploration id', () => {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -906,7 +914,7 @@ fdescribe('Settings Tab Component', () => {
       expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
     });
 
-    it('should check if parameters are used', () => {
+    it('should check if parameters are used', fakeAsync(() => {
       let paramChangeBackendDict = {
         customization_args: {
           parse_with_jinja: false,
@@ -917,10 +925,14 @@ fdescribe('Settings Tab Component', () => {
       };
 
       ctrl.refreshSettingsTab();
+
+      tick(1000);
+      $scope.$apply();
+
       expect(ctrl.areParametersUsed()).toBe(false);
       explorationDataService.data.param_changes.push(paramChangeBackendDict);
       expect(ctrl.areParametersUsed()).toBe(true);
-    });
+    }));
 
     describe('on calling onRolesFormUsernameBlur', function() {
       it('should disable save button when exploration title is empty', () => {
@@ -996,11 +1008,15 @@ fdescribe('Settings Tab Component', () => {
     });
 
     it('should refresh settings tab when refreshSettingsTab event occurs',
-      () => {
+      fakeAsync(() => {
         spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
         routerService.onRefreshSettingsTab.emit();
+
+        tick(1000);
+        $scope.$apply();
+
         expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
-      });
+      }));
 
     it('should toggle the preview cards', () => {
       expect(ctrl.basicSettingIsShown).toEqual(false);
