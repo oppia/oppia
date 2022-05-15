@@ -163,12 +163,6 @@ var TopicEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.openEditorInNewTab = async function(topicId) {
-    await browser.executeScript(
-      'window.open("' + EDITOR_URL_PREFIX + topicId + '")');
-    await waitFor.pageToFullyLoad();
-  };
-
   this.getTopicThumbnailSource = async function() {
     return await workflow.getImageSource(topicThumbnailImageElement);
   };
