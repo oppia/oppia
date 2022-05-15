@@ -178,12 +178,15 @@ describe('ExplorationFooterComponent', () => {
 
   it('should not show hints after user finishes practice session' +
   ' and results are loaded.', () => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    const explorationId = 'exp1';
+    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     expect(component.hintsAndSolutionsAreSupported).toBeTrue();
 
     spyOnProperty(questionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
       .and.returnValue(mockResultsLoadedEventEmitter);
+
+    component.explorationId = explorationId;
 
     component.ngOnInit();
     mockResultsLoadedEventEmitter.emit(true);
@@ -483,7 +486,7 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should display lesson information card', fakeAsync(() => {
-    let explorationId = 'expId';
+    const explorationId = 'expId';
     component.explorationId = explorationId;
     component.expInfo = {} as LearnerExplorationSummaryBackendDict;
 
@@ -752,10 +755,12 @@ describe('ExplorationFooterComponent', () => {
 
   it('should show hints when initialized in question player when user is' +
   ' going through the practice session and should add subscription.', () => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    const explorationId = 'expId';
+    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(
       questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
+    component.explorationId = explorationId;
 
     component.ngOnInit();
 
@@ -774,6 +779,7 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
       .returnValue(false);
     component.windowIsNarrow = true;
+    component.explorationId = 'exp1';
 
     component.ngOnInit();
     mockResizeEventEmitter.emit();
@@ -794,6 +800,7 @@ describe('ExplorationFooterComponent', () => {
     spyOn(
       explorationSummaryBackendApiService,
       'loadPublicAndPrivateExplorationSummariesAsync');
+    component.explorationId = 'exp1';
 
     component.ngOnInit();
 
