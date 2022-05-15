@@ -144,7 +144,7 @@ export class ExplorationFooterComponent {
 
     if (!this.footerIsInQuestionPlayerMode) {
       // Fetching the number of checkpoints.
-      this.getCheckpointCount(this.explorationId);
+      this.getCheckpointCount();
       this.setLearnerHasViewedLessonInfoTooltip();
     }
   }
@@ -245,9 +245,9 @@ export class ExplorationFooterComponent {
     return checkpointIndex;
   }
 
-  async getCheckpointCount(explorationId: string): Promise<void> {
+  async getCheckpointCount(): Promise<void> {
     return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null).then(
+      .fetchExplorationAsync(this.explorationId, null).then(
         (response: FetchExplorationBackendResponse) => {
           this.expStates = response.exploration.states;
           let count = 0;
