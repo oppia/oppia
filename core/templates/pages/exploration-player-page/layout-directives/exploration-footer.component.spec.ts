@@ -210,7 +210,7 @@ describe('ExplorationFooterComponent', () => {
     } as NgbModalRef);
 
     let sampleExpResponse: FetchExplorationBackendResponse = {
-      exploration_id: 'expId',
+      exploration_id: '0',
       is_logged_in: true,
       session_id: 'KERH',
       draft_change_list_id: 0,
@@ -454,7 +454,7 @@ describe('ExplorationFooterComponent', () => {
       .and.returnValue(Promise.resolve(sampleExpResponse));
 
     component.checkpointCount = 2;
-    component.explorationId = 'expId';
+    component.explorationId = '0';
 
     spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
       .and.returnValue(2);
