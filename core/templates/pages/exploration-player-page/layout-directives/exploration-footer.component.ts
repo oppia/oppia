@@ -140,7 +140,7 @@ export class ExplorationFooterComponent {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
       this.footerIsInQuestionPlayerMode = true;
-    } else if(this.explorationId) {
+    } else if (this.explorationId) {
       // Fetching the number of checkpoints.
       this.getCheckpointCount();
       this.setLearnerHasViewedLessonInfoTooltip();
