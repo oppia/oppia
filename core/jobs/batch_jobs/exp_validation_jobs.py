@@ -1,4 +1,3 @@
-
 # coding: utf-8
 #
 # Copyright 2022 The Oppia Authors. All Rights Reserved.
@@ -28,7 +27,6 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import List
 
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -38,9 +36,7 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
 
     def _check_tags_are_valid(
         self, exp: exp_models.ExplorationModel
-    ) -> result.Result[
-        exp_models.ExplorationModel, str
-    ]:
+    ) -> result.Result[exp_models.ExplorationModel, str]:
         """Returns the Result object based on the validity of tags
         in the exploration model.
 
@@ -55,40 +51,28 @@ class GetNumberOfExpHavingInvalidTagsListJob(base_jobs.JobBase):
         """
         tags = exp.tags
         tags_are_valid = True
-        output_string = 'The exp of id %s contains' % exp.id
-        visited = set()
-        dup: List[str] = []
-        empty_tag = max_length_exceed_tag = 0
+        errors_list: str = []
 
         if len(tags) > 10:
             tags_are_valid = False
-            output_string += ' tags length more than 10,'
+            errors_list.append('tags having length more than 10')
+
         if len(set(tags)) < len(tags):
             tags_are_valid = False
-            for ele in tags:
-                if ele.strip() != '':
-                    if ele in visited or (visited.add(ele)):
-                        dup.append(ele)
-            if len(dup) != 0:
-                output_string += f' {len(dup)} duplicate values {dup},'
+            errors_list.append('tags with duplicate values')
 
         for tag in tags:
             if tag.strip() == '':
                 tags_are_valid = False
-                empty_tag += 1
+                errors_list.append('tags with empty tag values')
             elif len(tag) > 30:
                 tags_are_valid = False
-                max_length_exceed_tag += 1
+                errors_list.append('tags having tag with length more than 30')
 
-        if (empty_tag != 0) or (max_length_exceed_tag != 0):
-            output_string += (
-                f' {empty_tag} empty tag and'
-                + f' {max_length_exceed_tag} tag having length more than 30, ')
-
-        last_comma_index = output_string.rfind(',')
-        output_string = (
-            output_string[:last_comma_index] + '.'
-            + output_string[last_comma_index + 1:])
+        errors_list = list(set(errors_list))
+        errors_list.sort()
+        error_string = ', '.join(errors_list)
+        output_string = ('The exp of id %s contain ' % exp.id) + error_string
 
         if tags_are_valid:
             return result.Ok(exp)
