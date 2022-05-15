@@ -112,6 +112,8 @@ var TopicsAndSkillsDashboardPage = function() {
   var retLocator = by.css('.protractor-test-rte');
   var skillDescriptionField = element(
     by.css('.protractor-test-skill-description-field'));
+  var openSkillEditorButtons = element.all(
+    by.css('.protractor-test-open-skill-editor'));
 
   this.get = async function() {
     await waitFor.clientSideRedirection(async() => {
@@ -173,6 +175,13 @@ var TopicsAndSkillsDashboardPage = function() {
       'Topic edit option', topicEditOptions.get(index));
     await action.click(
       'Edit topic button', editTopicButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToSkillWithIndex = async function(index) {
+    await this.navigateToSkillsTab();
+    await this.waitForSkillsToLoad();
+    await action.click('Skill editor', openSkillEditorButtons.get(index));
     await waitFor.pageToFullyLoad();
   };
 

@@ -131,12 +131,6 @@ var SkillEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.openSkillEditorInNewTab = async function(skillId) {
-    await browser.executeScript(
-      'window.open("' + EDITOR_URL_PREFIX + skillId + '")');
-    await waitFor.pageToFullyLoad();
-  };
-
   this.selectDifficultyForRubric = async function(difficulty) {
     await waitFor.visibilityOf(
       selectRubricDifficulty, 'Select Rubric takes too long to appear.');
