@@ -178,7 +178,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-video><br></p>'
         )
 
-        expected_components: Final = [
+        expected_components: List[html_cleaner.ComponentsDict] = [
             {
                 'customization_args': {
                     'text-with-value': u'Link"quoted text"\'singlequotes\'',
