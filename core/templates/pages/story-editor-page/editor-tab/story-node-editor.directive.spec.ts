@@ -134,6 +134,8 @@ describe('Story node editor directive', function() {
 
     var MockSkillBackendApiService = {
       fetchMultiSkillsAsync: (skillIds) => {
+        // The skillId ='2' case is used to test the case when the
+        // SkillBackendApiService rejects the request.
         if (skillIds[0] === '2') {
           return $q.reject();
         } else {
@@ -190,19 +192,15 @@ describe('Story node editor directive', function() {
   });
 
   it('should fetch the descriptions for prerequisite skills', function() {
-    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValues(['1', '0']);
+    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValues(['1']);
 
     $scope.getPrerequisiteSkillsDescription();
     $rootScope.$apply();
     expect($scope.skillIdToSummaryMap).toEqual({1: 'test'});
-
-    $scope.getPrerequisiteSkillsDescription();
-    $rootScope.$apply();
-    expect($scope.skillIdToSummaryMap).toEqual({});
   });
 
   it('should call Alerts Service if getting skill desc. fails', function() {
-    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValue('2');
+    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValue(['2']);
     var alertsSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
     $scope.getPrerequisiteSkillsDescription();
     $rootScope.$apply();
