@@ -178,6 +178,7 @@ describe('ExplorationFooterComponent', () => {
 
   it('should not show hints after user finishes practice session' +
   ' and results are loaded.', () => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     expect(component.hintsAndSolutionsAreSupported).toBeTrue();
 
@@ -209,7 +210,7 @@ describe('ExplorationFooterComponent', () => {
     } as NgbModalRef);
 
     let sampleExpResponse: FetchExplorationBackendResponse = {
-      exploration_id: '0',
+      exploration_id: 'expId',
       is_logged_in: true,
       session_id: 'KERH',
       draft_change_list_id: 0,
@@ -453,6 +454,7 @@ describe('ExplorationFooterComponent', () => {
       .and.returnValue(Promise.resolve(sampleExpResponse));
 
     component.checkpointCount = 2;
+    component.explorationId = 'expId';
 
     spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
       .and.returnValue(2);
@@ -654,11 +656,13 @@ describe('ExplorationFooterComponent', () => {
       most_recently_reached_checkpoint_exp_version: 1
     };
 
+    component.explorationId = 'expId';
+
     spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
       .and.returnValue(Promise.resolve(sampleDataResults));
     expect(component.checkpointCount).toEqual(0);
 
-    component.getCheckpointCount('expId');
+    component.getCheckpointCount();
     tick();
 
     expect(component.expStates).toEqual(sampleDataResults.exploration.states);
@@ -748,6 +752,7 @@ describe('ExplorationFooterComponent', () => {
 
   it('should show hints when initialized in question player when user is' +
   ' going through the practice session and should add subscription.', () => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(
       questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
