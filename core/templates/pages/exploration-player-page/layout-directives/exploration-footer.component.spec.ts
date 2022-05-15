@@ -178,8 +178,7 @@ describe('ExplorationFooterComponent', () => {
 
   it('should not show hints after user finishes practice session' +
   ' and results are loaded.', () => {
-    const explorationId = 'exp1';
-    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     expect(component.hintsAndSolutionsAreSupported).toBeTrue();
 
@@ -483,8 +482,7 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should display lesson information card', fakeAsync(() => {
-    const explorationId = 'expId';
-    component.explorationId = explorationId;
+    component.explorationId = 'exp1';
     component.expInfo = {} as LearnerExplorationSummaryBackendDict;
 
     spyOn(component, 'openInformationCardModal');
@@ -752,8 +750,7 @@ describe('ExplorationFooterComponent', () => {
 
   it('should show hints when initialized in question player when user is' +
   ' going through the practice session and should add subscription.', () => {
-    const explorationId = 'expId';
-    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(
       questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
