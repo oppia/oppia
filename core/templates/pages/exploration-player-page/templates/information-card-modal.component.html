@@ -16,7 +16,7 @@
 
     <ul *ngIf="!explorationIsPrivate" class="card-metrics row space-between center">
       <li class="protractor-test-info-card-rating row-item">
-        <span class="fas fa-star fa-lg" [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate" placement="top">
+        <span class="fas fa-star fa-lg learn-info-card-star" [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate" placement="top">
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_RATINGS_TOOLTIP' | translate }}</span>
         </span>
         <span *ngIf="!averageRating">{{ 'I18N_PLAYER_UNRATED' | translate }}</span>
@@ -58,7 +58,7 @@
     </ul>
 
     <div *ngIf="!explorationIsPrivate" class="oppia-info-card-bottom-row">
-      <div class="row center">
+      <div class="fx-row">
         <div class="oppia-info-card-tag-icon">
           <span class="fas fa-tags oppia-info-card-modal-tooltip"
                 [ngbTooltip]="'I18N_PLAYER_TAGS_TOOLTIP' | translate"

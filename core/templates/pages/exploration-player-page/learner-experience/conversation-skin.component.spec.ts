@@ -24,10 +24,12 @@ import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
@@ -100,7 +102,7 @@ describe('Conversation skin component', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let explorationRecommendationsService:
-  ExplorationRecommendationsService;
+    ExplorationRecommendationsService;
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let fatigueDetectionService: FatigueDetectionService;
   let focusManagerService: FocusManagerService;
@@ -114,14 +116,14 @@ describe('Conversation skin component', () => {
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
   let playerCorrectnessFeedbackEnabledService:
-  PlayerCorrectnessFeedbackEnabledService;
+    PlayerCorrectnessFeedbackEnabledService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let questionPlayerStateService: QuestionPlayerStateService;
   let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let refresherExplorationConfirmationModalService:
-  RefresherExplorationConfirmationModalService;
+    RefresherExplorationConfirmationModalService;
   let siteAnalyticsService: SiteAnalyticsService;
   let statsReportingService: StatsReportingService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -130,11 +132,299 @@ describe('Conversation skin component', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
+  let readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService;
+  let stateObjectFactory: StateObjectFactory;
 
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
       [], [], null, null, [], '', null),
     [], null, null, '', null);
+
+  let explorationDict = {
+    states: {
+      Start: {
+        classifier_model_id: null,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'TextInput',
+          hints: [],
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          answer_groups: [
+            {
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Good Job</p>'
+                },
+                param_changes: [],
+                dest: 'Mid'
+              },
+              training_data: [],
+              rule_specs: [
+                {
+                  inputs: {
+                    x: {
+                      normalizedStrSet: [
+                        'answer'
+                      ],
+                      contentId: 'rule_input_2'
+                    }
+                  },
+                  rule_type: 'FuzzyEquals'
+                }
+              ],
+              tagged_skill_misconception_id: null
+            }
+          ],
+          default_outcome: {
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            labelled_as_correct: false,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '<p>Try again.</p>'
+            },
+            param_changes: [],
+            dest: 'Start'
+          }
+        },
+        param_changes: [],
+        next_content_id_index: 3,
+        card_is_checkpoint: true,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: '<p>First Question</p>'
+        }
+      },
+      End: {
+        classifier_model_id: null,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {}
+          }
+        },
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'EndExploration',
+          hints: [],
+          customization_args: {
+            recommendedExplorationIds: {
+              value: ['recommnendedExplorationId']
+            }
+          },
+          answer_groups: [],
+          default_outcome: null
+        },
+        param_changes: [],
+        next_content_id_index: 0,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: 'Congratulations, you have finished!'
+        }
+      },
+      Mid: {
+        classifier_model_id: null,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'TextInput',
+          hints: [],
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          answer_groups: [
+            {
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ' <p>Good Job</p>'
+                },
+                param_changes: [],
+                dest: 'End'
+              },
+              training_data: [],
+              rule_specs: [
+                {
+                  inputs: {
+                    x: {
+                      normalizedStrSet: [
+                        'answer'
+                      ],
+                      contentId: 'rule_input_2'
+                    }
+                  },
+                  rule_type: 'FuzzyEquals'
+                }
+              ],
+              tagged_skill_misconception_id: null
+            }
+          ],
+          default_outcome: {
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            labelled_as_correct: false,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '<p>try again.</p>'
+            },
+            param_changes: [],
+            dest: 'Mid'
+          }
+        },
+        param_changes: [],
+        next_content_id_index: 3,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: '<p>Second Question</p>'
+        }
+      }
+    },
+    auto_tts_enabled: true,
+    version: 2,
+    draft_change_list_id: 9,
+    is_version_of_draft_valid: null,
+    title: 'Exploration',
+    language_code: 'en',
+    correctness_feedback_enabled: true,
+    init_state_name: 'Start',
+    param_changes: [],
+    param_specs: null,
+    draft_changes: null,
+  };
+
+  let explorationResponse: FetchExplorationBackendResponse = {
+    exploration_id: 'exp_id',
+    is_logged_in: true,
+    session_id: 'KERH',
+    exploration: {
+      init_state_name: 'Start',
+      param_changes: [],
+      param_specs: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      objective: 'To learn',
+      states: explorationDict.states
+    },
+    version: 2,
+    can_edit: true,
+    preferred_audio_language_code: 'en',
+    preferred_language_codes: [],
+    auto_tts_enabled: true,
+    correctness_feedback_enabled: true,
+    record_playthrough_probability: 1,
+    draft_change_list_id: 0,
+    has_viewed_lesson_info_modal_once: false,
+    furthest_completed_checkpoint_exp_version: 1,
+    furthest_completed_checkpoint_state_name: 'End',
+    most_recently_reached_checkpoint_state_name: 'Mid',
+    most_recently_reached_checkpoint_exp_version: 2
+  };
+
+  let sampleExpResponse: FetchExplorationBackendResponse = {
+    exploration_id: 'exp_id',
+    is_logged_in: true,
+    session_id: 'KERH',
+    exploration: {
+      init_state_name: 'Start',
+      param_changes: [],
+      param_specs: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      objective: 'To learn',
+      states: explorationDict.states
+    },
+    version: 2,
+    can_edit: true,
+    preferred_audio_language_code: 'en',
+    preferred_language_codes: [],
+    auto_tts_enabled: true,
+    correctness_feedback_enabled: true,
+    record_playthrough_probability: 1,
+    draft_change_list_id: 0,
+    has_viewed_lesson_info_modal_once: false,
+    furthest_completed_checkpoint_exp_version: 1,
+    furthest_completed_checkpoint_state_name: 'End',
+    most_recently_reached_checkpoint_state_name: null,
+    most_recently_reached_checkpoint_exp_version: 2
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -206,6 +496,9 @@ describe('Conversation skin component', () => {
     userService = TestBed.inject(UserService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     windowRef = TestBed.inject(WindowRef);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
   }));
 
   it('should create', () => {
@@ -263,6 +556,10 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
     spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(explorationResponse));
+    spyOn(explorationEngineService, 'getShortestPathToState')
+      .and.returnValue(['Start', 'Mid']);
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
@@ -301,8 +598,89 @@ describe('Conversation skin component', () => {
     tick(1000);
   }));
 
+  it('should initialize component as logged in user', fakeAsync(() => {
+    let collectionId = 'id';
+    let expId = 'exp_id';
+    let isInPreviewMode = false;
+    let isIframed = false;
+    let collectionSummary = {
+      is_admin: true,
+      summaries: [],
+      user_email: '',
+      is_topic_manager: false,
+      username: true
+    };
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+      .and.returnValues(collectionId, null);
+
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.returnValue(Promise.resolve(new Collection(
+        '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(explorationEngineService, 'isInPreviewMode')
+      .and.returnValue(isInPreviewMode);
+    spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('oppia_avatar_url');
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValues(true, false);
+    spyOn(componentInstance, 'initializePage');
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(
+        Promise.resolve(collectionSummary));
+    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(
+      guestCollectionProgressService, 'recordExplorationCompletedInCollection');
+    spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+      .and.returnValue(true);
+    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(sampleExpResponse));
+
+    let mockOnHintConsumed = new EventEmitter();
+    let mockOnSolutionViewedEventEmitter = new EventEmitter();
+    let mockOnPlayerStateChange = new EventEmitter();
+
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
+      .and.returnValue(mockOnHintConsumed);
+    spyOnProperty(
+      hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
+      .and.returnValue(mockOnSolutionViewedEventEmitter);
+    spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+      .and.returnValue(mockOnPlayerStateChange);
+
+    componentInstance.nextCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+    componentInstance.hasInteractedAtLeastOnce = true;
+    componentInstance.displayedCard = displayedCard;
+
+    componentInstance.ngOnInit();
+  }));
+
   it('should show alert when collection summaries are not loaded',
     fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(new UserInfo(
+          [], false, false,
+          false, false, false, '', '', '', true)));
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
         'collection_id');
@@ -357,6 +735,83 @@ describe('Conversation skin component', () => {
     expect(playerPositionService.getCurrentStateName).toHaveBeenCalled();
     expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalled();
   });
+
+  it('should navigate to the most recently reached checkpoint ' +
+  'on page load if user is logged in', fakeAsync(() => {
+    let stateCardNames = ['Start', 'Mid', 'End'];
+    let stateCards: StateCard[] = [];
+    for (let stateName in stateCardNames) {
+      stateCards.push(new StateCard(
+        stateName,
+        '<p>Testing</p>', null, new Interaction(
+          [], [], null, null, [], 'Continue', null),
+        [], null, null, 'content', null)
+      );
+    }
+    let alertMessageElement = document.createElement('div');
+    alertMessageElement.className =
+      'oppia-exploration-checkpoints-message';
+    const expResponse = explorationResponse;
+    expResponse.exploration.states.Mid.card_is_checkpoint = true;
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
+    spyOn(playerPositionService, 'init').and.callFake((callb) => {
+      callb();
+    });
+    componentInstance.questionPlayerConfig = {};
+    spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValues('en', 'en', 'en', 'pq');
+    spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')
+      .and.callFake((config, callb, questionAreAvailable) => {
+        callb(displayedCard, 'label');
+      });
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValue(false);
+    spyOn(componentInstance, 'adjustPageHeight');
+    spyOn(playerPositionService.onNewCardOpened, 'emit');
+    componentInstance.isIframed = true;
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValues('Start', 'Mid', 'End');
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(expResponse));
+    spyOn(explorationEngineService, 'getShortestPathToState')
+      .and.returnValue(['Start', 'Mid']);
+
+    spyOn(explorationEngineService, 'getStateCardByName')
+      .and.returnValues(stateCards[0], stateCards[1], stateCards[2]);
+
+    spyOn(playerPositionService, 'getDisplayedCardIndex')
+      .and.returnValue(1);
+    spyOn(explorationEngineService, 'getState')
+      .and.returnValue(stateObjectFactory.createFromBackendDict(
+        'Mid', expResponse.exploration.states.Mid
+      ));
+    spyOn(document, 'querySelector').withArgs(
+      '.oppia-exploration-checkpoints-message')
+      .and.returnValue(alertMessageElement);
+
+    componentInstance.explorationId = expResponse.exploration_id;
+    componentInstance.displayedCard = displayedCard;
+    componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+    componentInstance.alertMessageTimeout = 5;
+
+    componentInstance.initializePage();
+    tick(100);
+
+    expect(componentInstance.prevSessionStatesProgress).toEqual(
+      ['Start']);
+    expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
+  }));
+
 
   it('should unsubscribe on destroy', () => {
     spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');
@@ -493,6 +948,10 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'init').and.callFake((callb) => {
       callb();
     });
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
     componentInstance.questionPlayerConfig = {};
     spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
@@ -509,6 +968,7 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
 
+    componentInstance.explorationId = explorationResponse.exploration_id;
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.initializePage();
@@ -861,7 +1321,7 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'changeCurrentQuestion');
     spyOn(componentInstance, 'showPendingCard');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
-    spyOn(explorationEngineService, 'getAuthorRecommendedExpIds')
+    spyOn(explorationEngineService, 'getAuthorRecommendedExpIdsByStateName')
       .and.returnValue([]);
     spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
       .and.returnValue(true);
@@ -1029,7 +1489,7 @@ describe('Conversation skin component', () => {
       spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
       spyOn(playerPositionService, 'changeCurrentQuestion');
       spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
-      spyOn(explorationEngineService, 'getAuthorRecommendedExpIds')
+      spyOn(explorationEngineService, 'getAuthorRecommendedExpIdsByStateName')
         .and.returnValue([]);
       spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
         .and.returnValue(false);
@@ -1063,4 +1523,19 @@ describe('Conversation skin component', () => {
       componentInstance.isHackyExpTitleTranslationDisplayed(expId);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
+
+  it('should check if current card was completed in a previous session',
+    () => {
+      let mockStateCard = new StateCard(
+        'Temp2', '', '', new Interaction([], [], null, null, [], null, null)
+        , [], null, null, '', null);
+      componentInstance.displayedCard = mockStateCard;
+      componentInstance.prevSessionStatesProgress = ['Temp1', 'Temp2'];
+      expect(componentInstance.isDisplayedCardCompletedInPrevSession()).
+        toBeTrue();
+      componentInstance.prevSessionStatesProgress = ['Temp1'];
+      expect(componentInstance.isDisplayedCardCompletedInPrevSession()).
+        toBeFalse();
+    }
+  );
 });
