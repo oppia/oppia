@@ -31,7 +31,7 @@ from typing import Any, Dict, List
 from typing_extensions import Final, TypedDict
 
 
-class ComponentsDict(TypedDict):
+class ComponentsDict(TypedDict, total=False):
     """Dictionary that represents RTE Components."""
 
     id: str
@@ -177,7 +177,7 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
     for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:
-            component = {'id': tag_name}
+            component: ComponentsDict = {'id': tag_name}
             customization_args: Dict[str, Any] = {}
             for attr in tag_attrs:
                 # Unescape special HTML characters such as '&quot;'.
@@ -185,5 +185,5 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
                 customization_args[attr] = json.loads(attr_val)
 
             component['customization_args'] = customization_args
-            components.append(component)   # type: ignore[arg-type]
+            components.append(component)
     return components
