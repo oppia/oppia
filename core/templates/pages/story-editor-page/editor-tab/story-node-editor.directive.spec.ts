@@ -202,8 +202,10 @@ describe('Story node editor directive', function() {
   it('should call Alerts Service if getting skill desc. fails', function() {
     spyOn($scope, 'getPrerequisiteSkillIds').and.returnValue(['2']);
     var alertsSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
+
     $scope.getPrerequisiteSkillsDescription();
     $rootScope.$apply();
+
     expect(alertsSpy).toHaveBeenCalled();
   });
 
