@@ -137,7 +137,7 @@ describe('Create New Chapter Modal Controller', function() {
       expect($scope.nodeTitles).toEqual(nodeTitles);
       expect($scope.errorMsg).toBe(null);
       expect($scope.correctnessFeedbackDisabled).toBe(false);
-      expect($scope.categoryNotDefault).toBe(false);
+      expect($scope.categoryIsDefault).toBe(true);
     });
 
   it('should validate explorationId correctly',
@@ -245,7 +245,7 @@ describe('Create New Chapter Modal Controller', function() {
     const correctnessFeedbackSpy =
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled');
     const categorySpy =
-      spyOn(explorationIdValidationService, 'isCategoryNotDefault');
+      spyOn(explorationIdValidationService, 'isDefaultCategoryAsync');
     $scope.save();
     $rootScope.$apply();
     expect($scope.invalidExpId).toEqual(true);
@@ -276,15 +276,17 @@ describe('Create New Chapter Modal Controller', function() {
     $scope.title = 'dummy_title';
     var deferred = $q.defer();
     deferred.resolve(true);
+    var deferred2 = $q.defer();
+    deferred2.resolve(false);
     spyOn(explorationIdValidationService, 'isExpPublishedAsync')
       .and.returnValue(deferred.promise);
     spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
       .and.returnValue(deferred.promise);
-    spyOn(explorationIdValidationService, 'isCategoryNotDefault')
-      .and.returnValue(deferred.promise);
+    spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
+      .and.returnValue(deferred2.promise);
     $scope.save();
     $rootScope.$apply();
-    expect($scope.categoryNotDefault).toBe(true);
+    expect($scope.categoryIsDefault).toBe(false);
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 
@@ -297,10 +299,8 @@ describe('Create New Chapter Modal Controller', function() {
         .and.returnValue(deferred.promise);
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
         .and.returnValue(deferred.promise);
-      var deferred2 = $q.defer();
-      deferred2.resolve(false);
-      spyOn(explorationIdValidationService, 'isCategoryNotDefault')
-        .and.returnValue(deferred2.promise);
+      spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
+        .and.returnValue(deferred.promise);
       const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
       const updateTitleSpy = spyOn($scope, 'updateTitle');
       $scope.save();

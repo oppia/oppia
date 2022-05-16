@@ -60,7 +60,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
       StoryUpdateService.addStoryNode($scope.story, $scope.title);
       $scope.correctnessFeedbackDisabled = false;
-      $scope.categoryNotDefault = false;
+      $scope.categoryIsDefault = true;
     };
 
     $scope.init();
@@ -109,7 +109,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.errorMsg = null;
       $scope.invalidExpId = false;
       $scope.correctnessFeedbackDisabled = false;
-      $scope.categoryNotDefault = false;
+      $scope.categoryIsDefault = true;
       $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
     };
 
@@ -149,15 +149,15 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
                 return;
               }
               $scope.correctnessFeedbackDisabled = false;
-              ExplorationIdValidationService.isCategoryNotDefault(
+              ExplorationIdValidationService.isDefaultCategoryAsync(
                 $scope.explorationId).then(
-                (categoryNotDefault) => {
-                  if (categoryNotDefault) {
-                    $scope.categoryNotDefault = true;
+                (categoryIsDefault) => {
+                  if (!categoryIsDefault) {
+                    $scope.categoryIsDefault = false;
                     $scope.$applyAsync();
                     return;
                   }
-                  $scope.categoryNotDefault = false;
+                  $scope.categoryIsDefault = true;
                   $scope.updateTitle();
                   $scope.updateExplorationId();
                   $scope.$applyAsync();

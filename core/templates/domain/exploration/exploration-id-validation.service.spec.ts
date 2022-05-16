@@ -215,14 +215,14 @@ describe('Exploration id validation service', () => {
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.isCategoryNotDefault(explorationIds[0])
+    explorationIdValidationService.isDefaultCategoryAsync(explorationIds[0])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
     req.flush(validExpResultsWithDefaultCategory);
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(false);
+    expect(successHandler).toHaveBeenCalledWith(true);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -233,14 +233,14 @@ describe('Exploration id validation service', () => {
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.isCategoryNotDefault(explorationIds[0])
+    explorationIdValidationService.isDefaultCategoryAsync(explorationIds[0])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
     req.flush(validExpResultsWithCustomCategory);
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(true);
+    expect(successHandler).toHaveBeenCalledWith(false);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 });

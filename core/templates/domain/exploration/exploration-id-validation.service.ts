@@ -52,7 +52,7 @@ export class ExplorationIdValidationService {
         });
   }
 
-  async isCategoryNotDefault(explorationId: string): Promise<boolean> {
+  async isDefaultCategoryAsync(explorationId: string): Promise<boolean> {
     return this.explorationSummaryBackendApiService
       .loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {
@@ -66,7 +66,7 @@ export class ExplorationIdValidationService {
               }
             }
           }
-          return !isCategoryPresent;
+          return isCategoryPresent;
         });
   }
 }
