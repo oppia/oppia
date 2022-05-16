@@ -220,7 +220,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
-      ctrl.isExplorationInitialized = false;
+      ctrl.explorationIsInitialized = false;
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -244,8 +244,29 @@ angular.module('oppia').component('explorationEditorPage', {
         return explorationId ? ('/explore/' + explorationId) : '';
       };
 
-      ctrl.createExplorationEditorBrowserTabsInfo = function(version) {
-        var explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      ctrl.onClosingExplorationEditorBrowserTab = function() {
+        const explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
+            ContextService.getExplorationId()));
+
+        if (
+          explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+          ChangeListService.getChangeList().length > 0
+        ) {
+          explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        }
+        explorationEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          explorationEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
+      };
+
+      let createExplorationEditorBrowserTabsInfo = function(version: number) {
+        let explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
           LocalStorageService.getEntityEditorBrowserTabsInfo(
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
@@ -266,8 +287,8 @@ angular.module('oppia').component('explorationEditorPage', {
             .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
       };
 
-      ctrl.updateExplorationEditorBrowserTabsInfo = function(version) {
-        var explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      let updateExplorationEditorBrowserTabsInfo = function(version: number) {
+        const explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
           LocalStorageService.getEntityEditorBrowserTabsInfo(
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
@@ -282,28 +303,9 @@ angular.module('oppia').component('explorationEditorPage', {
             .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
       };
 
-      ctrl.onClosingExplorationEditorBrowserTab = function() {
-        var explorationEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-          LocalStorageService.getEntityEditorBrowserTabsInfo(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
-            ContextService.getExplorationId()));
-
-        if (
-          explorationEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
-          ChangeListService.getChangeList().length > 0
-        ) {
-          explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
-        }
-        explorationEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
-
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          explorationEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
-      };
-
-      ctrl.onCreateOrUpdateExplorationEditorBrowserTabsInfo = function(event) {
+      let onCreateOrUpdateExplorationEditorBrowserTabsInfo = function(
+          event: StorageEvent
+      ) {
         if (event.key === (
           EntityEditorBrowserTabsInfoDomainConstants
             .OPENED_EXPLORATION_EDITOR_BROWSER_TABS)
@@ -371,12 +373,12 @@ angular.module('oppia').component('explorationEditorPage', {
             EditabilityService.lockExploration(false);
           }
 
-          if (!ctrl.isExplorationInitialized) {
-            ctrl.isExplorationInitialized = true;
-            ctrl.createExplorationEditorBrowserTabsInfo(
+          if (!ctrl.explorationIsInitialized) {
+            ctrl.explorationIsInitialized = true;
+            createExplorationEditorBrowserTabsInfo(
               explorationData.version);
           } else {
-            ctrl.updateExplorationEditorBrowserTabsInfo(
+            updateExplorationEditorBrowserTabsInfo(
               explorationData.version);
           }
 
@@ -695,7 +697,7 @@ angular.module('oppia').component('explorationEditorPage', {
         WindowRef.nativeWindow.addEventListener(
           'beforeunload', ctrl.onClosingExplorationEditorBrowserTab);
         LocalStorageService.registerNewStorageEventListener(
-          ctrl.onCreateOrUpdateExplorationEditorBrowserTabsInfo);
+          onCreateOrUpdateExplorationEditorBrowserTabsInfo);
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
