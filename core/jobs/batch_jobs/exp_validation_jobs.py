@@ -28,7 +28,8 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -37,6 +38,16 @@ if MYPY:  # pragma: no cover
 
 (exp_models, opportunity_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.opportunity])
+
+
+class ExpAndOpportunityModelsDict(TypedDict):
+    """Dictionary that represents each element of the PCollection returned by
+    CoGroupByKey."""
+
+    exp_models: List[exp_models.ExplorationModel]
+    opportinity_models: List[
+        opportunity_models.ExplorationOpportunitySummaryModel
+    ]
 
 
 class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
@@ -110,7 +121,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
 
     def filter_curated_explorations(self, model_pair: Tuple[
         Optional[exp_models.ExplorationModel],
-        Optional[opportunity_models.OpportunityModel]
+        Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]) -> bool:
         """Returns whether the exp model is curated or not.
 
@@ -123,7 +134,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         return (model_pair[0] is not None) and (model_pair[1] is not None)
 
     def get_exploration_from_models(self, model_pair: Tuple[
-        exp_models.ExplorationModel, opportunity_models.OpportunityModel
+        exp_models.ExplorationModel,
+        opportunity_models.ExplorationOpportunitySummaryModel
     ]) -> exp_domain.Exploration:
         """Returns the exploration domain object from the curated
         exploration model.
@@ -137,26 +149,25 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         return exp_fetchers.get_exploration_from_model(model_pair[0])
 
     def convert_into_model_pair(
-        self, models_list: Dict[str, List[Union[exp_models.ExplorationModel,
-            opportunity_models.OpportunityModel]]]
+      self, models_dict: ExpAndOpportunityModelsDict
     ) -> Tuple[
         Optional[exp_models.ExplorationModel],
-        Optional[opportunity_models.OpportunityModel]
+        Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]:
         """Returns the pair of exp and opportunity models.
-        
+
         Args:
-            models_list: dict. The dict of exp and opportunity models list.
+            models_dict: dict. The dict of exp and opportunity models list.
 
         Returns:
             tuple. The pair of exp and opportunity models.
         """
         exp_model = None
         opportunity_model = None
-        if len(models_list['exp_models']) == 1:
-            exp_model = models_list['exp_models'][0]
-        if len(models_list['opportinity_models']) == 1:
-            opportunity_model = models_list['opportinity_models'][0]
+        if len(models_dict['exp_models']) == 1:
+            exp_model = models_dict['exp_models'][0]
+        if len(models_dict['opportinity_models']) == 1:
+            opportunity_model = models_dict['opportinity_models'][0]
         model_pair = (exp_model, opportunity_model)
         return model_pair
 
@@ -192,7 +203,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 'opportinity_models': all_exp_opportunities
             })
             | 'Combine the PCollections' >> beam.CoGroupByKey()
-            | 'Drop off the exp id' >> beam.Values()
+            | 'Drop off the exp id' >>
+                beam.Values() # pylint: disable=no-value-for-parameter
             | 'Get tuple pairs from both models' >> beam.Map(
                 self.convert_into_model_pair)
             | 'Filter curated explorations' >> beam.Filter(
