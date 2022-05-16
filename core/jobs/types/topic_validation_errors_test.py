@@ -22,6 +22,10 @@ from core.jobs.types import base_validation_errors_test
 from core.jobs.types import topic_validation_errors
 from core.platform import models
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import topic_models
+
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -30,7 +34,7 @@ datastore_services = models.Registry.import_datastore_services()
 class ModelCanonicalNameMismatchErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = topic_models.TopicModel(
             id='test',
             name='name',
