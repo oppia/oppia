@@ -254,7 +254,6 @@ describe('Settings Tab Component', () => {
       testSubscriptipns.unsubscribe();
     });
 
-    // eslint-disable-next-line oppia/no-test-blockers
     it('should initialize controller properties after its initialization',
       (done) => {
         expect(ctrl.isRolesFormOpen).toBe(false);
