@@ -19,7 +19,6 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import constants from 'assets/constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { NewlyCreatedTopic } from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
@@ -45,8 +44,8 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
 
   topicUrlFragmentExists: boolean = false;
   topicNameExists: boolean = false;
-  maxWebTitleFrag = constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
-  minWebTitleFrag = constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+  maxWebTitleFrag = AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+  minWebTitleFrag = AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
 
   constructor(
     private contextService: ContextService,

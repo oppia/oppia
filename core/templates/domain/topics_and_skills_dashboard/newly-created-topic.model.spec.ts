@@ -34,22 +34,22 @@ describe('Newly Created Topic Model', () => {
   });
 
   it('should validate the new topic fields', () => {
-    expect(topic.isValid()).toBe(false);
+    expect(topic.isValid()).toBeFalse();
 
     topic.description = '';
-    expect(topic.isValid()).toBe(false);
+    expect(topic.isValid()).toBeFalse();
 
     topic.pageTitleFragment = '';
-    expect(topic.isValid()).toBe(false);
+    expect(topic.isValid()).toBeFalse();
 
     topic.description = 'Topic description';
-    expect(topic.isValid()).toBe(false);
+    expect(topic.isValid()).toBeFalse();
 
     topic.urlFragment = 'url-fragment';
-    expect(topic.isValid()).toBe(false);
+    expect(topic.isValid()).toBeFalse();
 
     topic.pageTitleFragment = 'testing';
-    expect(topic.isValid()).toBe(false);
+    expect(topic.isValid()).toBeFalse();
 
     topic.name = 'TopicName1';
     expect(topic.isValid()).toBe(true);
