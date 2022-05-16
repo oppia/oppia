@@ -148,6 +148,27 @@ describe('Side Navigation Bar Component', () => {
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
   });
 
+  it('should navigate to learner dashboard when learner clicks on ' +
+  'HOME, when not on the learner dashboard', () => {
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    spyOn(sidebarStatusService, 'closeSidebar');
+    componentInstance.navigateToLearnerDashboard();
+
+    expect(sidebarStatusService.closeSidebar).not.toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/learner-dashboard');
+  });
+
+  it('should not navigate to learner dashboard when learner clicks on ' +
+  'HOME, when on the learner dashboard', () => {
+    componentInstance.currentUrl = '/learner-dashboard';
+
+    spyOn(sidebarStatusService, 'closeSidebar');
+    componentInstance.navigateToLearnerDashboard();
+
+    expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
+  });
+
   it('should navigate to classroom page when user clicks on' +
   '\'Basic Mathematics\'', fakeAsync(() => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
