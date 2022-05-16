@@ -26,11 +26,24 @@ class OppiaRootPage(base.BaseHandler):
     """Renders oppia root page (unified entry point) for all routes registered
        with angular router.
     """
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self) -> None:
+        """Handles GET requests."""
+        self.render_template('oppia-root.mainpage.html') # type: ignore[no-untyped-call]
+
+
+class OppiaLightweightRootPage(base.BaseHandler):
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self, **kwargs: Dict[str, str]) -> None: # pylint: disable=unused-argument
+    def get(self) -> None:
         """Handles GET requests."""
-        self.render_template( # type: ignore[no-untyped-call]
-            'oppia-root.mainpage.html')
+        self.render_template('lightweight-oppia-root.mainpage.html') # type: ignore[no-untyped-call]

@@ -20,7 +20,6 @@ import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
-import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
 
 
 // All paths must be defined in constants.ts file.
@@ -36,12 +35,6 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/about-foundation-page/about-foundation-page.module')
       .then(m => m.AboutFoundationPageModule)
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () => import('pages/classroom-page/classroom-page.module')
-      .then(m => m.ClassroomPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
@@ -103,13 +96,6 @@ const routes: Route[] = [
     pathMatch: 'full',
     loadChildren: () => import('pages/library-page/library-page.module')
       .then(m => m.LibraryPageModule)
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
-    pathMatch: 'full',
-    canLoad: [CanAccessSplashPageGuard],
-    loadChildren: () => import('pages/splash-page/splash-page.module')
-      .then(m => m.SplashPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_VIEWER.ROUTE,
