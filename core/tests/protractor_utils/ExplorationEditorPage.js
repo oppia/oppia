@@ -118,6 +118,10 @@ var ExplorationEditorPage = function() {
   var prePublicationConfirmButton = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   var closeButton = element(by.css('.protractor-test-share-publish-close'));
+  var staleTabInfoModal = element(
+    by.css('.protractor-test-stale-tab-info-modal'));
+  var unsavedChangesStatusInfoModal = element(
+    by.css('.protractor-test-unsaved-changes-info-modal'));
 
   /*
    * Components
@@ -414,6 +418,18 @@ var ExplorationEditorPage = function() {
     await waitFor.invisibilityOf(
       toastMessage,
       'Offline warning toast message taking too long to disappear.');
+  };
+
+  this.expectStaleTabInfoModalToBeVisible = async function() {
+    await waitFor.visibilityOf(
+      staleTabInfoModal,
+      'Stale tab info modal is taking too long to display');
+  };
+
+  this.expectUnsavedChangesStatusInfoModalToBeVisible = async function() {
+    await waitFor.visibilityOf(
+      unsavedChangesStatusInfoModal,
+      'Unsaved changes status info modal is taking too long to display');
   };
 };
 

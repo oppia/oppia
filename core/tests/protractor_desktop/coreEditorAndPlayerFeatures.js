@@ -593,3 +593,67 @@ describe('Core exploration functionality', function() {
     await users.logout();
   });
 });
+
+describe('Stale tab and unsaved changes detection functionality', function() {
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+  var userNumber = 1;
+
+  beforeAll(async function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    await users.createUser(
+      `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
+    await users.login(`user${userNumber}@stateEditor.com`);
+    await workflow.createExploration(true);
+
+    userNumber++;
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Exploration 1');
+    await explorationEditorPage.saveChanges('Changed exploration title.');
+    await explorationEditorPage.navigateToMainTab();
+  });
+
+  it('should show stale tab and unsaved changes info modals',
+    async function() {
+      var url = await browser.getCurrentUrl();
+      await browser.executeScript('window.open("' + url + '")');
+      var handles = await browser.getAllWindowHandles();
+
+      // Switch to the first tab and make some changes.
+      await browser.switchTo().window(handles[handles.length - 2]);
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorMainTab.setContent(await forms.toRichText(
+        'How are you feeling?'));
+      await explorationEditorMainTab.setInteraction('TextInput');
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('You must be happy!'),
+        null, false, 'Equals', ['happy']);
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('No being sad!'),
+        null, false, 'Contains', ['sad']);
+
+      // Switch to the second tab and check for the presence
+      // of the unsaved changes status info modal.
+      await browser.switchTo().window(handles[handles.length - 1]);
+      await explorationEditorPage
+        .expectUnsavedChangesStatusInfoModalToBeVisible();
+
+      // Switch back to the first tab and save those changes.
+      await browser.switchTo().window(handles[handles.length - 2]);
+      await explorationEditorPage.saveChanges('Saved changes.');
+
+      // Switch to the second tab and check for the presence of
+      // the stale tab status info modal.
+      await browser.switchTo().window(handles[handles.length - 1]);
+      await explorationEditorPage.expectStaleTabInfoModalToBeVisible();
+    });
+
+  afterAll(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
+  });
+});
