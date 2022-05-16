@@ -901,9 +901,13 @@ def require_valid_page_title_fragment_for_web(
     Raises:
         ValidationError. Page title fragment is not a string.
         ValidationError. Page title fragment is too lengthy.
+        ValidationError. Page title fragment is too small.
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    min_chars_in_page_title_frag_for_web = (
+        constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+
     if not isinstance(page_title_fragment_for_web, str):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -912,6 +916,11 @@ def require_valid_page_title_fragment_for_web(
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    if len(page_title_fragment_for_web) < min_chars_in_page_title_frag_for_web:
+        raise ValidationError(
+            'Page title fragment should not be shorter than %s characters.'
+            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        )
 
 
 def capitalize_string(input_string: str) -> str:

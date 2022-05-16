@@ -165,7 +165,7 @@ class TopicModel(base_models.VersionedModel):
     # the page title fragment field represents the middle value 'Add, Subtract,
     # Multiply and Divide'.
     page_title_fragment_for_web = datastore_services.StringProperty(
-        indexed=True, default='')
+        required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

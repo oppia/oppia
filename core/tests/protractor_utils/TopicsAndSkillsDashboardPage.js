@@ -48,6 +48,8 @@ var TopicsAndSkillsDashboardPage = function() {
     '.protractor-test-new-topic-url-fragment-field'));
   var topicDescriptionField = element(by.css(
     '.protractor-test-new-topic-description-field'));
+  var topicPageTitleFragmentField = element(by.css(
+    '.protractor-test-new-page-title-fragm-field'));
   var topicFilterKeywordField = element(by.css(
     '.protractor-test-select-keyword-dropdown'));
   var topicFilterClassroomField = element(by.css(
@@ -209,6 +211,9 @@ var TopicsAndSkillsDashboardPage = function() {
       'Topic URL fragment field', topicUrlFragmentField, topicUrlFragment);
     await action.sendKeys(
       'Topic description field', topicDescriptionField, description);
+    await action.sendKeys(
+      'Topic page title fragment field',
+      topicPageTitleFragmentField, description);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer,
       ('../data/test_svg.svg'), false);

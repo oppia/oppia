@@ -74,7 +74,8 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             canonical_story_references=[{
                 'story_id': self.STORY_1_ID,
                 'story_is_published': False
-            }]
+            }],
+            page_title_fragment_for_web='fragm',
         )
         datastore_services.update_timestamps_multi([
             topic_model, story_summary_model])

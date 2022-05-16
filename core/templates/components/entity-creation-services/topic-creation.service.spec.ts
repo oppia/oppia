@@ -91,7 +91,8 @@ describe('Topic creation service', () => {
     topicCreationService.topicCreationInProgress = false;
     spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve(new NewlyCreatedTopic('valid', 'valid', 'valid'))
+      result: Promise.resolve(new NewlyCreatedTopic(
+        'valid', 'valid', 'valid', 'valid'))
     } as NgbModalRef);
     spyOn(alertsService, 'clearWarnings');
     spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([]);
@@ -156,7 +157,8 @@ describe('Topic creation service', () => {
     topicCreationService.topicCreationInProgress = false;
     spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve(new NewlyCreatedTopic('valid', 'valid', 'valid'))
+      result: Promise.resolve(new NewlyCreatedTopic(
+        'valid', 'valid', 'valid', 'valid'))
     } as NgbModalRef);
     spyOn(alertsService, 'clearWarnings');
     spyOn(alertsService, 'addWarning');

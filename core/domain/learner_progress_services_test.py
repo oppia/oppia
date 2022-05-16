@@ -139,7 +139,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Save new topics and stories.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -182,7 +182,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -226,7 +226,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.STORY_ID_1, changelist, 'Added Node 1.')
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_2, 'topic 2', 'abbrev-two', 'description 2')
+            self.TOPIC_ID_2, 'topic 2', 'abbrev-two', 'description 2', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -252,7 +252,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_3, 'topic 3', 'abbrev-three', 'description 3')
+            self.TOPIC_ID_3, 'topic 3', 'abbrev-three', 'description 3',
+            'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [

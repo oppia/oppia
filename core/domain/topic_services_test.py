@@ -176,7 +176,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_dict],
             subtopic_schema_version=0,
-            story_reference_schema_version=0
+            story_reference_schema_version=0,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -200,7 +201,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_dict],
             subtopic_schema_version=1,
-            story_reference_schema_version=0
+            story_reference_schema_version=0,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -1816,7 +1818,8 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_v1_dict],
             subtopic_schema_version=1,
-            story_reference_schema_version=1
+            story_reference_schema_version=1,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -1862,7 +1865,8 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             subtopics=[],
             subtopic_schema_version=1,
             story_reference_schema_version=1,
-            canonical_story_references=[story_reference_dict]
+            canonical_story_references=[story_reference_dict],
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(

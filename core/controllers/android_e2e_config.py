@@ -109,7 +109,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         # Create and update topic to validate before publishing.
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'Android test', 'test-topic-one', 'description')
+            topic_id, 'Android test', 'test-topic-one', 'description',
+            'fragm')
         topic.update_url_fragment('test-topic')
         topic.update_meta_tag_content('tag')
         topic.update_page_title_fragment_for_web('page title for topic')

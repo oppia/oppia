@@ -863,7 +863,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_topic = (
             topic_domain.Topic.create_default_topic(
                 topic_id, 'Name 😍', 'abbrev 😍',
-                'description 😍'))
+                'description 😍', 'fragm 😍'))
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_TOPIC,

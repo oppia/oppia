@@ -303,6 +303,7 @@ class NewTopicHandler(base.BaseHandler):
         thumbnail_filename = self.payload.get('filename')
         thumbnail_bg_color = self.payload.get('thumbnailBgColor')
         raw_image = self.request.get('image')
+        page_title_frag = self.payload.get('page_title_fragment')
 
         try:
             topic_domain.Topic.require_valid_name(name)
@@ -311,7 +312,7 @@ class NewTopicHandler(base.BaseHandler):
                 'Invalid topic name, received %s.' % name) from e
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, url_fragment, description)
+            new_topic_id, name, url_fragment, description, page_title_frag)
         topic_services.save_new_topic(self.user_id, topic)
 
         try:
