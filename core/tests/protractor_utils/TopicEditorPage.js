@@ -109,7 +109,7 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
     by.css('.protractor-test-topic-meta-tag-content-label'));
-  var topicPageTitleFragmField = element(
+  var topicPageTitleFragmentField = element(
     by.css('.protractor-test-topic-page-title-fragment-field'));
   var topicPageTitleFragmentLabel = element(
     by.css('.protractor-test-topic-page-title-fragment-label'));
@@ -481,7 +481,7 @@ var TopicEditorPage = function() {
   this.updatePageTitleFragment = async function(newPageTitleFragment) {
     await action.sendKeys(
       'Update Page Title Fragment',
-      topicPageTitleFragmField, newPageTitleFragment);
+      topicPageTitleFragmentField, newPageTitleFragment);
     await action.click(
       'Page Title Fragment label', topicPageTitleFragmentLabel);
   };
