@@ -35,7 +35,6 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services  # pylint: disable=unused-import
 
 # Constants used for generating ids.
-MAX_RETRIES = 10
 MAX_ID_LENGTH = 6
 
 datastore_services = models.Registry.import_datastore_services()
@@ -986,7 +985,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        for _ in range(MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s' % ''.join(
                 random.choice(string.ascii_letters)
                 for _ in range(MAX_ID_LENGTH))

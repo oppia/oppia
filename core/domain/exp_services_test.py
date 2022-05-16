@@ -7788,9 +7788,9 @@ title: Title
             logged_out_user_data.most_recently_reached_checkpoint_state_name,
             'Intro')
 
-    def test_sync_learner_checkpoint_progress_with_current_exp_version(self):
+    def test_sync_logged_out_learner_checkpoint_progress_with_current_exp_version(self): # pylint: disable=line-too-long
         logged_out_user_data = (
-            exp_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+            exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                 self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID))
         self.assertIsNone(logged_out_user_data)
 
@@ -7833,7 +7833,7 @@ title: Title
         # furthest reached checkpoint is set to None. Similar workflow is
         # carried out for most recently reached checkpoint.
         logged_out_user_data = (
-            exp_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+            exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                 self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID))
         self.assertEqual(
             logged_out_user_data.furthest_reached_checkpoint_exp_version, 2)

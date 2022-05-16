@@ -254,6 +254,12 @@ class ExplorationHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
+            },
+            'uid': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None
             }
         }
     }
@@ -266,6 +272,7 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.normalized_request.get('v')
+        unique_progress_url_id = self.normalized_request.get('uid')
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
@@ -275,8 +282,6 @@ class ExplorationHandler(base.BaseHandler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         user_settings = user_services.get_user_settings(self.user_id)
-        exp_user_data = exp_fetchers.get_exploration_user_data(
-            self.user_id, exploration_id)
 
         preferred_audio_language_code = None
         preferred_language_codes = None
@@ -295,27 +300,23 @@ class ExplorationHandler(base.BaseHandler):
         most_recently_reached_checkpoint_exp_version = None
         most_recently_reached_checkpoint_state_name = None
 
-        # If exp_user_data is None, it means the exploration is started
-        # for the first time and no checkpoint progress of the user exists for
-        # the respective exploration.
-        # Exploration version 'v' passed as a parameter in GET request means a
-        # previous version of the exploration is being fetched. In that case,
-        # we want that exploration to start from the beginning and do not
-        # allow users to save their checkpoint progress in older exploration
-        # version.
-        if exp_user_data is not None and version is None:
+        if not self.user_id and unique_progress_url_id is not None:
+            logged_out_user_data = (
+                exp_fetchers.get_logged_out_user_progress(
+                    unique_progress_url_id))
+
             synced_exp_user_data = None
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.
             if (
-                exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
-                exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
             ):
                 synced_exp_user_data = (
-                    user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
-                        self.user_id, exploration_id))
+                    exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                        logged_out_user_data.exploration_id, unique_progress_url_id)) # pylint: disable=line-too-long
             else:
-                synced_exp_user_data = exp_user_data
+                synced_exp_user_data = logged_out_user_data
 
             furthest_reached_checkpoint_exp_version = (
                 synced_exp_user_data.furthest_reached_checkpoint_exp_version)
@@ -327,6 +328,43 @@ class ExplorationHandler(base.BaseHandler):
             most_recently_reached_checkpoint_state_name = (
                 synced_exp_user_data
                     .most_recently_reached_checkpoint_state_name)
+
+        elif self.user_id is not None:
+            exp_user_data = exp_fetchers.get_exploration_user_data(
+                self.user_id, exploration_id)
+
+            # If exp_user_data is None, it means the exploration is started
+            # for the first time and no checkpoint progress of the user
+            #  exists for the respective exploration.
+            # Exploration version 'v' passed as a parameter in GET request
+            # means a previous version of the exploration is being fetched.
+            # In that case, we want that exploration to start from the
+            # beginning and do not allow users to save their checkpoint
+            # progress in older exploration version.
+            if exp_user_data is not None and version is None:
+                synced_exp_user_data = None
+                # If the latest exploration version is ahead of the most
+                # recently interacted exploration version.
+                if (
+                    exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                    exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+                ):
+                    synced_exp_user_data = (
+                        user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                            self.user_id, exploration_id))
+                else:
+                    synced_exp_user_data = exp_user_data
+
+                furthest_reached_checkpoint_exp_version = (
+                    synced_exp_user_data.furthest_reached_checkpoint_exp_version) # pylint: disable=line-too-long
+                furthest_reached_checkpoint_state_name = (
+                    synced_exp_user_data.furthest_reached_checkpoint_state_name)
+                most_recently_reached_checkpoint_exp_version = (
+                    synced_exp_user_data
+                        .most_recently_reached_checkpoint_exp_version)
+                most_recently_reached_checkpoint_state_name = (
+                    synced_exp_user_data
+                        .most_recently_reached_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (
@@ -989,11 +1027,6 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             learner_progress_services.mark_exploration_as_completed(
                 user_id, exploration_id)
 
-            # Clear learner's checkpoint progress on completion of the
-            # exploration.
-            user_services.clear_learner_checkpoint_progress(
-                self.user_id, exploration_id)
-
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
@@ -1390,7 +1423,6 @@ class TransientCheckpointUrlHandler(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.can_play_exploration
     def get(self, unique_progress_url_id):
         """Handles GET requests. Fetches the logged-out learner's progress."""
 
@@ -1400,48 +1432,12 @@ class TransientCheckpointUrlHandler(base.BaseHandler):
         if logged_out_user_data is None:
             raise self.PageNotFoundException()
 
-        exploration = exp_fetchers.get_exploration_by_id(
-            logged_out_user_data.exploration_id, strict=False)
+        redirect_url = '%s/%s?uid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            logged_out_user_data.exploration_id,
+            unique_progress_url_id)
 
-        if logged_out_user_data is not None:
-            synced_exp_user_data = None
-            # If the latest exploration version is ahead of the most recently
-            # interacted exploration version.
-            if (
-                logged_out_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
-                logged_out_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
-            ):
-                synced_exp_user_data = (
-                    exp_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
-                        logged_out_user_data.exploration_id, unique_progress_url_id)) # pylint: disable=line-too-long
-            else:
-                synced_exp_user_data = logged_out_user_data
-
-            furthest_reached_checkpoint_exp_version = (
-                synced_exp_user_data.furthest_reached_checkpoint_exp_version)
-            furthest_reached_checkpoint_state_name = (
-                synced_exp_user_data.furthest_reached_checkpoint_state_name)
-            most_recently_reached_checkpoint_exp_version = (
-                synced_exp_user_data
-                    .most_recently_reached_checkpoint_exp_version)
-            most_recently_reached_checkpoint_state_name = (
-                synced_exp_user_data
-                    .most_recently_reached_checkpoint_state_name)
-
-        self.values.update({
-            'exploration_id': (
-                logged_out_user_data.exploration_id),
-            'furthest_reached_checkpoint_exp_version': (
-                furthest_reached_checkpoint_exp_version),
-            'furthest_reached_checkpoint_state_name': (
-                furthest_reached_checkpoint_state_name),
-            'most_recently_reached_checkpoint_exp_version': (
-                most_recently_reached_checkpoint_exp_version),
-            'most_recently_reached_checkpoint_state_name': (
-                most_recently_reached_checkpoint_state_name),
-        })
-
-        self.render_json(self.values)
+        self.redirect(redirect_url)
 
 
 class SaveTransientCheckpointProgressHandler(base.BaseHandler):
@@ -1665,7 +1661,7 @@ class ExplorationRestartEventHandler(base.BaseHandler):
                 'most_recently_reached_checkpoint_state_name'))
 
         if most_recently_reached_checkpoint_state_name is None:
-            user_services.clear_learner_checkpoint_progress(
+            user_services.update_learner_checkpoint_progress_on_restart(
                 self.user_id, exploration_id)
 
         self.render_json(self.values)

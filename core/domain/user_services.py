@@ -2468,7 +2468,7 @@ def clear_learner_checkpoint_progress(user_id, exploration_id):
         exp_user_model.put()
 
 
-def sync_learner_checkpoint_progress_with_current_exp_version(
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     user_id,
     exploration_id
 ):

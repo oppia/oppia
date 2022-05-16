@@ -2135,7 +2135,7 @@ def update_logged_out_user_progress(
     model.put()
 
 
-def sync_learner_checkpoint_progress_with_current_exp_version(
+def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
     exploration_id,
     unique_progress_url_id
 ):
