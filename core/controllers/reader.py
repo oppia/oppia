@@ -1661,7 +1661,7 @@ class ExplorationRestartEventHandler(base.BaseHandler):
                 'most_recently_reached_checkpoint_state_name'))
 
         if most_recently_reached_checkpoint_state_name is None:
-            user_services.update_learner_checkpoint_progress_on_restart(
+            user_services.clear_learner_checkpoint_progress(
                 self.user_id, exploration_id)
 
         self.render_json(self.values)
