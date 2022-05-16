@@ -84,11 +84,6 @@ var CreatorDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getCreatorDashboardInNewTab = async function() {
-    await browser.executeScript('window.open("' + CREATOR_DASHBOARD_URL + '")');
-    await waitFor.pageToFullyLoad();
-  };
-
   this.getNumberOfFeedbackMessages = async function() {
     var feedbackCount = await explorationFeedbackCount.getText();
     return parseInt(feedbackCount);
