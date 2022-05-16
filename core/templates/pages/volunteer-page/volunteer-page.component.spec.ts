@@ -16,31 +16,50 @@
  * @fileoverview Unit tests for volunteer page.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
+
 import { VolunteerPageComponent } from './volunteer-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
+import { PageTitleService } from 'services/page-title.service';
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
 describe('Volunteer page', () => {
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [VolunteerPageComponent],
       providers: [
         UrlInterpolationService,
         NgbCarouselConfig,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
+        PageTitleService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
-  let component;
+  let component: VolunteerPageComponent;
 
   beforeEach(() => {
     const volunteerPageComponent = TestBed.createComponent(
       VolunteerPageComponent);
     component = volunteerPageComponent.componentInstance;
+    translateService = TestBed.inject(TranslateService);
+    pageTitleService = TestBed.inject(PageTitleService);
   });
 
   it('should successfully instantiate the component from beforeEach block',
@@ -49,14 +68,36 @@ describe('Volunteer page', () => {
     });
 
   it('should set component properties when ngOnInit() is called', () => {
+    spyOn(translateService.onLangChange, 'subscribe');
     component.ngOnInit();
 
     expect(component.mapImgPath).toBe(
       '/volunteer/map.png');
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
 
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/test')).toEqual('/assets/images/test');
+  });
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', () => {
+    component.ngOnInit();
+    spyOn(component, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set new page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_VOLUNTEER_PAGE_TITLE');
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_VOLUNTEER_PAGE_TITLE');
   });
 
   it('should get webp extended file name', () => {
@@ -64,5 +105,16 @@ describe('Volunteer page', () => {
     expect(component.getWebpExtendedName('a.png')).toEqual('a.webp');
     expect(component.getWebpExtendedName('a.webp')).toEqual('a.webp');
     expect(component.getWebpExtendedName('a.b.jpg')).toEqual('a.b.webp');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    component.directiveSubscriptions.add(
+      translateService.onLangChange.subscribe(() => {
+        component.setPageTitle();
+      })
+    );
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
   });
 });

@@ -17,6 +17,11 @@
  */
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/compiler';
+import { EventEmitter } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+
 import { AlertsService } from 'services/alerts.service';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -29,10 +34,16 @@ import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.
 import { UserInfo } from 'domain/user/user-info.model';
 import { CollectionPlayerPageComponent, IconParametersArray } from './collection-player-page.component';
 import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
-import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { PageTitleService } from 'services/page-title.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
 describe('Collection player page component', () => {
   let alertsService: AlertsService;
@@ -51,6 +62,8 @@ describe('Collection player page component', () => {
   let sampleCollectionBackendObject: CollectionBackendDict;
   let collectionNodesList: IconParametersArray[];
   let collectionNodeBackendObject: CollectionNodeBackendDict;
+  let pageTitleService: PageTitleService;
+  let translateService: TranslateService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   const userInfoForCollectionCreator = new UserInfo(
@@ -65,7 +78,13 @@ describe('Collection player page component', () => {
         CollectionPlayerPageComponent,
         MockTranslatePipe
       ],
-      providers: [],
+      providers: [
+        PageTitleService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -81,6 +100,8 @@ describe('Collection player page component', () => {
       GuestCollectionProgressService);
     readOnlyCollectionBackendApiService = TestBed.inject(
       ReadOnlyCollectionBackendApiService);
+    translateService = TestBed.inject(TranslateService);
+    pageTitleService = TestBed.inject(PageTitleService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(CollectionPlayerPageComponent);
     component = fixture.componentInstance;
@@ -205,6 +226,50 @@ describe('Collection player page component', () => {
     expect(alertsSpy).toHaveBeenCalledWith(
       'There was an error loading the collection.');
   }));
+
+  it('should set page title and subscribe to the lang change emitter',
+    fakeAsync(() => {
+      spyOn(component, 'setPageTitle');
+      spyOn(component, 'subscribeToOnLangChange');
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.returnValue(Promise.resolve(sampleCollection));
+      component.ngOnInit();
+      tick();
+
+      expect(component.setPageTitle).toHaveBeenCalled();
+      expect(component.subscribeToOnLangChange).toHaveBeenCalled();
+    }));
+
+  it('should obtain translated title and set it whenever the ' +
+    'selected language changes', () => {
+    component.subscribeToOnLangChange();
+    spyOn(component, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.collection = Collection.create(sampleCollectionBackendObject);
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_COLLECTION_PLAYER_PAGE_TITLE', {
+        collectionTitle: 'title'
+      });
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_COLLECTION_PLAYER_PAGE_TITLE');
+  });
+
+  it('should unsubscribe upon component destruction', () => {
+    component.subscribeToOnLangChange();
+    expect(component.directiveSubscriptions.closed).toBe(false);
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
+  });
 
   it('should stop event propagation when click event is emitted', () => {
     let eventSpy = jasmine.createSpyObj(
