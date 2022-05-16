@@ -159,7 +159,7 @@ class ModelProperty:
         # checking and during runtime. During type checking it is considered as
         # `Callable[]` because a Python property is decorated using Python's
         # property class, while during runtime a Python property is considered
-        # as instance of python's inbuilt property class. So to split the
+        # as instance of Python's inbuilt property class. So to split the
         # assertion in both the cases, we used `if MYPY:` clause here.
         if MYPY: # pragma: no cover
             assert (
