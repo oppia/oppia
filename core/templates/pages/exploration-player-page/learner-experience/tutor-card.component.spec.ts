@@ -313,7 +313,7 @@ describe('Tutor card component', () => {
     expect(componentInstance.isContentAudioTranslationAvailable()).toBeTrue();
   });
 
-  it('should if current card is at end of transcript', () => {
+  it('should check if current card is at end of transcript', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
     expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalse();
