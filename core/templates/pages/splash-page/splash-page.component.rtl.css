@@ -173,7 +173,7 @@
   width: 100%;
 }
 
-.splash-page .splash-books-image img {
+.splash-page .splash-books-image {
   max-width: 500px;
   width: 100%;
 }
@@ -323,7 +323,7 @@
   margin-top: 25px;
 }
 
-.splash-page .splash-matthew-image img {
+.splash-page .splash-matthew-image {
   max-width: 600px;
   width: 100%;
 }
@@ -380,8 +380,7 @@
   font-weight: bold;
 }
 
-.splash-page .oppia-splash-main-image img,
-.splash-page .oppia-splash-main-image source {
+.splash-page .oppia-splash-main-image img {
   max-width: 800px;
   width: 100%;
 }
