@@ -55,6 +55,8 @@ def delete_multi(keys: Sequence[Key], **ctx_options: Any) -> List[None]: ...
 
 # Property Stubs
 class Property(object):
+    _name: str
+    _repeated: bool
     def __init__(
         self, name: Optional[str] = ..., indexed: Optional[bool] = ...,
         repeated: Optional[bool] = ..., required: Optional[bool] = ...,
