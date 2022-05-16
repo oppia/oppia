@@ -1,3 +1,6 @@
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
+
 <link rel="preload" href="/third_party/generated/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/third_party/generated/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
 
@@ -6,29 +9,21 @@
       href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'">
-<noscript>
-<link rel="stylesheet"
+<link rel="preload"
       media="screen"
-      href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap">
-</noscript>
-<link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap">
+      href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'">
 <% if (webpackConfig.mode == 'production') { %>
   <link rel="preload"
         href="/third_party/generated/css/third_party.min.css"
         as="style"
         onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link rel="stylesheet" href="/third_party/generated/css/third_party.min.css">
-  </noscript>
 <% } else { %>
   <link rel="preload"
         href="/third_party/generated/css/third_party.css"
         as="style"
         onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link rel="stylesheet" href="/third_party/generated/css/third_party.css">
-  </noscript>
 <% } %>
 
 <link rel="stylesheet" type="text/css" media="screen"

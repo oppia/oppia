@@ -336,7 +336,12 @@ describe('Exploration engine service ', () => {
       preferred_language_codes: [],
       auto_tts_enabled: false,
       correctness_feedback_enabled: true,
-      record_playthrough_probability: 1
+      record_playthrough_probability: 1,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_completed_checkpoint_exp_version: 1,
+      furthest_completed_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1
     };
 
     explorationFeatures = {
@@ -717,13 +722,13 @@ describe('Exploration engine service ', () => {
   });
 
   it('should return author recommended exploration id\'s ' +
-    'when calling \'getAuthorRecommendedExpIds\'', () => {
+    'when calling \'getAuthorRecommendedExpIdsByStateName\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
 
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds();
+      explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
     }).toThrowError(
       'Cannot read properties of undefined ' +
       '(reading \'getAuthorRecommendedExpIds\')');
@@ -731,17 +736,15 @@ describe('Exploration engine service ', () => {
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
 
-    explorationEngineService.currentStateName = 'Start';
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds();
+      explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
     }).toThrowError(
       'Tried to get recommendations for a non-terminal state: Start');
 
     // Please note that in order to get author recommended exploration id's
     // current should be the last state.
-    explorationEngineService.currentStateName = 'End';
-
-    const recommendedId = explorationEngineService.getAuthorRecommendedExpIds();
+    const recommendedId = explorationEngineService
+      .getAuthorRecommendedExpIdsByStateName('End');
     expect(recommendedId).toContain('recommnendedExplorationId');
   });
 
@@ -895,6 +898,69 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
     }).toThrowError('Cannot populate exploration in learner mode.');
+  });
+
+  it('should return state when calling \'getStateFromStateName\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getStateFromStateName('Start');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getState\')'
+    );
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let state = explorationEngineService.getStateFromStateName('Start');
+
+    expect(state.name).toBe('Start');
+
+    // Check for second state.
+    state = explorationEngineService.getStateFromStateName('Mid');
+
+    expect(state.name).toBe('Mid');
+  });
+
+  it('should return state card when calling \'getStateCardByName\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getStateCardByName('Start');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getInteraction\')'
+    );
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let stateCard = explorationEngineService.getStateCardByName('Start');
+
+    expect(stateCard.getStateName()).toBe('Start');
+
+    // Check for second state.
+    stateCard = explorationEngineService.getStateCardByName('Mid');
+
+    expect(stateCard.getStateName()).toBe('Mid');
+  });
+
+  it('should return shortest path to state when calling ' +
+    '\'getShortestPathToState\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let shortestPathToState = explorationEngineService.getShortestPathToState(
+      explorationDict.states, 'Mid');
+
+    expect(shortestPathToState).toEqual(['Start', 'Mid']);
   });
 
   describe('on validating parameters ', () => {
