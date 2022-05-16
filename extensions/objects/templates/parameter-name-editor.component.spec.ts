@@ -20,7 +20,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ParameterNameEditorComponent } from './parameter-name-editor.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
+import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
 describe('StateHintsEditorComponent', () => {
@@ -77,7 +77,7 @@ describe('StateHintsEditorComponent', () => {
 
   it('should set value null if the available param names is empty', () => {
     spyOn(
-      explorationParamSpecsService.savedMemento as unknown as ParamSpecs,
+      explorationParamSpecsService.savedMemento,
       'getParamNames'
     ).and.returnValue([]);
 

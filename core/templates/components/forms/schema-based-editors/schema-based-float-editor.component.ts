@@ -102,7 +102,8 @@ implements ControlValueAccessor, OnInit, Validator {
       customizationArg: {checkRequireNonnegativeInput: unknown}): boolean {
     let { checkRequireNonnegativeInput } = customizationArg || {};
 
-    // TODO(#15462): Move the type base checks to schema-validators.
+    // TODO(#15462): Move the type base checks (like the ones done below) to
+    // schema-validator's isFloat method.
     return (
       localValue !== undefined &&
       localValue !== null &&
