@@ -155,8 +155,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/takeout_service_test.py',
     'core/domain/taskqueue_services.py',
     'core/domain/taskqueue_services_test.py',
-    'core/domain/topic_fetchers.py',
-    'core/domain/topic_fetchers_test.py',
     'core/domain/topic_services.py',
     'core/domain/topic_services_test.py',
     'core/domain/user_services.py',

@@ -27,6 +27,9 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
+from typing import List, Optional
+from typing_extensions import TypedDict
+
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -173,6 +176,23 @@ class StoryChange(change_domain.BaseChange):
     }]
 
 
+class StoryNodeDict(TypedDict):
+    """Dictionary that represents story node dict."""
+
+    id: str
+    title: str
+    description: str
+    thumbnail_filename: Optional[str]
+    thumbnail_bg_color: Optional[str]
+    thumbnail_size_in_bytes: Optional[int]
+    destination_node_ids: List[str]
+    acquired_skill_ids: List[str]
+    prerequisite_skill_ids: List[str]
+    outline: str
+    outline_is_finalized: bool
+    exploration_id: Optional[str]
+
+
 class StoryNode:
     """Domain object describing a node in the exploration graph of a
     story.
@@ -291,7 +311,7 @@ class StoryNode:
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'chapter']
 
-    def to_dict(self):
+    def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
 
         Returns:
