@@ -775,9 +775,9 @@ class Story:
         if not isinstance(self.notes, str):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
-        if len(self.notes) > 5000:
+        if len(self.notes) > 4000:
             raise utils.ValidationError(
-                'Expected notes length to be less than or equal to 5000,'
+                'Expected notes length to be less than or equal to 4000,'
                 ' but it is %s long' % len(self.notes))
         if not isinstance(self.story_contents_schema_version, int):
             raise utils.ValidationError(
