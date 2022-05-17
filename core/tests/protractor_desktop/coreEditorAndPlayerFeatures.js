@@ -600,7 +600,7 @@ describe('Stale tab and unsaved changes detection functionality', function() {
   var explorationEditorSettingsTab = null;
   var userNumber = 1;
 
-  beforeAll(async function() {
+  beforeEach(async function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -652,7 +652,7 @@ describe('Stale tab and unsaved changes detection functionality', function() {
       await explorationEditorPage.expectStaleTabInfoModalToBeVisible();
     });
 
-  afterAll(async function() {
+  afterEach(async function() {
     await general.checkForConsoleErrors([]);
     await users.logout();
   });
