@@ -417,7 +417,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 strict=True
             )
 
-    def test_get_users_setting_system_user_id_adds_system_user_setting(self):
+    def test_get_users_setting_for_system_id_adds_system_user_setting(self):
         user_id = feconf.SYSTEM_COMMITTER_ID
         user_ids = [user_id]
 
@@ -431,10 +431,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         less_than_time = datetime.datetime.utcnow()
 
         users_settings = user_services.get_users_settings(user_ids)
-        for settings in users_settings:
-            if settings.username == 'admin':
-                admin_settings = settings
-                break
+        self.assertEqual(len(users_settings), 1)
+        admin_settings = users_settings[0]
 
         greater_than_time = datetime.datetime.utcnow()
 
@@ -520,24 +518,26 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_ids = [user_services.create_new_user(auth_id, user_email).user_id]
-        user_services.set_username(user_ids[0], username)
-        users_email_prefs = user_services.get_users_email_preferences(user_ids)
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        email_prefs = user_services.get_users_email_preferences([user_id])
+        self.assertEqual(len(email_prefs), 1)
+        user_email_prefs = email_prefs[0]
 
         self.assertEqual(
-            users_email_prefs[0].can_receive_email_updates,
+            user_email_prefs.can_receive_email_updates,
             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE)
 
         self.assertEqual(
-            users_email_prefs[0].can_receive_editor_role_email,
+            user_email_prefs.can_receive_editor_role_email,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
         self.assertEqual(
-            users_email_prefs[0].can_receive_feedback_message_email,
+            user_email_prefs.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         self.assertEqual(
-            users_email_prefs[0].can_receive_subscription_email,
+            user_email_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
     def test_set_and_get_user_email_preferences(self):
@@ -836,15 +836,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_update_preferred_language_codes(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
+        language_codes = ['en']
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_services.update_preferred_language_codes(
-            user_id, user_settings_model.preferred_language_codes)
+            user_id, language_codes)
         user_settings = user_services.get_user_settings_from_email(user_email)
 
         self.assertEqual(
-            user_settings_model.preferred_language_codes,
+            language_codes,
             user_settings.preferred_language_codes
         )
 
@@ -866,15 +866,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_update_preferred_audio_language_code(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
+        audio_code = 'en'
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_services.update_preferred_audio_language_code(
-            user_id, user_settings_model.preferred_audio_language_code)
+            user_id, audio_code)
         user_settings = user_services.get_user_settings_from_email(user_email)
 
         self.assertEqual(
-            user_settings_model.preferred_audio_language_code,
+            audio_code,
             user_settings.preferred_audio_language_code
         )
 
@@ -897,11 +897,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_remove_user_role_for_default_role_raises_error(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
-        error_msg = 'Removing a default role is not allowed.'
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
 
-        with self.assertRaisesRegex(Exception, error_msg):
+        with self.assertRaisesRegex(
+            Exception,
+            'Removing a default role is not allowed.'
+        ):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
 
     def test_update_user_creator_dashboard_display(self):
@@ -1125,7 +1127,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_msg):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
 
-    def test_is_user_registered(self):
+    def test_is_user_registered_with_existing_user_id_returns_true(self):
         auth_id = 'test_id'
         user_email = 'test@email.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
@@ -1136,7 +1138,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = None
         self.assertFalse(user_services.is_user_registered(user_id))
 
-    def test_has_fully_registered_account(self):
+    def test_has_fully_registered_account_returns_true(self):
+        """checks whether the user with user_id has created their username and
+        has agreed to terms.
+        """
+
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -1607,11 +1613,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings.last_started_state_translation_tutorial is not None)
 
     def test_get_human_readable_user_ids(self):
-        auth_ids = ['user1', 'user2', 'user3']
+        auth_ids = ['regular_user', 'user_being_deleted', 'no_username_user']
         user_emails = [
-            '1user@example.com',
-            '2user@example.com',
-            '3user@example.com']
+            'reuglar_user@example.com',
+            'user_being_deleted@example.com',
+            'no_username_user@example.com']
         user_ids = []
 
         for i, auth_id in enumerate(auth_ids):
@@ -1638,13 +1644,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_human_readable_user_ids_no_user_raises_error(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-
         with self.assertRaisesRegex(Exception, 'User not found.'):
-            user_services.get_human_readable_user_ids([user_id, 'another_id'])
+            user_services.get_human_readable_user_ids(['unregistered_id'])
 
     def test_record_user_started_state_editor_tutorial(self):
         auth_id = 'someUser'
@@ -1653,14 +1654,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.record_user_started_state_editor_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
-        orig = user_settings.last_started_state_editor_tutorial
+        prev_started_state = user_settings.last_started_state_editor_tutorial
+
+        self.assertEqual(
+            user_settings.last_started_state_editor_tutorial,
+            prev_started_state
+        )
 
         user_services.record_user_started_state_editor_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
 
         self.assertGreaterEqual(
             user_settings.last_started_state_editor_tutorial,
-            orig
+            prev_started_state
         )
 
     def test_create_user_contributions_with_bot_user_id_returns_none(self):
@@ -1682,6 +1688,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         edited_exp_ids = ['exp2', 'exp3', 'exp4']
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertIsNotNone(user_services.get_user_contributions(user_id))
+        self.assertIsInstance(
+            user_services.get_user_contributions(user_id),
+            user_domain.UserContributions)
 
         error_msg = (
             'User contributions model for user %s already exists.'
@@ -1701,6 +1713,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
 
+        pre_add_contributions = user_services.get_user_contributions(user_id)
+
+        self.assertEqual(
+            [],
+            pre_add_contributions.created_exploration_ids)
+
+        self.assertEqual(
+            [],
+            pre_add_contributions.edited_exploration_ids)
+
         for created_exp_id in created_exp_ids:
             user_services.add_created_exploration_id(user_id, created_exp_id)
         for edited_exp_id in edited_exp_ids:
@@ -1709,11 +1731,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertEqual(
-            created_exp_ids,
+            ['exp1', 'exp2', 'exp3'],
             contributions.created_exploration_ids)
 
         self.assertEqual(
-            edited_exp_ids,
+            ['exp2', 'exp3', 'exp4'],
             contributions.edited_exploration_ids)
 
     def test_update_user_contributions(self):
@@ -1724,6 +1746,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
 
+        pre_add_contributions = user_services.get_user_contributions(user_id)
+
+        self.assertEqual(
+            [],
+            pre_add_contributions.created_exploration_ids)
+
+        self.assertEqual(
+            [],
+            pre_add_contributions.edited_exploration_ids)
+
         user_services.update_user_contributions(
             user_id,
             created_exp_ids,
@@ -1732,11 +1764,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertEqual(
-            created_exp_ids,
+            ['exp1', 'exp2', 'exp3'],
             contributions.created_exploration_ids)
 
         self.assertEqual(
-            edited_exp_ids,
+            ['exp2', 'exp3', 'exp4'],
             contributions.edited_exploration_ids)
 
     def test_update_user_contributions_for_invalid_user_raises_error(self):
@@ -1768,15 +1800,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             created_exp_ids,
             contributions.created_exploration_ids)
 
-    def test_add_created_exploration_id_new_user_creates_contribution(self):
-        new_user_id = 'id_x'
+    def test_add_created_exploration_id_creates_user_contribution(self):
+        user_id = 'id_x'
         created_exp_id = 'exp1'
 
-        user_services.add_created_exploration_id(new_user_id, created_exp_id)
-        contributions = user_services.get_user_contributions(new_user_id)
+        pre_add_contributions = user_services.get_user_contributions(user_id)
+        self.assertIsNone(pre_add_contributions)
 
+        user_services.add_created_exploration_id(user_id, created_exp_id)
+        contributions = user_services.get_user_contributions(user_id)
+
+        self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertEqual(
-            [created_exp_id],
+            ['exp1'],
             contributions.created_exploration_ids)
 
     def test_add_edited_exploration_id(self):
@@ -1794,13 +1830,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             edited_exp_ids,
             contributions.edited_exploration_ids)
 
-    def test_add_edited_exploration_id_new_user_creates_contribution(self):
-        new_user_id = 'id_x'
+    def test_add_edited_exploration_id_creates_user_contribution(self):
+        user_id = 'id_x'
         edited_exp_id = 'exp1'
 
-        user_services.add_edited_exploration_id(new_user_id, edited_exp_id)
-        contributions = user_services.get_user_contributions(new_user_id)
+        pre_add_contributions = user_services.get_user_contributions(user_id)
+        self.assertIsNone(pre_add_contributions)
 
+        user_services.add_edited_exploration_id(user_id, edited_exp_id)
+        contributions = user_services.get_user_contributions(user_id)
+
+        self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertEqual(
             [edited_exp_id],
             contributions.edited_exploration_ids)
@@ -2604,7 +2644,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.migrate_dashboard_stats_to_latest_schema(
                 user_stats_model)
 
-    def test_get_user_impact_score_non_exisitng_user_id_returns_zero(self):
+    def test_get_user_impact_score_non_existing_user_id_returns_zero(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
 
@@ -3581,9 +3621,14 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.allow_user_to_submit_question(user_id)
+
+        pre_user_contribution_rights = (
+            user_services.get_user_contribution_rights(user_id))
+        self.assertTrue(pre_user_contribution_rights.can_submit_questions)
+
         user_services.remove_question_submit_rights(user_id)
 
         user_contribution_rights = (
             user_services.get_user_contribution_rights(user_id))
-
         self.assertFalse(user_contribution_rights.can_submit_questions)
