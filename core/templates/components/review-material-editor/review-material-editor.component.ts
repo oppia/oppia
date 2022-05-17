@@ -38,6 +38,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
   @Input() bindableDict: BindableDict;
   @Output() onSaveExplanation:
     EventEmitter<SubtitledHtml> = (new EventEmitter());
+
   explanationMemento: string;
   editableExplanation: string;
   conceptCardExplanationEditorIsShown: boolean;
@@ -72,8 +73,6 @@ export class ReviewMaterialEditorComponent implements OnInit {
   }
 
   openConceptCardExplanationEditor(): void {
-    this.editableExplanation = (
-      this.bindableDict.displayedConceptCardExplanation);
     this.explanationMemento = this.editableExplanation;
     this.conceptCardExplanationEditorIsShown = true;
   }

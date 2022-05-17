@@ -106,6 +106,12 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
         stateName && !tmpOutcome.hasNonemptyFeedback());
     };
 
+    // Remove this function once this controller is migrated to
+    // Angular 2+.
+    $scope.getChanges = function() {
+      $rootScope.$apply();
+    };
+
     $scope.isFeedbackLengthExceeded = function(tmpOutcome) {
       // TODO(#13764): Edit this check after appropriate limits are found.
       return (tmpOutcome.feedback._html.length > 10000);

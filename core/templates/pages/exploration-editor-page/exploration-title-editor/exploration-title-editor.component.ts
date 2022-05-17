@@ -51,5 +51,8 @@ angular.module('oppia').component('explorationTitleEditor', {
           )
         );
       };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
+      };
     }]
 });

@@ -51,6 +51,7 @@ export class AlertsService {
   get warnings(): Warning[] {
     return AlertsService.warnings;
   }
+
   private static messages: Message[] = [];
   get messages(): Message[] {
     return AlertsService.messages;

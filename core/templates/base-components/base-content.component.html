@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/base-components/base-content.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/base-components/base-content.component.rtl.css" as="style">
+
 <ng-template #contentTpl><ng-content select="content"></ng-content></ng-template>
 <ng-template #footerTpl>
   <ng-container>
@@ -102,79 +105,6 @@
   </div>
 </main>
 
-<style>
-  .oppia-base-content-pre-logo-container {
-    align-items: center;
-    display: flex;
-    float: left;
-    height: 56px;
-    transform: translateX(50%);
-    width: 20px;
-  }
-  .navbar-mobile-container {
-    bottom: 0;
-    display: block;
-    position: fixed;
-    right: 0;
-    text-align: right;
-    width: 100%;
-    z-index: 999;
-  }
-  .navbar-mobile-options {
-    background-color: #e6e6e6;
-    border-top: 1px solid #000;
-  }
-  .show-mobile-navbar-icon {
-    background-color: #e6e6e6;
-    border-left: 1.5px solid #000;
-    border-radius: 10px 0;
-    border-top: 1.5px solid #000;
-    color: #000;
-    font-size: 25px;
-    padding: 10px;
-  }
-  .oppia-cookie-banner-container {
-    background: rgb(0,0,0,0.9);
-    bottom: 0;
-    color: #fff;
-    font-family: 'Roboto', Arial, sans-serif;
-    padding: 24px 0;
-    position: fixed;
-    width: 100%;
-    z-index: 2000;
-  }
-  .oppia-cookie-banner-container .oppia-cookie-banner-explanation /deep/ a {
-    color: #aed2e9;
-  }
-
-  .oppia-cookie-banner-container .oppia-cookie-banner {
-    margin: auto;
-    width: 704px;
-  }
-
-  .oppia-cookie-banner-container .oppia-cookie-banner-accept-button {
-    background-color: #00609c;
-    color: #fff;
-    display: block;
-    float: right;
-    text-transform: uppercase;
-    width: 168px;
-  }
-
-  @media(max-width: 1024px) {
-    .oppia-cookie-banner-container .oppia-cookie-banner {
-      width: 80vw;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .oppia-cookie-banner-container .oppia-cookie-banner {
-      padding: 15px 24px 0 24px;
-      width: 90vw;
-    }
-    .oppia-cookie-banner-container .oppia-cookie-banner-accept-button {
-      float: none;
-      margin: 0 auto;
-    }
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/base-content.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/base-content.component.rtl.css">

@@ -22,8 +22,8 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
-from core.domain import fs_domain
+from core import utils
+from core.domain import fs_services
 from core.domain import html_validation_service
 from core.tests import test_utils
 
@@ -880,13 +880,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         fs.commit('image/img2.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
@@ -908,13 +907,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
             html_validation_service.validate_svg_filenames_in_math_rich_text(
@@ -940,13 +938,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
             html_validation_service.validate_svg_filenames_in_math_rich_text(

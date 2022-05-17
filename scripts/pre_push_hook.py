@@ -112,6 +112,10 @@ def get_remote_name():
 
     Returns:
         str. The remote name of the local repository.
+
+    Raises:
+        ValueError. Subprocess failed to start.
+        Exception. Upstream not set.
     """
     remote_name = ''
     remote_num = 0

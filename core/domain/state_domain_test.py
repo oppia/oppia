@@ -35,11 +35,22 @@ from core.domain import interaction_registry
 from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
+from core.domain import translation_domain
 from core.tests import test_utils
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
+
+    def setUp(self):
+        super(StateDomainUnitTests, self).setUp()
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.', True)
+        }
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
     def test_get_all_html_in_exploration_with_drag_and_drop_interaction(self):
         """Test the method for extracting all the HTML from a state having
@@ -3468,56 +3479,56 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected audio filename to be a string'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', 20):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', '.invalidext'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', 'justanextension'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
                 audio_voiceover.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected file size to be an int'
-            ):
+        ):
             with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid file size'
-            ):
+        ):
             with self.swap(audio_voiceover, 'file_size_bytes', -3):
                 audio_voiceover.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected needs_update to be a bool'
-            ):
+        ):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected duration_secs to be a float'
-            ):
+        ):
             with self.swap(audio_voiceover, 'duration_secs', 'test'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected duration_secs to be a float'
-            ):
-            with self.swap(audio_voiceover, 'duration_secs', 10):
+        ):
+            with self.swap(audio_voiceover, 'duration_secs', '10'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected duration_secs to be positive number, '
             'or zero if not yet specified'
-            ):
+        ):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
 
@@ -3534,19 +3545,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected needs_update to be a bool'
-            ):
+        ):
             with self.swap(written_translation, 'needs_update', 20):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
-            ):
+        ):
             with self.swap(written_translation, 'data_format', 'int'):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
-            ):
+        ):
             with self.swap(written_translation, 'data_format', 2):
                 written_translation.validate()
 
@@ -4372,6 +4383,193 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ]
         )
 
+    def test_get_all_translatable_content_for_state_content(self):
+        """Get all translatable fields for state content."""
+        state = state_domain.State.create_default_state('state_1')
+        state_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state content html</p>'
+        }
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, ['<p>state content html</p>']
+        )
+
+    def test_get_all_translatable_content_for_text_input_answer_groups(self):
+        """Get all the translatable fields for answer group."""
+        state = state_domain.State.create_default_state('state_1')
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_id('TextInput')
+        state.update_interaction_answer_groups(state_answer_group)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, [
+                '<p>state outcome html</p>',
+                ['Test rule spec.']]
+        )
+
+    def test_get_all_translatable_content_for_set_input_answer_groups(self):
+        """Get all the translatable fields for answer group."""
+        state = state_domain.State.create_default_state('state_1')
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', state_domain.SubtitledHtml(
+                        'feedback', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': {
+                                'contentId': 'rule_input_2',
+                                'unicodeStrSet': ['Input1', 'Input2']
+                                }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_id('SetInput')
+        state.update_interaction_answer_groups(state_answer_group)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, [
+                '<p>Feedback</p>',
+                ['Input1', 'Input2']
+            ]
+        )
+
+    def test_get_all_translatable_content_for_solution(self):
+        """Get all translatable fields for solution."""
+        state = state_domain.State.create_default_state('state_1')
+        state_solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state_1</p>'
+            }
+        }
+        state.update_interaction_id('TextInput')
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, ['<p>This is solution for state_1</p>'])
+
+    def test_test_get_all_translatable_content_for_unicode_cust_args(self):
+        """Get all the translatable fields for customization args."""
+        state = state_domain.State.create_default_state('state_1')
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Translatable cust args.'
+                }
+            },
+            'rows': {'value': 1}
+        }
+        state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, ['Translatable cust args.'])
+
+    def test_get_all_translatable_content_for_html_in_cust_args(self):
+        state = state_domain.State.create_default_state('state_1')
+        state.update_interaction_id('MultipleChoiceInput')
+        state_interaction_cust_args = {
+            'showChoicesInShuffledOrder': {
+                'value': True
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': 'Hello world!'
+                    }
+                ]
+            }
+        }
+        state.update_interaction_customization_args(state_interaction_cust_args)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            state.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, ['Hello world!'])
+
+    def test_get_all_translatable_content_for_hints(self):
+        """Get all translatable fields for hints."""
+        hint = state_domain.Hint(state_domain.SubtitledHtml(
+            'hint_1', '<p>Hello, this is html1 for state_1</p>'))
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            hint.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents, [
+                '<p>Hello, this is html1 for state_1</p>'
+            ])
+
 
 class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
     """Test methods for InteractionCustomizationArg domain object."""
@@ -5109,7 +5307,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected needs_update to be a bool'):
             self.voiceover.validate()
 
-    def test_validate_float_duration_secs(self):
+    def test_validate_str_duration_secs(self):
         self.voiceover.validate()
         self.voiceover.duration_secs = 'duration_secs'
         with self.assertRaisesRegex(
@@ -5119,9 +5317,14 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_int_duration_secs(self):
         self.voiceover.validate()
         self.voiceover.duration_secs = 10
-        with self.assertRaisesRegex(
-            Exception, 'Expected duration_secs to be a float'):
-            self.voiceover.validate()
+        self.voiceover.validate()
+        self.assertEqual(self.voiceover.duration_secs, 10)
+
+    def test_validate_float_duration_secs(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = 10.5
+        self.voiceover.validate()
+        self.assertEqual(self.voiceover.duration_secs, 10.5)
 
     def test_validate_negative_duration_seconds(self):
         self.voiceover.validate()

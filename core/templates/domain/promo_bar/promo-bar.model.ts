@@ -33,6 +33,7 @@ export class PromoBar {
   static createFromBackendDict(data: PromoBarBackendDict): PromoBar {
     return new PromoBar(data.promo_bar_enabled, data.promo_bar_message);
   }
+
   static createEmpty(): PromoBar {
     return new PromoBar(false, '');
   }

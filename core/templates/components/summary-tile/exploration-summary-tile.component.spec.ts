@@ -93,6 +93,7 @@ class MockWindowRef {
       this.location._hashChange = val;
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -425,7 +426,7 @@ describe('Exploration Summary Tile Component', () => {
     const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
       .and.returnValue('a few seconds ago');
 
-    component.lastUpdatedMsec = new Date().getUTCMilliseconds();
+    component.lastUpdatedMsec = Date.now();
     let relativeLastUpdatedDateTime =
       component.getRelativeLastUpdatedDateTime();
     fixture.detectChanges();

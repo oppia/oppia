@@ -137,6 +137,9 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
 
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_EXPLORATION, [])
+
         self.assertIsNone(
             feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
         self.assertIsNone(
@@ -239,6 +242,13 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
 
+    def test_delete_exploration_feedback_analytics(self):
+        self.assertIsNotNone(
+            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+        feedback_services.delete_exploration_feedback_analytics([self.EXP_1_ID])
+        self.assertIsNone(
+            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+
     def test_delete_feedback_threads_deletes_multiple_feedbacks(self):
         self.assertIsNotNone(
             feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -266,13 +276,13 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     EXPECTED_THREAD_DICT = {
         'status': u'open',
         'summary': None,
-        'original_author_username': None,
+        'original_author_id': None,
         'subject': u'a subject'
     }
     EXPECTED_THREAD_DICT_VIEWER = {
         'status': u'open',
         'summary': None,
-        'original_author_username': None,
+        'original_author_id': None,
         'subject': u'a subject second'
     }
 
@@ -334,8 +344,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             self.EXPECTED_THREAD_DICT, threads[0].to_dict())
 
-        self.EXPECTED_THREAD_DICT_VIEWER['original_author_username'] = (
-            self.VIEWER_USERNAME)
+        self.EXPECTED_THREAD_DICT_VIEWER['original_author_id'] = (
+            self.viewer_id)
 
         # Viewer creates feedback thread.
         feedback_services.create_thread(
@@ -356,6 +366,83 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.id, self.EXP_ID_1)
         self.assertEqual(thread.num_open_threads, 1)
         self.assertEqual(thread.num_total_threads, 1)
+
+    def test_get_next_page_of_all_feedback_messages(self):
+        self.save_new_default_exploration(self.EXP_ID_1, self.EXP_ID_2)
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_ID_1,
+            1,
+            self.user_id,
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': 'new content'
+            },
+            'some text')
+        thread_id = feedback_services.get_threads(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1
+        )[0].id
+        feedback_services.create_message(
+            thread_id, self.user_id, None, None, 'some text')
+        feedback_services.create_message(
+            thread_id, self.user_id, None, None, 'Another text')
+        messages_on_page = feedback_services.get_messages(thread_id)
+        dictionary_list_from_test_method = []
+        dictionary_list_from_page_message = []
+        method_result = (
+            feedback_services.get_next_page_of_all_feedback_messages())
+        for i in (method_result)[0]:
+            dictionary_list_from_test_method.append(i.to_dict().items())
+        for i in messages_on_page:
+            dictionary_list_from_page_message.append(i.to_dict().items())
+        dictionary_list_from_page_message.reverse()
+        self.assertListEqual(
+            dictionary_list_from_test_method,
+            dictionary_list_from_page_message,
+        )
+        genral_feedback_result = (
+        feedback_models.GeneralFeedbackMessageModel.get_all_messages(
+            feconf.FEEDBACK_TAB_PAGE_SIZE, None))
+        self.assertEqual(method_result[1], genral_feedback_result[1])
+        self.assertEqual(method_result[2], genral_feedback_result[2])
+
+    def test_get_multiple_threads(self):
+        thread_1 = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        thread_2 = feedback_services.create_thread(
+            'exploration', self.EXP_ID_2, None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        thread_id_list = [thread_1, thread_2]
+        thread_list = []
+        thread_list_from_result = []
+        for i in thread_id_list:
+            thread_list.append(
+                feedback_services.get_thread(i).to_dict().items())
+        for i in feedback_services.get_multiple_threads(thread_id_list):
+            thread_list_from_result.append(i.to_dict().items())
+        self.assertListEqual(thread_list_from_result, thread_list)
+
+    def test_handle_thread_status_changed(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_message(
+            thread_id, self.user_id,
+            feedback_models.STATUS_CHOICES_FIXED, None,
+            'feedback message not used here')
+        self.assertEqual(feedback_services.get_total_open_threads(
+            [feedback_services.get_thread_analytics(self.EXP_ID_1)]), 0)
+        feedback_services.handle_thread_status_changed(
+                self.EXP_ID_1,
+                feedback_models.STATUS_CHOICES_FIXED,
+                feedback_models.STATUS_CHOICES_OPEN)
+        self.assertEqual(feedback_services.get_total_open_threads(
+            [feedback_services.get_thread_analytics(self.EXP_ID_1)]
+        ), 1)
 
     def test_get_total_open_threads_for_multiple_explorations(self):
         feedback_services.create_thread(

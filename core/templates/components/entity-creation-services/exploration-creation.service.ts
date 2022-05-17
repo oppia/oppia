@@ -73,6 +73,7 @@ export class ExplorationCreationService {
         this.explorationCreationInProgress = false;
       });
   }
+
   showUploadExplorationModal(): void {
     this.alertsService.clearWarnings();
     this.ngbModal.open(
@@ -84,9 +85,8 @@ export class ExplorationCreationService {
       this.loaderService.showLoadingScreen('Creating exploration');
 
       var form = new FormData();
-      form.append('payload', JSON.stringify({
-        yaml_file: yamlFile
-      }));
+      form.append('yaml_file', yamlFile);
+      form.append('payload', JSON.stringify({}));
       this.csrfTokenService.getTokenAsync().then((token) => {
         form.append('csrf_token', token);
         $.ajax({
@@ -104,7 +104,7 @@ export class ExplorationCreationService {
           this.windowRef.nativeWindow.location.href =
           this.urlInterpolationService.interpolateUrl(
             this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-              exploration_id: data.explorationId
+              exploration_id: data.exploration_id
             }
           );
         }).fail((data) => {

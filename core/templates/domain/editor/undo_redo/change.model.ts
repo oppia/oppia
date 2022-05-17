@@ -648,6 +648,7 @@ export class Change {
   _applyChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;
+
   _reverseChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;

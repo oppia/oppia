@@ -1,7 +1,10 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.rtl.css" as="style">
+
 <div class="progress-nav-bar row space-between center">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
-  <div class="row-item" [ngClass]="{'align-right': isLanguageRTL()}">
+  <div class="row-item row-item-previous-card">
     <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
     <div *ngIf="hasPrevious && !helpCardHasContinueButton">
       <button mat-raised-button
@@ -12,7 +15,7 @@
       </button>
     </div>
   </div>
-  <div *ngIf="hasNext" [ngClass]="{'align-right': !isLanguageRTL()}" class="row-item">
+  <div *ngIf="hasNext" class="row-item row-item-next-card">
     <button mat-raised-button
             (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
             aria-label="Next Card"
@@ -48,66 +51,6 @@
   </div>
 </div>
 
-<style>
-  /*
-    This affects the progress nav bar.
-  */
-
-  .oppia-nav-button .mat-button.oppia-autofocus:focus {
-    background-color: #0d48a1;
-  }
-
-  .oppia-learner-confirm-button {
-    border-radius: 2px;
-    font-size: 16px;
-    line-height: 22px;
-    outline: none;
-    text-transform: uppercase;
-  }
-
-  .continue-button {
-    margin-bottom: 8px;
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-top: 12px;
-  }
-
-  .progress-nav-bar {
-    background-color: white;
-    margin-left: 0;
-    margin-right: 0;
-    max-width: 100%;
-  }
-
-  .oppia-nav-button {
-    height: 36px;
-    margin: 0 12px 12px 12px;
-    min-width: 36px;
-    padding: 6px;
-  }
-  .oppia-arrow-right {
-    font-size: 19px;
-    padding-top: 1.5px;
-  }
-  .oppia-nav-button.oppia-nav-left-button {
-    margin: 0 12px 12px 12px;
-  }
-
-  .row {
-    display: flex;
-    flex-direction: row;
-  }
-  .space-between {
-    justify-content: space-between;
-  }
-  .center {
-    align-content: center;
-    align-items: center;
-  }
-  .row-item {
-    flex-grow: 1;
-  }
-  .align-right {
-    text-align: right;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.rtl.css">

@@ -231,7 +231,7 @@ describe('Search Service', () => {
     let initialSearchResultsLoadedSpy: jasmine.Spy<jasmine.Func>;
     let testSubscriptions: Subscription;
     const SAMPLE_RESULTS = {
-      search_offset: 'notempty',
+      search_cursor: 'notempty',
       activity_list: []
     };
     const SAMPLE_QUERY = '/searchhandler/data?q=example&category=' +
@@ -294,7 +294,7 @@ describe('Search Service', () => {
       const MORE_DATA_REQUEST = '/searchhandler/data?q=example&category=' +
       '("exploration")&language_code=("en" OR "hi")&offset=notempty';
       const MORE_DATA_RESPONSE = {
-        search_offset: 'newcursor'
+        search_cursor: 'newcursor'
       };
 
       it('should successfully load more data', fakeAsync(() => {
@@ -344,7 +344,7 @@ describe('Search Service', () => {
           searchService.loadMoreData(() => { }, () => { });
           const moreDataReq = httpTestingController.expectOne(
             SAMPLE_QUERY + '&offset=notempty');
-          moreDataReq.flush({search_offset: null});
+          moreDataReq.flush({search_cursor: null});
           flushMicrotasks();
           searchService.loadMoreData(successHandler, errorHandler);
 

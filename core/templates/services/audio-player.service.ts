@@ -44,6 +44,7 @@ export class AudioPlayerService {
   private _updateViewEventEmitter = new EventEmitter<void>();
   private _autoplayAudioEventEmitter = (
     new EventEmitter<void | AutoPlayAudioEvent>());
+
   private _stopIntervalSubject = new Subject<void>();
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,

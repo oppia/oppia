@@ -321,7 +321,8 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = self.request.get('return_url', self.request.uri)
+        return_url = self.normalized_request.get(
+            'return_url', self.request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -471,6 +472,11 @@ class ExportAccountHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
@@ -483,7 +489,7 @@ class ExportAccountHandler(base.BaseHandler):
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
         if re.search(feconf.USER_ID_REGEX, user_data_json_string):
-            logging.exception(
+            logging.error(
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
                 % self.user_id)
             user_data_json_string = (
@@ -531,10 +537,24 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'site_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': list(map(
+                        lambda x: x['id'], constants.SUPPORTED_SITE_LANGUAGES
+                    ))
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        site_language_code = self.payload.get('site_language_code')
+        site_language_code = self.normalized_payload.get('site_language_code')
         user_services.update_preferred_site_language_code(
             self.user_id, site_language_code)
         self.render_json({})
@@ -542,8 +562,19 @@ class SiteLanguageHandler(base.BaseHandler):
 
 class UserInfoHandler(base.BaseHandler):
     """Provides info about user. If user is not logged in,
-    return dict containing false as logged in status.
-    """
+    return dict containing false as logged in status."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'user_has_viewed_lesson_info_modal_once': {
+                'schema': {
+                    'type': 'bool'
+                },
+            }
+        }
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -580,22 +611,38 @@ class UserInfoHandler(base.BaseHandler):
                 'user_is_logged_in': False
             })
 
+    @acl_decorators.open_access
+    def put(self):
+        """Handles PUT requests."""
+        user_has_viewed_lesson_info_modal_once = self.normalized_payload.get(
+            'user_has_viewed_lesson_info_modal_once')
+        if user_has_viewed_lesson_info_modal_once:
+            user_services.set_user_has_viewed_lesson_info_modal_once(
+                self.user_id)
+        self.render_json({'success': True})
+
 
 class UrlHandler(base.BaseHandler):
     """The handler for generating login URL."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'current_url': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.open_access
     def get(self):
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            if self.request and self.request.get('current_url'):
-                target_url = self.request.get('current_url')
-                login_url = user_services.create_login_url(target_url)
-                self.render_json({'login_url': login_url})
-            else:
-                raise self.InvalidInputException(
-                    'Incomplete or empty GET parameters passed'
-                )
+            target_url = self.normalized_request.get('current_url')
+            login_url = user_services.create_login_url(target_url)
+            self.render_json({'login_url': login_url})

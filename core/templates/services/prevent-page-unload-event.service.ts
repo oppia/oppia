@@ -28,6 +28,7 @@ export class PreventPageUnloadEventService {
   validationCallback: undefined | (() => boolean);
   _preventPageUnloadEventHandlerBind?: (
     this: Window, ev: BeforeUnloadEvent) => void;
+
   constructor(private windowRef: WindowRef) {
     this.listenerActive = false;
     this.validationCallback = undefined;

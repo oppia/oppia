@@ -108,6 +108,7 @@ export class MisconceptionObjectFactory {
       misconceptionBackendDict.feedback,
       misconceptionBackendDict.must_be_addressed);
   }
+
   create(
       id: number, name: string, notes: string,
       feedback: string, mustBeAddressed: boolean): Misconception {

@@ -21,6 +21,8 @@ import os
 import subprocess
 import sys
 
+from typing import Optional, Sequence
+
 from . import build
 from . import check_frontend_test_coverage
 from . import common
@@ -67,7 +69,7 @@ _PARSER.add_argument(
 )
 
 
-def run_dtslint_type_tests():
+def run_dtslint_type_tests() -> None:
     """Runs the dtslint type tests in typings/tests."""
     print('Running dtslint type tests.')
 
@@ -79,6 +81,9 @@ def run_dtslint_type_tests():
            TYPESCRIPT_DIR_RELATIVE_PATH]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert task.stdout is not None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
         line = task.stdout.readline()
@@ -93,7 +98,7 @@ def run_dtslint_type_tests():
         sys.exit('The dtslint (type tests) failed.')
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -128,6 +133,9 @@ def main(args=None):
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert task.stdout is not None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
         line = task.stdout.readline()

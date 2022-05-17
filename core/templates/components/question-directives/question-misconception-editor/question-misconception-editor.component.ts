@@ -49,8 +49,10 @@ interface TaggedMisconception {
 export class QuestionMisconceptionEditorComponent implements OnInit {
   @Output() saveAnswerGroupFeedback:
     EventEmitter<Outcome> = (new EventEmitter());
+
   @Output() saveTaggedMisconception:
     EventEmitter<TaggedMisconception> = (new EventEmitter());
+
   @Input() outcome: Outcome;
   @Input() isEditable: boolean;
   @Input() rules: Rule;
@@ -122,7 +124,9 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   tagAnswerGroupWithMisconception(): void {
     const modalRef: NgbModalRef = this.ngbModal.open(
       TagMisconceptionModalComponent, {
-        backdrop: 'static'
+        backdrop: 'static',
+        backdropClass: 'forced-modal-backdrop-stack-over',
+        windowClass: 'forced-modal-stack-over'
       });
     modalRef.componentInstance.taggedSkillMisconceptionId = (
       this.taggedSkillMisconceptionId);

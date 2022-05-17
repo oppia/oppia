@@ -16,8 +16,10 @@
  * @fileoverview Component for the partnerships page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from
@@ -29,7 +31,8 @@ import { UrlInterpolationService } from
   templateUrl: './partnerships-page.component.html',
   styleUrls: []
 })
-export class PartnershipsPageComponent implements OnInit {
+export class PartnershipsPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   partnershipsImgUrl: string = '';
   formIconUrl: string = '';
   callIconUrl: string = '';
@@ -38,9 +41,21 @@ export class PartnershipsPageComponent implements OnInit {
   constructor(
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
+    private translateService: TranslateService
   ) {}
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_PARTNERSHIPS_PAGE_TITLE');
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
   ngOnInit(): void {
-    this.pageTitleService.setDocumentTitle('Partnerships | Oppia');
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/partnerships_hero_image.png');
     this.formIconUrl = this.urlInterpolationService.getStaticImageUrl(
@@ -49,6 +64,10 @@ export class PartnershipsPageComponent implements OnInit {
       '/icons/icon_call.png');
     this.changeIconUrl = this.urlInterpolationService.getStaticImageUrl(
       '/icons/icon_change.png');
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

@@ -63,6 +63,7 @@ import { ToastrModule } from 'ngx-toastr';
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
+    LessonInformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -73,6 +74,7 @@ import { ToastrModule } from 'ngx-toastr';
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
+    LessonInformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -104,6 +106,7 @@ class ExplorationPlayerPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
+import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

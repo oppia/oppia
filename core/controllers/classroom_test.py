@@ -61,11 +61,11 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_id_2 = topic_fetchers.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
             topic_id_1, 'private_topic_name',
-            'private-topic-name', 'description')
+            'private-topic-name', 'description', 'fragm')
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
             topic_id_2, 'public_topic_name',
-            'public-topic-name', 'description')
+            'public-topic-name', 'description', 'fragm')
         public_topic.thumbnail_filename = 'Topic.svg'
         public_topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])

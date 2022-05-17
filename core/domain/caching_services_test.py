@@ -149,6 +149,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             }
         },
         'correctness_feedback_enabled': False,
+        'edits_allowed': True,
         'last_updated': '08/17/2020, 18:04:57:799687',
         'language_code': 'en',
         'blurb': ''
@@ -184,9 +185,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'ations": {"translations_mapping": {"feedback_2": {}, "rule_input_4": {'
         '}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder'
         '_0": {}}}, "next_content_id_index": 5, "solicit_answer_details": false'
-        '}}, "version": 0, "correctness_feedback_enabled": false, "language_cod'
-        'e": "en", "objective": "", "init_state_name": "Introduction", "blurb":'
-        ' "", "author_notes": ""}'
+        '}}, "version": 0, "correctness_feedback_enabled": false, "edits_allowe'
+        'd": true, "language_code": "en", "objective": "", "init_state_name": "'
+        'Introduction", "blurb": "", "author_notes": ""}'
     )
 
     def test_retrieved_memory_profile_contains_correct_elements(self) -> None:
@@ -777,7 +778,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_collection = (
-            collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+            collection_domain.Collection.create_default_collection(
                 collection_id))
 
         caching_services.set_multi(
@@ -793,7 +794,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_collection.to_dict(),
-            collections[collection_id].to_dict()) # type: ignore[no-untyped-call]
+            collections[collection_id].to_dict())
 
     def test_skills_with_unicode_characters_are_set_and_get_correctly(
         self
@@ -860,9 +861,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_topic = (
-            topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]
+            topic_domain.Topic.create_default_topic(
                 topic_id, 'Name 😍', 'abbrev 😍',
-                'description 😍'))
+                'description 😍', 'fragm 😍'))
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_TOPIC,
@@ -877,7 +878,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_topic.to_dict(),
-            topics[topic_id].to_dict()) # type: ignore[no-untyped-call]
+            topics[topic_id].to_dict())
 
     def test_stories_with_unicode_characters_are_set_and_get_correctly(
         self

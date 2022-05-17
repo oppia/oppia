@@ -31,8 +31,6 @@ _CERTIFI_PATH = os.path.join(
 sys.path.insert(0, _CERTIFI_PATH)
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 MAP = builtins.map
@@ -123,30 +121,6 @@ def get_args_of_function_node(function_node, args_to_ignore):
         ]
 
 
-def open_file(filename, mode, encoding='utf-8', newline=None):
-    """Open file and return a corresponding file object.
-
-    Args:
-        filename: str. The file to be opened.
-        mode: str. Mode in which the file is opened.
-        encoding: str. Encoding in which the file is opened.
-        newline: None|str. Controls how universal newlines work.
-
-    Returns:
-        _io.TextIOWrapper. The file object.
-
-    Raises:
-        IOError. The file cannot be opened.
-    """
-    # The try/except is needed here to unify the errors because io.open in
-    # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
-    # This should be removed after we fully migrate to Python 3.
-    try:
-        return io.open(filename, mode, encoding=encoding, newline=newline)
-    except:
-        raise IOError('Unable to open file: %s' % filename)
-
-
 def get_package_file_contents(package: str, filepath: str) -> str:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or
@@ -204,20 +178,6 @@ def url_encode(query, doseq=False):
     except ImportError:
         import urllib as urlparse
     return urlparse.urlencode(query, doseq=doseq)
-
-
-def divide(number1, number2):
-    """This function divides number1 by number2 in the Python 2 way, i.e it
-    performs an integer division.
-
-    Args:
-        number1: int. The dividend.
-        number2: int. The divisor.
-
-    Returns:
-        int. The quotent.
-    """
-    return past.utils.old_div(number1, number2)
 
 
 def _recursively_convert_to_str(value):

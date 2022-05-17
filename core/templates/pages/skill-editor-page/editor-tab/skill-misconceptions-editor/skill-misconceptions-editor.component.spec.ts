@@ -108,6 +108,15 @@ describe('Skill Misconceptions Editor Component', () => {
     expect(component.misconceptionsListIsShown).toEqual(true);
   });
 
+  it('should trigger change event when misconception is updated', () => {
+    component.ngOnInit();
+    spyOn(component.getMisconceptionsChange, 'emit').and.callThrough();
+
+    component.onMisconceptionChange();
+
+    expect(component.getMisconceptionsChange.emit).toHaveBeenCalled();
+  });
+
   it('should toggle misconceptionList when toggle ' +
     'button is clicked', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);

@@ -20,13 +20,11 @@ import datetime
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import question_domain
@@ -2395,7 +2393,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         question_state_dict = self._create_valid_question_data(
             'default_state').to_dict()
         question_state_dict['content']['html'] = html_content
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -2440,7 +2438,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.accept('commit_message')
 
     def test_accept_suggestion_with_image_region_interactions(self):
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             original_image_content = f.read()
@@ -2589,9 +2587,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         question = question_services.get_questions_by_skill_ids(
             1, ['skill1'], False)[0]
-        destination_fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, question.id))
+        destination_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_QUESTION, question.id)
         self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
         self.assertEqual(
             suggestion.status,

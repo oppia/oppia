@@ -23,7 +23,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
@@ -78,8 +78,7 @@ export class InteractiveMathEquationInput implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.value,
-      this.mathEquationInputRulesService as unknown as InteractionRulesService);
+      this.value, this.mathEquationInputRulesService);
   }
 
   showOSK(): void {

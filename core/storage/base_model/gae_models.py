@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import enum
+import re
 
 from core import feconf
 from core import utils
@@ -1339,7 +1340,7 @@ class VersionedModel(BaseModel):
             VersionedModel. Model instance representing given version.
 
         Raises:
-            Exception. This model instance has been deleted.
+            EntityNotFoundError. This model instance has been deleted.
         """
         current_version_model = cls.get(entity_id, strict=strict)
 
@@ -1664,11 +1665,20 @@ class BaseSnapshotMetadataModel(BaseModel):
         metadata_models: Sequence[BaseSnapshotMetadataModel] = cls.query(
             cls.committer_id == user_id
         ).fetch(projection=[cls.commit_type, cls.commit_message])
+
         user_data = {}
         for metadata_model in metadata_models:
+            message_without_user_ids = None
+            if metadata_model.commit_message is not None:
+                message_without_user_ids = re.sub(
+                    feconf.USER_ID_REGEX,
+                    '<user ID>',
+                    metadata_model.commit_message
+                )
+
             user_data[metadata_model.id] = {
                 'commit_type': metadata_model.commit_type,
-                'commit_message': metadata_model.commit_message,
+                'commit_message': message_without_user_ids,
             }
         return user_data
 

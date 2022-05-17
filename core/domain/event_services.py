@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core import python_utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -322,8 +321,7 @@ def _refresh_average_ratings_transactional(user_id, new_rating, old_rating):
             num_ratings += 1
         else:
             sum_of_ratings -= old_rating
-        average_ratings = python_utils.divide(
-            sum_of_ratings, float(num_ratings))
+        average_ratings = sum_of_ratings / float(num_ratings)
     user_stats_model.average_ratings = average_ratings
     user_stats_model.num_ratings = num_ratings
     user_stats_model.update_timestamps()
