@@ -1688,7 +1688,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         edited_exp_ids = ['exp2', 'exp3', 'exp4']
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_settings = user_services.get_user_settings(user_id)
 
         self.assertIsNotNone(user_services.get_user_contributions(user_id))
         self.assertIsInstance(
