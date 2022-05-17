@@ -236,10 +236,10 @@ export class ContributionOpportunitiesBackendApiService {
   Promise<string> {
     return this.http.get<PreferredTranslationLanguageBackendDict>(
       '/preferredtranslationlanguage').toPromise().then(data => {
-        return data.preferred_translation_language_code;
-      }, errorResponse => {
-        throw new Error(errorResponse.error.error);
-      });
+      return data.preferred_translation_language_code;
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
   }
 }
 

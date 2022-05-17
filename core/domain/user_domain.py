@@ -360,6 +360,8 @@ class UserSettings:
             modifiable_user_data.preferred_site_language_code)
         self.preferred_audio_language_code = (
             modifiable_user_data.preferred_audio_language_code)
+        self.preferred_translation_language_code = (
+            modifiable_user_data.preferred_translation_language_code)
         self.pin = modifiable_user_data.pin
 
     def to_dict(self) -> UserSettingsDict:
@@ -1222,6 +1224,7 @@ class ModifiableUserDataDict(TypedDict):
     preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
+    preferred_translation_language_code: Optional[str]
     user_id: Optional[str]
 
 
@@ -1264,8 +1267,8 @@ class ModifiableUserData:
                 preference.
             preferred_audio_language_code: str or None. Audio language
                 preference.
-            preferred_translation_language_code: str or None. Text translation language
-                preference.
+            preferred_translation_language_code: str or None. Text
+                translation language preference.
             user_id: str or None. User ID of the user whose data is being
                 updated. None if request did not have a user_id for the user
                 yet and expects the backend to create a new user entry for it.
