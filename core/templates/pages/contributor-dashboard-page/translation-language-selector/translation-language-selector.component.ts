@@ -29,7 +29,6 @@ import { FeaturedTranslationLanguage } from
   'domain/opportunity/featured-translation-language.model';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { i } from 'mathjs';
 
 interface Options {
   id: string;
@@ -93,11 +92,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
 
     this.contributionOpportunitiesBackendApiService
       .fetchUserLanguagePreferenceAsync()
-      .then((preferred_language_code: string|null) => {
-          if(preferred_language_code){
-            this.populateSavedLanguageSelection(
-              preferred_language_code);
-          }
+      .then((preferredLanguageCode: string) => {
+        if (preferredLanguageCode) {
+          this.populateLanguageSelection(
+            preferredLanguageCode);
+        }
       });
   }
 
@@ -106,21 +105,18 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   }
 
   async saveCurrentSelectedLanguage(
-    languageCode: string): Promise<unknown> {
-    console.log(languageCode);
+      languageCode: string): Promise<Object> {
     return await this.contributionOpportunitiesBackendApiService
       .saveUserLanguagePreferenceAsync(languageCode);
   }
 
-  populateSavedLanguageSelection(languageCode: string): void {
+  populateLanguageSelection(languageCode: string): void {
     this.setActiveLanguageCode.emit(languageCode);
     this.languageSelection = this.languageIdToDescription[languageCode];
   }
 
   selectOption(activeLanguageCode: string): void {
-    this.setActiveLanguageCode.emit(activeLanguageCode);
-    this.languageSelection = this.languageIdToDescription[
-      activeLanguageCode];
+    this.populateLanguageSelection(activeLanguageCode);
     this.dropdownShown = false;
     this.saveCurrentSelectedLanguage(activeLanguageCode);
   }

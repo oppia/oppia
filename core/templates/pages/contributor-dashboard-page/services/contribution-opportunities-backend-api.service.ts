@@ -80,6 +80,10 @@ interface TopicNamesBackendDict {
   'topic_names': string[];
 }
 
+interface PreferredTranslationLanguageBackendDict {
+  'preferred_translation_language_code': string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -216,27 +220,26 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async saveUserLanguagePreferenceAsync(language_code: string):
-  Promise<unknown> {
+  async saveUserLanguagePreferenceAsync(languageCode: string):
+  Promise<Object> {
     const postData: {'language_code': string} = {
-      language_code: language_code,
-    }
+      language_code: languageCode,
+    };
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
     const response = this.http.post(
-      '/prefferedtranslationlanguage', body).toPromise();
+      '/preferredtranslationlanguage', body).toPromise();
     return response;
   }
 
   async fetchUserLanguagePreferenceAsync():
-  Promise<string|null> {
-    try {
-      const response = await this.http.get<string>(
-        '/prefferedtranslationlanguage').toPromise();
-      return response;
-    } catch {
-      return null;
-    }
+  Promise<string> {
+    return this.http.get<PreferredTranslationLanguageBackendDict>(
+      '/preferredtranslationlanguage').toPromise().then(data => {
+        return data.preferred_translation_language_code;
+      }, errorResponse => {
+        throw new Error(errorResponse.error.error);
+      });
   }
 }
 

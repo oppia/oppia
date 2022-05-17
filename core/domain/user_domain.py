@@ -96,7 +96,8 @@ class UserSettings:
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
-        preferred_text_language_code: str or None. Text language preference.
+        preferred_translation_language_code: str or None. Translation
+            language preference.
         pin: str or None. The PIN of the user's profile for android.
         display_alias: str or None. Display name of a user who is logged
             into the Android app. None when the request is coming from web
@@ -131,7 +132,7 @@ class UserSettings:
         preferred_language_codes: Optional[List[str]] = None,
         preferred_site_language_code: Optional[str] = None,
         preferred_audio_language_code: Optional[str] = None,
-        preferred_text_language_code: Optional[str] = None,
+        preferred_translation_language_code: Optional[str] = None,
         pin: Optional[str] = None,
         display_alias: Optional[str] = None,
         deleted: bool = False,
@@ -176,7 +177,7 @@ class UserSettings:
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
-            preferred_text_language_code: str or None. Default language
+            preferred_translation_language_code: str or None. Default language
                 used for text translations preference.
             pin: str or None. The PIN of the user's profile for android.
             display_alias: str or None. Display name of a user who is logged
@@ -209,7 +210,8 @@ class UserSettings:
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
-        self.preferred_text_language_code = preferred_text_language_code
+        self.preferred_translation_language_code = (
+            preferred_translation_language_code)
         self.pin = pin
         self.display_alias = display_alias
         self.banned = banned
@@ -396,8 +398,8 @@ class UserSettings:
                 self.preferred_site_language_code),
             'preferred_audio_language_code': (
                 self.preferred_audio_language_code),
-            'preferred_text_language_code': (
-                self.preferred_text_language_code),
+            'preferred_translation_language_code': (
+                self.preferred_translation_language_code),
             'pin': self.pin,
             'display_alias': self.display_alias,
             'deleted': self.deleted,
@@ -1247,7 +1249,7 @@ class ModifiableUserData:
         preferred_language_codes: List[str],
         preferred_site_language_code: Optional[str],
         preferred_audio_language_code: Optional[str],
-        preferred_text_language_code: Optional[str],
+        preferred_translation_language_code: Optional[str],
         user_id: Optional[str] = None
     ) -> None:
         """Constructs a ModifiableUserData domain object.
@@ -1262,7 +1264,7 @@ class ModifiableUserData:
                 preference.
             preferred_audio_language_code: str or None. Audio language
                 preference.
-            preferred_text_language_code: str or None. Text translation language
+            preferred_translation_language_code: str or None. Text translation language
                 preference.
             user_id: str or None. User ID of the user whose data is being
                 updated. None if request did not have a user_id for the user
@@ -1273,7 +1275,8 @@ class ModifiableUserData:
         self.preferred_language_codes = preferred_language_codes
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
-        self.preferred_text_language_code = preferred_text_language_code
+        self.preferred_translation_language_code = (
+            preferred_translation_language_code)
         # The user_id is not intended to be a modifiable attribute, it is just
         # needed to identify the object.
         self.user_id = user_id
@@ -1298,7 +1301,7 @@ class ModifiableUserData:
             modifiable_user_data_dict['preferred_language_codes'],
             modifiable_user_data_dict['preferred_site_language_code'],
             modifiable_user_data_dict['preferred_audio_language_code'],
-            modifiable_user_data_dict['preferred_text_language_code'],
+            modifiable_user_data_dict['preferred_translation_language_code'],
             modifiable_user_data_dict['user_id'],
         )
 

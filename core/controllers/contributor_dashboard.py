@@ -527,8 +527,8 @@ class TranslatableTopicNamesHandler(base.BaseHandler):
 
 
 class TranslationPreferenceHandler(base.BaseHandler):
-    """Provides preffered translation language for the
-    Contribution dashboard page.
+    """Provides the prefered translation language in the
+    contributor dashboard page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -538,7 +538,10 @@ class TranslationPreferenceHandler(base.BaseHandler):
         'POST': {
             'language_code': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
                 }
             }
         }
@@ -549,15 +552,14 @@ class TranslationPreferenceHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
-            'preferred_text_language_code': (
-                user_settings.preferred_text_language_code)
+            'preferred_translation_language_code': (
+                user_settings.preferred_translation_language_code)
         })
-        self.render_json(self.values['preferred_text_language_code'])
-        # self.render_json('ak')
+        self.render_json(self.values)
 
     @acl_decorators.can_manage_own_account
     def post(self):
         """Handles POST requests."""
         language_code = self.normalized_payload.get('language_code')
-        user_services.update_preferred_text_language_code(
+        user_services.update_preferred_translation_language_code(
             self.user_id, language_code)

@@ -95,9 +95,9 @@ export class ContributionOpportunitiesService {
       .fetchUserLanguagePreferenceAsync();
   }
 
-  private async _saveUserLanguagePreferenceAsync(language_code: string) {
+  private async _saveUserLanguagePreferenceAsync(languageCode: string) {
     return this.contributionOpportunitiesBackendApiService
-      .saveUserLanguagePreferenceAsync(language_code);
+      .saveUserLanguagePreferenceAsync(languageCode);
   }
 
   showRequiresLoginModal(): void {
@@ -137,13 +137,13 @@ export class ContributionOpportunitiesService {
     return this._getTranslatableTopicNamesAsync();
   }
 
-  async getUserLanguagePreferenceAsync(): Promise<string|null> {
+  async getUserLanguagePreferenceAsync(): Promise<string> {
     return this._getUserLanguagePreferenceAsync();
   }
 
   async saveUserLanguagePreferenceAsync(
-    language_code: string): Promise<unknown> {
-    return this._saveUserLanguagePreferenceAsync(language_code)
+      languageCode: string): Promise<Object> {
+    return this._saveUserLanguagePreferenceAsync(languageCode);
   }
 
   get reloadOpportunitiesEventEmitter(): EventEmitter<void> {
