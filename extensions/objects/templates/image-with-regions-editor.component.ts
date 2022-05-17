@@ -226,7 +226,8 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     if (
       !changes.value ||
       !changes.value.currentValue ||
-      changes.value.previousValue === changes.value.currentValue) {
+      changes.value.previousValue === changes.value.currentValue
+    ) {
       return;
     }
     this.initializeEditor();
@@ -333,13 +334,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // Use these two functions to get the calculated image width and
   // height.
   getImageWidth(): number {
-    const width = this._calculateImageDimensions().width;
-    return width;
+    return this._calculateImageDimensions().width;
   }
 
   getImageHeight(): number {
-    const height = this._calculateImageDimensions().height;
-    return height;
+    return this._calculateImageDimensions().height;
   }
 
   getPreviewUrl(imageUrl: string): string {

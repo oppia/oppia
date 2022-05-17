@@ -188,12 +188,7 @@ describe('MathExpressionContentEditorComponent', () => {
 
   it('should initialise component when user clicks \'math expression\' in' +
   ' the rich text editor', () => {
-    component.value = {
-      raw_latex: '',
-      svg_filename: '',
-      svgFile: '',
-      mathExpressionSvgIsBeingProcessed: false
-    };
+    component.value = undefined;
     component.active = true;
     spyOn(component.valueChanged, 'emit');
 
