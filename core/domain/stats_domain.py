@@ -66,7 +66,7 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
 MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 
 
-class SubmittedAnswerDict(TypedDict, total=False):
+class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""
 
     answer: Optional[str]
@@ -79,8 +79,8 @@ class SubmittedAnswerDict(TypedDict, total=False):
     params: Dict[str, Any]
     session_id: str
     time_spent_in_sec: float
-    rule_spec_str: str
-    answer_str: str
+    rule_spec_str: Optional[str]
+    answer_str: Optional[str]
 
 
 class ExplorationIssueDict(TypedDict):
