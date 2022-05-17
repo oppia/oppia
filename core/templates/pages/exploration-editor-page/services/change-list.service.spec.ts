@@ -55,6 +55,7 @@ class MockWindowRef {
       onLine: true
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -68,6 +69,7 @@ class MockExplorationDataService1 {
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
@@ -81,6 +83,7 @@ class MockExplorationDataService2 {
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
@@ -91,6 +94,7 @@ class MockExplorationDataService3 {
   autosaveChangeListAsync(changeList, successCb, errorCb) {
     errorCb();
   }
+
   discardDraftAsync() {
     return;
   }
@@ -284,6 +288,10 @@ describe('Change List Service when changes are mergable', () => {
   it('should show alert message if we try to edit ' +
     'an state with invalid property', () => {
     changeListService.editStateProperty(
+      // This throws "Argument of type 'prop1' is not assignable to parameter
+      // of type 'StatePropertyNames'.". We need to suppress this error because
+      // we want to test passing wrong values.
+      // @ts-expect-error
       'stateName', 'prop1', 'oldValue', 'newValue');
 
     expect(alertsSpy).toHaveBeenCalledWith(

@@ -42,7 +42,7 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { animate, state, style, transition, trigger } from '@angular/animations';
+import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -63,11 +63,22 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
         style({ display: 'block' }),
         animate('500ms ease-in-out')
       ])
+    ]),
+    trigger('fadeInOut', [
+      transition('void => *', []),
+      transition('* <=> *', [
+        style({ opacity: 1 }),
+        animate('1s ease', keyframes([
+          style({ opacity: 0 }),
+          style({ opacity: 1 })
+        ]))
+      ])
     ])
   ]
 })
 export class TutorCardComponent {
   @Input() displayedCard: StateCard;
+  @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
   directiveSubscriptions = new Subscription();

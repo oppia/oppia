@@ -45,6 +45,7 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   // properties undefined.
   @ViewChild(CodemirrorComponent) codemirrorComponent:
    CodemirrorComponent | undefined;
+
   codemirror: CodeMirror.Editor | undefined;
   autoFocus = false;
 

@@ -23,7 +23,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 import { AddMisconceptionModalComponent } from './add-misconception-modal.component';
 
@@ -44,7 +44,7 @@ describe('Add Misconception Modal Component', function() {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let skillEditorStateService: SkillEditorStateService;
   let skillObjectFactory: SkillObjectFactory;
-  let skillObject = null;
+  let skillObject: Skill;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

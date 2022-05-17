@@ -57,6 +57,7 @@ class MockWindowDimensionsService {
   getResizeEvent() {
     return of(new Event('resize'));
   }
+
   getWidth(): number {
     return 530;
   }
@@ -216,7 +217,9 @@ describe('Collection Summary Tile Component', () => {
     const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
       .and.returnValue('a few seconds ago');
 
-    component.getLastUpdatedMsec = new Date().getUTCMilliseconds();
+    // Date.now() returns the current time in milliseconds since the
+    // Epoch.
+    component.getLastUpdatedMsec = Date.now();
     let relativeLastUpdatedDateTime =
       component.getRelativeLastUpdatedDateTime();
     fixture.detectChanges();

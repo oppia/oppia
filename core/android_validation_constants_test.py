@@ -54,6 +54,9 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
         self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_MISCONCEPTION_NAME,
             constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
+        self.assertEqual(
+            android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION,
+            constants.MAX_CHARS_IN_STORY_DESCRIPTION)
 
     def test_exploration_constants_in_both_files_are_equal(self) -> None:
         interaction_ids_in_constants = []

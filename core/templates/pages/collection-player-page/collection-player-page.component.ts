@@ -16,7 +16,11 @@
  * @fileoverview Component for the learner's view of a collection.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -26,12 +30,11 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserService } from 'services/user.service';
 import { CollectionNode } from 'domain/collection/collection-node.model';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -67,7 +70,8 @@ export interface CollectionHandler {
   selector: 'oppia-collection-player-page',
   templateUrl: './collection-player-page.component.html'
 })
-export class CollectionPlayerPageComponent implements OnInit {
+export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   collection!: Collection;
   collectionPlaythrough;
   currentExplorationId!: string;
@@ -103,7 +107,9 @@ export class CollectionPlayerPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private userService: UserService,
     private collectionPlayerBackendApiService:
-      CollectionPlayerBackendApiService
+      CollectionPlayerBackendApiService,
+    private translateService: TranslateService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -249,11 +255,11 @@ export class CollectionPlayerPageComponent implements OnInit {
 
   getExplorationTitlePosition(index: number): string {
     if (index % 2 === 0) {
-      return '8px';
+      return '-13px';
     } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
-      return '30px';
+      return '40px';
     } else if ((index + 1) % 4 === 0) {
-      return '-40px';
+      return '-55px';
     }
   }
 
@@ -287,11 +293,10 @@ export class CollectionPlayerPageComponent implements OnInit {
       collectionId
     ).then((collectionSummary) => {
       summary = collectionSummary;
+      if (summary) {
+        this.collectionSummary = summary.summaries[0];
+      }
     });
-
-    if (summary) {
-      this.collectionSummary = summary.summaries[0];
-    }
   }
 
   updateCollection(collection: Collection): void {
@@ -302,6 +307,26 @@ export class CollectionPlayerPageComponent implements OnInit {
     ) {
       this.generatePathParameters();
     }
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_COLLECTION_PLAYER_PAGE_TITLE', {
+        collectionTitle: this.collection.getTitle()
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {
@@ -319,20 +344,12 @@ export class CollectionPlayerPageComponent implements OnInit {
     this.ICON_Y_INITIAL_PX = 35;
     this.ICON_Y_INCREMENT_PX = 110;
     this.ICON_X_MIDDLE_PX = 225;
-    this.ICON_X_LEFT_PX = 55;
-    this.ICON_X_RIGHT_PX = 395;
+    this.ICON_X_LEFT_PX = 60;
+    this.ICON_X_RIGHT_PX = 390;
     this.svgHeight = this.MIN_HEIGHT_FOR_PATH_SVG_PX;
     this.nextExplorationId = null;
     this.whitelistedCollectionIdsForGuestProgress = (
       AppConstants.WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
-
-    // Touching anywhere outside the mobile preview should hide it.
-    document.addEventListener('touchstart', () => {
-      if (this.explorationCardIsShown === true) {
-        this.explorationCardIsShown = false;
-        this.scrollToLocation(this.elementToScrollTo);
-      }
-    });
 
     this.fetchSummaryAsync(this.collectionId);
 
@@ -341,34 +358,21 @@ export class CollectionPlayerPageComponent implements OnInit {
       this.collectionId).then(
       (collection) => {
         this.updateCollection(collection);
-        this.pageTitleService.setDocumentTitle(
-          this.collection.getTitle() + ' - Oppia');
+        // The onLangChange event is initially fired before the collection is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the collection is loaded.
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
 
         // Load the user's current progress in the collection. If the
         // user is a guest, then either the defaults from the server
         // will be used or the user's local progress, if any has been
         // made and the collection is whitelisted.
-        let collectionAllowsGuestProgress = (
-          this.whitelistedCollectionIdsForGuestProgress.indexOf(
-            this.collectionId) !== -1);
         this.userService.getUserInfoAsync().then((userInfo) => {
           this.loaderService.hideLoadingScreen();
           this.isLoggedIn = userInfo.isLoggedIn();
-          if (!this.isLoggedIn && collectionAllowsGuestProgress &&
-              this.guestCollectionProgressService
-                .hasCompletedSomeExploration(this.collectionId)) {
-            let completedExplorationIds = (
-              this.guestCollectionProgressService
-                .getCompletedExplorationIds(this.collection));
-            let nextExplorationId = (
-              this.guestCollectionProgressService.getNextExplorationId(
-                this.collection, completedExplorationIds));
-            this.collectionPlaythrough = (
-              CollectionPlaythrough.create(
-                nextExplorationId, completedExplorationIds));
-          } else {
-            this.collectionPlaythrough = collection.getPlaythrough();
-          }
+          this.collectionPlaythrough = collection.getPlaythrough();
           this.nextExplorationId =
             this.collectionPlaythrough.getNextExplorationId();
         });
@@ -382,6 +386,10 @@ export class CollectionPlayerPageComponent implements OnInit {
           'There was an error loading the collection.');
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

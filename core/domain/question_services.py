@@ -76,8 +76,8 @@ def link_multiple_skills_for_question(
             0 and 1 (inclusive).
 
     Raises:
-        Exception. The lengths of the skill_ids and skill_difficulties
-            lists are different.
+        Exception. Number of elements in skill ids and skill difficulties
+            are different.
     """
     if len(skill_ids) != len(skill_difficulties):
         raise Exception(
@@ -247,6 +247,9 @@ def get_questions_by_skill_ids(
         skill is random when require_medium_difficulty is false, otherwise
         the order is sorted by absolute value of the difference between
         skill difficulty and the medium difficulty.
+
+    Raises:
+        Exception. Question count is higher than the maximum limit.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -536,6 +539,9 @@ def apply_change_list(question_id, change_list):
 
     Returns:
         Question. The resulting question domain object.
+
+    Raises:
+        Exception. The change list is not applicable to the question.
     """
     question = get_question_by_id(question_id)
     question_property_inapplicable_skill_misconception_ids = (

@@ -19,6 +19,10 @@
           <img id="croppable-image" [src]="uploadedImage" #croppableImage alt="">
         </div>
       </div>
+      <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
+           class="oppia-unsupported-svg-tag-attribute-error"
+           [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }"
+      ></div>
     </div>
   </div>
 
@@ -60,6 +64,14 @@
     margin-right: auto;
     padding-top: 0;
     width: 300px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
   }
 
   @media(max-width: 768px) {

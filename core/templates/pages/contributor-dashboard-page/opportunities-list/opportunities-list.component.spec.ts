@@ -480,6 +480,13 @@ describe('Opportunities List Component', () => {
     }]);
 
     expect(component.opportunities.length).toEqual(15);
+
+    // RemoveOpportunitiesEvent with no opportunities, e.g. if a user closes a
+    // review modal without completing a review.
+    mockRemoveOpportunitiesEventEmitter.emit([]);
+    tick();
+
+    expect(component.opportunities.length).toEqual(15);
   }));
 
   describe('when clicking on page number ', () => {

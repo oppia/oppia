@@ -153,7 +153,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_cannot_get_skill_by_invalid_skill_id(self):
         url_with_invalid_id = '%s/%s' % (
             feconf.SKILL_EDITOR_DATA_URL_PREFIX, 'invalidSkillId')
-        self.get_json(url_with_invalid_id, expected_status_int=404)
+        self.get_json(url_with_invalid_id, expected_status_int=400)
 
     def test_guest_can_not_delete_skill(self):
         response = self.delete_json(self.url, expected_status_int=401)
@@ -314,14 +314,16 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token,
             expected_status_int=400)
-        self.put_payload['version'] = -1
+        self.put_payload['version'] = 10
         self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token,
             expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.put_payload['version'] = 1
         self.put_json(
-            self.url, {}, csrf_token=csrf_token, expected_status_int=404)
+            self.url, self.put_payload,
+            csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
     def test_editable_skill_handler_delete_succeeds(self):

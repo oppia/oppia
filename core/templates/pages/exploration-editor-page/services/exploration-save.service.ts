@@ -205,9 +205,13 @@ angular.module('oppia').factory('ExplorationSaveService', [
             whenSavingDone.resolve();
             $rootScope.$applyAsync();
           });
-        }, function() {
+        }, function(errorResponse) {
           saveIsInProgress = false;
           whenSavingDone.resolve();
+          EditabilityService.markEditable();
+          const errorMessage = errorResponse.error.error;
+          AlertsService.addWarning(
+            'Error! Changes could not be saved - ' + errorMessage);
           $rootScope.$applyAsync();
         }
       );

@@ -25,20 +25,31 @@ import sys
 import urllib.request as urlrequest
 import zipfile
 
+from typing import Tuple
+
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 # These libraries need to be installed before running or importing any script.
 
-PREREQUISITES = [
+PREREQUISITES = (
     ('pyyaml', '6.0', os.path.join(TOOLS_DIR, 'pyyaml-6.0')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
     ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2021.10.8', os.path.join(
-        TOOLS_DIR, 'certifi-2021.10.8')),
-    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs')),
-]
+    ('certifi', '2021.10.8', os.path.join(TOOLS_DIR, 'certifi-2021.10.8')),
+    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
+)
 
-for package_name, version_number, target_path in PREREQUISITES:
+
+def install_prerequisite(package: Tuple[str]) -> None:
+    """Install prerequisite Python package.
+
+    Args:
+        package: tuple. The args to provide to pip install.
+
+    Raises:
+        Exception. If the package fails to install due to issues with --prefix.
+    """
+    package_name, version_number, target_path = package
     command_text = [
         sys.executable, '-m', 'pip', 'install', '%s==%s'
         % (package_name, version_number), '--target', target_path]
@@ -47,10 +58,17 @@ for package_name, version_number, target_path in PREREQUISITES:
         command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
     if b'can\'t combine user with prefix' in output_stderr:
-        subprocess.check_call(command_text + uextention_text)
+        try:
+            subprocess.check_call(command_text + uextention_text)
+        except subprocess.CalledProcessError as e:
+            raise Exception(
+                'Error installing prerequisite %s' % package_name) from e
 
 
-from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+for prerequisite in PREREQUISITES:
+    install_prerequisite(prerequisite)
+
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -137,8 +155,8 @@ def install_buf_and_protoc():
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)
         os.remove(os.path.join(BUF_DIR, protoc_file))
-    except Exception:
-        raise Exception('Error installing protoc binary')
+    except Exception as e:
+        raise Exception('Error installing protoc binary') from e
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
 
@@ -240,7 +258,11 @@ def main() -> None:
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
+        (
+            'git+https://github.com/oppia/pylint-quotes.git',
+            common.PYLINT_QUOTES_VERSION,
+            common.OPPIA_TOOLS_DIR
+        ),
         ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
         ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
@@ -248,11 +270,7 @@ def main() -> None:
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'git+https://github.com/oppia/pip-tools.git',
-            common.PIP_TOOLS_VERSION,
-            common.OPPIA_TOOLS_DIR
-        ),
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
         ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
@@ -308,7 +326,7 @@ def main() -> None:
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.

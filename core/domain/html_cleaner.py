@@ -40,6 +40,9 @@ def filter_a(tag, name, value):
 
     Returns:
         bool. Whether the given attribute should be whitelisted.
+
+    Raises:
+        Exception. The 'tag' is not as expected.
     """
     if tag != 'a':
         raise Exception('The filter_a method should only be used for a tags.')

@@ -33,8 +33,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(skill_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.suggestion])
+(skill_models, suggestion_models, question_models) = models.Registry.import_models( # pylint: disable=line-too-long
+    [models.NAMES.skill, models.NAMES.suggestion, models.NAMES.question])
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):
@@ -970,6 +970,32 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id_a, self.SKILL_ID, changelist,
                 'Change description.')
 
+    def test_update_skill_property(self):
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        old_description = 'Description'
+        new_description = 'New description'
+
+        self.assertEqual(
+            skill.description, old_description)
+
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
+                'old_value': old_description,
+                'new_value': new_description
+            })
+        ]
+        skill_services.update_skill(
+            self.user_id_admin,
+            self.SKILL_ID, changelist,
+            'Change description.'
+            )
+
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.description, new_description)
+
     def test_update_skill_explanation(self):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         old_explanation = {'content_id': '1', 'html': '<p>Explanation</p>'}
@@ -1047,6 +1073,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(skill.misconceptions, [])
 
+    def test_does_skill_with_description_exist(self):
+        self.assertEqual(
+            skill_services.does_skill_with_description_exist('Description'),
+            True
+        )
+        self.assertEqual(
+            skill_services.does_skill_with_description_exist('Does not exist'),
+            False
+        )
+
     def test_update_skill_misconception_notes(self):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
@@ -1103,6 +1139,34 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
         self.assertEqual(
             skill.misconceptions[0].feedback, '<p>new feedback</p>')
+
+    def test_skill_has_associated_questions(self):
+        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
+
+        # Testing that no question is linked to a skill.
+        self.assertEqual(
+            skill_services.skill_has_associated_questions(skill_id_1),
+            False
+        )
+
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', skill_id_1, 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_1, 0.2)
+            )
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2]
+        )
+
+        self.assertEqual(
+            skill_services.skill_has_associated_questions(skill_id_1),
+            True
+        )
 
     def test_update_skill_schema(self):
         orig_skill_dict = (
@@ -1260,6 +1324,70 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception feedback.')
+
+    def test_get_untriaged_skill_summaries(self):
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_ids_assigned_to_some_topic = (
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
+        merged_skill_ids = skill_services.get_merged_skill_ids()
+
+        untriaged_skill_summaries = (
+            skill_services.get_untriaged_skill_summaries(
+                skill_summaries, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
+
+        untriaged_skill_summary_dicts = [
+            skill_summary.to_dict()
+            for skill_summary in untriaged_skill_summaries]
+
+        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
+        skill_summary_dict = skill_summary.to_dict()
+        expected_untriaged_skill_summary_dicts = [skill_summary_dict]
+
+        self.assertEqual(
+            untriaged_skill_summary_dicts,
+            expected_untriaged_skill_summary_dicts)
+
+    def test_get_categorized_skill_ids_and_descriptions(self):
+        topic_id = topic_fetchers.get_new_topic_id()
+        linked_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            linked_skill_id, self.user_id_admin, description='Description 3')
+        subtopic_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            subtopic_skill_id, self.user_id_admin,
+            description='Subtopic Skill')
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title')
+        subtopic.skill_ids = [subtopic_skill_id]
+
+        self.save_new_topic(
+            topic_id, self.user_id_admin, name='Topic Name',
+            abbreviated_name='topic', url_fragment='topic-name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[linked_skill_id],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        expected_categorized_skills_dict = {
+            'Topic Name': {
+                'uncategorized': [{
+                    'skill_id': linked_skill_id,
+                    'skill_description': 'Description 3',
+                }],
+                'Subtopic Title': [{
+                    'skill_id': subtopic_skill_id,
+                    'skill_description': 'Subtopic Skill'
+                }]
+            }
+        }
+        categorized_skills = (
+            skill_services.get_categorized_skill_ids_and_descriptions())
+
+        self.assertEqual(
+            categorized_skills.to_dict(),
+            expected_categorized_skills_dict)
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):

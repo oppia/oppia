@@ -24,7 +24,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ContinueCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContextService } from 'services/context.service';
 import { ContinueRulesService } from './continue-rules.service';
@@ -41,6 +40,7 @@ export class OppiaInteractiveContinue implements OnInit {
   readonly DEFAULT_BUTTON_TEXT: string = 'Continue';
   readonly DEFAULT_HUMAN_READABLE_ANSWER: string = (
     'Please continue.');
+
   constructor(
     private continueRulesService: ContinueRulesService,
     private contextService: ContextService,
@@ -68,8 +68,7 @@ export class OppiaInteractiveContinue implements OnInit {
         humanReadableAnswer = this.buttonText;
       }
       this.currentInteractionService.onSubmit(
-        humanReadableAnswer as string,
-      this.continueRulesService as InteractionRulesService);
+        humanReadableAnswer, this.continueRulesService);
     };
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswer, null);

@@ -83,7 +83,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           if (ctrl.taskRunningInBackground) {
             return;
           }
-          ctrl.statusMessage = 'Adding new reviewer...';
+          ctrl.statusMessage = 'Adding contribution rights...';
           ctrl.taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .addContributionReviewerAsync(

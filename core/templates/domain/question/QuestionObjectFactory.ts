@@ -59,6 +59,7 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
+
   // Some methods have either string or null return value,
   // because when we create default question their fields get null value.
   getId(): string | null {
@@ -102,6 +103,7 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
+
   // Returns 'null' when the message is valid.
   getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;

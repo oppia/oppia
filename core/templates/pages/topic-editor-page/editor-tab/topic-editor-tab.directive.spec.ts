@@ -302,6 +302,21 @@ describe('Topic editor tab directive', function() {
       expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
     });
 
+  it('should not call the getTopicWithUrlFragmentExists if url fragment' +
+     'is not correct', function() {
+    var topicUrlFragmentSpy = spyOn(
+      TopicUpdateService, 'setTopicUrlFragment');
+    var topicUrlFragmentExists = spyOn(
+      TopicEditorStateService, 'getTopicWithUrlFragmentExists');
+    spyOn(
+      TopicEditorStateService,
+      'updateExistenceOfTopicUrlFragment').and.callFake(
+      (newUrlFragment, successCallback, errorCallback) => errorCallback());
+    $scope.updateTopicUrlFragment('topic-url fragment');
+    expect(topicUrlFragmentSpy).toHaveBeenCalled();
+    expect(topicUrlFragmentExists).not.toHaveBeenCalled();
+  });
+
   it('should call the TopicUpdateService if url fragment is updated',
     function() {
       var topicUrlFragmentSpy = spyOn(
@@ -309,7 +324,7 @@ describe('Topic editor tab directive', function() {
       spyOn(
         TopicEditorStateService,
         'updateExistenceOfTopicUrlFragment').and.callFake(
-        (newUrlFragment, successCallback) => successCallback());
+        (newUrlFragment, successCallback, errorCallback) => successCallback());
       $scope.updateTopicUrlFragment('topic');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
     });
@@ -392,21 +407,16 @@ describe('Topic editor tab directive', function() {
       expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
     });
 
-  it('should call the TopicUpdateService if practice tab is displayed ' +
-    'property is updated', function() {
+  it('should set the practice tab as displayed if there are the defined ' +
+      'minimum number of practice questions in the topic', function() {
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
-    $scope.updatePracticeTabIsDisplayed(true);
-    expect(topicPracticeTabSpy).toHaveBeenCalled();
-  });
-
-  it('should not call the TopicUpdateService if practice tab is displayed ' +
-   'property is same', function() {
-    $scope.updatePracticeTabIsDisplayed(true);
-    var topicPracticeTabSpy = (
-      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
+    $scope.skillQuestionCountDict = {skill1: 3, skill2: 6};
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
+    $scope.skillQuestionCountDict = {skill1: 3, skill2: 7};
+    $scope.updatePracticeTabIsDisplayed(true);
+    expect(topicPracticeTabSpy).toHaveBeenCalled();
   });
 
   it('should call the TopicUpdateService if skill is deleted from topic',

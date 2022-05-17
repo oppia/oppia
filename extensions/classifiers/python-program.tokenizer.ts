@@ -39,6 +39,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class PythonProgramTokenizer {
   private PythonProgramTokenType = (
     ClassifiersExtensionConstants.PythonProgramTokenType);
+
   constructor(private loggerService: LoggerService) {}
 
   private groupOfRegEx(...params: (string | string[])[]): string {
@@ -57,6 +58,7 @@ export class PythonProgramTokenizer {
   private comment = '#[^\\r\\n]*';
   private ignore = this.whitespace + this.repeatedRegEx(
     '\\\\\\r?\\n' + this.whitespace) + this.regExMayBePresent(this.comment);
+
   private name = '[a-zA-Z_]\\w*';
 
   private hexnumber = '0[xX][\\da-fA-F]+[lL]?';
@@ -65,15 +67,19 @@ export class PythonProgramTokenizer {
   private decnumber = '[1-9]\\d*[lL]?';
   private intnumber = this.groupOfRegEx(
     this.hexnumber, this.binnumber, this.octnumber, this.decnumber);
+
   private exponent = '[eE][-+]?\\d+';
   private pointfloat = this.groupOfRegEx(
     '\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') + this.regExMayBePresent(this.exponent);
+
   private expfloat = '\\d+' + this.exponent;
   private floatnumber = this.groupOfRegEx(this.pointfloat, this.expfloat);
   private imagnumber = this.groupOfRegEx(
     '\\d+[jJ]', this.floatnumber + '[jJ]');
+
   private num = this.groupOfRegEx(
     this.imagnumber, this.floatnumber, this.intnumber);
+
   // Tail end of ' string.
   private single = '[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'';
   // Tail end of " string.
@@ -100,6 +106,7 @@ export class PythonProgramTokenizer {
 
   private plaintoken = this.groupOfRegEx(
     this.num, this.funny, this.str, this.name);
+
   private token = this.ignore + this.plaintoken;
 
   // First (or only) line of ' or " string.
@@ -108,8 +115,10 @@ export class PythonProgramTokenizer {
     this.groupOfRegEx("'", '\\\\\\r?\\n'),
     '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*' +
     this.groupOfRegEx('"', '\\\\\\r?\\n'));
+
   private pseudoextras = this.groupOfRegEx(
     '\\\\\\r?\\n|\\Z', this.comment, this.triple);
+
   private pseudotoken = this.whitespace + this.groupOfRegEx(
     this.pseudoextras, this.num, this.funny, this.contStr, this.name);
 

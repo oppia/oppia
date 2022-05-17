@@ -59,9 +59,6 @@ require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.component.ts');
-require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
@@ -137,7 +134,6 @@ require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/page-title.service.ts');
-require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-top-answers-stats-backend-api.service.ts');
 require('services/state-top-answers-stats.service.ts');
@@ -241,6 +237,7 @@ angular.module('oppia').component('explorationEditorPage', {
       // Initializes the exploration page using data from the backend.
       // Called on page load.
       ctrl.initExplorationPage = () => {
+        EditabilityService.lockExploration(true);
         return $q.all([
           ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
@@ -251,10 +248,10 @@ angular.module('oppia').component('explorationEditorPage', {
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
-          ThreadDataBackendApiService.getOpenThreadsCountAsync(),
+          ThreadDataBackendApiService.getFeedbackThreadsAsync(),
           UserService.getUserInfoAsync()
         ]).then(async(
-            [explorationData, featuresData, openThreadsCount, userInfo]) => {
+            [explorationData, featuresData, _, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
@@ -284,6 +281,9 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
+          if (explorationData.edits_allowed) {
+            EditabilityService.lockExploration(false);
+          }
 
 
           ctrl.explorationTitleService = ExplorationTitleService;
@@ -338,7 +338,7 @@ angular.module('oppia').component('explorationEditorPage', {
           if (!RouterService.isLocationSetToNonStateEditorTab() &&
               !explorationData.states.hasOwnProperty(
                 RouterService.getCurrentStateFromLocationPath('gui'))) {
-            if (openThreadsCount > 0) {
+            if (ThreadDataBackendApiService.getOpenThreadsCount() > 0) {
               RouterService.navigateToFeedbackTab();
             } else {
               RouterService.navigateToMainTab();

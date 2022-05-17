@@ -389,7 +389,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should add state in exploration states', function() {
-    spyOn(explorationStatesService, 'addState');
+    spyOn(explorationStatesService, 'addState').and.callThrough();
 
     ctrl.addState('Fourth State');
 
@@ -743,6 +743,11 @@ describe('Exploration editor tab component', function() {
     ctrl.initStateEditor();
     $scope.$apply();
     expect(ctrl.startTutorial).toHaveBeenCalled();
+  });
+
+  it('should check if exploration is editable', () => {
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+    expect(ctrl.isEditable()).toBe(true);
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {

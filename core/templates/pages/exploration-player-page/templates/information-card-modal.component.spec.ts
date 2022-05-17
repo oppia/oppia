@@ -22,8 +22,10 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { InformationCardModalComponent } from './information-card-modal.component';
 
@@ -54,9 +56,11 @@ describe('Information card modal component', () => {
   let dateTimeFormatService: DateTimeFormatService;
   let ratingComputationService: RatingComputationService;
   let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
+  let rating: ExplorationRatings;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -88,7 +92,7 @@ describe('Information card modal component', () => {
       community_owned: true,
       activity_type: '',
       last_updated_msec: 0,
-      ratings: null,
+      ratings: rating,
       id: expId,
       created_on_msec: 2,
       human_readable_contributors_summary: {
@@ -111,6 +115,10 @@ describe('Information card modal component', () => {
     dateTimeFormatService = TestBed.inject(DateTimeFormatService);
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should initialize', () => {
@@ -168,5 +176,9 @@ describe('Information card modal component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       staticImageUrl);
     expect(componentInstance.getStaticImageUrl('')).toEqual(staticImageUrl);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });

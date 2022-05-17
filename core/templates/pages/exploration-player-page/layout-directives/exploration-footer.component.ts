@@ -19,14 +19,25 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { UserService } from 'services/user.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
+import { PlayerPositionService } from '../services/player-position.service';
+import { PlayerTranscriptService } from '../services/player-transcript.service';
+import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -34,7 +45,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class ExplorationFooterComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   iframed!: boolean;
@@ -43,20 +54,41 @@ export class ExplorationFooterComponent {
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
 
+  // Stores the number of checkpoints in an exploration.
+  checkpointCount: number = 0;
+
+  // Used to update the number of checkpoints completed
+  // and decide the completed width of the progress bar.
+  checkpointArray: number[] = [0];
+  expInfo: LearnerExplorationSummaryBackendDict;
+  completedWidth: number = 0;
+  expStates: StateObjectsBackendDict;
+  completedCheckpointsCount: number = 0;
+  lastCheckpointWasCompleted: boolean = false;
+  learnerHasViewedLessonInfoTooltip: boolean = false;
+  userIsLoggedIn: boolean = false;
+  footerIsInQuestionPlayerMode: boolean = false;
+
   constructor(
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private ngbModal: NgbModal,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private questionPlayerStateService: QuestionPlayerStateService
+    private questionPlayerStateService: QuestionPlayerStateService,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
+    private loggerService: LoggerService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private playerPositionService: PlayerPositionService,
+    private explorationEngineService: ExplorationEngineService,
+    private userService: UserService,
+    private editableExplorationBackendApiService:
+      EditableExplorationBackendApiService
   ) {}
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
 
   ngOnInit(): void {
     // TODO(#13494): Implement a different footer for practice-session-page.
@@ -70,6 +102,9 @@ export class ExplorationFooterComponent {
     try {
       this.explorationId = this.contextService.getExplorationId();
       this.iframed = this.urlService.isIframed();
+      this.userService.getUserInfoAsync().then((userInfo) => {
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+      });
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
       this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
         .subscribe(evt => {
@@ -104,6 +139,87 @@ export class ExplorationFooterComponent {
         .subscribe((resultsLoaded: boolean) => {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
+      this.footerIsInQuestionPlayerMode = true;
+    } else if (this.explorationId) {
+      // Fetching the number of checkpoints.
+      this.getCheckpointCount();
+      this.setLearnerHasViewedLessonInfoTooltip();
+    }
+  }
+
+  openInformationCardModal(): void {
+    let modalRef = this.ngbModal.open(LessonInformationCardModalComponent, {
+      windowClass: 'oppia-modal-lesson-information-card'
+    });
+
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
+
+    let mostRecentlyReachedCheckpointIndex = (
+      this.getMostRecentlyReachedCheckpointIndex()
+    );
+
+    this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
+
+    let displayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex()
+    );
+    if (displayedCardIndex > 0) {
+      let state = this.explorationEngineService.getState();
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name);
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
+      }
+    }
+
+    if (this.completedCheckpointsCount === this.checkpointCount) {
+      this.lastCheckpointWasCompleted = true;
+    }
+
+    this.completedWidth = (
+      (100 / (this.checkpointCount)) * this.completedCheckpointsCount
+    );
+
+    if (this.lastCheckpointWasCompleted) {
+      this.completedWidth = 100;
+    }
+
+    modalRef.componentInstance.completedWidth = this.completedWidth;
+    modalRef.componentInstance.contributorNames = this.contributorNames;
+    modalRef.componentInstance.expInfo = this.expInfo;
+    modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
+
+    modalRef.result.then(() => {}, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  showInformationCard(): void {
+    let stringifiedExpIds = JSON.stringify(
+      [this.explorationId]);
+    let includePrivateExplorations = JSON.stringify(true);
+    if (this.expInfo) {
+      this.openInformationCardModal();
+
+      // Update user has viewed lesson info modal once if
+      // lesson info modal button is clicked.
+      if (!this.learnerHasViewedLessonInfoTooltip) {
+        this.learnerHasViewedLessonInfo();
+      }
+    } else {
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openInformationCardModal();
+      }, () => {
+        this.loggerService.error(
+          'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
     }
   }
 
@@ -113,8 +229,56 @@ export class ExplorationFooterComponent {
     }
   }
 
+  getMostRecentlyReachedCheckpointIndex(): number {
+    let checkpointIndex = 0;
+    let numberOfCards = this.playerTranscriptService.getNumCards();
+    for (let i = 0; i < numberOfCards; i++) {
+      let stateName = this.playerTranscriptService.getCard(i).getStateName();
+      let correspondingState = this.explorationEngineService.
+        getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointIndex++;
+      }
+    }
+    return checkpointIndex;
+  }
+
+  async getCheckpointCount(): Promise<void> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(this.explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          this.expStates = response.exploration.states;
+          let count = 0;
+          for (let [, value] of Object.entries(this.expStates)) {
+            if (value.card_is_checkpoint) {
+              count++;
+            }
+          }
+          this.checkpointCount = count;
+        });
+  }
+
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  async setLearnerHasViewedLessonInfoTooltip(): Promise<void> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(this.explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          this.learnerHasViewedLessonInfoTooltip = (
+            response.has_viewed_lesson_info_modal_once);
+        });
+  }
+
+  learnerHasViewedLessonInfo(): void {
+    this.learnerHasViewedLessonInfoTooltip = true;
+    this.editableExplorationBackendApiService
+      .recordLearnerHasViewedLessonInfoModalOnce();
+  }
+
+  hasLearnerHasViewedLessonInfoTooltip(): boolean {
+    return this.learnerHasViewedLessonInfoTooltip;
   }
 }
 

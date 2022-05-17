@@ -22,18 +22,12 @@ from __future__ import annotations
 
 import fnmatch
 import linecache
-import os
 import re
-import sys
 import tokenize
 
 from core import handler_schema_constants
 
 from .. import docstrings_checker
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.
@@ -290,9 +284,10 @@ class HangingIndentChecker(checkers.BaseChecker):
                     split_line = line.split()
                     if '#' in split_line:
                         comment_index = split_line.index('#')
-                        if split_line[comment_index - 1].endswith('):'):
+                        if (split_line[comment_index - 1].endswith(':') or
+                                split_line[comment_index - 1].endswith('):')):
                             excluded = False
-                    elif line.endswith('):'):
+                    elif line.endswith(':') or line.endswith('):'):
                         excluded = False
                 if excluded:
                     continue
@@ -1670,32 +1665,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('newline-at-eof', line=file_length)
 
 
-class DivisionOperatorChecker(checkers.BaseChecker):
-    """Checks if division operator is used."""
-
-    __implements__ = interfaces.IAstroidChecker
-    name = 'division-operator-used'
-    priority = -1
-    msgs = {
-        'C0015': (
-            'Please use python_utils.divide() instead of the "/" operator',
-            'division-operator-used',
-            'Do not use division operator.'
-        )
-    }
-
-    def visit_binop(self, node):
-        """Visit assign statements to ensure that the division operator('/')
-        is not used and python_utils.divide() is used instead.
-
-        Args:
-            node: astroid.node.BinOp. Node to access module content.
-        """
-        if node.op == '/':
-            self.add_message(
-                'division-operator-used', node=node)
-
-
 class SingleLineCommentChecker(checkers.BaseChecker):
     """Checks if comments follow correct style."""
 
@@ -2346,7 +2315,6 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
-    linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))

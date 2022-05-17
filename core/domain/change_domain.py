@@ -223,10 +223,36 @@ class BaseChange:
 
         return base_change_dict
 
+    @classmethod
+    def from_dict(cls, base_change_dict):
+        """Returns a BaseChange domain object from a dict.
+
+        Args:
+            base_change_dict: dict. The dict representation of
+                BaseChange object.
+
+        Returns:
+            BaseChange. The corresponding BaseChange domain object.
+        """
+        return cls(base_change_dict)
+
+    def validate(self):
+        """Validates various properties of the BaseChange object.
+
+        Raises:
+            ValidationError. One or more attributes of the BaseChange are
+                invalid.
+        """
+        # We validate the BaseChange object by converting
+        # it into a dict and using the validate_dict method.
+        # This is done because schema_utils used the validate method
+        # to verify that the domain object is correct.
+        self.validate_dict(self.to_dict())
+
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
             return self.__dict__[name]
-        except KeyError:
-            raise AttributeError(name)
+        except KeyError as e:
+            raise AttributeError(name) from e

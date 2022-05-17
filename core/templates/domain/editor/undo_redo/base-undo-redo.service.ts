@@ -30,6 +30,7 @@ export class BaseUndoRedo {
   constructor() {
     this.init();
   }
+
   private _appliedChanges: Change[] = [];
   private _undoneChanges: Change[] = [];
   _undoRedoChangeEventEmitter: EventEmitter<void> = new EventEmitter();
@@ -136,7 +137,7 @@ export class BaseUndoRedo {
   }
 
   /**
-   * Returns whether this objcet has any applied changes.
+   * Returns whether this object has any applied changes.
    */
   hasChanges(): boolean {
     return this._appliedChanges.length !== 0;

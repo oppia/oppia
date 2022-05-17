@@ -128,10 +128,11 @@
         class="form-inline protractor-test-edit-outcome-dest"
         name="$ctrl.editOutcomeForm.editDestForm"
         ng-submit="$ctrl.saveThisDestination()">
-    <outcome-destination-editor outcome="$ctrl.outcome"
-                                outcome-has-feedback="$ctrl.displayFeedback"
-                                add-state="$ctrl.addState">
-    </outcome-destination-editor>
+    <oppia-outcome-destination-editor [outcome]="$ctrl.outcome"
+                                      (get-changes)="getChanges()"
+                                      [outcome-has-feedback]="$ctrl.displayFeedback"
+                                      (add-state)="$ctrl.addState($event)">
+    </oppia-outcome-destination-editor>
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">

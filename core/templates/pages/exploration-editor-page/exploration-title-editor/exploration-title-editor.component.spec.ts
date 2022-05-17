@@ -31,6 +31,7 @@ class MockRouterService {
   get onRefreshSettingsTab() {
     return this.refreshSettingsTabEventEmitter;
   }
+
   set refreshSettingsTabEmitter(val) {
     this.refreshSettingsTabEventEmitter = val;
   }
@@ -94,5 +95,14 @@ describe('Exploration Title Editor directive', function() {
     $flushPendingTasks();
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'xyzz');
+  });
+
+  it('should unsubscribe when component is destroyed', () => {
+    const unsubscribeSpy =
+      spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
+    ctrl.$onDestroy();
+
+    expect(unsubscribeSpy).toHaveBeenCalled();
   });
 });

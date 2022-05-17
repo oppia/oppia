@@ -21,10 +21,10 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import exp_services
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -108,6 +108,32 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
 
+    def test_get_story_titles_in_topic(self):
+        story_titles = topic_services.get_story_titles_in_topic(
+            self.topic)
+        self.assertEqual(len(story_titles), 2)
+        self.assertIn('Title', story_titles)
+        self.assertIn('Title 2', story_titles)
+
+    def test_update_story_and_topic_summary(self):
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                    'property_name': story_domain.STORY_PROPERTY_TITLE,
+                    'old_value': 'Title',
+                    'new_value': 'New Title'
+                }
+            )
+        ]
+        topic_services.update_story_and_topic_summary(
+            self.user_id, self.story_id_1, change_list,
+            'Updated story title', self.TOPIC_ID
+        )
+        story_titles = topic_services.get_story_titles_in_topic(
+            self.topic)
+        self.assertIn('New Title', story_titles)
+
     def test_compute_summary(self):
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
 
@@ -150,7 +176,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_dict],
             subtopic_schema_version=0,
-            story_reference_schema_version=0
+            story_reference_schema_version=0,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -174,7 +201,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_dict],
             subtopic_schema_version=1,
-            story_reference_schema_version=0
+            story_reference_schema_version=0,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -413,13 +441,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].title, 'Title')
 
         # Store a dummy image in filesystem.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
             '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -613,13 +639,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_topic(self):
         # Save a dummy image on filesystem, to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
             '%s/thumbnail.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -1691,6 +1715,64 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.deassign_manager_role_from_topic(
                 self.user_admin, self.user_id_b, self.TOPIC_ID)
 
+    def test_update_thumbnail_filename(self) -> None:
+        self.assertEqual(self.topic.thumbnail_filename, 'topic.svg')
+        # Test exception when thumbnail is not found on filesystem.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'The thumbnail img.svg for topic with id %s does not exist'
+            ' in the filesystem.' % (self.TOPIC_ID)
+        ):
+            topic_services.update_thumbnail_filename(self.topic, 'img.svg')
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+        fs.commit(  # type: ignore[no-untyped-call]
+            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+        # Test successful update of thumbnail present in the filesystem.
+        topic_services.update_thumbnail_filename(self.topic, 'img.svg')
+        self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
+        self.assertEqual(self.topic.thumbnail_size_in_bytes, len(raw_image))
+
+    def test_update_subtopic_thumbnail_filename(self) -> None:
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_filename, None)
+
+        # Test Exception when the thumbnail is not found in filesystem.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'The thumbnail %s for subtopic with topic_id %s does not exist '
+            'in the filesystem.' % ('new_image.svg', self.TOPIC_ID)
+        ):
+            topic_services.update_subtopic_thumbnail_filename(
+                self.topic, 1, 'new_image.svg')
+
+        # Test successful update of thumbnail_filename when the thumbnail
+        # is found in the filesystem.
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
+        fs.commit(  # type: ignore[no-untyped-call]
+            'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
+        topic_services.update_subtopic_thumbnail_filename(
+            self.topic, 1, 'new_image.svg')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
+
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
@@ -1736,7 +1818,8 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_v1_dict],
             subtopic_schema_version=1,
-            story_reference_schema_version=1
+            story_reference_schema_version=1,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -1782,7 +1865,8 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             subtopics=[],
             subtopic_schema_version=1,
             story_reference_schema_version=1,
-            canonical_story_references=[story_reference_dict]
+            canonical_story_references=[story_reference_dict],
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(

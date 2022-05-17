@@ -1,6 +1,7 @@
 <svg-editor *ngIf="svgEditorIsShown"
             (validityChange)="validityHasChanged($event)"
             (valueChanged)="valueHasChanged($event)"
+            (discardImage)="resetEditor()"
             [value]="value">
 </svg-editor>
 <image-editor *ngIf="imageEditorIsShown"
