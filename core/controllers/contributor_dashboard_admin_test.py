@@ -519,7 +519,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             topic_name: str. Topic name.
         """
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, topic_name, 'abbrev', 'description')
+            topic_id, topic_name, 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
