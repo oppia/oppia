@@ -824,7 +824,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, add_translation_change_dict, 'test description')
 
         suggestion_services.update_translation_suggestion(
-            suggestion.suggestion_id, '<p>Updated translation</p>'
+            suggestion.suggestion_id, '<p>Updated translation</p>',
+            self.author_id
         )
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
@@ -876,7 +877,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.update_question_suggestion(
             suggestion.suggestion_id,
             suggestion.change.skill_difficulty,
-            question_state_data)
+            question_state_data, self.author_id)
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
         new_question_state_data = updated_suggestion.change.question_dict[
@@ -921,7 +922,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.update_question_suggestion(
             suggestion.suggestion_id,
             0.6,
-            question_state_data)
+            question_state_data, self.author_id)
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
 
@@ -965,7 +966,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, add_translation_change_dict, 'test description')
 
         suggestion_services.update_translation_suggestion(
-            suggestion.suggestion_id, '<p>Updated translation</p>'
+            suggestion.suggestion_id, '<p>Updated translation</p>', self.author_id
         )
 
         suggestion_services.accept_suggestion(
