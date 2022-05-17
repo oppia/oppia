@@ -92,6 +92,9 @@ describe('Topic editor page', function() {
     topic.setPageTitleFragmentForWeb('topic page title');
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    LocalStorageService.removeOpenedEntityEditorBrowserTabsInfo(
+      EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_TOPIC_EDITOR_BROWSER_TABS);
     $scope = $rootScope.$new();
     ctrl = $componentController('topicEditorPage', {
       $scope: $scope,
@@ -263,53 +266,113 @@ describe('Topic editor page', function() {
     ctrl.$onDestroy();
   });
 
-  it('should create or update topic editor browser tabs info on ' +
+  it('should create topic editor browser tabs info on ' +
   'local storage when a new tab opens', () => {
-    let topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'topic', 'topic_1', 1, 1, false);
-    spyOn(EntityEditorBrowserTabsInfo, 'create').and.callThrough();
-    spyOn(topicEditorBrowserTabsInfo, 'setLatestVersion').and.callThrough();
-    spyOn(
-      LocalStorageService, 'getEntityEditorBrowserTabsInfo'
-    ).and.returnValues(topicEditorBrowserTabsInfo, null);
-    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    ctrl.$onInit();
+
+    let topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+    expect(topicEditorBrowserTabsInfo).toBeNull();
 
     // Opening the first tab.
-    ctrl.$onInit();
+    TopicEditorStateService.onTopicInitialized.emit();
+    topicEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+    expect(topicEditorBrowserTabsInfo).toBeDefined();
     expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
     // Opening the second tab.
     TopicEditorStateService.onTopicInitialized.emit();
-    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
-    expect(topicEditorBrowserTabsInfo.setLatestVersion).toHaveBeenCalled();
+    topicEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
 
-    // Opening another tab of a different topic. Here, localStorageService
-    // will return null no other tab of the same url was opened before.
+    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+  });
+
+  it('should update topic editor browser tabs info on local storage when ' +
+  'some new changes are saved', () => {
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    ctrl.$onInit();
+
+    let topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+    expect(topicEditorBrowserTabsInfo).toBeNull();
+
+    // First time opening of the tab.
     TopicEditorStateService.onTopicInitialized.emit();
-    expect(EntityEditorBrowserTabsInfo.create).toHaveBeenCalled();
+    topicEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+    expect(topicEditorBrowserTabsInfo.getLatestVersion()).toEqual(1);
+
+    // Save some changes on the story and increasing its version.
+    topic._version = 2;
+    TopicEditorStateService.onTopicReinitialized.emit();
+    topicEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+    expect(topicEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
   });
 
   it('should decrement number of opened topic editor tabs when ' +
   'a tab is closed', () => {
-    let topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'topic', 'topic_1', 1, 1, true);
-    spyOn(
-      LocalStorageService, 'getEntityEditorBrowserTabsInfo'
-    ).and.returnValue(topicEditorBrowserTabsInfo);
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    ctrl.$onInit();
+
+    // Opening of the first tab.
+    TopicEditorStateService.onTopicInitialized.emit();
+    // Opening of the second tab.
+    TopicEditorStateService.onTopicInitialized.emit();
+
+    let topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+    // Making some unsaved changes on the editor page.
+    topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+    LocalStorageService.updateEntityEditorBrowserTabsInfo(
+      topicEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_TOPIC_EDITOR_BROWSER_TABS);
 
     expect(
       topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
     ).toBeTrue();
-    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
 
     ctrl.onClosingTopicEditorBrowserTab();
+    topicEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
 
+    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+
+    // Since the tab containing unsaved changes is closed, the value of
+    // unsaved changes status will become false.
     expect(
       topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
     ).toBeFalse();
-    expect(topicEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(0);
   });
 
   it('should emit stale tab and unsaved changes events when the ' +
@@ -321,13 +384,19 @@ describe('Topic editor page', function() {
       TopicEditorStalenessDetectionService
         .presenceOfUnsavedChangesEventEmitter, 'emit'
     ).and.callThrough();
+    spyOn(LocalStorageService, 'registerNewStorageEventListener').and.callFake(
+      (callback) => {
+        document.addEventListener('storage', callback);
+      });
+    spyOn(PageTitleService, 'setDocumentTitle').and.callThrough();
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    ctrl.$onInit();
 
     let storageEvent = new StorageEvent('storage', {
       key: EntityEditorBrowserTabsInfoDomainConstants
         .OPENED_TOPIC_EDITOR_BROWSER_TABS
     });
-
-    ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo(storageEvent);
+    document.dispatchEvent(storageEvent);
 
     expect(
       TopicEditorStalenessDetectionService.staleTabEventEmitter.emit

@@ -188,47 +188,6 @@ angular.module('oppia').directive('topicEditorPage', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
-          ctrl.createTopicEditorBrowserTabsInfo = function() {
-            var topic = TopicEditorStateService.getTopic();
-
-            var topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-              LocalStorageService.getEntityEditorBrowserTabsInfo(
-                EntityEditorBrowserTabsInfoDomainConstants
-                  .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
-
-            if (topicEditorBrowserTabsInfo) {
-              topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
-              topicEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
-            } else {
-              topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-                'topic', topic.getId(), topic.getVersion(), 1, false);
-            }
-
-            LocalStorageService.updateEntityEditorBrowserTabsInfo(
-              topicEditorBrowserTabsInfo,
-              EntityEditorBrowserTabsInfoDomainConstants
-                .OPENED_TOPIC_EDITOR_BROWSER_TABS);
-          };
-
-          ctrl.updateTopicEditorBrowserTabsInfo = function() {
-            const topic = TopicEditorStateService.getTopic();
-
-            const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-              LocalStorageService.getEntityEditorBrowserTabsInfo(
-                EntityEditorBrowserTabsInfoDomainConstants
-                  .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
-
-            if (topicEditorBrowserTabsInfo) {
-              topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
-              topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
-
-              LocalStorageService.updateEntityEditorBrowserTabsInfo(
-                topicEditorBrowserTabsInfo,
-                EntityEditorBrowserTabsInfoDomainConstants
-                  .OPENED_TOPIC_EDITOR_BROWSER_TABS);
-            }
-          };
-
           ctrl.onClosingTopicEditorBrowserTab = function() {
             const topic = TopicEditorStateService.getTopic();
 
@@ -249,7 +208,48 @@ angular.module('oppia').directive('topicEditorPage', [
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
           };
 
-          ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
+          let createTopicEditorBrowserTabsInfo = function() {
+            const topic = TopicEditorStateService.getTopic();
+
+            let topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+              LocalStorageService.getEntityEditorBrowserTabsInfo(
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+            if (topicEditorBrowserTabsInfo) {
+              topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
+              topicEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+            } else {
+              topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+                'topic', topic.getId(), topic.getVersion(), 1, false);
+            }
+
+            LocalStorageService.updateEntityEditorBrowserTabsInfo(
+              topicEditorBrowserTabsInfo,
+              EntityEditorBrowserTabsInfoDomainConstants
+                .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+          };
+
+          let updateTopicEditorBrowserTabsInfo = function() {
+            const topic = TopicEditorStateService.getTopic();
+
+            const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+              LocalStorageService.getEntityEditorBrowserTabsInfo(
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
+
+            if (topicEditorBrowserTabsInfo) {
+              topicEditorBrowserTabsInfo.setLatestVersion(topic.getVersion());
+              topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+
+              LocalStorageService.updateEntityEditorBrowserTabsInfo(
+                topicEditorBrowserTabsInfo,
+                EntityEditorBrowserTabsInfoDomainConstants
+                  .OPENED_TOPIC_EDITOR_BROWSER_TABS);
+            }
+          };
+
+          let onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
             if (event.key === (
               EntityEditorBrowserTabsInfoDomainConstants
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS)
@@ -269,7 +269,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 () => {
                   LoaderService.hideLoadingScreen();
                   setDocumentTitle();
-                  ctrl.createTopicEditorBrowserTabsInfo();
+                  createTopicEditorBrowserTabsInfo();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -277,7 +277,7 @@ angular.module('oppia').directive('topicEditorPage', [
               TopicEditorStateService.onTopicReinitialized.subscribe(
                 () => {
                   setDocumentTitle();
-                  ctrl.updateTopicEditorBrowserTabsInfo();
+                  updateTopicEditorBrowserTabsInfo();
                   $rootScope.$applyAsync();
                 }
               ));
@@ -307,7 +307,7 @@ angular.module('oppia').directive('topicEditorPage', [
             WindowRef.nativeWindow.addEventListener(
               'beforeunload', ctrl.onClosingTopicEditorBrowserTab);
             LocalStorageService.registerNewStorageEventListener(
-              ctrl.onCreateOrUpdateTopicEditorBrowserTabsInfo);
+              onCreateOrUpdateTopicEditorBrowserTabsInfo);
           };
 
           ctrl.$onDestroy = function() {
