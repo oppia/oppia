@@ -828,8 +828,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_bio = 'new bio'
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
+        pre_update_user_settings = user_services.get_user_settings(user_id)
+        self.assertNotEqual(pre_update_user_settings.user_bio, user_bio)
+
         user_services.update_user_bio(user_id, user_bio)
-        user_settings = user_services.get_user_settings_from_email(user_email)
+        user_settings = user_services.get_user_settings(user_id)
 
         self.assertEqual(user_bio, user_settings.user_bio)
 
@@ -1643,7 +1646,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_human_readable_user_ids(user_ids)
         )
 
-    def test_get_human_readable_user_ids_no_user_raises_error(self):
+    def test_get_human_readable_user_ids_for_no_user_raises_error(self):
         with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.get_human_readable_user_ids(['unregistered_id'])
 
