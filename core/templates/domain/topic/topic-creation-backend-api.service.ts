@@ -46,6 +46,7 @@ export class TopicCreationBackendApiService {
       thumbnailBgColor: bgColor,
       filename: imagesData[0].filename,
       url_fragment: topic.urlFragment,
+      page_title_fragment: topic.pageTitleFragment
     };
 
     let body = new FormData();
