@@ -568,6 +568,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id')
         ]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         # Here, a bool value is expected but for test purpose we're assigning it
         # a string type. Thus to avoid MyPy error, we added an ignore here.
         self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore[assignment]
