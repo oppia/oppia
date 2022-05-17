@@ -24,6 +24,7 @@ import { ContributionAndReviewBackendApiService }
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ImagesData } from 'services/image-local-storage.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface OpportunityDict {
   'skill_id': string;
@@ -243,7 +244,7 @@ export class ContributionAndReviewService {
   async updateTranslationSuggestionAsync(
       suggestionId: string, translationHtml: string,
       onSuccess: () => void,
-      onFailure: (error: Error) => void
+      onFailure: (error: HttpErrorResponse) => void
   ): Promise<void> {
     const requestBody = {
       translation_html: translationHtml
