@@ -24,11 +24,20 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
+from typing import Any, List
+from typing_extensions import TypedDict
+
+
+class ParamSpecDict(TypedDict):
+    """Dictionary representing the ParamSpec object."""
+
+    obj_type: str
+
 
 class ParamSpec:
     """Value object for an exploration parameter specification."""
 
-    def __init__(self, obj_type):
+    def __init__(self, obj_type: str) -> None:
         """Initializes a ParamSpec object with the specified object type.
 
         Args:
@@ -37,7 +46,7 @@ class ParamSpec:
         """
         self.obj_type = obj_type
 
-    def to_dict(self):
+    def to_dict(self) -> ParamSpecDict:
         """Returns a dict representation of this ParamSpec.
 
         Returns:
@@ -49,7 +58,7 @@ class ParamSpec:
         }
 
     @classmethod
-    def from_dict(cls, param_spec_dict):
+    def from_dict(cls, param_spec_dict: ParamSpecDict) -> ParamSpec:
         """Creates a ParamSpec object from its dict representation.
 
         Args:
@@ -63,7 +72,7 @@ class ParamSpec:
         """
         return cls(param_spec_dict['obj_type'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validate the existence of the object class."""
 
         # Ensure the obj_type is among the supported ParamSpec types.
@@ -74,10 +83,31 @@ class ParamSpec:
                 (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
 
 
+class CustomizationArgsDict(TypedDict):
+    """Dictionary representing the customization_args argument."""
+
+    value: str
+    parse_with_jinja: bool
+    list_of_values: List[str]
+
+
+class ParamChangeDict(TypedDict):
+    """Dictionary representing the ParamChange object."""
+
+    name: str
+    generator_id: str
+    customization_args: CustomizationArgsDict
+
+
 class ParamChange:
     """Value object for a parameter change."""
 
-    def __init__(self, name, generator_id, customization_args):
+    def __init__(
+        self,
+        name: str,
+        generator_id: str,
+        customization_args: CustomizationArgsDict
+    ) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
         Args:
@@ -99,7 +129,7 @@ class ParamChange:
         self._customization_args = customization_args
 
     @property
-    def name(self):
+    def name(self) -> str:
         """The name of the changing parameter.
 
         Returns:
@@ -108,7 +138,7 @@ class ParamChange:
         return self._name
 
     @property
-    def generator(self):
+    def generator(self) -> value_generators_domain.BaseValueGenerator:
         """The value generator used to define the new value of the
         changing parameter.
 
@@ -120,7 +150,7 @@ class ParamChange:
             self._generator_id)()
 
     @property
-    def customization_args(self):
+    def customization_args(self) -> CustomizationArgsDict:
         """A dict containing several arguments that determine the changing value
         of the parameter.
 
@@ -134,7 +164,7 @@ class ParamChange:
          """
         return self._customization_args
 
-    def to_dict(self):
+    def to_dict(self) -> ParamChangeDict:
         """Returns a dict representing this ParamChange domain object.
 
         Returns:
@@ -147,7 +177,7 @@ class ParamChange:
         }
 
     @classmethod
-    def from_dict(cls, param_change_dict):
+    def from_dict(cls, param_change_dict: ParamChangeDict) -> ParamChange:
         """Create a ParamChange object with the specified arguments.
 
         Args:
@@ -173,12 +203,19 @@ class ParamChange:
             param_change_dict['customization_args']
         )
 
-    def get_value(self, context_params):
+    # The method `generate_value()` accepts first argument of type Any and it
+    # also returns values of type Any. So that's why argument context_params
+    # and the return type of `get_value()` is annotated as Any.
+    def get_value(self, context_params: Any) -> Any:
         """Generates a single value for a parameter change."""
+        # The second argument of method `generate_value()` can only accept
+        # values of type Dict[str, Any], but here we are providing
+        # self.customization_args which is of type CustomizationArgsDict. Thus
+        # to avoid MyPy error, we added an ignore here.
         return self.generator.generate_value(
-            context_params, **self.customization_args)
+            context_params, **self.customization_args)  # type: ignore[arg-type]
 
-    def validate(self):
+    def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
         if not isinstance(self.name, str):
             raise utils.ValidationError(
