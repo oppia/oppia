@@ -56,7 +56,9 @@ describe('Volunteer Page Root', () => {
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.ngOnInit();
+
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.META);

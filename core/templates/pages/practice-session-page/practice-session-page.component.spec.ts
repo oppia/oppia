@@ -83,6 +83,7 @@ describe('Practice session page', function() {
       },
       topic_name: 'Foo Topic'
     });
+
     ctrl.$onInit();
     $httpBackend.flush();
 
@@ -120,6 +121,7 @@ describe('Practice session page', function() {
     spyOn(I18nLanguageCodeService.onI18nLanguageCodeChange, 'subscribe');
 
     ctrl.subscribeToOnLanguageCodeChange();
+
     expect(ctrl.directiveSubscriptions.add).toHaveBeenCalled();
     expect(I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe)
       .toHaveBeenCalled();
@@ -128,6 +130,7 @@ describe('Practice session page', function() {
   it('should update title whenever the language changes', () => {
     ctrl.subscribeToOnLanguageCodeChange();
     spyOn(ctrl, 'setPageTitle');
+
     I18nLanguageCodeService.onI18nLanguageCodeChange.emit();
 
     expect(ctrl.setPageTitle).toHaveBeenCalled();
@@ -137,6 +140,7 @@ describe('Practice session page', function() {
     spyOn($translate, 'instant').and.returnValue('translated_title');
     spyOn(PageTitleService, 'setDocumentTitle');
     ctrl.topicName = 'dummy_topic_name';
+
     ctrl.setPageTitle();
     $scope.$apply();
 
@@ -150,6 +154,7 @@ describe('Practice session page', function() {
 
   it('should unsubscribe on component destruction', () => {
     spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
     ctrl.$onDestroy();
 
     expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();

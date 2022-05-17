@@ -59,7 +59,9 @@ describe('Donate Page Root', () => {
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.ngOnInit();
+
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META);

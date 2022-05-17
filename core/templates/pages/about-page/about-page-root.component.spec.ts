@@ -73,6 +73,7 @@ describe('About Root Page', () => {
 
   it('should initialize and subscribe to onLangChange', () => {
     spyOn(translateService.onLangChange, 'subscribe');
+
     component.ngOnInit();
 
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
@@ -81,6 +82,7 @@ describe('About Root Page', () => {
   it('should update page title whenever the language changes', () => {
     component.ngOnInit();
     spyOn(component, 'setPageTitleAndMetaTags');
+
     translateService.onLangChange.emit();
 
     expect(component.setPageTitleAndMetaTags).toHaveBeenCalled();
@@ -89,6 +91,7 @@ describe('About Root Page', () => {
   it('should obtain translated title and set the title and meta tags', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -100,6 +103,7 @@ describe('About Root Page', () => {
 
   it('should unsubscribe on component destruction', () => {
     spyOn(component.directiveSubscriptions, 'unsubscribe');
+
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();

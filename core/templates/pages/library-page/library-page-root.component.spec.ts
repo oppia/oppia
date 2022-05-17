@@ -56,7 +56,9 @@ describe('Library Page Root', () => {
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.ngOnInit();
+
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.META);

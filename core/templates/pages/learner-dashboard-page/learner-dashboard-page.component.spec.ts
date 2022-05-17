@@ -523,6 +523,7 @@ describe('Learner dashboard page', () => {
 
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
       expect(component.windowIsNarrow).toBeTrue();
 
       mockResizeEmitter.emit();
@@ -532,8 +533,10 @@ describe('Learner dashboard page', () => {
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+
       component.ngOnInit();
       flush();
+
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
     }));
 
@@ -542,6 +545,7 @@ describe('Learner dashboard page', () => {
       spyOn(component.directiveSubscriptions, 'add');
       spyOn(translateService.onLangChange, 'subscribe');
       spyOn(component, 'setPageTitle');
+
       component.ngOnInit();
       flush();
 
@@ -549,12 +553,14 @@ describe('Learner dashboard page', () => {
       expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
 
       translateService.onLangChange.emit();
+
       expect(component.setPageTitle).toHaveBeenCalled();
     }));
 
     it('should obtain translated page title and set it', () => {
       spyOn(translateService, 'instant').and.callThrough();
       spyOn(pageTitleService, 'setDocumentTitle');
+
       component.setPageTitle();
 
       expect(translateService.instant).toHaveBeenCalledWith(
@@ -565,6 +571,7 @@ describe('Learner dashboard page', () => {
 
     it('should get static image url', () => {
       let imagePath = '/path/to/image.png';
+
       expect(component.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
     });
@@ -578,6 +585,7 @@ describe('Learner dashboard page', () => {
 
         let newActiveSubsection2 = 'I18N_DASHBOARD_SKILL_PROFICIENCY';
         component.setActiveSubsection(newActiveSubsection2);
+
         expect(component.activeSubsection).toBe(newActiveSubsection2);
       });
 
@@ -590,13 +598,16 @@ describe('Learner dashboard page', () => {
       ' changing sorting type', () => {
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
       expect(component.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
+
       component.setFeedbackSortingOptions('lastUpdatedMsecs');
+
       expect(component.isCurrentFeedbackSortDescending).toBe(false);
     });
 
     it('should change feedback sorting options by exploration when changing' +
       ' sorting type', () => {
       component.setFeedbackSortingOptions('exploration');
+
       expect(component.currentFeedbackThreadsSortType).toBe('exploration');
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
     });
@@ -646,6 +657,7 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('lastUpdatedMsecs');
+
       expect(component.isCurrentFeedbackSortDescending).toBeFalse();
 
       tick();
@@ -684,6 +696,7 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.currentFeedbackThreadsSortType)
         .toBe('explorationTitle');
       expect(component.getValueOfFeedbackThreadSortKey())
@@ -725,12 +738,14 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.currentFeedbackThreadsSortType)
         .toBe('explorationTitle');
       expect(component.getValueOfFeedbackThreadSortKey())
         .toBe('explorationTitle');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.isCurrentFeedbackSortDescending).toBeFalse();
 
       tick();
@@ -785,6 +800,7 @@ describe('Learner dashboard page', () => {
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
+
       expect(component.loadingFeedbacks).toBe(true);
 
       tick();
@@ -823,6 +839,7 @@ describe('Learner dashboard page', () => {
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
+
       expect(component.loadingFeedbacks).toBe(true);
 
       tick();
@@ -874,6 +891,7 @@ describe('Learner dashboard page', () => {
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
+
         expect(component.loadingFeedbacks).toBe(true);
 
         tick();
@@ -886,8 +904,8 @@ describe('Learner dashboard page', () => {
         expect(threadSpy).toHaveBeenCalled();
 
         component.showAllThreads();
-        expect(component.feedbackThreadActive).toBe(false);
 
+        expect(component.feedbackThreadActive).toBe(false);
         expect(component.numberOfUnreadThreads).toBe(6);
       }));
 
@@ -923,6 +941,7 @@ describe('Learner dashboard page', () => {
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
+
         expect(component.loadingFeedbacks).toBe(true);
 
         tick();
@@ -935,6 +954,7 @@ describe('Learner dashboard page', () => {
         expect(threadSpy).toHaveBeenCalled();
 
         component.addNewMessage(threadId, message);
+
         expect(component.messageSendingInProgress).toBe(true);
 
         tick();
@@ -948,6 +968,7 @@ describe('Learner dashboard page', () => {
       () => {
         spyOn(suggestionModalForLearnerDashboardService, 'showSuggestionModal')
           .and.returnValue(null);
+
         let newContent = 'New content';
         let oldContent = 'Old content';
         let description = 'Description';
@@ -980,6 +1001,7 @@ describe('Learner dashboard page', () => {
         let NOW_MILLIS = 1617393321345;
         spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
           .withArgs(NOW_MILLIS).and.returnValue('4/2/2021');
+
         expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS))
           .toBe('4/2/2021');
       });
@@ -1302,6 +1324,7 @@ describe('Learner dashboard page', () => {
 
     it('should unsubscribe upon component destruction', () => {
       spyOn(component.directiveSubscriptions, 'unsubscribe');
+
       component.ngOnDestroy();
 
       expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();

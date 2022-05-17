@@ -56,7 +56,9 @@ describe('Classroom Root Page', () => {
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.ngOnInit();
+
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META);

@@ -42,7 +42,9 @@ describe('Page head service', () => {
     };
     spyOn(pageTitleService, 'setDocumentTitle');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
+
     pageHeadService.updateTitleAndMetaTags(title, [meta]);
+
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(title);
     expect(metaTagCustomizationService.addOrReplaceMetaTags)
       .toHaveBeenCalledWith([

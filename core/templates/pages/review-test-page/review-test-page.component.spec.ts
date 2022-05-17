@@ -93,6 +93,7 @@ describe('Review test page component', function() {
   it('should initialize correctly controller properties after its' +
   ' initialization and get skill details from backend', function() {
     spyOn(ctrl, 'subscribeToOnLanguageCodeChange');
+
     ctrl.$onInit();
     $scope.$apply();
 
@@ -126,6 +127,7 @@ describe('Review test page component', function() {
     spyOn(I18nLanguageCodeService.onI18nLanguageCodeChange, 'subscribe');
 
     ctrl.subscribeToOnLanguageCodeChange();
+
     expect(ctrl.directiveSubscriptions.add).toHaveBeenCalled();
     expect(I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe)
       .toHaveBeenCalled();
@@ -134,6 +136,7 @@ describe('Review test page component', function() {
   it('should update title whenever the language changes', () => {
     ctrl.subscribeToOnLanguageCodeChange();
     spyOn(ctrl, 'setPageTitle');
+
     I18nLanguageCodeService.onI18nLanguageCodeChange.emit();
 
     expect(ctrl.setPageTitle).toHaveBeenCalled();
@@ -143,6 +146,7 @@ describe('Review test page component', function() {
     spyOn($translate, 'instant').and.returnValue('translated_title');
     spyOn(pageTitleService, 'setDocumentTitle');
     ctrl.storyName = 'dummy_story_name';
+
     ctrl.setPageTitle();
     $scope.$apply();
 
@@ -156,6 +160,7 @@ describe('Review test page component', function() {
 
   it('should unsubscribe on component destruction', () => {
     spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
     ctrl.$onDestroy();
 
     expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();

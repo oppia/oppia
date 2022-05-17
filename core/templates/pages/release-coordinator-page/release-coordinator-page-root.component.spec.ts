@@ -88,8 +88,10 @@ describe('Release Coordinator Page Root', () => {
       .and.returnValue(Promise.resolve());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
+
     component.ngOnInit();
     tick();
+
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(
       accessValidationBackendApiService.validateAccessToReleaseCoordinatorPage)
@@ -107,8 +109,10 @@ describe('Release Coordinator Page Root', () => {
         .and.returnValue(Promise.reject());
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(loaderService, 'hideLoadingScreen');
+
       component.ngOnInit();
       tick();
+
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(
         accessValidationBackendApiService
@@ -126,6 +130,7 @@ describe('Release Coordinator Page Root', () => {
       .and.returnValue(Promise.resolve());
     spyOn(component.directiveSubscriptions, 'add');
     spyOn(translateService.onLangChange, 'subscribe');
+
     component.ngOnInit();
     tick();
 
@@ -140,6 +145,7 @@ describe('Release Coordinator Page Root', () => {
       .and.returnValue(Promise.resolve());
     component.ngOnInit();
     spyOn(component, 'setPageTitleAndMetaTags');
+
     translateService.onLangChange.emit();
 
     expect(component.setPageTitleAndMetaTags).toHaveBeenCalled();
@@ -148,6 +154,7 @@ describe('Release Coordinator Page Root', () => {
   it('should obtain translated title and set the title and meta tags', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -162,6 +169,7 @@ describe('Release Coordinator Page Root', () => {
 
   it('should unsubscribe on component destruction', () => {
     spyOn(component.directiveSubscriptions, 'unsubscribe');
+
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
