@@ -104,10 +104,30 @@ angular.module('oppia').component('skillEditorPage', {
         return ctrl.skill ? ctrl.skill.getValidationIssues().length : 0;
       };
 
-      ctrl.createSkillEditorBrowserTabsInfo = function() {
-        var skill = SkillEditorStateService.getSkill();
+      ctrl.onClosingSkillEditorBrowserTab = function() {
+        const skill = SkillEditorStateService.getSkill();
 
-        var skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+        const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+
+        if (skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+            UndoRedoService.getChangeCount() > 0) {
+          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        }
+        skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          skillEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_SKILL_EDITOR_BROWSER_TABS);
+      };
+
+      let createSkillEditorBrowserTabsInfo = function() {
+        const skill = SkillEditorStateService.getSkill();
+
+        let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
           LocalStorageService.getEntityEditorBrowserTabsInfo(
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
@@ -126,10 +146,10 @@ angular.module('oppia').component('skillEditorPage', {
             .OPENED_SKILL_EDITOR_BROWSER_TABS);
       };
 
-      ctrl.updateSkillEditorBrowserTabsInfo = function() {
-        var skill = SkillEditorStateService.getSkill();
+      let updateSkillEditorBrowserTabsInfo = function() {
+        const skill = SkillEditorStateService.getSkill();
 
-        var skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+        const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
           LocalStorageService.getEntityEditorBrowserTabsInfo(
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
@@ -143,27 +163,7 @@ angular.module('oppia').component('skillEditorPage', {
             .OPENED_SKILL_EDITOR_BROWSER_TABS);
       };
 
-      ctrl.onClosingSkillEditorBrowserTab = function() {
-        var skill = SkillEditorStateService.getSkill();
-
-        var skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-          LocalStorageService.getEntityEditorBrowserTabsInfo(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-        if (skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
-            UndoRedoService.getChangeCount() > 0) {
-          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
-        }
-        skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
-
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          skillEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS);
-      };
-
-      ctrl.onCreateOrUpdateSkillEditorBrowserTabsInfo = function(event) {
+      let onCreateOrUpdateSkillEditorBrowserTabsInfo = function(event) {
         if (event.key === (
           EntityEditorBrowserTabsInfoDomainConstants
             .OPENED_SKILL_EDITOR_BROWSER_TABS)
@@ -187,19 +187,19 @@ angular.module('oppia').component('skillEditorPage', {
             () => $rootScope.$applyAsync()));
         ctrl.directiveSubscriptions.add(
           SkillEditorStateService.onSkillInitialized.subscribe(() => {
-            ctrl.createSkillEditorBrowserTabsInfo();
+            createSkillEditorBrowserTabsInfo();
           })
         );
         ctrl.directiveSubscriptions.add(
           SkillEditorStateService.onSkillReinitialized.subscribe(() => {
-            ctrl.updateSkillEditorBrowserTabsInfo();
+            updateSkillEditorBrowserTabsInfo();
           })
         );
         SkillEditorStalenessDetectionService.init();
         WindowRef.nativeWindow.addEventListener(
           'beforeunload', ctrl.onClosingSkillEditorBrowserTab);
         LocalStorageService.registerNewStorageEventListener(
-          ctrl.onCreateOrUpdateSkillEditorBrowserTabsInfo);
+          onCreateOrUpdateSkillEditorBrowserTabsInfo);
       };
     }
   ]
