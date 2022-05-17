@@ -19,13 +19,12 @@ from __future__ import annotations
 from core.controllers import acl_decorators
 from core.controllers import base
 
-from typing import Dict
-
 
 class OppiaRootPage(base.BaseHandler):
     """Renders oppia root page (unified entry point) for all routes registered
-       with angular router.
+    with angular router.
     """
+
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
@@ -35,6 +34,9 @@ class OppiaRootPage(base.BaseHandler):
 
 
 class OppiaLightweightRootPage(base.BaseHandler):
+    """Renders lightweight oppia root page (unified entry point) for all routes
+    registered with angular router.
+    """
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
