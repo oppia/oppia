@@ -217,10 +217,30 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorNavigationService.navigateToStoryEditor();
       };
 
-      ctrl.createStoryEditorBrowserTabsInfo = function() {
-        var story = StoryEditorStateService.getStory();
+      ctrl.onClosingStoryEditorBrowserTab = function() {
+        const story = StoryEditorStateService.getStory();
 
-        var storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+        const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+        if (storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+            UndoRedoService.getChangeCount() > 0) {
+          storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        }
+        storyEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          storyEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS);
+      };
+
+      let createStoryEditorBrowserTabsInfo = function() {
+        const story = StoryEditorStateService.getStory();
+
+        let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
           LocalStorageService.getEntityEditorBrowserTabsInfo(
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
@@ -239,10 +259,10 @@ angular.module('oppia').component('storyEditorPage', {
             .OPENED_STORY_EDITOR_BROWSER_TABS);
       };
 
-      ctrl.updateStoryEditorBrowserTabsInfo = function() {
-        var story = StoryEditorStateService.getStory();
+      let updateStoryEditorBrowserTabsInfo = function() {
+        const story = StoryEditorStateService.getStory();
 
-        var storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+        const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
           LocalStorageService.getEntityEditorBrowserTabsInfo(
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
@@ -256,27 +276,7 @@ angular.module('oppia').component('storyEditorPage', {
             .OPENED_STORY_EDITOR_BROWSER_TABS);
       };
 
-      ctrl.onClosingStoryEditorBrowserTab = function() {
-        var story = StoryEditorStateService.getStory();
-
-        var storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-          LocalStorageService.getEntityEditorBrowserTabsInfo(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
-
-        if (storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
-            UndoRedoService.getChangeCount() > 0) {
-          storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
-        }
-        storyEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
-
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          storyEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_STORY_EDITOR_BROWSER_TABS);
-      };
-
-      ctrl.onCreateOrUpdateStoryEditorBrowserTabsInfo = function(event) {
+      let onCreateOrUpdateStoryEditorBrowserTabsInfo = function(event) {
         if (event.key === (
           EntityEditorBrowserTabsInfoDomainConstants
             .OPENED_STORY_EDITOR_BROWSER_TABS)
@@ -295,7 +295,7 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorStateService.onStoryInitialized.subscribe(
             () => {
               _initPage();
-              ctrl.createStoryEditorBrowserTabsInfo();
+              createStoryEditorBrowserTabsInfo();
               LoaderService.hideLoadingScreen();
               $rootScope.$applyAsync();
             }
@@ -304,7 +304,7 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorStateService.onStoryReinitialized.subscribe(
             () => {
               _initPage();
-              ctrl.updateStoryEditorBrowserTabsInfo();
+              updateStoryEditorBrowserTabsInfo();
               $rootScope.$applyAsync();
             }
           ));
@@ -337,7 +337,7 @@ angular.module('oppia').component('storyEditorPage', {
         $window.addEventListener(
           'beforeunload', ctrl.onClosingStoryEditorBrowserTab);
         LocalStorageService.registerNewStorageEventListener(
-          ctrl.onCreateOrUpdateStoryEditorBrowserTabsInfo);
+          onCreateOrUpdateStoryEditorBrowserTabsInfo);
       };
 
       ctrl.$onDestroy = function() {
