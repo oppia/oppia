@@ -1600,11 +1600,8 @@ class VersionedModel(BaseModel):
             for snapshot_id in snapshot_ids]
         returned_models = datastore_services.get_multi(metadata_keys)
 
-        # Here, the type of returned_models is List[Optional[Model]] but the
-        # type of model is strict VersionedModel, Thus to avoid MyPy assignment
-        # error, we added an ignore here.
-        for ind, model in enumerate(returned_models):  # type: ignore[assignment]
-            if model is None:
+        for ind, returned_model in enumerate(returned_models):
+            if returned_model is None:
                 raise Exception(
                     'Invalid version number %s for model %s with id %s'
                     % (version_numbers[ind], cls.__name__, model_instance_id))
