@@ -33,6 +33,7 @@ import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface HTMLSchema {
   'type': string;
@@ -246,8 +247,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.contributionOpportunitiesService.
           reloadOpportunitiesEventEmitter.emit();
       },
-      (failure: any) => {
-        this.showTranslationSuggestionUpdateError(failure.error)
+      (failure: HttpErrorResponse) => {
+        this.showTranslationSuggestionUpdateError(failure);
       });
   }
 
@@ -403,8 +404,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.activeModal.close(this.resolvedSuggestionIds);
   }
 
-  showTranslationSuggestionUpdateError(failure: any): void {
-    this.errorMessage = 'Invalid Suggestion: ' + failure.error;
+  showTranslationSuggestionUpdateError(failure: HttpErrorResponse): void {
+    this.errorMessage = 'Invalid Suggestion: ' + failure.error.error;
     this.errorFound = true;
     this.startedEditing = true;
     this.translationHtml = this.preEditTranslationHtml;

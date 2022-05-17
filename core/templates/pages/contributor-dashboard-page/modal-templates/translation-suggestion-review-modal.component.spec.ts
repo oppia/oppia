@@ -28,6 +28,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -224,11 +225,11 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should notify user on failed suggestion update', function() {
       component.ngOnInit();
-      const error = new Error('Error');
+      const httpError = new HttpErrorResponse({error: {error: 'Error'}});
       expect(component.errorFound).toBeFalse();
       expect(component.errorMessage).toBe('');
 
-      component.showTranslationSuggestionUpdateError(error);
+      component.showTranslationSuggestionUpdateError(httpError);
 
       expect(component.errorFound).toBeTrue();
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
@@ -419,6 +420,26 @@ describe('Translation Suggestion Review Modal Component', function() {
             'suggestion_1', component.editedContent.html,
             jasmine.any(Function),
             jasmine.any(Function));
+      });
+
+    it(
+      'should update translation when the update button is clicked',
+      function() {
+        component.ngOnInit();
+        spyOn(contributionAndReviewService, 'updateTranslationSuggestionAsync')
+          .and.callFake((
+              suggestionId, translationHtml,
+              successCallback, errorCallback) => {
+            let dummyErrorResponse = new HttpErrorResponse({error: {error: 'Error'}});
+            return Promise.reject(
+              errorCallback(dummyErrorResponse)
+            );
+          });
+
+        component.updateSuggestion();
+
+        expect(component.errorFound).toBeTrue();
+        expect(component.errorMessage).toBe('Invalid Suggestion: Error');
       });
 
     describe('isHtmlContentEqual', function() {
