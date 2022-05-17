@@ -563,7 +563,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
 
-    def test_bool_type_validation(self) -> None:
+    def test_validation_fails_with_story_is_published_set_to_non_bool_value(self) -> None:
         self.topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id')
