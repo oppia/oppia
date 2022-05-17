@@ -29,11 +29,6 @@ from typing import Tuple
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
-# Add third_party to path. Some scripts access the scripts layer even before
-# python_libs is added to path.
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
-
 # These libraries need to be installed before running or importing any script.
 
 PREREQUISITES = (
@@ -75,6 +70,11 @@ def install_prerequisite(package: Tuple[str]) -> None:
 
 for prerequisite in PREREQUISITES:
     install_prerequisite(prerequisite)
+
+# Add third_party to path. Some scripts access the scripts layer even before
+# python_libs is added to path.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
 
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
