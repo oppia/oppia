@@ -140,11 +140,9 @@ export class ExplorationFooterComponent {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
       this.footerIsInQuestionPlayerMode = true;
-    }
-
-    if (!this.footerIsInQuestionPlayerMode) {
+    } else if (this.explorationId) {
       // Fetching the number of checkpoints.
-      this.getCheckpointCount(this.explorationId);
+      this.getCheckpointCount();
       this.setLearnerHasViewedLessonInfoTooltip();
     }
   }
@@ -245,9 +243,9 @@ export class ExplorationFooterComponent {
     return checkpointIndex;
   }
 
-  async getCheckpointCount(explorationId: string): Promise<void> {
+  async getCheckpointCount(): Promise<void> {
     return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null).then(
+      .fetchExplorationAsync(this.explorationId, null).then(
         (response: FetchExplorationBackendResponse) => {
           this.expStates = response.exploration.states;
           let count = 0;
