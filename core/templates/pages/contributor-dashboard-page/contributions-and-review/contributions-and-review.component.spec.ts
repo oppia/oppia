@@ -98,7 +98,8 @@ describe('Contributions and review component', function() {
         }));
       spyOn(
         contributionOpportunitiesService,
-        'getReviewableTranslationOpportunitiesAsync').and.returnValue(
+        'getReviewableTranslationOpportunitiesAsync'
+      ).and.returnValue(
         Promise.resolve({
           opportunities: [
             ExplorationOpportunitySummary.createFromBackendDict({

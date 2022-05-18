@@ -76,7 +76,7 @@ interface VoiceoverContributionOpportunities {
   more: boolean;
 }
 
-interface FetchReviewableTranslationOpportunitiesResponse {
+interface FetchedReviewableTranslationOpportunitiesResponse {
   opportunities: ExplorationOpportunitySummary[];
 }
 
@@ -199,7 +199,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   async fetchReviewableTranslationOpportunitiesAsync(
       topicName: string
-  ): Promise<FetchReviewableTranslationOpportunitiesResponse> {
+  ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const topicNameParam = (
       topicName === constants.TOPIC_SENTINEL_NAME_ALL ? null : topicName);
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(

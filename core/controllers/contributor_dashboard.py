@@ -272,7 +272,8 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id, topic_name):
+        self, user_id, topic_name
+    ):
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
         sorted in descending order by topic, story, and story node order.

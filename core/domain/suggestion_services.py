@@ -649,7 +649,7 @@ def get_reviewable_translation_suggestion_target_ids(user_id):
         user_id: str. The ID of the user.
 
     Returns:
-        list(str). A list of target IDs of the translation suggestions that the
+        set(str). A set of target IDs of the translation suggestions that the
         supplied user can review.
     """
     contribution_rights = user_services.get_user_contribution_rights(user_id)
@@ -662,8 +662,7 @@ def get_reviewable_translation_suggestion_target_ids(user_id):
         get_suggestion_from_model(s)
         for s in in_review_translation_suggestions
     ])
-    return list(
-        {suggestion.target_id for suggestion in translation_suggestions})
+    return {suggestion.target_id for suggestion in translation_suggestions}
 
 
 def get_reviewable_question_suggestions_by_offset(

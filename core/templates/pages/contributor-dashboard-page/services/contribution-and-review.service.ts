@@ -168,24 +168,24 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true):
-  Promise<FetchSuggestionsResponse> {
+      shouldResetOffset: boolean = true
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.userCreatedQuestionFetcher,
       shouldResetOffset);
   }
 
   async getReviewableQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true):
-  Promise<FetchSuggestionsResponse> {
+      shouldResetOffset: boolean = true
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
       shouldResetOffset);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
-      shouldResetOffset: boolean = true):
-  Promise<FetchSuggestionsResponse> {
+      shouldResetOffset: boolean = true
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset);
@@ -193,8 +193,8 @@ export class ContributionAndReviewService {
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      explorationId: string):
-  Promise<FetchSuggestionsResponse> {
+      explorationId: string
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,
