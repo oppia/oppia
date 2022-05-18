@@ -180,11 +180,18 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSkillWithIndex = async function(index) {
+  this.navigateToSkillWithDescription = async function(description) {
     await this.navigateToSkillsTab();
     await this.waitForSkillsToLoad();
-    await action.click('Skill editor', openSkillEditorButtons.get(index));
-    await waitFor.pageToFullyLoad();
+    for (var i = 0; i < await openSkillEditorButtons.count(); i++) {
+      var button = openSkillEditorButtons.get(i);
+      var buttonText = await action.getText('Skill editor button', button);
+      if (buttonText.includes(description)) {
+        await action.click('Skill editor', button);
+        await waitFor.pageToFullyLoad();
+        return;
+      }
+    }
   };
 
   this.assignSkillToTopic = async function(skillName, topicName) {

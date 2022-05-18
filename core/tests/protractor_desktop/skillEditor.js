@@ -175,7 +175,8 @@ describe('Skill Editor functionality', function() {
         .createSkillWithDescriptionAndExplanation(
           'Skill 2', 'Concept card explanation', false);
       await browser.switchTo().window(handle);
-      await topicsAndSkillsDashboardPage.navigateToSkillWithIndex(0);
+      await topicsAndSkillsDashboardPage
+        .navigateToSkillWithDescription('Skill 2');
 
       var handles = await browser.getAllWindowHandles();
 
