@@ -1437,6 +1437,8 @@ class SubmittedAnswer:
             'params': self.params,
             'session_id': self.session_id,
             'time_spent_in_sec': self.time_spent_in_sec,
+            'rule_spec_str': self.rule_spec_str,
+            'answer_str': self.answer_str
         }
         if self.rule_spec_str is not None:
             submitted_answer_dict['rule_spec_str'] = self.rule_spec_str

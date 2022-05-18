@@ -1615,7 +1615,10 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
-                'time_spent_in_sec': 10.5
+                'time_spent_in_sec': 10.5,
+                'answer': None,
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_requires_interaction_id_to_be_created_from_dict(self) -> None:
@@ -1628,7 +1631,10 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
-                'time_spent_in_sec': 10.5
+                'time_spent_in_sec': 10.5,
+                'interaction_id': 'TextInput',
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_requires_answer_group_index_to_be_created_from_dict(self) -> None:
@@ -1641,7 +1647,10 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
-                'time_spent_in_sec': 10.5
+                'time_spent_in_sec': 10.5,
+                'answer_group_index': 0,
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_requires_rule_spec_index_to_be_created_from_dict(self) -> None:
@@ -1654,7 +1663,10 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
-                'time_spent_in_sec': 10.5
+                'time_spent_in_sec': 10.5,
+                'rule_spec_index': 1,
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_requires_classification_categ_to_be_created_from_dict(
@@ -1662,13 +1674,18 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(KeyError, 'classification_categorization'):  # type: ignore[no-untyped-call]
             stats_domain.SubmittedAnswer.from_dict({
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
                 'rule_spec_index': 1,
                 'params': {},
                 'session_id': 'sess',
-                'time_spent_in_sec': 10.5
+                'time_spent_in_sec': 10.5,
+                'params': {},
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_requires_params_to_be_created_from_dict(self) -> None:
@@ -1681,7 +1698,10 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'classification_categorization': (
                     exp_domain.EXPLICIT_CLASSIFICATION),
                 'session_id': 'sess',
-                'time_spent_in_sec': 10.5
+                'time_spent_in_sec': 10.5,
+                'params': {},
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_requires_session_id_to_be_created_from_dict(self) -> None:
@@ -1694,7 +1714,10 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'classification_categorization': (
                     exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
-                'time_spent_in_sec': 10.5
+                'time_spent_in_sec': 10.5,
+                'session_id': 'sess',
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_requires_time_spent_in_sec_to_be_created_from_dict(self) -> None:
@@ -1708,6 +1731,9 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
+                'time_spent_in_sec': 10.5,
+                'rule_spec_str': None,
+                'answer_str': None
             })
 
     def test_can_be_created_from_full_dict(self) -> None:
@@ -1749,7 +1775,9 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'params': {},
             'session_id': 'sess',
-            'time_spent_in_sec': 10.5
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': None,
+            'answer_str': None
         })
         self.assertEqual(submitted_answer.answer, 'Text')
         self.assertEqual(submitted_answer.interaction_id, 'TextInput')
