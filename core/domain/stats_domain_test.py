@@ -1683,7 +1683,6 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'params': {},
                 'session_id': 'sess',
                 'time_spent_in_sec': 10.5,
-                'params': {},
                 'rule_spec_str': None,
                 'answer_str': None
             })
