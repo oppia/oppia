@@ -777,7 +777,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 'change_cmd': suggestion_model.change_cmd,
                 'language_code': suggestion_model.language_code,
                 'edited_by_reviewer': suggestion_model.edited_by_reviewer,
-                'edited_after_rejecting': suggestion_model.edited_after_rejecting
+                'edited_after_rejecting': (
+                    suggestion_model.edited_after_rejecting)
             }
 
         return user_data

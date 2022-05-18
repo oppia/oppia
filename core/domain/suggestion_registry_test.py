@@ -162,7 +162,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, False, self.fake_date)
+            expected_suggestion_dict['language_code'],
+            False, False, self.fake_date)
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -652,7 +653,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, False, self.fake_date)
+            expected_suggestion_dict['language_code'],
+            False, False, self.fake_date)
 
         change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -978,7 +980,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, False, self.fake_date)
+            expected_suggestion_dict['language_code'],
+            False, False, self.fake_date)
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -1636,7 +1639,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, False, self.fake_date)
+            expected_suggestion_dict['language_code'],
+            False, False, self.fake_date)
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -2242,7 +2246,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, self.suggestion_dict['change'],
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.suggestion_dict['edited_after_rejecting'], self.fake_date)
+            self.suggestion_dict['language_code'],
+            self.suggestion_dict['edited_after_rejecting'], self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [

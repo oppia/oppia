@@ -430,7 +430,8 @@ describe('Translation Suggestion Review Modal Component', function() {
           .and.callFake((
               suggestionId, translationHtml,
               successCallback, errorCallback) => {
-            let dummyErrorResponse = new HttpErrorResponse({error: {error: 'Error'}});
+            let dummyErrorResponse = new HttpErrorResponse(
+              {error: {error: 'Error'}});
             return Promise.reject(
               errorCallback(dummyErrorResponse)
             );

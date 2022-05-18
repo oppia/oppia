@@ -34,11 +34,6 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
-from core.platform import models
-
-(suggestion_models,) = models.Registry.import_models([
-    models.NAMES.suggestion])
-
 
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
@@ -521,13 +516,8 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.edited_after_rejecting:
-            raise self.InvalidInputException('Rejected suggestions can be edited only once')
-
-        if suggestion.status == suggestion_models.STATUS_ACCEPTED:
             raise self.InvalidInputException(
-                'The suggestion with id %s has been already accepted'
-                % (suggestion_id)
-            )
+                'Rejected suggestions can be edited only once')
 
         if self.payload.get('translation_html') is None:
             raise self.InvalidInputException(
@@ -568,13 +558,8 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.edited_after_rejecting:
-            raise self.InvalidInputException('Rejected suggestions can be edited only once')
-
-        if suggestion.status == suggestion_models.STATUS_ACCEPTED:
             raise self.InvalidInputException(
-                'The suggestion with id %s has been already accepted'
-                % (suggestion_id)
-            )
+                'Rejected suggestions can be edited only once')
 
         if self.payload.get('skill_difficulty') is None:
             raise self.InvalidInputException(

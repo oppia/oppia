@@ -297,7 +297,8 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
         suggestion_model.edited_by_reviewer = suggestion.edited_by_reviewer
-        suggestion_model.edited_after_rejecting = suggestion.edited_after_rejecting
+        suggestion_model.edited_after_rejecting = (
+            suggestion.edited_after_rejecting)
 
     suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
@@ -1443,8 +1444,18 @@ def update_translation_suggestion(suggestion_id, translation_html, user_id):
     Args:
         suggestion_id: str. The id of the suggestion to be updated.
         translation_html: str. The new translation_html string.
+        user_id: str. The id of the user who updates the suggestion.
+
+    Raises:
+        Exception. The suggestion is already accepted.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
+
+    if suggestion.status == suggestion_models.STATUS_ACCEPTED:
+        raise Exception(
+            'The suggestion with id %s has been already accepted'
+            % (suggestion_id)
+        )
 
     if suggestion.author_id != user_id:
         suggestion.edited_by_reviewer = True
@@ -1457,7 +1468,8 @@ def update_translation_suggestion(suggestion_id, translation_html, user_id):
             else translation_html
         )
         create_suggestion(
-            suggestion.suggestion_type, suggestion.target_type, suggestion.target_id,
+            suggestion.suggestion_type, suggestion.target_type,
+            suggestion.target_id,
             suggestion.target_version_at_submission, user_id,
             change_dict, 'Adds translation'
         )
@@ -1485,12 +1497,23 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+        user_id: str. The id of the user who updates the suggestion.
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
         is found.
+
+    Raises:
+        Exception. The suggestion is already accepted.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
+
+    if suggestion.status == suggestion_models.STATUS_ACCEPTED:
+        raise Exception(
+            'The suggestion with id %s has been already accepted'
+            % (suggestion_id)
+        )
+
     new_change_obj = question_domain.QuestionSuggestionChange(
         {
             'cmd': suggestion.change.cmd,
@@ -1516,7 +1539,8 @@ def update_question_suggestion(
 
     if suggestion.status == suggestion_models.STATUS_REJECTED:
         create_suggestion(
-            suggestion.suggestion_type, suggestion.target_type, suggestion.target_id,
+            suggestion.suggestion_type, suggestion.target_type,
+            suggestion.target_id,
             suggestion.target_version_at_submission, user_id,
             new_change_obj.to_dict(), 'Adds question'
         )

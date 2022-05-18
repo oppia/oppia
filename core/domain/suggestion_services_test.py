@@ -966,7 +966,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, add_translation_change_dict, 'test description')
 
         suggestion_services.update_translation_suggestion(
-            suggestion.suggestion_id, '<p>Updated translation</p>', self.reviewer_id
+            suggestion.suggestion_id, '<p>Updated translation</p>',
+            self.reviewer_id
         )
 
         suggestion_services.accept_suggestion(
