@@ -501,9 +501,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '0', 1, self.owner_id, change_dict, 'description')
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
-        response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': None})
+        response = self.get_json('%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL)
 
         # Should return all available reviewable opportunities.
         self.assertEqual(
@@ -515,13 +513,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
             params={'topic_name': 'Invalid'},
-            expected_status_int=400)
-
-    def test_get_reviewable_translation_opportunities_without_topic(self):
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
             expected_status_int=400)
 
     def test_get_reviewable_translation_opportunities_returns_opportunities_in_story_order( # pylint: disable=line-too-long

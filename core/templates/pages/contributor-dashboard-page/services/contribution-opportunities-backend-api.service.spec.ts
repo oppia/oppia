@@ -285,7 +285,7 @@ describe('Contribution Opportunities backend API service', function() {
         urlInterpolationService.interpolateUrl(
           '/getreviewableopportunitieshandler',
           {}
-        ) + '?topic_name=All'
+        )
       );
       expect(req.request.method).toEqual('GET');
       req.flush({opportunities: translationOpportunities});
