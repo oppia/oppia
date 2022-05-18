@@ -35,6 +35,7 @@ from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 
+
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 

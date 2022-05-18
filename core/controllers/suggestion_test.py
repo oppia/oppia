@@ -856,15 +856,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         )
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json('%s/%s' % (
-            feconf.UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
-                'translation_html': '<p>Updated In Hindi</p>'
-            }, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'],
-            'The suggestion with id %s has been accepted or rejected' % (
-                suggestion.suggestion_id))
+        with self.assertRaisesRegex(
+            Exception,
+            'The suggestion with id %s has been already accepted' % (
+                suggestion.suggestion_id)):
+            self.put_json('%s/%s' % (
+                feconf.UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id), {
+                    'translation_html': '<p>Updated In Hindi</p>'
+                }, csrf_token=csrf_token)
         self.logout()
 
     def test_cannot_update_translations_without_translation_html(self):
@@ -1212,25 +1212,21 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.post_json(
-            '%s/%s' % (
-                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-                suggestion.suggestion_id
-            ),
-            {
-                'question_state_data': question_state_data,
-                'skill_difficulty': '0.6'
-            },
-            csrf_token=csrf_token,
-            expected_status_int=400
-        )
-
-        self.assertEqual(
-            response['error'],
-            'The suggestion with id %s has been accepted or rejected' % (
-                suggestion.suggestion_id
+        with self.assertRaisesRegex(
+            Exception,
+            'The suggestion with id %s has been already accepted' % (
+                suggestion.suggestion_id)):
+            self.post_json(
+                '%s/%s' % (
+                    feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                    suggestion.suggestion_id
+                ),
+                {
+                    'question_state_data': question_state_data,
+                    'skill_difficulty': 0.6
+                },
+                csrf_token=csrf_token
             )
-        )
         self.logout()
 
     def test_cannot_update_question_when_provided_state_data_is_invalid(self):
