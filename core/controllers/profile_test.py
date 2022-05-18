@@ -131,7 +131,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             {'update_type': 'preferred_audio_language_code', 'data': 'hi-en'},
             csrf_token=csrf_token)
         self.put_json(
-            '/preferenceshandler/data',{
+            '/preferenceshandler/data', {
                 'update_type': 'preferred_translation_language_code',
                 'data': 'en'
             },
