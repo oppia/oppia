@@ -994,7 +994,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.change.skill_difficulty,
             question_state_data, self.author_id)
 
-        suggestions, offset = (
+        suggestions, = (
             suggestion_services.get_reviewable_question_suggestions_by_offset(
                 self.reviewer_id,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
@@ -1192,6 +1192,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 0.6,
                 question_state_data,
                 self.author_id)
+
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (

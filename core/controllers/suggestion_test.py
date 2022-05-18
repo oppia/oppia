@@ -836,8 +836,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.change.translation_html, '<p>Updated In Hindi</p>')
         self.logout()
 
-    def test_cannot_update_already_handled_translation(self):
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
+    def test_cannot_update_already_edited_after_being_rejected_translation(
+        self):
+        self.login(self.TRANSLATOR_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -851,20 +852,28 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, self.translator_id, change_dict, 'description')
-        suggestion_services.accept_suggestion(
-            suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
+
+        suggestion_services.reject_suggestion(
+            suggestion.suggestion_id, self.reviewer_id, 'Wrong'
+        )
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, '<p>Translation for content.</p>',
+            self.translator_id
         )
 
         csrf_token = self.get_new_csrf_token()
-        with self.assertRaisesRegex(
-            Exception,
-            'The suggestion with id %s has been already accepted' % (
-                suggestion.suggestion_id)):
-            self.put_json('%s/%s' % (
-                feconf.UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX,
-                suggestion.suggestion_id), {
-                    'translation_html': '<p>Updated In Hindi</p>'
-                }, csrf_token=csrf_token)
+        response = self.put_json('%s/%s' % (
+            feconf.UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'translation_html': '<p>Updated In Hindi</p>'
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Rejected suggestions can be edited only once')
         self.logout()
 
     def test_cannot_update_translations_without_translation_html(self):
@@ -1170,7 +1179,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             response['error'], 'The parameter \'skill_difficulty\' is missing.')
         self.logout()
 
-    def test_cannot_update_already_handled_question(self):
+    def test_cannot_update_already_edited_after_being_rejected_question(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
@@ -1200,33 +1209,41 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
-        suggestion_services.accept_suggestion(
-            suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
-        )
 
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         question_state_data['interaction']['solution'] = new_solution_dict
 
+        suggestion_services.reject_suggestion(
+            suggestion.suggestion_id, self.reviewer_id, 'Wrong'
+        )
+
+        suggestion_services.update_question_suggestion(
+            suggestion.suggestion_id,
+            0.6,
+            question_state_data,
+            self.author_id
+        )
+
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with self.assertRaisesRegex(
-            Exception,
-            'The suggestion with id %s has been already accepted' % (
-                suggestion.suggestion_id)):
-            self.post_json(
-                '%s/%s' % (
-                    feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-                    suggestion.suggestion_id
-                ),
-                {
-                    'question_state_data': question_state_data,
-                    'skill_difficulty': 0.6
-                },
-                csrf_token=csrf_token
-            )
+        response = self.post_json(
+            '%s/%s' % (
+                feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id
+            ),{
+                'question_state_data': question_state_data,
+                'skill_difficulty': 0.6
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response['error'],
+            'Rejected suggestions can be edited only once')
         self.logout()
 
     def test_cannot_update_question_when_provided_state_data_is_invalid(self):

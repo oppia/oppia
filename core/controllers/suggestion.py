@@ -509,7 +509,8 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
         """Handles PUT requests.
 
         Raises:
-            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The suggestion is already edited after
+                being rejected.
             InvalidInputException. The 'translation_html' parameter is missing.
             InvalidInputException. The 'translation_html' parameter is not a
                 string.
@@ -548,7 +549,8 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
         """Handles PUT requests.
 
         Raises:
-            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The suggestion is already edited after
+                being rejected.
             InvalidInputException. The 'skill_difficulty' parameter is missing.
             InvalidInputException. The 'skill_difficulty' is not a decimal.
             InvalidInputException. The 'question_state_data' parameter is

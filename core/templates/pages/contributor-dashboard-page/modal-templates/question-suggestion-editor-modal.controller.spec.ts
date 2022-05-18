@@ -271,6 +271,22 @@ describe('Question Suggestion Editor Modal Controller', function() {
           .toHaveBeenCalledWith('No changes detected.', 5000);
       });
 
+    it('should show failure message when backend throws an error',
+    function() {
+      spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
+        .and.callFake((
+            suggestionId, skillDifficulty, questionStateData, imagesData,
+            successCallback, errorCallback) => {
+          errorCallback();
+        });
+      spyOn(AlertsService, 'addInfoMessage');
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
+      $scope.isEditing = true;
+      $scope.done();
+      expect(AlertsService.addInfoMessage)
+        .toHaveBeenCalledWith('Question update failed.');
+    });
+
     it('should show alert when suggestion is submitted', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn(AlertsService, 'addSuccessMessage');

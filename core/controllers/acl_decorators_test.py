@@ -6724,16 +6724,13 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.question_suggestion_id = question_suggestion.suggestion_id
         self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
 
-    def test_authors_cannot_update_suggestion_that_they_created(self):
+    def test_authors_can_update_suggestion_that_they_created(self):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s' % self.translation_suggestion_id,
-                expected_status_int=401)
+                '/mock/%s' % self.translation_suggestion_id)
         self.assertEqual(
-            response['error'],
-            'The user, %s is not allowed to update self-created'
-            'suggestions.' % self.author_username)
+            response['suggestion_id'], self.translation_suggestion_id)
         self.logout()
 
     def test_admin_can_update_any_given_translation_suggestion(self):
