@@ -2100,7 +2100,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -2368,7 +2368,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
