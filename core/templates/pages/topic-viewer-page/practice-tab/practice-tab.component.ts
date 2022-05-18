@@ -16,29 +16,35 @@
  * @fileoverview Component for the topic viewer practice tab.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
 import { LoaderService } from 'services/loader.service';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 
 @Component({
   selector: 'practice-tab',
   templateUrl: './practice-tab.component.html',
   styleUrls: []
 })
-export class PracticeTabComponent implements OnInit {
+export class PracticeTabComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -49,6 +55,8 @@ export class PracticeTabComponent implements OnInit {
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
   @Input() subtopicMastery: Record<string, number> = {};
+  topicNameTranslationKey!: string;
+  translatedTopicName!: string;
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
@@ -61,10 +69,12 @@ export class PracticeTabComponent implements OnInit {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private questionBackendApiService: QuestionBackendApiService,
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
+    private translateService: TranslateService,
     private loaderService: LoaderService
   ) {}
 
@@ -95,6 +105,45 @@ export class PracticeTabComponent implements OnInit {
       this.classroomUrlFragment = (
         this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     }
+    this.topicViewerBackendApiService.fetchTopicDataAsync(
+      this.topicUrlFragment, this.classroomUrlFragment).then(
+      (readOnlyTopic: ReadOnlyTopic) => {
+        this.topicNameTranslationKey =
+        this.i18nLanguageCodeService.getTopicTranslationKey(
+          readOnlyTopic.getTopicId(), TranslationKeyType.TITLE
+        );
+        this.obtainTranslatedTopicName();
+        this.subscribeToOnLangChange();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.obtainTranslatedTopicName();
+      })
+    );
+  }
+
+  obtainTranslatedTopicName(): void {
+    if (this.shouldGetTranslatedTopicName()) {
+      this.translatedTopicName = this.translateService.instant(
+        this.topicNameTranslationKey);
+    } else {
+      this.translatedTopicName = this.topicName;
+    }
+  }
+
+  shouldGetTranslatedTopicName(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 
   isLanguageRTL(): boolean {
