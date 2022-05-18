@@ -527,7 +527,7 @@ class TranslatableTopicNamesHandler(base.BaseHandler):
 
 
 class TranslationPreferenceHandler(base.BaseHandler):
-    """Provides the prefered translation language in the
+    """Provides the preferred translation language in the
     contributor dashboard page.
     """
 
@@ -551,11 +551,10 @@ class TranslationPreferenceHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
-        self.values.update({
+        self.render_json({
             'preferred_translation_language_code': (
                 user_settings.preferred_translation_language_code)
         })
-        self.render_json(self.values)
 
     @acl_decorators.can_manage_own_account
     def post(self):
@@ -563,3 +562,4 @@ class TranslationPreferenceHandler(base.BaseHandler):
         language_code = self.normalized_payload.get('language_code')
         user_services.update_preferred_translation_language_code(
             self.user_id, language_code)
+        # self.render_json({})

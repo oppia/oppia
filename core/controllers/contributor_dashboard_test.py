@@ -1031,3 +1031,26 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
             response,
             {'topic_names': ['topic']}
         )
+
+
+class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
+    """Test for the TranslationPreferenceHandler."""
+
+    def test_get_preferred_translation_language(self):
+        user_email = 'user@example.com'
+        self.signup(user_email, 'user')
+        self.login(user_email)
+
+        response = self.get_json('/preferredtranslationlanguage')
+        self.assertIsNone(response['preferred_translation_language_code'])
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/preferredtranslationlanguage',
+            {'language_code': 'en'},
+            csrf_token=csrf_token
+        )
+
+        response = self.get_json('/preferredtranslationlanguage')
+        self.assertEqual(response['preferred_translation_language_code'], 'en')
+        self.logout()

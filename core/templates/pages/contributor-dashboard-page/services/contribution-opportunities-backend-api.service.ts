@@ -220,19 +220,19 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async saveUserLanguagePreferenceAsync(languageCode: string):
+  async savePreferredTranslationLanguageAsync(languageCode: string):
   Promise<Object> {
     const postData: {'language_code': string} = {
       language_code: languageCode,
     };
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    const response = this.http.post(
+    const response = this.http.post<Object>(
       '/preferredtranslationlanguage', body).toPromise();
     return response;
   }
 
-  async fetchUserLanguagePreferenceAsync():
+  async getPreferredTranslationLanguageAsync():
   Promise<string> {
     return this.http.get<PreferredTranslationLanguageBackendDict>(
       '/preferredtranslationlanguage').toPromise().then(data => {

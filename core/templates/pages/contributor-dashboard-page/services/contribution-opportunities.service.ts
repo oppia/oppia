@@ -90,16 +90,6 @@ export class ContributionOpportunitiesService {
       .fetchTranslatableTopicNamesAsync();
   }
 
-  private async _getUserLanguagePreferenceAsync() {
-    return this.contributionOpportunitiesBackendApiService
-      .fetchUserLanguagePreferenceAsync();
-  }
-
-  private async _saveUserLanguagePreferenceAsync(languageCode: string) {
-    return this.contributionOpportunitiesBackendApiService
-      .saveUserLanguagePreferenceAsync(languageCode);
-  }
-
   showRequiresLoginModal(): void {
     this.modalService.open(LoginRequiredModalContent);
   }
@@ -135,15 +125,6 @@ export class ContributionOpportunitiesService {
 
   async getTranslatableTopicNamesAsync(): Promise<string[]> {
     return this._getTranslatableTopicNamesAsync();
-  }
-
-  async getUserLanguagePreferenceAsync(): Promise<string> {
-    return this._getUserLanguagePreferenceAsync();
-  }
-
-  async saveUserLanguagePreferenceAsync(
-      languageCode: string): Promise<Object> {
-    return this._saveUserLanguagePreferenceAsync(languageCode);
   }
 
   get reloadOpportunitiesEventEmitter(): EventEmitter<void> {

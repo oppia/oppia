@@ -91,7 +91,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     );
 
     this.contributionOpportunitiesBackendApiService
-      .fetchUserLanguagePreferenceAsync()
+      .getPreferredTranslationLanguageAsync()
       .then((preferredLanguageCode: string) => {
         if (preferredLanguageCode) {
           this.populateLanguageSelection(
@@ -104,12 +104,6 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.dropdownShown = !this.dropdownShown;
   }
 
-  async saveCurrentSelectedLanguage(
-      languageCode: string): Promise<Object> {
-    return await this.contributionOpportunitiesBackendApiService
-      .saveUserLanguagePreferenceAsync(languageCode);
-  }
-
   populateLanguageSelection(languageCode: string): void {
     this.setActiveLanguageCode.emit(languageCode);
     this.languageSelection = this.languageIdToDescription[languageCode];
@@ -118,7 +112,8 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   selectOption(activeLanguageCode: string): void {
     this.populateLanguageSelection(activeLanguageCode);
     this.dropdownShown = false;
-    this.saveCurrentSelectedLanguage(activeLanguageCode);
+    this.contributionOpportunitiesBackendApiService
+      .savePreferredTranslationLanguageAsync(activeLanguageCode);
   }
 
   showExplanationPopup(index: number): void {

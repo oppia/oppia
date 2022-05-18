@@ -90,7 +90,8 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = datastore_services.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
-    # Text language preference used for text translations.
+    # Language preference when submitting text translations in the
+    # contributor dashboard.
     preferred_translation_language_code = datastore_services.StringProperty(
         default=None)
 

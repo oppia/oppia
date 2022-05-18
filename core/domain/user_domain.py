@@ -1237,6 +1237,7 @@ class RawUserDataDict(TypedDict):
     preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
+    preferred_translation_language_code: Optional[str]
     user_id: Optional[str]
 
 

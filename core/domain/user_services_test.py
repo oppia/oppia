@@ -68,6 +68,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': 'user_id',
         }
         new_user_data_dict = {
@@ -77,6 +78,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -764,6 +766,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         modifiable_user_data = user_domain.ModifiableUserData.from_raw_dict(
@@ -1009,6 +1012,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         modifiable_new_user_data_2 = (
@@ -1163,6 +1167,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         modifiable_new_user_data_2 = (
