@@ -18,19 +18,25 @@
 
 import { TestBed, async, ComponentFixture, fakeAsync, flushMicrotasks, tick } from
   '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { PracticeTabComponent } from './practice-tab.component';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
+import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -61,6 +67,14 @@ class MockQuestionBackendApiService {
   }
 }
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
+
+
 describe('Practice tab component', function() {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
@@ -69,11 +83,15 @@ describe('Practice tab component', function() {
   let ngbModal: NgbModal;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let loaderService: LoaderService;
+  let translateService: TranslateService;
+  let topicViewerBackendApiService: TopicViewerBackendApiService;
+  let readOnlyTopicObjectFactory = null;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
     questionBackendApiService = new MockQuestionBackendApiService();
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [PracticeTabComponent, MockTranslatePipe],
       providers: [
         NgbModal,
@@ -85,7 +103,13 @@ describe('Practice tab component', function() {
         {
           provide: QuestionBackendApiService,
           useValue: questionBackendApiService
-        }
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
+        TopicViewerBackendApiService,
+        ReadOnlyTopicObjectFactory
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -128,32 +152,114 @@ describe('Practice tab component', function() {
     ngbModal = TestBed.inject(NgbModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     loaderService = TestBed.inject(LoaderService);
+    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    translateService = TestBed.inject(TranslateService);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
   });
 
   it('should initialize controller properties after its initilization',
     function() {
       component.ngOnInit();
+
       expect(component.selectedSubtopics).toEqual([]);
       expect(component.availableSubtopics.length).toBe(1);
       expect(component.selectedSubtopicIndices).toEqual([false]);
     });
 
+  it('should obtain topic details upon initialization, and subscribe to ' +
+    'the language change event emitter', fakeAsync(() => {
+    const fetchTopicDataSpy = spyOn(
+      topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
+      readOnlyTopicObjectFactory.createFromBackendDict({
+        subtopics: [],
+        skill_descriptions: {},
+        uncategorized_skill_ids: [],
+        degrees_of_mastery: {},
+        canonical_story_dicts: [],
+        additional_story_dicts: [],
+        topic_name: 'Topic Name 1',
+        topic_id: 'topic_id_1',
+        topic_description: 'Description',
+        practice_tab_is_displayed: false
+      }));
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
+      'dummy_topic_translation_key');
+    spyOn(component, 'subscribeToOnLangChange');
+    spyOn(component, 'obtainTranslatedTopicName');
+
+    component.ngOnInit();
+    tick();
+
+    expect(fetchTopicDataSpy).toHaveBeenCalledWith(
+      'topic_1', 'classroom_1');
+    expect(i18nLanguageCodeService.getTopicTranslationKey)
+      .toHaveBeenCalledWith('topic_id_1', 'TITLE');
+    expect(component.topicNameTranslationKey).toEqual(
+      'dummy_topic_translation_key');
+    expect(component.subscribeToOnLangChange).toHaveBeenCalled();
+    expect(component.obtainTranslatedTopicName).toHaveBeenCalled();
+  }));
+
+  it('should subscribe to the onLangChange event emitter, and obtain ' +
+    'translated topic name whenever the selected language changes', () => {
+    component.subscribeToOnLangChange();
+    spyOn(component, 'obtainTranslatedTopicName');
+
+    translateService.onLangChange.emit();
+
+    expect(component.obtainTranslatedTopicName).toHaveBeenCalled();
+  });
+
+  it('should obtain translated topic name and set it when hacky ' +
+    'translations are available', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
+    spyOn(translateService, 'instant').and.callThrough();
+    component.topicNameTranslationKey = 'dummy_translation_key';
+
+    component.obtainTranslatedTopicName();
+
+    expect(translateService.instant)
+      .toHaveBeenCalledWith('dummy_translation_key');
+    expect(component.translatedTopicName).toEqual('dummy_translation_key');
+  });
+
+  it('should not obtain translated topic name when hacky translations are ' +
+    'unavailable, and use the default english topic name instead', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(false);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
+    spyOn(translateService, 'instant');
+    component.topicName = 'default_topic_name';
+
+    component.obtainTranslatedTopicName();
+
+    expect(translateService.instant).not.toHaveBeenCalled();
+    expect(component.translatedTopicName).toEqual('default_topic_name');
+  });
+
   it('should have start button enabled when a subtopic is selected',
     function() {
       component.selectedSubtopicIndices[0] = true;
       component.questionsAreAvailable = true;
+
       expect(component.isStartButtonDisabled()).toBe(false);
     });
 
   it('should have start button disabled when there is no subtopic selected',
     function() {
       component.selectedSubtopicIndices[0] = false;
+
       expect(component.isStartButtonDisabled()).toBe(true);
     });
 
   it('should have start button disabled when the disable boolean is set',
     function() {
       component.previewMode = true;
+
       expect(component.isStartButtonDisabled()).toBe(true);
     });
 
@@ -161,13 +267,13 @@ describe('Practice tab component', function() {
     ' when start button is clicked for topicViewer display area', function() {
     spyOn(loaderService, 'showLoadingScreen');
     component.selectedSubtopicIndices[0] = true;
+
     component.openNewPracticeSession();
 
     expect(windowRef.nativeWindow.location.href).toBe(
       '/learn/classroom_1/topic_1/practice/session?' +
       'selected_subtopic_ids=%5B1%5D'
     );
-
     expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 
@@ -175,9 +281,12 @@ describe('Practice tab component', function() {
     fakeAsync(() => {
       component.checkIfQuestionsExist([true]);
       flushMicrotasks();
+
       expect(component.questionsAreAvailable).toBeTrue();
+
       component.checkIfQuestionsExist([false]);
       flushMicrotasks();
+
       expect(component.questionsAreAvailable).toBeFalse();
     }));
 
@@ -192,6 +301,7 @@ describe('Practice tab component', function() {
           result: Promise.resolve()
         } as NgbModalRef);
       });
+
     component.checkSiteLanguageBeforeBeginningPracticeSession();
     tick();
 
@@ -210,6 +320,7 @@ describe('Practice tab component', function() {
           result: Promise.resolve()
         } as NgbModalRef);
       });
+
     component.checkSiteLanguageBeforeBeginningPracticeSession();
     tick();
 
@@ -229,6 +340,7 @@ describe('Practice tab component', function() {
           result: Promise.resolve()
         } as NgbModalRef);
       });
+
     component.checkSiteLanguageBeforeBeginningPracticeSession();
     tick();
 
@@ -249,6 +361,7 @@ describe('Practice tab component', function() {
           result: Promise.reject()
         } as NgbModalRef);
       });
+
     component.checkSiteLanguageBeforeBeginningPracticeSession();
     tick();
 
@@ -264,35 +377,47 @@ describe('Practice tab component', function() {
     component.topicUrlFragment = 'topic_1';
     component.classroomUrlFragment = 'classroom_1';
     component.selectedSubtopicIndices[0] = true;
+
     component.openNewPracticeSession();
 
     expect(windowRef.nativeWindow.location.href).toBe(
       '/learn/classroom_1/topic_1/practice/session?' +
       'selected_subtopic_ids=%5B1%5D'
     );
-
     expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 
   it('should return background for progress of a subtopic', () => {
     component.subtopicMasteryArray = [10, 20];
+
     expect(component.getBackgroundForProgress(0)).toEqual(10);
   });
 
   it('should get subtopic mastery position for capsule', () => {
     component.clientWidth = 700;
     component.subtopicMasteryArray = [20, 99];
+
     expect(component.subtopicMasteryPosition(0)).toEqual(175);
     expect(component.subtopicMasteryPosition(1)).toEqual(12);
 
     component.clientWidth = 400;
+
     expect(component.subtopicMasteryPosition(0)).toEqual(150);
     expect(component.subtopicMasteryPosition(1)).toEqual(7);
   });
 
   it('should get mastery text color', () => {
     component.subtopicMasteryArray = [20, 99];
+
     expect(component.masteryTextColor(0)).toEqual('black');
     expect(component.masteryTextColor(1)).toEqual('white');
+  });
+
+  it('should unsubscribe upon component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });
