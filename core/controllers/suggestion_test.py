@@ -1233,7 +1233,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s/%s' % (
                 feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
                 suggestion.suggestion_id
-            ),{
+            ), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
             },

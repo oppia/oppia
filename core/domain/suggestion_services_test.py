@@ -994,7 +994,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.change.skill_difficulty,
             question_state_data, self.author_id)
 
-        suggestions, = (
+        suggestions, offset = (
             suggestion_services.get_reviewable_question_suggestions_by_offset(
                 self.reviewer_id,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
@@ -1002,6 +1002,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         new_question_state_data = suggestions[0].change.question_dict[
             'question_state_data']
 
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(offset, 1)
         self.assertEqual(
             new_question_state_data['content'][
                 'html'],
