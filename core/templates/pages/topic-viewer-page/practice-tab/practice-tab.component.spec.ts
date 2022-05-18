@@ -85,7 +85,7 @@ describe('Practice tab component', function() {
   let loaderService: LoaderService;
   let translateService: TranslateService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
-  let readOnlyTopicObjectFactory = null;
+  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -180,7 +180,9 @@ describe('Practice tab component', function() {
         topic_name: 'Topic Name 1',
         topic_id: 'topic_id_1',
         topic_description: 'Description',
-        practice_tab_is_displayed: false
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'dummy_meta_tag',
+        page_title_fragment_for_web: 'page_title_fragment'
       }));
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
       'dummy_topic_translation_key');
