@@ -598,7 +598,7 @@ describe('Stale tab and unsaved changes detection functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
-  var userNumber = 1;
+  var userNumber = 20;
 
   beforeEach(async function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
