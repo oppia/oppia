@@ -109,9 +109,9 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       this.topicUrlFragment, this.classroomUrlFragment).then(
       (readOnlyTopic: ReadOnlyTopic) => {
         this.topicNameTranslationKey =
-        this.i18nLanguageCodeService.getTopicTranslationKey(
-          readOnlyTopic.getTopicId(), TranslationKeyType.TITLE
-        );
+          this.i18nLanguageCodeService.getTopicTranslationKey(
+            readOnlyTopic.getTopicId(), TranslationKeyType.TITLE
+          );
         this.obtainTranslatedTopicName();
         this.subscribeToOnLangChange();
       });
