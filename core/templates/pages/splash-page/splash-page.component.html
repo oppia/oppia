@@ -16,13 +16,13 @@
       </div>
     </div>
     <div class="oppia-splash-section-one-right">
-      <picture class="oppia-splash-main-image image-desktop">
+      <picture class="oppia-splash-main-image" *ngIf="!isWindowNarrow">
         <source type="image/webp" [srcset]="getImageSet('/splash/splashMainDesktop', 'webp')">
         <source type="image/png" [srcset]="getImageSet('/splash/splashMainDesktop', 'png')">
         <img [src]="getStaticImageUrl('/splash/splashMainDesktop1x.png')"
              alt="Photo of two kids and a tutor">
       </picture>
-      <picture class="oppia-splash-main-image image-mobile">
+      <picture class="oppia-splash-main-image" *ngIf="isWindowNarrow">
         <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainMobile.webp')">
         <source type="image/png" [srcset]="getStaticImageUrl('/splash/splashMainMobile.png')">
         <img [src]="getStaticImageUrl('/splash/splashMainMobile.png')"

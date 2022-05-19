@@ -19,6 +19,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
+
 import { AppConstants } from 'app.constants';
 import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
 

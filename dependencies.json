@@ -146,7 +146,6 @@
         "targetDirPrefix": "bower-material-",
         "files": ["angular-material.css", "angular-material.js"],
         "bundle": {
-          "css": ["angular-material.css"],
           "js": ["angular-material.js"]
         }
       },
