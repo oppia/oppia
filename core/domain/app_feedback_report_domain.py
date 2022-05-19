@@ -1278,7 +1278,8 @@ class LessonPlayerEntryPoint(EntryPoint):
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.lesson_player)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
-        story_domain.Story.require_valid_story_id(self.story_id) # type: ignore[no-untyped-call]
+        if self.story_id is not None:
+            story_domain.Story.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
             self.exploration_id, self.story_id)
 
