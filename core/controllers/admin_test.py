@@ -330,7 +330,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic', 'abbrev', 'description')
+            topic_id, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
