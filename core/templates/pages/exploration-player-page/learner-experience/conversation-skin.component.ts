@@ -144,6 +144,7 @@ export class ConversationSkinComponent {
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
   alertMessageTimeout = 6000;
+  checkpointProgressId: string | null = null;
 
   constructor(
     private windowRef: WindowRef,
@@ -339,7 +340,7 @@ export class ConversationSkinComponent {
       }
 
       // We do not save checkpoints progress for iframes.
-      if (!this.isIframed && this.isLoggedIn && !this._editorPreviewMode &&
+      if (!this.isIframed && !this._editorPreviewMode &&
         !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
         // For the first state which is always a checkpoint.
         let firstStateName: string;
@@ -355,12 +356,26 @@ export class ConversationSkinComponent {
               // If the exploration is freshly started, mark the first state
               // as the most recently reached checkpoint.
               if (!this.mostRecentlyReachedCheckpoint) {
-                this.editableExplorationBackendApiService.
-                  recordMostRecentlyReachedCheckpointAsync(
-                    this.explorationId,
-                    expVersion,
-                    firstStateName
-                  );
+                if (this.isLoggedIn) {
+                  this.editableExplorationBackendApiService.
+                    recordMostRecentlyReachedCheckpointAsync(
+                      this.explorationId,
+                      expVersion,
+                      firstStateName,
+                      true
+                    );
+                } else {
+                  this.editableExplorationBackendApiService.
+                    recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+                      this.explorationId,
+                      expVersion,
+                      firstStateName
+                    )
+                    .then((response) => {
+                      this.checkpointProgressId = (
+                        response.unique_progress_url_id);
+                    });
+                }
               }
             }
           );
@@ -682,8 +697,7 @@ export class ConversationSkinComponent {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
 
-    if (index > 0 && !this.isIframed && this.isLoggedIn &&
-      !this._editorPreviewMode &&
+    if (index > 0 && !this.isIframed && !this._editorPreviewMode &&
       !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
@@ -698,6 +712,8 @@ export class ConversationSkinComponent {
                   this.explorationId,
                   response.version,
                   currentStateName,
+                  this.isLoggedIn,
+                  this.checkpointProgressId
                 );
             }
           );

@@ -128,15 +128,45 @@ export class EditableExplorationBackendApiService {
       explorationId: string,
       mostRecentlyReachedCheckpointExpVersion: number,
       mostRecentlyReachedCheckpointStateName: string,
+      isUserLoggedIn: boolean,
+      uniqueProgressUrlId: string | null = null
   ): Promise<void> {
+    let requestUrl = '';
+    if (isUserLoggedIn) {
+      requestUrl = '/explorehandler/checkpoint_reached/' + explorationId;
+      return this.httpClient.put<void>(requestUrl, {
+        most_recently_reached_checkpoint_exp_version:
+          mostRecentlyReachedCheckpointExpVersion,
+        most_recently_reached_checkpoint_state_name:
+          mostRecentlyReachedCheckpointStateName
+      }).toPromise();
+    } else {
+      requestUrl =
+        '/explorehandler/states_completed_by_logged_out_user/' + explorationId;
+      return this.httpClient.put<void>(requestUrl, {
+        unique_progress_url_id: uniqueProgressUrlId,
+        most_recently_reached_checkpoint_exp_version:
+          mostRecentlyReachedCheckpointExpVersion,
+        most_recently_reached_checkpoint_state_name:
+          mostRecentlyReachedCheckpointStateName
+      }).toPromise();
+    }
+  }
+
+  async recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+      explorationId: string,
+      mostRecentlyReachedCheckpointExpVersion: number,
+      mostRecentlyReachedCheckpointStateName: string,
+  ): Promise< {'unique_progress_url_id': string} > {
     const requestUrl =
-      '/explorehandler/checkpoint_reached/' + explorationId;
-    return this.httpClient.put<void>(requestUrl, {
-      most_recently_reached_checkpoint_exp_version:
-       mostRecentlyReachedCheckpointExpVersion,
-      most_recently_reached_checkpoint_state_name:
-       mostRecentlyReachedCheckpointStateName
-    }).toPromise();
+     '/explorehandler/states_completed_by_logged_out_user/' + explorationId;
+    return this.httpClient.post<{'unique_progress_url_id': string}>(
+      requestUrl, {
+        most_recently_reached_checkpoint_exp_version:
+          mostRecentlyReachedCheckpointExpVersion,
+        most_recently_reached_checkpoint_state_name:
+          mostRecentlyReachedCheckpointStateName
+      }).toPromise();
   }
 
   async resetExplorationProgressAsync(explorationId: string): Promise<void> {

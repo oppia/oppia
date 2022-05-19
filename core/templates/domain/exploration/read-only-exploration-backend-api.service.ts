@@ -70,11 +70,11 @@ export class ReadOnlyExplorationBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   private async _fetchExplorationAsync(
-      explorationId: string, version: number | null
+      explorationId: string, version: number | null, uid: string | null = null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       const explorationDataUrl = this._getExplorationUrl(
-        explorationId, version);
+        explorationId, version, uid);
 
       this.http.get<FetchExplorationBackendResponse>(
         explorationDataUrl).toPromise().then(response => {
@@ -89,21 +89,26 @@ export class ReadOnlyExplorationBackendApiService {
     return this._explorationCache.hasOwnProperty(explorationId);
   }
 
-  private _getExplorationUrl(explorationId: string, version: number | null):
-    string {
+  private _getExplorationUrl(
+      explorationId: string, version: number | null, uid: string | null = null):
+     string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
           exploration_id: explorationId,
           version: String(version)
         });
+    } else if (uid) {
+      return this.urlInterpolationService.interpolateUrl(
+        AppConstants.EXPLORATION_PROGRESS_UID_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          uid: uid
+        });
     }
-
     return this.urlInterpolationService.interpolateUrl(
       AppConstants.EXPLORATION_DATA_URL_TEMPLATE, {
         exploration_id: explorationId
-      }
-    );
+      });
   }
 
   /**
@@ -117,9 +122,10 @@ export class ReadOnlyExplorationBackendApiService {
    * is called instead, if present. The rejection callback function is
    * passed any data returned by the backend in the case of an error.
    */
-  async fetchExplorationAsync(explorationId: string, version: number | null):
-    Promise<FetchExplorationBackendResponse> {
-    return this._fetchExplorationAsync(explorationId, version);
+  async fetchExplorationAsync(
+      explorationId: string, version: number | null, uid: string | null = null):
+     Promise<FetchExplorationBackendResponse> {
+    return this._fetchExplorationAsync(explorationId, version, uid);
   }
 
   /**

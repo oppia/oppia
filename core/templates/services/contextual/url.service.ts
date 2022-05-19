@@ -404,6 +404,15 @@ export class UrlService {
     }
     return null;
   }
+
+  getUidFromUrl(): string | null {
+    let urlParams: UrlParamsType = this.getUrlParams();
+    if (urlParams.hasOwnProperty('uid')) {
+      let uid = urlParams.uid;
+      return String(uid);
+    }
+    return null;
+  }
 }
 
 angular.module('oppia').factory(

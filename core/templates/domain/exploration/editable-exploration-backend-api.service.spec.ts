@@ -306,11 +306,74 @@ describe('Editable exploration backend API service', function() {
         explorationId,
         mostRecentlyReachedCheckpointExpVersion,
         mostRecentlyReachedCheckpointStateName,
+        true
       ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/explorehandler/checkpoint_reached/' + explorationId);
     expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    editableExplorationBackendApiService.
+      recordMostRecentlyReachedCheckpointAsync(
+        explorationId,
+        mostRecentlyReachedCheckpointExpVersion,
+        mostRecentlyReachedCheckpointStateName,
+        false,
+        '123456'
+      ).then(successHandler, failHandler);
+
+    let loggedOutPayload = {
+      unique_progress_url_id: '123456',
+      most_recently_reached_checkpoint_exp_version:
+         mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+         mostRecentlyReachedCheckpointStateName
+    };
+
+    req = httpTestingController.expectOne(
+      '/explorehandler/states_completed_by_logged_out_user/' + explorationId);
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(loggedOutPayload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should record checkpoint progress and return unique progress' +
+    ' id of logged out learner', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let explorationId = '0';
+    let mostRecentlyReachedCheckpointExpVersion = 1;
+    let mostRecentlyReachedCheckpointStateName = 'State A';
+
+    let payload = {
+      most_recently_reached_checkpoint_exp_version:
+        mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+        mostRecentlyReachedCheckpointStateName
+    };
+
+    editableExplorationBackendApiService.
+      recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+        explorationId,
+        mostRecentlyReachedCheckpointExpVersion,
+        mostRecentlyReachedCheckpointStateName
+      ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/states_completed_by_logged_out_user/' + explorationId);
+    expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
     req.flush(

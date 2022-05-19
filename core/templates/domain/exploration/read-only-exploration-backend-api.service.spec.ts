@@ -134,6 +134,24 @@ describe('Read only exploration backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch an existing exploration from a unique' +
+    ' url progress id', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    roebas.fetchExplorationAsync('0', null, '123456').then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/init/0?uid=123456');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should load an existing exploration from the backend',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');

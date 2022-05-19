@@ -73,6 +73,7 @@ import { QuestionPlayerEngineService } from '../services/question-player-engine.
 import { RefresherExplorationConfirmationModalService } from '../services/refresher-exploration-confirmation-modal.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { ConversationSkinComponent } from './conversation-skin.component';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -99,6 +100,8 @@ describe('Conversation skin component', () => {
   let contentTranslationManagerService: ContentTranslationManagerService;
   let contextService: ContextService;
   let currentInteractionService: CurrentInteractionService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
   let explorationEngineService: ExplorationEngineService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let explorationRecommendationsService:
@@ -425,6 +428,7 @@ describe('Conversation skin component', () => {
     most_recently_reached_checkpoint_state_name: null,
     most_recently_reached_checkpoint_exp_version: 2
   };
+  let uniqueProgressIdResponse = '123456';
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -458,6 +462,8 @@ describe('Conversation skin component', () => {
       ContentTranslationManagerService);
     contextService = TestBed.inject(ContextService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
@@ -560,6 +566,11 @@ describe('Conversation skin component', () => {
       .and.returnValue(Promise.resolve(explorationResponse));
     spyOn(explorationEngineService, 'getShortestPathToState')
       .and.returnValue(['Start', 'Mid']);
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue(Promise.resolve(
+        {unique_progress_url_id: uniqueProgressIdResponse}));
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
@@ -668,6 +679,90 @@ describe('Conversation skin component', () => {
         [], [], null, null, [], 'EndExploration', null),
       [], null, null, '', null);
     componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+    componentInstance.hasInteractedAtLeastOnce = true;
+    componentInstance.displayedCard = displayedCard;
+
+    componentInstance.ngOnInit();
+  }));
+
+  it('should initialize component as logged out user', fakeAsync(() => {
+    let collectionId = 'id';
+    let expId = 'exp_id';
+    let isInPreviewMode = false;
+    let isIframed = false;
+    let collectionSummary = {
+      is_admin: true,
+      summaries: [],
+      user_email: '',
+      is_topic_manager: false,
+      username: true
+    };
+    let expResponse = sampleExpResponse;
+    expResponse.is_logged_in = false;
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', false)));
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+      .and.returnValues(collectionId, null);
+
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.returnValue(Promise.resolve(new Collection(
+        '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(explorationEngineService, 'isInPreviewMode')
+      .and.returnValue(isInPreviewMode);
+    spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('oppia_avatar_url');
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValues(true, false);
+    spyOn(componentInstance, 'initializePage');
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(
+        Promise.resolve(collectionSummary));
+    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(
+      guestCollectionProgressService, 'recordExplorationCompletedInCollection');
+    spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+      .and.returnValue(true);
+    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(expResponse));
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue(Promise.resolve(
+        {unique_progress_url_id: uniqueProgressIdResponse}));
+
+    let mockOnHintConsumed = new EventEmitter();
+    let mockOnSolutionViewedEventEmitter = new EventEmitter();
+    let mockOnPlayerStateChange = new EventEmitter();
+
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
+      .and.returnValue(mockOnHintConsumed);
+    spyOnProperty(
+      hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
+      .and.returnValue(mockOnSolutionViewedEventEmitter);
+    spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+      .and.returnValue(mockOnPlayerStateChange);
+
+    componentInstance.nextCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = false;
     componentInstance.isIframed = false;
     componentInstance.hasInteractedAtLeastOnce = true;
     componentInstance.displayedCard = displayedCard;
