@@ -40,7 +40,8 @@ describe('Topic creation backend api service', () => {
     description: 'Description',
     thumbnailBgColor: thumbnailBgColor,
     filename: 'image.svg',
-    url_fragment: 'url-fragment'
+    url_fragment: 'url-fragment',
+    page_title_fragment: 'page_title_fragment'
   };
 
   beforeEach(() => {
@@ -57,6 +58,7 @@ describe('Topic creation backend api service', () => {
     topic.name = 'topic-name';
     topic.description = 'Description';
     topic.urlFragment = 'url-fragment';
+    topic.pageTitleFragment = 'page_title_fragment';
     let imageBlob = new Blob(
       ['data:image/png;base64,xyz']);
     imagesData = [{
