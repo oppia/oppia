@@ -146,6 +146,18 @@ describe('Story node editor directive', function() {
               new ConceptCard(
                 new SubtitledHtml(
                   '', '1'), [], RecordedVoiceovers.createEmpty()),
+              'en', 1, 1, '0', true, []),
+            new Skill(
+              '2', 'test2', [], [],
+              new ConceptCard(
+                new SubtitledHtml(
+                  '', '1'), [], RecordedVoiceovers.createEmpty()),
+              'en', 1, 1, '0', true, []),
+            new Skill(
+              '3', 'test3', [], [],
+              new ConceptCard(
+                new SubtitledHtml(
+                  '', '1'), [], RecordedVoiceovers.createEmpty()),
               'en', 1, 1, '0', true, [])
           ]);
           return deferred.promise;
@@ -192,11 +204,14 @@ describe('Story node editor directive', function() {
   });
 
   it('should fetch the descriptions for prerequisite skills', function() {
-    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValues(['1']);
+    spyOn($scope, 'getPrerequisiteSkillIds').and.returnValues(['1', '2', '3']);
 
     $scope.getPrerequisiteSkillsDescription();
     $rootScope.$apply();
-    expect($scope.skillIdToSummaryMap).toEqual({1: 'test'});
+
+    expect($scope.skillIdToSummaryMap).toEqual(
+      {1: 'test', 2: 'test2', 3: 'test3'}
+    );
   });
 
   it('should call Alerts Service if getting skill desc. fails', function() {
