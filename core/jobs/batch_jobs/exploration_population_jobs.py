@@ -231,7 +231,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         unmigrated_explorations = (
             migrated_exploration_results
             | 'Filter not oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
+                lambda result_item: result_item.is_err())
             | 'Unwrap not oks' >> beam.Map(
                 lambda result_item: result_item.unwrap())
         )
