@@ -962,7 +962,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
                 'progress_id'))
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(transient_checkpoint_url_model)
+        assert transient_checkpoint_url_model is not None
         self.assertEqual(
             transient_checkpoint_url_model.exploration_id,
             'exp_id')
