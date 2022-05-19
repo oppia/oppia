@@ -274,18 +274,22 @@ describe('Create New Chapter Modal Controller', function() {
   it('should prevent exploration from being added if its category ' +
   'is not default', function() {
     $scope.title = 'dummy_title';
+
     var deferred = $q.defer();
     deferred.resolve(true);
     var deferred2 = $q.defer();
     deferred2.resolve(false);
+
     spyOn(explorationIdValidationService, 'isExpPublishedAsync')
       .and.returnValue(deferred.promise);
     spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
       .and.returnValue(deferred.promise);
     spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
       .and.returnValue(deferred2.promise);
+
     $scope.save();
     $rootScope.$apply();
+
     expect($scope.categoryIsDefault).toBe(false);
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
