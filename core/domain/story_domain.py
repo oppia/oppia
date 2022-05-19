@@ -529,7 +529,7 @@ class StoryContentsDict(TypedDict):
     """Dictionary representing the StoryContents object."""
 
     nodes: List[StoryNodeDict]
-    initial_node_id: str
+    initial_node_id: Optional[str]
     next_node_id: str
 
 
@@ -539,7 +539,7 @@ class StoryContents:
     def __init__(
         self,
         story_nodes: List[StoryNode],
-        initial_node_id: str,
+        initial_node_id: Optional[str],
         next_node_id: str
     ) -> None:
         """Constructs a StoryContents domain object.
@@ -547,7 +547,8 @@ class StoryContents:
         Args:
             story_nodes: list(StoryNode). The list of story nodes that are part
                 of this story.
-            initial_node_id: str. The id of the starting node of the story.
+            initial_node_id: Optional[str]. The id of the starting node of the
+                story and None if there is only one node(or the starting node).
             next_node_id: str. The id for the next node to be added to the
                 story.
         """
@@ -567,6 +568,8 @@ class StoryContents:
                 'Expected nodes field to be a list, received %s' % self.nodes)
 
         if len(self.nodes) > 0:
+            # Ruling out the possibility of None for mypy type checking.
+            assert self.initial_node_id is not None
             StoryNode.require_valid_node_id(self.initial_node_id)
         StoryNode.require_valid_node_id(self.next_node_id)
 
@@ -635,6 +638,8 @@ class StoryContents:
         Returns:
             list(StoryNode). The ordered list of nodes.
         """
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.initial_node_id is not None
         initial_index = self.get_node_index(self.initial_node_id)
         # Ruling out the possibility of None for mypy type checking.
         assert initial_index is not None
@@ -662,14 +667,12 @@ class StoryContents:
                 exp_ids.append(node.exploration_id)
         return exp_ids
 
-    def get_node_with_corresponding_exp_id(
-        self, exp_id: str
-    ) -> Optional[StoryNode]:
+    def get_node_with_corresponding_exp_id(self, exp_id: str) -> StoryNode:
         """Returns the node object which corresponds to a given exploration ids.
 
         Returns:
-            StoryNode or None. The StoryNode object of the corresponding
-            exploration id if exist else None.
+            StoryNode. The StoryNode object of the corresponding exploration id
+            if exist.
 
         Raises:
             Exception. Unable to find the exploration in any node.
@@ -1173,10 +1176,7 @@ class Story:
         """
         # Initial node id for a new story.
         initial_node_id = '%s1' % NODE_ID_PREFIX
-        # The argument `initial_node_id` of StoryContents can only accept str
-        # values but here we are providing None value that causes MyPy to throw
-        # argument type error. Thus to silent error, we added an ignore here.
-        story_contents = StoryContents([], None, initial_node_id)  # type: ignore[arg-type]
+        story_contents = StoryContents([], None, initial_node_id)
         return cls(
             story_id, title, None, None, None, description,
             feconf.DEFAULT_STORY_NOTES, story_contents,
@@ -1443,11 +1443,7 @@ class Story:
                 'The node with id %s is not part of this story' % node_id)
         if node_id == self.story_contents.initial_node_id:
             if len(self.story_contents.nodes) == 1:
-                # The attribute `initial_node_id` of StoryContents can only
-                # accept str values but here we are providing None value that
-                # causes MyPy to throw assignment error. Thus to silent error,
-                # we added an ignore here.
-                self.story_contents.initial_node_id = None  # type: ignore[assignment]
+                self.story_contents.initial_node_id = None
             else:
                 raise ValueError(
                     'The node with id %s is the starting node for the story, '

@@ -131,7 +131,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/stats_domain_test.py',
     'core/domain/stats_services.py',
     'core/domain/stats_services_test.py',
-    'core/domain/story_domain_test.py',
     'core/domain/story_fetchers.py',
     'core/domain/story_fetchers_test.py',
     'core/domain/story_services.py',
