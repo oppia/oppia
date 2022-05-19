@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import copy
 import datetime
+import types
 
 from core import feconf
 from core.constants import constants
@@ -896,3 +897,148 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExpSummaryModel
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
+
+
+class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
+    """Tests for the TransientCheckpointUrl model."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            exp_models.TransientCheckpointUrlModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            exp_models.TransientCheckpointUrlModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'creation_timestamp':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'unique_progress_url_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        fetched_dict = (
+            exp_models.TransientCheckpointUrlModel.get_export_policy())
+        self.assertEqual(
+            expected_dict['creation_timestamp'],
+            fetched_dict['creation_timestamp'])
+        self.assertEqual(
+            expected_dict['exploration_id'],
+            fetched_dict['exploration_id'])
+        self.assertEqual(
+            expected_dict['furthest_reached_checkpoint_exp_version'],
+            fetched_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertEqual(
+            expected_dict['furthest_reached_checkpoint_state_name'],
+            fetched_dict['furthest_reached_checkpoint_state_name'])
+        self.assertEqual(
+            expected_dict['most_recently_reached_checkpoint_exp_version'],
+            fetched_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertEqual(
+            expected_dict['most_recently_reached_checkpoint_state_name'],
+            fetched_dict['most_recently_reached_checkpoint_state_name'])
+        self.assertEqual(
+            expected_dict['unique_progress_url_id'],
+            fetched_dict['unique_progress_url_id'])
+
+    def test_create_new_object(self) -> None:
+        exp_models.TransientCheckpointUrlModel.create(
+            'exp_id', 'progress_id')
+        transient_checkpoint_url_model = (
+            exp_models.TransientCheckpointUrlModel.get(
+                'progress_id'))
+
+        # Ruling out the possibility of None for mypy type checking.
+        self.assertIsNotNone(transient_checkpoint_url_model)
+        self.assertEqual(
+            transient_checkpoint_url_model.exploration_id,
+            'exp_id')
+        self.assertEqual(
+            transient_checkpoint_url_model.unique_progress_url_id,
+            'progress_id')
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            most_recently_reached_checkpoint_exp_version)
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            most_recently_reached_checkpoint_state_name)
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            furthest_reached_checkpoint_exp_version)
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            furthest_reached_checkpoint_state_name)
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            creation_timestamp)
+
+    def test_get_object(self) -> None:
+        exp_models.TransientCheckpointUrlModel.create(
+            'exp_id', 'progress_id')
+        expected_model = exp_models.TransientCheckpointUrlModel(
+            exploration_id='exp_id',
+            unique_progress_url_id='progress_id',
+            most_recently_reached_checkpoint_exp_version=None,
+            most_recently_reached_checkpoint_state_name=None,
+            furthest_reached_checkpoint_exp_version=None,
+            furthest_reached_checkpoint_state_name=None,
+            creation_timestamp=None)
+
+        actual_model = (
+            exp_models.TransientCheckpointUrlModel.get(
+                'progress_id'))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert expected_model is not None
+        assert actual_model is not None
+        self.assertEqual(
+            actual_model.exploration_id,
+            expected_model.exploration_id)
+        self.assertEqual(
+            actual_model.unique_progress_url_id,
+            expected_model.unique_progress_url_id)
+        self.assertEqual(
+            actual_model.most_recently_reached_checkpoint_exp_version,
+            expected_model.most_recently_reached_checkpoint_exp_version)
+        self.assertEqual(
+            actual_model.most_recently_reached_checkpoint_state_name,
+            expected_model.most_recently_reached_checkpoint_state_name)
+        self.assertEqual(
+            actual_model.furthest_reached_checkpoint_exp_version,
+            expected_model.furthest_reached_checkpoint_exp_version)
+        self.assertEqual(
+            actual_model.furthest_reached_checkpoint_state_name,
+            expected_model.furthest_reached_checkpoint_state_name)
+        self.assertEqual(
+            actual_model.creation_timestamp,
+            expected_model.creation_timestamp)
+
+    def test_raise_exception_by_mocking_collision(self) -> None:
+        """Tests get_new_progress_id method for raising exception."""
+        transient_checkpoint_progress_model_cls = (
+            exp_models.TransientCheckpointUrlModel)
+
+        # Test get_new_progress_id method.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'New id generator is producing too many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                transient_checkpoint_progress_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    transient_checkpoint_progress_model_cls)):
+                transient_checkpoint_progress_model_cls.get_new_progress_id()

@@ -965,11 +965,14 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
             TransientCheckpointUrlModel. The newly created
             TransientCheckpointUrlModel instance.
         """
-        return cls(
-            # VERIFY.
+        entity = cls(
             id=unique_progress_url_id,
             exploration_id=exploration_id,
             unique_progress_url_id=unique_progress_url_id)
+
+        entity.update_timestamps()
+        entity.put()
+        return entity
 
     @classmethod
     def get_new_progress_id(cls) -> str:
