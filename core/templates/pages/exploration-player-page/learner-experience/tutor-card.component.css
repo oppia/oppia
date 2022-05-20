@@ -158,6 +158,15 @@
 .oppia-no-interaction-text {
   color: #f00;
 }
+.conversation-skin-oppia-completed-state-card {
+  margin: 60px 0 40px;
+  padding: 0 20px;
+  position: relative;
+}
+.conversation-skin-oppia-completed-state-card .conversation-skin-oppia-feedback-content {
+  color: #888;
+  font-style: italic;
+}
 
 /* When the size of the browser is reduced, and the answer submitted is
     correct, the continue button (in the tutor card) hides under the
