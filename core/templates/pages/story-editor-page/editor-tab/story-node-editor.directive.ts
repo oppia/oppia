@@ -40,6 +40,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/ngb-modal.service.ts');
 require('services/page-title.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('domain/skill/skill-backend-api.service.ts');
 import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
@@ -68,7 +69,7 @@ angular.module('oppia').directive('storyNodeEditor', [
         '$rootScope', '$scope', '$timeout',
         'AlertsService',
         'ExplorationIdValidationService', 'FocusManagerService', 'NgbModal',
-        'PageTitleService',
+        'PageTitleService', 'SkillBackendApiService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
@@ -76,7 +77,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $rootScope, $scope, $timeout,
             AlertsService,
             ExplorationIdValidationService, FocusManagerService, NgbModal,
-            PageTitleService,
+            PageTitleService, SkillBackendApiService,
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
@@ -136,6 +137,8 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
                 skillSummaries[idx].description;
             }
+            $scope.getPrerequisiteSkillsDescription();
+
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             PageTitleService.setNavbarSubtitleForMobileView(
@@ -163,6 +166,23 @@ angular.module('oppia').directive('storyNodeEditor', [
 
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
+          };
+
+          $scope.getPrerequisiteSkillsDescription = function() {
+            const skills = $scope.getPrerequisiteSkillIds();
+            if (skills && skills.length > 0) {
+              SkillBackendApiService.fetchMultiSkillsAsync(skills).then(
+                function(response) {
+                  for (let idx in response) {
+                    $scope.skillIdToSummaryMap[response[idx].getId()] =
+                      response[idx].getDescription();
+                  }
+                  $rootScope.$applyAsync();
+                }, function(error) {
+                  AlertsService.addWarning();
+                }
+              );
+            }
           };
 
           $scope.checkCanSaveExpId = function() {
