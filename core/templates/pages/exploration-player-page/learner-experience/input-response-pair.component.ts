@@ -32,8 +32,9 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { NumberConversionService } from 'services/number-conversion.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { isNumber, isString} from 'lodash';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
+
 
 @Component({
   selector: 'oppia-input-response-pair',
