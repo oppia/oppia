@@ -285,7 +285,7 @@ describe('Settings Tab Component', () => {
       routerService.onRefreshSettingsTab.emit();
       $scope.$apply();
 
-      tick(1000);
+      tick(500);
       $scope.$apply();
 
       expect(ctrl.stateNames).toEqual(['Introduction']);
@@ -925,7 +925,7 @@ describe('Settings Tab Component', () => {
 
       ctrl.refreshSettingsTab();
 
-      tick(1000);
+      tick(500);
       $scope.$apply();
 
       expect(ctrl.areParametersUsed()).toBe(false);
@@ -1011,7 +1011,7 @@ describe('Settings Tab Component', () => {
         spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
         routerService.onRefreshSettingsTab.emit();
 
-        tick(1000);
+        tick(500);
         $scope.$apply();
 
         expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
