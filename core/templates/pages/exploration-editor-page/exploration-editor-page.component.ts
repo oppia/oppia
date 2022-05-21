@@ -294,13 +294,15 @@ angular.module('oppia').component('explorationEditorPage', {
               .OPENED_EXPLORATION_EDITOR_BROWSER_TABS,
             ContextService.getExplorationId()));
 
-        explorationEditorBrowserTabsInfo.setLatestVersion(version);
-        explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        if (explorationEditorBrowserTabsInfo) {
+          explorationEditorBrowserTabsInfo.setLatestVersion(version);
+          explorationEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
 
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          explorationEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
+          LocalStorageService.updateEntityEditorBrowserTabsInfo(
+            explorationEditorBrowserTabsInfo,
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_EXPLORATION_EDITOR_BROWSER_TABS);
+        }
       };
 
       let onCreateOrUpdateExplorationEditorBrowserTabsInfo = function(
