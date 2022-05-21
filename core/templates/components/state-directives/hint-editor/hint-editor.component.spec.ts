@@ -54,7 +54,7 @@ describe('HintEditorComponent', () => {
 
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        'html text', 'contentID'),
+        'html text', 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -92,7 +92,7 @@ describe('HintEditorComponent', () => {
     component.hintEditorIsOpen = true;
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        'change', 'data'),
+        'change', 'data', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -102,7 +102,7 @@ describe('HintEditorComponent', () => {
     };
     component.hintMemento = {
       hintContent: SubtitledHtml.createDefault(
-        'html text', 'contentID'),
+        'html text', 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -122,7 +122,7 @@ describe('HintEditorComponent', () => {
     component.isEditable = true;
     component.hintMemento = {
       hintContent: SubtitledHtml.createDefault(
-        '<p> Hint Original</p>', 'contentID'),
+        '<p> Hint Original</p>', 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -132,7 +132,7 @@ describe('HintEditorComponent', () => {
     };
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        '<p> Hint After Edit </p>', 'contentID'),
+        '<p> Hint After Edit </p>', 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -154,7 +154,7 @@ describe('HintEditorComponent', () => {
     component.hintEditorIsOpen = true;
     const earlierHint = component.hintMemento = {
       hintContent: SubtitledHtml.createDefault(
-        '<p> Hint Original</p>', 'contentID'),
+        '<p> Hint Original</p>', 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -164,7 +164,7 @@ describe('HintEditorComponent', () => {
     };
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        '<p> Hint After Edit </p>', 'contentID'),
+        '<p> Hint After Edit </p>', 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -183,7 +183,7 @@ describe('HintEditorComponent', () => {
   it('should check if hint HTML length exceeds 10000 characters', () => {
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        'a'.repeat(10000), 'contentID'),
+        'a'.repeat(10000), 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -195,7 +195,7 @@ describe('HintEditorComponent', () => {
 
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        'a'.repeat(10001), 'contentID'),
+        'a'.repeat(10001), 'contentID', []),
 
       toBackendDict(): HintBackendDict {
         return {
