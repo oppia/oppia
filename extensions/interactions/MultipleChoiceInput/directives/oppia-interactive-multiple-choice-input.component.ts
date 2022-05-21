@@ -22,10 +22,15 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.service';
 
 @Component({
@@ -33,19 +38,25 @@ import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.s
   templateUrl: './multiple-choice-input-interaction.component.html'
 })
 export class InteractiveMultipleChoiceInputComponent implements OnInit {
+  COMPONENT_NAME_RULE_INPUT!: string;
   @Input() choicesWithValue: string;
   @Input() showChoicesInShuffledOrderWithValue: string;
   choices;
   answer;
   questionIsAnsweredOnce = false;
   orderOfChoices: number[] = [];
+  displayedCard!: StateCard;
+  recordedVoiceovers!: RecordedVoiceovers;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
-    private multipleChoiceInputRulesService: MultipleChoiceInputRulesService
+    private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
+    private audioTranslationManagerService: AudioTranslationManagerService,
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService
   ) { }
 
   private getAttrs() {
@@ -115,6 +126,26 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     // next time the question is answered.
     for (let i = 0; i < this.choices.length; i++) {
       this.orderOfChoices.push(this.choices[i].originalIndex);
+    }
+
+    // Setup voiceover.
+    this.displayedCard = this.playerTranscriptService.getCard(
+      this.playerPositionService.getDisplayedCardIndex());
+    if (this.displayedCard) {
+      this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
+
+      // Combine labels for voiceover.
+      let combinedChoiceLabels = '';
+      for (const choice of choices.value) {
+        combinedChoiceLabels += this.audioTranslationManagerService
+          .cleanUpHTMLforVoiceover(choice.html);
+      }
+      // Say the choices aloud if autoplay is enabled.
+      this.audioTranslationManagerService.setSequentialAudioTranslations(
+        this.recordedVoiceovers.getBindableVoiceovers(
+          choices.value[0]._contentId),
+        combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
+      );
     }
 
     this.answer = null;
