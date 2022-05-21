@@ -225,7 +225,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_dict],
             subtopic_schema_version=0,
-            story_reference_schema_version=0
+            story_reference_schema_version=0,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -249,7 +250,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_dict],
             subtopic_schema_version=1,
-            story_reference_schema_version=0
+            story_reference_schema_version=0,
+            page_title_fragment_for_web='fragm'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -283,7 +285,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             language_code='en',
             subtopics=[subtopic_v1_dict],
             subtopic_schema_version=1,
-            story_reference_schema_version=1
+            story_reference_schema_version=1,
+            page_title_fragment_for_web='fragment'
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(

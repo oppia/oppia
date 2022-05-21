@@ -38,7 +38,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
@@ -55,7 +55,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_topic(self) -> None:
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         expected_topic_dict: topic_domain.TopicDict = {
             'id': self.topic_id,
             'name': 'Name',
@@ -77,7 +77,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'version': 0,
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
-            'page_title_fragment_for_web': ''
+            'page_title_fragment_for_web': 'fragm'
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
