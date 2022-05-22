@@ -32,7 +32,8 @@ from core import utils
 from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -488,6 +489,30 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get().
+    @overload # type: ignore[override]
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int
+    ) -> GeneralFeedbackMessageModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int, strict: Literal[True]
+    ) -> GeneralFeedbackMessageModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int, strict: Literal[False]
+    ) -> Optional[GeneralFeedbackMessageModel]: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int, strict: bool = False
+    ) -> Optional[GeneralFeedbackMessageModel]: ...
+
     @classmethod
     def get( # type: ignore[override]
         cls, thread_id: str, message_id: int, strict: bool = True
@@ -552,8 +577,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
         thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
         message = cls.get(thread_id, thread.message_count - 1)
-        # Ruling out the possibility of None for mypy type checking.
-        assert message is not None
         return message
 
     @classmethod

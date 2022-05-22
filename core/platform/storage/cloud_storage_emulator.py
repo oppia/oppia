@@ -38,10 +38,10 @@ class EmulatorBlob:
     """Object for storing the file data."""
 
     def __init__(
-            self,
-            name: str,
-            data: Union[bytes, str],
-            content_type: Optional[str]
+        self,
+        name: str,
+        data: Union[bytes, str],
+        content_type: Optional[str]
     ) -> None:
         """Initialize blob.
 
@@ -81,7 +81,7 @@ class EmulatorBlob:
 
     @classmethod
     def create_copy(
-            cls, original_blob: EmulatorBlob, new_name: str
+        cls, original_blob: EmulatorBlob, new_name: str
     ) -> EmulatorBlob:
         """Create new instance of EmulatorBlob with the same values.
 

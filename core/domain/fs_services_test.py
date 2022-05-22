@@ -32,37 +32,41 @@ from proto_files import text_classifier_pb2
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the GCS file system."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(GcsFileSystemUnitTests, self).setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
         self.fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, 'eid')
 
-    def test_get_and_save(self):
+    def test_get_and_save(self) -> None:
         self.fs.commit('abc.png', 'file_contents')
         self.assertEqual(self.fs.get('abc.png'), b'file_contents')
 
-    def test_validate_entity_parameters(self):
-        with self.assertRaisesRegex(
+    def test_validate_entity_parameters(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid entity_id received: 1'
         ):
-            fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)
+            # The argument `entity_id` of GcsFileSystem() can only accept
+            # string values, but here for testing purpose we are providing
+            # integer value. Thus to silent incompatible argument type MyPy
+            # error, we added an ignore statement here.
+            fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)  # type: ignore[arg-type]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Entity id cannot be empty'
         ):
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '')
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid entity_name received: '
             'invalid_name.'
         ):
             fs_services.GcsFileSystem('invalid_name', 'exp_id')
 
-    def test_delete(self):
+    def test_delete(self) -> None:
         self.assertFalse(self.fs.isfile('abc.png'))
         self.fs.commit('abc.png', 'file_contents')
         self.assertTrue(self.fs.isfile('abc.png'))
@@ -70,18 +74,18 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             IOError, 'File abc.png not found'
         ):
             self.fs.get('abc.png')
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             IOError, 'File does not exist: fake_file.png'
         ):
             self.fs.delete('fake_file.png')
 
-    def test_listdir(self):
-        self.assertItemsEqual(self.fs.listdir(''), [])
+    def test_listdir(self) -> None:
+        self.assertItemsEqual(self.fs.listdir(''), [])  # type: ignore[no-untyped-call]
 
         self.fs.commit('abc.png', 'file_contents')
         self.fs.commit('abcd.png', 'file_contents_2')
@@ -90,14 +94,14 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
         file_names = ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png']
 
-        self.assertItemsEqual(self.fs.listdir(''), file_names)
+        self.assertItemsEqual(self.fs.listdir(''), file_names)  # type: ignore[no-untyped-call]
 
         self.assertEqual(self.fs.listdir('abc'), ['abc/abcd.png'])
 
-        with self.assertRaisesRegex(IOError, 'Invalid filepath'):
+        with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
             self.fs.listdir('/abc')
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             IOError,
             (
                 'The dir_name should not start with /'
@@ -112,7 +116,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, 'eid2')
         self.assertEqual(new_fs.listdir('assets'), [])
 
-    def test_copy(self):
+    def test_copy(self) -> None:
         self.fs.commit('abc2.png', 'file_contents')
         self.assertEqual(self.fs.listdir(''), ['abc2.png'])
         destination_fs = fs_services.GcsFileSystem(
@@ -125,28 +129,28 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 class DirectoryTraversalTests(test_utils.GenericTestBase):
     """Tests to check for the possibility of directory traversal."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(DirectoryTraversalTests, self).setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
 
-    def test_invalid_filepaths_are_caught(self):
+    def test_invalid_filepaths_are_caught(self) -> None:
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 'eid')
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']
 
         for filepath in invalid_filepaths:
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
                 fs.isfile(filepath)
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
                 fs.get(filepath)
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
                 fs.commit(filepath, 'raw_file')
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
                 fs.delete(filepath)
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
                 fs.listdir(filepath)
 
 
@@ -159,15 +163,15 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     MICRO_IMAGE_FILENAME = 'image_micro.png'
     USER = 'ADMIN'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(SaveOriginalAndCompressedVersionsOfImageTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.admin = user_services.get_user_actions_info(self.user_id_admin)
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+        self.admin = user_services.get_user_actions_info(self.user_id_admin)  # type: ignore[no-untyped-call]
 
-    def test_save_original_and_compressed_versions_of_image(self):
+    def test_save_original_and_compressed_versions_of_image(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
@@ -184,7 +188,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
-    def test_compress_image_on_prod_mode_with_small_image_size(self):
+    def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
@@ -228,7 +232,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
                     micro_image_content),
                 (22, 22))
 
-    def test_save_original_and_compressed_versions_of_svg_image(self):
+    def test_save_original_and_compressed_versions_of_svg_image(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
@@ -263,7 +267,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertEqual(compressed_image_content, image_content)
             self.assertEqual(micro_image_content, image_content)
 
-    def test_copy_images(self):
+    def test_copy_images(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
@@ -292,7 +296,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 class FileSystemClassifierDataTests(test_utils.GenericTestBase):
     """Unit tests for storing, reading and deleting classifier data."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FileSystemClassifierDataTests, self).setUp()
         self.fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
@@ -306,7 +310,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
             }
         })
 
-    def test_save_and_get_classifier_data(self):
+    def test_save_and_get_classifier_data(self) -> None:
         """Test that classifier data is stored and retrieved correctly."""
         fs_services.save_classifier_data(
             'exp_id', 'job_id', self.classifier_data_proto)
@@ -320,7 +324,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
             classifier_data_proto.model_json,
             self.classifier_data_proto.model_json)
 
-    def test_remove_classifier_data(self):
+    def test_remove_classifier_data(self) -> None:
         """Test that classifier data is removed upon deletion."""
         fs_services.save_classifier_data(
             'exp_id', 'job_id', self.classifier_data_proto)

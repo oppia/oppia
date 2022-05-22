@@ -1605,8 +1605,6 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.CommunityContributionStatsModel.get()
         )
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert community_contribution_stats_model is not None
         self.assertEqual(
             community_contribution_stats_model.id,
             suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
@@ -1643,9 +1641,6 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
         community_contribution_stats_model = (
             suggestion_models.CommunityContributionStatsModel.get()
         )
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert community_contribution_stats_model is not None
         self.assertEqual(
             community_contribution_stats_model.id,
             suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID

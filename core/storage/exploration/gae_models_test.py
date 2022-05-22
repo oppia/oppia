@@ -269,8 +269,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
-        # Ruling out the possibility of None for mypy type checking.
-        assert saved_model is not None
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
         self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
@@ -356,8 +354,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
-        # Ruling out the possibility of None for mypy type checking.
-        assert saved_model is not None
 
         snapshot_dict = saved_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['owner_id']

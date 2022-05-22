@@ -89,8 +89,6 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model(self) -> None:
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
-        # Ruling out the possibility of None for mypy type checking.
-        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_ADD)
@@ -155,8 +153,6 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model(self) -> None:
         audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
-        # Ruling out the possibility of None for mypy type checking.
-        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)

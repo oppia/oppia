@@ -26,7 +26,8 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -244,8 +245,6 @@ class UserSettingsModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSettingsModel.
         """
         user = UserSettingsModel.get(user_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert user is not None
         return {
             'email': user.email,
             'roles': user.roles,
@@ -1995,6 +1994,30 @@ class StoryProgressModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, story_id)
         return cls(
             id=instance_id, user_id=user_id, story_id=story_id)
+
+    @overload  # type: ignore[override]
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str
+    ) -> StoryProgressModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: Literal[True]
+    ) -> StoryProgressModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: Literal[False]
+    ) -> Optional[StoryProgressModel]: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: bool = False
+    ) -> Optional[StoryProgressModel]: ...
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get().

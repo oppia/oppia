@@ -432,8 +432,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
             if utils.is_user_id_valid(report_model.scrubbed_by):
                 scrubbed_by_user_model = user_models.UserSettingsModel.get(
                     report_model.scrubbed_by)
-                # Ruling out the possibility of None for mypy type checking.
-                assert scrubbed_by_user_model is not None
                 scrubbed_by_username = scrubbed_by_user_model.username
             else:
                 scrubbed_by_username = None

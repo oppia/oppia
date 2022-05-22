@@ -1194,11 +1194,11 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
         subtopic_dict['thumbnail_size_in_bytes'] = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
         return subtopic_dict
 

@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import collections
 import copy
+import datetime
 import json
 import re
 import string
@@ -37,6 +38,8 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
+
+from typing import Dict, List
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -2507,13 +2510,29 @@ class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
     def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids, voice_artist_ids,
-            viewer_ids, contributor_ids, contributors_summary, version,
-            exploration_model_created_on,
-            exploration_model_last_updated,
-            first_published_msec, deleted=False):
+        self,
+        exploration_id: str,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        ratings: Dict[str, int],
+        scaled_average_rating: float,
+        status: str,
+        community_owned: bool,
+        owner_ids: List[str],
+        editor_ids: List[str],
+        voice_artist_ids: List[str],
+        viewer_ids: List[str],
+        contributor_ids: List[str],
+        contributors_summary: Dict[str, int],
+        version: int,
+        exploration_model_created_on: datetime.datetime,
+        exploration_model_last_updated: datetime.datetime,
+        first_published_msec: int,
+        deleted: bool = False
+    ) -> None:
         """Initializes a ExplorationSummary domain object.
 
         Args:

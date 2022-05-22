@@ -792,13 +792,11 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         version_model = TestVersionedModel.get_version('model_id1', 2)
-        # Ruling out the possibility of None for mypy type checking.
-        assert version_model is not None
         self.assertEqual(version_model.version, 2)
 
-        version_model = (
+        test_version_model = (
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
-        self.assertIsNone(version_model)
+        self.assertIsNone(test_version_model)
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             base_models.BaseModel.EntityNotFoundError,
@@ -806,9 +804,9 @@ class VersionedModelTests(test_utils.GenericTestBase):
             'not found'):
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
 
-        version_model = (
+        test_version_model = (
             TestVersionedModel.get_version('model_id1', 4, strict=False))
-        self.assertIsNone(version_model)
+        self.assertIsNone(test_version_model)
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             base_models.BaseModel.EntityNotFoundError,
