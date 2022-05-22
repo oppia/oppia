@@ -267,22 +267,3 @@ def validate_suggestion_images(files):
     # The files argument do not represent any domain class, hence dict form
     # of the data is returned from here.
     return files
-
-
-def validate_params_dict(params):
-    """validates params data type
-
-    Args:
-        params: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the params argument in dict form.
-
-    Raises:
-        Exception. The given params is not of type dict as expected.
-    """
-    if not isinstance(params, dict):
-        raise Exception('Excepted dict, received %s' % params)
-    # The params argument do not represent any domain class, hence dict form of
-    # the data is returned from here.
-    return params

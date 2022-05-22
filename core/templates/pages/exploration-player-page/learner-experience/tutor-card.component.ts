@@ -78,6 +78,7 @@ import { animate, keyframes, state, style, transition, trigger } from '@angular/
 })
 export class TutorCardComponent {
   @Input() displayedCard: StateCard;
+  @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
   directiveSubscriptions = new Subscription();
