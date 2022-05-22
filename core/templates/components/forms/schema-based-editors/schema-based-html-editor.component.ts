@@ -73,7 +73,6 @@ implements ControlValueAccessor, OnInit, Validator {
   ngOnInit(): void { }
 
   updateValue(value: string): void {
-    this.localValue = value;
     this.onChange(value);
     setTimeout(() => {
       this.onChange(value);

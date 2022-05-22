@@ -78,6 +78,5 @@ describe('Schema Based Html Editor Component', () => {
     component.updateValue('<p> HTML </p>');
 
     expect(component.onChange).toHaveBeenCalledWith('<p> HTML </p>');
-    expect(component.localValue).toBe('<p> HTML </p>');
   });
 });
