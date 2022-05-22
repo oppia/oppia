@@ -64,7 +64,7 @@ describe('Schema Based Choices Editor Component', () => {
     expect(component.localValue).toEqual(null);
 
     component.writeValue('true');
-    expect(component.localValue).toBeTrue();
+    expect(component.localValue).toBe('true');
   });
 
   it('should update value when local value change', () => {
