@@ -525,9 +525,18 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict']
+                        }
+                    }
                 },
                 'default_value': {}
             },
@@ -752,9 +761,18 @@ class ExplorationStartEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring']
+                        }
+                    }
                 }
             },
             'session_id': {
@@ -953,11 +971,20 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict']
+                        }
+                    }
                 }
-            }
+            },
         }
     }
 
@@ -988,6 +1015,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         if user_id:
             learner_progress_services.mark_exploration_as_completed(
                 user_id, exploration_id)
+
+            # Clear learner's checkpoint progress on completion of the
+            # exploration.
+            user_services.clear_learner_checkpoint_progress(
+                self.user_id, exploration_id)
 
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
@@ -1057,11 +1089,20 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict']
+                        }
+                    }
                 }
-            }
+            },
         }
     }
 
@@ -1494,7 +1535,7 @@ class ExplorationRestartEventHandler(base.BaseHandler):
                 'most_recently_reached_checkpoint_state_name'))
 
         if most_recently_reached_checkpoint_state_name is None:
-            user_services.update_learner_checkpoint_progress_on_restart(
+            user_services.clear_learner_checkpoint_progress(
                 self.user_id, exploration_id)
 
         self.render_json(self.values)
