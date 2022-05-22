@@ -437,15 +437,15 @@ class NewSkillHandler(base.BaseHandler):
         skill_services.save_new_skill(self.user_id, skill)
 
         for filename in image_filenames:
-            image = files.get(filename)
-            image = base64.decodebytes(image.encode('utf-8'))
+            base64_image = files.get(filename)
+            bytes_image = base64.decodebytes(base64_image.encode('utf-8'))
             file_format = (
                 image_validation_services.validate_image_and_filename(
-                    image, filename))
+                    bytes_image, filename))
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_SKILL, skill.id, image,
+                filename, feconf.ENTITY_TYPE_SKILL, skill.id, bytes_image,
                 'image', image_is_compressible)
 
         self.render_json({
