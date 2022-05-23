@@ -137,8 +137,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_ANDROID)
         self.assertEqual(
@@ -162,8 +160,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_WEB)
         self.assertEqual(
@@ -308,8 +304,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
             'randomInteger123')
         model_entity = model_class.get(report_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert model_entity is not None
         model_entity.scrubbed_by = 'scrubber_user'
         model_entity.update_timestamps()
         model_entity.put()
@@ -385,8 +379,6 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get(
                 ticket_id))
-        # Ruling out the possibility of None for mypy type checking.
-        assert ticket_model is not None
 
         self.assertEqual(ticket_model.id, ticket_id)
         self.assertEqual(ticket_model.platform, self.PLATFORM)
