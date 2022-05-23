@@ -123,17 +123,7 @@ export class StateContentEditorComponent implements OnInit {
     this.contentEditorIsOpen = true;
   }
 
-  onSaveContentButtonClicked(): void {
-    this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
-    let savedContent = this.stateContentService.savedMemento;
-    let contentHasChanged = (
-      savedContent.html !==
-      this.stateContentService.displayed.html);
-    if (contentHasChanged) {
-      let contentId = this.stateContentService.displayed.contentId;
-      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
-    }
-
+  updateImageFilenameInHtml(): void {
     var parser = new DOMParser();
     var doc = parser.parseFromString(
       this.stateContentService.displayed.html, 'text/html');
@@ -148,6 +138,19 @@ export class StateContentEditorComponent implements OnInit {
     }
     this.stateContentService.displayed._imageFilenamesInHtml = (
       imageFilenameList);
+  }
+
+  onSaveContentButtonClicked(): void {
+    this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
+    let savedContent = this.stateContentService.savedMemento;
+    let contentHasChanged = (
+      savedContent.html !==
+      this.stateContentService.displayed.html);
+    if (contentHasChanged) {
+      let contentId = this.stateContentService.displayed.contentId;
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
+    }
+    this.updateImageFilenameInHtml();
     this.saveContent();
   }
 

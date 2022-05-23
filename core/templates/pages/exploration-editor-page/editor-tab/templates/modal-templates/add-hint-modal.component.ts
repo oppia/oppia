@@ -85,10 +85,7 @@ export class AddHintModalComponent
     }
   }
 
-  saveHint(): void {
-    let contentId = this.generateContentIdService.getNextStateId(
-      this.COMPONENT_NAME_HINT);
-    // Close the modal and save it afterwards.
+  updateImageFilenamesInHtml(): string[] {
     var parser = new DOMParser();
     var doc = parser.parseFromString(this.tmpHint, 'text/html');
     var imageFilenameList = [];
@@ -102,10 +99,17 @@ export class AddHintModalComponent
               attr)).replace('"', ''));
       }
     }
+    return imageFilenameList;
+  }
+
+  saveHint(): void {
+    let contentId = this.generateContentIdService.getNextStateId(
+      this.COMPONENT_NAME_HINT);
+    // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
       hint: cloneDeep(
         this.hintObjectFactory.createNew(
-          contentId, this.tmpHint, imageFilenameList)),
+          contentId, this.tmpHint, this.updateImageFilenamesInHtml())),
       contentId: contentId
     });
   }

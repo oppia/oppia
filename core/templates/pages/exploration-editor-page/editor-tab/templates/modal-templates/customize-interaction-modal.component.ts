@@ -355,6 +355,21 @@ export class CustomizeInteractionModalComponent
     }
   }
 
+  getImageFilenamesInHtml(html: string): string[] {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+    var imageFilenameList: string[] = [];
+    var elements = doc.getElementsByTagName('oppia-noninteractive-image');
+    for (let i = 0; i < elements.length; i++) {
+      imageFilenameList.push(
+        String(this.htmlEscaperService.escapedStrToUnescapedStr(
+          elements[i].getAttribute('filepath-with-value'))
+        ).replace('"', ''));
+      // Replaces only first ", need to fix for second ".
+    }
+    return imageFilenameList;
+  }
+
   populateImageFilenamesInHtml(): void {
     let traverseSchemaAndAssignImageIds = (
         value: Object | Object[],
@@ -365,19 +380,8 @@ export class CustomizeInteractionModalComponent
         schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
 
       if (schemaIsSubtitledHtml) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(
-          (value as SubtitledHtml)._html, 'text/html');
-        var imageFilenameList: string[] = [];
-        var elements = doc.getElementsByTagName('oppia-noninteractive-image');
-        for (let i = 0; i < elements.length; i++) {
-          imageFilenameList.push(
-            String(this.htmlEscaperService.escapedStrToUnescapedStr(
-              elements[i].getAttribute('filepath-with-value'))
-            ).replace('"', ''));
-          // Replaces only first ", need to fix for second ".
-        }
-        (value as SubtitledHtml)._imageFilenamesInHtml = imageFilenameList;
+        (value as SubtitledHtml)._imageFilenamesInHtml = this.getImageFilenamesInHtml(
+          (value as SubtitledHtml)._html);
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (
           let i = 0;

@@ -158,6 +158,22 @@ angular.module('oppia').component('outcomeEditor', {
         }
       };
 
+      ctrl.updateImageFilenameInHtml = function() {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(
+          ctrl.savedOutcome.feedback.html, 'text/html');
+        var imageFilenameList: string[] = [];
+        var elements = doc.getElementsByTagName('oppia-noninteractive-image');
+        for (let i = 0; i < elements.length; i++) {
+          imageFilenameList.push(
+            String(HtmlEscaperService.escapedStrToUnescapedStr(
+              elements[i].getAttribute('filepath-with-value'))
+            ).replace('"', ''));
+          // Replaces only first ", need to fix for second ".
+        }
+        ctrl.savedOutcome.feedback.imageFilenamesInHtml = imageFilenameList;
+      }
+
       ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
         ctrl.feedbackEditorIsOpen = false;
         var contentHasChanged = (
@@ -179,19 +195,7 @@ angular.module('oppia').component('outcomeEditor', {
         }
         if (fromClickSaveFeedbackButton && contentHasChanged) {
           var contentId = ctrl.savedOutcome.feedback.contentId;
-          var parser = new DOMParser();
-          var doc = parser.parseFromString(
-            ctrl.savedOutcome.feedback.html, 'text/html');
-          var imageFilenameList: string[] = [];
-          var elements = doc.getElementsByTagName('oppia-noninteractive-image');
-          for (let i = 0; i < elements.length; i++) {
-            imageFilenameList.push(
-              String(HtmlEscaperService.escapedStrToUnescapedStr(
-                elements[i].getAttribute('filepath-with-value'))
-              ).replace('"', ''));
-            // Replaces only first ", need to fix for second ".
-          }
-          ctrl.savedOutcome.feedback._imageFilenamesInHtml = imageFilenameList;
+          ctrl.updateImageFilenameInHtml()
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
         }
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);

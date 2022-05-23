@@ -122,8 +122,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
 
     $scope.addAnswerGroupForm = {};
 
-    $scope.saveResponse = function(reopen) {
-      PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);
+    $scope.updateImageFilenamesInHtml = function() {
       var parser = new DOMParser();
       var doc = parser.parseFromString(
         ($scope.tmpOutcome.feedback as SubtitledHtml)._html, 'text/html');
@@ -138,6 +137,11 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       }
       ($scope.tmpOutcome.feedback as SubtitledHtml)._imageFilenamesInHtml = (
         imageFilenameList);
+    }
+
+    $scope.saveResponse = function(reopen) {
+      PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);
+      $scope.updateImageFilenamesInHtml();
       StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();

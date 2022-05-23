@@ -118,6 +118,37 @@ describe('HintEditorComponent', () => {
       .toHaveBeenCalled();
   }));
 
+  it('should check if image_filenames_in_html is populated', fakeAsync(() => {
+    let onExternalSaveEmitter = new EventEmitter();
+    spyOnProperty(externalSaveService, 'onExternalSave')
+      .and.returnValue(onExternalSaveEmitter);
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.callThrough();
+
+    component.ngOnInit();
+
+    component.hintEditorIsOpen = true;
+    component.hint = {
+      hintContent: SubtitledHtml.createDefault(
+        '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
+        '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
+        ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
+        'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>', 'data', []),
+
+      toBackendDict(): HintBackendDict {
+        return {
+          hint_content: this.hintContent
+        };
+      }
+    };
+    expect(component.hint.hintContent._imageFilenamesInHtml).toEqual([]);
+
+    component.updateImageFilenamesInHtml()
+
+    expect(component.hint.hintContent._imageFilenamesInHtml).toEqual(
+      ['img_20200630_114637_c2ek92uvb8_height_326_width_490.png"']);
+  }));
+
   it('should open hint editor when user clicks on \'Edit hint\'', () => {
     component.isEditable = true;
     component.hintMemento = {

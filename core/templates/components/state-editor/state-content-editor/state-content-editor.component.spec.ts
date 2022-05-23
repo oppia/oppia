@@ -213,4 +213,16 @@ describe('StateHintsEditorComponent', () => {
       _getContent('content', 'old'));
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
+
+  it('should check if imageFilenameInHtml is updated', () => {
+    stateContentService.displayed = (
+      _getContent('content', '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
+        '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
+        ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
+        'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>'));
+
+    component.updateImageFilenameInHtml();
+    expect(stateContentService.displayed._imageFilenamesInHtml).toEqual(
+      ['img_20200630_114637_c2ek92uvb8_height_326_width_490.png"']);
+  });
 });

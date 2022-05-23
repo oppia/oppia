@@ -161,6 +161,21 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.isFeedbackLengthExceeded(outcome2)).toBe(true);
   });
 
+  it('should check if imageFilenamesInHtml is updated', () => {
+    var outcome1 = outcomeObjectFactory.createNew(
+      'State Name', '1',
+      '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
+      '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
+      ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
+      'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>', []);
+    $scope.tmpOutcome = outcome1;
+    $scope.updateImageFilenamesInHtml();
+    expect(
+      ($scope.tmpOutcome.feedback as SubtitledHtml)
+        ._imageFilenamesInHtml).toEqual(
+          ['img_20200630_114637_c2ek92uvb8_height_326_width_490.png"']);
+  });
+
   it('should save answer group response when closing the modal', function() {
     $scope.saveResponse(null);
     $scope.getChanges();
