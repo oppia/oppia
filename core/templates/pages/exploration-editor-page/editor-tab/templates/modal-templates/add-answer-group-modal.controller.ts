@@ -137,7 +137,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       }
       ($scope.tmpOutcome.feedback as SubtitledHtml)._imageFilenamesInHtml = (
         imageFilenameList);
-    }
+    };
 
     $scope.saveResponse = function(reopen) {
       PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);

@@ -68,17 +68,17 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 
   updateImageFilenamesInHtml(): void {
     var parser = new DOMParser();
-      var doc = parser.parseFromString(this.hint.hintContent.html, 'text/html');
-      var imageFilenameList: string[] = [];
-      var elements = doc.getElementsByTagName('oppia-noninteractive-image');
-      for (let i = 0; i < elements.length; i++) {
-        imageFilenameList.push(
-          String(this.htmlEscaperService.escapedStrToUnescapedStr(
-            elements[i].getAttribute('filepath-with-value'))
-          ).replace('"', ''));
-        // Replaces only first ", need to fix for second ".
-      }
-      this.hint.hintContent._imageFilenamesInHtml = imageFilenameList;
+    var doc = parser.parseFromString(this.hint.hintContent.html, 'text/html');
+    var imageFilenameList: string[] = [];
+    var elements = doc.getElementsByTagName('oppia-noninteractive-image');
+    for (let i = 0; i < elements.length; i++) {
+      imageFilenameList.push(
+        String(this.htmlEscaperService.escapedStrToUnescapedStr(
+          elements[i].getAttribute('filepath-with-value'))
+        ).replace('"', ''));
+      // Replaces only first ", need to fix for second ".
+    }
+    this.hint.hintContent._imageFilenamesInHtml = imageFilenameList;
   }
 
   openHintEditor(): void {
@@ -102,7 +102,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
     if (contentHasChanged) {
       const hintContentId = this.hint.hintContent.contentId;
 
-      this.updateImageFilenamesInHtml()
+      this.updateImageFilenamesInHtml();
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [hintContentId]);
     }

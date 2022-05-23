@@ -124,7 +124,7 @@ describe('Add Hint Modal Component', () => {
     component.updateLocalHint(hint);
 
     expect(component.tmpHint).toEqual(hint);
-  })
+  });
 
   it('should update imageFilenamesInHtml', () => {
     component.tmpHint = (

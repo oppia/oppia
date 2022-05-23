@@ -215,11 +215,13 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should check if imageFilenameInHtml is updated', () => {
+    const html = '<oppia-noninteractive-image ng-reflect-alt-with-value="' +
+      '&amp;" alt-with-value="&amp;quot;&amp;quot;" caption-with-value="' +
+      '&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;quot;' +
+      'img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;"' +
+      '></oppia-noninteractive-image>';
     stateContentService.displayed = (
-      _getContent('content', '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
-        '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
-        ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
-        'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>'));
+      _getContent('content', html));
 
     component.updateImageFilenameInHtml();
     expect(stateContentService.displayed._imageFilenamesInHtml).toEqual(

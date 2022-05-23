@@ -27,6 +27,7 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { Subscription } from 'rxjs';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
@@ -172,8 +173,8 @@ describe('Add Answer Group Modal Controller', function() {
     $scope.updateImageFilenamesInHtml();
     expect(
       ($scope.tmpOutcome.feedback as SubtitledHtml)
-        ._imageFilenamesInHtml).toEqual(
-          ['img_20200630_114637_c2ek92uvb8_height_326_width_490.png"']);
+        ._imageFilenamesInHtml)
+      .toEqual(['img_20200630_114637_c2ek92uvb8_height_326_width_490.png"']);
   });
 
   it('should save answer group response when closing the modal', function() {

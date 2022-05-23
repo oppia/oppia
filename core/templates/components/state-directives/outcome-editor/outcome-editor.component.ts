@@ -172,7 +172,7 @@ angular.module('oppia').component('outcomeEditor', {
           // Replaces only first ", need to fix for second ".
         }
         ctrl.savedOutcome.feedback.imageFilenamesInHtml = imageFilenameList;
-      }
+      };
 
       ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
         ctrl.feedbackEditorIsOpen = false;
@@ -195,7 +195,7 @@ angular.module('oppia').component('outcomeEditor', {
         }
         if (fromClickSaveFeedbackButton && contentHasChanged) {
           var contentId = ctrl.savedOutcome.feedback.contentId;
-          ctrl.updateImageFilenameInHtml()
+          ctrl.updateImageFilenameInHtml();
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
         }
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);

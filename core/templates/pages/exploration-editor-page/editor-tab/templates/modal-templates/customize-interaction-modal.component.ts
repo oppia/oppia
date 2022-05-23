@@ -380,8 +380,8 @@ export class CustomizeInteractionModalComponent
         schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
 
       if (schemaIsSubtitledHtml) {
-        (value as SubtitledHtml)._imageFilenamesInHtml = this.getImageFilenamesInHtml(
-          (value as SubtitledHtml)._html);
+        (value as SubtitledHtml)._imageFilenamesInHtml = (
+          this.getImageFilenamesInHtml((value as SubtitledHtml)._html));
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (
           let i = 0;

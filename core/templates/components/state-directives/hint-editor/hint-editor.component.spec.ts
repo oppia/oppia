@@ -130,10 +130,11 @@ describe('HintEditorComponent', () => {
     component.hintEditorIsOpen = true;
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
-        '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
-        ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
-        'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>', 'data', []),
+        '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;"' +
+        'alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;' +
+        'Banana&amp;quot;" filepath-with-value="&amp;quot;' +
+        'img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
+        '"></oppia-noninteractive-image>', 'data', []),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -143,7 +144,7 @@ describe('HintEditorComponent', () => {
     };
     expect(component.hint.hintContent._imageFilenamesInHtml).toEqual([]);
 
-    component.updateImageFilenamesInHtml()
+    component.updateImageFilenamesInHtml();
 
     expect(component.hint.hintContent._imageFilenamesInHtml).toEqual(
       ['img_20200630_114637_c2ek92uvb8_height_326_width_490.png"']);
