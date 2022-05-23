@@ -25,8 +25,6 @@ import { Subscription } from 'rxjs';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
-import { TopicViewerBackendApiService } from
-  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
@@ -36,7 +34,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
 import { LoaderService } from 'services/loader.service';
-import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 
 @Component({
   selector: 'practice-tab',
@@ -55,6 +52,7 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
   @Input() subtopicMastery: Record<string, number> = {};
+  @Input() topicId!: string;
   topicNameTranslationKey!: string;
   translatedTopicName!: string;
   selectedSubtopics: Subtopic[] = [];
@@ -69,7 +67,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private questionBackendApiService: QuestionBackendApiService,
-    private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
@@ -105,16 +102,12 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       this.classroomUrlFragment = (
         this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     }
-    this.topicViewerBackendApiService.fetchTopicDataAsync(
-      this.topicUrlFragment, this.classroomUrlFragment).then(
-      (readOnlyTopic: ReadOnlyTopic) => {
-        this.topicNameTranslationKey =
-          this.i18nLanguageCodeService.getTopicTranslationKey(
-            readOnlyTopic.getTopicId(), TranslationKeyType.TITLE
-          );
-        this.obtainTranslatedTopicName();
-        this.subscribeToOnLangChange();
-      });
+    this.topicNameTranslationKey =
+      this.i18nLanguageCodeService.getTopicTranslationKey(
+        this.topicId, TranslationKeyType.TITLE
+      );
+    this.getTranslatedTopicName();
+    this.subscribeToOnLangChange();
   }
 
   ngOnDestroy(): void {
@@ -124,13 +117,13 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   subscribeToOnLangChange(): void {
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
-        this.obtainTranslatedTopicName();
+        this.getTranslatedTopicName();
       })
     );
   }
 
-  obtainTranslatedTopicName(): void {
-    if (this.shouldGetTranslatedTopicName()) {
+  getTranslatedTopicName(): void {
+    if (this.isTopicNameTranslationAvailable()) {
       this.translatedTopicName = this.translateService.instant(
         this.topicNameTranslationKey);
     } else {
@@ -138,7 +131,7 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  shouldGetTranslatedTopicName(): boolean {
+  isTopicNameTranslationAvailable(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.topicNameTranslationKey
