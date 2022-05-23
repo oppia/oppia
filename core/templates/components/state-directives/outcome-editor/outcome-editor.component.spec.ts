@@ -410,13 +410,13 @@ describe('OutcomeEditorComponent', () => {
           'img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
           '"></oppia-noninteractive-image>',
         contentId: 'contentId',
-        imageFilenamesInHtml: []
+        _imageFilenamesInHtml: []
       }
     };
-    expect(ctrl.savedOutcome.feedback.imageFilenamesInHtml).toEqual([]);
+    expect(ctrl.savedOutcome.feedback._imageFilenamesInHtml).toEqual([]);
 
     ctrl.updateImageFilenameInHtml();
-    expect(ctrl.savedOutcome.feedback.imageFilenamesInHtml).toEqual(
+    expect(ctrl.savedOutcome.feedback._imageFilenamesInHtml).toEqual(
       ['img_20200630_114637_c2ek92uvb8_height_326_width_490.png"']);
   });
 });

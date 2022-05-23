@@ -171,7 +171,7 @@ angular.module('oppia').component('outcomeEditor', {
             ).replace('"', ''));
           // Replaces only first ", need to fix for second ".
         }
-        ctrl.savedOutcome.feedback.imageFilenamesInHtml = imageFilenameList;
+        ctrl.savedOutcome.feedback._imageFilenamesInHtml = imageFilenameList;
       };
 
       ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
@@ -195,9 +195,9 @@ angular.module('oppia').component('outcomeEditor', {
         }
         if (fromClickSaveFeedbackButton && contentHasChanged) {
           var contentId = ctrl.savedOutcome.feedback.contentId;
-          ctrl.updateImageFilenameInHtml();
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
         }
+        ctrl.updateImageFilenameInHtml();
         ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
       };
 
