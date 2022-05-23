@@ -2910,3 +2910,155 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             exploration_dict['most_recently_reached_checkpoint_state_name'])
 
         self.logout()
+
+
+class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for save transient checkpoint progress handler."""
+
+    def test_logged_out_user_checkpoint_progress_is_saved_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
+        exp_services.update_exploration(
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
+        )
+
+        # Second checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'unique_progress_url_id': unique_progress_url_id,
+                'most_recently_reached_checkpoint_exp_version': 2,
+                'most_recently_reached_checkpoint_state_name': 'What language'
+            },
+            csrf_token=csrf_token
+        )
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            'What language')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'What language')
+
+
+class TransientCheckpointUrlHandlerTests(test_utils.GenericTestBase):
+    """Tests for transient checkpoint url handler."""
+
+    def test_exploration_page_raises_error_with_invalid_uid(self):
+        unique_progress_url_id = 'invalidID'
+
+        self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=404
+        )
+
+    def test_logged_out_learner_is_redirected_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        response = self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=302
+        )
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+
+        self.assertTrue(
+            response.headers['Location'].endswith(
+                '%s/%s?uid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            exp_user_data.exploration_id,
+            unique_progress_url_id)))

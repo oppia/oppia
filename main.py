@@ -537,10 +537,10 @@ URLS = [
         r'/explorehandler/state_complete_event/<exploration_id>',
         reader.StateCompleteEventHandler),
     get_redirect_route(
-        r'/explorehandler/states_completed_by_logged_out_user/<exploration_id>',
+        r'/explorehandler/checkpoint_reached_by_logged_out_user/<exploration_id>', # pylint: disable=line-too-long
         reader.SaveTransientCheckpointProgressHandler),
     get_redirect_route(
-        r'/progress/<unique_progress_url_id>',
+        '/progress/<unique_progress_url_id>',
         reader.TransientCheckpointUrlHandler),
     get_redirect_route(
         r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',

@@ -1500,9 +1500,6 @@ class SaveTransientCheckpointProgressHandler(base.BaseHandler):
             }
         },
         'PUT': {
-            'exploration_id': {
-                'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-            },
             'unique_progress_url_id': {
                 'schema': {
                     'type': 'basestring',
