@@ -162,6 +162,16 @@ describe('Learner Local Nav Component ', () => {
       FlagExplorationModalComponent, {backdrop: 'static'});
   });
 
+  it('should open the report exploration modal when the user ' +
+  'clicks on the enter button', ()=>{
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+    spyOn(component, 'showFlagExplorationModal');
+
+    component.reportExploration(event);
+
+    expect(component.showFlagExplorationModal).toHaveBeenCalled();
+  });
+
   it('should toggle feedback popover', () => {
     component.feedbackPopOver = MockNgbPopover;
 
