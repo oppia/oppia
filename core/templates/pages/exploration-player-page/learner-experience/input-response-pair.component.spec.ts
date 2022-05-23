@@ -289,9 +289,9 @@ describe('InputResponsePairComponent', () => {
 
   it('should determine if a string is a number', ()=>{
     let number = '-12.4';
-    expect(component.isNumber(number)).toEqual(true);
+    expect(component.isStringifiedNumber(number)).toEqual(true);
     number = 'ab12';
-    expect(component.isNumber(number)).toEqual(false);
+    expect(component.isStringifiedNumber(number)).toEqual(false);
   });
 
   it('should convert answer to a local format if it is a number', ()=>{
