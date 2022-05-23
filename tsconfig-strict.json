@@ -533,6 +533,8 @@
     "core/templates/pages/exploration-player-page/services/current-interaction.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.ts",
     "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts",
+    "core/templates/pages/exploration-player-page/services/extract-image-filenames-from-model.service.ts",
+    "core/templates/pages/exploration-player-page/services/extract-image-filenames-from-model.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/fatigue-detection.service.ts",
     "core/templates/pages/exploration-player-page/services/hints-and-solution-manager.service.ts",
     "core/templates/pages/exploration-player-page/services/hints-and-solution-manager.service.spec.ts",

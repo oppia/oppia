@@ -16,6 +16,8 @@ let jasmineSeed = Math.floor(Math.random() * 1000);
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
 module.exports = function(config) {
+  const process = require('process');
+  process.env.CHROME_BIN = require('puppeteer').executablePath();
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
