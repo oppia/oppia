@@ -42,12 +42,11 @@ describe('Stale tab info modal component', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
-  it('should close modal when user clicks on the reload button from the modal',
-    () => {
-      spyOn(ngbActiveModal, 'close');
+  it('should close the modal when user presses the reload button', () => {
+    spyOn(ngbActiveModal, 'close');
 
-      component.closeModal();
+    component.closeModal();
 
-      expect(ngbActiveModal.close).toHaveBeenCalled();
-    });
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  });
 });
