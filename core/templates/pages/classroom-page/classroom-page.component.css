@@ -93,6 +93,7 @@
   text-align: center;
 }
 .oppia-classroom-banner-img {
+  height: auto;
   max-width: 400px;
   width: 20vw;
 }
