@@ -200,14 +200,15 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchReviewableTranslationOpportunitiesAsync(
       topicName: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
-    const params = (
-      topicName === constants.TOPIC_SENTINEL_NAME_ALL ?
-      {} :
-      {topic_name: topicName}
-    );
+    const params: {
+      topic_name?: string;
+    } = {};
+    if (topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
+      params.topic_name = topicName;
+    }
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
-        params: params
+        params
       }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));

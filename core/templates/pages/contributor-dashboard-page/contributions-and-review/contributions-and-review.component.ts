@@ -120,7 +120,6 @@ angular.module('oppia').component('contributionsAndReview', {
             return ContributionAndReviewService
               .getReviewableTranslationSuggestionsAsync(
                 shouldResetOffset,
-                TranslationTopicService.getActiveTopicName(),
                 ctrl.activeExplorationId);
           }
         }

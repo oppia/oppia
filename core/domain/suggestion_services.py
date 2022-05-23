@@ -655,6 +655,9 @@ def get_reviewable_translation_suggestion_target_ids(user_id):
     contribution_rights = user_services.get_user_contribution_rights(user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
+    # The user cannot review any translations, so return early.
+    if len(language_codes) == 0:
+        return set()
     in_review_translation_suggestions = (
         suggestion_models.GeneralSuggestionModel
         .get_in_review_translation_suggestions(user_id, language_codes))

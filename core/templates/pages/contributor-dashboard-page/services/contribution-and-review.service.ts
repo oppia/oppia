@@ -119,7 +119,7 @@ export class ContributionAndReviewService {
   private async fetchSuggestionsAsync(
       fetcher: SuggestionFetcher,
       shouldResetOffset: boolean,
-      explorationId: string = null
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
