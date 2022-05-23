@@ -1,15 +1,17 @@
-<div uib-dropdown class="oppia-html-select">
-  <button uib-dropdown-toggle class="btn btn-secondary oppia-html-select-selection" type="button" aria-expanded="false" data-toggle="dropdown">
+<div ngbDropdown class="oppia-html-select">
+  <button ngbDropdownToggle class="btn btn-secondary oppia-html-select-selection" type="button" aria-expanded="false" data-toggle="dropdown">
     <div class="oppia-dropdown-menu-text">
-      <angular-html-bind class="oppia-html-select-selection-element" html-data="$ctrl.options[getSelectionIndex()].val">
-      </angular-html-bind>
+      <angular-html-bind-wrapper classStr="oppia-html-select-selection-element"
+                                 [htmlData]="options[getSelectionIndex()].val">
+      </angular-html-bind-wrapper>
     </div>
   </button>
-  <ul uib-dropdown-menu class="oppia-dropdown-menu">
-    <li ng-repeat="choice in $ctrl.options" class="dropdown-item float-left">
-      <a ng-click="select(choice.id)">
-        <angular-html-bind class="oppia-html-select-option protractor-test-html-multiple-select-option" html-data="choice.val">
-        </angular-html-bind>
+  <ul ngbDropdownMenu class="oppia-dropdown-menu">
+    <li *ngFor="let choice of options" class="dropdown-item float-left">
+      <a (click)="select(choice.id)">
+        <angular-html-bind-wrapper classStr="oppia-html-select-option protractor-test-html-multiple-select-option" 
+                                   [htmlData]="choice.val">
+        </angular-html-bind-wrapper>
       </a>
     </li>
   </ul>

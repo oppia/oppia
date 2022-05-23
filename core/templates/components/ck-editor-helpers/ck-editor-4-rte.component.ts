@@ -121,7 +121,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
-    let value = this.value;
+
+    // String methods are used on value variable, so it can't be null or
+    // undefined.
+    let value = this.value ? this.value : '';
     // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<oppia-noninteractive-/g,

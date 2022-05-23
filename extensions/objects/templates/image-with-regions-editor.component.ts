@@ -19,7 +19,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -83,6 +83,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
+    private changeDetectorDef: ChangeDetectorRef,
     private el: ElementRef,
     private utilsService: UtilsService,
     private ngbModal: NgbModal
@@ -202,10 +203,17 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.alwaysEditable = true;
-    // The initializeEditor function is written separately since it
-    // is also called in resetEditor function.
-    this.initializeEditor();
-    this.imageValueChanged(this.value.imagePath);
+    // The following check is used to prevent cases when the value is not
+    // defined. This is a dynamically created component and in some cases we get
+    // undefined. This happens when ngOnInit runs before we can assign
+    // this.value the value that is supposed to be passed from object editor
+    // component.
+    if (this.value) {
+      // The initializeEditor function is written separately since it
+      // is also called in resetEditor function.
+      this.initializeEditor();
+      this.imageValueChanged(this.value.imagePath);
+    }
     this.SCHEMA = {
       type: 'custom',
       obj_type: 'Filepath'
@@ -309,11 +317,13 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // Use these two functions to get the calculated image width and
   // height.
   getImageWidth(): number {
-    return this._calculateImageDimensions().width;
+    const width = this._calculateImageDimensions().width;
+    return isNaN(width) ? 0 : width;
   }
 
   getImageHeight(): number {
-    return this._calculateImageDimensions().height;
+    const height = this._calculateImageDimensions().height;
+    return isNaN(height) ? 0 : height;
   }
 
   getPreviewUrl(imageUrl: string): string {
@@ -459,7 +469,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
           }
         };
         this.value.labeledRegions.push(newRegion);
-        this.valueChanged.emit(this.value);
+        // In order to trigger change detection, we emit a new object by
+        // using the spread operator. This is because adding/modifying
+        // properties in an Object/Array doesn't always trigger
+        // change-detection cycles.
+        this.valueChanged.emit({...this.value});
         this.selectedRegion = (
           this.value.labeledRegions.length - 1);
       }
@@ -606,7 +620,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.hoveredRegion--;
     }
     this.value.labeledRegions.splice(index, 1);
-    this.valueChanged.emit(this.value);
+    // In order to trigger change detection, we emit a new object by
+    // using the spread operator. This is because adding/modifying
+    // properties in an Object/Array doesn't always trigger
+    // change-detection cycles.
+    this.valueChanged.emit({...this.value});
   }
 
   imageValueChanged(newVal: string): void {
