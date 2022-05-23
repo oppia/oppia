@@ -32,6 +32,7 @@ import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -52,6 +53,7 @@ import { NonExistentTopicsAndStories } from 'domain/learner_dashboard/non-existe
 import { NonExistentCollections } from 'domain/learner_dashboard/non-existent-collections.model';
 import { NonExistentExplorations } from 'domain/learner_dashboard/non-existent-explorations.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -72,6 +74,13 @@ class MockLearnerDashboardActivityBackendApiService {
     return new Promise((resolve, reject) => {
       resolve();
     });
+  }
+}
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string): string {
+    return key;
   }
 }
 
@@ -106,6 +115,8 @@ describe('Learner dashboard page', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService = null;
+  let translateService: TranslateService = null;
+  let pageTitleService: PageTitleService = null;
 
   let profilePictureDataUrl = 'profile-picture-url';
 
@@ -347,6 +358,11 @@ describe('Learner dashboard page', () => {
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
+          PageTitleService,
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
+          }
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
@@ -367,6 +383,8 @@ describe('Learner dashboard page', () => {
       suggestionModalForLearnerDashboardService =
         TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
+      translateService = TestBed.inject(TranslateService);
+      pageTitleService = TestBed.inject(PageTitleService);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
@@ -505,6 +523,7 @@ describe('Learner dashboard page', () => {
 
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
       expect(component.windowIsNarrow).toBeTrue();
 
       mockResizeEmitter.emit();
@@ -514,13 +533,45 @@ describe('Learner dashboard page', () => {
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+
       component.ngOnInit();
       flush();
+
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
     }));
 
+    it('should subscribe to onLangChange upon initialisation and set page ' +
+    'title whenever language changes', fakeAsync(() => {
+      spyOn(component.directiveSubscriptions, 'add');
+      spyOn(translateService.onLangChange, 'subscribe');
+      spyOn(component, 'setPageTitle');
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.directiveSubscriptions.add).toHaveBeenCalled();
+      expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+
+      translateService.onLangChange.emit();
+
+      expect(component.setPageTitle).toHaveBeenCalled();
+    }));
+
+    it('should obtain translated page title and set it', () => {
+      spyOn(translateService, 'instant').and.callThrough();
+      spyOn(pageTitleService, 'setDocumentTitle');
+
+      component.setPageTitle();
+
+      expect(translateService.instant).toHaveBeenCalledWith(
+        'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+      expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+        'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+    });
+
     it('should get static image url', () => {
       let imagePath = '/path/to/image.png';
+
       expect(component.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
     });
@@ -534,6 +585,7 @@ describe('Learner dashboard page', () => {
 
         let newActiveSubsection2 = 'I18N_DASHBOARD_SKILL_PROFICIENCY';
         component.setActiveSubsection(newActiveSubsection2);
+
         expect(component.activeSubsection).toBe(newActiveSubsection2);
       });
 
@@ -546,13 +598,16 @@ describe('Learner dashboard page', () => {
       ' changing sorting type', () => {
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
       expect(component.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
+
       component.setFeedbackSortingOptions('lastUpdatedMsecs');
+
       expect(component.isCurrentFeedbackSortDescending).toBe(false);
     });
 
     it('should change feedback sorting options by exploration when changing' +
       ' sorting type', () => {
       component.setFeedbackSortingOptions('exploration');
+
       expect(component.currentFeedbackThreadsSortType).toBe('exploration');
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
     });
@@ -602,6 +657,7 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('lastUpdatedMsecs');
+
       expect(component.isCurrentFeedbackSortDescending).toBeFalse();
 
       tick();
@@ -640,6 +696,7 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.currentFeedbackThreadsSortType)
         .toBe('explorationTitle');
       expect(component.getValueOfFeedbackThreadSortKey())
@@ -681,12 +738,14 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.currentFeedbackThreadsSortType)
         .toBe('explorationTitle');
       expect(component.getValueOfFeedbackThreadSortKey())
         .toBe('explorationTitle');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.isCurrentFeedbackSortDescending).toBeFalse();
 
       tick();
@@ -741,6 +800,7 @@ describe('Learner dashboard page', () => {
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
+
       expect(component.loadingFeedbacks).toBe(true);
 
       tick();
@@ -779,6 +839,7 @@ describe('Learner dashboard page', () => {
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
+
       expect(component.loadingFeedbacks).toBe(true);
 
       tick();
@@ -830,6 +891,7 @@ describe('Learner dashboard page', () => {
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
+
         expect(component.loadingFeedbacks).toBe(true);
 
         tick();
@@ -842,8 +904,8 @@ describe('Learner dashboard page', () => {
         expect(threadSpy).toHaveBeenCalled();
 
         component.showAllThreads();
-        expect(component.feedbackThreadActive).toBe(false);
 
+        expect(component.feedbackThreadActive).toBe(false);
         expect(component.numberOfUnreadThreads).toBe(6);
       }));
 
@@ -879,6 +941,7 @@ describe('Learner dashboard page', () => {
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
+
         expect(component.loadingFeedbacks).toBe(true);
 
         tick();
@@ -891,6 +954,7 @@ describe('Learner dashboard page', () => {
         expect(threadSpy).toHaveBeenCalled();
 
         component.addNewMessage(threadId, message);
+
         expect(component.messageSendingInProgress).toBe(true);
 
         tick();
@@ -904,6 +968,7 @@ describe('Learner dashboard page', () => {
       () => {
         spyOn(suggestionModalForLearnerDashboardService, 'showSuggestionModal')
           .and.returnValue(null);
+
         let newContent = 'New content';
         let oldContent = 'Old content';
         let description = 'Description';
@@ -936,6 +1001,7 @@ describe('Learner dashboard page', () => {
         let NOW_MILLIS = 1617393321345;
         spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
           .withArgs(NOW_MILLIS).and.returnValue('4/2/2021');
+
         expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS))
           .toBe('4/2/2021');
       });
@@ -973,7 +1039,12 @@ describe('Learner dashboard page', () => {
           AlertsService,
           CsrfTokenService,
           LearnerDashboardBackendApiService,
-          UserService
+          UserService,
+          PageTitleService,
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
+          }
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
@@ -987,6 +1058,8 @@ describe('Learner dashboard page', () => {
       learnerDashboardBackendApiService =
         TestBed.inject(LearnerDashboardBackendApiService);
       userService = TestBed.inject(UserService);
+      translateService = TestBed.inject(TranslateService);
+      pageTitleService = TestBed.inject(PageTitleService);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         Promise.resolve('sample-csrf-token'));
@@ -1248,5 +1321,13 @@ describe('Learner dashboard page', () => {
           'Failed to get learner dashboard feedback updates data');
         expect(fetchDataSpy).toHaveBeenCalled();
       }));
+
+    it('should unsubscribe upon component destruction', () => {
+      spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+      component.ngOnDestroy();
+
+      expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+    });
   });
 });

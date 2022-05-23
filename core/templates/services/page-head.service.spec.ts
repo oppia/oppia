@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { PageTitleService } from 'services/page-title.service';
 import { MetaTagCustomizationService } from './contextual/meta-tag-customization.service';
 import { PageHeadService } from './page-head.service';
@@ -41,11 +42,9 @@ describe('Page head service', () => {
     };
     spyOn(pageTitleService, 'setDocumentTitle');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
-    pageHeadService.updateTitleAndMetaTags({
-      ROUTE: '',
-      TITLE: title,
-      META: [meta]
-    });
+
+    pageHeadService.updateTitleAndMetaTags(title, [meta]);
+
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(title);
     expect(metaTagCustomizationService.addOrReplaceMetaTags)
       .toHaveBeenCalledWith([

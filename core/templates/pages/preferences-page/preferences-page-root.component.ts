@@ -16,7 +16,10 @@
  * @fileoverview Root component for Preferences Page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { LoaderService } from 'services/loader.service';
@@ -26,7 +29,8 @@ import { PageHeadService } from 'services/page-head.service';
   selector: 'oppia-preferences-page-root',
   templateUrl: './preferences-page-root.component.html'
 })
-export class PreferencesPageRootComponent {
+export class PreferencesPageRootComponent implements OnDestroy {
+  directiveSubscriptions = new Subscription();
   pageIsShown: boolean = false;
   errorPageIsShown: boolean = false;
 
@@ -34,12 +38,24 @@ export class PreferencesPageRootComponent {
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
     private loaderService: LoaderService,
-    private pageHeadService: PageHeadService
+    private pageHeadService: PageHeadService,
+    private translateService: TranslateService
   ) {}
 
-  ngOnInit(): void {
+  setPageTitleAndMetaTags(): void {
+    let translatedTitle = this.translateService.instant(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.TITLE);
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES);
+      translatedTitle,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.META);
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitleAndMetaTags();
+      })
+    );
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService.validateCanManageOwnAccount()
       .then(() => {
@@ -49,5 +65,9 @@ export class PreferencesPageRootComponent {
       }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

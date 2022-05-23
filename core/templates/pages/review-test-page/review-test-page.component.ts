@@ -18,6 +18,7 @@
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { Subscription } from 'rxjs';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -38,16 +39,34 @@ require('domain/review_test/review-test-backend-api.service.ts');
 angular.module('oppia').component('reviewTestPage', {
   template: require('./review-test-page.component.html'),
   controller: [
-    'PageTitleService', 'ReviewTestEngineService', 'UrlInterpolationService',
-    'UrlService', 'QUESTION_PLAYER_MODE', 'REVIEW_TESTS_URL',
-    'STORY_VIEWER_PAGE',
+    '$translate', 'I18nLanguageCodeService', 'PageTitleService',
+    'ReviewTestEngineService', 'UrlInterpolationService', 'UrlService',
+    'QUESTION_PLAYER_MODE', 'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
     function(
-        PageTitleService, ReviewTestEngineService, UrlInterpolationService,
-        UrlService, QUESTION_PLAYER_MODE, REVIEW_TESTS_URL,
-        STORY_VIEWER_PAGE
+        $translate, I18nLanguageCodeService, PageTitleService,
+        ReviewTestEngineService, UrlInterpolationService, UrlService,
+        QUESTION_PLAYER_MODE, REVIEW_TESTS_URL, STORY_VIEWER_PAGE
     ) {
       var ctrl = this;
-
+      ctrl.directiveSubscriptions = new Subscription();
+      ctrl.setPageTitle = function() {
+        $translate.use(I18nLanguageCodeService.getCurrentI18nLanguageCode())
+          .then(() => {
+            const translatedTitle = $translate.instant(
+              'I18N_REVIEW_TEST_PAGE_TITLE', {
+                storyName: ctrl.storyName
+              }
+            );
+            PageTitleService.setDocumentTitle(translatedTitle);
+          });
+      };
+      ctrl.subscribeToOnLanguageCodeChange = function() {
+        ctrl.directiveSubscriptions.add(
+          I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+            ctrl.setPageTitle();
+          })
+        );
+      };
       ctrl.reviewTestBackendApiService = (
         OppiaAngularRootComponent.reviewTestBackendApiService);
 
@@ -75,8 +94,9 @@ angular.module('oppia').component('reviewTestPage', {
           function(result) {
             var skillIdList = [];
             var skillDescriptions = [];
-            PageTitleService.setDocumentTitle(
-              'Review Test: ' + result.storyName + ' - Oppia');
+            ctrl.storyName = result.storyName;
+            ctrl.setPageTitle();
+            ctrl.subscribeToOnLanguageCodeChange();
             for (var skillId in result.skillDescriptions) {
               skillIdList.push(skillId);
               skillDescriptions.push(
@@ -116,6 +136,9 @@ angular.module('oppia').component('reviewTestPage', {
       ctrl.$onInit = function() {
         ctrl.questionPlayerConfig = null;
         _fetchSkillDetails();
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

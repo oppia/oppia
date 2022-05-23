@@ -17,8 +17,11 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
+import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { LoaderService } from 'services/loader.service';
@@ -27,12 +30,20 @@ import { PageHeadService } from 'services/page-head.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string): string {
+    return key;
+  }
+}
+
 describe('Release Coordinator Page Root', () => {
   let fixture: ComponentFixture<ReleaseCoordinatorPageRootComponent>;
   let component: ReleaseCoordinatorPageRootComponent;
   let pageHeadService: PageHeadService;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let loaderService: LoaderService;
+  let translateService: TranslateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -45,7 +56,11 @@ describe('Release Coordinator Page Root', () => {
       ],
       providers: [
         PageHeadService,
-        MetaTagCustomizationService
+        MetaTagCustomizationService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -58,6 +73,7 @@ describe('Release Coordinator Page Root', () => {
     loaderService = TestBed.inject(LoaderService);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
+    translateService = TestBed.inject(TranslateService);
   });
 
   it('should successfully instantiate the component',
@@ -66,16 +82,16 @@ describe('Release Coordinator Page Root', () => {
     });
 
   it('should initialize and show page when access is valid', fakeAsync(() => {
-    spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToReleaseCoordinatorPage')
       .and.returnValue(Promise.resolve());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
+
     component.ngOnInit();
     tick();
-    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
+
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(
       accessValidationBackendApiService.validateAccessToReleaseCoordinatorPage)
@@ -87,16 +103,16 @@ describe('Release Coordinator Page Root', () => {
 
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {
-      spyOn(pageHeadService, 'updateTitleAndMetaTags');
       spyOn(
         accessValidationBackendApiService,
         'validateAccessToReleaseCoordinatorPage')
         .and.returnValue(Promise.reject());
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(loaderService, 'hideLoadingScreen');
+
       component.ngOnInit();
       tick();
-      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
+
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(
         accessValidationBackendApiService
@@ -106,4 +122,56 @@ describe('Release Coordinator Page Root', () => {
       expect(component.errorPageIsShown).toBeTrue();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
+
+  it('should initialize and subscribe to onLangChange', fakeAsync(() => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToReleaseCoordinatorPage')
+      .and.returnValue(Promise.resolve());
+    spyOn(component.directiveSubscriptions, 'add');
+    spyOn(translateService.onLangChange, 'subscribe');
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.directiveSubscriptions.add).toHaveBeenCalled();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+  }));
+
+  it('should update page title whenever the language changes', () => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToReleaseCoordinatorPage')
+      .and.returnValue(Promise.resolve());
+    component.ngOnInit();
+    spyOn(component, 'setPageTitleAndMetaTags');
+
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitleAndMetaTags).toHaveBeenCalled();
+  });
+
+  it('should obtain translated title and set the title and meta tags', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
+    component.setPageTitleAndMetaTags();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .RELEASE_COORDINATOR_PAGE.TITLE);
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .RELEASE_COORDINATOR_PAGE.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .RELEASE_COORDINATOR_PAGE.META);
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
 });

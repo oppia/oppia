@@ -16,7 +16,10 @@
  * @fileoverview Root component for Profile Page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -27,7 +30,8 @@ import { PageHeadService } from 'services/page-head.service';
   selector: 'oppia-profile-page-root',
   templateUrl: './profile-page-root.component.html'
 })
-export class ProfilePageRootComponent {
+export class ProfilePageRootComponent implements OnDestroy {
+  directiveSubscriptions = new Subscription();
   pageIsShown: boolean = false;
   errorPageIsShown: boolean = false;
 
@@ -37,11 +41,23 @@ export class ProfilePageRootComponent {
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private urlService: UrlService,
+    private translateService: TranslateService
   ) {}
 
-  ngOnInit(): void {
+  setPageTitleAndMetaTags(): void {
+    let translatedTitle = this.translateService.instant(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.TITLE);
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE);
+      translatedTitle,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.META);
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitleAndMetaTags();
+      })
+    );
 
     let username = this.urlService.getPathname().split('/')[2];
     this.loaderService.showLoadingScreen('Loading');
@@ -53,5 +69,9 @@ export class ProfilePageRootComponent {
       }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
