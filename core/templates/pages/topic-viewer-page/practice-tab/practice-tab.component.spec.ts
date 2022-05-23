@@ -27,8 +27,6 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 import { PracticeTabComponent } from './practice-tab.component';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
-import { TopicViewerBackendApiService } from
-  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -36,7 +34,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
-import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -84,8 +81,6 @@ describe('Practice tab component', function() {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let loaderService: LoaderService;
   let translateService: TranslateService;
-  let topicViewerBackendApiService: TopicViewerBackendApiService;
-  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -107,9 +102,7 @@ describe('Practice tab component', function() {
         {
           provide: TranslateService,
           useClass: MockTranslateService
-        },
-        TopicViewerBackendApiService,
-        ReadOnlyTopicObjectFactory
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -152,9 +145,7 @@ describe('Practice tab component', function() {
     ngbModal = TestBed.inject(NgbModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     loaderService = TestBed.inject(LoaderService);
-    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     translateService = TestBed.inject(TranslateService);
-    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
   });
 
   it('should initialize controller properties after its initilization',
@@ -166,51 +157,33 @@ describe('Practice tab component', function() {
       expect(component.selectedSubtopicIndices).toEqual([false]);
     });
 
-  it('should obtain topic details upon initialization, and subscribe to ' +
-    'the language change event emitter', fakeAsync(() => {
-    const fetchTopicDataSpy = spyOn(
-      topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
-      readOnlyTopicObjectFactory.createFromBackendDict({
-        subtopics: [],
-        skill_descriptions: {},
-        uncategorized_skill_ids: [],
-        degrees_of_mastery: {},
-        canonical_story_dicts: [],
-        additional_story_dicts: [],
-        topic_name: 'Topic Name 1',
-        topic_id: 'topic_id_1',
-        topic_description: 'Description',
-        practice_tab_is_displayed: false,
-        meta_tag_content: 'dummy_meta_tag',
-        page_title_fragment_for_web: 'page_title_fragment'
-      }));
+  it('should obtain topic translation key upon initialization, and subscribe ' +
+  'to the language change event emitter', () => {
+    component.topicId = 'topic_id_1';
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
       'dummy_topic_translation_key');
     spyOn(component, 'subscribeToOnLangChange');
-    spyOn(component, 'obtainTranslatedTopicName');
+    spyOn(component, 'getTranslatedTopicName');
 
     component.ngOnInit();
-    tick();
 
-    expect(fetchTopicDataSpy).toHaveBeenCalledWith(
-      'topic_1', 'classroom_1');
     expect(i18nLanguageCodeService.getTopicTranslationKey)
       .toHaveBeenCalledWith('topic_id_1', 'TITLE');
     expect(component.topicNameTranslationKey).toEqual(
       'dummy_topic_translation_key');
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
-    expect(component.obtainTranslatedTopicName).toHaveBeenCalled();
-  }));
-
-  it('should subscribe to the onLangChange event emitter, and obtain ' +
-    'translated topic name whenever the selected language changes', () => {
-    component.subscribeToOnLangChange();
-    spyOn(component, 'obtainTranslatedTopicName');
-
-    translateService.onLangChange.emit();
-
-    expect(component.obtainTranslatedTopicName).toHaveBeenCalled();
+    expect(component.getTranslatedTopicName).toHaveBeenCalled();
   });
+
+  it('should obtain translated topic name whenever selected language changes',
+    () => {
+      component.subscribeToOnLangChange();
+      spyOn(component, 'getTranslatedTopicName');
+
+      translateService.onLangChange.emit();
+
+      expect(component.getTranslatedTopicName).toHaveBeenCalled();
+    });
 
   it('should obtain translated topic name and set it when hacky ' +
     'translations are available', () => {
@@ -221,7 +194,7 @@ describe('Practice tab component', function() {
     spyOn(translateService, 'instant').and.callThrough();
     component.topicNameTranslationKey = 'dummy_translation_key';
 
-    component.obtainTranslatedTopicName();
+    component.getTranslatedTopicName();
 
     expect(translateService.instant)
       .toHaveBeenCalledWith('dummy_translation_key');
@@ -237,7 +210,7 @@ describe('Practice tab component', function() {
     spyOn(translateService, 'instant');
     component.topicName = 'default_topic_name';
 
-    component.obtainTranslatedTopicName();
+    component.getTranslatedTopicName();
 
     expect(translateService.instant).not.toHaveBeenCalled();
     expect(component.translatedTopicName).toEqual('default_topic_name');
