@@ -1874,7 +1874,8 @@ class LearnerAnswerDetails:
         }
 
     @classmethod
-    def from_dict(cls,
+    def from_dict(
+        cls,
         learner_answer_details_dict: LearnerAnswerDetailsDict
     ) -> LearnerAnswerDetails:
         """Return a LearnerAnswerDetails domain object from a dict.
