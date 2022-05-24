@@ -136,7 +136,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             version=0,
             question_state_data_schema_version=0)
 
-        question_model.commit(
+        assert isinstance(question_model, question_models.QuestionModel)
+        question_model.commit(  
             self.editor_id, 'question model created',
             [{'cmd': question_domain.CMD_CREATE_NEW}])
 
@@ -148,7 +149,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-            question_fetchers.get_question_from_model(question_model)
+            assert isinstance(question_model, question_models.QuestionModel)
+            question_fetchers.get_question_from_model(question_model) 
 
     def test_get_question_from_model_with_current_valid_schema_version(
         self
@@ -178,7 +180,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
-        question_model = all_question_models.get()
+        # Ignore[assignment] is used here because invalid question ids may lead
+        # to type None for all_question_models.get().
+        question_model = all_question_models.get() #type: ignore[assignment]
         updated_question_model = question_fetchers.get_question_from_model(
             question_model)
         self.assertEqual(
