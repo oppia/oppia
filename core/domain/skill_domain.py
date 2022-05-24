@@ -918,7 +918,8 @@ class Skill:
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         skill_contents = SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION, []), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION,
+                []), [],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}

@@ -6658,9 +6658,9 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.author, self.exploration_id)
 
         self.new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>').to_dict()
+            'content', '<p>new content html</p>', []).to_dict()
         self.resubmit_change_content = state_domain.SubtitledHtml(
-            'content', '<p>resubmit change content html</p>').to_dict()
+            'content', '<p>resubmit change content html</p>', []).to_dict()
 
         self.save_new_skill('skill_123', self.admin_id)
 

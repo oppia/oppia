@@ -878,7 +878,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>', []
                 )
             )
         ]
@@ -1058,7 +1058,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', [])
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1108,7 +1108,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-collapsible content-with-value='
                     '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
                     'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
-                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
+                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>',
+                    []
                 )
             )
         )
@@ -1124,7 +1125,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-collapsible content-with-value='
                     '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
                     'quot;" heading-with-value="&amp;quot;Sub&amp;quot;">'
-                    '</oppia-noninteractive-collapsible><p>&nbsp;</p>')),
+                    '</oppia-noninteractive-collapsible><p>&nbsp;</p>'), []),
             False, [], None, None
         )
 
@@ -1143,7 +1144,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                         'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
                         'quot;:&amp;quot;hello&amp;quot;}]\">'
-                        '</oppia-noninteractive-tabs>')),
+                        '</oppia-noninteractive-tabs>'), []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1272,7 +1273,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', [])
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1296,7 +1297,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', []),
             False, [], None, None
         )
 
@@ -1305,7 +1306,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None, None),
+                    'feedback_1', '<p>Feedback</p>', []),
+                False, [], None, None),
             [
                 state_domain.RuleSpec(
                     'Contains',
@@ -1324,7 +1326,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [state_answer_group])
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', [])
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1413,7 +1415,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', []),
             False, [], None, None
         )
 
@@ -1421,7 +1423,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1441,7 +1443,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [state_answer_group])
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', [])
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -1451,7 +1453,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             },
         }
 
@@ -1534,7 +1537,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1592,15 +1595,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': [
                     {
                         'content_id': 'ca_choices_0',
-                        'html': '\u003cp\u003eoption 1\u003c/p\u003e'
+                        'html': '\u003cp\u003eoption 1\u003c/p\u003e',
+                        'image_filenames_in_html': []
                     },
                     {
                         'content_id': 'ca_choices_1',
-                        'html': '1,000'
+                        'html': '1,000',
+                        'image_filenames_in_html': []
                     },
                     {
                         'content_id': 'ca_choices_2',
-                        'html': '100'
+                        'html': '100',
+                        'image_filenames_in_html': []
                     }
                 ]
             }
@@ -1610,7 +1616,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Set the default outcome.
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
+                'default_outcome', '<p>The default outcome.</p>', []),
             False, [], None, None
         )
         init_state.update_interaction_default_outcome(default_outcome)
@@ -1689,7 +1695,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', []))]
         state.update_interaction_hints(hints_list)
 
         solution_dict = {
@@ -1920,7 +1926,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
+                    'html': '<p>Feedback</p>',
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1963,7 +1970,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
+                    'html': '<p>Feedback</p>',
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2003,7 +2011,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content', 'html': 'Hello!',
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2023,7 +2032,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2034,16 +2043,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
+                            'html': '<p>2</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
+                            'html': '<p>3</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
+                            'html': '<p>4</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
@@ -2054,13 +2067,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }
                 ],
@@ -2074,7 +2089,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     ],
                     'explanation': {
                         'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
+                        'html': '<p>This is solution for state1</p>',
+                        'image_filenames_in_html': []
                     }
                 }
 
@@ -2085,7 +2101,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content', 'html': 'Hello!',
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2105,7 +2122,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2116,16 +2133,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
+                            'html': '<p>2</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
+                            'html': '<p>3</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
+                            'html': '<p>4</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
@@ -2136,13 +2157,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }
                 ],
@@ -2156,7 +2179,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     ],
                     'explanation': {
                         'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
+                        'html': '<p>This is solution for state1</p>',
+                        'image_filenames_in_html': []
                     }
                 }
 
@@ -2210,7 +2234,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback',
-                    'html': html_with_old_math_schema
+                    'html': html_with_old_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -2247,7 +2272,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback',
-                    'html': html_with_new_math_schema
+                    'html': html_with_new_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -2260,7 +2286,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content', 'html': 'Hello!',
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2279,7 +2306,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     ],
                     'explanation': {
                         'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
+                        'html': '<p>This is solution for state1</p>',
+                        'image_filenames_in_html': []
                     }
                 },
                 'answer_groups': answer_group_with_old_math_schema,
@@ -2293,7 +2321,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2310,16 +2338,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': '<p>init_state customization arg html 1</p>'
+                            'html': (
+                                '<p>init_state customization arg html 1</p>'),
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_2',
-                            'html': '<p>init_state customization arg html 3</p>'
+                            'html': (
+                                '<p>init_state customization arg html 3</p>'),
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_3',
-                            'html': '<p>init_state customization arg html 4</p>'
+                            'html': (
+                                '<p>init_state customization arg html 4</p>'),
+                            'image_filenames_in_html': []
                         }]
                     }
                 },
@@ -2331,7 +2366,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content', 'html': 'Hello!',
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2350,7 +2386,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     ],
                     'explanation': {
                         'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
+                        'html': '<p>This is solution for state1</p>',
+                        'image_filenames_in_html': []
                     }
                 },
                 'answer_groups': answer_group_with_new_math_schema,
@@ -2364,7 +2401,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2381,16 +2418,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': '<p>init_state customization arg html 1</p>'
+                            'html': (
+                                '<p>init_state customization arg html 1</p>'),
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_2',
-                            'html': '<p>init_state customization arg html 3</p>'
+                            'html': (
+                                '<p>init_state customization arg html 3</p>'),
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_3',
-                            'html': '<p>init_state customization arg html 4</p>'
+                            'html': (
+                                '<p>init_state customization arg html 4</p>'),
+                            'image_filenames_in_html': []
                         }]
                     }
                 },
@@ -2427,7 +2471,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html_with_old_math_schema
+                    'html': html_with_old_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2448,7 +2493,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html_with_new_math_schema
+                    'html': html_with_new_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2467,7 +2513,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content', 'html': html_with_old_math_schema,
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2481,7 +2528,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'correct_answer': 'Answer1',
                     'explanation': {
                         'content_id': 'solution',
-                        'html': html_with_old_math_schema
+                        'html': html_with_old_math_schema,
+                        'image_filenames_in_html': []
                     }
                 },
                 'answer_groups': [answer_group_with_old_math_schema],
@@ -2489,7 +2537,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html_with_old_math_schema
+                        'html': html_with_old_math_schema,
+                        'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2513,13 +2562,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }]
             }
@@ -2527,7 +2578,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
+                'content_id': 'content', 'html': html_with_new_math_schema,
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2541,7 +2593,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'correct_answer': 'Answer1',
                     'explanation': {
                         'content_id': 'solution',
-                        'html': html_with_new_math_schema
+                        'html': html_with_new_math_schema,
+                        'image_filenames_in_html': []
                     }
                 },
                 'answer_groups': [answer_group_with_new_math_schema],
@@ -2549,7 +2602,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html_with_new_math_schema
+                        'html': html_with_new_math_schema,
+                        'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2573,13 +2627,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }]
             }
@@ -2608,7 +2664,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html_with_old_math_schema
+                    'html': html_with_old_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2629,7 +2686,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html_with_new_math_schema
+                    'html': html_with_new_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2648,7 +2706,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content', 'html': html_with_old_math_schema,
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2662,7 +2721,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'correct_answer': '42',
                     'explanation': {
                         'content_id': 'solution',
-                        'html': html_with_old_math_schema
+                        'html': html_with_old_math_schema,
+                        'image_filenames_in_html': []
                     }
                 },
                 'answer_groups': [answer_group_with_old_math_schema],
@@ -2670,7 +2730,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html_with_old_math_schema
+                        'html': html_with_old_math_schema,
+                        'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2684,13 +2745,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }]
             }
@@ -2698,7 +2761,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
+                'content_id': 'content', 'html': html_with_new_math_schema,
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2712,7 +2776,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'correct_answer': '42',
                     'explanation': {
                         'content_id': 'solution',
-                        'html': html_with_new_math_schema
+                        'html': html_with_new_math_schema,
+                        'image_filenames_in_html': []
                     }
                 },
                 'answer_groups': [answer_group_with_new_math_schema],
@@ -2720,7 +2785,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html_with_new_math_schema
+                        'html': html_with_new_math_schema,
+                        'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2734,13 +2800,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }]
             }
@@ -2822,7 +2890,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
+                    'html': '<p>Feedback</p>',
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2843,7 +2912,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
+                    'html': '<p>Feedback</p>',
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2881,7 +2951,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2892,16 +2962,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
+                            'html': '<p>2</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
+                            'html': '<p>3</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
+                            'html': '<p>4</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
@@ -2912,13 +2986,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }
                 ],
@@ -2932,7 +3008,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     ],
                     'explanation': {
                         'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
+                        'html': '<p>This is solution for state1</p>',
+                        'image_filenames_in_html': []
                     }
                 }
 
@@ -2963,7 +3040,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -2974,16 +3051,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
+                            'html': '<p>2</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
+                            'html': '<p>3</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
+                            'html': '<p>4</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
@@ -2994,13 +3075,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }
                 ],
@@ -3014,7 +3097,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     ],
                     'explanation': {
                         'content_id': 'solution',
-                        'html': '<p>This is solution for state1</p>'
+                        'html': '<p>This is solution for state1</p>',
+                        'image_filenames_in_html': []
                     }
                 }
 
@@ -3054,7 +3138,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback',
-                    'html': html_with_old_math_schema
+                    'html': html_with_old_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -3067,7 +3152,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content', 'html': 'Hello!',
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -3088,7 +3174,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -3163,7 +3249,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'feedback': {
                     'content_id': 'feedback',
-                    'html': html_with_old_math_schema
+                    'html': html_with_old_math_schema,
+                    'image_filenames_in_html': []
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -3176,7 +3263,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content', 'html': 'Hello!',
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -3197,7 +3285,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
-                        )
+                        ), 'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -3261,7 +3349,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content', 'html': html_with_old_math_schema,
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -3276,7 +3365,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'correct_answer': 'Answer1',
                     'explanation': {
                         'content_id': 'solution',
-                        'html': html_with_old_math_schema
+                        'html': html_with_old_math_schema,
+                        'image_filenames_in_html': []
                     }
                 },
                 'answer_groups': [],
@@ -3284,7 +3374,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html_with_old_math_schema
+                        'html': html_with_old_math_schema,
+                        'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -3305,13 +3396,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }
                 ]
@@ -3355,7 +3448,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content', 'html': html_with_old_math_schema,
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -3370,7 +3464,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html_with_old_math_schema
+                        'html': html_with_old_math_schema,
+                        'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -3384,13 +3479,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
+                            'html': html_with_old_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }]
             }
@@ -3398,7 +3495,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
+                'content_id': 'content', 'html': html_with_new_math_schema,
+                'image_filenames_in_html': []
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -3413,7 +3511,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html_with_new_math_schema
+                        'html': html_with_new_math_schema,
+                        'image_filenames_in_html': []
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -3427,13 +3526,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     },
                     {
                         'hint_content': {
                             'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
+                            'html': html_with_new_math_schema,
+                            'image_filenames_in_html': []
                         }
                     }]
             }
@@ -3443,7 +3544,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'Answer1',
             'explanation': {
                 'content_id': 'solution',
-                'html': html_with_old_math_schema
+                'html': html_with_old_math_schema,
+                'image_filenames_in_html': []
             }
         }
         self.assertEqual(
@@ -3466,7 +3568,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
         subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
+            'content_id', '<p>some html</p>', [])
         subtitled_html.validate()
 
         with self.assertRaisesRegex(
@@ -3478,7 +3580,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_subtitled_html_validation_with_invalid_content(self):
         """Test validation of subtitled HTML with invalid content."""
         subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
+            'content_id', '<p>some html</p>', [])
         subtitled_html.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected content id to be a string, ' +
@@ -3608,7 +3710,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>', [])
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -3618,7 +3720,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             },
         }
 
@@ -3630,7 +3733,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list.append(
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_2', '<p>new hint</p>')
+                state_domain.SubtitledHtml('hint_2', '<p>new hint</p>', [])
             )
         )
         init_state.update_interaction_hints(hints_list)
@@ -3641,7 +3744,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list.append(
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_3', '<p>hint three</p>')
+                state_domain.SubtitledHtml('hint_3', '<p>hint three</p>', [])
             )
         )
         init_state.update_interaction_hints(hints_list)
@@ -3668,10 +3771,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'choices': {
                     'value': [{
                         'content_id': 'non-unique-content-id',
-                        'html': '1'
+                        'html': '1',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'non-unique-content-id',
-                        'html': '2'
+                        'html': '2',
+                        'image_filenames_in_html': []
                     }]
                 },
                 'showChoicesInShuffledOrder': {'value': True}
@@ -3690,7 +3795,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '')
+                state_domain.SubtitledHtml('hint_1', '', [])
             )
         ]
         init_state.update_interaction_hints(hints_list)
@@ -3699,7 +3804,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': [0, 0],
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             }
         }
 
@@ -3717,7 +3823,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             }
         }
         init_state.update_interaction_solution(
@@ -3733,7 +3840,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [{
                     'content_id': '',
-                    'html': 'one'
+                    'html': 'one',
+                    'image_filenames_in_html': []
                 }]
             },
             'showChoicesInShuffledOrder': {'value': True}
@@ -3758,7 +3866,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [{
                     'content_id': 'ca_choices_10',
-                    'html': 'one'
+                    'html': 'one',
+                    'image_filenames_in_html': []
                 }]
             },
             'showChoicesInShuffledOrder': {'value': True}
@@ -3836,12 +3945,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             }
         }
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '')
+                state_domain.SubtitledHtml('hint_1', '', [])
             )
         ]
         solution = state_domain.Solution.from_dict(
@@ -3855,7 +3965,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             }
         }
         solution = state_domain.Solution.from_dict(
@@ -3878,7 +3989,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -3912,7 +4023,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -3946,7 +4057,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml('default_outcome', ''),
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '', []),
             False, [], None, None
         )
         exploration.init_state.update_interaction_default_outcome(
@@ -3967,7 +4079,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>some html</p>')
+                state_domain.SubtitledHtml('hint_1', '<p>some html</p>', [])
             )
         ]
 
@@ -3985,7 +4097,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', 'some html', [])
 
         hints_list = [state_domain.Hint(subtitled_html)]
 
@@ -3995,7 +4108,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             }
         }
         solution = state_domain.Solution.from_dict(
@@ -4035,13 +4149,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', [])
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', [])
             )
         ]
 
@@ -4076,13 +4190,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', [])
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', [])
             )
         ]
 
@@ -4117,13 +4231,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', [])
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', [])
             )
         ]
 
@@ -4165,13 +4279,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', [])
             )
         ]
         new_hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+                    'hint_2', '<p>Hello, this is html2 for state2</p>', [])
             )
         ]
 
@@ -4213,7 +4327,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+                    'hint_1', '<p>Hello, this is html1 for state2</p>', [])
             )
         ]
         solution_dict = {
@@ -4221,7 +4335,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': u'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': u'<p>hello_world is a string</p>'
+                'html': u'<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             }
         }
         solution = state_domain.Solution.from_dict(
@@ -4243,7 +4358,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                    'hint_1', '<p>Hello, this is html1 for state2</p>',
+                    []
                 )
             )
         ]
@@ -4275,7 +4391,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4315,7 +4431,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4338,7 +4454,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None, None
+                    'feedback_1', '<p>Feedback</p>', []), False, [], None, None
             ), {}, [], None
         )
         state_answer_group.rule_specs = {}
@@ -4353,7 +4469,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4392,7 +4508,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'),
+                    'feedback_1', '<p>Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -4429,7 +4545,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = state_domain.State.create_default_state('state_1')
         state_content_dict = {
             'content_id': 'content',
-            'html': '<p>state content html</p>'
+            'html': '<p>state content html</p>',
+            'image_filenames_in_html': []
         }
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
@@ -4451,7 +4568,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'destination', state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'),
+                        'feedback_1', '<p>state outcome html</p>', []),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -4487,7 +4604,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'destination', state_domain.SubtitledHtml(
-                        'feedback', '<p>Feedback</p>'),
+                        'feedback', '<p>Feedback</p>', []),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -4527,7 +4644,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'Answer1',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state_1</p>'
+                'html': '<p>This is solution for state_1</p>',
+                'image_filenames_in_html': []
             }
         }
         state.update_interaction_id('TextInput')
@@ -4579,7 +4697,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': [
                     {
                         'content_id': 'ca_choices_0',
-                        'html': 'Hello world!'
+                        'html': 'Hello world!',
+                        'image_filenames_in_html': []
                     }
                 ]
             }
@@ -4598,7 +4717,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_all_translatable_content_for_hints(self):
         """Get all translatable fields for hints."""
         hint = state_domain.Hint(state_domain.SubtitledHtml(
-            'hint_1', '<p>Hello, this is html1 for state_1</p>'))
+            'hint_1', '<p>Hello, this is html1 for state_1</p>', []))
         translatable_contents = [
             translatable_content.content_value
             for translatable_content in
@@ -4646,7 +4765,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             }]
         }
         value = {
-            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>', [])
         }
 
         state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(
@@ -4668,7 +4787,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             }]
         }
         value = {
-            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>', [])
         }
 
         html = (
