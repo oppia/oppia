@@ -208,7 +208,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
           };
 
-          let createTopicEditorBrowserTabsInfo = function() {
+          const createTopicEditorBrowserTabsInfo = function() {
             const topic = TopicEditorStateService.getTopic();
 
             let topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -230,7 +230,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS);
           };
 
-          let updateTopicEditorBrowserTabsInfo = function() {
+          const updateTopicEditorBrowserTabsInfo = function() {
             const topic = TopicEditorStateService.getTopic();
 
             const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -249,7 +249,7 @@ angular.module('oppia').directive('topicEditorPage', [
             }
           };
 
-          let onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
+          const onCreateOrUpdateTopicEditorBrowserTabsInfo = function(event) {
             if (event.key === (
               EntityEditorBrowserTabsInfoDomainConstants
                 .OPENED_TOPIC_EDITOR_BROWSER_TABS)

@@ -19,7 +19,6 @@
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
@@ -40,7 +39,6 @@ describe('topicEditorNavbar', () => {
   let ngbModal: NgbModal = null;
   let TopicEditorRoutingService = null;
   let TopicRightsBackendApiService = null;
-  let LocalStorageService = null;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let undoRedoChangeAppliedEventEmitter = new EventEmitter();
@@ -77,7 +75,6 @@ describe('topicEditorNavbar', () => {
       $injector.get('TopicRightsBackendApiService');
     $uibModal = $injector.get('$uibModal');
     ngbModal = $injector.get('NgbModal');
-    LocalStorageService = $injector.get('LocalStorageService');
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._skillIds = ['skill_1'];
@@ -614,27 +611,4 @@ describe('topicEditorNavbar', () => {
 
       expect($scope.topicRights.isPublished()).toBe(false);
     }));
-
-  it('should set presence of unsaved changes status to true if there ' +
-  'are unsaved changes in the topic editor', () => {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'topic', 'topic_id', 1, 1, false);
-    spyOn(
-      LocalStorageService, 'getEntityEditorBrowserTabsInfo'
-    ).and.returnValue(topicEditorBrowserTabsInfo);
-    spyOn(
-      LocalStorageService, 'updateEntityEditorBrowserTabsInfo'
-    ).and.callFake(() => {});
-
-    expect(
-      topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ).toBeFalse();
-
-    $scope.updateTopicEditorBrowserTabsUnsavedChangesStatus();
-
-    expect(
-      topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ).toBeTrue();
-  });
 });
