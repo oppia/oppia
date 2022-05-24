@@ -183,9 +183,14 @@ export class SvgSanitizerService {
         node.remove();
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
-          let nodeAttrName: string = node.attributes[i].name.toLowerCase();
+          const nodeAttrName: string = node.attributes[i].name;
+          const nodeAttrCombination = (
+            nodeTagName.toLocaleLowerCase() + ':' + nodeAttrName.toLowerCase());
           if (
-            attrsToBeRemoved.indexOf(nodeTagName + ':' + nodeAttrName) !== -1) {
+            attrsToBeRemoved.findIndex(
+              attribute => attribute.toLowerCase() === nodeAttrCombination
+            ) !== -1
+          ) {
             node.removeAttribute(nodeAttrName);
           }
         }
