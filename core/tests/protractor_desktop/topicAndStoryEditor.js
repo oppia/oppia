@@ -243,7 +243,7 @@ describe('Chapter editor functionality', function() {
   var explorationEditorPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
-    'Dummy exploration', 'Algorithm', 'Learn more about oppia', 'English'];
+    'Dummy exploration', 'Algorithms', 'Learn more about oppia', 'English'];
   var dummySkills = [];
   var allowedErrors = [];
   var topicName = 'Topic 0';

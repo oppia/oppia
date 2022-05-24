@@ -91,7 +91,7 @@ describe('Learner dashboard functionality', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Dummy Exploration');
-    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setCategory('Algorithms');
     await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.saveChanges();

@@ -199,7 +199,7 @@ class ExplorationDisplayableSummariesTest(
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
-            'category': u'A category',
+            'category': u'Algebra',
             'community_owned': False,
             'id': self.EXP_ID_2,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -208,8 +208,8 @@ class ExplorationDisplayableSummariesTest(
             'ratings': feconf.get_empty_ratings(),
             'status': 'public',
             'tags': [],
-            'thumbnail_bg_color': '#a33f40',
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
@@ -373,13 +373,13 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.assertEqual(len(featured_activity_summaries), 1)
         self.assertDictContainsSubset({
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': 'A category',
+            'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': 'A title',
             'num_views': 0,
@@ -697,13 +697,13 @@ class TopRatedExplorationDisplayableSummariesTest(
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
             'status': u'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'id': self.EXP_ID_3,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
             'title': u'A title',
             'num_views': 0,
@@ -735,13 +735,13 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         expected_summary = {
             'status': u'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
             'title': u'A title',
             'num_views': 0,
@@ -818,13 +818,13 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
                 feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         test_summary_1 = {
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': u'A title',
             'num_views': 0,
@@ -832,13 +832,13 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         }
         test_summary_2 = {
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': u'A title',
             'num_views': 0,
@@ -846,13 +846,13 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         }
         test_summary_3 = {
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': u'A title',
             'num_views': 0,

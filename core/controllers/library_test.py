@@ -231,7 +231,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exp_services.index_explorations_given_ids([exp_id])
         response_dict = self.get_json(
             feconf.LIBRARY_SEARCH_DATA_URL, params={
-                'category': '("A category")',
+                'category': '("Algebra")',
                 'language_code': '("en")'
             })
         activity_list = (
