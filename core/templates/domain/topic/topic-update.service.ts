@@ -30,10 +30,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Change, TopicChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
+import { Topic } from './TopicObjectFactory';
 import { ShortSkillSummary } from 'core/templates/domain/skill/short-skill-summary.model';
 import { SubtitledHtml } from 'core/templates/domain/exploration/subtitled-html.model';
-import { SubtopicPage } from 'core/templates/domain/topic/subtopic-page.model';
+import { SubtopicPage } from './subtopic-page.model';
 import { RecordedVoiceovers } from 'core/templates/domain/exploration/recorded-voiceovers.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -61,7 +61,7 @@ export class TopicUpdateService {
   // topic.
   // entity can be a topic object or a subtopic page object.
   private _applyChange(
-      entity,
+      entity: Topic | SubtopicPage,
       command: string, params,
       apply: TopicUpdateApply | SubtopicUpdateApply,
       reverse: TopicUpdateReverse | SubtopicUpdateReverse) {
@@ -72,15 +72,14 @@ export class TopicUpdateService {
     this._updateTopicEditorBrowserTabUnsavedChangesStatus(entity);
   }
 
-  private _updateTopicEditorBrowserTabUnsavedChangesStatus(entity) {
+  private _updateTopicEditorBrowserTabUnsavedChangesStatus(
+      entity: Topic | SubtopicPage
+  ) {
     let topicId: string = null;
-    try {
-      // If the entity is a SubtopicPage, then the corresponding topic
-      // id is given by getTopicId().
-      topicId = entity.getTopicId();
-    } catch (e) {
-      // Otherwise, the topic id can be accessed via entity.getId().
+    if (entity instanceof Topic) {
       topicId = entity.getId();
+    } else if (entity instanceof SubtopicPage) {
+      topicId = entity.getTopicId();
     }
     const topicEditorBrowserTabsInfo:
       EntityEditorBrowserTabsInfo = (
