@@ -101,7 +101,7 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the type of the args
+    # Type Dict[str, Any] is used here because the type of the args
     # value can differ.
     issue_customization_args: Dict[str, Any]
     actions: List[LearnerActionDict]
@@ -156,7 +156,7 @@ class LearnerActionDict(TypedDict):
     """Dictionary representing the LearnerAction object."""
 
     action_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the type of the value
+    # Type Dict[str, Any] is used here because the type of the value
     # of the args can differ.
     action_customization_args: Dict[str, Any]
     schema_version: int
@@ -915,7 +915,7 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the type of the
+        # Type Dict[str, Any] is used here because the type of the
         # args value can differ.
         issue_customization_args: Dict[str, Any],
         actions: List[LearnerAction]
