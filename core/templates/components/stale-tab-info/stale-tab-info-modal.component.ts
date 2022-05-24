@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for stale tab information component in skill editor.
+ * @fileoverview Component for stale tab information component editor.
  */
 
 import { Component } from '@angular/core';
