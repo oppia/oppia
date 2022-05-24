@@ -157,8 +157,6 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         assert model_id is not None
         translation_model = (
             translation_models.MachineTranslationModel.get(model_id))
-        # Ruling out the possibility of None for mypy type checking.
-        assert translation_model is not None
         self.assertEqual(translation_model.translated_text, 'hola mundo')
 
     def test_create_model_with_same_source_target_language_codes_returns_none(
