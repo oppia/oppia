@@ -66,6 +66,7 @@ describe('About foundation page', () => {
 
   it('should set component properties when ngOnInit() is called', () => {
     spyOn(translateService.onLangChange, 'subscribe');
+
     component.ngOnInit();
 
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
@@ -75,6 +76,7 @@ describe('About foundation page', () => {
   'language changes', () => {
     component.ngOnInit();
     spyOn(component, 'setPageTitle');
+
     translateService.onLangChange.emit();
 
     expect(component.setPageTitle).toHaveBeenCalled();
@@ -83,6 +85,7 @@ describe('About foundation page', () => {
   it('should set new page title', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageTitleService, 'setDocumentTitle');
+
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -97,6 +100,7 @@ describe('About foundation page', () => {
         component.setPageTitle();
       })
     );
+
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
