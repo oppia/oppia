@@ -59,7 +59,7 @@ export class SkillUpdateService {
   };
 
   private _updateSkillEditorBrowserTabsUnsavedChangesStatus(skill: Skill) {
-    var skillEditorBrowserTabsInfo:
+    const skillEditorBrowserTabsInfo:
       EntityEditorBrowserTabsInfo = (
         this.localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants

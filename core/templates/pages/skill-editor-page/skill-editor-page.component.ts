@@ -124,7 +124,7 @@ angular.module('oppia').component('skillEditorPage', {
             .OPENED_SKILL_EDITOR_BROWSER_TABS);
       };
 
-      let createSkillEditorBrowserTabsInfo = function() {
+      const createSkillEditorBrowserTabsInfo = function() {
         const skill = SkillEditorStateService.getSkill();
 
         let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -146,7 +146,7 @@ angular.module('oppia').component('skillEditorPage', {
             .OPENED_SKILL_EDITOR_BROWSER_TABS);
       };
 
-      let updateSkillEditorBrowserTabsInfo = function() {
+      const updateSkillEditorBrowserTabsInfo = function() {
         const skill = SkillEditorStateService.getSkill();
 
         const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -163,7 +163,7 @@ angular.module('oppia').component('skillEditorPage', {
             .OPENED_SKILL_EDITOR_BROWSER_TABS);
       };
 
-      let onCreateOrUpdateSkillEditorBrowserTabsInfo = function(event) {
+      const onCreateOrUpdateSkillEditorBrowserTabsInfo = function(event) {
         if (event.key === (
           EntityEditorBrowserTabsInfoDomainConstants
             .OPENED_SKILL_EDITOR_BROWSER_TABS)
