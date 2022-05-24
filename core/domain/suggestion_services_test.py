@@ -1428,6 +1428,25 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             suggestion_target_ids, [self.target_id_2, self.target_id_1])
 
+    def test_get_reviewable_translation_suggestion_target_ids_with_no_reviewable_languages( # pylint: disable=line-too-long
+        self
+    ):
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion('pt', self.target_id_2)
+        self._create_translation_suggestion('bn', self.target_id_3)
+        self._create_translation_suggestion('bn', self.target_id_3)
+
+        suggestion_target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1))
+
+        # The user does not have rights to review any languages, so expect an
+        # empty result.
+        self.assertEqual(len(suggestion_target_ids), 0)
+
     def test_get_reviewable_translation_suggestions_with_valid_exp_ids(
             self):
         # Add a few translation suggestions in different languages.

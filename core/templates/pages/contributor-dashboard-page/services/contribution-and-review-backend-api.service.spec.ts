@@ -116,7 +116,7 @@ describe('Contribution and review backend API service', () => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url = (
         '/getreviewablesuggestions/skill/add_question' +
-        '?limit=10&offset=0&exploration_id=null');
+        '?limit=10&offset=0');
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_QUESTION_SUGGESTIONS',
