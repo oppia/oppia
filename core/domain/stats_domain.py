@@ -325,7 +325,8 @@ class ExplorationStats:
     def validate(self) -> None:
         """Validates the ExplorationStats domain object."""
 
-        exploration_stats_properties: List[Literal['num_starts_v1',
+        exploration_stats_properties: List[Literal[
+            'num_starts_v1',
             'num_starts_v2',
             'num_actual_starts_v1',
             'num_actual_starts_v2',
@@ -611,7 +612,7 @@ class StateStats:
             bool. Whether the two instances have the same values.
         """
         if not isinstance(other, StateStats):
-            # https://docs.python.org/2/library/constants.html#NotImplemented.
+            # https://docs.python.org/3.7/library/constants.html
             return NotImplemented
         return (
             self.total_answers_count_v1,
@@ -772,7 +773,7 @@ class SessionStateStats:
             bool. Whether the two instances have the same values.
         """
         if not isinstance(other, SessionStateStats):
-            # https://docs.python.org/2/library/constants.html#NotImplemented.
+            # https://docs.python.org/3.7/library/constants.html
             return NotImplemented
         return (
             self.total_answers_count,
@@ -1064,7 +1065,7 @@ class ExplorationIssue:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         if not isinstance(other, ExplorationIssue):
-            # https://docs.python.org/2/library/constants.html#NotImplemented.
+            #  https://docs.python.org/3.7/library/constants.html
             return NotImplemented
         return (
             self.issue_type == other.issue_type and
@@ -1143,7 +1144,7 @@ class ExplorationIssue:
     def _convert_issue_v1_dict_to_v2_dict(
         cls,
         issue_dict: Dict[
-            str, Union[str, Dict[str, Dict[str, str]], list[str], int, bool]
+            str, Union[str, Dict[str, Dict[str, str]], List[str], int, bool]
         ]
     ) -> None:
         """Converts a v1 issue dict to a v2 issue dict. This function is now
