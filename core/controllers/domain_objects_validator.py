@@ -20,6 +20,7 @@ handler arguments.
 
 from __future__ import annotations
 
+from core import utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
@@ -240,6 +241,10 @@ def validate_aggregated_stats(aggregated_stats):
         if exp_stats_property not in aggregated_stats:
             raise base.BaseHandler.InvalidInputException(
                 '%s not in aggregated stats dict.' % (exp_stats_property))
+        if not isinstance(aggregated_stats[exp_stats_property], int):
+            raise utils.ValidationError(
+                'Expected %s to be an int, received %s' % (
+                    exp_stats_property, aggregated_stats[exp_stats_property]))
     state_stats_mapping = aggregated_stats['state_stats_mapping']
     for state_name in state_stats_mapping:
         for state_stats_property in state_stats_properties:
@@ -247,6 +252,15 @@ def validate_aggregated_stats(aggregated_stats):
                 raise base.BaseHandler.InvalidInputException(
                     '%s not in state stats mapping of %s in aggregated '
                     'stats dict.' % (state_stats_property, state_name))
+            if not isinstance(
+                state_stats_mapping[state_name][state_stats_property],
+                int
+            ):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (
+                        state_stats_property,
+                        state_stats_mapping[state_name][state_stats_property]
+                    ))
     # The aggregated_stats parameter do not represents any domain class, hence
     # dict form of the data is returned from here.
     return aggregated_stats

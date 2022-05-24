@@ -157,8 +157,15 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegex(Exception, 'id="nullid.1" does not exist'):
-            stats_services.update_stats('nullid', 1, aggregated_stats)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'nullid', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+        stats_services.update_stats('nullid', 1, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'nullid', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
         """Test the update_stats method."""
@@ -200,6 +207,34 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         """Tests that the update_stats returns if a state name is undefined."""
         aggregated_stats = {
             'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'undefined': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+    def test_update_stats_returns_if_aggregated_stats_type_is_invalid(self):
+        """Tests that the update_stats returns if a state name is undefined."""
+        aggregated_stats = {
+            'num_starts': '1',
             'num_actual_starts': 1,
             'num_completions': 1,
             'state_stats_mapping': {

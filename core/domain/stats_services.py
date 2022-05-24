@@ -21,6 +21,7 @@ from __future__ import annotations
 import copy
 import datetime
 import itertools
+import logging
 
 from core import feconf
 from core import utils
@@ -137,26 +138,33 @@ def _update_stats_transactional(
     """
     exp_stats = get_exploration_stats_by_id(exp_id, exp_version)
     if exp_stats is None:
-        raise Exception(
+        logging.error(
             'ExplorationStatsModel id="%s.%s" does not exist' % (
                 exp_id, exp_version))
+        return
 
-    exp_stats.num_starts_v2 += aggregated_stats['num_starts']
-    exp_stats.num_completions_v2 += aggregated_stats['num_completions']
-    exp_stats.num_actual_starts_v2 += aggregated_stats['num_actual_starts']
+    try:
+        exp_stats.num_starts_v2 += aggregated_stats['num_starts']
+        exp_stats.num_completions_v2 += aggregated_stats['num_completions']
+        exp_stats.num_actual_starts_v2 += aggregated_stats['num_actual_starts']
 
-    for state_name, stats in aggregated_stats['state_stats_mapping'].items():
-        if state_name not in exp_stats.state_stats_mapping:
-            # Some events in the past seems to have 'undefined' state names
-            # passed from the frontend code. These are invalid and should be
-            # discarded.
-            if state_name == 'undefined':
-                return
-            raise Exception(
-                'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
-                'does not exist' % (exp_id, exp_version, state_name))
-        exp_stats.state_stats_mapping[state_name].aggregate_from(
-            stats_domain.SessionStateStats.from_dict(stats))
+        state_stats_mapping = aggregated_stats['state_stats_mapping']
+        for state_name, stats in state_stats_mapping.items():
+            if state_name not in exp_stats.state_stats_mapping:
+                # Some events in the past seems to have 'undefined' state names
+                # passed from the frontend code. These are invalid and should be
+                # discarded.
+                if state_name == 'undefined':
+                    return
+                raise Exception(
+                    'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
+                    'does not exist' % (exp_id, exp_version, state_name))
+            exp_stats.state_stats_mapping[state_name].aggregate_from(
+                stats_domain.SessionStateStats.from_dict(stats))
+    except TypeError:
+        logging.error(
+            'The aggregated_stats has an invalid format: %s' % aggregated_stats)
+        return
 
     save_stats_model(exp_stats)
 
