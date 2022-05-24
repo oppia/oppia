@@ -151,12 +151,6 @@ describe('Skill editor staleness detection service', () => {
     expect(faviconService.setFavicon).toHaveBeenCalledWith(
       '/assets/images/favicon_alert/favicon_alert.ico');
     expect(ngbModal.open).toHaveBeenCalled();
-
-    skillEditorStateService.onSkillInitialized.emit();
-
-    expect(
-      skillEditorStalenessDetectionService.showStaleTabInfoModal
-    ).toHaveBeenCalled();
   });
 
   it('should open or close presence of unsaved changes info modal ' +

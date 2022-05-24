@@ -238,7 +238,7 @@ describe('Skill editor page', function() {
     expect(ctrl.getWarningsCount()).toEqual(1);
   });
 
-  it('should create skill editor browser tabs info on ' +
+  it('should create or update skill editor browser tabs info on ' +
   'local storage when a new tab opens', () => {
     spyOn(SkillEditorStateService, 'loadSkill').and.stub();
     spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
@@ -252,7 +252,7 @@ describe('Skill editor page', function() {
     expect(skillEditorBrowserTabsInfo).toBeNull();
 
     // Opening the first tab.
-    SkillEditorStateService.onSkillInitialized.emit();
+    SkillEditorStateService.onSkillChange.emit();
     skillEditorBrowserTabsInfo = (
       LocalStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
@@ -262,40 +262,19 @@ describe('Skill editor page', function() {
     expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
     // Opening the second tab.
-    SkillEditorStateService.onSkillInitialized.emit();
+    ctrl.$onInit();
+    SkillEditorStateService.onSkillChange.emit();
     skillEditorBrowserTabsInfo = (
       LocalStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
 
     expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
-  });
-
-  it('should update skill editor browser tabs info on local storage when ' +
-  'some new changes are saved', () => {
-    spyOn(SkillEditorStateService, 'loadSkill').and.stub();
-    spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
-    ctrl.$onInit();
-
-    let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-      LocalStorageService.getEntityEditorBrowserTabsInfo(
-        EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-    expect(skillEditorBrowserTabsInfo).toBeNull();
-
-    // First time opening of the tab.
-    SkillEditorStateService.onSkillInitialized.emit();
-    skillEditorBrowserTabsInfo = (
-      LocalStorageService.getEntityEditorBrowserTabsInfo(
-        EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
     expect(skillEditorBrowserTabsInfo.getLatestVersion()).toEqual(3);
 
-    // Save some changes on the story and increasing its version.
-    skill._version = 4;
-    SkillEditorStateService.onSkillReinitialized.emit();
+    // Save some changes on the skill which will increment its version.
+    spyOn(skill, 'getVersion').and.returnValue(4);
+    SkillEditorStateService.onSkillChange.emit();
     skillEditorBrowserTabsInfo = (
       LocalStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
@@ -309,12 +288,13 @@ describe('Skill editor page', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     spyOn(SkillEditorStateService, 'loadSkill').and.stub();
     spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
-    ctrl.$onInit();
 
     // Opening of the first tab.
-    SkillEditorStateService.onSkillInitialized.emit();
+    ctrl.$onInit();
+    SkillEditorStateService.onSkillChange.emit();
     // Opening of the second tab.
-    SkillEditorStateService.onSkillInitialized.emit();
+    ctrl.$onInit();
+    SkillEditorStateService.onSkillChange.emit();
 
     let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
       LocalStorageService.getEntityEditorBrowserTabsInfo(

@@ -245,8 +245,6 @@ describe('Skill editor state service', () => {
 
   it('should test getters', () => {
     expect(skillEditorStateService.onSkillChange).toBeDefined();
-    expect(skillEditorStateService.onSkillInitialized).toBeDefined();
-    expect(skillEditorStateService.onSkillReinitialized).toBeDefined();
   });
 
   it('should request to load the skill from the backend', () => {

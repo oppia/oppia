@@ -65,6 +65,7 @@ angular.module('oppia').component('skillEditorPage', {
         UndoRedoService, UrlService, WindowRef,
         MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
+      let skillIsInitialized = false;
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.getActiveTabName = function() {
@@ -124,7 +125,7 @@ angular.module('oppia').component('skillEditorPage', {
             .OPENED_SKILL_EDITOR_BROWSER_TABS);
       };
 
-      const createSkillEditorBrowserTabsInfo = function() {
+      const createOrUpdateSkillEditorBrowserTabsInfo = function() {
         const skill = SkillEditorStateService.getSkill();
 
         let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
@@ -132,30 +133,19 @@ angular.module('oppia').component('skillEditorPage', {
             EntityEditorBrowserTabsInfoDomainConstants
               .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
 
-        if (skillEditorBrowserTabsInfo) {
+        if (skillIsInitialized) {
           skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
-          skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
         } else {
-          skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-            'skill', skill.getId(), skill.getVersion(), 1, false);
+          if (skillEditorBrowserTabsInfo) {
+            skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
+            skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+          } else {
+            skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+              'skill', skill.getId(), skill.getVersion(), 1, false);
+          }
+          skillIsInitialized = true;
         }
-
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          skillEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS);
-      };
-
-      const updateSkillEditorBrowserTabsInfo = function() {
-        const skill = SkillEditorStateService.getSkill();
-
-        const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-          LocalStorageService.getEntityEditorBrowserTabsInfo(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
-
-        skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
-        skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
 
         LocalStorageService.updateEntityEditorBrowserTabsInfo(
           skillEditorBrowserTabsInfo,
@@ -183,18 +173,12 @@ angular.module('oppia').component('skillEditorPage', {
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
         ctrl.directiveSubscriptions.add(
-          SkillEditorStateService.onSkillChange.subscribe(
-            () => $rootScope.$applyAsync()));
-        ctrl.directiveSubscriptions.add(
-          SkillEditorStateService.onSkillInitialized.subscribe(() => {
-            createSkillEditorBrowserTabsInfo();
+          SkillEditorStateService.onSkillChange.subscribe(() => {
+            createOrUpdateSkillEditorBrowserTabsInfo();
+            $rootScope.$applyAsync();
           })
         );
-        ctrl.directiveSubscriptions.add(
-          SkillEditorStateService.onSkillReinitialized.subscribe(() => {
-            updateSkillEditorBrowserTabsInfo();
-          })
-        );
+        skillIsInitialized = false;
         SkillEditorStalenessDetectionService.init();
         WindowRef.nativeWindow.addEventListener(
           'beforeunload', ctrl.onClosingSkillEditorBrowserTab);
