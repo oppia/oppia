@@ -992,15 +992,14 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls) -> Optional[CommunityContributionStatsModel]: # type: ignore[override]
+    def get(cls) -> CommunityContributionStatsModel: # type: ignore[override]
         """Gets the CommunityContributionStatsModel instance. If the
         CommunityContributionStatsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
-            CommunityContributionStatsModel|None. The single model instance,
-            or None if no such model instance exists.
+            CommunityContributionStatsModel. The single model instance.
         """
         community_contribution_stats_model = cls.get_by_id(
             COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
