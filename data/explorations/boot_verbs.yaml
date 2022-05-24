@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -43,6 +44,7 @@ states:
         \ the following sentence:<br><br>\_\_\_ <em>Yo __________ (jugar) al f\xFA\
         tbol con amigos los domingos.<br><br></em>What verb conjugation goes in the\
         \ blank?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -50,6 +52,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That is correct! Great job!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -69,6 +72,7 @@ states:
             content_id: feedback_2
             html: <p>No, remember jugo means 'juice'. It sounds about right, but it
               isn't quite because jugar is a boot verb.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -95,6 +99,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -129,6 +134,7 @@ states:
       content_id: content
       html: <p>OK, now you can join that stem together with the ending. What answer
         do you get?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -136,6 +142,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -162,6 +169,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Try that again. Put jueg- together with -o and you get...?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -199,6 +207,7 @@ states:
         \ draw a line around these, it looks like a boot.<br>\n<br>\nIn the case of\
         \ jugar, since it is a verb ending in -gar, it uses the u &gt; ue stem, so\
         \ what does the stem become?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -206,6 +215,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -226,6 +236,7 @@ states:
             html: "<p>That was quick! I was asking just for the stem, which is <strong>jueg-</strong>.\
               \ But you already gave the entire conjugated verb\xC2\_<strong>juego</strong>\
               \ (stem + ending). Great job!</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -253,6 +264,7 @@ states:
           content_id: default_outcome
           html: <p>Not quite. Just change the <strong>u</strong> to a <strong>ue</strong>
             and you get <strong>jueg-.</strong></p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -287,6 +299,7 @@ states:
       content_id: content
       html: <p>In order to figure out how to conjugate the verb properly, we should
         look at the subject of the sentence. Can you identify what the subject is?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -294,6 +307,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -321,6 +335,7 @@ states:
           content_id: default_outcome
           html: <p>Remember, the subject of the sentence is the noun in the sentence
             that is doing the action. It is usually near the beginning of the sentence.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -350,6 +365,7 @@ states:
     content:
       content_id: content
       html: <p>So what is the correct verb ending for yo?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -358,6 +374,7 @@ states:
             content_id: feedback_1
             html: <p>But if you just drop the -ar and at -o, you get jugo which means
               juice, so that's not quite right. That's because jugar is a boot verb!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -377,6 +394,7 @@ states:
             content_id: feedback_2
             html: <p>But if you just drop the -ar and at -o, you get jugo which means
               juice, so that's not quite right. That's because jugar is a boot verb!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -406,6 +424,7 @@ states:
             \ speak): yo hablo, t\xFA hablas, usted/\xE9l/ella habla, nosotros/as\
             \ hablamos, vosotros/as habl\xE1is, ustedes/ellos/ellas hablan. From this\
             \ list, what do you think the corresponding ending for 'yo' is?</p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

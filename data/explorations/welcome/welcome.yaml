@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -40,6 +41,7 @@ states:
     content:
       content_id: content
       html: <p>What is 10 times 10?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -47,6 +49,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Yes! So 11 times 11 must be bigger. Let's try again.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -65,6 +68,7 @@ states:
           content_id: default_outcome
           html: <p>No; try again. Remember, multiplication by ten can be done by just
             adding a zero at the end.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -94,6 +98,7 @@ states:
         Oppia!</p><p><br>Where would people say the word 'Oppia'? Well, in Finland,
         and probably in its capital, Helsinki. Can you find Helsinki on a map of the
         world?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -101,6 +106,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Hooray, you found it!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -120,6 +126,7 @@ states:
             content_id: feedback_2
             html: <p>Close, but not quite. Helsinki is on the south coast of Finland;
               try looking there.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -146,6 +153,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That is rather far away! Try zooming into Finland.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -178,6 +186,7 @@ states:
         \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;,\
         \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_151657_43i02glydt_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
         ></oppia-noninteractive-math>?</p><p>\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -185,6 +194,7 @@ states:
           feedback:
             content_id: feedback_1
             html: '<p>Yes, that''s correct: 11 times 11 is 121.</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -200,6 +210,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Nope. Let's make a quick estimate.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -217,6 +228,7 @@ states:
             html: <p>You are actually very close. Think about the last digit of the
               answer; what must it be? Then you should be able to get it in one or
               two more goes.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -233,6 +245,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>That's too high! Try guessing lower.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -248,6 +261,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>That's not large enough. Try guessing higher?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -266,6 +280,7 @@ states:
           content_id: default_outcome
           html: <p>If you got here, something's gone a bit wrong with this exploration.
             Sorry about that. If you're wondering, the answer is 121.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -305,6 +320,7 @@ states:
         \ know at our <oppia-noninteractive-link text-with-value=\"&amp;quot;discussion\
         \ forum&amp;quot;\" url-with-value=\"&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;\"\
         ></oppia-noninteractive-link>!</p><p></p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -318,6 +334,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -347,6 +364,7 @@ states:
         is a tool that helps you create interactive learning activities that can be
         continually improved over time.<br><br>Incidentally, do you know where the
         name 'Oppia' comes from?<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -354,6 +372,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Yes!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -370,6 +389,7 @@ states:
             content_id: feedback_2
             html: <p>Actually, I don't know of any such characters, so I must confess
               to making that choice up. Have another go?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -386,10 +406,13 @@ states:
           value:
           - content_id: ca_choices_3
             html: <p>It's translated from a different language.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>It's a nonsense word that someone made up.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>It's the name of a popular cartoon character.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -398,6 +421,7 @@ states:
           content_id: default_outcome
           html: <p>Hm, it certainly looks like it! But it's actually a word from a
             different language.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -443,6 +467,7 @@ states:
         \ {&amp;quot;title&amp;quot;: &amp;quot;Hint 3&amp;quot;, &amp;quot;content&amp;quot;:\
         \ &amp;quot;&amp;lt;p&amp;gt;Oppia is a Finnish word.&amp;lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;}]\"\
         ></oppia-noninteractive-tabs><p>\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -452,6 +477,7 @@ states:
             html: <p>That's a pretty good guess. Several Greek words end with 'ia',
               such as 'thexia' and 'paralia'. But Oppia is not a Greek word, though
               it's from a country that's not too far away. Try again?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -475,6 +501,7 @@ states:
               that we're looking for. (Please feel free to search on the Web for the
               answer, by the way; this is admittedly a factual question which not
               many people will know the answer to.)</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -498,6 +525,7 @@ states:
               that we're looking for. (Please feel free to search on the Web for the
               answer, by the way; this is admittedly a factual question which not
               many people will know the answer to.)</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -517,6 +545,7 @@ states:
             content_id: feedback_4
             html: <p>That's not it, alas. But you're very close! Oppia is indeed a
               Nordic word, but it's not from Sweden.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -536,6 +565,7 @@ states:
             content_id: feedback_5
             html: '<p>Oops, I was unclear, sorry. I meant: type ''translate oppia''
               into a search engine, such as Google.</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -555,6 +585,7 @@ states:
             content_id: feedback_6
             html: <p>Not quite; that's actually the opposite of 'start'. Check your
               spelling!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -577,6 +608,7 @@ states:
               ask for numeric answers, text answers, sets of strings, and so on. You
               can even write your own types of questions. Here is a question that
               takes numeric input:</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -596,6 +628,7 @@ states:
             content_id: feedback_8
             html: <p>I think your spelling isn't quite right; you might want to check
               it.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -614,6 +647,7 @@ states:
           feedback:
             content_id: feedback_9
             html: <p>Great, glad to hear that. Which language is it?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -633,6 +667,7 @@ states:
             content_id: feedback_10
             html: <p>Nein! Ahem... no, it's not German. But it's a European language.
               From a place that's colder than Germany. Have another go?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -653,6 +688,7 @@ states:
             html: '<p>Mais non! Well, no, it''s not French. But it''s pretty close.
               Here, I''ll give you a hint: Oppia is a word from one of the Scandinavian
               countries. Can you guess which one?</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -675,6 +711,7 @@ states:
               here. For example, you could ask for numeric answers, text answers,
               sets of strings, and so on. You can even write your own types of questions.
               Here is a question that takes numeric input:</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -693,6 +730,7 @@ states:
           feedback:
             content_id: feedback_13
             html: <p>Finland is a country. But what language do they speak there?<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -711,6 +749,7 @@ states:
           feedback:
             content_id: feedback_14
             html: <p>You're close! Try heading east...<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -730,6 +769,7 @@ states:
             content_id: feedback_15
             html: <p>That's not it, alas. But you're very close! Oppia is indeed a
               Nordic word, but it's not from Sweden.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -758,6 +798,7 @@ states:
           html: <p>Sorry, nope, we didn't get it from {{answer}}. But you can find
             out lots of things on the Web. Why not try doing a search for [translate
             oppia] on your favorite search engine?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

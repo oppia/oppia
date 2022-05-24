@@ -19,6 +19,7 @@ states:
         \ They are widely used in many fields, such as computer science and statistics.\_\
         </p><p>\_</p><p>Maybe from now on you'll start seeing graphs all over the\
         \ place!\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -32,6 +33,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -61,6 +63,7 @@ states:
         to George.</li><li>John and George report to Irene.</li></ul><p>Try modeling
         this as a graph, with a directed edge from an employee to his or her immediate
         superior.</p>'
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -68,6 +71,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Well done!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -162,6 +166,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Not exactly... try again!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -196,6 +201,7 @@ states:
         \ dots, we have arrows instead. In mathematician-speak, this would be a \"\
         directed graph\", since every edge has a direction.</p><p>\_</p><p>Let's give\
         \ this a try now!</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -209,6 +215,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -239,6 +246,7 @@ states:
         from Madrid.</li><li>London is 1265km from Madrid.</li><li>Madrid is 1871km
         from Berlin.</li></ul><p>(Note: On the graph, don''t put "km" on the edges,
         just put the number)</p>'
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -246,6 +254,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Excellent!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -331,6 +340,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Not quite, try again!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -356,6 +366,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -386,6 +397,7 @@ states:
         \ to each edge to represent this data. In mathematician-speak, such a graph\
         \ is a \"weighted graph\", since each edge has a \"weight\" number.</p><p>\_\
         </p><p>Let's give this a try!</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -399,6 +411,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -428,6 +441,7 @@ states:
         is friends with Alice only<br></li><li>Charlie is friends with Alice and David<br></li><li>David
         is friends with Charlie and Emily<br></li><li>Emily is friends with Alice
         and David<br></li></ul><p>Try to model the friendships as a graph!</p>'
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -435,6 +449,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -485,6 +500,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Did you forget to add new edges?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -558,6 +574,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Not quite... Let's try again!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -595,6 +612,7 @@ states:
         </p><p>\_</p><p>Despite this simplicity, graphs are useful for modeling all\
         \ kinds of real world behavior. Not convinced? Let's take a look at some things\
         \ that graphs can model...</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -608,6 +626,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

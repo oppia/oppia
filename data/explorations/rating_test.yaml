@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Test exploration</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []

@@ -720,7 +720,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'description': 'Skill Description',
                 'rubrics': rubrics,
                 'explanation_dict': state_domain.SubtitledHtml(
-                    '1', '<p>Explanation</p>').to_dict(),
+                    '1', '<p>Explanation</p>', []).to_dict(),
                 'thumbnail_filename': 'image.svg'
             },
             csrf_token=csrf_token,
@@ -740,7 +740,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'linked_topic_ids': ['topic'],
             'rubrics': [],
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict(),
+                '1', '<p>Explanation</p>', []).to_dict(),
             'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
@@ -773,7 +773,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', explanation_html).to_dict(),
+                '1', explanation_html, []).to_dict(),
             'thumbnail_filename': 'image.svg'
         }
 
@@ -792,7 +792,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description 2',
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', explanation_html).to_dict(),
+                '1', explanation_html, []).to_dict(),
             'thumbnail_filename': 'image.svg'
         }
         response_dict = self.post_json(
@@ -836,7 +836,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', explanation_html).to_dict(),
+                '1', explanation_html, []).to_dict(),
             'thumbnail_filename': 'image.svg'
         }
 
@@ -925,7 +925,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'linked_topic_ids': [self.topic_id],
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict(),
+                '1', '<p>Explanation</p>', []).to_dict(),
             'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
@@ -959,7 +959,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Duplicate Skill Description',
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict(),
+                '1', '<p>Explanation</p>', []).to_dict(),
             'thumbnail_filename': 'image.svg'
         }
 

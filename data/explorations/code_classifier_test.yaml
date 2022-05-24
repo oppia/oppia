@@ -13,6 +13,7 @@ states:
     content:
       audio_translations: {}
       html: <p>Hi there</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - correct: false

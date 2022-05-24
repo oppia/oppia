@@ -80,7 +80,7 @@ describe('Outcome Feedback Editor Component', () => {
       changeDetectorRef.constructor.prototype, 'detectChanges');
     component.outcome = new Outcome(
       'default',
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id', []),
       false,
       [],
       null,
@@ -104,7 +104,7 @@ describe('Outcome Feedback Editor Component', () => {
       changeDetectorRef.constructor.prototype, 'detectChanges');
     component.outcome = new Outcome(
       'default',
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id', []),
       false,
       [],
       null,

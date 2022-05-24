@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -50,6 +51,7 @@ states:
     content:
       content_id: content
       html: <p>Try clicking on the speaker! After listening, click continue.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -63,6 +65,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -98,6 +101,7 @@ states:
     content:
       content_id: content
       html: <p>Try typing some code.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -105,6 +109,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Nice!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -130,6 +135,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Nice work.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -160,6 +166,7 @@ states:
     content:
       content_id: content
       html: <p>Are you a cat or dog person?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -167,6 +174,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>I like cats too.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -185,6 +193,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>I like dogs too.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -211,6 +220,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>I'm not sure what that animal is.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -219,6 +229,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>There's no wrong answer.</p>
+          image_filenames_in_html: []
       id: TextInput
       solution:
         answer_is_exclusive: false

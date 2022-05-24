@@ -1306,7 +1306,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = stateCard;
     componentInstance.nextCard = stateCard;
     componentInstance.conceptCard = new ConceptCard(
-      new SubtitledHtml('', ''), [], null);
+      new SubtitledHtml('', '', []), [], null);
     spyOn(explorationPlayerStateService, 'recordNewCardAdded');
     spyOn(playerTranscriptService, 'addNewCard');
     spyOn(explorationPlayerStateService, 'getLanguageCode')
@@ -1453,7 +1453,7 @@ describe('Conversation skin component', () => {
     spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
       .and.returnValue(Promise.resolve([
         new ConceptCard(
-          new SubtitledHtml('', ''), [], null)
+          new SubtitledHtml('', '', []), [], null)
       ]));
 
     spyOn(

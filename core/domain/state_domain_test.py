@@ -62,23 +62,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
         state_content_dict = {
             'content_id': 'content',
-            'html': '<p>state content html</p>'
+            'html': '<p>state content html</p>',
+            'image_filenames_in_html': []
         }
         state_customization_args_dict = {
             'choices': {
                 'value': [
                     {
                         'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
+                        'html': '<p>state customization arg html 1</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
+                        'html': '<p>state customization arg html 2</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
+                        'html': '<p>state customization arg html 3</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
+                        'html': '<p>state customization arg html 4</p>',
+                        'image_filenames_in_html': []
                     }
                 ]
             },
@@ -89,7 +94,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>State Feedback</p>'),
+                    'feedback_1', '<p>State Feedback</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -134,7 +139,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ],
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
+                'html': '<p>This is solution for state1</p>',
+                'image_filenames_in_html': []
             }
         }
         state_written_translations_dict = {
@@ -293,7 +299,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>', []
                 )
             )
         ]
@@ -308,7 +314,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ],
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
+                'html': '<p>This is solution for state1</p>',
+                'image_filenames_in_html': []
             }
         }
 
@@ -408,12 +415,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_content_dict = {
             'content_id': 'content',
-            'html': '<p>state content html</p>'
+            'html': '<p>state content html</p>',
+            'image_filenames_in_html': []
         }
         state_answer_group = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>state outcome html</p>'),
+                    'feedback_1', '<p>state outcome html</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -428,18 +436,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )]
         state_default_outcome = state_domain.Outcome(
             'State1', state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for State1</p>'),
+                'default_outcome', '<p>Default outcome for State1</p>', []),
             False, [], None, None
         )
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state1</p>'
+                    'hint_1', '<p>Hello, this is html1 for state1</p>', []
                 )
             ),
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state1</p>'
+                    'hint_2', '<p>Hello, this is html2 for state1</p>', []
                 )
             ),
         ]
@@ -448,7 +456,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'Answer1',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
+                'html': '<p>This is solution for state1</p>',
+                'image_filenames_in_html': []
             }
         }
         state_interaction_cust_args = {
@@ -498,7 +507,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_content_dict = {
             'content_id': 'content',
-            'html': '<p>state content html</p>'
+            'html': '<p>state content html</p>',
+            'image_filenames_in_html': []
         }
         state_customization_args_dict = {
             'maxAllowableSelectionCount': {
@@ -511,16 +521,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': [
                     {
                         'content_id': 'ca_choices_0',
-                        'html': '<p>init_state customization arg html 1</p>'
+                        'html': '<p>init_state customization arg html 1</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_1',
-                        'html': '<p>init_state customization arg html 2</p>'
+                        'html': '<p>init_state customization arg html 2</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_2',
-                        'html': '<p>init_state customization arg html 3</p>'
+                        'html': '<p>init_state customization arg html 3</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_3',
-                        'html': '<p>init_state customization arg html 4</p>'
+                        'html': '<p>init_state customization arg html 4</p>',
+                        'image_filenames_in_html': []
                     },
                 ]
             }
@@ -528,7 +542,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'),
+                    'feedback', '<p>state outcome html</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -566,13 +580,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ],
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
+                'html': '<p>This is solution for state1</p>',
+                'image_filenames_in_html': []
             }
         }
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>', []
                 )
             )
         ]
@@ -647,7 +662,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'),
+                    'feedback', '<p>state outcome html</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -719,10 +734,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': [
                     {
                         'content_id': None,
-                        'html': '<p>init_state customization arg html 1</p>'
+                        'html': '<p>init_state customization arg html 1</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_1',
-                        'html': '<p>init_state customization arg html 2</p>'
+                        'html': '<p>init_state customization arg html 2</p>',
+                        'image_filenames_in_html': []
                     }
                 ]
             }
@@ -748,7 +765,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'),
+                    'feedback', '<p>state outcome html</p>', []),
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -771,16 +788,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': [
                     {
                         'content_id': 'ca_choices_0',
-                        'html': '<p>init_state customization arg html 1</p>'
+                        'html': '<p>init_state customization arg html 1</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_1',
-                        'html': '<p>init_state customization arg html 2</p>'
+                        'html': '<p>init_state customization arg html 2</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_2',
-                        'html': '<p>init_state customization arg html 3</p>'
+                        'html': '<p>init_state customization arg html 3</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_3',
-                        'html': '<p>init_state customization arg html 4</p>'
+                        'html': '<p>init_state customization arg html 4</p>',
+                        'image_filenames_in_html': []
                     }
                 ]
             }
@@ -824,23 +845,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
         state_content_dict = {
             'content_id': 'content',
-            'html': '<p>state content html</p>'
+            'html': '<p>state content html</p>',
+            'image_filenames_in_html': []
         }
         state_customization_args_dict = {
             'choices': {
                 'value': [
                     {
                         'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
+                        'html': '<p>state customization arg html 1</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
+                        'html': '<p>state customization arg html 2</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
+                        'html': '<p>state customization arg html 3</p>',
+                        'image_filenames_in_html': []
                     }, {
                         'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
+                        'html': '<p>state customization arg html 4</p>',
+                        'image_filenames_in_html': []
                     }
                 ]
             },
@@ -868,7 +894,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ],
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
+                'html': '<p>This is solution for state1</p>',
+                'image_filenames_in_html': []
             }
         }
 
@@ -915,7 +942,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
         state_content_dict = {
             'content_id': 'content',
-            'html': '<p>state content html</p>'
+            'html': '<p>state content html</p>',
+            'image_filenames_in_html': []
         }
 
         state.update_content(
@@ -1152,7 +1180,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                     'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
                     'quot;:&amp;quot;hello&amp;quot;}]\">'
-                    '</oppia-noninteractive-tabs>')
+                    '</oppia-noninteractive-tabs>'),
+                'image_filenames_in_html': []
             }))
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
@@ -1162,7 +1191,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '<p><oppia-noninteractive-link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
                     'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>')
+                    ';quot;"></oppia-noninteractive-link></p>'),
+                'image_filenames_in_html': []
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
@@ -1171,7 +1201,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': (
                     '<p><oppia-noninteractive-skillreview text-with-value="'
                     '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
-                    '&amp;quot;"></oppia-noninteractive-skillreview></p>')
+                    '&amp;quot;"></oppia-noninteractive-skillreview></p>'),
+                'image_filenames_in_html': []
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
@@ -1259,7 +1290,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_filenames_in_html': []
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
@@ -1363,7 +1395,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_filenames_in_html': []
             }))
         init_state.update_interaction_id('TextInput')
         state_interaction_cust_args = {
@@ -1493,7 +1526,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_filenames_in_html': []
             }))
         init_state.update_interaction_id('SetInput')
 
@@ -1545,7 +1579,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_filenames_in_html': []
             }))
         # Set the multiple choice interaction.
         init_state.update_interaction_id('MultipleChoiceInput')
@@ -1631,7 +1666,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_filenames_in_html': []
             }))
 
         self.assertEqual(init_state.get_translation_counts(), {})
@@ -1645,7 +1681,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
-                'html': '<p>This is content</p>'
+                'html': '<p>This is content</p>',
+                'image_filenames_in_html': []
             }))
 
         self.set_interaction_for_state(state, 'TextInput')
@@ -3862,7 +3899,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'feedback_1',
-                'html': '<p>Feedback</p>'
+                'html': '<p>Feedback</p>',
+                'image_filenames_in_html': []
             }))
 
         with self.assertRaisesRegex(
@@ -3917,7 +3955,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'default_outcome',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             }))
 
         with self.assertRaisesRegex(
@@ -3936,7 +3975,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'hint_1',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             }))
 
         with self.assertRaisesRegex(
@@ -3964,7 +4004,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'solution',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
                 }))
 
         with self.assertRaisesRegex(

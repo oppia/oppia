@@ -22,6 +22,7 @@ states:
     content:
       content_id: content
       html: <p>Write a program the prints 12.<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -29,6 +30,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -54,6 +56,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -89,6 +92,7 @@ states:
         \ 4}} should be true.</p><p>{{4 &gt;= 3}} should be true.</p><p>&lt; should\
         \ be an unescaped 'less-than' sign.</p><p>&gt; should be an unescaped 'greater-than'\
         \ sign.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -102,6 +106,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -147,6 +152,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -173,6 +179,7 @@ states:
       html: "<p>Choose option B.<br></p><p>\_</p><p><strong>Parameters</strong></p><p>{{a}}\
         \ should be 1.</p><p>{{b}} should be 3.<br></p><p>{{c}} should be 2.</p><p>{{a*b}}\
         \ should be 3.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -180,6 +187,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -199,12 +207,15 @@ states:
               \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
               &amp;quot;A_height_24_width_24.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
               </p>"
+            image_filenames_in_html: []
           - content_id: ca_choices_3
             html: <p>Option B<br></p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
               &amp;quot;\\frac{x}{y}&amp;quot;, &amp;quot;svg_filename&amp;quot;:
               &amp;quot;mathImg_20200904_152727_0lz7a7ui3f_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math><br></p>'
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -212,6 +223,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -248,6 +260,7 @@ states:
     content:
       content_id: content
       html: <p>Enter two E4 notes (bottom line).<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -255,6 +268,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -292,6 +306,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -319,6 +334,7 @@ states:
       html: <p>Do the following step by step:<br><br>1. Delete Node labelled B</p><p>2.
         Add Node labelled Z</p><p>3. Add Edge of weight 150 connecting A to Z</p><p>4.
         Delete Edge between A and F</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -326,6 +342,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -393,6 +410,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Incorrect</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -418,6 +436,7 @@ states:
     content:
       content_id: content
       html: <p>Enter a number larger than 6.<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -425,6 +444,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -442,6 +462,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -467,6 +488,7 @@ states:
     content:
       content_id: content
       html: <p>Enter the set {abc, xyz}<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -474,6 +496,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -499,6 +522,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -528,6 +552,7 @@ states:
     content:
       content_id: content
       html: <p>Please type hello.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -535,6 +560,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -561,6 +587,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -590,6 +617,7 @@ states:
     content:
       content_id: content
       html: <p>Enter the string rrrrr<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -597,6 +625,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -623,6 +652,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -652,6 +682,7 @@ states:
     content:
       content_id: content
       html: <p>Click on the USA.<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -659,6 +690,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -685,6 +717,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Wrong.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

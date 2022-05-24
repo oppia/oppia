@@ -6646,7 +6646,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
+            'content', '<p>old content html</p>', []).to_dict()
         exploration.states['State 1'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 2'].update_content(

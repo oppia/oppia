@@ -17,6 +17,7 @@ states:
       content_id: content
       html: "<p>\xA1Ay! \xBF\xA150 pesos por una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
         \xA1Adi\xF3s!</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -24,6 +25,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Don't forget your accent marks next time!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -42,6 +44,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -68,6 +71,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Say goodbye</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -101,6 +105,7 @@ states:
     content:
       content_id: content
       html: "<p>\xBFDe qu\xE9 colores son las manzanas?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -109,6 +114,7 @@ states:
             content_id: feedback_1
             html: <p>Apples aren't black unless they are rotten...and they aren't
               blue</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -124,6 +130,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Orange and white...not quite</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -139,6 +146,7 @@ states:
           feedback:
             content_id: feedback_3
             html: "<p>\xA1S\xED! That's right -- apples are red and green.</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -154,6 +162,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>Yellow and gray? Apples?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -170,14 +179,19 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>negro y azul</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>anaranjado y blanco</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>rojo y verde</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>amarillo y gris</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_9
             html: <p>I don't know</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -189,6 +203,7 @@ states:
             manzanas is apples.
 
             So this is asking, what colors are apples?</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -231,6 +246,7 @@ states:
       content_id: content
       html: "<p>Now, \"te llamas\" looks a lot like \"me llamo.\"\nAnd this sentence\
         \ is a question.\n<br><br>What do you think \"\xBFC\xF3mo te llamas?\" means?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -240,6 +256,7 @@ states:
             html: '<p>Yes!
 
               So, let''s try this again...Introduce yourself.</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -260,6 +277,7 @@ states:
             html: '<p>Great!
 
               So, let''s try this again...Introduce yourself.</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -288,6 +306,7 @@ states:
           html: '<p>So this means "What is your name?"
 
             So, let''s try this again...Introduce yourself.</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -321,6 +340,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -346,6 +366,7 @@ states:
       content_id: content
       html: "<p>Let's speak some Spanish! I'll say something in Spanish, and you can\
         \ respond in Spanish. OK?<br><br>\n\xC2\xA1Hola!</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -354,6 +375,7 @@ states:
             content_id: feedback_1
             html: '<p>Don''t forget: Spanish uses inverted exclamation points at the
               beginning of sentences as well as the ending exclamation point.</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -372,6 +394,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -390,6 +413,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Check your spelling!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -416,6 +440,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Hola means Hello. Say Hello back (in Spanish).</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -453,6 +478,7 @@ states:
     content:
       content_id: content
       html: "<p>Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -460,6 +486,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>You've got one too many verbs.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -478,6 +505,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -496,6 +524,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -522,6 +551,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -559,6 +589,7 @@ states:
     content:
       content_id: content
       html: <p>(What do you think "Me llamo" means?)</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -566,6 +597,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That's right!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -584,6 +616,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Literally, yes, but it can also be translated as "My name is."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -602,6 +635,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Literally, yes, but it can also be translated as "My name is."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -630,6 +664,7 @@ states:
           html: '<p>Me llamo means "My name is"
 
             So "Me llamo Oppia" means "My name is Oppia".</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -668,6 +703,7 @@ states:
       content_id: content
       html: "<p>\xA1Vamos al supermercado!\n<br><br>\n\xBFQu\xE9 podemos comprar all\xED\
         ?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -677,6 +713,7 @@ states:
             html: "<p>\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\
               You can't buy windows in a supermarket. If you need more help, select\
               \ \"I don't know\"</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -694,6 +731,7 @@ states:
             html: "<p>\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\
               \nYou can't buy cars in a supermarket. If you need more help, select\
               \ \"I don't know\"</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -709,6 +747,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Yes! You can buy apples in a supermarket.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -725,12 +764,16 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>Ventanas</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>Coches</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Manzanas</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>I don't know</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -740,6 +783,7 @@ states:
           html: '<p>Supermercado is supermarket.
 
             What can you buy at a supermarket?</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

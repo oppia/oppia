@@ -17,6 +17,7 @@ states:
     content:
       content_id: content
       html: <p>What fraction represents half of something?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -24,6 +25,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -55,6 +57,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That answer isn't correct. Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -63,13 +66,16 @@ states:
       - hint_content:
           content_id: hint_2
           html: <p>Remember that two halves, when added together, make one whole.</p>
+          image_filenames_in_html: []
       - hint_content:
           content_id: hint_3
           html: <p>One half is a fraction resulting from dividing one by two.</p>
+          image_filenames_in_html: []
       - hint_content:
           content_id: hint_4
           html: <p>Half in fraction&nbsp;is represented by 1 in the numerator and
             2 in the denominator.</p>
+          image_filenames_in_html: []
       id: FractionInput
       solution:
         answer_is_exclusive: true
@@ -82,6 +88,7 @@ states:
           content_id: solution
           html: <p>Half of something has one part in the numerator for every two parts
             in the denominator.</p>
+          image_filenames_in_html: []
     linked_skill_id: null
     next_content_id_index: 5
     param_changes: []
@@ -114,6 +121,7 @@ states:
       html: <p>Test exploration with all android specific interactions</p><oppia-noninteractive-image
         alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;img_20210622_123005_efcgi87dk2_height_130_width_289.png&amp;quot;"></oppia-noninteractive-image>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -154,6 +162,7 @@ states:
     content:
       content_id: content
       html: <p>In which language does Oppia mean 'to learn'?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -161,6 +170,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -187,6 +197,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Not quite. Try again (or maybe use a search engine).</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -218,6 +229,7 @@ states:
     content:
       content_id: content
       html: <p>What are the primary colors of light?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -225,6 +237,7 @@ states:
           feedback:
             content_id: feedback_6
             html: <p><strong>Correct!</strong></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -244,6 +257,7 @@ states:
             content_id: feedback_7
             html: <p>'Yellow' is considered a primary color in the RYB spectrum, but
               that doesn't correspond to light. Try again!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -261,16 +275,22 @@ states:
           value:
           - content_id: ca_choices_0
             html: <p>Red</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_1
             html: <p>Yellow</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_2
             html: <p>Green</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_3
             html: <p>Blue</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>Orange</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>Purple</p>
+            image_filenames_in_html: []
         maxAllowableSelectionCount:
           value: 3
         minAllowableSelectionCount:
@@ -280,6 +300,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That's not quite right. Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -321,6 +342,7 @@ states:
     content:
       content_id: content
       html: <p>Sort the following in descending order.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -328,6 +350,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>That's correct</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -350,17 +373,22 @@ states:
           value:
           - content_id: ca_choices_0
             html: <p>0.35</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_1
             html: <p>3/5</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_2
             html: <p>0.5</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_3
             html: <p>0.46</p>
+            image_filenames_in_html: []
       default_outcome:
         dest: drag and drop
         feedback:
           content_id: default_outcome
           html: <p>Not quite. Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -397,6 +425,7 @@ states:
       content_id: content
       html: <p>Sort the following in descending order, putting equal items in the
         same position.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -404,6 +433,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>That's correct</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -423,6 +453,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>Seems like you did the ascending order</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -442,17 +473,22 @@ states:
           value:
           - content_id: ca_choices_0
             html: <p>3/5</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_1
             html: <p>6.0</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_2
             html: <p>0.35</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_3
             html: <p>0.46</p>
+            image_filenames_in_html: []
       default_outcome:
         dest: drag and drop sort
         feedback:
           content_id: default_outcome
           html: <p>Not quite. Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -490,6 +526,7 @@ states:
     content:
       content_id: content
       html: Congratulations, you have finished!
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -516,6 +553,7 @@ states:
     content:
       content_id: content
       html: <p>Click on the "O" letter in the below image.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -523,6 +561,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Continue</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -586,6 +625,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Select the left most letter</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -613,6 +653,7 @@ states:
     content:
       content_id: content
       html: <p>What is 11 times 11?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -620,6 +661,7 @@ states:
           feedback:
             content_id: feedback_0
             html: <p>Correct!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -635,6 +677,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Not quite. It's actually larger than that. Try again.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -650,6 +693,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Not quite. It's less than that.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -667,6 +711,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Try again</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -698,6 +743,7 @@ states:
     content:
       content_id: content
       html: <p>Which bird can sustain flight for long periods of time?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -705,6 +751,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Correct! Eagles can sustain flight.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -721,10 +768,13 @@ states:
           value:
           - content_id: ca_choices_0
             html: <p>Penguin</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_1
             html: <p>Chicken</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_2
             html: <p>Eagle</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -732,6 +782,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -766,6 +817,7 @@ states:
       content_id: content
       html: <p>Two numbers are respectively 20% and 50% more than a third number.
         The ratio of the two numbers is:</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -773,6 +825,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -798,6 +851,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Not correct</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

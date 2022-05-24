@@ -95,7 +95,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
+            'content', '<p>old content html</p>', []).to_dict()
         self.exploration.states['State 1'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
         self.exploration.states['State 2'].update_content(
@@ -109,11 +109,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.editor, self.EXP_ID, self.owner_id, rights_domain.ROLE_EDITOR)
 
         self.new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>').to_dict()
+            'content', '<p>new content html</p>', []).to_dict()
         self.resubmit_change_content = state_domain.SubtitledHtml(
-            'content', '<p>resubmit change content html</p>').to_dict()
+            'content', '<p>resubmit change content html</p>', []).to_dict()
         self.update_change_content = state_domain.SubtitledHtml(
-            'content', '<p>update change content html</p>').to_dict()
+            'content', '<p>update change content html</p>', []).to_dict()
 
         self.logout()
 
@@ -323,7 +323,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, self.editor_id)
 
         new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>').to_dict()
+            'content', '<p>new content html</p>', []).to_dict()
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1894,7 +1894,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, self.admin_id)
 
         new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>').to_dict()
+            'content', '<p>new content html</p>', []).to_dict()
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,

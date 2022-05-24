@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Where would you like to go next?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -23,6 +24,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -38,6 +40,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -53,6 +56,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -68,6 +72,7 @@ states:
           feedback:
             content_id: feedback_4
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -84,12 +89,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Continue with the Interval Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Go back to the Pitch Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Move on to the Melody Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>No, thanks. I'm done for now.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -97,6 +106,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's keep matching intervals for now.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -136,6 +146,7 @@ states:
     content:
       content_id: content
       html: <p>Where would you like to go from here?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -143,6 +154,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Practice makes perfect!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -158,6 +170,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Now it's getting interesting!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -173,6 +186,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>I already miss you...</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -188,6 +202,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>Sounds good to me!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -204,12 +219,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Continue with Interval Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Go to Pitch Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Go to Melody Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>No thanks, I'm done for now</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -217,6 +236,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's keep matching intervals for now.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -256,6 +276,7 @@ states:
     content:
       content_id: content
       html: <p>You've really come a long way. Where would you like to go next?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -264,6 +285,7 @@ states:
             content_id: feedback_1
             html: <p>I think you can handle this. You ears are definitely warmed up
               now.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -279,6 +301,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Good choice. It's always smart to review what you've learned.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -294,6 +317,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Good choice. It's always smart to review what you've learned.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -309,6 +333,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>So long, farewell, auf Wiedersehen, good night!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -325,12 +350,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Move on to Melody Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Go to Pitch Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Restart Interval Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>No thanks, I'm done for now.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -338,6 +367,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's move on to the Melody Trainer.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -377,6 +407,7 @@ states:
     content:
       content_id: content
       html: <p>Where would you like to go?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -384,6 +415,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Now we're cookin!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -399,6 +431,7 @@ states:
           feedback:
             content_id: feedback_2
             html: "<p>Good choice. It never hurts to do a recap.\xC2\_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -414,6 +447,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Good choice. It never hurts to do a recap.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -430,6 +464,7 @@ states:
             content_id: feedback_4
             html: <p>You should be proud. You've come a long way from where we started.
               Come back anytime!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -446,12 +481,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Continue with the Melody Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Go to the Interval Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Go to the Pitch Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>No, thanks. I'm done for now.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -459,6 +498,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's keep matching melodies.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -502,6 +542,7 @@ states:
         radio, try to pick out intervals that sound familiar. Just remember, ear training
         is a life long journey and you'll get significantly better at it with just
         a little effort. Thanks for playing!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -510,6 +551,7 @@ states:
             content_id: feedback_1
             html: <p>Good choice. It's always a good idea to go over things you've
               learned.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -526,6 +568,7 @@ states:
             content_id: feedback_2
             html: <p>Good choice. It's always a good idea to go over things you've
               learned.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -542,6 +585,7 @@ states:
             content_id: feedback_3
             html: <p>Good choice. It's always a good idea to go over things you've
               learned.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -558,6 +602,7 @@ states:
             content_id: feedback_4
             html: <p>Thanks for hanging around and flexing your ear muscles. See you
               next time!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -574,12 +619,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Replay Melody Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Go to Interval Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Go to Pitch Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>I'm done for now.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -587,6 +636,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's review some intervals.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -627,6 +677,7 @@ states:
       content_id: content
       html: <p>You're getting the hang of this! The world is your oyster, where do
         you want to go?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -634,6 +685,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Sounds like a plan.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -649,6 +701,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Now your ears are getting warmed up!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -664,6 +717,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Bold move. I like your style.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -679,6 +733,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>Thanks for stopping by! Come back anytime.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -695,12 +750,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Continue with Pitch Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: "<p>Move on to Interval Trainer.\xC2\_</p>"
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Go to Melody Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>No thanks, I'm done for now.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -708,6 +767,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's keep matching pitches for now.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -747,6 +807,7 @@ states:
     content:
       content_id: content
       html: <p>Alright you've got that down pretty well. What do you want to try next?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -754,6 +815,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Sounds good to me. This is getting exciting!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -769,6 +831,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>I think you can handle this now. Your ears are all warmed up.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -784,6 +847,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Sounds good to me. Practice makes perfect!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -799,6 +863,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>Thanks for playing. We look forward to seeing you next time!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -815,12 +880,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Move on to Interval Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Move on to Melody Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Replay Pitch Trainer.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>No thanks, I'm done for now.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -828,6 +897,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's move on to the Interval Trainer.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -871,6 +941,7 @@ states:
         move to intervals, and work with melodies last after your ears have warmed
         up. You, however, are a free thinking individual, and should go wherever your
         heart desires. Where would you like to boldly go?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -878,6 +949,7 @@ states:
           feedback:
             content_id: feedback_1
             html: "<p>Sounds good to me.\xC2\_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -893,6 +965,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Let's do this!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -908,6 +981,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Bold move. I like your style.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -923,6 +997,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>Thanks for playing! Come back anytime.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -939,12 +1014,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Pitch Trainer</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Interval Trainer</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Melody Trainer</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>No thanks, I'm done for now.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -952,6 +1031,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Let's keep matching pitches for now.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -991,6 +1071,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1018,6 +1099,7 @@ states:
         \ two, right? Two notes make up what is called an interval. There are a few\
         \ different kinds but you don't have to worry about remembering them all just\
         \ yet. Let's just start with a few common ones.\xC2\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1028,6 +1110,7 @@ states:
               like to use familiar songs to remember the way intervals sound. Can
               you think of a melody that starts with these two notes? The Star Wars
               theme is good example.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1052,6 +1135,7 @@ states:
             content_id: feedback_2
             html: <p>Oops! There are too many notes on the staff. Melodies are just
               around the corner.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1069,6 +1153,7 @@ states:
             html: <p>You're getting close. One of the notes in your sequence is incorrect.
               Listen to the desired sequence and compare it to yours. Once you find
               the note that doesn't match, move it to the desired pitch.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1095,6 +1180,7 @@ states:
             html: <p>This is the right interval, just not the right pitches. We call
               this a transposition of the original sequence. Try moving both notes
               up just a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1121,6 +1207,7 @@ states:
             html: <p>This is the right interval, just not the right pitches. We call
               this a transposition of the original sequence. Try moving both notes
               up just a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1147,6 +1234,7 @@ states:
             html: <p>This is the right interval, just not the right pitches. We call
               this a transposition of the original sequence. Try moving both notes
               down just a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1173,6 +1261,7 @@ states:
             html: <p>This is the right interval, just not the right pitches. We call
               this a transposition of the original sequence. Try moving both notes
               down just a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1199,6 +1288,7 @@ states:
             html: <p>This is the right interval, just not the right pitches. We call
               this a transposition of the original sequence. Try moving both notes
               down just a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1225,6 +1315,7 @@ states:
             html: <p>This is the right interval, just not the right pitches. We call
               this a transposition of the original sequence. Try moving both notes
               down a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1251,6 +1342,7 @@ states:
             html: <p>This is the right interval, just not the right pitches. We call
               this a transposition of the original sequence. Try moving both notes
               down a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1291,6 +1383,7 @@ states:
           html: "<p>Not quite there yet. Listen to the desired sequence again and\
             \ make your selection. You can compare it with your note as many times\
             \ as you like using the play buttons.\xC2\_</p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1335,6 +1428,7 @@ states:
       content_id: content
       html: <p>You've come a long way! Let's keep it up and see where it takes us.
         Listen to the desired interval and try to match it on the staff.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1344,6 +1438,7 @@ states:
             html: <p>Very good, you'll be a pro in no time! This interval is called
               a Perfect Fourth. I like to remember it as the first two notes of the
               melody for "Here Comes the Bride".</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1368,6 +1463,7 @@ states:
             content_id: feedback_2
             html: <p>Oops! There are too many notes on the staff. Remember, an interval
               is made up of only two notes.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1385,6 +1481,7 @@ states:
             html: <p>You're getting close. One of the notes in your sequence is incorrect.
               Listen to the desired sequence and compare it to yours. Once you find
               the note that doesn't match, move it to the desired pitch.<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1411,6 +1508,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes up a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1437,6 +1535,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes up a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1463,6 +1562,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes up a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1489,6 +1589,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes up just a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1515,6 +1616,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes down just a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1541,6 +1643,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes down a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1567,6 +1670,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes down a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1605,6 +1709,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>It's okay, practice makes perfect. Try as many times as you like.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1650,6 +1755,7 @@ states:
       html: <p>Great! Now that we have a good feel for the Perfect intervals, let's
         try something a bit more challenging. Listen to the desired interval and try
         to match it on the staff.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1660,6 +1766,7 @@ states:
               \ remember it as the first two notes of \"My bonnie lies over the ocean\"\
               , but I remember it as the first two of the three \"NBC Chimes\".\xC2\
               \_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1684,6 +1791,7 @@ states:
             content_id: feedback_2
             html: <p>Oops! There are too many notes on the staff. Remember, an interval
               is made up of only two notes.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1701,6 +1809,7 @@ states:
             html: <p>You've very close. One of the notes in your sequence is still
               off. Listen to the desired sequence again and compare it to yours. Once
               you find the note that doesn't match, move it to the desired pitch.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1727,6 +1836,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes down a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1753,6 +1863,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes down a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1779,6 +1890,7 @@ states:
             html: <p>You're ear is pretty good! This is the right interval, just not
               the right pitches. We call this a transposition of the original sequence.
               Try moving both notes down a bit.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1806,6 +1918,7 @@ states:
               the right octave. An octave is 7 scale steps, either up or down, from
               a given note. We call this a transposition of the original sequence.
               Try moving both notes down an octave.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1846,6 +1959,7 @@ states:
           html: "<p>Not quite there yet. Listen to the desired sequence again and\
             \ make your selection. You can compare it with your note as many times\
             \ as you like using the play buttons.\xC2\_</p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1886,6 +2000,7 @@ states:
         melodies. Don't worry about the rhythm for now, we're just going to focus
         on matching the pitches. Listen to the desired sequence and match them on
         the staff.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1896,6 +2011,7 @@ states:
               or "Maria", if you like West Side Story. The first two notes are called
               a tritone. I like to sing this melody in my head when I'm trying to
               remember what an tritone sounds like.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1924,6 +2040,7 @@ states:
             content_id: feedback_2
             html: <p>There are too many notes on the staff. Compare your sequence
               with the desired sequence to hear where you've added an extra note.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1940,6 +2057,7 @@ states:
             content_id: feedback_3
             html: <p>There aren't enough notes on the staff yet. Compare your sequence
               with the desired sequence to hear where you should add a note.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1959,6 +2077,7 @@ states:
               \ correct. Listen to the desired sequence and compare it to yours. Once\
               \ you find the note that doesn't match, move it to the desired pitch.\xC2\
               \_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1989,6 +2108,7 @@ states:
             html: "<p>You've got quite an ear on you. That is the right melody but\
               \ it's been transposed down a Perfect Fourth. Try moving all the notes\
               \ up a bit.\xC2\_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2021,6 +2141,7 @@ states:
               \ still not right. Try moving all the notes up a bit and then comparing\
               \ your sequence with the desired sequence to find the wrong note.\xC2\
               \_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2068,6 +2189,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Try again. Listen to the desired sequence and make your selection.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2104,6 +2226,7 @@ states:
       content_id: content
       html: "<p>You've got the hang of it! Let's try another melody. Listen to the\
         \ desired sequence and try to match it on the staff. \xC2\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2113,6 +2236,7 @@ states:
             html: <p>Well done! This is the first five notes of Beethoven's 3rd symphony.
               The first two notes are a Major Third and I like to use this melody
               to remember the way it sounds.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2149,6 +2273,7 @@ states:
             content_id: feedback_2
             html: <p>There are too many notes on the staff. Compare your sequence
               with the desired sequence to hear where you've added an extra note.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2165,6 +2290,7 @@ states:
             content_id: feedback_3
             html: <p>There aren't enough notes on the staff yet. Compare your sequence
               with the desired sequence to hear where you should add a note.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2183,6 +2309,7 @@ states:
             html: <p>You're very close. One of the notes in your sequence is still
               off. Listen to the desired sequence and compare it to yours. Once you
               find the note that doesn't match, move it to the desired pitch.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2222,6 +2349,7 @@ states:
               just not the right pitches. It's actually a Perfect Fourth lower. We
               call this a transposition of the original melody. Try moving all the
               notes up a Fourth.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2261,6 +2389,7 @@ states:
               just not the right pitches. It's actually a Perfect Fifth lower. We
               call this a transposition of the original melody. Try moving all the
               notes down a Fifth.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2302,6 +2431,7 @@ states:
               the original melody. Try moving all the notes down a Fourth and then
               compare your sequence to the desired sequence to find the note that
               doesn't match up.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2365,6 +2495,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>It's okay, keep trying and you'll get it soon.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2409,6 +2540,7 @@ states:
         \ it by dragging notes onto the staff.\_</p><p>\_</p><p>For now let's start\
         \ small with just one note. Don't worry about getting it right the first time.\
         \ Your ears will grow with time.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2416,6 +2548,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That's right! That note is D5.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2436,6 +2569,7 @@ states:
             content_id: feedback_2
             html: <p>Oops! There are too many notes on the staff. Let's not get ahead
               of ourselves just yet.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2453,6 +2587,7 @@ states:
             html: <p>Your ear is pretty good! This is the right note, just the wrong
               octave. An octave is 7 scale steps, either up or down, from a given
               pitch. Try moving the note down an octave.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2473,6 +2608,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>You're very close, just a little too high. Give it another shot!<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2493,6 +2629,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>You're very close, just a little too high. Give it another shot!<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2513,6 +2650,7 @@ states:
           feedback:
             content_id: feedback_6
             html: <p>Your choice is a bit too high. Give it another go!<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2533,6 +2671,7 @@ states:
           feedback:
             content_id: feedback_7
             html: <p>Your choice is a bit too high. Give it another go!<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2553,6 +2692,7 @@ states:
           feedback:
             content_id: feedback_8
             html: <p>You're very close, just a little too low. Give it another try!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2573,6 +2713,7 @@ states:
           feedback:
             content_id: feedback_9
             html: <p>You're very close, just a little too low. Give it another try!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2593,6 +2734,7 @@ states:
           feedback:
             content_id: feedback_10
             html: <p>Your choice is a bit too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2613,6 +2755,7 @@ states:
           feedback:
             content_id: feedback_11
             html: <p>Your choice is a bit too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2633,6 +2776,7 @@ states:
           feedback:
             content_id: feedback_12
             html: <p>Your choice is a bit too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2653,6 +2797,7 @@ states:
           feedback:
             content_id: feedback_13
             html: <p>Your choice is much too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2673,6 +2818,7 @@ states:
           feedback:
             content_id: feedback_14
             html: <p>Your choice is much too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2705,6 +2851,7 @@ states:
           html: "<p>Not quite there yet. Listen to the desired sequence again and\
             \ make your selection. You can compare it with your note as many times\
             \ as you like using the play buttons.\xC2\_<br></p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2758,6 +2905,7 @@ states:
       html: "<p>Listen to the desired note and make your selection. You can compare\
         \ your note with the desired one as many times as you like before submitting.\xC2\
         \_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2765,6 +2913,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Very good! You've done this before, haven't you?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2785,6 +2934,7 @@ states:
             content_id: feedback_2
             html: <p>Oops! There are too many notes on the staff. I can tell you're
               excited, but don't worry, we'll get there.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2802,6 +2952,7 @@ states:
             html: <p>Your ear is pretty good! This is the right note, just the wrong
               octave. An octave is 7 scale steps, either up or down, from a given
               pitch. Try moving the note up an octave.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2822,6 +2973,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>Very close, you're just a bit too low. Give it another try!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2842,6 +2994,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>Very close, you're just a bit too low. Give it another try!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2862,6 +3015,7 @@ states:
           feedback:
             content_id: feedback_6
             html: <p>Your choice is just a bit too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2883,6 +3037,7 @@ states:
             content_id: feedback_7
             html: <p>Very close, your choice is just a bit too high. Give it another
               go!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2904,6 +3059,7 @@ states:
             content_id: feedback_8
             html: <p>Very close, your choice is just a bit too high. Give it another
               shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2924,6 +3080,7 @@ states:
           feedback:
             content_id: feedback_9
             html: <p>Your choice is just a bit too high. Give it another go!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2944,6 +3101,7 @@ states:
           feedback:
             content_id: feedback_10
             html: <p>Your choice is just a bit too high. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2964,6 +3122,7 @@ states:
           feedback:
             content_id: feedback_11
             html: <p>Your choice is just a bit too high. Give it another go!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2984,6 +3143,7 @@ states:
           feedback:
             content_id: feedback_12
             html: <p>Your choice is much too high. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3004,6 +3164,7 @@ states:
           feedback:
             content_id: feedback_13
             html: <p>Your choice is much too high. Give it another go!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3024,6 +3185,7 @@ states:
           feedback:
             content_id: feedback_14
             html: <p>Your choice is much too high. Give it another go!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3056,6 +3218,7 @@ states:
           html: "<p>Not quite there yet. Listen to the desired sequence again and\
             \ make your selection. You can compare it with your note as many times\
             \ as you like using the play buttons.\xC2\_</p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3109,6 +3272,7 @@ states:
       html: <p>Let's match one last pitch before we move on. Listen to the desired
         note and make your selection. You may want to think outside of the box for
         this one.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3117,6 +3281,7 @@ states:
             content_id: feedback_1
             html: <p>You got it! When a note goes above or below the staff, the staff
               is extended with what are called ledger lines.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3137,6 +3302,7 @@ states:
             content_id: feedback_2
             html: <p>Oops! There are too many notes on the staff. I can tell you're
               excited, but don't worry, we'll get there.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3154,6 +3320,7 @@ states:
             html: <p>Your ear is pretty good! this is the right note, just the wrong
               octave. An octave is 7 scale steps, either up or down, from a given
               pitch. Try moving the note up an octave.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3175,6 +3342,7 @@ states:
             content_id: feedback_4
             html: <p>Very close, your choice is just a bit too low. Give it another
               shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3196,6 +3364,7 @@ states:
             content_id: feedback_5
             html: <p>Very close, your choice is just a bit too low. Give it another
               go!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3216,6 +3385,7 @@ states:
           feedback:
             content_id: feedback_6
             html: <p>Your choice is just a bit too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3236,6 +3406,7 @@ states:
           feedback:
             content_id: feedback_7
             html: <p>Your choice is just a bit too low. Give it another go!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3256,6 +3427,7 @@ states:
           feedback:
             content_id: feedback_8
             html: <p>Your choice is a bit too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3276,6 +3448,7 @@ states:
           feedback:
             content_id: feedback_9
             html: <p>Your choice is much too low. Give it another try!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3296,6 +3469,7 @@ states:
           feedback:
             content_id: feedback_10
             html: <p>Your choice is much too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3316,6 +3490,7 @@ states:
           feedback:
             content_id: feedback_11
             html: <p>Your choice is much too low. Give it another try!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3336,6 +3511,7 @@ states:
           feedback:
             content_id: feedback_12
             html: <p>Your choice is much too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3356,6 +3532,7 @@ states:
           feedback:
             content_id: feedback_13
             html: <p>Your choice is much too low. Give it another try!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3376,6 +3553,7 @@ states:
           feedback:
             content_id: feedback_14
             html: <p>Your choice is much too low. Give it another shot!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3406,6 +3584,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>It's okay, practice makes perfect. Try as many times as you like.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

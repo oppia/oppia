@@ -65,6 +65,7 @@ states:
         example, to guess 1000 numbers, I would need 1000 tries! And the magician
         does it so much faster."<br><br>"So we need to make one guess eliminate more
         than one number. Hmm, how can we do that in the 3-number-guessing case?"<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -73,6 +74,7 @@ states:
             content_id: feedback_1
             html: <p>"Oh yeah! when the magician responds to our guess, he also tells
               us if his number is bigger or smaller!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -92,6 +94,7 @@ states:
             content_id: feedback_2
             html: <p>"Oh yeah! when the magician responds to our guess, he also tells
               us if his number is bigger or smaller!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -111,6 +114,7 @@ states:
             content_id: feedback_3
             html: "<p>\xC2\_\"Oh yeah! when the magician responds to our guess, he\
               \ also tells us if his number is bigger or smaller!\"</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -130,6 +134,7 @@ states:
             content_id: feedback_4
             html: <p>"Oh yeah! when the magician responds to our guess, he also tells
               us if his number is bigger or smaller!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -149,6 +154,7 @@ states:
             content_id: feedback_5
             html: <p>"Oh! so if we guess '2' as our first try, then we know what number
               to guess on the second try, even if 2 wasn't right!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -168,6 +174,7 @@ states:
             content_id: feedback_6
             html: <p>"Oh! so if we guess '2' as our first try, then we know what number
               to guess on the second try, even if 2 wasn't right!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -188,6 +195,7 @@ states:
             html: <p>"I see! If we guess the number in the middle (which is 2 in our
               case), then no matter what the magician answers, we'll eliminate two
               numbers!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -208,6 +216,7 @@ states:
             html: <p>"I see! If we guess the number in the middle (which is 2 in our
               case), then no matter what the magician answers, we'll eliminate two
               numbers!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -228,6 +237,7 @@ states:
             html: <p>"I see! If we guess the number in the middle (which is 2 in our
               case), then no matter what the magician answers, we'll eliminate two
               numbers!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -254,6 +264,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>"What kind of extra information does the magician give us?"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -317,6 +328,7 @@ states:
       html: <p>"Cool! how would you do that?"<br><br>"If you were guessing a number
         between 1 and 7 and you only had three tries, what would your first guess
         be?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -333,6 +345,7 @@ states:
               "But what if he said it was bigger than 4? Then we would still have
               to guess a number between 5 and 7... But wait, that''s the same thing
               as between 1 and 3, just shifted over!"</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -351,6 +364,7 @@ states:
               than {{answer}}? Then we would only have two tries left, but we would
               have to guess a number between {{answer+1}} and 7. That's {{7-answer}}
               possible options! I don't think we could do that in 2 tries."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -370,6 +384,7 @@ states:
               have to guess a number between 1 and {{answer-1}}. That's {{answer-1}}
               possible options! I don't think we could do that in 2 tries. We can
               do between 1 and 3 in 2 tries though..."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -387,6 +402,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>But that's not even between 1 and 7!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -428,6 +444,7 @@ states:
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;4tree-half_height_556_width_1121.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\_</p><p>You can write in all the numbers\
         \ from left to right (or just count them up!).<br></p><p>So, how many is that?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -442,6 +459,7 @@ states:
               \ know how many guesses you have!</p><p>\_</p><p>But that's kind of\
               \ backwards from how the game works - we should think about how to <strong>minimize</strong>\
               \ the number of guesses when we know what our starting range is.</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -459,6 +477,7 @@ states:
         feedback:
           content_id: default_outcome
           html: "<p>No, that's not right.\xC2\_</p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -489,6 +508,7 @@ states:
         wait - our number wasn't exactly in the middle... in fact, there's no exact
         middle for numbers between 1 and 6. And one of our 'halves' actually turned
         out to be a bit smaller!"<br><br>"So that must mean..."</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -496,6 +516,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>"Exactly!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -514,6 +535,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>"Yeah!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -532,6 +554,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>"That's what I was thinking!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -559,6 +582,7 @@ states:
           content_id: default_outcome
           html: <p>"... That we can actually add one more number to the range! We
             can do numbers from 1 to 7 in three tries!"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -607,6 +631,7 @@ states:
         \ 1-3 in just two tries... but I wonder what we could do with one more try?\"\
         </p><p>\"If we had three tries, what kind of range of numbers would we be\
         \ able to always guess?\"</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -614,6 +639,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -632,6 +658,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -650,6 +677,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -668,6 +696,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>"Six! Whoa, that's twice as many!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -686,6 +715,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>"Six! Whoa, that's twice as many!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -704,6 +734,7 @@ states:
           feedback:
             content_id: feedback_6
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -722,6 +753,7 @@ states:
           feedback:
             content_id: feedback_7
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -751,6 +783,7 @@ states:
             \ hard question. I try to imagine what the world would be like if I already\
             \ knew the answer. Then I try to find a way to change that situation to\
             \ one where I really do know the answer!\"</p><p>\xC2\_</p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -814,6 +847,7 @@ states:
         </p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;magician-2_height_223_width_504.png&amp;quot;\"\
         ></oppia-noninteractive-image><p><br><br><br></p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -822,6 +856,7 @@ states:
             content_id: feedback_1
             html: <p>"Right! since it can only be 1 or 2, whatever I choose first,
               I could be wrong; but then I can always get it right on the second try"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -839,6 +874,7 @@ states:
             html: <p>"I don't think I can always get it that fast though. If you're
               thinking of a 1 or a 2 and I'm just guessing, there's always a chance
               I don't get it right at first."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -857,6 +893,7 @@ states:
           content_id: default_outcome
           html: <p>"No, I don't think I would ever need that many tries... All I'm
             trying to do is guess whether you're thinking 1 or 2!"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -885,6 +922,7 @@ states:
       content_id: content
       html: <p>{{if redux==1 then "'So, how do you think he does it?' asks your friend."
         else "Ah, so where were we again?"}}</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -893,6 +931,7 @@ states:
             content_id: feedback_1
             html: <p>"I agree, it's probably important that he's always picking a
               number in the middle of the range of possible numbers."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -912,6 +951,7 @@ states:
             content_id: feedback_2
             html: <p>"Yeah, he divides the range of possible numbers about in half
               every time. I wonder why?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -931,6 +971,7 @@ states:
             content_id: feedback_3
             html: <p>Yeah, he divides the range of possible numbers about in half
               every time. I wonder why?<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -950,6 +991,7 @@ states:
             content_id: feedback_4
             html: <p>Yeah, he divides the range of possible numbers about in half
               every time. I wonder why?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -969,6 +1011,7 @@ states:
             content_id: feedback_5
             html: <p>"Yeah, there's something important about how he keeps track of
               the range of possible numbers!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -988,6 +1031,7 @@ states:
             content_id: feedback_6
             html: <p>"Yeah, there's something important about how he keeps track of
               the range of possible numbers!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1006,6 +1050,7 @@ states:
           feedback:
             content_id: feedback_7
             html: <p>"What does binary mean?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1024,6 +1069,7 @@ states:
           feedback:
             content_id: feedback_8
             html: <p>"You want to try guessing yourself?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1050,6 +1096,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>"Hmm, I have a thought..."</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1116,6 +1163,7 @@ states:
         3, and we guessed 2, we were cutting it right in the middle!"<br><br>"OK,
         if we're guessing a number between 1 and 6, what should we guess to cut the
         range in half?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1132,6 +1180,7 @@ states:
               "But what if he said it was bigger than {{answer}}? Then we would still
               have to guess a number between {{answer+1}} and 6... But wait, that''s
               the same thing as between 1 and {{6-answer}}, just shifted over a bit!"</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1152,6 +1201,7 @@ states:
               to guess a number between {{answer+1}} and 6. That's {{6-answer}} possible
               options! I don't think we could do that in 2 tries."</p><p>"No, we have
               to guess something else for numbers between 1 and 6..."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1173,6 +1223,7 @@ states:
               \ do between 1 and 3 in 2 tries though.\"</p><p>\"What number could\
               \ we guess between 1 and 6 that might bring us back to the 'between\
               \ 1 and 3' case?\"</p><p>\xC2\_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1219,6 +1270,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1246,6 +1298,7 @@ states:
         between 1 and 3 in just two tries?"<br><br>"I want it to work all the time,
         so let's think about what is the <strong>best</strong> thing to do in the
         <strong>worst</strong> case!"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1255,6 +1308,7 @@ states:
             html: <p>"But then in the worst case, the number could be either 2 or
               3, and we'd only have one try left to pick between those two! And all
               we would know is that it's bigger than 1!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1272,6 +1326,7 @@ states:
             html: <p>"But then in the worst case, the number could be either 1 or
               2, and we'd only have one try left to pick between those two. And all
               we would know is that it's smaller than 3!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1291,6 +1346,7 @@ states:
               if the number is smaller or greater than our guess! So we'll be able
               to tell whether it's 1 or 3 because we'll know if it's bigger or smaller
               than 2!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1307,10 +1363,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>1</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>2</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>3</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -1318,6 +1377,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>"There should be no default"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1366,6 +1426,7 @@ states:
         \ thousand! If he's cheating and reading minds, he's gotta be stopped! And\
         \ if he's not, you have to meet him and figure out what his secret is!<br><br>\"\
         So, what do you think? How does he do it?\"</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1374,6 +1435,7 @@ states:
             content_id: feedback_1
             html: <p>"Well, let's just pretend you don't know what binary search is
               and go along with the story for a bit, eh?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1393,6 +1455,7 @@ states:
             content_id: feedback_2
             html: <p>"You think he reads minds? But then couldn't he use that for
               something a bit more flashy than guessing numbers?.."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1412,6 +1475,7 @@ states:
             content_id: feedback_3
             html: <p>"You think he reads minds? But then couldn't he use that for
               something a bit more flashy than guessing numbers?.."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1430,6 +1494,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>"You think the magician is using... magic?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1457,6 +1522,7 @@ states:
           content_id: default_outcome
           html: <p>"I've got a theory or two, but we should watch him first to figure
             out what he does."</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1498,6 +1564,7 @@ states:
     content:
       content_id: content
       html: <p>"Is it {{guess}}?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1505,6 +1572,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1520,6 +1588,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1535,6 +1604,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1551,10 +1621,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>No, it's smaller</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>No, it's bigger</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Yes, that's correct!</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -1562,6 +1635,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1604,6 +1678,7 @@ states:
       html: <p>You wave your hand until you get the Magician's attention.<br><br>"Ah,
         welcome back! Would you like to think of a number and see how quickly I can
         guess it? or would you like to try guessing yourself?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1611,6 +1686,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1626,6 +1702,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1642,8 +1719,10 @@ states:
           value:
           - content_id: ca_choices_3
             html: <p>Magician guesses my number</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>I guess Magician's number</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -1651,6 +1730,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>ERROR</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1689,6 +1769,7 @@ states:
         caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;middleworst1-10_height_511_width_647.png&amp;quot;"></oppia-noninteractive-image><p><br>"(there's
         no whole number exactly between 1 and 10... we could of course try guessing
         5 and a half, but that doesn't make a whole lot of sense!)"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1696,6 +1777,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1711,6 +1793,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1727,9 +1810,11 @@ states:
           value:
           - content_id: ca_choices_3
             html: <p>I think I get it now! let me try the whole game out!</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>That kind of makes sense. But what happens after I guess in the
               middle the first time? What do I find "the middle" of after that?</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -1737,6 +1822,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>ERROR</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1770,6 +1856,7 @@ states:
       html: <p>"OK, now you try it out.<br>Pretend we're guessing a number from 1
         to 10. You pick what number to guess, and I'll say what the worst case would
         be."</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1777,6 +1864,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1793,26 +1881,37 @@ states:
           value:
           - content_id: ca_choices_2
             html: <p>1</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_3
             html: <p>2</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>3</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>4</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>5</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>6</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>7</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_9
             html: <p>8</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_10
             html: <p>9</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_11
             html: <p>10</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_12
             html: <p>OK, I understand now! Let's move on.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -1831,6 +1930,7 @@ states:
             \ between 1 and 10!\" else \"\"}}<br></p><p>So, the worst case is if the\
             \ real number is {{if (answer-5==abs(answer-5)) then \"less than\" else\
             \ \"greater than\"}} {{answer+1}}!<br></p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1878,6 +1978,7 @@ states:
     content:
       content_id: content
       html: <p>"OK, how big of a number do you want me to guess?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1886,6 +1987,7 @@ states:
             content_id: feedback_1
             html: <p>"No, that could take me more than 19 guesses! Then everyone would
               get bored. Try something smaller than a million."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1903,6 +2005,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1939,6 +2042,7 @@ states:
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;pick7worst_height_653_width_538.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\_</p><p>What would be the worst of those\
         \ cases for me?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1947,6 +2051,7 @@ states:
             content_id: feedback_1
             html: <p>"Exactly! A range of 6 numbers is worse than a range of 3 numbers,
               and certainly worse than being right on the first try!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1963,6 +2068,7 @@ states:
             content_id: feedback_2
             html: <p>"No, that doesn't make sense. Winning is the best possible thing,
               not the worst!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1979,6 +2085,7 @@ states:
             content_id: feedback_3
             html: <p>"No, I don't think so. In this case we would have a range of
               just 3 numbers left to guess. There's a worse case."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1996,11 +2103,14 @@ states:
           - content_id: ca_choices_4
             html: <p>The real number is less than 7, so it's between 1 and 6 (6 number
               range)</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>The real number IS 7 (so we win!)</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>The real number is bigger than 7, so it's between 8 and 10 (3
               number range)</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -2008,6 +2118,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>ERROR</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2044,6 +2155,7 @@ states:
       content_id: content
       html: <p>"OK, I'm thinking of a number between 1 and 100!<br>Make a guess and
         I'll tell you if it's bigger or smaller!<br>See if you can get it in 7 guesses!"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2051,6 +2163,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>"Hey, that's right! first try - beginner's luck!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2066,6 +2179,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>"No, it's smaller than that!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2081,6 +2195,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>"No, it's bigger than that!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2098,6 +2213,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2145,6 +2261,7 @@ states:
     content:
       content_id: content
       html: <p>"Pretty good! That only took you {{tries}} tries!"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2158,6 +2275,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2190,6 +2308,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>"That's right!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2205,6 +2324,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>"No, it's bigger than that!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2220,6 +2340,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>"No, it's smaller than that!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2237,6 +2358,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>"This should never happen"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2287,6 +2409,7 @@ states:
         filepath-with-value="&amp;quot;range5-11_height_90_width_467.png&amp;quot;"></oppia-noninteractive-image><p><br>"Now
         suppose after that, we guess 7; and the Magician says it's smaller than that!"<br><br>"What
         is the range now? put it in the same format as '0-11' or '5-11' from before."</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2294,6 +2417,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>"You got it!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2313,6 +2437,7 @@ states:
             content_id: feedback_2
             html: <p>That's not right... Remember, we already knew it was greater
               than 5. And the magician gave us a new number it's smaller than.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2342,6 +2467,7 @@ states:
             like:
 
             X-Y except X and Y will be numbers.</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2391,6 +2517,7 @@ states:
         \ alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;3guessSeq3_height_679_width_648.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2399,6 +2526,7 @@ states:
             content_id: feedback_1
             html: <p>"But if our first guess was correct, we wouldn't need any more
               guesses!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2416,6 +2544,7 @@ states:
             html: <p>"No, I don't think we could ever make a reasonable guess where
               the number turned out to be between 1 and 3 and was bigger than our
               guess"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2433,6 +2562,7 @@ states:
             html: <p>"Yeah, that sounds right! if we narrowed it down to between 1
               and 3, then it's a pretty small number, and we must have guessed something
               slightly bigger!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2449,10 +2579,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>The number is bigger than your guess</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>The number is smaller than your guess</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Your guess is correct</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -2460,6 +2593,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>ERROR</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2499,6 +2633,7 @@ states:
         \ have been?\"</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3guessSeq4_height_693_width_616.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\xC2\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2506,6 +2641,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2524,6 +2660,7 @@ states:
           content_id: default_outcome
           html: <p>"Hmm, but if the number was less than {{answer}}, wouldn't it be
             between 1 and {{answer-1}}?"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2549,6 +2686,7 @@ states:
     content:
       content_id: content
       html: <p>"OK, think of a number between {{lowest}} and {{highest-1}}"!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2562,6 +2700,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2601,6 +2740,7 @@ states:
         \ alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;ThinkOf3_height_489_width_608.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\xC2\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2609,6 +2749,7 @@ states:
             content_id: feedback_1
             html: <p>"No, I don't think I ever need more than 3 guesses if I'm only
               guessing 3 numbers."</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2624,6 +2765,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>"Oh! You think we can still do it in 2?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2639,6 +2781,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2657,6 +2800,7 @@ states:
           content_id: default_outcome
           html: <p>"But I made the range bigger! how can I possible need fewer guesses
             now?"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2695,6 +2839,7 @@ states:
         \ the remaining numbers.\"<br><br>I think we can <strong>generalize</strong>\
         \ this - the idea of halving the range can apply in general, to any range\
         \ of numbers!\"<br><br>\"What do you think?\"</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2702,6 +2847,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2717,6 +2863,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2732,6 +2879,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2747,6 +2895,7 @@ states:
           feedback:
             content_id: feedback_4
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2762,6 +2911,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>Excellent question!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2779,15 +2929,20 @@ states:
           - content_id: ca_choices_6
             html: <p>I'm not sure what you mean yet. How do we split the numbers in
               half, and why is that always the best thing to do?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>I think I understand! Let me try guessing!</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>Hmm, that's interesting. Let's watch the magician some more -
               is that what he does, too?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_9
             html: <p>What do you mean by "range"?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_10
             html: <p>Wait, but what happens if we have 4 tries?</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -2795,6 +2950,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>ERROR</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2844,6 +3000,7 @@ states:
         \ says the local, and the crowd oohs and aahs in appreciation of the Magician's\
         \ number-guessing powers.<br><br>...<br><br>\"You there!\" the magician points\
         \ to you<br>\"Think of a number between 1 and 85!\"</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2857,6 +3014,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2921,6 +3079,7 @@ states:
         \ a feeling that we can do almost the same thing as in our 'between 1 and\
         \ 3' case, just... shifted.\"</p><p>\"What do you think our SOMETHING limit\
         \ should be?\"</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -2929,6 +3088,7 @@ states:
             content_id: feedback_1
             html: <p>"Aha! 'between 5 and 7' is just like 'between 1 and 3' but shifted
               over to be bigger than 4!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2945,6 +3105,7 @@ states:
             content_id: feedback_2
             html: <p>"Wait, that doesn't make sense! how can a number be greater than
               4 but less than {{answer}}?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2961,6 +3122,7 @@ states:
             content_id: feedback_3
             html: <p>"Hmm, I suppose it's pretty easy to guess a number between 5
               and {{answer}} in 2 tries, but I think we can do even better!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2978,6 +3140,7 @@ states:
             html: <p>But there are {{answer-4}} numbers between 5 and {{answer}}!
               I don't think we can always find the right number in 2 tries if the
               range is that big.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -2995,6 +3158,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>ERROR</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3041,6 +3205,7 @@ states:
         \ You see, I really want to travel to a Far Away land, but I really don't\
         \ want to travel more than I have to. So I was thinking...\"<br><br>The three\
         \ of you walk off along a winding path, planning your next adventure...<br><br></p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3054,6 +3219,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3084,6 +3250,7 @@ states:
     content:
       content_id: content
       html: <p> </p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3094,6 +3261,7 @@ states:
 
               Hmm, there''s gotta be a better way of keeping track of that than just
               looking through all the answers all the time..."</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3111,6 +3279,7 @@ states:
             html: "<p>\"Wait, but I already said that the number is smaller than {{highest}}!\
               \ \nHmm, there's gotta be a better way of keeping track of this than\
               \ just looking through all the previous answers all the time.\"</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3126,6 +3295,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>That's right!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3141,6 +3311,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>"Let's say that the number is bigger than that"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3156,6 +3327,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>"Let's say that the number is smaller than that"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3177,6 +3349,7 @@ states:
               But that still leaves a range of {{answer-lowest-2}} numbers! I think
               that''s too many."</p><p>"We should always pick numbers in the middle
               of the possible range, remember?"</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3198,6 +3371,7 @@ states:
               But that still leaves a range of {{highest-answer-2}} numbers! I think
               that''s too many."</p><p>"We should always pick numbers in the middle
               of the possible range, remember?"<br></p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3221,6 +3395,7 @@ states:
             {{answer}}
 
             {{middle}}</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3297,6 +3472,7 @@ states:
         </strong>answer every time you pick. That way, we can be sure that this trick
         will work<strong> at least </strong>as well in all the other cases, and maybe
         even better!"<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3310,6 +3486,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>"OK, try to guess a number between 1 and 30!"</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3348,6 +3525,7 @@ states:
       content_id: content
       html: <p>The crowd goes wild again!<br>"Do you want to play again?" asks the
         magician. "I'll even let you pick a bigger number this time!"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3355,6 +3533,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3370,6 +3549,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3385,6 +3565,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3401,10 +3582,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>Let's play again</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>No, not right now. I need to confer with my colleague.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>This time, I want to try guessing!</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -3412,6 +3596,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>ERROR</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3447,6 +3632,7 @@ states:
     content:
       content_id: content
       html: <p>"Is it {{guess}}"?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3454,6 +3640,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3469,6 +3656,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Is it {{precomputeGuess}}?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3484,6 +3672,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3500,10 +3689,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>No, it's smaller</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>No, it's bigger</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Yes, that's right!</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -3511,6 +3703,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3566,6 +3759,7 @@ states:
     content:
       content_id: content
       html: <p>"Is it {{guess}}?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3573,6 +3767,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Is it {{precomputeGuess}}?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3588,6 +3783,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3603,6 +3799,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3619,10 +3816,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>No, it's smaller</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>No, it's bigger</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Yes, that's right!</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -3630,6 +3830,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3688,6 +3889,7 @@ states:
         smaller than {{highest}}."<br><br>"And suppose we guess {{guess}}, and the
         magician tells us it's {{comparison}} than that."<br><br>What's the new <strong>upper
         limit</strong>? That is, what is our number <strong>smaller than</strong>?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3695,6 +3897,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>"Yep!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3711,6 +3914,7 @@ states:
             content_id: feedback_2
             html: <p>Well, technically that's true... it does have to be smaller than
               {{answer}}. But we can be even more precise!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3728,6 +3932,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>No, we can't really say that!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3797,6 +4002,7 @@ states:
       content_id: content
       html: <p>"OK, so what is our <strong>lower limit</strong>? what does the number
         have to be greater than?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3804,6 +4010,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>"You got it! Alright, now let's practice the whole game!"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3821,6 +4028,7 @@ states:
             html: <p>"Technically, it does have to be smaller than {{answer}}... but
               that's not the best we can do! What's the biggest number it has to be
               smaller than?"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3839,6 +4047,7 @@ states:
           content_id: default_outcome
           html: <p>"No, that's not right... the number doesn't have to be bigger than
             that based on the information we have."</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3866,6 +4075,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -3876,6 +4086,7 @@ states:
 
               Hmm, there''s gotta be a better way of keeping track of that than just
               looking through all the answers all the time..."</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3893,6 +4104,7 @@ states:
             html: "<p>\"Wait, but I already said that the number is smaller than {{highest}}!\
               \ \nHmm, there's gotta be a better way of keeping track of this than\
               \ just looking through all the previous answers all the time.\"</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3908,6 +4120,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>That's right!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3923,6 +4136,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>"Let's say that the number is bigger than that"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3938,6 +4152,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>"Let's say that the number is smaller than that"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3959,6 +4174,7 @@ states:
               But that still leaves a range of {{answer-lowest-2}} numbers! I think
               that''s too many."</p><p>"We should always pick numbers in the middle
               of the possible range, remember?"<br></p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3980,6 +4196,7 @@ states:
               But that still leaves a range of {{highest-answer-2}} numbers! I think
               that''s too many."</p><p>"We should always pick numbers in the middle
               of the possible range, remember?"<br></p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4003,6 +4220,7 @@ states:
             {{answer}}
 
             {{middle}}</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -4085,6 +4303,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -4095,6 +4314,7 @@ states:
 
               Hmm, there''s gotta be a better way of keeping track of that than just
               looking through all the answers all the time..."</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4112,6 +4332,7 @@ states:
             html: "<p>\"Wait, but I already said that the number is smaller than {{highest}}!\
               \ \nHmm, there's gotta be a better way of keeping track of this than\
               \ just looking through all the previous answers all the time.\"</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4127,6 +4348,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>That's right!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4142,6 +4364,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>"Let's say that the number is bigger than that"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4157,6 +4380,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>"Let's say that the number is smaller than that"</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4178,6 +4402,7 @@ states:
               But that still leaves a range of {{answer-lowest-2}} numbers! I think
               that''s too many."</p><p>"We should always pick numbers in the middle
               of the possible range, remember?"<br></p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4199,6 +4424,7 @@ states:
               But that still leaves a range of {{highest-answer-2}} numbers! I think
               that''s too many."</p><p>"We should always pick numbers in the middle
               of the possible range, remember?"<br></p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4222,6 +4448,7 @@ states:
             {{answer}}
 
             {{middle}}</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

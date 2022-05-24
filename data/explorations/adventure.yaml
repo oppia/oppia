@@ -34,6 +34,7 @@ states:
       content_id: content
       html: <p>You are at a clearing. There are lots of pretty <strong>flowers</strong>
         here.</p><p>There is a path leading back to the <strong>southeast</strong>.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -41,6 +42,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -59,6 +61,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -77,6 +80,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>You go southeast</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -95,6 +99,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>You go southeast</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -121,6 +126,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Pardon?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -162,6 +168,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -187,6 +194,7 @@ states:
       content_id: content
       html: <p>You are standing at a fork in the road. The main road goes to the <strong>northeast</strong>,
         while a smaller path winds to the <strong>northwest</strong>.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -194,6 +202,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>You go northeast</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -212,6 +221,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>You go northwest</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -230,6 +240,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>You go northeast</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -248,6 +259,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>You go northwest</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -266,6 +278,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>You cannot go back</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -292,6 +305,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Pardon?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -337,6 +351,7 @@ states:
     content:
       content_id: content
       html: <p>"Guess how many coins I'm holding!"<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -344,6 +359,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -360,6 +376,7 @@ states:
             content_id: feedback_2
             html: <p>Actually, I can't hold any more than 10 coins. My hands are too
               small.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -375,6 +392,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>I do have some coins!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -390,6 +408,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>No, fewer than that!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -405,6 +424,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>More than that!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -422,6 +442,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>This should never happen</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -458,6 +479,7 @@ states:
         \ also get a pretty red <strong>towel</strong>.</p><p>\xC2\_</p><p>You are\
         \ standing in a small courtyard. To the north is a gate, with a sign:</p><p>\"\
         This way to adventure!\"</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -465,6 +487,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -481,6 +504,7 @@ states:
           value:
           - content_id: ca_choices_2
             html: <p>Go north</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -488,6 +512,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -534,6 +559,7 @@ states:
       html: "<p>You come to a bridge that is being guarded by a troll. The troll says:</p><p>\_\
         </p><p>\"Hello, {{Name}}. You have to pay a toll if you want to cross this\
         \ bridge.\"</p><p>\_</p><p>There is a path leading back to the <strong>southwest</strong>.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -541,6 +567,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>You go southwest</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -559,6 +586,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>You go southwest</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -577,6 +605,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>You use nothing. Nothing happens.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -595,6 +624,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>You do nothing. nothing happens.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -613,6 +643,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>You flail at the troll with your {{Weapon}}. He is not amused.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -633,6 +664,7 @@ states:
             html: <p>You flail your {{sneezeitem}} at the troll. Oh no, the troll
               is allergic! he sneezes really loudly and you are carried away by the
               gust...</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -653,6 +685,7 @@ states:
             html: "<p>You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
               \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
               \ and toward victory!</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -671,6 +704,7 @@ states:
           feedback:
             content_id: feedback_8
             html: <p>You don't have that!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -689,6 +723,7 @@ states:
           feedback:
             content_id: feedback_9
             html: <p>You flail at the troll with your bare hands. He is not amused.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -707,6 +742,7 @@ states:
           feedback:
             content_id: feedback_10
             html: <p>Pay toll with what?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -733,6 +769,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Pardon?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -807,6 +844,7 @@ states:
         \ universal commands that would be available to you any time an input field\
         \ is provided in a \"classic\" adventure game.</p><p>\_</p><p>Now - what is\
         \ your name?\xC2\_<br></p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -822,6 +860,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -848,6 +887,7 @@ states:
       content_id: content
       html: <p>He gives you the <strong>coins</strong> and uses his magic to return
         you back to the troll.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -861,6 +901,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -890,6 +931,7 @@ states:
     content:
       content_id: content
       html: <p>You pick a pretty bouquet of <strong>flowers</strong>.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -903,6 +945,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -933,6 +976,7 @@ states:
       content_id: content
       html: <p>You find yourself at the end of a rainbow. There's a leprechaun here.</p><p>He
         says:<br></p><p>"Hello, {{Name}}! How are you?"</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -948,6 +992,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

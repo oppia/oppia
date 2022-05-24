@@ -128,7 +128,7 @@ describe('Outcome Destination Editor', () => {
     ' when outcome destination details are saved', fakeAsync(() => {
     component.outcome = new Outcome(
       'Hola',
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id', []),
       false,
       [],
       null,
@@ -152,7 +152,7 @@ describe('Outcome Destination Editor', () => {
     ' outcome destination details are saved', fakeAsync(() => {
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id', []),
       false,
       [],
       null,
@@ -263,7 +263,7 @@ describe('Outcome Destination Editor', () => {
     ' selector change', () => {
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id', []),
       false,
       [],
       null,
@@ -281,7 +281,7 @@ describe('Outcome Destination Editor', () => {
   it('should check if new state is being created', () => {
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id', []),
       false,
       [],
       null,
@@ -292,7 +292,7 @@ describe('Outcome Destination Editor', () => {
 
     component.outcome = new Outcome(
       'Introduction',
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id', []),
       false,
       [],
       null,
@@ -305,7 +305,7 @@ describe('Outcome Destination Editor', () => {
   it('should emit changes on destination selector change', () => {
     component.outcome = new Outcome(
       'Introduction',
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id', []),
       false,
       [],
       null,

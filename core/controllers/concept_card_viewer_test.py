@@ -38,16 +38,16 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', [])
         )
         example_2 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('4', '<p>Example Question 2</p>'),
-            state_domain.SubtitledHtml('5', '<p>Example Explanation 2</p>')
+            state_domain.SubtitledHtml('4', '<p>Example Question 2</p>', []),
+            state_domain.SubtitledHtml('5', '<p>Example Explanation 2</p>', [])
         )
         self.skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Skill Explanation</p>'), [example_1, example_2],
+                '1', '<p>Skill Explanation</p>', []), [example_1, example_2],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
@@ -62,7 +62,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
 
         self.skill_contents_1 = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Skill Explanation 1</p>'), [example_1, example_2],
+                '1', '<p>Skill Explanation 1</p>', []), [example_1, example_2],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
@@ -98,14 +98,14 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             [skill_domain.WorkedExample(
                 state_domain.SubtitledHtml(
-                    '2', '<p>Example Question 1</p>'),
+                    '2', '<p>Example Question 1</p>', []),
                 state_domain.SubtitledHtml(
-                    '3', '<p>Example Explanation 1</p>')
+                    '3', '<p>Example Explanation 1</p>', [])
             ).to_dict(), skill_domain.WorkedExample(
                 state_domain.SubtitledHtml(
-                    '4', '<p>Example Question 2</p>'),
+                    '4', '<p>Example Question 2</p>', []),
                 state_domain.SubtitledHtml(
-                    '5', '<p>Example Explanation 2</p>')
+                    '5', '<p>Example Explanation 2</p>', [])
             ).to_dict()],
             json_response['concept_card_dicts'][0]['worked_examples'])
 
@@ -115,14 +115,14 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             [skill_domain.WorkedExample(
                 state_domain.SubtitledHtml(
-                    '2', '<p>Example Question 1</p>'),
+                    '2', '<p>Example Question 1</p>', []),
                 state_domain.SubtitledHtml(
-                    '3', '<p>Example Explanation 1</p>')
+                    '3', '<p>Example Explanation 1</p>', [])
             ).to_dict(), skill_domain.WorkedExample(
                 state_domain.SubtitledHtml(
-                    '4', '<p>Example Question 2</p>'),
+                    '4', '<p>Example Question 2</p>', []),
                 state_domain.SubtitledHtml(
-                    '5', '<p>Example Explanation 2</p>')
+                    '5', '<p>Example Explanation 2</p>', [])
             ).to_dict()],
             json_response['concept_card_dicts'][1]['worked_examples'])
 

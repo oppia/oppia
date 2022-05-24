@@ -378,7 +378,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'new_value': {
                         'content_id': 'content',
-                        'html': '<p>The new content to voiceover</p>'
+                        'html': '<p>The new content to voiceover</p>',
+                        'image_filenames_in_html': []
                     }
                 })], 'Adds new content to init state')
 
@@ -396,7 +397,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'new_value': {
                         'content_id': 'content',
-                        'html': '<p>The new content to voiceover</p>'
+                        'html': '<p>The new content to voiceover</p>',
+                        'image_filenames_in_html': []
                     }
                 }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,

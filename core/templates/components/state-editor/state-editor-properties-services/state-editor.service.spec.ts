@@ -215,8 +215,8 @@ describe('Editor state service', () => {
     const customizationArgsForMultipleChoiceInput = {
       choices: {
         value: [
-          new SubtitledHtml('Choice 1', ''),
-          new SubtitledHtml('Choice 2', '')
+          new SubtitledHtml('Choice 1', '', []),
+          new SubtitledHtml('Choice 2', '', [])
         ]
       }
     };
@@ -256,8 +256,8 @@ describe('Editor state service', () => {
     const customizationArgsForItemSelectionAndDragAndDropInput = {
       choices: {
         value: [
-          new SubtitledHtml('Choice 1', 'ca_choices_0'),
-          new SubtitledHtml('Choice 2', 'ca_choices_1')
+          new SubtitledHtml('Choice 1', 'ca_choices_0', []),
+          new SubtitledHtml('Choice 2', 'ca_choices_1', [])
         ]
       }
     };
@@ -295,8 +295,8 @@ describe('Editor state service', () => {
     expect(ecs.getAnswerChoices('', {
       choices: {
         value: [
-          new SubtitledHtml('Choice 1', ''),
-          new SubtitledHtml('Choice 2', '')
+          new SubtitledHtml('Choice 1', '', []),
+          new SubtitledHtml('Choice 2', '', [])
         ]
       }
     })).toBeNull();

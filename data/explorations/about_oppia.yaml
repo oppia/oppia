@@ -23,6 +23,7 @@ states:
         \ the code powering this site is written by Google engineers. However, oppia.org\
         \ is not a Google product, and Google bears no responsibility for the content\
         \ of this website.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -30,6 +31,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -45,6 +47,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -60,6 +63,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -76,12 +80,16 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>Who created this site?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>How can I contact the creators of Oppia?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Can I use the content on this site?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>I want to go back to my earlier questions.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -89,6 +97,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>...</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -140,6 +149,7 @@ states:
         \ url-with-value=\"&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;\"\
         ></oppia-noninteractive-link><br></p><p>\_</p><p>If you need to contact the\
         \ admins privately, you can email them at admin@oppia.org.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -147,6 +157,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -162,6 +173,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -177,6 +189,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -193,10 +206,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>So who created this site?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>Can I use the content on this site?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>I want to go back to my earlier questions.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -204,6 +220,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>...</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -256,6 +273,7 @@ states:
         \ find out more about how you can contribute:</p><p><oppia-noninteractive-link\
         \ text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia&amp;quot;\"\
         ></oppia-noninteractive-link><br></p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -269,6 +287,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -300,6 +319,7 @@ states:
         \ for the future! If you'd like to help, you'd be very welcome, and we'd be\
         \ delighted to help you get started. Feel free to reach out to us at the oppia-dev\
         \ Google Group, or by contacting admin@oppia.org.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -307,6 +327,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -322,6 +343,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -337,6 +359,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -353,10 +376,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>How can I contact the creators of Oppia?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>Can I use the site content?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>I want to go back to my earlier questions.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -364,6 +390,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>...</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -399,6 +426,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -425,6 +453,7 @@ states:
       html: "<p>Fantastic. Feel free to try one of my featured explorations below.\
         \ Then I hope you'll feel inspired to create a few explorations yourself.\xC2\
         \_</p><p>\_</p><p>Have fun!</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -438,6 +467,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -463,6 +493,7 @@ states:
     content:
       content_id: content
       html: <p>Great question! To demonstrate, can I ask your name?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -478,6 +509,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -507,6 +539,7 @@ states:
         \ are many types of interactions you can have in an exploration; for example,\
         \ let's try using a map.</p><p>\_</p><p>Can you find Helsinki, Finland on\
         \ the map?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -514,6 +547,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Great job, you found it!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -540,6 +574,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Well, not quite, but close enough!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -570,6 +605,7 @@ states:
         \u201D your participation is welcome and needed!</p><p>\_</p><p>Creating conversations\
         \ is fun and easy. You try it for yourself by clicking 'Create Exploration'\
         \ on my home page.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -583,6 +619,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -617,6 +654,7 @@ states:
         \ explorations in the Oppia library, embed them on a webpage, or just share\
         \ them with your friends-- it\u2019s all up to you. And best of all, I'm completely\
         \ free!</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -630,6 +668,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -657,6 +696,7 @@ states:
       html: <p>Yes, all the content on this website can be used freely under the Creative
         Commons 2.0 License. You can learn more about the License here:</p><p><oppia-noninteractive-link
         text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -664,6 +704,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -679,6 +720,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -694,6 +736,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -710,10 +753,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>So who created this site?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>How can I contact the creators of Oppia?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>I want to go back to my earlier questions.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -721,6 +767,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>...</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -756,6 +803,7 @@ states:
     content:
       content_id: content
       html: <p>So, what else can I tell you about myself?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -763,6 +811,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -778,6 +827,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -793,6 +843,7 @@ states:
           feedback:
             content_id: feedback_3
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -808,6 +859,7 @@ states:
           feedback:
             content_id: feedback_4
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -824,12 +876,16 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>How do your explorations work?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>What can you tell me about this website?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>How can I contribute to Oppia?</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_8
             html: <p>Those were all the questions I had!</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -837,6 +893,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>...</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

@@ -199,7 +199,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     '<p>İźžśşɛمшصحếở“∉⅘√∈◯–⅖⅔≤€やんもをり北木我是西错õ</p>'
                     '<p>üóäüñıīç×÷öóûؤ¡´</p>'
                     '<p>😕😊😉🙄🙂😊🙂💡😑😊🔖😉😃🤖📷😂📀💿💯💡</p>'
-                    '<p>👋😱😑😊🎧🎙🎼📻🤳👌🚦🤗😄👉📡📣📢🔊²</p>'
+                    '<p>👋😱😑😊🎧🎙🎼📻🤳👌🚦🤗😄👉📡📣📢🔊²</p>', []
                 ).to_dict()
             }), exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
@@ -214,7 +214,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 '<p>İźžśşɛمшصحếở“∉⅘√∈◯–⅖⅔≤ęąĀ€やんもをり</p>'
                                 '<p>üóäüñıīç×÷öóûؤ¡北木我是西错õ´😕😊😉</p>'
                                 '<p>🙄🙂😊🙂💡😑😊🔖😉😃🤖📷😂📀💿💯💡</p>'
-                                '<p>👋😱😑😊🎧🎙🎼📻🤳👌🚦🤗😄👉📡📣📢🔊²</p>'
+                                '<p>👋😱😑😊🎧🎙🎼📻🤳👌🚦🤗😄👉📡📣📢🔊²</p>', []
                             ).to_dict()
                         ]
                     },
@@ -259,7 +259,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-svgdiagram '
                     'alt-with-value="&amp;quot;Image12345&amp;quot;"'
                     ' svg_filename-with-value="&amp;quot;igage.svg&amp;quot;">'
-                    '</oppia-noninteractive-svgdiagram>'
+                    '</oppia-noninteractive-svgdiagram>', []
                 ).to_dict()
             }), exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
@@ -274,7 +274,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 'svg_filename-with-value="&amp;quot;'
                                 'img12.svg&amp;quot;" alt-with-value="'
                                 '&amp;quot;Image&amp;quot;">'
-                                '</oppia-noninteractive-svgdiagram>'
+                                '</oppia-noninteractive-svgdiagram>', []
                             ).to_dict()
                         ]
                     },

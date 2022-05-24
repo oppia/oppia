@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -41,6 +42,7 @@ states:
     content:
       content_id: content
       html: <p>Give me an example of a happy word.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -49,6 +51,7 @@ states:
             content_id: feedback_1
             html: <p>Happy is certainly a happy word. Can you be more creative than
               that?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -67,6 +70,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>That is definitely happy! Can you think of any more?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -95,6 +99,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Is {{answer}} actually happy? I'm not so sure. Let's move on!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

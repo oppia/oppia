@@ -677,7 +677,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
         new_content = state_domain.SubtitledHtml(
-            'content', '<p>new suggestion html</p>').to_dict()
+            'content', '<p>new suggestion html</p>', []).to_dict()
 
         suggestion.change.new_value = new_content
 

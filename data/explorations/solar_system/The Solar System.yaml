@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -40,6 +41,7 @@ states:
     content:
       content_id: content
       html: <p>Do you want to quit?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -47,6 +49,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Thank you for exploring the Solar System!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -62,6 +65,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Let's learn more about the planets then!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -78,8 +82,10 @@ states:
           value:
           - content_id: ca_choices_3
             html: <p>Yes</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>No</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -87,6 +93,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -121,6 +128,7 @@ states:
         \ Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto.\
         \ They range from huge gas giants to small icy dwarf planets.</p><p>\xC2\_\
         </p><p>Click on the planets below to find out more about each one!</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -130,6 +138,7 @@ states:
             html: <p>This is Mercury, a small metallic planet closest to the sun.
               Since it is so near to the sun, it only takes 88 days for it to travel
               one entire orbit, so a year on Mercury would only be 88 days long.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -149,6 +158,7 @@ states:
               day. Though Mercury is nearer to the sun than Venus, Venus is the hottest
               planet in the Solar System, because its thick atmosphere of carbon dioxide
               traps heat on its surface.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -167,6 +177,7 @@ states:
               the vastness of the Solar System and the rest of space, it is the only
               place that we know life exists on. It is at just the right distance
               from the sun to ensure a comfortable temperature for us to exist in.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -186,6 +197,7 @@ states:
               of iron oxide on its surface. It has a thin atmosphere of carbon dioxide
               and ice caps on either end, and has two small irregularly-shaped moons
               called Phobos and Deimos.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -206,6 +218,7 @@ states:
               One famous feature on it is the "Great Red Spot", which is a huge storm
               on its surface that has raged for at least 350 years, and is large enough
               to swallow three entire Earths.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -224,6 +237,7 @@ states:
               \ its beautiful rings of ice and dust orbiting around it. Like Jupiter,\
               \ it is a gas giant, mostly made of layers of hydrogen which get progressively\
               \ denser towards its solid core.\xC2\_</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -242,6 +256,7 @@ states:
               that was discovered using a telescope, since it is normally too dim
               to be seen with the naked eye. It is the coldest planet, and is formed
               from layers of hydrogen gas enveloping a frigid core of rock and ice.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -261,6 +276,7 @@ states:
               an icy core. The methane in its atmosphere absorbs red light, giving
               it a beautiful blue color. It was first predicted to exist from gravitational
               calculations, and was only discovered by telescope later.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -279,6 +295,7 @@ states:
               has now been reclassified as a "dwarf planet". It is formed from ice
               and rock, and is even smaller than our moon. The first spacecraft to
               visit Pluto is due to reach in July 2015.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -374,6 +391,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Do you want to exit the exploration?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

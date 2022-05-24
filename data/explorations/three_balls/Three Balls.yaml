@@ -25,6 +25,7 @@ states:
       html: "<p>Wow, you got through that really fast!</p><p>\xC2\_</p><p>Would you\
         \ like to play around with the problem a bit more, and see how this exploration\
         \ would have presented the material if you didn't figure it out yourself?</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -32,6 +33,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -47,6 +49,7 @@ states:
           feedback:
             content_id: feedback_2
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -64,9 +67,11 @@ states:
           - content_id: ca_choices_3
             html: <p>Yes, take me to another stage in the exploration that would have
               taught me about permutations</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>No thanks, I'm done for now. I can always restart it if I want
               to experiment more.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -74,6 +79,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>This will never get hit and this message should not be necessary.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -105,6 +111,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -132,6 +139,7 @@ states:
         figure out how many ways there are to arrange four balls in a row? Listing
         all the possibilities by hand is going to be tedious, but, by now, you''ve
         learned at least one way to calculate this number quickly and accurately.</p>'
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -141,6 +149,7 @@ states:
             html: '<p>Yes, that is correct: the answer is 4 times the number of ways
               to arrange three balls in a row, so it is 4 times 6, which is 24! Well
               done.</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -157,6 +166,7 @@ states:
             content_id: feedback_2
             html: <p>Ahem. That, I think, is a trick answer, surely? I am pretty sure
               there's at least one way to arrange four balls in a line...</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -182,6 +192,7 @@ states:
               to systematically find all the cases, and make sure that you haven''t
               missed any. It''s up to you whichever you pick, but you need to get
               an accurate answer!</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -206,6 +217,7 @@ states:
               you have no duplicates! And you might also consider using the approach
               we''ve developed earlier in the exploration -- it''s much easier, and
               less prone to errors.</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -222,6 +234,7 @@ states:
             content_id: feedback_5
             html: <p>But we know you can arrange 3 balls in 6 ways. So for 4 balls,
               there couldn't possibly be fewer ways than 6!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -238,6 +251,7 @@ states:
             content_id: feedback_6
             html: <p>So adding a fourth ball doesn't give you any more combinations
               than arranging three balls did? I don't think that's right.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -258,6 +272,7 @@ states:
               \ there are several ways to add the fourth ball. If you figure out how\
               \ many, it should be straightforward to arrive at the final number of\
               \ 4-ball arrangements.</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -276,6 +291,7 @@ states:
           content_id: default_outcome
           html: <p>Hmm, I don't think so, there are quite a lot more than that. Check
             your work, and try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -314,6 +330,7 @@ states:
       content_id: content
       html: <p>So, you've found that there are six ways to arrange these three balls.<br><br>Is
         that the same as your first guess?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -322,6 +339,7 @@ states:
             content_id: feedback_1
             html: <p>Was it? I think you guessed {{guess}}, but there were actually
               6 ways.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -338,6 +356,7 @@ states:
             content_id: feedback_2
             html: <p>Yes, you thought the number of ways was {{guess}}, but it was
               actually 6.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -354,8 +373,10 @@ states:
           value:
           - content_id: ca_choices_3
             html: <p>Yes</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_4
             html: <p>No</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -363,6 +384,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -418,6 +440,7 @@ states:
         \ all this works out correctly, because F2 = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,\
         \ can you write out a similar expression for F2, in terms of F1? Then we'll\
         \ move on to figuring out F4, which starts to become hard to compute manually.</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -427,6 +450,7 @@ states:
             html: <p>Yes! F2 = 2 * F1, since there are two ways to pick the ball on
               the left, and  for each of these 2 ways, there are F1 ways to arrange
               the other balls.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -447,6 +471,7 @@ states:
             html: <p>Yes! F2 = 2 * F1, since there are two ways to pick the ball on
               the left, and  for each of these 2 ways, there are F1 ways to arrange
               the other balls.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -467,6 +492,7 @@ states:
             html: <p>Yes! F2 = 2 * F1, since there are two ways to pick the ball on
               the left, and  for each of these 2 ways, there are F1 ways to arrange
               the other balls.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -487,6 +513,7 @@ states:
             html: <p>Yes! F2 = 2 * F1, since there are two ways to pick the ball on
               the left, and  for each of these 2 ways, there are F1 ways to arrange
               the other balls.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -507,6 +534,7 @@ states:
             html: <p>Yes! F2 = 2 * F1, since there are two ways to pick the ball on
               the left, and  for each of these 2 ways, there are F1 ways to arrange
               the other balls.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -536,6 +564,7 @@ states:
             like F2 = 2 * F1? If so, you are correct! There are two ways to pick the
             first ball, and F1 ways to pick the second one. This all works out because
             F1 = 1, so F2 = 2 * 1 = 2.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -588,6 +617,7 @@ states:
         works for 3 balls; we can figure out exactly why later.<br><br>Do you believe
         this reasoning? Do you agree that there are exactly 8 ways to arrange four
         balls of different colours in a line?</p>'
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -597,6 +627,7 @@ states:
             html: <p>All right! We have an answer. We could check it, I guess, by
               listing all sequences of four balls. But let's do something easier;
               let's try it with just two.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -613,8 +644,10 @@ states:
           value:
           - content_id: ca_choices_2
             html: <p>Yes! It's clearly 8.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_3
             html: <p>No, I don't think it's 8.</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -622,6 +655,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -659,6 +693,7 @@ states:
         \ stretching from left to right in front of you.<br><br>How many different\
         \ ways can you find to arrange the three balls in a straight line? Try to\
         \ determine all of them.<br></p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -666,6 +701,7 @@ states:
           feedback:
             content_id: feedback_1
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -684,6 +720,7 @@ states:
               red ball on the left, the blue ball in the middle, and the yellow ball
               on the right. Now try and find a few more. How many different ways can
               you find, in total?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -701,6 +738,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -737,6 +775,7 @@ states:
         things, or a systematic way that you could have used to count the balls. Write
         these down here -- you will probably want to refer to them in a future exercise,
         and we'll show your jottings to you again at that point.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -744,6 +783,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Come on, surely you have something...</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -770,6 +810,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -806,6 +847,7 @@ states:
         &amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
         &amp;quot;RBY_height_196_width_551.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
         </p><p>Can you list all the ways you found?<br><br>\_ \_\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -815,6 +857,7 @@ states:
             html: <p>Looks like you forgot to capitalize your answers. Sorry, but
               could you use capital letters like RBY instead of lowercase like rby?<br>It's
               easier to read.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -840,6 +883,7 @@ states:
             html: <p>At least one of your list elements seems to be wrong. Can you
               check and make sure that each of them is a three-letter uppercase string
               that contains only the letters 'B', 'R' and 'Y' once each?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -864,6 +908,7 @@ states:
             content_id: feedback_3
             html: <p>You seem to have missed some arrangements with the red ball on
               the left...</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -884,6 +929,7 @@ states:
             content_id: feedback_4
             html: <p>I think you're missing some! Make sure you've listed all the
               arrangements where the yellow ball is on the left</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -903,6 +949,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>Have you found all the arrangements with a blue ball on the left?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -922,6 +969,7 @@ states:
           feedback:
             content_id: feedback_6
             html: ''
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -952,6 +1000,7 @@ states:
           content_id: default_outcome
           html: <p>(Whoops! If you got here, this is a bug. Please leave some feedback
             and we'll fix it.)<br></p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1014,6 +1063,7 @@ states:
         \ alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;2balls_height_248_width_265.png&amp;quot;\"\
         ></oppia-noninteractive-image><p>\xC2\_</p>"
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1023,6 +1073,7 @@ states:
             html: <p>Yes! That is correct. If the balls are red and blue, either the
               red one comes first, or the blue one comes first. Once you've picked
               the first one, the other choice is fixed.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1050,6 +1101,7 @@ states:
 
               Why not try again? How many ways are there to arrange two balls in a
               row?</p>'
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1066,6 +1118,7 @@ states:
             content_id: feedback_3
             html: <p>Nah, that can't be right :-) There's at least one way to arrange
               two balls in a row, isn't there?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1081,6 +1134,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>There's at least one more way. Try swapping the balls?</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1099,6 +1153,7 @@ states:
           content_id: default_outcome
           html: <p>I think you may have counted something too many times. Try to remember
             the systematic approach you came up with earlier, and use it here...</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1130,6 +1185,7 @@ states:
     content:
       content_id: content
       html: <p>Right! Why do you think it is 6?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1141,6 +1197,7 @@ states:
               by noticing that there are 3 ways to pick the first ball -- then, once
               you've done that, there are 2 ways to pick the second, and the last
               choice is forced. That's 3 x 2 = 6 ways.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1163,6 +1220,7 @@ states:
               about this by noticing that there are 3 ways to pick the first ball
               -- then, once you've done that, there are 2 ways to pick the second,
               and the last choice is forced. That's 3 x 2 = 6 ways.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1185,6 +1243,7 @@ states:
               think about this by noticing that there are 3 ways to pick the first
               ball -- then, once you've done that, there are 2 ways to pick the second,
               and the last choice is forced. That's 3 x 2 = 6 ways.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1208,6 +1267,7 @@ states:
               \ the first ball -- then, \nonce you've done that, there are 2 ways\
               \ to pick the second, and the last\n choice is forced. That's 3 x 2\
               \ = 6 ways.</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1231,6 +1291,7 @@ states:
               \ the first ball -- then, \nonce you've done that, there are 2 ways\
               \ to pick the second, and the last\n choice is forced. That's 3 x 2\
               \ = 6 ways.</p>"
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1265,6 +1326,7 @@ states:
             If you do a quick search for the words ''permutation'' or ''factorial''
             on the Internet, you''ll also be able to find more information about this
             topic.</p>'
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
