@@ -16,6 +16,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -41,6 +42,7 @@ states:
     content:
       content_id: content
       html: <p>Why do you think three things can be arranged 6 ways?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -48,6 +50,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Done.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -66,6 +69,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Detected permutation.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -144,6 +148,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Detected combination.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -195,6 +200,7 @@ states:
           feedback:
             content_id: feedback_4
             html: <p>Detected factorial.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1081,6 +1087,7 @@ states:
           feedback:
             content_id: feedback_5
             html: <p>Detected listing.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1276,6 +1283,7 @@ states:
           feedback:
             content_id: feedback_6
             html: <p>Detected unsure.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1340,6 +1348,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Did not detect. Try again?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

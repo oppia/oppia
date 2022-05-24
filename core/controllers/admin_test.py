@@ -404,12 +404,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
-                'html': 'content 1'
+                'html': 'content 1',
+                'image_filenames_in_html': []
             },
             'state_name': 'Introduction',
             'old_value': {
                 'content_id': 'content',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             },
             'cmd': 'edit_state_property',
             'property_name': 'content'
@@ -418,12 +420,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
-                'html': 'content 1'
+                'html': 'content 1',
+                'image_filenames_in_html': []
             },
             'state_name': 'Introduction',
             'old_value': {
                 'content_id': 'content',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             },
             'cmd': 'edit_state_property',
             'property_name': 'content'
@@ -432,12 +436,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
-                'html': 'content 1'
+                'html': 'content 1',
+                'image_filenames_in_html': []
             },
             'state_name': 'Introduction',
             'old_value': {
                 'content_id': 'content',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             },
             'cmd': 'edit_state_property',
             'property_name': 'content'
@@ -446,12 +452,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
-                'html': 'content 1'
+                'html': 'content 1',
+                'image_filenames_in_html': []
             },
             'state_name': 'Introduction',
             'old_value': {
                 'content_id': 'content',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             },
             'cmd': 'edit_state_property',
             'property_name': 'content'

@@ -17,6 +17,7 @@ states:
       content_id: content
       html: <p>Algebraic Expression Input. Provide the formula for calculating the
         area of a circle with radius = r.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -24,6 +25,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That is exactly how you find the area of a circle! Good job!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -45,6 +47,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That is not how the area of a circle is calculated. Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -53,6 +56,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>The area of a circle is related to a constant called "pi".</p>
+          image_filenames_in_html: []
       id: AlgebraicExpressionInput
       solution: null
     next_content_id_index: 2
@@ -75,6 +79,7 @@ states:
     content:
       content_id: content
       html: <p>Code Editor. Write a program which prints 'Hello Oppia' to me.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -82,6 +87,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Hello! Let's move onto another interaction.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -108,6 +114,7 @@ states:
           content_id: default_outcome
           html: <p>I'm looking for a particular 'Hello Oppia' message. Don't you want
             to say hello?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -133,6 +140,7 @@ states:
     content:
       content_id: content
       html: <p>Continue. Please press the continue button.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -146,6 +154,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Moving onward!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -171,6 +180,7 @@ states:
     content:
       content_id: content
       html: <p>Sort the following fractions in ascending order.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -178,6 +188,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Yes, well done!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -198,13 +209,16 @@ states:
           value:
           - content_id: ca_choices_2
             html: <p>Choice 1</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_3
             html: <p>Choice 2</p>
+            image_filenames_in_html: []
       default_outcome:
         dest: Drag And Drop Sort
         feedback:
           content_id: default_outcome
           html: <p>No, that's not right.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -234,6 +248,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -258,6 +273,7 @@ states:
     content:
       content_id: content
       html: <p>Write 20/50 as a fraction in simplest terms.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -265,6 +281,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Yes, well done!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -296,6 +313,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>No, that's not right. The answer is 2/5.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -323,6 +341,7 @@ states:
     content:
       content_id: content
       html: <p>Graph Theory. Please create a pentagon.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -330,6 +349,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Penta-penta-pentagon!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -380,6 +400,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>That's a triangle. Your shape needs more sides.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -418,6 +439,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Your shape is missing one side!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -503,6 +525,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That's not quite a pentagon. Please try again!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -511,6 +534,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>dsf</p>
+          image_filenames_in_html: []
       id: GraphInput
       solution: null
     next_content_id_index: 4
@@ -537,6 +561,7 @@ states:
     content:
       content_id: content
       html: <p>Image Region. Please click on the constructor in the Python code shown.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -544,6 +569,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That's the class definition. Try again.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -559,6 +585,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>That's the class's docstring. Try again.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -575,6 +602,7 @@ states:
             content_id: feedback_3
             html: <p>That's a function, which is close to what you're looking for.
               Try again!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -591,6 +619,7 @@ states:
             content_id: feedback_4
             html: <p>That's a classmethod. It does execute code, but it doesn't construct
               anything. Try again!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -607,6 +636,7 @@ states:
             content_id: feedback_5
             html: <p>You found it! This is the code responsible for constructing a
               new class object.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -671,6 +701,7 @@ states:
           content_id: default_outcome
           html: "<p>Constructors <em>initialize</em>\_an object, or <em>init</em>\_\
             it.Constructors are also functions themselves.</p>"
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -679,6 +710,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>sdf</p>
+          image_filenames_in_html: []
       id: ImageClickInput
       solution: null
     next_content_id_index: 6
@@ -709,6 +741,7 @@ states:
     content:
       content_id: content
       html: <p>Item selection. Please select the good options.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -716,6 +749,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That's right!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -733,6 +767,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>That's not a good option!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -749,6 +784,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>That's not all of the good options!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -765,6 +801,7 @@ states:
             content_id: feedback_4
             html: <p>That's good! No bad options, but make sure to choose all good
               options!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -783,10 +820,13 @@ states:
           value:
           - content_id: ca_choices_5
             html: <p>Good option A.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Bad option B.</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_7
             html: <p>Good option C.</p>
+            image_filenames_in_html: []
         maxAllowableSelectionCount:
           value: 2
         minAllowableSelectionCount:
@@ -796,6 +836,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>The two good options actually have the word 'good' in them.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -804,6 +845,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>sdf</p>
+          image_filenames_in_html: []
       id: ItemSelectionInput
       solution: null
     next_content_id_index: 8
@@ -838,6 +880,7 @@ states:
     content:
       content_id: content
       html: <p>Item Selection with one choice. Select "Choice 2" below.<br></p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -845,6 +888,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>No, you want the one below this one.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -861,6 +905,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Yes, good choice!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -877,6 +922,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>No, you want the choice above this one.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -894,10 +940,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>Choice 1</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>Choice 2</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Choice 3</p>
+            image_filenames_in_html: []
         maxAllowableSelectionCount:
           value: 1
         minAllowableSelectionCount:
@@ -907,6 +956,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -943,6 +993,7 @@ states:
       content_id: content
       html: <p>Math Equation Input. Write the equation of a straight line in the slope-intercept
         form. Consider the slope to be 'm' and the y-intercept to be 'c'</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -950,6 +1001,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That is the slope-intercept form of a straight line! Good job!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -974,6 +1026,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That is not the slope-intercept form of a straight line. Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -982,6 +1035,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>The slope-intercept form of a straight-line is 'y=m*x+c'.</p>
+          image_filenames_in_html: []
       id: MathEquationInput
       solution: null
     next_content_id_index: 2
@@ -1004,6 +1058,7 @@ states:
     content:
       content_id: content
       html: <p>Multiple Choice. Select "Second choice" below.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1011,6 +1066,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Nice choice!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1026,6 +1082,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Hmm, not quite. Perhaps the right option is below this one.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1041,6 +1098,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Hmm, not quite. Perhaps the answer is above this one.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1057,10 +1115,13 @@ states:
           value:
           - content_id: ca_choices_4
             html: <p>First choice</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_5
             html: <p>Second choice</p>
+            image_filenames_in_html: []
           - content_id: ca_choices_6
             html: <p>Third choice</p>
+            image_filenames_in_html: []
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -1068,6 +1129,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1076,6 +1138,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>sfd</p>
+          image_filenames_in_html: []
       id: MultipleChoiceInput
       solution: null
     next_content_id_index: 7
@@ -1109,6 +1172,7 @@ states:
       content_id: content
       html: <p>Music Notes Input. One C note is given. Can you find the next C in
         the scale?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1116,6 +1180,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>You found the next C! Excellent.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1145,6 +1210,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That's not the next C. Try again?</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1154,6 +1220,7 @@ states:
           content_id: hint_1
           html: '<p>Hint: The acronym ''FACE'' is very helpful for remembering notes
             on the C major scale.</p>'
+          image_filenames_in_html: []
       id: MusicNotesInput
       solution: null
     next_content_id_index: 2
@@ -1176,6 +1243,7 @@ states:
     content:
       content_id: content
       html: <p>Number Input. Enter a two or higher digit number.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1183,6 +1251,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That number has more than one digit. Right!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1200,6 +1269,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That's only one digit! Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1225,6 +1295,7 @@ states:
     content:
       content_id: content
       html: <p>Write 2 km/s in terms of m/s.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1232,6 +1303,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Yes, well done!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1261,6 +1333,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>No, that's not right. The answer is 2000 m/s.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1286,6 +1359,7 @@ states:
     content:
       content_id: content
       html: <p>Numeric Expression Input. Break down 1234.56 into component place values.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1293,6 +1367,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That is perfect!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1314,6 +1389,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>That is not the correct expansion of 1234.56. Try again.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1324,6 +1400,7 @@ states:
           html: <p>The final numeric expression that you get should be equivalent
             to the original number. Also, don't forget to breakdown the decimal place
             values as well!</p>
+          image_filenames_in_html: []
       id: NumericExpressionInput
       solution: null
     next_content_id_index: 2
@@ -1349,6 +1426,7 @@ states:
       content_id: content
       html: <p>Pencil Code Editor. Similar to before, but instead write a goodbye
         message to me.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1356,6 +1434,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1371,6 +1450,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1391,6 +1471,7 @@ states:
           content_id: default_outcome
           html: <p>Where are your manners? You should say goodbye to me. We've explored
             so much, together!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1418,6 +1499,7 @@ states:
     content:
       content_id: content
       html: <p>Write the equivalent ratio for half.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1425,6 +1507,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Yes, well done!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1450,6 +1533,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>No, that's not right. The answer is 1:2 (or equivalent).</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1478,6 +1562,7 @@ states:
       content_id: content
       html: <p>Set Input. Try entering a word which has nearly no rhymes. I am specifically
         looking for any of three popular ones.</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1486,6 +1571,7 @@ states:
             content_id: feedback_1
             html: <p>Nice! Orange, purple, and silver are all words that are exceptionally
               hard to use in rhyming devices.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1512,6 +1598,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Not quite.</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1520,13 +1607,16 @@ states:
       - hint_content:
           content_id: hint_1
           html: '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
+          image_filenames_in_html: []
       - hint_content:
           content_id: hint_2
           html: <p>A third one is both a color and a fruit. This fruit is of particular
             importance to the state of Florida.<br></p>
+          image_filenames_in_html: []
       - hint_content:
           content_id: hint_3
           html: <p>Try orange. :) There are still two others, however!<br></p>
+          image_filenames_in_html: []
       id: SetInput
       solution: null
     next_content_id_index: 6
@@ -1557,6 +1647,7 @@ states:
     content:
       content_id: content
       html: <p>Text input. Please add a word containing "ate".</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1564,6 +1655,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Omnomnom.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1590,6 +1682,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>The answer needs to contain "ate".</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1598,6 +1691,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>Hint 1</p>
+          image_filenames_in_html: []
       id: TextInput
       solution: null
     next_content_id_index: 4
@@ -1625,6 +1719,7 @@ states:
       content_id: content
       html: <p>World Map. Can you find the capitals of Canada, Mexico, or the United
         States?</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1632,6 +1727,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>That's Washington, D.C., the capital of the United States.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1650,6 +1746,7 @@ states:
           feedback:
             content_id: feedback_2
             html: <p>Ottawa, the capital of Canada!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1668,6 +1765,7 @@ states:
           feedback:
             content_id: feedback_3
             html: <p>Mexico City, Mexico. The capital of Mexico.</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1694,6 +1792,7 @@ states:
         feedback:
           content_id: default_outcome
           html: <p>Not quite. Try again!</p>
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1703,6 +1802,7 @@ states:
           content_id: hint_1
           html: '<p>Hint: Try looking in the middle of Mexico. Capitals also have
             special markings on a map.</p>'
+          image_filenames_in_html: []
       id: InteractiveMap
       solution: null
     next_content_id_index: 4
