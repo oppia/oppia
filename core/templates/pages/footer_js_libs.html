@@ -6,6 +6,10 @@
   <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
 <% } %>
 
+<% for (var chunk in htmlWebpackPlugin.files.css) { %>
+  <link href="<%= htmlWebpackPlugin.files.css[chunk] %>"></script>
+<% } %>
+
 <% if (htmlWebpackPlugin.options.hybrid && webpackConfig.mode == 'production') { %>
   <script src="/third_party/generated/js/third_party.min.js"></script>
 <% } else if (htmlWebpackPlugin.options.hybrid) { %>

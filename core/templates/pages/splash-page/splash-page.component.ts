@@ -27,6 +27,9 @@ import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './splash-page.component.css';
+import './splash-page.component.rtl.css';
+
 export interface Testimonial {
   quote: string;
   studentDetails: string;
