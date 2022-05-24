@@ -26,6 +26,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Optional
+
 MYPY = False
 if MYPY:
     from mypy_imports import question_models
@@ -69,6 +71,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 2, ['skill_1'], 0))
 
         self.assertEqual(len(questions), 1)
+        assert isinstance(questions[0], str)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
 
@@ -93,6 +96,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 2, ['skill_1', 'skill_2'], 0))
 
         self.assertEqual(len(questions), 1)
+        assert isinstance(questions[0], str)
         self.assertEqual(
             questions[0].to_dict(), question_1.to_dict())
 
@@ -104,8 +108,10 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)
+        assert isinstance(questions[0], str)
         self.assertEqual(questions[0].id, self.question_id)
         self.assertIsNone(questions[1]) 
+        assert isinstance(questions[2], str)
         self.assertEqual(questions[2].id, question_id_2)
 
     def test_cannot_get_question_from_model_with_invalid_schema_version(
@@ -122,7 +128,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         question_id = question_services.get_new_question_id() #type: ignore[no-untyped-call]
 
-        question_model = question_models.QuestionModel(
+        question_model: Optional[question_models.QuestionModel] = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
                 self._create_valid_question_data('ABC').to_dict()), #type: ignore[no-untyped-call]

@@ -76,11 +76,21 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         else:
             grouped_skill_ids[-1].append(question_skill_link.skill_id)
 
+    # for skill_ids_list in grouped_skill_ids:
+    #     skills = skill_models.SkillModel.get_multi(skill_ids_list)
+    #     grouped_skill_descriptions.append(
+    #         [skill.description if skill else None for skill in skills]) 
+
     for skill_ids_list in grouped_skill_ids:
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
-        assert isinstance(skill.description, str)
-        grouped_skill_descriptions.append(
-            [skill.description if skill else None for skill in skills]) 
+        skill_descriptions: List[Optional[str]] = []
+        for skill in skills:
+            if skill:
+                assert isinstance(skill.description, str)
+                skill_descriptions.append(skill.description)
+            else:
+                skill_descriptions.append(None)
+    grouped_skill_descriptions.append(skill_descriptions)
 
     questions = get_questions_by_ids(question_ids)
     return questions, grouped_skill_descriptions
@@ -122,7 +132,7 @@ def get_question_from_model(
     """
 
     # Ensure the original question model does not get altered.
-    versioned_question_state = {
+    versioned_question_state: VersionedQuestionStateDict = {
         'state_schema_version': (
             question_model.question_state_data_schema_version),
         'state': copy.deepcopy(
