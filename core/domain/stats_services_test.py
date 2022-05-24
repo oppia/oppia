@@ -159,13 +159,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'nullid', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats, None)
 
         stats_services.update_stats('nullid', 1, aggregated_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'nullid', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats, None)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
         """Test the update_stats method."""
