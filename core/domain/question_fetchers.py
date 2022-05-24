@@ -76,11 +76,6 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         else:
             grouped_skill_ids[-1].append(question_skill_link.skill_id)
 
-    # for skill_ids_list in grouped_skill_ids:
-    #     skills = skill_models.SkillModel.get_multi(skill_ids_list)
-    #     grouped_skill_descriptions.append(
-    #         [skill.description if skill else None for skill in skills]) 
-
     for skill_ids_list in grouped_skill_ids:
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
         skill_descriptions: List[Optional[str]] = []
@@ -98,7 +93,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
 
 def get_questions_by_ids(
     question_ids: List[str]
-) -> List[Optional[question_domain.Question]]: #Sequence[Optional[question_domain.Question]]:
+) -> List[Optional[question_domain.Question]]:
     """Returns a list of domain objects representing questions.
 
     Args:
@@ -132,7 +127,7 @@ def get_question_from_model(
     """
 
     # Ensure the original question model does not get altered.
-    versioned_question_state: VersionedQuestionStateDict = {
+    versioned_question_state = {
         'state_schema_version': (
             question_model.question_state_data_schema_version),
         'state': copy.deepcopy(
@@ -144,9 +139,11 @@ def get_question_from_model(
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 
-    return question_domain.Question( #type: ignore[no-untyped-call]
+    return question_domain.Question( # type: ignore[no-untyped-call]
         question_model.id,
-        state_domain.State.from_dict(versioned_question_state['state']), #type: ignore[no-untyped-call]
+        state_domain.State.from_dict(
+            versioned_question_state['state']
+        ), # type: ignore[no-untyped-call]
         versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
         question_model.linked_skill_ids,
@@ -154,7 +151,9 @@ def get_question_from_model(
         question_model.created_on, question_model.last_updated)
 
 
-def _migrate_state_schema(versioned_question_state: VersionedQuestionStateDict) -> None:
+def _migrate_state_schema(
+    versioned_question_state: VersionedQuestionStateDict
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
     state dictionary. If the current State schema changes, a new
@@ -183,6 +182,7 @@ def _migrate_state_schema(versioned_question_state: VersionedQuestionStateDict) 
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
-        question_domain.Question.update_state_from_model( #type: ignore[no-untyped-call]
+        question_domain.Question.update_state_from_model( # type: 
+        # ignore[no-untyped-call]
             versioned_question_state, state_schema_version)
         state_schema_version += 1
