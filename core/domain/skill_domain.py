@@ -361,6 +361,16 @@ class Rubric:
                     'Expected each explanation to be a string, received %s' %
                     explanation)
 
+        if len(self.explanations) > 10:
+            raise utils.ValidationError(
+                'Expected number of explanations to be less than or equal '
+                'to 10, received %d' % len(self.explanations))
+
+        for explanation in self.explanations:
+            if len(explanation) > 300:
+                raise utils.ValidationError(
+                    'Explanation should be less than or equal to 300 chars, '
+                    'received %d chars' % len(explanation))
         if (
                 self.difficulty == constants.SKILL_DIFFICULTIES[1] and
                 len(self.explanations) == 0

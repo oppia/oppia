@@ -18,13 +18,15 @@ are created.
 
 from __future__ import annotations
 
-import logging
+import base64
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -351,30 +353,67 @@ class NewTopicHandler(base.BaseHandler):
 class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'description': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': android_validation_constants
+                            .MAX_CHARS_IN_SKILL_DESCRIPTION
+                    }]
+                }
+            },
+            'linked_topic_ids': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring',
+                        'validators': [{
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX
+                        }]
+                    }
+                }
+            },
+            'explanation_dict': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': state_domain.SubtitledHtml
+                }
+            },
+            'rubrics': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': skill_domain.Rubric
+                    }
+                }
+            },
+            'files': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.
+                            validate_suggestion_images
+                    )
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_create_skill
     def post(self):
-        description = self.payload.get('description')
-        linked_topic_ids = self.payload.get('linked_topic_ids')
-        explanation_dict = self.payload.get('explanation_dict')
-        rubrics = self.payload.get('rubrics')
+        description = self.normalized_payload.get('description')
+        linked_topic_ids = self.normalized_payload.get('linked_topic_ids')
+        explanation_dict = self.normalized_payload.get('explanation_dict')
+        rubrics = self.normalized_payload.get('rubrics')
+        files = self.normalized_payload.get('files')
 
-        if not isinstance(rubrics, list):
-            raise self.InvalidInputException('Rubrics should be a list.')
-
-        if not isinstance(explanation_dict, dict):
-            raise self.InvalidInputException(
-                'Explanation should be a dict.')
-
-        try:
-            subtitled_html = (
-                state_domain.SubtitledHtml.from_dict(explanation_dict))
-            subtitled_html.validate()
-        except Exception as e:
-            raise self.InvalidInputException(
-                'Explanation should be a valid SubtitledHtml dict.'
-            ) from e
-
-        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
             topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
@@ -384,8 +423,6 @@ class NewSkillHandler(base.BaseHandler):
                 topic_services.add_uncategorized_skill(
                     self.user_id, topic.id, new_skill_id)
 
-        skill_domain.Skill.require_valid_description(description)
-
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(
                 'Skill description should not be a duplicate.')
@@ -393,36 +430,22 @@ class NewSkillHandler(base.BaseHandler):
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 
-        skill.update_explanation(
-            state_domain.SubtitledHtml.from_dict(explanation_dict))
+        skill.update_explanation(explanation_dict)
 
         image_filenames = skill_services.get_image_filenames_from_skill(skill)
 
         skill_services.save_new_skill(self.user_id, skill)
 
-        image_validation_error_message_suffix = (
-            'Please go to oppia.org/skill_editor/%s to edit '
-            'the image.' % skill.id)
         for filename in image_filenames:
-            image = self.request.get(filename)
-            if not image:
-                logging.exception(
-                    'Image not provided for file with name %s when the skill '
-                    'with id %s was created.' % (filename, skill.id))
-                raise self.InvalidInputException(
-                    'No image data provided for file with name %s. %s'
-                    % (filename, image_validation_error_message_suffix))
-            try:
-                file_format = (
-                    image_validation_services.validate_image_and_filename(
-                        image, filename))
-            except utils.ValidationError as e:
-                e = '%s %s' % (e, image_validation_error_message_suffix)
-                raise self.InvalidInputException(e)
+            base64_image = files.get(filename)
+            bytes_image = base64.decodebytes(base64_image.encode('utf-8'))
+            file_format = (
+                image_validation_services.validate_image_and_filename(
+                    bytes_image, filename))
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_SKILL, skill.id, image,
+                filename, feconf.ENTITY_TYPE_SKILL, skill.id, bytes_image,
                 'image', image_is_compressible)
 
         self.render_json({
