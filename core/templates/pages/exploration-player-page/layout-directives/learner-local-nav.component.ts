@@ -54,12 +54,6 @@ export class LearnerLocalNavComponent implements OnInit {
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService
   ) {}
 
-  reportExploration(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.showFlagExplorationModal();
-    }
-  }
-
   showFlagExplorationModal(): void {
     this.ngbModal.open(FlagExplorationModalComponent, {
       backdrop: 'static'
