@@ -26,7 +26,8 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -131,6 +132,10 @@ class UserSettingsModel(base_models.BaseModel):
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
+    # Flag to check whether the user has viewed lesson info modal once which
+    # shows the progress of the user through exploration checkpoints.
+    has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(
+        indexed=True, default=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -196,6 +201,8 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
+            'has_viewed_lesson_info_modal_once':
+                base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
 
@@ -238,8 +245,6 @@ class UserSettingsModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSettingsModel.
         """
         user = UserSettingsModel.get(user_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert user is not None
         return {
             'email': user.email,
             'roles': user.roles,
@@ -289,6 +294,8 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
             'display_alias': user.display_alias,
+            'has_viewed_lesson_info_modal_once': (
+                user.has_viewed_lesson_info_modal_once)
         }
 
     @classmethod
@@ -1475,6 +1482,18 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+    # The state name of the furthest reached checkpoint.
+    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
+    # The exploration version of the furthest reached checkpoint.
+    furthest_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+    # The state name of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_state_name = (
+        datastore_services.StringProperty(default=None))
+    # The exploration version of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1530,6 +1549,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
             'mute_suggestion_notifications':
                 base_models.EXPORT_POLICY.EXPORTED,
             'mute_feedback_notifications':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'most_recently_reached_checkpoint_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1661,7 +1688,15 @@ class ExplorationUserDataModel(base_models.BaseModel):
                 'mute_suggestion_notifications': (
                     user_model.mute_suggestion_notifications),
                 'mute_feedback_notifications': (
-                    user_model.mute_feedback_notifications)
+                    user_model.mute_feedback_notifications),
+                'furthest_reached_checkpoint_exp_version': (
+                    user_model.furthest_reached_checkpoint_exp_version),
+                'furthest_reached_checkpoint_state_name': (
+                    user_model.furthest_reached_checkpoint_state_name),
+                'most_recently_reached_checkpoint_exp_version': (
+                    user_model.most_recently_reached_checkpoint_exp_version),
+                'most_recently_reached_checkpoint_state_name': (
+                    user_model.most_recently_reached_checkpoint_state_name)
             }
 
         return user_data
@@ -1959,6 +1994,30 @@ class StoryProgressModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, story_id)
         return cls(
             id=instance_id, user_id=user_id, story_id=story_id)
+
+    @overload  # type: ignore[override]
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str
+    ) -> StoryProgressModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: Literal[True]
+    ) -> StoryProgressModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: Literal[False]
+    ) -> Optional[StoryProgressModel]: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: bool = False
+    ) -> Optional[StoryProgressModel]: ...
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get().

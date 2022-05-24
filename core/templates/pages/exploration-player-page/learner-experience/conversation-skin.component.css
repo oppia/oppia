@@ -25,7 +25,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
   min-width: 50%;
 }
 
-/*rtl:begin:ignore*/
 .conversation-skin-next-lesson-wrapper {
   align-items: center;
   background-color: white;
@@ -37,7 +36,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
   text-align: right;
   vertical-align: middle;
 }
-/*rtl:end:ignore*/
 
 .conversation-skin-next-lesson-text {
   color: #0d48a1;
@@ -64,7 +62,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 .conversation-skin-tutor-card-container {
   flex-shrink: 10000;
-  margin-bottom: 24px;
+  margin-bottom: 84px;
   max-width: 650px;
   /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
       below should be changed to match. */
@@ -82,7 +80,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
   }
 }
 
-/*rtl:begin:ignore*/
 .conversation-skin-supplemental-card-container {
   background-color: white;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
@@ -101,7 +98,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
   right: 8px;
   top: -10px;
 }
-/*rtl:end:ignore*/
 
 .conversation-skin-supplemental-nav-submit-button.oppia-learner-confirm-button {
   left: auto;
@@ -130,6 +126,14 @@ otherwise they will interfere with the iframed conversation skin directive. */
   color: #fff;
 }
 
+.oppia-exploration-checkpoints-message .toast-top-center {
+  top: 24px;
+}
+
+.oppia-exploration-checkpoints-message .checkpoints-toast-info {
+  background-color: #337ab7;
+}
+
 @media screen and (max-width: 959px) {
   .conversation-skin-cards-container {
     display: block;
@@ -138,7 +142,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
     width: 100%;
   }
 
-  /*rtl:begin:ignore*/
   .conversation-skin-tutor-card-container {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
     left: 0;
@@ -148,7 +151,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
     width: 100%;
     z-index: 15;
   }
-  /*rtl:end:ignore*/
 
   .conversation-skin-tutor-card-alone {
     position: relative;
@@ -159,7 +161,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
     position: unset;
   }
 
-  /*rtl:begin:ignore*/
   .conversation-skin-supplemental-card-container {
     left: 50%;
     margin: 0 auto;
@@ -180,7 +181,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
     width: 40px;
     z-index: 16;
   }
-  /*rtl:end:ignore*/
 
   .conversation-skin-oppia-avatar.show-tutor-card:hover {
     opacity: 0.8;

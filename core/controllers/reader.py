@@ -30,6 +30,7 @@ from core.controllers import editor
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -274,15 +275,58 @@ class ExplorationHandler(base.BaseHandler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         user_settings = user_services.get_user_settings(self.user_id)
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.user_id, exploration_id)
 
         preferred_audio_language_code = None
         preferred_language_codes = None
+        has_viewed_lesson_info_modal_once = None
 
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
             preferred_language_codes = (
                 user_settings.preferred_language_codes)
+            has_viewed_lesson_info_modal_once = (
+                user_settings.has_viewed_lesson_info_modal_once)
+
+        furthest_reached_checkpoint_exp_version = None
+        furthest_reached_checkpoint_state_name = None
+        most_recently_reached_checkpoint_exp_version = None
+        most_recently_reached_checkpoint_state_name = None
+
+        # If exp_user_data is None, it means the exploration is started
+        # for the first time and no checkpoint progress of the user exists for
+        # the respective exploration.
+        # Exploration version 'v' passed as a parameter in GET request means a
+        # previous version of the exploration is being fetched. In that case,
+        # we want that exploration to start from the beginning and do not
+        # allow users to save their checkpoint progress in older exploration
+        # version.
+        if exp_user_data is not None and version is None:
+            synced_exp_user_data = None
+            # If the latest exploration version is ahead of the most recently
+            # interacted exploration version.
+            if (
+                exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+            ):
+                synced_exp_user_data = (
+                    user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                        self.user_id, exploration_id))
+            else:
+                synced_exp_user_data = exp_user_data
+
+            furthest_reached_checkpoint_exp_version = (
+                synced_exp_user_data.furthest_reached_checkpoint_exp_version)
+            furthest_reached_checkpoint_state_name = (
+                synced_exp_user_data.furthest_reached_checkpoint_state_name)
+            most_recently_reached_checkpoint_exp_version = (
+                synced_exp_user_data
+                    .most_recently_reached_checkpoint_exp_version)
+            most_recently_reached_checkpoint_state_name = (
+                synced_exp_user_data
+                    .most_recently_reached_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (
@@ -300,6 +344,16 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
+            'has_viewed_lesson_info_modal_once': (
+                has_viewed_lesson_info_modal_once),
+            'furthest_reached_checkpoint_exp_version': (
+                furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                most_recently_reached_checkpoint_state_name)
         })
         self.render_json(self.values)
 
@@ -456,6 +510,99 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'params': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict']
+                        }
+                    }
+                },
+                'default_value': {}
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'old_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'answer': {
+                'schema': {
+                    'type': 'weak_multiple',
+                    'options': ['int', 'basestring', 'dict']
+                }
+            },
+            'client_time_spent_in_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'answer_group_index': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'rule_spec_index': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'classification_categorization': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        exp_domain.EXPLICIT_CLASSIFICATION,
+                        exp_domain.TRAINING_DATA_CLASSIFICATION,
+                        exp_domain.STATISTICAL_CLASSIFICATION,
+                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+                    ]
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -464,24 +611,21 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        old_state_name = self.payload.get('old_state_name')
+        old_state_name = self.normalized_payload.get('old_state_name')
         # The reader's answer.
-        answer = self.payload.get('answer')
+        answer = self.normalized_payload.get('answer')
         # Parameters associated with the learner.
-        params = self.payload.get('params', {})
+        params = self.normalized_payload.get('params', {})
         # The version of the exploration.
-        version = self.payload.get('version')
-        if version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Answer Submit')
-        session_id = self.payload.get('session_id')
-        client_time_spent_in_secs = self.payload.get(
+        version = self.normalized_payload.get('version')
+        session_id = self.normalized_payload.get('session_id')
+        client_time_spent_in_secs = self.normalized_payload.get(
             'client_time_spent_in_secs')
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
-        answer_group_index = self.payload.get('answer_group_index')
-        rule_spec_index = self.payload.get('rule_spec_index')
-        classification_categorization = self.payload.get(
+        answer_group_index = self.normalized_payload.get('answer_group_index')
+        rule_spec_index = self.normalized_payload.get('rule_spec_index')
+        classification_categorization = self.normalized_payload.get(
             'classification_categorization')
 
         exploration = exp_fetchers.get_exploration_by_id(
@@ -617,9 +761,18 @@ class ExplorationStartEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring']
+                        }
+                    }
                 }
             },
             'session_id': {
@@ -818,11 +971,20 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict']
+                        }
+                    }
                 }
-            }
+            },
         }
     }
 
@@ -853,6 +1015,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         if user_id:
             learner_progress_services.mark_exploration_as_completed(
                 user_id, exploration_id)
+
+            # Clear learner's checkpoint progress on completion of the
+            # exploration.
+            user_services.clear_learner_checkpoint_progress(
+                self.user_id, exploration_id)
 
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
@@ -922,11 +1089,20 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             },
             'params': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_params_dict),
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict']
+                        }
+                    }
                 }
-            }
+            },
         }
     }
 
@@ -1274,3 +1450,92 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
             entity_type, state_reference,
             interaction_id, answer, answer_details)
         self.render_json({})
+
+
+class CheckpointReachedEventHandler(base.BaseHandler):
+    """Tracks a learner reaching a checkpoint."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
+        """Handles PUT requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        user_services.update_learner_checkpoint_progress(
+            self.user_id,
+            exploration_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
+        self.render_json(self.values)
+
+
+class ExplorationRestartEventHandler(base.BaseHandler):
+    """Tracks a learner restarting an exploration."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                },
+                'default_value': None
+            },
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
+        """Handles PUT requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+
+        if most_recently_reached_checkpoint_state_name is None:
+            user_services.clear_learner_checkpoint_progress(
+                self.user_id, exploration_id)
+
+        self.render_json(self.values)

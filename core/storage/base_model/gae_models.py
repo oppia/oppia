@@ -18,13 +18,14 @@ from __future__ import annotations
 
 import datetime
 import enum
+import re
 
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing_extensions import TypedDict
+from typing_extensions import Literal, TypedDict
 
 from typing import ( # isort:skip
     Any,
@@ -37,7 +38,8 @@ from typing import ( # isort:skip
     Type,
     Union,
     TypeVar,
-    cast
+    cast,
+    overload
 )
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
@@ -261,6 +263,37 @@ class BaseModel(datastore_services.Model):
         not match their field name.
         """
         return {}
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+    ) -> SELF_BASE_MODEL: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+        strict: Literal[True]
+    ) -> SELF_BASE_MODEL: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+        strict: Literal[False]
+    ) -> Optional[SELF_BASE_MODEL]: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+        strict: bool = False
+    ) -> Optional[SELF_BASE_MODEL]: ...
 
     @classmethod
     def get(
@@ -879,8 +912,6 @@ class VersionedModel(BaseModel):
         """
         assert self.SNAPSHOT_CONTENT_CLASS is not None
         snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert snapshot_model is not None
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
         # TODO(sll): The 'created_on' and 'last_updated' values here will be
@@ -1317,12 +1348,47 @@ class VersionedModel(BaseModel):
         BaseModel.update_timestamps_multi(list(models_to_put))
         BaseModel.put_multi_transactional(list(models_to_put))
 
+    @overload
     @classmethod
     def get_version(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            version_number: int,
-            strict: bool = True
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+    ) -> SELF_VERSIONED_MODEL: ...
+
+    @overload
+    @classmethod
+    def get_version(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: Literal[True]
+    ) -> SELF_VERSIONED_MODEL: ...
+
+    @overload
+    @classmethod
+    def get_version(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: Literal[False]
+    ) -> Optional[SELF_VERSIONED_MODEL]: ...
+
+    @overload
+    @classmethod
+    def get_version(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: bool = False
+    ) -> Optional[SELF_VERSIONED_MODEL]: ...
+
+    @classmethod
+    def get_version(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_number: int,
+        strict: bool = True
     ) -> Optional[SELF_VERSIONED_MODEL]:
         """Gets model instance representing the given version.
 
@@ -1416,12 +1482,48 @@ class VersionedModel(BaseModel):
             instances.append(reconstituted_model)
         return instances
 
+    @overload
     @classmethod
     def get(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            strict: bool = True,
-            version: Optional[int] = None
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+    ) -> SELF_VERSIONED_MODEL: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: Literal[True],
+        version: Optional[int] = None
+    ) -> SELF_VERSIONED_MODEL: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: Literal[False],
+        version: Optional[int] = None
+    ) -> Optional[SELF_VERSIONED_MODEL]: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: bool = False,
+        version: Optional[int] = None
+    ) -> Optional[SELF_VERSIONED_MODEL]: ...
+
+    # Here, the signature of get method is different from the get method in
+    # superclass. Thus to avoid MyPy error, we used ignore here.
+    @classmethod
+    def get(  # type: ignore[override]
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        strict: bool = True,
+        version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]:
         """Gets model instance.
 
@@ -1488,8 +1590,6 @@ class VersionedModel(BaseModel):
         """
         if not allow_deleted:
             model = cls.get(model_instance_id)
-            # Ruling out the possibility of None for mypy type checking.
-            assert model is not None
             model._require_not_marked_deleted()  # pylint: disable=protected-access
 
         snapshot_ids = [
@@ -1500,8 +1600,8 @@ class VersionedModel(BaseModel):
             for snapshot_id in snapshot_ids]
         returned_models = datastore_services.get_multi(metadata_keys)
 
-        for ind, model in enumerate(returned_models):
-            if model is None:
+        for ind, returned_model in enumerate(returned_models):
+            if returned_model is None:
                 raise Exception(
                     'Invalid version number %s for model %s with id %s'
                     % (version_numbers[ind], cls.__name__, model_instance_id))
@@ -1664,11 +1764,20 @@ class BaseSnapshotMetadataModel(BaseModel):
         metadata_models: Sequence[BaseSnapshotMetadataModel] = cls.query(
             cls.committer_id == user_id
         ).fetch(projection=[cls.commit_type, cls.commit_message])
+
         user_data = {}
         for metadata_model in metadata_models:
+            message_without_user_ids = None
+            if metadata_model.commit_message is not None:
+                message_without_user_ids = re.sub(
+                    feconf.USER_ID_REGEX,
+                    '<user ID>',
+                    metadata_model.commit_message
+                )
+
             user_data[metadata_model.id] = {
                 'commit_type': metadata_model.commit_type,
-                'commit_message': metadata_model.commit_message,
+                'commit_message': message_without_user_ids,
             }
         return user_data
 
