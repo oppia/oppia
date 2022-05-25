@@ -34,7 +34,6 @@ from core import utils
 
 from typing import Dict, Generator, List, Optional, Union
 
-
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable

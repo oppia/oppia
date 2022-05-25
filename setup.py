@@ -20,11 +20,18 @@ The package is built by running 'python setup.py sdist' in the build.py.
 
 from __future__ import annotations
 
-from core import feconf
+import os
+import sys
 
 import pkg_resources
 import setuptools
 
+# Add third_party to path. Setup script accesses feconf even before
+# python_libs is added to path.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from core import feconf  # pylint: disable=wrong-import-position
 
 # Configure the required packages and scripts to install.
 with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls

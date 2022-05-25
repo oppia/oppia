@@ -22,18 +22,12 @@ import copy
 import datetime
 import enum
 import os
-import sys
 
 from core.constants import constants
 
 from typing import Dict, List, Union
 
-# Add third_party to path. Some scripts access feconf even before
-# python_libs is added to path.
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
-
-from typing_extensions import TypedDict # pylint: disable=wrong-import-position
+from typing_extensions import TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
