@@ -19,13 +19,13 @@
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
-   'exploration-param-changes.service.ts');
+  'exploration-param-changes.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/parameter-metadata.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
-   'solution-validity.service.ts');
+  'solution-validity.service.ts');
 require('services/improvements.service.ts');
 require('services/state-top-answers-stats.service.ts');
 
@@ -71,7 +71,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-             !SolutionValidityService.isSolutionValid(stateName)) {
+            !SolutionValidityService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
@@ -140,9 +140,9 @@ angular.module('oppia').factory('ExplorationWarningsService', [
             type: WARNING_TYPES.CRITICAL,
             message: (
               'Please ensure the value of parameter "' +
-               unsetParameterData.paramName +
-               '" is set before it is referred to in the initial list of ' +
-               'parameter changes.')
+              unsetParameterData.paramName +
+              '" is set before it is referred to in the initial list of ' +
+              'parameter changes.')
           });
         } else {
           // The parameter value is required in a subsequent state.
@@ -150,9 +150,9 @@ angular.module('oppia').factory('ExplorationWarningsService', [
             type: WARNING_TYPES.CRITICAL,
             message: (
               'Please ensure the value of parameter "' +
-               unsetParameterData.paramName +
-               '" is set before using it in "' + unsetParameterData.stateName +
-               '".')
+              unsetParameterData.paramName +
+              '" is set before using it in "' + unsetParameterData.stateName +
+              '".')
           });
         }
       });
@@ -166,7 +166,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.rules.length === 0 &&
-             group.trainingData.length === 0) {
+            group.trainingData.length === 0) {
           indexes.push(i);
         }
       }
@@ -197,13 +197,13 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       var states = ExplorationStatesService.getStates();
       return stass.getStateNamesWithStats().filter(function(stateName) {
         var mustResolveState =
-           ImprovementsService
-             .isStateForcedToResolveOutstandingUnaddressedAnswers(
-               states.getState(stateName));
+          ImprovementsService
+            .isStateForcedToResolveOutstandingUnaddressedAnswers(
+              states.getState(stateName));
         return mustResolveState &&
-           stass.getUnresolvedStateStats(stateName).some(function(answer) {
-             return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
-           });
+          stass.getUnresolvedStateStats(stateName).some(function(answer) {
+            return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
+          });
       });
     };
 
@@ -229,7 +229,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
           var validatorServiceName =
-             _states.getState(stateName).interaction.id + 'ValidationService';
+            _states.getState(stateName).interaction.id + 'ValidationService';
           var validatorService = $injector.get(validatorServiceName);
           var interactionWarnings = validatorService.getAllWarnings(
             stateName, interaction.customizationArgs,
@@ -253,7 +253,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
         });
 
       var statesWithAnswersThatMustBeResolved =
-         _getStatesWithAnswersThatMustBeResolved();
+        _getStatesWithAnswersThatMustBeResolved();
       angular.forEach(statesWithAnswersThatMustBeResolved, function(stateName) {
         _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
       });
@@ -355,12 +355,12 @@ angular.module('oppia').factory('ExplorationWarningsService', [
 
       if (Object.keys(stateWarnings).length) {
         var errorString = (
-           Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
+          Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: (
             'The following ' + errorString + ' errors: ' +
-             Object.keys(stateWarnings).join(', ') + '.')
+            Object.keys(stateWarnings).join(', ') + '.')
         });
       }
 

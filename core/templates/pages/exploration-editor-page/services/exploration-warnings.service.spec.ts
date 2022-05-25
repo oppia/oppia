@@ -16,87 +16,78 @@
  * @fileoverview Unit tests for ExplorationWarningsService.
  */
 
-import { fakeAsync, TestBed } from '@angular/core/testing';
+import { fakeAsync } from '@angular/core/testing';
+
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
-import { StateTopAnswersStats } from 'domain/statistics/state-top-answers-stats-object.factory';
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
-import { ExplorationWarningsService } from './exploration-warnings.service';
-import { ExplorationStatesService } from './exploration-states.service';
-import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
-import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
-import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationParamChangesService } from './exploration-param-changes.service';
-import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
-import { ContinueValidationService } from 'interactions/Continue/directives/continue-validation.service';
+// ^^^ This block is to be removed.
 
-class MockExplorationParamChanges {
-  savedMemento = [{
-    customizationArgs: {
-      parse_with_jinja: false,
-      value: '5'
-    },
-    generatorId: 'Copier',
-    name: 'ParamChange1'
-  }, {
-    customizationArgs: {
-      parse_with_jinja: true,
-      value: '{{ParamChange2}}'
-    },
-    generatorId: 'Copier',
-  }, {
-    customizationArgs: {
-      parse_with_jinja: true,
-      value: '5'
-    },
-    generatorId: 'RandomSelector',
-    name: 'ParamChange3'
-  }];
-}
+require('pages/exploration-editor-page/services/graph-data.service');
+require('pages/exploration-editor-page/services/exploration-property.service');
+require(
+  'pages/exploration-editor-page/services/exploration-init-state-name.service');
 
-describe('Exploration Warnings Service', () => {
-  let explorationInitStateNameService: ExplorationInitStateNameService;
-  let explorationWarningsService: ExplorationWarningsService;
-  let explorationStatesService: ExplorationStatesService;
-  let stateTopAnswersStatsService: StateTopAnswersStatsService;
-  let stateTopAnswersStatsBackendApiService:
-   StateTopAnswersStatsBackendApiService;
-  let textInputValidationService: TextInputValidationService;
-  let continueValidationService: ContinueValidationService;
+describe('Exploration Warnings Service', function() {
+  let ExplorationInitStateNameService;
+  let ExplorationWarningsService;
+  let ExplorationStatesService;
+  let StateTopAnswersStatsService;
+  let StateTopAnswersStatsBackendApiService;
 
-  describe('when exploration param changes has jinja values', () => {
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [
-          {
-            provide: ExplorationParamChangesService,
-            useClass: MockExplorationParamChanges
-          }
-          ,
-          TextInputValidationService,
-          ContinueValidationService
-        ]
-      });
-      explorationInitStateNameService = TestBed.inject(
-        ExplorationInitStateNameService);
-      explorationWarningsService = TestBed.inject(ExplorationWarningsService);
-      explorationStatesService = TestBed.inject(ExplorationStatesService);
-      stateTopAnswersStatsBackendApiService = TestBed.inject(
-        StateTopAnswersStatsBackendApiService);
-      stateTopAnswersStatsService = TestBed.inject(
-        StateTopAnswersStatsService);
-      textInputValidationService = TestBed.inject(TextInputValidationService);
-      continueValidationService = TestBed.inject(ContinueValidationService);
-      spyOn(textInputValidationService, 'getCustomizationArgsWarnings')
-        .and.returnValue([]);
-      spyOn(continueValidationService, 'getCustomizationArgsWarnings')
-        .and.returnValue([]);
-      explorationInitStateNameService.init('Hola');
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
     });
+  }));
 
-    it('should update warnings with TextInput as interaction id', () => {
-      explorationStatesService.init({
+  importAllAngularServices();
+  describe('when exploration param changes has jinja values', function() {
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('ExplorationParamChangesService', {
+        savedMemento: [{
+          customizationArgs: {
+            parse_with_jinja: false,
+            value: '5'
+          },
+          generatorId: 'Copier',
+          name: 'ParamChange1'
+        }, {
+          customizationArgs: {
+            parse_with_jinja: true,
+            value: '{{ParamChange2}}'
+          },
+          generatorId: 'Copier',
+        }, {
+          customizationArgs: {
+            parse_with_jinja: true,
+            value: '5'
+          },
+          generatorId: 'RandomSelector',
+          name: 'ParamChange3'
+        }]
+      });
+    }));
+    beforeEach(angular.mock.inject(function($injector) {
+      ExplorationInitStateNameService = $injector.get(
+        'ExplorationInitStateNameService');
+      ExplorationWarningsService = $injector.get('ExplorationWarningsService');
+      ExplorationStatesService = $injector.get('ExplorationStatesService');
+      StateTopAnswersStatsBackendApiService = $injector.get(
+        'StateTopAnswersStatsBackendApiService');
+      StateTopAnswersStatsService = $injector.get(
+        'StateTopAnswersStatsService');
+      ExplorationInitStateNameService.init('Hola');
+    }));
+
+    it('should update warnings with TextInput as interaction id', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
           content: {
@@ -116,12 +107,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -150,40 +136,40 @@ describe('Exploration Warnings Service', () => {
           },
         }
       });
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
 
-      expect(explorationWarningsService.getWarnings()).toEqual([{
+      expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is' +
-        ' set before it is referred to in the initial list of parameter' +
-        ' changes.'
+         ' set before it is referred to in the initial list of parameter' +
+         ' changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-        ' before using it in "Hola".'
+         ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-        ' with no training data: 0'
+         ' with no training data: 0'
       }]);
-      expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-      expect(explorationWarningsService.countWarnings()).toBe(4);
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.countWarnings()).toBe(4);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
           'There\'s no way to complete the exploration starting from this' +
-          ' card. To fix this, make sure that the last card in the chain' +
-          ' starting from this one has an \'End Exploration\' question type.'
+           ' card. To fix this, make sure that the last card in the chain' +
+           ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
 
-    it('should update warnings with Continue as interaction id', () => {
-      explorationStatesService.init({
+    it('should update warnings with Continue as interaction id', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
           content: {
@@ -203,12 +189,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }, {
@@ -218,12 +199,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -258,40 +234,40 @@ describe('Exploration Warnings Service', () => {
           },
         }
       });
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
 
-      expect(explorationWarningsService.getWarnings()).toEqual([{
+      expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-        ' before it is referred to in the initial list of parameter changes.'
+         ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-        ' before using it in "Hola".'
+         ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer groups have classifiers' +
-        ' with no training data: 0, 1'
+         ' with no training data: 0, 1'
       }]);
-      expect(explorationWarningsService.countWarnings()).toBe(4);
-      expect(explorationWarningsService.hasCriticalWarnings())
-        .toBeTrue();
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      expect(ExplorationWarningsService.countWarnings()).toBe(4);
+      expect(ExplorationWarningsService.hasCriticalWarnings())
+        .toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'The button text should not be empty.',
           'Only the default outcome is necessary for a continue interaction.',
           'There\'s no way to complete the exploration starting from this' +
-          ' card. To fix this, make sure that the last card in the chain' +
-          ' starting from this one has an \'End Exploration\' question type.'
+           ' card. To fix this, make sure that the last card in the chain' +
+           ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
 
-    it('should update warnings when no interaction id is provided', () => {
-      explorationStatesService.init({
+    it('should update warnings when no interaction id is provided', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
           content: {
@@ -311,12 +287,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -338,39 +309,39 @@ describe('Exploration Warnings Service', () => {
           },
         }
       });
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
 
-      expect(explorationWarningsService.getWarnings()).toEqual([{
+      expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-        ' before it is referred to in the initial list of parameter changes.'
+         ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-        ' before using it in "Hola".'
+         ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-        ' with no training data: 0'
+         ' with no training data: 0'
       }]);
-      expect(explorationWarningsService.countWarnings()).toBe(4);
-      expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      expect(ExplorationWarningsService.countWarnings()).toBe(4);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'Please add an interaction to this card.',
           'There\'s no way to complete the exploration starting from this' +
-          ' card. To fix this, make sure that the last card in the chain' +
-          ' starting from this one has an \'End Exploration\' question type.'
+           ' card. To fix this, make sure that the last card in the chain' +
+           ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
 
     it('should update warnings when there is a solution in the interaction',
-      () => {
-        explorationStatesService.init({
+      function() {
+        ExplorationStatesService.init({
           Hola: {
             card_is_checkpoint: true,
             content: {
@@ -397,12 +368,7 @@ describe('Exploration Warnings Service', () => {
                     content_id: 'feedback_1',
                     html: ''
                   },
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: 'a',
-                  missing_prerequisite_skill_id: 'abc'
                 },
-                tagged_skill_misconception_id: null,
                 rule_specs: [],
                 training_data: []
               }],
@@ -431,44 +397,44 @@ describe('Exploration Warnings Service', () => {
             },
           }
         });
-        explorationWarningsService.updateWarnings();
+        ExplorationWarningsService.updateWarnings();
 
-        expect(explorationWarningsService.getWarnings()).toEqual([{
+        expect(ExplorationWarningsService.getWarnings()).toEqual([{
           type: 'critical',
           message: 'Please ensure the value of parameter "ParamChange2"' +
-          ' is set before it is referred to in the initial list of' +
-          ' parameter changes.'
+           ' is set before it is referred to in the initial list of' +
+           ' parameter changes.'
         }, {
           type: 'critical',
           message: 'Please ensure the value of parameter "HtmlValue" is set' +
-          ' before using it in "Hola".'
+           ' before using it in "Hola".'
         }, {
           type: 'error',
           message: 'The following card has errors: Hola.'
         }, {
           type: 'error',
           message: 'In \'Hola\', the following answer group has a classifier' +
-          ' with no training data: 0'
+           ' with no training data: 0'
         }]);
-        expect(explorationWarningsService.countWarnings()).toBe(4);
-        expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-        expect(explorationWarningsService.getAllStateRelatedWarnings())
+        expect(ExplorationWarningsService.countWarnings()).toBe(4);
+        expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+        expect(ExplorationWarningsService.getAllStateRelatedWarnings())
           .toEqual({
             Hola: [
               'Placeholder text must be a string.',
               'Number of rows must be integral.',
               'The current solution does not lead to another card.',
               'There\'s no way to complete the exploration starting from' +
-              ' this card. To fix this, make sure that the last card in' +
-              ' the chain starting from this one has an \'End Exploration\'' +
-              ' question type.'
+               ' this card. To fix this, make sure that the last card in' +
+               ' the chain starting from this one has an \'End Exploration\'' +
+               ' question type.'
             ]
           });
       });
 
     it('should update warnings when state top answers stats is initiated',
-      fakeAsync(async() => {
-        explorationStatesService.init({
+      fakeAsync(async function() {
+        ExplorationStatesService.init({
           Hola: {
             card_is_checkpoint: true,
             content: {
@@ -495,12 +461,7 @@ describe('Exploration Warnings Service', () => {
                     content_id: 'feedback_1',
                     html: ''
                   },
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: 'a',
-                  missing_prerequisite_skill_id: 'abc'
                 },
-                tagged_skill_misconception_id: null,
                 rule_specs: [],
                 training_data: []
               }],
@@ -529,54 +490,54 @@ describe('Exploration Warnings Service', () => {
             },
           }
         });
-        spyOn(stateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
+        spyOn(StateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
           .and.returnValue(Promise.resolve(
             new StateTopAnswersStats(
               {Hola: [new AnswerStats('hola', 'hola', 7, false)]},
               {Hola: 'TextInput'})));
-        await stateTopAnswersStatsService.initAsync(
-          'expId', explorationStatesService.getStates());
+        await StateTopAnswersStatsService.initAsync(
+          'expId', ExplorationStatesService.getStates());
 
-        explorationWarningsService.updateWarnings();
+        ExplorationWarningsService.updateWarnings();
 
-        expect(explorationWarningsService.getWarnings()).toEqual([{
+        expect(ExplorationWarningsService.getWarnings()).toEqual([{
           type: 'critical',
           message: 'Please ensure the value of parameter "ParamChange2" is' +
-          ' set before it is referred to in the initial list of parameter' +
-          ' changes.'
+           ' set before it is referred to in the initial list of parameter' +
+           ' changes.'
         }, {
           type: 'critical',
           message: 'Please ensure the value of parameter "HtmlValue" is set' +
-          ' before using it in "Hola".'
+           ' before using it in "Hola".'
         }, {
           type: 'error',
           message: 'The following card has errors: Hola.'
         }, {
           type: 'error',
           message: 'In \'Hola\', the following answer group has a classifier' +
-          ' with no training data: 0'
+           ' with no training data: 0'
         }]);
-        expect(explorationWarningsService.countWarnings()).toBe(4);
-        expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-        expect(explorationWarningsService.getAllStateRelatedWarnings())
+        expect(ExplorationWarningsService.countWarnings()).toBe(4);
+        expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+        expect(ExplorationWarningsService.getAllStateRelatedWarnings())
           .toEqual({
             Hola: [
               'Placeholder text must be a string.',
               'Number of rows must be integral.',
               'There is an answer among the top 10 which has no explicit' +
-              ' feedback.',
+               ' feedback.',
               'The current solution does not lead to another card.',
               'There\'s no way to complete the exploration starting from' +
-              ' this card. To fix this, make sure that the last card in' +
-              ' the chain starting from this one has an \'End Exploration\'' +
-              ' question type.'
+               ' this card. To fix this, make sure that the last card in' +
+               ' the chain starting from this one has an \'End Exploration\'' +
+               ' question type.'
             ]
           });
       }));
 
     it('should update warnings when state name is not equal to the default' +
-    ' outcome destination', () => {
-      explorationStatesService.init({
+     ' outcome destination', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
           content: {
@@ -603,12 +564,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -637,40 +593,40 @@ describe('Exploration Warnings Service', () => {
           },
         }
       });
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
 
-      expect(explorationWarningsService.getWarnings()).toEqual([{
+      expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-        ' before it is referred to in the initial list of parameter changes.'
+         ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-        ' before using it in "Hola".'
+         ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-        ' with no training data: 0'
+         ' with no training data: 0'
       }]);
-      expect(explorationWarningsService.countWarnings()).toBe(4);
-      expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      expect(ExplorationWarningsService.countWarnings()).toBe(4);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
           'There\'s no way to complete the exploration starting from this' +
-          ' card. To fix this, make sure that the last card in the chain' +
-          ' starting from this one has an \'End Exploration\' question type.'
+           ' card. To fix this, make sure that the last card in the chain' +
+           ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
 
     it('should update warnings when there are two states but only one saved' +
-    ' memento value', () => {
-      explorationStatesService.init({
+     ' memento value', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
           content: {
@@ -697,12 +653,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -756,12 +707,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -790,31 +736,31 @@ describe('Exploration Warnings Service', () => {
           },
         }
       });
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
 
-      expect(explorationWarningsService.getWarnings()).toEqual([{
+      expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-        ' before it is referred to in the initial list of parameter changes.'
+         ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-        ' before using it in "Hola".'
+         ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following cards have errors: Hola, State.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-        ' with no training data: 0'
+         ' with no training data: 0'
       }, {
         type: 'error',
         message: 'In \'State\', the following answer group has a classifier' +
-        ' with no training data: 0'
+         ' with no training data: 0'
       }]);
-      expect(explorationWarningsService.countWarnings()).toBe(5);
-      expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      expect(ExplorationWarningsService.countWarnings()).toBe(5);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
@@ -829,8 +775,8 @@ describe('Exploration Warnings Service', () => {
       });
     });
 
-    it('should update warning when first card is not a checkpoint', () => {
-      explorationStatesService.init({
+    it('should update warning when first card is not a checkpoint', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: false,
           content: {
@@ -850,12 +796,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -885,23 +826,23 @@ describe('Exploration Warnings Service', () => {
         }
       });
 
-      explorationWarningsService.updateWarnings();
-      expect(explorationWarningsService.countWarnings()).toBe(4);
-      expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      ExplorationWarningsService.updateWarnings();
+      expect(ExplorationWarningsService.countWarnings()).toBe(4);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
           'There\'s no way to complete the exploration starting from this' +
-          ' card. To fix this, make sure that the last card in the chain' +
-          ' starting from this one has an \'End Exploration\' question type.',
+           ' card. To fix this, make sure that the last card in the chain' +
+           ' starting from this one has an \'End Exploration\' question type.',
           'The first card of the lesson must be a checkpoint.'
         ]
       });
     });
 
-    it('should show warning if terminal card is a checkpoint', () => {
-      explorationStatesService.init({
+    it('should show warning if terminal card is a checkpoint', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
           content: {
@@ -921,12 +862,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_1',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -973,12 +909,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -999,17 +930,17 @@ describe('Exploration Warnings Service', () => {
         }
       });
 
-      explorationWarningsService.updateWarnings();
-      expect(explorationWarningsService.countWarnings()).toBe(5);
-      expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      ExplorationWarningsService.updateWarnings();
+      expect(ExplorationWarningsService.countWarnings()).toBe(5);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
         ],
         End: [
           'Please make sure end exploration interactions do not ' +
-          'have any answer groups.',
+           'have any answer groups.',
           'Checkpoints are not allowed on the last card of the lesson.',
           'Checkpoints must not be assigned to cards that can be bypassed.'
         ]
@@ -1017,8 +948,8 @@ describe('Exploration Warnings Service', () => {
     });
 
     it('should show warnings if checkpoint count is more than 8 and' +
-      ' bypassable state is made a checkpoint', () => {
-      explorationStatesService.init({
+       ' bypassable state is made a checkpoint', function() {
+      ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
           content: {
@@ -1039,12 +970,7 @@ describe('Exploration Warnings Service', () => {
                     content_id: 'feedback_1',
                     html: ''
                   },
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: 'a',
-                  missing_prerequisite_skill_id: 'abc'
                 },
-                tagged_skill_misconception_id: null,
                 rule_specs: [],
                 training_data: []
               },
@@ -1055,12 +981,7 @@ describe('Exploration Warnings Service', () => {
                     content_id: 'feedback_2',
                     html: ''
                   },
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: 'a',
-                  missing_prerequisite_skill_id: 'abc'
                 },
-                tagged_skill_misconception_id: null,
                 rule_specs: [],
                 training_data: []
               },
@@ -1071,12 +992,7 @@ describe('Exploration Warnings Service', () => {
                     content_id: 'feedback_3',
                     html: ''
                   },
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: 'a',
-                  missing_prerequisite_skill_id: 'abc'
                 },
-                tagged_skill_misconception_id: null,
                 rule_specs: [],
                 training_data: []
               }
@@ -1117,12 +1033,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1163,12 +1074,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1209,12 +1115,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1228,15 +1129,6 @@ describe('Exploration Warnings Service', () => {
               }
             },
             hints: [],
-            confirmed_unclassified_answers: [],
-            solution: {
-              answer_is_exclusive: true,
-              correct_answer: '10',
-              explanation: {
-                html: 'placeholder value',
-                content_id: ''
-              }
-            }
           },
           written_translations: {
             translations_mapping: {
@@ -1264,12 +1156,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1283,15 +1170,6 @@ describe('Exploration Warnings Service', () => {
               }
             },
             hints: [],
-            confirmed_unclassified_answers: [],
-            solution: {
-              answer_is_exclusive: true,
-              correct_answer: '10',
-              explanation: {
-                html: 'placeholder value',
-                content_id: ''
-              }
-            }
           },
           written_translations: {
             translations_mapping: {
@@ -1319,12 +1197,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1338,15 +1211,6 @@ describe('Exploration Warnings Service', () => {
               }
             },
             hints: [],
-            confirmed_unclassified_answers: [],
-            solution: {
-              answer_is_exclusive: true,
-              correct_answer: '10',
-              explanation: {
-                html: 'placeholder value',
-                content_id: ''
-              }
-            }
           },
           written_translations: {
             translations_mapping: {
@@ -1374,12 +1238,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1393,15 +1252,6 @@ describe('Exploration Warnings Service', () => {
               }
             },
             hints: [],
-            confirmed_unclassified_answers: [],
-            solution: {
-              answer_is_exclusive: true,
-              correct_answer: '10',
-              explanation: {
-                html: 'placeholder value',
-                content_id: ''
-              }
-            }
           },
           written_translations: {
             translations_mapping: {
@@ -1429,12 +1279,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1475,12 +1320,7 @@ describe('Exploration Warnings Service', () => {
                   content_id: 'feedback_2',
                   html: ''
                 },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: 'a',
-                missing_prerequisite_skill_id: 'abc'
               },
-              tagged_skill_misconception_id: null,
               rule_specs: [],
               training_data: []
             }],
@@ -1488,15 +1328,6 @@ describe('Exploration Warnings Service', () => {
             customization_args: {
               recommendedExplorationIds: {
                 value: []
-              }
-            },
-            confirmed_unclassified_answers: [],
-            solution: {
-              answer_is_exclusive: true,
-              correct_answer: '10',
-              explanation: {
-                html: 'placeholder value',
-                content_id: ''
               }
             },
             hints: [],
@@ -1510,12 +1341,12 @@ describe('Exploration Warnings Service', () => {
         }
       });
 
-      explorationWarningsService.updateWarnings();
-      expect(explorationWarningsService.countWarnings()).toBe(13);
-      expect(explorationWarningsService.hasCriticalWarnings()).toBeTrue();
-      expect(explorationWarningsService.getCheckpointCountWarning()).toEqual(
+      ExplorationWarningsService.updateWarnings();
+      expect(ExplorationWarningsService.countWarnings()).toBe(13);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getCheckpointCountWarning()).toEqual(
         'Only a maximum of 8 checkpoints are allowed per lesson.');
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
@@ -1553,7 +1384,7 @@ describe('Exploration Warnings Service', () => {
         ],
         End: [
           'Please make sure end exploration interactions do not ' +
-          'have any answer groups.',
+           'have any answer groups.',
           'Checkpoints are not allowed on the last card of the lesson.',
           'Checkpoints must not be assigned to cards that can be bypassed.'
         ]
@@ -1561,43 +1392,28 @@ describe('Exploration Warnings Service', () => {
     });
   });
 
-  class MockExplorationInitStateNameService {
-    savedMemento = 'Hola';
-  }
-
-  class MockExplorationParamChangesService {
-    savedMemento = [{
-      customizationArgs: {
-        parse_with_jinja: true,
-        value: ''
-      },
-      generatorId: 'Copier',
-    }];
-  }
-
-  describe('when exploration param changes has no jinja values', () => {
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [
-          {
-            provide: ExplorationParamChangesService,
-            useClass: MockExplorationParamChangesService
-          },
-          {
-            provide: ExplorationInitStateNameService,
-            useClass: MockExplorationInitStateNameService
-          },
-          TextInputValidationService,
-          ContinueValidationService
-        ]
+  describe('when exploration param changes has no jinja values', function() {
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('ExplorationInitStateNameService', {
+        savedMemento: 'Hola'
       });
-      explorationWarningsService = TestBed.inject(ExplorationWarningsService);
-      explorationStatesService = TestBed.inject(ExplorationStatesService);
-    });
+      $provide.value('ExplorationParamChangesService', {
+        savedMemento: [{
+          customizationArgs: {
+            parse_with_jinja: true,
+            value: ''
+          },
+          generatorId: 'Copier',
+        }]
+      });
+    }));
+    beforeEach(angular.mock.inject(function($injector) {
+      ExplorationWarningsService = $injector.get('ExplorationWarningsService');
+      ExplorationStatesService = $injector.get('ExplorationStatesService');
+    }));
 
-    it('should update warning to an empty array', () => {
-      explorationStatesService.init({
+    it('should update warning to an empty array', function() {
+      ExplorationStatesService.init({
         Hola: {
           content: {
             content_id: 'content',
@@ -1715,10 +1531,10 @@ describe('Exploration Warnings Service', () => {
           next_content_id_index: null
         }
       } as StateObjectsBackendDict);
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
 
-      expect(explorationWarningsService.getWarnings()).toEqual([]);
-      expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual(
+      expect(ExplorationWarningsService.getWarnings()).toEqual([]);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual(
         {});
     });
   });
