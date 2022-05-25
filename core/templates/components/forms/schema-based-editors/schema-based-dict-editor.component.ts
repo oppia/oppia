@@ -72,7 +72,7 @@ implements ControlValueAccessor, OnInit, Validator {
     // Currently, the validation for this component is handled by the
     // apply-validation directive, so this method returns an empty
     // object. However, when we move to reactive forms, that validation should
-    // be moved here instead (see the TODO below).
+    // be moved here instead (see the Todo below).
     // TODO(#15458): Move template driven validation into code.
     return {};
   }
