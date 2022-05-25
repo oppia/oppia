@@ -119,9 +119,19 @@ export class SchemaValidators {
           if (viewValue.slice(-1) === '%') {
             // This is a percentage, so the input needs to be divided by 100.
             return isNaN(parseFloat(
+<<<<<<< HEAD
               viewValue.substring(0, viewValue.length - 1).replace(',', '.')
             ) / 100.0) ? {isFloat: 'Not float', actual: control.value} : null;
           } else {
+=======
+              // TODO(#15455): Use the numeric-service to get the current
+              // decimal separator.
+              viewValue.substring(0, viewValue.length - 1).replace(',', '.')
+            ) / 100.0) ? {isFloat: 'Not float', actual: control.value} : null;
+          } else {
+            // TODO(#15455): Use the numeric-service to get the current
+            // decimal separator.
+>>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
             return isNaN(parseFloat(viewValue.replace(',', '.'))) ?
                {isFloat: 'Not float', actual: control.value} : null;
           }

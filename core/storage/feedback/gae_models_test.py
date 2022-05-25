@@ -211,8 +211,6 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
         model = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         self.assertEqual(model.entity_type, 'exploration')
 
         all_messages = (
@@ -242,8 +240,6 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
         model1 = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
-        # Ruling out the possibility of None for mypy type checking.
-        assert model1 is not None
         self.assertEqual(model1.entity_type, 'exploration')
 
         message = (
@@ -420,7 +416,6 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
                 'user_id', 'exploration.exp_id.thread_id'))
 
         # Ruling out the possibility of None for mypy type checking.
-        assert expected_model is not None
         assert actual_model is not None
         self.assertEqual(actual_model.id, expected_model.id)
         self.assertEqual(actual_model.user_id, expected_model.user_id)

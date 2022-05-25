@@ -23,13 +23,13 @@ import { Component, Input, OnInit } from '@angular/core';
   templateUrl: './html-select.component.html'
 })
 export class HtmlSelectComponent implements OnInit {
-  @Input() options;
-  @Input() selection;
+  @Input() options: {id: string}[];
+  @Input() selection: string;
 
   ngOnInit(): void {
   }
 
-  select(id: number): void {
+  select(id: string): void {
     this.selection = id;
   }
 

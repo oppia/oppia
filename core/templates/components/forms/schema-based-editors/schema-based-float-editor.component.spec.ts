@@ -132,7 +132,11 @@ describe('Schema based float editor component', function() {
     expect(component.getMaxValue()).toBe(3.5);
   });
 
+<<<<<<< HEAD
   it('should not register keyboard event when user is typing', fakeAsync(() => {
+=======
+  it('should register that the user is typing on keypress', fakeAsync(() => {
+>>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     let evt = new KeyboardEvent('', {
       keyCode: 14
     });
@@ -212,8 +216,13 @@ describe('Schema based float editor component', function() {
     spyOn(numberConversionService, 'currentDecimalSeparator')
       .and.returnValues('.', ',');
 
+<<<<<<< HEAD
     expect(component.currentDecimalSeparator()).toEqual('.');
     expect(component.currentDecimalSeparator()).toEqual(',');
+=======
+    expect(component.getCurrentDecimalSeparator()).toEqual('.');
+    expect(component.getCurrentDecimalSeparator()).toEqual(',');
+>>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
   });
 
   it('should remove any invalid character from the input', ()=>{
@@ -232,7 +241,11 @@ describe('Schema based float editor component', function() {
   it('should parse the string to a number on input', ()=>{
     spyOn(numberConversionService, 'getInputValidationRegex')
       .and.returnValue(/[^e0-9\.\-]/g);
+<<<<<<< HEAD
     spyOn(component, 'currentDecimalSeparator').and.returnValues('.', ',');
+=======
+    spyOn(component, 'getCurrentDecimalSeparator').and.returnValues('.', ',');
+>>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
 
     component.localStringValue = '';
     component.parseInput();

@@ -19,7 +19,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -27,6 +26,7 @@ import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/ser
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
 var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 @Component({
   selector: 'oppia-rule-editor',
@@ -46,6 +46,7 @@ export class RuleEditorComponent implements OnInit {
   eventBusGroup;
   editRuleForm;
   ruleEditForm;
+  interactionSpecs = INTERACTION_SPECS;
 
   constructor(
     private eventBusService: EventBusService,
@@ -53,7 +54,9 @@ export class RuleEditorComponent implements OnInit {
     private responsesService: ResponsesService,
     private populateRuleContentIdsService: PopulateRuleContentIdsService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-  ) {}
+  ) {
+    this.eventBusGroup = new EventBusGroup(this.eventBusService);
+  }
 
   computeRuleDescriptionFragments(): string {
     if (!this.rule.type) {
@@ -62,7 +65,7 @@ export class RuleEditorComponent implements OnInit {
     }
 
     var ruleDescription = (
-      InteractionSpecsConstants.INTERACTION_SPECS[
+      this.interactionSpecs[
         this.currentInteractionId
       ].rule_descriptions[this.rule.type]);
 
@@ -261,11 +264,8 @@ export class RuleEditorComponent implements OnInit {
       * below.
       */
     if (this.isEditingRuleInline) {
-      const eventBusGroup: EventBusGroup = new EventBusGroup(
-        this.eventBusService);
-      this.eventBusGroup = eventBusGroup;
       this.modalId = Symbol();
-      eventBusGroup.on(
+      this.eventBusGroup.on(
         ObjectFormValidityChangeEvent,
         event => {
           if (event.message.modalId === this.modalId) {

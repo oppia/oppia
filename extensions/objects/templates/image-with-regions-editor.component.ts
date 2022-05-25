@@ -19,7 +19,11 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+<<<<<<< HEAD
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+=======
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+>>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -50,6 +54,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: { labeledRegions: Region[]; imagePath: string };
+
   @Output() valueChanged = new EventEmitter();
   errorText!: string;
   SCHEMA!: { type: string; 'obj_type': string };
@@ -79,6 +84,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   hoveredRegion: number | null = null;
   // Selected Region will be null if no region is selected.
   selectedRegion: number | null = null;
+  editorIsInitialized: boolean = false;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -220,6 +226,17 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     };
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      !changes.value ||
+      !changes.value.currentValue ||
+      changes.value.previousValue === changes.value.currentValue
+    ) {
+      return;
+    }
+    this.initializeEditor();
+  }
+
   // Dynamically defines the CSS style for the region rectangle.
   getRegionStyle(index: number): string {
     if (index === this.selectedRegion) {
@@ -262,6 +279,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   initializeEditor(): void {
+    if (this.editorIsInitialized) {
+      return;
+    }
     // All coordinates have origin at top-left,
     // increasing in x to the right and increasing in y down
     // Current mouse position in SVG coordinates.
@@ -312,6 +332,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     this.selectedRegion = null;
     // Message to displayed when there is an error.
     this.errorText = '';
+    this.editorIsInitialized = true;
   }
 
   // Use these two functions to get the calculated image width and
@@ -597,6 +618,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       backdrop: 'static',
       keyboard: false,
     }).result.then(() => {
+      this.editorIsInitialized = false;
       this.value.imagePath = '';
       this.value.labeledRegions = [];
       this.imageValueChanged('');
