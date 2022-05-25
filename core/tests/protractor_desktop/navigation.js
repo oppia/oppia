@@ -17,7 +17,6 @@
  */
 var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
@@ -52,42 +51,6 @@ describe('Oppia landing pages tour', function() {
     await browser.get('/teachers');
     await waitFor.pageToFullyLoad();
   });
-
-  afterEach(async function() {
-    await general.checkForConsoleErrors([]);
-  });
-});
-
-describe('Meta Tags', function() {
-  var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
-  var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
-  var getStartedPage = new GetStartedPage.GetStartedPage();
-
-  beforeEach(async function() {
-    await getStartedPage.get();
-  });
-
-  it('should set the correct itemprop meta tags', async function() {
-    expect(await getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
-      EXPECTED_META_NAME);
-    expect(
-      await getStartedPage.getMetaTagContent(
-        'description', 'itemprop')).toEqual(EXPECTED_META_DESCRIPTION);
-  });
-
-  it('should set the correct og meta tags', async function() {
-    expect(await getStartedPage.getMetaTagContent('title', 'og')).toEqual(
-      EXPECTED_META_NAME);
-    expect(await getStartedPage.getMetaTagContent('description', 'og')).toEqual(
-      EXPECTED_META_DESCRIPTION);
-    expect(await getStartedPage.getMetaTagContent('url', 'og')).toEqual(
-      'http://localhost:9001/get-started');
-  });
-
-  it('should set the correct application name', async function() {
-    expect(await getStartedPage.getMetaTagContent(
-      'application-name', 'name')).toEqual('Oppia.org');
-  });
 });
 
 describe('DEV MODE Test', function() {
@@ -96,7 +59,7 @@ describe('DEV MODE Test', function() {
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-dev-mode')).isPresent())
-      .toBe(general.isInDevMode());
+      .toBe(false);
   });
 });
 
@@ -132,43 +95,6 @@ describe('Static Pages Tour', function() {
     var loginPage = element(by.css('.protractor-test-login-page'));
     await waitFor.presenceOf(loginPage, 'Login page did not load');
   });
-
-  it('should redirect away from the Login page when visited by logged-in user',
-    async function() {
-      var loginPage = element(by.css('.protractor-test-login-page'));
-      var learnerDashboardPage = (
-        element(by.css('.protractor-test-learner-dashboard-page')));
-
-      await users.createAndLoginUser('user@navigation.com', 'navigationUser');
-
-      await waitFor.clientSideRedirection(async() => {
-        // Login page will redirect user away if logged in.
-        await browser.get('/login');
-
-        // Wait for first redirection (login page to splash page).
-        await browser.driver.wait(async() => {
-          var url = await browser.driver.getCurrentUrl();
-          // Wait until the URL has changed to something that is not /login.
-          return !(/login/.test(url));
-        }, 10000);
-      },
-      (url) => {
-        // Wait for second redirection (splash page to preferred dashboard
-        // page).
-        return url !== 'http://localhost:9001/';
-      },
-      async() => {
-        await waitFor.presenceOf(
-          learnerDashboardPage, 'Learner dashboard page did not load');
-      });
-
-      expect(await loginPage.isPresent()).toBe(false);
-
-      await users.logout();
-      await browser.get('/login');
-      await waitFor.pageToFullyLoad();
-      await waitFor.presenceOf(loginPage, 'Login page did not load');
-    });
 
   it('should visit the Teach page', async function() {
     await browser.get('/teach');
