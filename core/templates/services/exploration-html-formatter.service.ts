@@ -160,7 +160,7 @@ export class ExplorationHtmlFormatterService {
   }
 
   getAnswerHtml(
-      answer: string,
+      answer: InteractionAnswer,
       interactionId: string | null,
       interactionCustomizationArgs: InteractionCustomizationArgs
   ): string {
