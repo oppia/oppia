@@ -282,6 +282,8 @@ describe('Settings Tab Component', () => {
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
         'broadcasted', fakeAsync(() => {
+      spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
+
       routerService.onRefreshSettingsTab.emit();
       $scope.$apply();
 
@@ -290,6 +292,7 @@ describe('Settings Tab Component', () => {
 
       expect(ctrl.stateNames).toEqual(['Introduction']);
       expect(ctrl.hasPageLoaded).toBe(true);
+      expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
     }));
 
     it('should get explore page url based on the exploration id', () => {
@@ -1005,17 +1008,6 @@ describe('Settings Tab Component', () => {
       expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
         true);
     });
-
-    it('should refresh settings tab when refreshSettingsTab event occurs',
-      fakeAsync(() => {
-        spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
-        routerService.onRefreshSettingsTab.emit();
-
-        tick(500);
-        $scope.$apply();
-
-        expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
-      }));
 
     it('should toggle the preview cards', () => {
       expect(ctrl.basicSettingIsShown).toEqual(false);
