@@ -63,6 +63,14 @@ export class SplashPageComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  getImageSet(imageName: string, imageExt: string): string {
+    return (
+      this.getStaticImageUrl(imageName + '1x.' + imageExt) + ' 1x, ' +
+      this.getStaticImageUrl(imageName + '15x.' + imageExt) + ' 1.5x, ' +
+      this.getStaticImageUrl(imageName + '2x.' + imageExt) + ' 2x'
+    );
+  }
+
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
@@ -106,27 +114,27 @@ export class SplashPageComponent implements OnInit {
     return [{
       quote: 'I18N_SPLASH_TESTIMONIAL_1',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_1',
-      imageUrl: this.getStaticImageUrl('/splash/mira.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/mira.webp'),
+      imageUrl: this.getImageSet('/splash/mira', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/mira', 'webp'),
       borderPresent: false
     },
     {
       quote: 'I18N_SPLASH_TESTIMONIAL_2',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_2',
-      imageUrl: this.getStaticImageUrl('/splash/Dheeraj_3.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/Dheeraj_3.webp'),
+      imageUrl: this.getImageSet('/splash/Dheeraj', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/Dheeraj', 'webp'),
       borderPresent: true
     }, {
       quote: 'I18N_SPLASH_TESTIMONIAL_3',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_3',
-      imageUrl: this.getStaticImageUrl('/splash/sama.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/sama.webp'),
+      imageUrl: this.getImageSet('/splash/sama', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/sama', 'webp'),
       borderPresent: false
     }, {
       quote: 'I18N_SPLASH_TESTIMONIAL_4',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_4',
-      imageUrl: this.getStaticImageUrl('/splash/Gaurav_2.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/Gaurav_2.webp'),
+      imageUrl: this.getImageSet('/splash/Gaurav', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/Gaurav', 'webp'),
       borderPresent: true
     }];
   }

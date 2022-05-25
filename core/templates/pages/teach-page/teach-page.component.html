@@ -55,24 +55,11 @@
   </div>
 
   <div class="oppia-teach-section-two">
-    <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-two-left" >
-      <picture class="teach-matthew-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
-        <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')"
-             alt="">
-      </picture>
+    <div class="oppia-teach-section-two-left" >
+      <img class="teach-matthew-image"
+           [src]="getStaticImageUrl('/splash/matthew_fractions.svg')"
+           alt="Illustration of a young person in front of part of Oppia fraction lesson">
     </div>
-
-    <div *ngIf="isWindowNarrow" class="oppia-teach-section-two-left">
-      <picture class="teach-matthew-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
-        <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')"
-             alt="Illustration of a young person in front of part of Oppia fraction lesson">
-      </picture>
-    </div>
-
     <div class="oppia-teach-section-two-right" *ngIf="!isWindowNarrow" >
       <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <div class="teach-benefits-section">
@@ -702,7 +689,7 @@
     margin-top: 50px;
   }
 
-  .teach-page .teach-matthew-image img {
+  .teach-page .teach-matthew-image {
     max-width: 600px;
     width: 100%;
   }
