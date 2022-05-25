@@ -201,7 +201,7 @@ export class ExtractImageFilenamesFromModelService {
         let collapsibleDocument = (
           new DOMParser().parseFromString(contentWithValue, 'text/html'));
         imageTagLists.push(
-          collapsibleDocument.getElementsByTagName('oppia-noninteractive-image'));
+        collapsibleDocument.getElementsByTagName('oppia-noninteractive-image'));
       }
     }
 
@@ -214,12 +214,12 @@ export class ExtractImageFilenamesFromModelService {
         let contentsWithValue = JSON.parse(attribute);
         for (let contentWithValue of contentsWithValue) {
           let tabDocument = (
-            new DOMParser().parseFromString(contentWithValue.content, 'text/html')
+          new DOMParser().parseFromString(contentWithValue.content, 'text/html')
           );
           imageTagLists.push(
             tabDocument.getElementsByTagName('oppia-noninteractive-image'));
         }
-      }   
+      }
     }
 
     for (let imageTagList of imageTagLists) {
@@ -234,7 +234,7 @@ export class ExtractImageFilenamesFromModelService {
             this.htmlEscaperService.escapedStrToUnescapedStr(
               attribute));
           filenames.push(filename);
-        }       
+        } 
       }
     }
     return filenames;
@@ -262,7 +262,7 @@ export class ExtractImageFilenamesFromModelService {
       if (attribute !== null) {
         let mathContentWithValue = JSON.parse(attribute);
         filenames.push(mathContentWithValue.svg_filename);
-      } 
+      }
     }
     return filenames;
   }
