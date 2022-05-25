@@ -185,7 +185,7 @@ implements ControlValueAccessor, OnInit, Validator {
       this.numericInputValidationService.validateNumber(
         this.localValue,
         this.checkRequireNonnegativeInputValue,
-        this.getCurrentDecimalSeparator()));
+        this.getCurrentDecimalSeparator())) || '';
   }
 
   onKeypress(evt: KeyboardEvent): void {
@@ -221,7 +221,7 @@ implements ControlValueAccessor, OnInit, Validator {
     if (this.localStringValue === '') {
       this.localValue = null;
       // Clear errors if input is empty.
-      this.errorStringI18nKey = null;
+      this.errorStringI18nKey = '';
     } else {
       // Make sure number is in a correct format.
       let error = this.numericInputValidationService
@@ -230,7 +230,7 @@ implements ControlValueAccessor, OnInit, Validator {
           this.getCurrentDecimalSeparator());
       if (error !== undefined) {
         this.localValue = null;
-        this.errorStringI18nKey = error;
+        this.errorStringI18nKey = error || '';
       } else {
         // Parse number if the string is in proper format.
         this.localValue = this.numberConversionService

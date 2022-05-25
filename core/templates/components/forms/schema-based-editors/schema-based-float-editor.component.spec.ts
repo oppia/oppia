@@ -229,7 +229,7 @@ describe('Schema based float editor component', function() {
     expect(component.localStringValue).toEqual('12');
   });
 
-  it('should parse the string to a number on input', ()=>{
+  it('should parse the string to a number on input', () => {
     spyOn(numberConversionService, 'getInputValidationRegex')
       .and.returnValue(/[^e0-9\.\-]/g);
     spyOn(component, 'getCurrentDecimalSeparator').and.returnValues('.', ',');
