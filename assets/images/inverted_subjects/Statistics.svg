@@ -1,10 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="statistics" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="44.8 134.7 520.6 521" enable-background="new 44.8 134.7 520.6 521" xml:space="preserve">
-<path fill="#FFFFFF" d="M458.4,540.7H167.3c-3.6,0-6.5-2.9-6.5-6.5v-278c0-3.6,2.9-6.5,6.5-6.5c3.6,0,6.5,2.9,6.5,6.5v271.5H185
-	V310.5h51.4v217.1h16v-131h51.4v131h16V280.1h51.4V528h16v-98.2h51.4V528h19.6c3.6,0,6.5,2.9,6.5,6.5
-	C465,538.1,462,540.7,458.4,540.7z"/>
-<path fill="none" d="M305.5,134.7c-144.1,0-260.6,116.6-260.6,260.6c0,143.7,116.6,260.3,260.3,260.3s260.3-116.6,260.3-260.3
-	C565.8,251.3,449.2,134.7,305.5,134.7z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="44.8 134.7 520.6 521" xmlns:v="https://vecta.io/nano"><path fill="#fff" d="M458.4 540.7H167.3a6.49 6.49 0 0 1-6.5-6.5v-278a6.49 6.49 0 1 1 13 0v271.5H185V310.5h51.4v217.1h16v-131h51.4v131h16V280.1h51.4V528h16v-98.2h51.4V528h19.6a6.49 6.49 0 0 1 6.5 6.5c.3 3.6-2.7 6.2-6.3 6.2z"/></svg>
