@@ -196,14 +196,13 @@ export class ExtractImageFilenamesFromModelService {
       'oppia-noninteractive-collapsible');
     for (let i = 0; i < collapsibleTagList.length; i++) {
       let attribute = collapsibleTagList[i].getAttribute('content-with-value');
-      if (attribute === null) {
-        continue;
+      if (attribute !== null) {
+        let contentWithValue = JSON.parse(attribute);
+        let collapsibleDocument = (
+          new DOMParser().parseFromString(contentWithValue, 'text/html'));
+        imageTagLists.push(
+          collapsibleDocument.getElementsByTagName('oppia-noninteractive-image'));
       }
-      let contentWithValue = JSON.parse(attribute);
-      let collapsibleDocument = (
-        new DOMParser().parseFromString(contentWithValue, 'text/html'));
-      imageTagLists.push(
-        collapsibleDocument.getElementsByTagName('oppia-noninteractive-image'));
     }
 
     // Add images that are embedded in tabs.
@@ -211,17 +210,16 @@ export class ExtractImageFilenamesFromModelService {
       'oppia-noninteractive-tabs');
     for (let i = 0; i < tabsTagList.length; i++) {
       let attribute = tabsTagList[i].getAttribute('tab_contents-with-value');
-      if (attribute === null) {
-        continue;
-      }
-      let contentsWithValue = JSON.parse(attribute);
-      for (let contentWithValue of contentsWithValue) {
-        let tabDocument = (
-          new DOMParser().parseFromString(contentWithValue.content, 'text/html')
-        );
-        imageTagLists.push(
-          tabDocument.getElementsByTagName('oppia-noninteractive-image'));
-      }
+      if (attribute !== null) {
+        let contentsWithValue = JSON.parse(attribute);
+        for (let contentWithValue of contentsWithValue) {
+          let tabDocument = (
+            new DOMParser().parseFromString(contentWithValue.content, 'text/html')
+          );
+          imageTagLists.push(
+            tabDocument.getElementsByTagName('oppia-noninteractive-image'));
+        }
+      }   
     }
 
     for (let imageTagList of imageTagLists) {
@@ -231,13 +229,12 @@ export class ExtractImageFilenamesFromModelService {
         // variable filename instead of filepath since in the end we are
         // retrieving the filenames in the exploration.
         let attribute = imageTagList[i].getAttribute('filepath-with-value');
-        if (attribute === null) {
-          continue;
-        }
-        let filename = JSON.parse(
-          this.htmlEscaperService.escapedStrToUnescapedStr(
-            attribute));
-        filenames.push(filename);
+        if (attribute !== null) {
+          let filename = JSON.parse(
+            this.htmlEscaperService.escapedStrToUnescapedStr(
+              attribute));
+          filenames.push(filename);
+        }       
       }
     }
     return filenames;
@@ -262,11 +259,10 @@ export class ExtractImageFilenamesFromModelService {
       'oppia-noninteractive-math');
     for (let i = 0; i < mathTagList.length; i++) {
       let attribute = mathTagList[i].getAttribute('math_content-with-value');
-      if (attribute === null) {
-        continue;
-      }
-      let mathContentWithValue = JSON.parse(attribute);
-      filenames.push(mathContentWithValue.svg_filename);
+      if (attribute !== null) {
+        let mathContentWithValue = JSON.parse(attribute);
+        filenames.push(mathContentWithValue.svg_filename);
+      } 
     }
     return filenames;
   }
