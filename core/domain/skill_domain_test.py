@@ -425,6 +425,31 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         ]
         self._assert_validation_error('Duplicate rubric found')
 
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                ['<p>' + 'Explanation' * 30 + '</p>']
+            )
+        ]
+        self._assert_validation_error(
+            'Explanation should be less than or equal to 300 chars, '
+            'received 337 chars')
+
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                ['<p> Explanation </p>'] * 15
+            )
+        ]
+        self._assert_validation_error(
+            'Expected number of explanations to be less than or equal '
+            'to 10, received 15')
+
+        self.skill.rubrics = [skill_domain.Rubric(
+            constants.SKILL_DIFFICULTIES[1], [])]
+        self._assert_validation_error(
+            'Expected at least one explanation in medium level rubrics')
+
     def test_valid_rubric_difficulty(self):
         self.skill.rubrics = [skill_domain.Rubric(
             'invalid_difficulty', ['<p>Explanation</p>'])]
