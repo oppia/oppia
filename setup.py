@@ -31,7 +31,7 @@ import setuptools
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-from core import feconf  # pylint: disable=wrong-import-position
+from core import feconf # pylint: disable=wrong-import-position
 
 # Configure the required packages and scripts to install.
 with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
