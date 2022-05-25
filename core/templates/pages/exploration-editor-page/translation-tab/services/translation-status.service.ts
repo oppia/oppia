@@ -129,6 +129,12 @@ export class TranslationStatusService {
   }
 
   _computeAllStatesStatus(): void {
+    this.stateNeedsUpdateWarnings = {};
+    this.stateWiseStatusColor = {};
+    this.explorationTranslationContentRequiredCount = 0;
+    this.explorationVoiceoverContentRequiredCount = 0;
+    this.explorationTranslationContentNotAvailableCount = 0;
+    this.explorationVoiceoverContentNotAvailableCount = 0;
     if (this.explorationStatesService.isInitialized()) {
       this.explorationStatesService.getStateNames().forEach((stateName) => {
         let stateNeedsUpdate = false;

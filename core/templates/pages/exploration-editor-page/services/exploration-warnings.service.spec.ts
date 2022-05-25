@@ -141,19 +141,19 @@ describe('Exploration Warnings Service', function() {
       expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is' +
-         ' set before it is referred to in the initial list of parameter' +
-         ' changes.'
+        ' set before it is referred to in the initial list of parameter' +
+        ' changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-         ' before using it in "Hola".'
+        ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-         ' with no training data: 0'
+        ' with no training data: 0'
       }]);
       expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
       expect(ExplorationWarningsService.countWarnings()).toBe(4);
@@ -162,8 +162,8 @@ describe('Exploration Warnings Service', function() {
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
           'There\'s no way to complete the exploration starting from this' +
-           ' card. To fix this, make sure that the last card in the chain' +
-           ' starting from this one has an \'End Exploration\' question type.'
+          ' card. To fix this, make sure that the last card in the chain' +
+          ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
@@ -239,18 +239,18 @@ describe('Exploration Warnings Service', function() {
       expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-         ' before it is referred to in the initial list of parameter changes.'
+        ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-         ' before using it in "Hola".'
+        ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer groups have classifiers' +
-         ' with no training data: 0, 1'
+        ' with no training data: 0, 1'
       }]);
       expect(ExplorationWarningsService.countWarnings()).toBe(4);
       expect(ExplorationWarningsService.hasCriticalWarnings())
@@ -260,8 +260,8 @@ describe('Exploration Warnings Service', function() {
           'The button text should not be empty.',
           'Only the default outcome is necessary for a continue interaction.',
           'There\'s no way to complete the exploration starting from this' +
-           ' card. To fix this, make sure that the last card in the chain' +
-           ' starting from this one has an \'End Exploration\' question type.'
+          ' card. To fix this, make sure that the last card in the chain' +
+          ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
@@ -314,18 +314,18 @@ describe('Exploration Warnings Service', function() {
       expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-         ' before it is referred to in the initial list of parameter changes.'
+        ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-         ' before using it in "Hola".'
+        ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-         ' with no training data: 0'
+        ' with no training data: 0'
       }]);
       expect(ExplorationWarningsService.countWarnings()).toBe(4);
       expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
@@ -333,8 +333,8 @@ describe('Exploration Warnings Service', function() {
         Hola: [
           'Please add an interaction to this card.',
           'There\'s no way to complete the exploration starting from this' +
-           ' card. To fix this, make sure that the last card in the chain' +
-           ' starting from this one has an \'End Exploration\' question type.'
+          ' card. To fix this, make sure that the last card in the chain' +
+          ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
@@ -402,19 +402,19 @@ describe('Exploration Warnings Service', function() {
         expect(ExplorationWarningsService.getWarnings()).toEqual([{
           type: 'critical',
           message: 'Please ensure the value of parameter "ParamChange2"' +
-           ' is set before it is referred to in the initial list of' +
-           ' parameter changes.'
+          ' is set before it is referred to in the initial list of' +
+          ' parameter changes.'
         }, {
           type: 'critical',
           message: 'Please ensure the value of parameter "HtmlValue" is set' +
-           ' before using it in "Hola".'
+          ' before using it in "Hola".'
         }, {
           type: 'error',
           message: 'The following card has errors: Hola.'
         }, {
           type: 'error',
           message: 'In \'Hola\', the following answer group has a classifier' +
-           ' with no training data: 0'
+          ' with no training data: 0'
         }]);
         expect(ExplorationWarningsService.countWarnings()).toBe(4);
         expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
@@ -425,9 +425,9 @@ describe('Exploration Warnings Service', function() {
               'Number of rows must be integral.',
               'The current solution does not lead to another card.',
               'There\'s no way to complete the exploration starting from' +
-               ' this card. To fix this, make sure that the last card in' +
-               ' the chain starting from this one has an \'End Exploration\'' +
-               ' question type.'
+              ' this card. To fix this, make sure that the last card in' +
+              ' the chain starting from this one has an \'End Exploration\'' +
+              ' question type.'
             ]
           });
       });
@@ -503,19 +503,19 @@ describe('Exploration Warnings Service', function() {
         expect(ExplorationWarningsService.getWarnings()).toEqual([{
           type: 'critical',
           message: 'Please ensure the value of parameter "ParamChange2" is' +
-           ' set before it is referred to in the initial list of parameter' +
-           ' changes.'
+          ' set before it is referred to in the initial list of parameter' +
+          ' changes.'
         }, {
           type: 'critical',
           message: 'Please ensure the value of parameter "HtmlValue" is set' +
-           ' before using it in "Hola".'
+          ' before using it in "Hola".'
         }, {
           type: 'error',
           message: 'The following card has errors: Hola.'
         }, {
           type: 'error',
           message: 'In \'Hola\', the following answer group has a classifier' +
-           ' with no training data: 0'
+          ' with no training data: 0'
         }]);
         expect(ExplorationWarningsService.countWarnings()).toBe(4);
         expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
@@ -525,18 +525,18 @@ describe('Exploration Warnings Service', function() {
               'Placeholder text must be a string.',
               'Number of rows must be integral.',
               'There is an answer among the top 10 which has no explicit' +
-               ' feedback.',
+              ' feedback.',
               'The current solution does not lead to another card.',
               'There\'s no way to complete the exploration starting from' +
-               ' this card. To fix this, make sure that the last card in' +
-               ' the chain starting from this one has an \'End Exploration\'' +
-               ' question type.'
+              ' this card. To fix this, make sure that the last card in' +
+              ' the chain starting from this one has an \'End Exploration\'' +
+              ' question type.'
             ]
           });
       }));
 
     it('should update warnings when state name is not equal to the default' +
-     ' outcome destination', function() {
+    ' outcome destination', function() {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -598,18 +598,18 @@ describe('Exploration Warnings Service', function() {
       expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-         ' before it is referred to in the initial list of parameter changes.'
+        ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-         ' before using it in "Hola".'
+        ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following card has errors: Hola.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-         ' with no training data: 0'
+        ' with no training data: 0'
       }]);
       expect(ExplorationWarningsService.countWarnings()).toBe(4);
       expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
@@ -618,14 +618,14 @@ describe('Exploration Warnings Service', function() {
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
           'There\'s no way to complete the exploration starting from this' +
-           ' card. To fix this, make sure that the last card in the chain' +
-           ' starting from this one has an \'End Exploration\' question type.'
+          ' card. To fix this, make sure that the last card in the chain' +
+          ' starting from this one has an \'End Exploration\' question type.'
         ]
       });
     });
 
     it('should update warnings when there are two states but only one saved' +
-     ' memento value', function() {
+    ' memento value', function() {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -741,22 +741,22 @@ describe('Exploration Warnings Service', function() {
       expect(ExplorationWarningsService.getWarnings()).toEqual([{
         type: 'critical',
         message: 'Please ensure the value of parameter "ParamChange2" is set' +
-         ' before it is referred to in the initial list of parameter changes.'
+        ' before it is referred to in the initial list of parameter changes.'
       }, {
         type: 'critical',
         message: 'Please ensure the value of parameter "HtmlValue" is set' +
-         ' before using it in "Hola".'
+        ' before using it in "Hola".'
       }, {
         type: 'error',
         message: 'The following cards have errors: Hola, State.'
       }, {
         type: 'error',
         message: 'In \'Hola\', the following answer group has a classifier' +
-         ' with no training data: 0'
+        ' with no training data: 0'
       }, {
         type: 'error',
         message: 'In \'State\', the following answer group has a classifier' +
-         ' with no training data: 0'
+        ' with no training data: 0'
       }]);
       expect(ExplorationWarningsService.countWarnings()).toBe(5);
       expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
@@ -834,8 +834,8 @@ describe('Exploration Warnings Service', function() {
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
           'There\'s no way to complete the exploration starting from this' +
-           ' card. To fix this, make sure that the last card in the chain' +
-           ' starting from this one has an \'End Exploration\' question type.',
+          ' card. To fix this, make sure that the last card in the chain' +
+          ' starting from this one has an \'End Exploration\' question type.',
           'The first card of the lesson must be a checkpoint.'
         ]
       });
@@ -940,7 +940,7 @@ describe('Exploration Warnings Service', function() {
         ],
         End: [
           'Please make sure end exploration interactions do not ' +
-           'have any answer groups.',
+          'have any answer groups.',
           'Checkpoints are not allowed on the last card of the lesson.',
           'Checkpoints must not be assigned to cards that can be bypassed.'
         ]
@@ -948,7 +948,7 @@ describe('Exploration Warnings Service', function() {
     });
 
     it('should show warnings if checkpoint count is more than 8 and' +
-       ' bypassable state is made a checkpoint', function() {
+      ' bypassable state is made a checkpoint', function() {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -1384,7 +1384,7 @@ describe('Exploration Warnings Service', function() {
         ],
         End: [
           'Please make sure end exploration interactions do not ' +
-           'have any answer groups.',
+          'have any answer groups.',
           'Checkpoints are not allowed on the last card of the lesson.',
           'Checkpoints must not be assigned to cards that can be bypassed.'
         ]
