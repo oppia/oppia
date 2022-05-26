@@ -41,11 +41,7 @@ describe('Schema Based Choices Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-<<<<<<< HEAD
     let mockFunction = function(value: number) {
-=======
-    let mockFunction = function(value: string) {
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -54,11 +50,7 @@ describe('Schema Based Choices Editor Component', () => {
     expect(component).toBeDefined();
     expect(component.validate(null)).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
-<<<<<<< HEAD
     expect(component.onChange(true)).toEqual(true);
-=======
-    expect(component.onChange('true')).toEqual('true');
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
   }));
 
   it('should get empty object on validating', () => {
@@ -71,7 +63,6 @@ describe('Schema Based Choices Editor Component', () => {
 
     expect(component.localValue).toEqual(null);
 
-<<<<<<< HEAD
     component.writeValue(true);
     expect(component.localValue).toBeTrue();
   });
@@ -88,24 +79,6 @@ describe('Schema Based Choices Editor Component', () => {
 
   it('should not update value when local value not change', () => {
     let value = ['item1'];
-=======
-    component.writeValue('true');
-    expect(component.localValue).toBe('true');
-  });
-
-  it('should update value when local value change', () => {
-    component.localValue = 'item1';
-
-    expect(component.localValue).toEqual('item1');
-
-    component.updateValue('item2');
-
-    expect(component.localValue).toEqual('item2');
-  });
-
-  it('should not update value when local value not change', () => {
-    let value = 'item1';
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     component.localValue = value;
 
     expect(component.localValue).toEqual(value);

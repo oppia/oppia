@@ -38,7 +38,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SchemaBasedChoicesEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-<<<<<<< HEAD
   localValue;
   @Input() disabled;
   // The choices for the object's value.
@@ -50,27 +49,11 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: unknown): void {
-=======
-  localValue: string;
-  @Input() disabled: boolean;
-  // The choices for the object's value.
-  @Input() choices: string[];
-  // The schema for this object.
-  @Input() schema: unknown;
-  onChange: (val: string) => void = () => {};
-
-  // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: string): void {
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     this.localValue = value;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-<<<<<<< HEAD
   registerOnChange(fn: (val: unknown) => void): void {
-=======
-  registerOnChange(fn: (val: string) => void): void {
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     this.onChange = fn;
   }
 
@@ -80,18 +63,10 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
-<<<<<<< HEAD
     return {};
   }
 
   updateValue(val: unknown[]): void {
-=======
-    // TODO(#15458): Validate each choice against the schema.
-    return {};
-  }
-
-  updateValue(val: string): void {
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     if (this.localValue === val) {
       return;
     }

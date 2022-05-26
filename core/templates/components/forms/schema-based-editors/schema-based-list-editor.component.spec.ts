@@ -119,13 +119,8 @@ describe('Schema Based List Editor Component', () => {
 
     component.lastElementOnBlur();
 
-<<<<<<< HEAD
     let value = ['item1'];
     expect(component.localValue).toEqual(value);
-=======
-    const expectedValue = ['item1'];
-    expect(component.localValue).toEqual(expectedValue);
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
   });
 
   it('should add element to the item list', () => {
@@ -134,11 +129,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.addElement();
 
-<<<<<<< HEAD
     let expectedValue = ['item1', 'default'];
-=======
-    const expectedValue = ['item1', 'default'];
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -194,11 +185,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.ngOnInit();
 
-<<<<<<< HEAD
     let expectedValue = ['item1', 'default', 'default'];
-=======
-    const expectedValue = ['item1', 'default', 'default'];
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -249,11 +236,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.showAddItemButton();
 
-<<<<<<< HEAD
     let expectedValue = ['item'];
-=======
-    const expectedValue = ['item'];
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -276,11 +259,7 @@ describe('Schema Based List Editor Component', () => {
 
     onChildFormSubmitEmitter.emit();
 
-<<<<<<< HEAD
     let expectedValue = ['item', 'default'];
-=======
-    const expectedValue = ['item', 'default'];
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     expect(component.localValue).toEqual(expectedValue);
   });
 
@@ -330,11 +309,7 @@ describe('Schema Based List Editor Component', () => {
 
     component.setValue(null, 2);
 
-<<<<<<< HEAD
     let expectedValue = ['item1', 'item2', 'item3'];
-=======
-    const expectedValue = ['item1', 'item2', 'item3'];
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     expect(component.localValue).toEqual(expectedValue);
   });
 });

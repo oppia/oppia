@@ -19,11 +19,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-<<<<<<< HEAD
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
-=======
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';

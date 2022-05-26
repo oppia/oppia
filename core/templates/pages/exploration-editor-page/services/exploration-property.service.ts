@@ -90,11 +90,7 @@ export class ExplorationPropertyService {
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-<<<<<<< HEAD
   _isValid(value: string | boolean): true {
-=======
-  _isValid(value: unknown): boolean {
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     return true;
   }
 

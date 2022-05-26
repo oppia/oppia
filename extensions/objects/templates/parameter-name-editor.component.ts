@@ -21,11 +21,7 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-<<<<<<< HEAD
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
-=======
-
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
 import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
 @Component({
@@ -49,12 +45,8 @@ export class ParameterNameEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.availableParamNames = (
-<<<<<<< HEAD
       // TODO(#13015): Remove use of unknown as a type.
       (this.explorationParamSpecsService.savedMemento as unknown as ParamSpecs)
-=======
-      (this.explorationParamSpecsService.savedMemento)
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
         .getParamNames());
 
     if (this.availableParamNames.length === 0) {

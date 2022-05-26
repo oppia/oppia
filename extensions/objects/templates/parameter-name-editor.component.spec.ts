@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for parameter name editor.
  */
-<<<<<<< HEAD
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -50,42 +49,6 @@ describe('StateHintsEditorComponent', () => {
     fixture = TestBed.createComponent(ParameterNameEditorComponent);
     component = fixture.componentInstance;
 
-=======
-
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ParameterNameEditorComponent } from './parameter-name-editor.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
-import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
-
-describe('StateHintsEditorComponent', () => {
-  let component: ParameterNameEditorComponent;
-  let fixture: ComponentFixture<ParameterNameEditorComponent>;
-  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
-  let explorationParamSpecsService: ExplorationParamSpecsService;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        ParameterNameEditorComponent
-      ],
-      providers: [
-        ParamSpecsObjectFactory,
-        ExplorationParamSpecsService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ParameterNameEditorComponent);
-    component = fixture.componentInstance;
-
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
     explorationParamSpecsService = TestBed.inject(ExplorationParamSpecsService);
 
@@ -114,11 +77,7 @@ describe('StateHintsEditorComponent', () => {
 
   it('should set value null if the available param names is empty', () => {
     spyOn(
-<<<<<<< HEAD
       explorationParamSpecsService.savedMemento as unknown as ParamSpecs,
-=======
-      explorationParamSpecsService.savedMemento,
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
       'getParamNames'
     ).and.returnValue([]);
 

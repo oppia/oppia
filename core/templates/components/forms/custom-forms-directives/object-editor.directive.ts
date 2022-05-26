@@ -26,11 +26,7 @@
  * function.
  */
 
-<<<<<<< HEAD
 import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
-=======
-import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, Output, SimpleChange, SimpleChanges, ViewContainerRef } from '@angular/core';
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from 'objects/templates/boolean-editor.component';
@@ -167,10 +163,6 @@ ControlValueAccessor, Validator {
   }
 
   @Input() set value(val: unknown) {
-<<<<<<< HEAD
-=======
-    const previousValue = this._value;
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     this._value = val;
     // Ng-model can call write-obj before we create the component. Hence a
     // check to see if component has been created.
@@ -178,19 +170,6 @@ ControlValueAccessor, Validator {
       this.componentRef.instance.value = this._value;
       this.onChange(this._value);
       this.valueChange.emit(this._value);
-<<<<<<< HEAD
-=======
-      if (this.componentRef.instance.ngOnChanges) {
-        const componentInputPropsChangeObject: SimpleChanges = {
-          value: new SimpleChange(
-            previousValue,
-            val,
-            false),
-        };
-        this.componentRef.instance.ngOnChanges(
-          componentInputPropsChangeObject);
-      }
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     }
   }
 
@@ -281,7 +260,6 @@ ControlValueAccessor, Validator {
             if (Array.isArray(newValue)) {
               this.value = [...newValue];
               return;
-<<<<<<< HEAD
             }
             this.value = newValue;
           })
@@ -309,35 +287,6 @@ ControlValueAccessor, Validator {
                 this.validityChange.emit();
               }
             }
-=======
-            }
-            this.value = newValue;
-          })
-        );
-      }
-      if (componentRef.instance.validityChange) {
-        this.componentSubscriptions.add(
-          componentRef.instance.validityChange.subscribe((errorsMap) => {
-            for (const errorKey of Object.keys(errorsMap)) {
-              // Errors map contains true for a key if valid state and false
-              // for an error state. We remove the key from componentErrors
-              // when it is valid and add it when it is reported as error.
-              const errorState = errorsMap[errorKey];
-              if (errorState !== true) {
-                if (this.componentErrors[errorKey] === undefined) {
-                  this.componentErrors[errorKey] = errorState;
-                }
-              } else {
-                if (this.componentErrors[errorKey] !== undefined) {
-                  delete this.componentErrors[errorKey];
-                }
-              }
-              if (this.form) {
-                this.form.$setValidity(errorKey, errorsMap[errorKey]);
-                this.validityChange.emit();
-              }
-            }
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
             this.onValidatorChange();
           })
         );
@@ -355,13 +304,8 @@ ControlValueAccessor, Validator {
     ).length > 0 ? this.componentErrors : null;
   }
 
-<<<<<<< HEAD
   // See NOTE at the top.
   ngOnChanges(changes: SimpleChanges): void {
-=======
-  ngOnChanges(changes: SimpleChanges): void {
-    // This is left empty on purpose. See NOTE at the top.
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
   }
 
   ngOnDestroy(): void {

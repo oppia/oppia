@@ -90,10 +90,6 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
-<<<<<<< HEAD
-=======
-    // TODO(#15458): Move template driven validation into code.
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     if (this._validate(control.value, this.uiConfig)) {
       return {};
     }
@@ -105,11 +101,6 @@ implements ControlValueAccessor, OnInit, Validator {
       customizationArg: {checkRequireNonnegativeInput: unknown}): boolean {
     let { checkRequireNonnegativeInput } = customizationArg || {};
 
-<<<<<<< HEAD
-=======
-    // TODO(#15462): Move the type base checks (like the ones done below) to
-    // schema-validator's isFloat method.
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     return (
       localValue !== undefined &&
       localValue !== null &&
@@ -191,11 +182,7 @@ implements ControlValueAccessor, OnInit, Validator {
       this.numericInputValidationService.validateNumber(
         this.localValue,
         this.checkRequireNonnegativeInputValue,
-<<<<<<< HEAD
         this.currentDecimalSeparator()));
-=======
-        this.getCurrentDecimalSeparator()));
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
   }
 
   onKeypress(evt: KeyboardEvent): void {
@@ -215,11 +202,7 @@ implements ControlValueAccessor, OnInit, Validator {
     }
   }
 
-<<<<<<< HEAD
   currentDecimalSeparator(): string {
-=======
-  getCurrentDecimalSeparator(): string {
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     return this.numberConversionService.currentDecimalSeparator();
   }
 
@@ -241,11 +224,7 @@ implements ControlValueAccessor, OnInit, Validator {
       let error = this.numericInputValidationService
         .validateNumericString(
           this.localStringValue,
-<<<<<<< HEAD
           this.currentDecimalSeparator());
-=======
-          this.getCurrentDecimalSeparator());
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
       if (error !== undefined) {
         this.localValue = null;
         this.errorStringI18nKey = error;

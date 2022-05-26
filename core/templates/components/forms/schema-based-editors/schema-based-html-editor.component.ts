@@ -62,14 +62,6 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
-<<<<<<< HEAD
-=======
-    // Currently, the validation for this component is handled by the
-    // apply-validation directive, so this method returns an empty
-    // object. However, when we move to reactive forms, that validation should
-    // be moved here instead (see the TODO below).
-    // TODO(#15458): Move template driven validation into code.
->>>>>>> ed7426736275ea55d6def0530b9e60d733e59c98
     return {};
   }
 
