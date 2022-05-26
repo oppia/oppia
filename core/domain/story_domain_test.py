@@ -281,9 +281,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.Story.deserialize(story.serialize()).to_dict())
 
     def test_valid_story_id(self) -> None:
-        # The expected type of story_id is string but for testing purpose
-        # we are providing integer value which causes MyPy to throw type
-        # error. So to silent the error, we added an ignore here.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         self._assert_valid_story_id('Story id should be a string', 10)  # type: ignore[arg-type]
         self._assert_valid_story_id('Invalid story id', 'abc')
 
@@ -306,9 +306,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 thumbnail_filename)
 
     def test_thumbnail_filename_validation_for_story(self) -> None:
-        # The expected type of thumbnail_filename is string but for testing
-        # purpose we are providing integer value which causes MyPy to throw
-        # type error. So to silent the error, we added an ignore here.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story(
             'Expected thumbnail filename to be a string, received 10', 10)  # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename_for_story(
@@ -325,9 +325,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_thumbnail_filename_validation_for_story_node(self) -> None:
-        # The expected type of thumbnail_filename is string but for testing
-        # purpose we are providing integer value which causes MyPy to throw
-        # type error. So to silent the error, we added an ignore here.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story_node(
             'Expected thumbnail filename to be a string, received 10', 10)  # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename_for_story_node(
