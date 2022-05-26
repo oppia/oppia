@@ -184,13 +184,10 @@ export class SvgSanitizerService {
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
           const nodeAttrName: string = node.attributes[i].name;
-          const nodeAttrCombination = (
-            nodeTagName.toLocaleLowerCase() + ':' + nodeAttrName.toLowerCase());
+          // Check if the tag name and attribute combination matches any value
+          // in attrsToBeRemoved. If so, remove that attribute from the node.
           if (
-            attrsToBeRemoved.findIndex(
-              attribute => attribute.toLowerCase() === nodeAttrCombination
-            ) !== -1
-          ) {
+            attrsToBeRemoved.indexOf(nodeTagName + ':' + nodeAttrName) !== -1) {
             node.removeAttribute(nodeAttrName);
           }
         }
