@@ -25,7 +25,7 @@ from core.domain import question_domain
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Tuple
 from typing_extensions import TypedDict
 
 MYPY = False
@@ -38,10 +38,13 @@ if MYPY:
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
+
 class VersionedQuestionStateDict(TypedDict):
     """versioned_question_state dictionary used in def _migrate_state_schema."""
+
     state_schema_version: int
     state: state_domain.State
+
 
 def get_questions_and_skill_descriptions_by_skill_ids(
     question_count: int, skill_ids: List[str], offset: int
@@ -182,7 +185,6 @@ def _migrate_state_schema(
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
-        question_domain.Question.update_state_from_model( # type: 
-        # ignore[no-untyped-call]
+        question_domain.Question.update_state_from_model( # type: ignore[no-untyped-call]
             versioned_question_state, state_schema_version)
         state_schema_version += 1
