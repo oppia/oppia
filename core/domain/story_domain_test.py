@@ -366,8 +366,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)  # type: ignore[no-untyped-call]
-        fs.commit(  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)
+        fs.commit(
             '%s/new_image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
 
@@ -548,8 +548,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)  # type: ignore[no-untyped-call]
-        fs.commit(  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)
+        fs.commit(
             '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
 

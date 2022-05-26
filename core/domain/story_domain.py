@@ -1261,13 +1261,13 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
         for index in range(len(story_contents_dict['nodes'])):
             filepath = '%s/%s' % (
                 constants.ASSET_TYPE_THUMBNAIL,
                 story_contents_dict['nodes'][index]['thumbnail_filename'])
             story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = (
-                len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
+                len(fs.get(filepath)) if fs.isfile(filepath) else None)
         return story_contents_dict
 
     @classmethod
@@ -1323,13 +1323,13 @@ class Story:
         Raises:
             Exception. The subtopic with the given id doesn't exist.
         """
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        if fs.isfile(filepath):
             self.thumbnail_filename = new_thumbnail_filename
-            self.thumbnail_size_in_bytes = len(fs.get(filepath))  # type: ignore[no-untyped-call]
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
         else:
             raise Exception(
                 'The thumbnail %s for story with id %s does not exist'
@@ -1526,15 +1526,15 @@ class Story:
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        if fs.isfile(filepath):
             self.story_contents.nodes[node_index].thumbnail_filename = (
                 new_thumbnail_filename)
             self.story_contents.nodes[node_index].thumbnail_size_in_bytes = (
-                len(fs.get(filepath)))  # type: ignore[no-untyped-call]
+                len(fs.get(filepath)))
         else:
             raise Exception(
                 'The thumbnail %s for story node with id %s does not exist'
