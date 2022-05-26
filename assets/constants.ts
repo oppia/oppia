@@ -6288,7 +6288,7 @@ export default {
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "ABOUT": {
       "ROUTE": "about",
-      "TITLE": "About | Oppia",
+      "TITLE": "I18N_ABOUT_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6311,7 +6311,7 @@ export default {
     },
     "CONTACT": {
       "ROUTE": "contact",
-      "TITLE": "Contact | Oppia",
+      "TITLE": "I18N_CONTACT_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6347,7 +6347,7 @@ export default {
     },
     "GET_STARTED": {
       "ROUTE": "get-started",
-      "TITLE": "Get Started | Oppia",
+      "TITLE": "I18N_GET_STARTED_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6363,7 +6363,7 @@ export default {
     },
     "LICENSE": {
       "ROUTE": "license",
-      "TITLE": "License Page | Oppia",
+      "TITLE": "I18N_LICENSE_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6379,12 +6379,12 @@ export default {
     },
     "LOGIN": {
       "ROUTE": "login",
-      "TITLE": "Sign in | Oppia",
+      "TITLE": "I18N_LOGIN_PAGE_TITLE",
       "META": []
     },
     "LOGOUT": {
       "ROUTE": "logout",
-      "TITLE": "Logout | Oppia",
+      "TITLE": "I18N_LOGOUT_PAGE_BROWSER_TAB_TITLE",
       "META": []
     },
     "PARTNERSHIPS": {
@@ -6394,7 +6394,7 @@ export default {
     },
     "PLAYBOOK": {
       "ROUTE": "creator-guidelines",
-      "TITLE": "Creator Guidelines | Oppia",
+      "TITLE": "I18N_PLAYBOOK_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6412,12 +6412,12 @@ export default {
     },
     "PRIVACY": {
       "ROUTE": "privacy-policy",
-      "TITLE": "Privacy Policy | Oppia",
+      "TITLE": "I18N_PRIVACY_POLICY_PAGE_TITLE",
       "META": []
     },
     "SIGNUP": {
       "ROUTE": "signup",
-      "TITLE": "Join the community - Oppia",
+      "TITLE": "I18N_SIGNUP_PAGE_TITLE",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
@@ -6434,7 +6434,7 @@ export default {
     },
     "TEACH": {
       "ROUTE": "teach",
-      "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
+      "TITLE": "I18N_TEACH_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6452,7 +6452,7 @@ export default {
     },
     "TERMS": {
       "ROUTE": "terms",
-      "TITLE": "Terms of Use | Oppia",
+      "TITLE": "I18N_TERMS_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6470,7 +6470,7 @@ export default {
     },
     "THANKS": {
       "ROUTE": "thanks",
-      "TITLE": "Thanks | Oppia",
+      "TITLE": "I18N_THANKS_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6486,7 +6486,7 @@ export default {
     },
     "DELETE_ACCOUNT": {
       "ROUTE": "delete-account",
-      "TITLE": "Delete Account | Oppia",
+      "TITLE": "I18N_DELETE_ACCOUNT_PAGE_TITLE",
       "META": []
     },
     "LIBRARY_INDEX": {
@@ -6563,12 +6563,12 @@ export default {
     },
     "PENDING_ACCOUNT_DELETION": {
       "ROUTE": "pending-account-deletion",
-      "TITLE": "Pending Account Deletion | Oppia",
+      "TITLE": "I18N_PENDING_ACCOUNT_DELETION_PAGE_TITLE",
       "META": []
     },
     "PREFERENCES": {
       "ROUTE": "preferences",
-      "TITLE": "Preferences | Oppia",
+      "TITLE": "I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6584,7 +6584,7 @@ export default {
     },
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
-      "TITLE": "Profile | Oppia",
+      "TITLE": "I18N_PROFILE_PAGE_TITLE",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -6593,7 +6593,7 @@ export default {
     },
     "RELEASE_COORDINATOR_PAGE": {
       "ROUTE": "release-coordinator",
-      "TITLE": "Oppia Release Coordinator Panel",
+      "TITLE": "I18N_RELEASE_COORDINATOR_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
