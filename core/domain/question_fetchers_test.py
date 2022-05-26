@@ -43,36 +43,27 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL) 
-        # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email( # type: 
-        # ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL) # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email( # type: ignore[no-untyped-call]
             self.EDITOR_EMAIL)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: 
-        # ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
 
-        self.admin = user_services.get_user_actions_info(self.admin_id) # type: 
-        # ignore[no-untyped-call]
-        self.editor = user_services.get_user_actions_info(self.editor_id) # type
-        # : ignore[no-untyped-call]
+        self.admin = user_services.get_user_actions_info(self.admin_id) # type: ignore[no-untyped-call]
+        self.editor = user_services.get_user_actions_info(self.editor_id) # type: ignore[no-untyped-call]
 
         self.save_new_skill( # type: ignore[no-untyped-call]
-            'skill_1', self.admin_id, description='Skill Description 1') 
+            'skill_1', self.admin_id, description='Skill Description 1')
         self.save_new_skill( # type: ignore[no-untyped-call]
             'skill_2', self.admin_id, description='Skill Description 2')
 
-        self.question_id = question_services.get_new_question_id() # type: 
-        # ignore[no-untyped-call]
-        self.question = self.save_new_question( # type: 
-        # ignore[no-untyped-call]
+        self.question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
+        self.question = self.save_new_question( # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1']) # type:
-            # ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1']) # type: ignore[no-untyped-call]
 
     def test_get_questions_and_skill_descriptions_by_skill_ids(self) -> None:
-        question_services.create_new_question_skill_link( # type: 
-        # ignore[no-untyped-call]
+        question_services.create_new_question_skill_link( # type: ignore[no-untyped-call]
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
         questions, _ = (
@@ -91,17 +82,14 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 0)
 
     def test_get_questions_with_multi_skill_ids(self) -> None:
-        question_id_1 = question_services.get_new_question_id() # type:
-        # ignore[no-untyped-call]
+        question_id_1 = question_services.get_new_question_id() # type: ignore[no-untyped-call]
         question_1 = self.save_new_question( # type: ignore[no-untyped-call]
             question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1', 'skill_2']) # type:
-            # ignore[no-untyped-call]
-        question_services.create_new_question_skill_link( # type: 
-        # ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), # type: ignore[no-untyped-call]
+                ['skill_1', 'skill_2'])
+        question_services.create_new_question_skill_link( # type: ignore[no-untyped-call]
             self.editor_id, question_id_1, 'skill_1', 0.3)
-        question_services.create_new_question_skill_link( # type: 
-        # ignore[no-untyped-call]
+        question_services.create_new_question_skill_link( # type: ignore[no-untyped-call]
             self.editor_id, question_id_1, 'skill_2', 0.5)
 
         questions, _ = (
@@ -114,18 +102,16 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             questions[0].to_dict(), question_1.to_dict())
 
     def test_get_questions_by_ids(self) -> None:
-        question_id_2 = question_services.get_new_question_id() # type: 
-        # ignore[no-untyped-call]
+        question_id_2 = question_services.get_new_question_id() # type: ignore[no-untyped-call]
         self.save_new_question( # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
-            self._create_valid_question_data('DEF'), ['skill_1']) # type: 
-            # ignore[no-untyped-call]
+            self._create_valid_question_data('DEF'), ['skill_1']) # type: ignore[no-untyped-call]
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)
         assert isinstance(questions[0], str)
         self.assertEqual(questions[0].id, self.question_id)
-        self.assertIsNone(questions[1]) 
+        self.assertIsNone(questions[1])
         assert isinstance(questions[2], str)
         self.assertEqual(questions[2].id, question_id_2)
 
@@ -141,33 +127,32 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
 
-        question_id = question_services.get_new_question_id() # type: 
-        # ignore[no-untyped-call]
+        question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
 
-        question_model: Optional[question_models.QuestionModel] = question_models.QuestionModel(
+        question_model: Optional[
+            question_models.QuestionModel] = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data('ABC').to_dict()), # type: 
-                # ignore[no-untyped-call]
+                self._create_valid_question_data('ABC').to_dict()), # type: ignore[no-untyped-call]
             language_code='en',
             version=0,
             question_state_data_schema_version=0)
 
         assert isinstance(question_model, question_models.QuestionModel)
-        question_model.commit(  
+        question_model.commit(
             self.editor_id, 'question model created',
             [{'cmd': question_domain.CMD_CREATE_NEW}])
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
-        question_model = all_question_models.get() 
+        question_model = all_question_models.get()
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION):
             assert isinstance(question_model, question_models.QuestionModel)
-            question_fetchers.get_question_from_model(question_model) 
+            question_fetchers.get_question_from_model(question_model)
 
     def test_get_question_from_model_with_current_valid_schema_version(
         self
@@ -181,14 +166,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
 
-        question_id = question_services.get_new_question_id() # type: 
-        # ignore[no-untyped-call]
+        question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
 
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data('ABC').to_dict()), # type: 
-                # ignore[no-untyped-call]
+                self._create_valid_question_data('ABC').to_dict()), # type: ignore[no-untyped-call]
             language_code='en',
             version=0,
             question_state_data_schema_version=48)
