@@ -726,7 +726,6 @@ textarea {
   color: #fff;
   font-size: 13px;
   line-height: 20px;
-  padding-bottom: 5vh;
   position: relative;
   width: 100%;
 }
@@ -1582,6 +1581,9 @@ pre.oppia-pre-wrapped-text {
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
+.oppia-language-dropdown-button {
+  border: 2px solid white;
+}
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
   background-color: #fff;
@@ -2239,9 +2241,8 @@ oppia-parameter {
 
 .oppia-modal-lesson-information-card .modal-dialog {
   margin: 100px auto;
-  max-width: 35%;
-  min-width: 270px;
-  width: 350px;
+  max-width: 430px;
+  min-width: 320px;
 }
 
 .skill-select-modal .modal-xl {

@@ -237,6 +237,7 @@ angular.module('oppia').component('explorationEditorPage', {
       // Initializes the exploration page using data from the backend.
       // Called on page load.
       ctrl.initExplorationPage = () => {
+        EditabilityService.lockExploration(true);
         return $q.all([
           ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
@@ -280,6 +281,9 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
+          if (explorationData.edits_allowed) {
+            EditabilityService.lockExploration(false);
+          }
 
 
           ctrl.explorationTitleService = ExplorationTitleService;
