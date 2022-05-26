@@ -26,7 +26,7 @@
  * function.
  */
 
-import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, Output, SimpleChange, SimpleChanges, ViewContainerRef } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from 'objects/templates/boolean-editor.component';
@@ -163,6 +163,7 @@ ControlValueAccessor, Validator {
   }
 
   @Input() set value(val: unknown) {
+    const previousValue = this._value;
     this._value = val;
     // Ng-model can call write-obj before we create the component. Hence a
     // check to see if component has been created.
@@ -170,6 +171,16 @@ ControlValueAccessor, Validator {
       this.componentRef.instance.value = this._value;
       this.onChange(this._value);
       this.valueChange.emit(this._value);
+      if (this.componentRef.instance.ngOnChanges) {
+        const componentInputPropsChangeObject: SimpleChanges = {
+          value: new SimpleChange(
+            previousValue,
+            val,
+            false),
+        };
+        this.componentRef.instance.ngOnChanges(
+          componentInputPropsChangeObject);
+      }
     }
   }
 
@@ -304,8 +315,8 @@ ControlValueAccessor, Validator {
     ).length > 0 ? this.componentErrors : null;
   }
 
-  // See NOTE at the top.
   ngOnChanges(changes: SimpleChanges): void {
+    // This is left empty on purpose. See NOTE at the top.
   }
 
   ngOnDestroy(): void {

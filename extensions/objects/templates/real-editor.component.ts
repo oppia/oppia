@@ -27,7 +27,7 @@ interface RealSchema {
   styleUrls: []
 })
 export class RealEditorComponent
-  implements OnInit, ControlValueAccessor, Validator {
+    implements OnInit, ControlValueAccessor, Validator {
   // These property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -37,6 +37,7 @@ export class RealEditorComponent
     type: 'float'
   };
 
+  // TODO(#13015): Remove use of unknown as a type.
   onChange: (_: unknown) => void = () => {};
   onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};

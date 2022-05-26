@@ -188,7 +188,9 @@ describe('MathExpressionContentEditorComponent', () => {
 
   it('should initialise component when user clicks \'math expression\' in' +
   ' the rich text editor', () => {
-    component.value = undefined;
+    const component = TestBed.createComponent(
+      MathExpressionContentEditorComponent).componentInstance;
+    component.ngOnInit();
     component.active = true;
     spyOn(component.valueChanged, 'emit');
 

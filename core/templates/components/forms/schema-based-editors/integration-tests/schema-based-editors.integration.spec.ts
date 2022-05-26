@@ -192,4 +192,3 @@ describe('Schema based editor', () => {
     expect(unicodeInputFormController.invalid).toBeTrue();
   }));
 });
-

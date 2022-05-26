@@ -90,6 +90,7 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
+    // TODO(#15458): Move template driven validation into code.
     if (this._validate(control.value, this.uiConfig)) {
       return {};
     }
@@ -101,6 +102,8 @@ implements ControlValueAccessor, OnInit, Validator {
       customizationArg: {checkRequireNonnegativeInput: unknown}): boolean {
     let { checkRequireNonnegativeInput } = customizationArg || {};
 
+    // TODO(#15462): Move the type base checks (like the ones done below) to
+    // schema-validator's isFloat method.
     return (
       localValue !== undefined &&
       localValue !== null &&
@@ -182,7 +185,7 @@ implements ControlValueAccessor, OnInit, Validator {
       this.numericInputValidationService.validateNumber(
         this.localValue,
         this.checkRequireNonnegativeInputValue,
-        this.currentDecimalSeparator()));
+        this.getCurrentDecimalSeparator())) || '';
   }
 
   onKeypress(evt: KeyboardEvent): void {
@@ -202,7 +205,7 @@ implements ControlValueAccessor, OnInit, Validator {
     }
   }
 
-  currentDecimalSeparator(): string {
+  getCurrentDecimalSeparator(): string {
     return this.numberConversionService.currentDecimalSeparator();
   }
 
@@ -218,16 +221,16 @@ implements ControlValueAccessor, OnInit, Validator {
     if (this.localStringValue === '') {
       this.localValue = null;
       // Clear errors if input is empty.
-      this.errorStringI18nKey = null;
+      this.errorStringI18nKey = '';
     } else {
       // Make sure number is in a correct format.
       let error = this.numericInputValidationService
         .validateNumericString(
           this.localStringValue,
-          this.currentDecimalSeparator());
+          this.getCurrentDecimalSeparator());
       if (error !== undefined) {
         this.localValue = null;
-        this.errorStringI18nKey = error;
+        this.errorStringI18nKey = error || '';
       } else {
         // Parse number if the string is in proper format.
         this.localValue = this.numberConversionService

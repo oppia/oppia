@@ -48,7 +48,7 @@ describe('Schema Based Bool Editor Component', () => {
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(null)).toEqual(null);
     expect(component.onChange).toEqual(mockFunction);
     expect(component.onChange(true)).toEqual(true);
   }));

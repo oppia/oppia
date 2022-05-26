@@ -59,7 +59,7 @@ describe('Schema based editor component', function() {
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(null)).toEqual(null);
     expect(component.onChange).toEqual(mockFunction);
     expect(component.onChange(19)).toEqual(19);
   }));
