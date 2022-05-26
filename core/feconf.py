@@ -25,6 +25,8 @@ import os
 
 from core.constants import constants
 
+from scripts import common # pylint: disable=unused-import
+
 from typing import Dict, List, Union
 
 from typing_extensions import TypedDict
