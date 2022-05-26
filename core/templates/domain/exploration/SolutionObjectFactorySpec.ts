@@ -129,12 +129,38 @@ describe('Solution object factory', () => {
         'One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
-        ['<p>1</p>', '<b>3</b>'],
-        ['c', '<oppia-noninteractive-math></oppia-noninteractive-math>']
+        ['content_id_1', 'content_id_3'],
+        ['content_id_2']
       ]);
-      expect(solution.getSummary('DragAndDropSortInput')).toEqual(
-        'One solution is "[[1,3],[c,[Math]]]". This is the explanation to ' +
-        'the answer.');
+      let dragAndDropCustomizationArgs = {
+        choices: {
+          value: [
+            new SubtitledHtml('html_1', 'content_id_1'),
+            new SubtitledHtml('html_2', 'content_id_2'),
+            new SubtitledHtml('html_3', 'content_id_3')
+          ]
+        }
+      };
+
+      expect(
+        solution.getSummary(
+          'DragAndDropSortInput', dragAndDropCustomizationArgs)
+      ).toEqual(
+        'One solution is "[[html_1,html_3],[html_2]]". ' +
+        'This is the explanation to the answer.');
+    });
+
+    it('should throw error when obtaining summary for drag and drop ' +
+      'if customization args are missing', () => {
+      solution.setCorrectAnswer([
+        ['content_id_1', 'content_id_3'],
+        ['content_id_2']
+      ]);
+
+      expect(() => {
+        solution.getSummary('DragAndDropSortInput');
+      }).toThrowError(
+        'Customization args for the drag and drop interaction are missing');
     });
 
     it('should get oppia short answer', () => {

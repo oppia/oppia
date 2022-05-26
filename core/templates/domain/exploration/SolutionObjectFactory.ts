@@ -104,6 +104,10 @@ export class Solution {
         new UnitsObjectFactory())).fromDict(
           this.correctAnswer as NumberWithUnitsAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
+      if (!customizationArgs) {
+        throw new Error(
+          'Customization args for the drag and drop interaction are missing');
+      }
       correctAnswer = [];
       let subtitledHtmlChoices = (
         customizationArgs as DragAndDropSortInputCustomizationArgs)
