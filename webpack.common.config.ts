@@ -18,7 +18,8 @@
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
@@ -491,6 +492,11 @@ module.exports = {
       chunkFilename: '[id].css',
       ignoreOrder: false,
     }),
+    new WebpackRTLPlugin({
+      minify: {
+        zindex: false
+      }
+    })
   ],
   module: {
     rules: [{
@@ -542,29 +548,13 @@ module.exports = {
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'node_modules'),
       ],
-      oneOf: [
+      use: [
+        MiniCssExtractPlugin.loader,
         {
-          test: '',
-          use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader',
-              options: {
-                url: false,
-              }
-            },
-          ],
-        },
-        {
-          use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader',
-              options: {
-                url: false,
-              }
-            },
-          ],
+          loader: 'css-loader',
+          options: {
+            url: false,
+          }
         },
       ],
     }]
