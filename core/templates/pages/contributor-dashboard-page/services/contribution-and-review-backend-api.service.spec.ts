@@ -159,6 +159,18 @@ describe('Contribution and review backend API service', () => {
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
+
+    it('should throw error if fetch type is invalid', fakeAsync(() => {
+      carbas.fetchSuggestionsAsync(
+        'INVALID_SUGGESTION_TYPE',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0, 'All'
+      ).then(successHandler, failureHandler);
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failureHandler).toHaveBeenCalled();
+    }));
   });
 
   it('should correctly review exploration suggestion', fakeAsync(() => {

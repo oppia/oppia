@@ -33,6 +33,8 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
+import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +66,12 @@ export class MathEquationInputValidationService {
       customizationArgs: MathEquationInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList: Warning[] = [];
-    let meirs = new MathEquationInputRulesService();
+    let meirs = new MathEquationInputRulesService(
+      new AlgebraicExpressionInputRulesService(
+        new MathInteractionsService(),
+        new NumericExpressionInputRulesService()
+      )
+    );
     let mathInteractionsService = new MathInteractionsService();
 
     warningsList = warningsList.concat(

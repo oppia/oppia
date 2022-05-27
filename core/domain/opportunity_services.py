@@ -850,7 +850,11 @@ def _get_skill_opportunities_with_updated_question_counts(skill_ids, delta):
         if skill_opportunity_model is not None:
             skill_opportunity = get_skill_opportunity_from_model(
                 skill_opportunity_model)
-            skill_opportunity.question_count += delta
+            # The question count should never be negative. We default to 0
+            # if some operation tries to reduce question count down to a
+            # negative value.
+            skill_opportunity.question_count = max(
+                skill_opportunity.question_count + delta, 0)
             updated_skill_opportunities.append(skill_opportunity)
     return updated_skill_opportunities
 

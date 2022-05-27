@@ -59,7 +59,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_collection_count(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
         collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
@@ -69,7 +69,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(num_collections, 1)
 
     def test_reconstitute(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
         collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
@@ -253,8 +253,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 self.USER_ID_COMMITTER, 'Created new collection',
                 [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
-        # Ruling out the possibility of None for mypy type checking.
-        assert collection_model is not None
 
         self.assertEqual('id', collection_model.id)
         self.assertEqual(
@@ -341,8 +339,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         collection_rights_model = (
             collection_models.CollectionRightsModel.get('id')
             )
-        # Ruling out the possibility of None for mypy type checking.
-        assert collection_rights_model is not None
         snapshot_dict = collection_rights_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['tid1', 'tid2']
         snapshot_dict = collection_rights_model.convert_to_valid_dict(

@@ -992,15 +992,14 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls) -> Optional[CommunityContributionStatsModel]: # type: ignore[override]
+    def get(cls) -> CommunityContributionStatsModel: # type: ignore[override]
         """Gets the CommunityContributionStatsModel instance. If the
         CommunityContributionStatsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
-            CommunityContributionStatsModel|None. The single model instance,
-            or None if no such model instance exists.
+            CommunityContributionStatsModel. The single model instance.
         """
         community_contribution_stats_model = cls.get_by_id(
             COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
@@ -1263,7 +1262,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls, user_id: str
+        cls, user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
         """Exports the data from TranslationContributionStatsModel into dict
         format for Takeout.
@@ -1278,7 +1277,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         stats_models: Sequence[TranslationContributionStatsModel] = (
             cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
         for model in stats_models:
-            user_data[model.id] = {
+            splitted_id = model.id.split('.')
+            id_without_user_id = '%s.%s' % (splitted_id[0], splitted_id[2])
+            user_data[id_without_user_id] = {
                 'language_code': model.language_code,
                 'topic_id': model.topic_id,
                 'submitted_translations_count': (

@@ -253,6 +253,11 @@ class Misconception:
                 'Expected misconception ID to be an integer, received %s' %
                 misconception_id)
 
+        if misconception_id < 0:
+            raise utils.ValidationError(
+                'Expected misconception ID to be >= 0, received %s' %
+                misconception_id)
+
     def validate(self):
         """Validates various properties of the Misconception object.
 
@@ -355,6 +360,23 @@ class Rubric:
                 raise utils.ValidationError(
                     'Expected each explanation to be a string, received %s' %
                     explanation)
+
+        if len(self.explanations) > 10:
+            raise utils.ValidationError(
+                'Expected number of explanations to be less than or equal '
+                'to 10, received %d' % len(self.explanations))
+
+        for explanation in self.explanations:
+            if len(explanation) > 300:
+                raise utils.ValidationError(
+                    'Explanation should be less than or equal to 300 chars, '
+                    'received %d chars' % len(explanation))
+        if (
+                self.difficulty == constants.SKILL_DIFFICULTIES[1] and
+                len(self.explanations) == 0
+        ):
+            raise utils.ValidationError(
+                'Expected at least one explanation in medium level rubrics')
 
 
 class WorkedExample:

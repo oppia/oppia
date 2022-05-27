@@ -29,7 +29,6 @@ import from this location.
 from __future__ import annotations
 
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
-    'AnswerSubmittedEventHandler',
     'AssetDevHandler',
     'AudioUploadHandler',
     'BulkEmailWebhookEndpoint',
@@ -46,7 +45,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'LeaveForRefresherExpEventHandler',
     'MemoryCacheAdminHandler',
     'MergeSkillHandler',
-    'NewSkillHandler',
     'NewTopicHandler',
     'NotificationHandler',
     'NotificationsDashboardHandler',

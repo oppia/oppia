@@ -23,7 +23,7 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 
 export class GuppyObject {
   // These properties are initialized using constructor function
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   divId!: string;
   guppyInstance!: Guppy;

@@ -43,7 +43,7 @@ export class PlayerPositionService {
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
 
   // The following property is initialized using the class methods.
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   displayedCardIndex!: number;
   onChangeCallback!: Function;
