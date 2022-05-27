@@ -29,8 +29,8 @@ from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Set
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, Sequence, Set, overload
+from typing_extensions import Literal, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -288,6 +288,18 @@ def get_all_topics() -> List[topic_domain.Topic]:
     return topics
 
 
+@overload
+def get_topic_rights(
+    topic_id: str, strict: Literal[True]
+) -> topic_domain.TopicRights: ...
+
+
+@overload
+def get_topic_rights(
+    topic_id: str, strict: Literal[False]
+) -> Optional[topic_domain.TopicRights]: ...
+
+
 def get_topic_rights(
     topic_id: str, strict: bool = True
 ) -> Optional[topic_domain.TopicRights]:
@@ -392,10 +404,10 @@ def get_all_skill_ids_assigned_to_some_topic() -> Set[str]:
     Returns:
         set([str]). The ids of all the skills linked to some topic.
     """
-    skill_ids: Set[str] = set([])
+    skill_ids: Set[str] = set()
     all_topic_models = topic_models.TopicModel.get_all()
-    all_topics: List[topic_domain.Topic] = (
-        [get_topic_from_model(topic) for topic in all_topic_models])
+    all_topics: List[topic_domain.Topic] = [
+        get_topic_from_model(topic) for topic in all_topic_models]
     for topic in all_topics:
         skill_ids.update(topic.get_all_skill_ids())
     return skill_ids
@@ -450,7 +462,7 @@ def get_topic_summary_by_id(
     """
     topic_summary_model: Optional[topic_models.TopicSummaryModel] = (
         topic_models.TopicSummaryModel.get(
-        topic_id, strict=strict))
+            topic_id, strict=strict))
     if topic_summary_model:
         topic_summary: topic_domain.TopicSummary = (
             get_topic_summary_from_model(topic_summary_model))

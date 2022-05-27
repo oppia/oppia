@@ -190,7 +190,7 @@ class StoryNodeDict(TypedDict):
     prerequisite_skill_ids: List[str]
     outline: str
     outline_is_finalized: bool
-    exploration_id: Optional[str]
+    exploration_id: str
 
 
 class StoryNode:

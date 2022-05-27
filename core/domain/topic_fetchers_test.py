@@ -60,8 +60,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(TopicFetchersUnitTests, self).setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        # After updating the type of __init__ in `BaseChange` class, we can
-        # remove this ignore.
+        # TODO(#13059): After updating the type of __init__ in the `BaseChange`
+        # class, we can remove this ignore.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -378,11 +378,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_commit_log_entry(self) -> None:
         topic_commit_log_entry: (
-            Optional[topic_models.TopicCommitLogEntryModel]) = (
-                topic_models.TopicCommitLogEntryModel.get_commit(
-                    self.TOPIC_ID, 1
-                )
+            Optional[topic_models.TopicCommitLogEntryModel]
+        ) = (
+            topic_models.TopicCommitLogEntryModel.get_commit(
+                self.TOPIC_ID, 1
             )
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic_commit_log_entry is not None
         self.assertEqual(topic_commit_log_entry.commit_type, 'create')
@@ -426,8 +427,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         # Publish the topic.
 
-        # After updating the type of __init__ in `BaseChange` class, we can
-        # remove this ignore.
+        # TODO(#13059): After updating the type of __init__ in the `BaseChange`
+        # class, we can remove this ignore.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,   # type: ignore[dict-item]
@@ -450,8 +451,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
     def test_get_all_skill_ids_assigned_to_some_topic(self) -> None:
-        # After updating the type of __init__ in `BaseChange` class, we can
-        # remove this ignore.
+        # TODO(#13059): After updating the type of __init__ in the `BaseChange`
+        # class, we can remove this ignore.
         change_list = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,   # type: ignore[dict-item]
