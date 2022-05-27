@@ -52,10 +52,10 @@ describe('Translation language selector', () => {
         Promise.resolve(featuredLanguages),
       getPreferredTranslationLanguageAsync: async() => {
         component.populateLanguageSelection(preferredLanguageCode);
-        return Promise.resolve(preferredLanguageCode)
+        return Promise.resolve(preferredLanguageCode);
       },
-      savePreferredTranslationLanguageAsync: async(language_code: string) =>
-        Promise.resolve(language_code)
+      savePreferredTranslationLanguageAsync: async(languageCode: string) =>
+        Promise.resolve(languageCode)
     };
 
   let clickDropdown: () => void;
@@ -98,7 +98,7 @@ describe('Translation language selector', () => {
   afterEach(() => {
     preferredLanguageCode = 'en';
     component.activeLanguageCode = 'en';
-  })
+  });
 
   it('should correctly initialize languageIdToDescription map', () => {
     expect(component.languageIdToDescription.en).toBe('English');
@@ -188,22 +188,22 @@ describe('Translation language selector', () => {
   it('should display the preferred language when the preferred' +
     ' language is defined', async(() => {
     preferredLanguageCode = 'en';
-    let language_description = component.languageIdToDescription.en
+    let languageDescription = component.languageIdToDescription.en;
     component.activeLanguageCode = null;
 
     spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
-      (language_code) => {
-        component.activeLanguageCode = language_code
+      (languageCode) => {
+        component.activeLanguageCode = languageCode;
       });
 
     component.ngOnInit();
-    
+
     fixture.whenStable().then(() => {
       fixture.detectChanges();
       expect(component.setActiveLanguageCode.emit)
         .toHaveBeenCalledWith(preferredLanguageCode);
       expect(component.activeLanguageCode).toBe(preferredLanguageCode);
-      expect(component.languageSelection).toBe(language_description);
+      expect(component.languageSelection).toBe(languageDescription);
     });
   }));
 
@@ -237,22 +237,22 @@ describe('Translation language selector', () => {
 
   it('should indiacate selection and save the language' +
     ' on selecting a new language', () => {
-    let selected_language = 'fr';
+    let selectedLanguage = 'fr';
     spyOn(component.setActiveLanguageCode, 'emit');
     spyOn(
       contributionOpportunitiesBackendApiServiceStub,
       'savePreferredTranslationLanguageAsync');
 
-    component.selectOption(selected_language);
+    component.selectOption(selectedLanguage);
 
     fixture.whenStable().then(() => {
       fixture.detectChanges();
       expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
-        selected_language);
+        selectedLanguage);
       expect(
         contributionOpportunitiesBackendApiServiceStub
           .savePreferredTranslationLanguageAsync).toHaveBeenCalledWith(
-            selected_language);
+        selectedLanguage);
     });
-  })
+  });
 });

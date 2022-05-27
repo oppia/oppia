@@ -230,24 +230,24 @@ export class ContributionOpportunitiesBackendApiService {
 
     return this.http.post<Object>(
       '/preferredtranslationlanguage', body).toPromise().then(
-        data => {
-          return data;
-        }, errorResponse => {
-          throw new Error(errorResponse.error.error);
-        }
-      );
+      data => {
+        return data;
+      }, errorResponse => {
+        throw new Error(errorResponse.error.error);
+      }
+    );
   }
 
   async getPreferredTranslationLanguageAsync():
   Promise<string> {
-    try{
+    try {
       const response = await this.http
         .get<PreferredTranslationLanguageBackendDict>(
           '/preferredtranslationlanguage').toPromise();
       return response.preferred_translation_language_code;
     } catch {
       return '';
-    };
+    }
   }
 }
 

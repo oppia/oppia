@@ -396,35 +396,34 @@ describe('Contribution Opportunities backend API service', function() {
   it('should fail to save the preferred translation language ' +
     'given invalid language code when calling ' +
     '\'savePreferredTranslationLanguageAsync\'', fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-      const params = 'en';
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const params = 'en';
 
-      contributionOpportunitiesBackendApiService
-        .savePreferredTranslationLanguageAsync(params)
-        .then(successHandler, failHandler);
+    contributionOpportunitiesBackendApiService
+      .savePreferredTranslationLanguageAsync(params)
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(
-        urlInterpolationService.interpolateUrl(
-          '/preferredtranslationlanguage',
-          { language_code: 'invalidCode' }
-        )
-      );
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        '/preferredtranslationlanguage',
+        { language_code: 'invalidCode' }
+      )
+    );
 
-      expect(req.request.method).toEqual('POST');
-      req.flush({
-        error: 'Failed to save the preferred translation language.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      error: 'Failed to save the preferred translation language.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        new Error('Failed to save the preferred translation language.'));
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to save the preferred translation language.'));
+  }));
 
   it('should successfully fetch the preferred translation language',
     fakeAsync(() => {
