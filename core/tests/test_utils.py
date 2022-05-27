@@ -1583,7 +1583,10 @@ class GenericTestBase(AppEngineTestBase):
     }
 
     VERSION_27_STATE_DICT = {
-        'content': {'content_id': 'content', 'html': ''},
+        'content': {
+            'content_id': 'content', 'html': '',
+            'image_filenames_in_html': []
+        },
         'param_changes': [],
         'content_ids_to_audio_translations': {
             'content': {},
@@ -1605,6 +1608,7 @@ class GenericTestBase(AppEngineTestBase):
                 'explanation': {
                     'content_id': 'solution',
                     'html': '<p>Solution explanation</p>',
+                    'image_filenames_in_html': []
                 },
                 'answer_is_exclusive': False,
             },
@@ -1614,6 +1618,7 @@ class GenericTestBase(AppEngineTestBase):
                 'feedback': {
                     'content_id': 'default_outcome',
                     'html': '',
+                    'image_filenames_in_html': []
                 },
                 'dest': None,
                 'refresher_exploration_id': None,
@@ -1630,6 +1635,7 @@ class GenericTestBase(AppEngineTestBase):
                 'hint_content': {
                     'content_id': 'hint_1',
                     'html': '<p>Hint 1</p>',
+                    'image_filenames_in_html': []
                 },
             }],
         },
@@ -1781,6 +1787,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1790,6 +1797,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1815,6 +1823,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1824,6 +1833,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -3403,11 +3413,13 @@ title: Title
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is a solution.</p>',
+                'image_filenames_in_html': []
             },
         }
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')),
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>This is a hint.</p>', [])),
         ]
         solution = state_domain.Solution.from_dict(
             state.interaction.id, solution_dict)

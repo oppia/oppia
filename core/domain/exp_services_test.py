@@ -3201,10 +3201,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': '<p>Option A</p>'
+                            'html': '<p>Option A</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>Option B</p>'
+                            'html': '<p>Option B</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': False}
@@ -3223,6 +3225,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
         change_list = _get_change_list(
@@ -3265,10 +3268,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': '<p>Option A</p>'
+                            'html': '<p>Option A</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>Option B</p>'
+                            'html': '<p>Option B</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': False}
@@ -3291,6 +3296,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
         change_list = _get_change_list(
@@ -7375,19 +7381,23 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                 'value': [
                     {
                         'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
+                        'html': '<p>state customization arg html 1</p>',
+                        'image_filenames_in_html': []
                     },
                     {
                         'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
+                        'html': '<p>state customization arg html 2</p>',
+                        'image_filenames_in_html': []
                     },
                     {
                         'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
+                        'html': '<p>state customization arg html 3</p>',
+                        'image_filenames_in_html': []
                     },
                     {
                         'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
+                        'html': '<p>state customization arg html 4</p>',
+                        'image_filenames_in_html': []
                     }
                 ]
             },
@@ -7412,11 +7422,13 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                     'value': [
                         {
                             'content_id': 'ca_choices_0',
-                            'html': '<p>1</p>'
+                            'html': '<p>1</p>',
+                            'image_filenames_in_html': []
                         },
                         {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
+                            'html': '<p>2</p>',
+                            'image_filenames_in_html': []
                         },
                         {
                             'content_id': 'ca_choices_2',
@@ -7425,11 +7437,13 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                                 '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
                                 '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
                                 'math>'
-                            )
+                            ),
+                            'image_filenames_in_html': []
                         },
                         {
                             'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
+                            'html': '<p>4</p>',
+                            'image_filenames_in_html': []
                         }
                     ]
                 },

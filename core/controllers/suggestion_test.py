@@ -683,7 +683,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
                 'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>')
+                '</oppia-noninteractive-image>'),
+            'image_filenames_in_html': []
         }
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -948,6 +949,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is the updated solution.</p>',
+                'image_filenames_in_html': []
             },
         }
         suggestion = suggestion_services.create_suggestion(
@@ -1035,6 +1037,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is the updated solution.</p>',
+                'image_filenames_in_html': []
             },
         }
         question_state_data['interaction']['solution'] = new_solution_dict
@@ -1083,6 +1086,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is the updated solution.</p>',
+                'image_filenames_in_html': []
             },
         }
         suggestion = suggestion_services.create_suggestion(
@@ -1139,6 +1143,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is the updated solution.</p>',
+                'image_filenames_in_html': []
             },
         }
         suggestion = suggestion_services.create_suggestion(
@@ -1194,6 +1199,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is the updated solution.</p>',
+                'image_filenames_in_html': []
             },
         }
         suggestion = suggestion_services.create_suggestion(
@@ -1288,7 +1294,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
                 'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>')
+                '</oppia-noninteractive-image>'),
+            'image_filenames_in_html': []
         }
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1362,7 +1369,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
                 'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>')
+                '</oppia-noninteractive-image>'),
+            'image_filenames_in_html': []
         }
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1569,7 +1577,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         question_state_dict = {
             'content': {
                 'html': '<p>Text</p>',
-                'content_id': 'content'
+                'content_id': 'content',
+                'image_filenames_in_html': []
             },
             'classifier_model_id': None,
             'linked_skill_id': None,
@@ -1586,7 +1595,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                             'dest': None,
                             'feedback': {
                                 'html': '<p>assas</p>',
-                                'content_id': 'feedback_0'
+                                'content_id': 'feedback_0',
+                                'image_filenames_in_html': []
                             },
                             'labelled_as_correct': True,
                             'param_changes': [],
@@ -1630,7 +1640,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'dest': None,
                     'feedback': {
                         'html': '<p>wer</p>',
-                        'content_id': 'default_outcome'
+                        'content_id': 'default_outcome',
+                        'image_filenames_in_html': []
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
@@ -1641,7 +1652,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'html': '<p>assaas</p>',
-                            'content_id': 'hint_1'
+                            'content_id': 'hint_1',
+                            'image_filenames_in_html': []
                         }
                     }
                 ],
@@ -2154,7 +2166,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'new_value': {
                         'content_id': 'content',
-                        'html': '<p>new content html</p>'
+                        'html': '<p>new content html</p>',
+                        'image_filenames_in_html': []
                     }
                 })], 'Add content')
 
@@ -2418,7 +2431,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'new_value': {
                         'content_id': 'content',
-                        'html': '<p>new content html</p>'
+                        'html': '<p>new content html</p>',
+                        'image_filenames_in_html': []
                     }
                 })], 'Add content')
 
@@ -2638,10 +2652,12 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                         'choices': {
                             'value': [{
                                 'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
+                                'html': '<p>Option A</p>',
+                                'image_filenames_in_html': []
                             }, {
                                 'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
+                                'html': '<p>Option B</p>',
+                                'image_filenames_in_html': []
                             }]
                         },
                         'showChoicesInShuffledOrder': {'value': False}
@@ -2756,10 +2772,12 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                         'choices': {
                             'value': [{
                                 'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
+                                'html': '<p>Option A</p>',
+                                'image_filenames_in_html': []
                             }, {
                                 'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
+                                'html': '<p>Option B</p>',
+                                'image_filenames_in_html': []
                             }]
                         },
                         'showChoicesInShuffledOrder': {'value': False}
@@ -2826,7 +2844,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                         'choices': {
                             'value': [{
                                 'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
+                                'html': '<p>Option A</p>',
+                                'image_filenames_in_html': []
                             }]
                         },
                         'showChoicesInShuffledOrder': {'value': False}
