@@ -219,7 +219,7 @@ class StoryChangeTests(test_utils.GenericTestBase):
 class StoryDomainUnitTests(test_utils.GenericTestBase):
     """Test the story domain object."""
 
-    STORY_ID: Literal['story_id'] = 'story_id'
+    STORY_ID: Final = 'story_id'
     NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
     NODE_ID_2: Final = 'node_2'
     SKILL_ID_1: Final = 'skill_id_1'
@@ -230,10 +230,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(StoryDomainUnitTests, self).setUp()
-        self.STORY_ID = story_services.get_new_story_id()  # type: ignore[no-untyped-call]
+        self.story_id = story_services.get_new_story_id()  # type: ignore[no-untyped-call]
         self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(  # type: ignore[no-untyped-call]
-            self.STORY_ID, self.USER_ID, self.TOPIC_ID,
+            self.story_id, self.USER_ID, self.TOPIC_ID,
             url_fragment='story-frag')
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.story.add_node(self.NODE_ID_2, 'Node title 2')
@@ -356,7 +356,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'The thumbnail img.svg for story node with id %s does not exist'
-            ' in the filesystem.' % (self.STORY_ID)):
+            ' in the filesystem.' % (self.story_id)):
             self.story.update_node_thumbnail_filename(
                 self.NODE_ID_1, 'img.svg')
 
@@ -403,9 +403,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             1000, 1001))
 
     def test_to_human_readable_dict(self) -> None:
-        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)  # type: ignore[no-untyped-call]
+        story_summary = story_fetchers.get_story_summary_by_id(self.story_id)  # type: ignore[no-untyped-call]
         expected_dict: story_domain.HumanReadableStorySummaryDict = {
-            'id': self.STORY_ID,
+            'id': self.story_id,
             'title': 'Title',
             'description': 'Description',
             'node_titles': [],
@@ -540,7 +540,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'The thumbnail img.svg for story with id %s does not exist'
-            ' in the filesystem.' % (self.STORY_ID)):
+            ' in the filesystem.' % (self.story_id)):
             self.story.update_thumbnail_filename('img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
