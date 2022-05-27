@@ -44,11 +44,18 @@ describe('Translation language selector', () => {
       explanation: 'Partnership with CBA'
     })
   ];
+  let preferredLanguageCode = 'en';
 
   let contributionOpportunitiesBackendApiServiceStub:
     Partial<ContributionOpportunitiesBackendApiService> = {
       fetchFeaturedTranslationLanguagesAsync: async() =>
-        Promise.resolve(featuredLanguages)
+        Promise.resolve(featuredLanguages),
+      getPreferredTranslationLanguageAsync: async() => {
+        component.populateLanguageSelection(preferredLanguageCode);
+        return Promise.resolve(preferredLanguageCode)
+      },
+      savePreferredTranslationLanguageAsync: async(language_code: string) =>
+        Promise.resolve(language_code)
     };
 
   let clickDropdown: () => void;
@@ -87,6 +94,11 @@ describe('Translation language selector', () => {
         '.oppia-translation-language-selector-dropdown-container');
     };
   });
+
+  afterEach(() => {
+    preferredLanguageCode = 'en';
+    component.activeLanguageCode = 'en';
+  })
 
   it('should correctly initialize languageIdToDescription map', () => {
     expect(component.languageIdToDescription.en).toBe('English');
@@ -163,16 +175,6 @@ describe('Translation language selector', () => {
     });
   }));
 
-  it('should ask user to select a language when the language is not selected'
-    , () => {
-      component.activeLanguageCode = null;
-
-      component.ngOnInit();
-
-      expect(component.languageSelection).toBe('Select a language...');
-      expect(component.activeLanguageCode).toBe(null);
-    });
-
   it('should display the selected language when the language is already' +
     ' selected', () => {
     component.activeLanguageCode = 'en';
@@ -182,6 +184,43 @@ describe('Translation language selector', () => {
     expect(component.languageSelection).toBe('English');
     expect(component.activeLanguageCode).toBe('en');
   });
+
+  it('should display the preferred language when the preferred' +
+    ' language is defined', async(() => {
+    preferredLanguageCode = 'en';
+    let language_description = component.languageIdToDescription.en
+    component.activeLanguageCode = null;
+
+    spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
+      (language_code) => {
+        component.activeLanguageCode = language_code
+      });
+
+    component.ngOnInit();
+    
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.setActiveLanguageCode.emit)
+        .toHaveBeenCalledWith(preferredLanguageCode);
+      expect(component.activeLanguageCode).toBe(preferredLanguageCode);
+      expect(component.languageSelection).toBe(language_description);
+    });
+  }));
+
+  it('should ask user to select a language when the preferred' +
+    ' language is not defined', async(() => {
+    preferredLanguageCode = null;
+    component.activeLanguageCode = null;
+
+    spyOn(component.setActiveLanguageCode, 'emit');
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+    expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(null);
+    expect(component.languageSelection).toBe('Select a language...');
+    expect(component.activeLanguageCode).toBe(null);
+  }));
 
   it('should show the correct language when the language is changed'
     , () => {
@@ -195,4 +234,25 @@ describe('Translation language selector', () => {
 
       expect(component.languageSelection).toBe('français (French)');
     });
+
+  it('should indiacate selection and save the language' +
+    ' on selecting a new language', () => {
+    let selected_language = 'fr';
+    spyOn(component.setActiveLanguageCode, 'emit');
+    spyOn(
+      contributionOpportunitiesBackendApiServiceStub,
+      'savePreferredTranslationLanguageAsync');
+
+    component.selectOption(selected_language);
+
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
+        selected_language);
+      expect(
+        contributionOpportunitiesBackendApiServiceStub
+          .savePreferredTranslationLanguageAsync).toHaveBeenCalledWith(
+            selected_language);
+    });
+  })
 });

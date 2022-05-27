@@ -227,19 +227,27 @@ export class ContributionOpportunitiesBackendApiService {
     };
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    const response = this.http.post<Object>(
-      '/preferredtranslationlanguage', body).toPromise();
-    return response;
+
+    return this.http.post<Object>(
+      '/preferredtranslationlanguage', body).toPromise().then(
+        data => {
+          return data;
+        }, errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 
   async getPreferredTranslationLanguageAsync():
   Promise<string> {
-    return this.http.get<PreferredTranslationLanguageBackendDict>(
-      '/preferredtranslationlanguage').toPromise().then(data => {
-      return data.preferred_translation_language_code;
-    }, errorResponse => {
-      throw new Error(errorResponse.error.error);
-    });
+    try{
+      const response = await this.http
+        .get<PreferredTranslationLanguageBackendDict>(
+          '/preferredtranslationlanguage').toPromise();
+      return response.preferred_translation_language_code;
+    } catch {
+      return '';
+    };
   }
 }
 

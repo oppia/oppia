@@ -106,7 +106,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
 
   populateLanguageSelection(languageCode: string): void {
     this.setActiveLanguageCode.emit(languageCode);
-    this.languageSelection = this.languageIdToDescription[languageCode];
+    this.languageSelection = (
+      languageCode ?
+      this.languageIdToDescription[languageCode] :
+      'Select a language...'
+    );
   }
 
   selectOption(activeLanguageCode: string): void {

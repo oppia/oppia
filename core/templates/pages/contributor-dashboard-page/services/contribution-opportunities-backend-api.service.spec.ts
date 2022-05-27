@@ -371,4 +371,108 @@ describe('Contribution Opportunities backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(emptyResponse);
       expect(failHandler).not.toHaveBeenCalled();
     }));
+
+  it('should successfully save the preferred translation language.',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      const params = 'en';
+
+      contributionOpportunitiesBackendApiService
+        .savePreferredTranslationLanguageAsync(params)
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        '/preferredtranslationlanguage'
+      );
+      expect(req.request.method).toEqual('POST');
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({});
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should fail to save the preferred translation language ' +
+    'given invalid language code when calling ' +
+    '\'savePreferredTranslationLanguageAsync\'', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      const params = 'en';
+
+      contributionOpportunitiesBackendApiService
+        .savePreferredTranslationLanguageAsync(params)
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        urlInterpolationService.interpolateUrl(
+          '/preferredtranslationlanguage',
+          { language_code: 'invalidCode' }
+        )
+      );
+
+      expect(req.request.method).toEqual('POST');
+      req.flush({
+        error: 'Failed to save the preferred translation language.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        new Error('Failed to save the preferred translation language.'));
+    })
+  );
+
+  it('should successfully fetch the preferred translation language',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      contributionOpportunitiesBackendApiService
+        .getPreferredTranslationLanguageAsync()
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        '/preferredtranslationlanguage'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({ preferred_translation_language_code: 'en' });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith('en');
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should return empty string if \'preferredtranslationlanguage call fails',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      const emptyString: string = '';
+
+      contributionOpportunitiesBackendApiService
+        .getPreferredTranslationLanguageAsync()
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        '/preferredtranslationlanguage'
+      );
+
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: '500 Internal Server Error'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(emptyString);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });
