@@ -70,7 +70,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
         ) for i in range(3)]
@@ -547,7 +547,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
         ) for i in range(2)]
