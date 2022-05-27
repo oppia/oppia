@@ -130,7 +130,7 @@ def get_question_from_model(
     """
 
     # Ensure the original question model does not get altered.
-    versioned_question_state = {
+    versioned_question_state: VersionedQuestionStateDict = {
         'state_schema_version': (
             question_model.question_state_data_schema_version),
         'state': copy.deepcopy(
@@ -144,9 +144,9 @@ def get_question_from_model(
 
     return question_domain.Question( # type: ignore[no-untyped-call]
         question_model.id,
-        state_domain.State.from_dict(
+        state_domain.State.from_dict( # type: ignore[no-untyped-call]
             versioned_question_state['state']
-        ), # type: ignore[no-untyped-call]
+        ),
         versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
         question_model.linked_skill_ids,
