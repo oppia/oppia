@@ -193,7 +193,8 @@ describe('Translation language selector', () => {
 
     spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
       (languageCode) => {
-        component.activeLanguageCode = languageCode;
+        component.activeLanguageCode = (
+          languageCode ? languageCode : null);
       });
 
     component.ngOnInit();
@@ -209,7 +210,7 @@ describe('Translation language selector', () => {
 
   it('should ask user to select a language when the preferred' +
     ' language is not defined', async(() => {
-    preferredLanguageCode = null;
+    preferredLanguageCode = '';
     component.activeLanguageCode = null;
 
     spyOn(component.setActiveLanguageCode, 'emit');
@@ -217,7 +218,7 @@ describe('Translation language selector', () => {
     component.ngOnInit();
 
     fixture.detectChanges();
-    expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(null);
+    expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('');
     expect(component.languageSelection).toBe('Select a language...');
     expect(component.activeLanguageCode).toBe(null);
   }));
@@ -241,7 +242,7 @@ describe('Translation language selector', () => {
     spyOn(component.setActiveLanguageCode, 'emit');
     spyOn(
       contributionOpportunitiesBackendApiServiceStub,
-      'savePreferredTranslationLanguageAsync');
+      'savePreferredTranslationLanguageAsync' as never);
 
     component.selectOption(selectedLanguage);
 
