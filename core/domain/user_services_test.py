@@ -417,7 +417,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 strict=True
             )
 
-    def test_get_users_setting_for_system_id_adds_system_user_setting(self):
+    def test_get_users_setting_retrieves_settings_for_system_user(self):
         user_id = feconf.SYSTEM_COMMITTER_ID
         user_ids = [user_id]
 
@@ -1141,7 +1141,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = None
         self.assertFalse(user_services.is_user_registered(user_id))
 
-    def test_has_fully_registered_account_returns_true(self):
+    def test_has_fully_registered_account_for_properly_registered_user(self):
         """checks whether the user with user_id has created their username and
         has agreed to terms.
         """
