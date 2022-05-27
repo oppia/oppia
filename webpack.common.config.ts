@@ -102,8 +102,8 @@ module.exports = {
     //   commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     // moderator:
     //   commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
-    // oppia_root:
-    //   commonPrefix + '/pages/oppia-root/index.ts',
+    oppia_root:
+      commonPrefix + '/pages/oppia-root/index.ts',
     lightweight_oppia_root:
       commonPrefix + '/pages/lightweight-oppia-root/index.ts',
     // practice_session:
@@ -367,15 +367,15 @@ module.exports = {
     //   minify: htmlMinifyConfig,
     //   inject: false
     // }),
-    // new HtmlWebpackPlugin({
-    //   chunks: ['oppia_root'],
-    //   filename: 'oppia-root.mainpage.html',
-    //   meta: defaultMeta,
-    //   template:
-    //       commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
-    //   minify: htmlMinifyConfig,
-    //   inject: false
-    // }),
+    new HtmlWebpackPlugin({
+      chunks: ['oppia_root'],
+      filename: 'oppia-root.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
     new HtmlWebpackPlugin({
       chunks: ['lightweight_oppia_root'],
       filename: 'lightweight-oppia-root.mainpage.html',

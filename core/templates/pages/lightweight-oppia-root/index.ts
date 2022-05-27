@@ -18,8 +18,9 @@
 
 import 'pages/common-imports';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppConstants } from 'app.constants';
 import { enableProdMode } from '@angular/core';
+
+import { AppConstants } from 'app.constants';
 import { LighweightAppModule } from './app.module';
 import { LoggerService } from 'services/contextual/logger.service';
 

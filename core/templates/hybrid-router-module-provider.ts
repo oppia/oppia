@@ -17,8 +17,10 @@
  * in components which registered both on hybrid and angular pages.
  */
 
-import { Directive, EventEmitter, Injectable, Input, ModuleWithProviders, NgModule } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Directive, EventEmitter, HostListener, Injectable, Input, ModuleWithProviders, NgModule, OnDestroy } from '@angular/core';
+import { Router, RouterModule, RouterLink } from '@angular/router';
+
+import { AppConstants } from 'app.constants';
 
 // TODO(#13443): Remove hybrid router module provider once all pages are
 // migrated to angular router.
@@ -27,7 +29,7 @@ import { Router, RouterModule } from '@angular/router';
  *  to angular router.
  */
 @Directive({
-  selector: '[routerLink]'
+  selector: '[smartRouterLink]'
 })
 export class MockRouterLink {
   @Input() routerLink!: string;
@@ -58,6 +60,58 @@ export class MockRouter {
 })
 export class MockRouterModule {}
 
+
+@Directive({
+  selector: 'a[smartRouterLink]'
+})
+export class SmartRouterLink extends RouterLink {
+  @Input()
+  set smartRouterLink(commands: any[] | string) {
+    this.routerLink = commands;
+  }
+
+  @HostListener('click')
+  onClick(): boolean {
+    let bodyContent = window.document.querySelector('body');
+
+    // Checks whether the page is using angular router.
+    if (bodyContent) {
+      // eslint-disable-next-line oppia/no-inner-html
+      if (bodyContent.innerHTML.includes('<router-outlet></router-outlet>')) {
+
+    console.log(window.location.href);
+    console.log(this.urlTree.toString());
+    let lightweightRouterPagesRoutes = [];
+    let routerPagesRoutes = [];
+    for (let page of Object.values(AppConstants.PAGES_REGISTERED_WITH_FRONTEND)) {
+      if ('LIGHTWEIGHT' in page) {
+        lightweightRouterPagesRoutes.push('/' + page.ROUTE);
+      } else {
+        routerPagesRoutes.push('/' + page.ROUTE);
+      }
+    }
+    console.log(lightweightRouterPagesRoutes);
+    console.log(routerPagesRoutes);
+    window.location.href = this.urlTree.toString();
+    return true;
+  }
+}
+
+@NgModule({
+  imports: [
+    RouterModule
+  ],
+  declarations: [
+    SmartRouterLink
+  ],
+  exports: [
+    SmartRouterLink,
+    RouterModule
+  ]
+})
+export class SmartRouterModule {}
+
+
 export class HybridRouterModuleProvider {
   static provide(): ModuleWithProviders<MockRouterModule | RouterModule> {
     let bodyContent = window.document.querySelector('body');
@@ -65,10 +119,17 @@ export class HybridRouterModuleProvider {
     // Checks whether the page is using angular router.
     if (bodyContent) {
       // eslint-disable-next-line oppia/no-inner-html
-      if (bodyContent.innerHTML.indexOf(
-        '<router-outlet></router-outlet>') > -1) {
+      if (bodyContent.innerHTML.includes('<router-outlet></router-outlet>')) {
         return {
-          ngModule: RouterModule
+          ngModule: SmartRouterModule
+        };
+      }
+      // eslint-disable-next-line oppia/no-inner-html
+      if (bodyContent.innerHTML.includes(
+        '<router-outlet custom="light"></router-outlet>')
+      ) {
+        return {
+          ngModule: SmartRouterModule
         };
       }
     }

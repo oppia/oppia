@@ -45,8 +45,8 @@ const routes: Route[] = [
   },
   {
     path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION
-        .ROUTE),
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION.ROUTE
+    ),
     loadChildren: () => import(
       'pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.module')
@@ -65,8 +65,8 @@ const routes: Route[] = [
   },
   {
     path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE
-        .ROUTE),
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE.ROUTE
+    ),
     loadChildren: () => import(
       'pages/release-coordinator-page/release-coordinator-page.module')
       .then(m => m.ReleaseCoordinatorPageModule)
@@ -86,7 +86,8 @@ const routes: Route[] = [
   {
     path: (
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_RECENTLY_PUBLISHED
-        .ROUTE),
+        .ROUTE
+    ),
     pathMatch: 'full',
     loadChildren: () => import('pages/library-page/library-page.module')
       .then(m => m.LibraryPageModule)

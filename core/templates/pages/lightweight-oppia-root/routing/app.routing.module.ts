@@ -28,18 +28,23 @@ import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard'
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () => import('pages/classroom-page/classroom-page.module')
-      .then(m => m.ClassroomPageModule)
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
-    pathMatch: 'full',
-    canLoad: [CanAccessSplashPageGuard],
-    loadChildren: () => import('pages/splash-page/splash-page.module')
-      .then(m => m.SplashPageModule)
-  },
+    path: '',
+    children: [
+      {
+        path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
+        pathMatch: 'full',
+        loadChildren: () => import('pages/classroom-page/classroom-page.module')
+          .then(m => m.ClassroomPageModule)
+      },
+      {
+        path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
+        pathMatch: 'full',
+        canLoad: [CanAccessSplashPageGuard],
+        loadChildren: () => import('pages/splash-page/splash-page.module')
+          .then(m => m.SplashPageModule)
+      },
+    ]
+  }
 ];
 
 // '**' wildcard route must be kept at the end,as it can override all other

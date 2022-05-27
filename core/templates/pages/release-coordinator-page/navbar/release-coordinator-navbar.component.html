@@ -144,7 +144,7 @@
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        href="/preferences"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+                       [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
@@ -153,7 +153,7 @@
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        [href]="logoutUrl"
-                       [routerLink]="logoutUrl"
+                       [smartRouterLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>
