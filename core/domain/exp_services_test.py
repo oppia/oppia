@@ -1975,15 +1975,18 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
                 '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-image>')
+                '</oppia-noninteractive-image>'),
+            'image_filenames_in_html': []
         }
         content2_dict = {
             'content_id': 'content',
-            'html': '<pre>Hello, this is state2</pre>'
+            'html': '<pre>Hello, this is state2</pre>',
+            'image_filenames_in_html': []
         }
         content3_dict = {
             'content_id': 'content',
-            'html': '<p>Hello, this is state3</p>'
+            'html': '<p>Hello, this is state3</p>',
+            'image_filenames_in_html': []
         }
         state1.update_content(
             state_domain.SubtitledHtml.from_dict(content1_dict))
@@ -2023,7 +2026,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
-                )
+                ),
+                'image_filenames_in_html': []
             }, {
                 'content_id': 'ca_choices_1',
                 'html': (
@@ -2032,7 +2036,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p></p>')
+                    '</p></p>'),
+                'image_filenames_in_html': []
             }]},
             'showChoicesInShuffledOrder': {'value': True}
         }
@@ -2045,7 +2050,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }, {
                 'content_id': 'ca_choices_1',
                 'html': (
@@ -2054,7 +2060,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }, {
                 'content_id': 'ca_choices_2',
                 'html': (
@@ -2063,7 +2070,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }]},
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 5}
@@ -2201,6 +2209,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2216,6 +2225,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2243,6 +2253,7 @@ states:
     content:
       content_id: content
       html: %s
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2258,6 +2269,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2310,6 +2322,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2325,6 +2338,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2352,6 +2366,7 @@ states:
     content:
       content_id: content
       html: %s
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2367,6 +2382,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -2692,6 +2708,7 @@ classifier_model_id: null
 content:
   content_id: content
   html: ''
+  image_filenames_in_html: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -2707,6 +2724,7 @@ interaction:
     feedback:
       content_id: default_outcome
       html: ''
+      image_filenames_in_html: []
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
     param_changes: []
@@ -2738,6 +2756,7 @@ classifier_model_id: null
 content:
   content_id: content
   html: ''
+  image_filenames_in_html: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -2753,6 +2772,7 @@ interaction:
     feedback:
       content_id: default_outcome
       html: ''
+      image_filenames_in_html: []
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
     param_changes: []
@@ -2785,6 +2805,7 @@ classifier_model_id: null
 content:
   content_id: content
   html: ''
+  image_filenames_in_html: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -2800,6 +2821,7 @@ interaction:
     feedback:
       content_id: default_outcome
       html: ''
+      image_filenames_in_html: []
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
     param_changes: []
@@ -2994,7 +3016,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'dest': self.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': '<p>Try again</p>'
+                    'html': '<p>Try again</p>',
+                    'image_filenames_in_html': []
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -3009,7 +3032,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'dest': self.init_state_name,
             'feedback': {
                 'content_id': 'default_outcome',
-                'html': '<p><strong>Incorrect</strong></p>'
+                'html': '<p><strong>Incorrect</strong></p>',
+                'image_filenames_in_html': []
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -3433,10 +3457,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': '<p>Option A</p>'
+                            'html': '<p>Option A</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': '<p>Option B</p>'
+                            'html': '<p>Option B</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': False}
@@ -3473,10 +3499,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_1',
-                            'html': '<p>Option A</p>'
+                            'html': '<p>Option A</p>',
+                            'image_filenames_in_html': []
                         }, {
                             'content_id': 'ca_choices_2',
-                            'html': '<p>Option B</p>'
+                            'html': '<p>Option B</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': False}
@@ -3497,7 +3525,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'dest': 'State 2',
                         'feedback': {
                             'content_id': 'feedback_3',
-                            'html': '<p>Try again</p>'
+                            'html': '<p>Try again</p>',
+                            'image_filenames_in_html': []
                         },
                         'labelled_as_correct': False,
                         'param_changes': [],
@@ -3514,7 +3543,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'dest': 'State 2',
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': '<p><strong>Incorrect</strong></p>'
+                        'html': '<p><strong>Incorrect</strong></p>',
+                        'image_filenames_in_html': []
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
@@ -3560,10 +3590,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'choices': {
                             'value': [{
                                 'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
+                                'html': '<p>Option A</p>',
+                                'image_filenames_in_html': []
                             }, {
                                 'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
+                                'html': '<p>Option B</p>',
+                                'image_filenames_in_html': []
                             }]
                         },
                         'showChoicesInShuffledOrder': {'value': False}
@@ -3610,6 +3642,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
 
@@ -3628,6 +3661,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.init_state_name, 'content', {
                 'html': '<p><strong>Test content</strong></p>',
                 'content_id': 'content',
+                'image_filenames_in_html': []
             })
 
         change_list.append(exp_domain.ExplorationChange({
@@ -3657,6 +3691,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.init_state_name, 'content', {
                 'html': '<p><strong>Test content</strong></p>',
                 'content_id': 'content',
+                'image_filenames_in_html': []
             })
 
         change_list.append(exp_domain.ExplorationChange({
@@ -3740,6 +3775,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'new_value': {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }
             }),
             exp_domain.ExplorationChange({
@@ -3908,6 +3944,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'new_value': {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }
             }),
             exp_domain.ExplorationChange({
@@ -4086,6 +4123,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
 
@@ -4135,6 +4173,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
         change_list = _get_change_list(
@@ -4190,6 +4229,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
 
@@ -4243,6 +4283,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
 
@@ -4288,6 +4329,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
+                    'image_filenames_in_html': []
                 }),
             '')
 
@@ -4942,12 +4984,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -4956,12 +5000,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -4970,12 +5016,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -4984,12 +5032,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5012,12 +5062,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5026,12 +5078,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5040,12 +5094,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5054,12 +5110,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5086,12 +5144,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5100,12 +5160,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5114,12 +5176,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5128,12 +5192,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5156,12 +5222,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5170,12 +5238,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5184,12 +5254,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5198,12 +5270,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5231,12 +5305,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5245,12 +5321,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5259,12 +5337,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -5273,12 +5353,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'content 1'
+                    'html': 'content 1',
+                    'image_filenames_in_html': []
                 },
                 'state_name': 'Introduction',
                 'old_value': {
                     'content_id': 'content',
-                    'html': ''
+                    'html': '',
+                    'image_filenames_in_html': []
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
@@ -6115,6 +6197,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6140,6 +6223,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6153,6 +6237,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -6810,7 +6895,8 @@ title: Old Title
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }
         }]
 
@@ -6848,7 +6934,8 @@ title: Old Title
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }
         }, {
             'hint_content': {
@@ -6859,7 +6946,8 @@ title: Old Title
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }
         }]
 
@@ -6907,7 +6995,8 @@ title: Old Title
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }
         }
 
@@ -6943,7 +7032,8 @@ title: Old Title
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }
         }
 
@@ -6985,7 +7075,8 @@ title: Old Title
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '</p>'),
+                'image_filenames_in_html': []
             }
         }
 
@@ -7017,7 +7108,8 @@ title: Old Title
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>',
+                'image_filenames_in_html': []
             },
         }
 
@@ -7030,7 +7122,8 @@ title: Old Title
                     u'&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     u'"&amp;quot;&amp;quot;" alt-with-value='
                     u'"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    u'</p>')
+                    u'</p>'),
+                'image_filenames_in_html': []
             }
         }]
 
@@ -7082,7 +7175,8 @@ title: Old Title
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>hello_oppia is a string</p>'
+                'html': '<p>hello_oppia is a string</p>',
+                'image_filenames_in_html': []
             },
         }
 

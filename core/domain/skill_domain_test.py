@@ -35,12 +35,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', [])
         )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
+                '1', '<p>Explanation</p>', []), [example_1],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -130,6 +130,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-math raw_latex-with-valu'
                     'e="&amp;quot;+,-,-,+&amp;quot;">'
                     '</oppia-noninteractive-math>',
+                    'image_filenames_in_html': []
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -168,6 +169,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
                 '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
                 ';quot;}"></oppia-noninteractive-math>',
+                'image_filenames_in_html': []
             }
         )
         versioned_skill_contents['skill_contents']['explanation'] = {
@@ -175,7 +177,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'html': '<oppia-noninteractive-svgdiagram '
                 'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
                 ' alt-with-value="&amp;quot;Image&amp;quot;">'
-                '</oppia-noninteractive-svgdiagram>'
+                '</oppia-noninteractive-svgdiagram>',
+            'image_filenames_in_html': []
         }
         self.skill.update_skill_contents_from_model(
             versioned_skill_contents,
@@ -192,6 +195,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 'caption-with-value="&amp;quot;&amp;quot;" '
                 'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
                 '</oppia-noninteractive-image>',
+                'image_filenames_in_html': []
             }
         )
         versioned_skill_contents['skill_contents']['explanation']['html'] = (
@@ -208,6 +212,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             {
                 'content_id': '1',
                 'html': '<p><span>Test </span></p>',
+                'image_filenames_in_html': []
             }
         )
 
@@ -366,7 +371,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_update_explanation(self):
         new_explanation = state_domain.SubtitledHtml(
             '1',
-            '<p>New Explanation</p>'
+            '<p>New Explanation</p>', []
         )
         self.skill.update_explanation(new_explanation)
         self.skill.validate()
@@ -580,7 +585,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         example = skill_domain.WorkedExample(
             state_domain.SubtitledHtml(
-                '2', '<p>Example Question 1</p>'), 'explanation')
+                '2', '<p>Example Question 1</p>', []), 'explanation')
         self.skill.skill_contents.worked_examples = [example]
         self._assert_validation_error(
             'Expected example explanation to be a SubtitledHtml object')
@@ -601,8 +606,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Found a duplicate content id 1')
 
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>', [])
         )
         self.skill.skill_contents.worked_examples = [example_1]
         self._assert_validation_error('Found a duplicate content id 1')
@@ -651,7 +656,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'skill_contents': {
                 'explanation': {
                     'html': feconf.DEFAULT_SKILL_EXPLANATION,
-                    'content_id': 'explanation'
+                    'content_id': 'explanation',
+                    'image_filenames_in_html': []
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -688,11 +694,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents and misconception object.
         """
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>', [])
         )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>', []), [example_1],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -741,19 +748,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_update_worked_examples(self):
         question_1 = {
             'content_id': 'question_1',
-            'html': '<p>Worked example question 1</p>'
+            'html': '<p>Worked example question 1</p>',
+            'image_filenames_in_html': []
         }
         explanation_1 = {
             'content_id': 'explanation_1',
-            'html': '<p>Worked example explanation 1</p>'
+            'html': '<p>Worked example explanation 1</p>',
+            'image_filenames_in_html': []
         }
         question_2 = {
             'content_id': 'question_2',
-            'html': '<p>Worked example question 2</p>'
+            'html': '<p>Worked example question 2</p>',
+            'image_filenames_in_html': []
         }
         explanation_2 = {
             'content_id': 'explanation_2',
-            'html': '<p>Worked example explanation 2</p>'
+            'html': '<p>Worked example explanation 2</p>',
+            'image_filenames_in_html': []
         }
         worked_examples_dict_list = [{
             'question': question_1,
