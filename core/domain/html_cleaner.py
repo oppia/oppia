@@ -31,7 +31,7 @@ from typing import Any, Dict, List
 from typing_extensions import Final, TypedDict
 
 
-class ComponentsDict(TypedDict, total=False):
+class ComponentsDict(TypedDict):
     """Dictionary that represents RTE Components."""
 
     id: str
