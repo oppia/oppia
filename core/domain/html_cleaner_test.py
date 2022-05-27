@@ -21,7 +21,6 @@ from __future__ import annotations
 from core.domain import html_cleaner
 from core.tests import test_utils
 from typing import List, Tuple
-from typing_extensions import Final
 
 
 class HtmlCleanerUnitTests(test_utils.GenericTestBase):
@@ -157,7 +156,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
     """Test the RTE component extractor."""
 
     def test_get_rte_components(self) -> None:
-        test_data: Final = (
+        test_data = (
             '<p>Test text&nbsp;'
             '<oppia-noninteractive-math '
             'math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;qu'
@@ -216,7 +215,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             self.assertIn(component, expected_components)
 
     def test_get_image_filenames_from_html_strings(self) -> None:
-        html_strings: Final = [
+        html_strings = [
             '<oppia-noninteractive-image '
             'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
