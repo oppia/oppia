@@ -1372,6 +1372,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups:
       - outcome:
@@ -1379,6 +1380,7 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
+            image_filenames_in_html: []
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -1405,6 +1407,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1413,6 +1416,7 @@ states:
       - hint_content:
           content_id: hint_1
           html: <p>hint one,</p>
+          image_filenames_in_html: []
       id: TextInput
       solution:
         answer_is_exclusive: false
@@ -1420,6 +1424,7 @@ states:
         explanation:
           content_id: solution
           html: <p>hello_world is a string</p>
+          image_filenames_in_html: []
     linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
@@ -1473,6 +1478,7 @@ states:
     content:
       content_id: content
       html: ''
+      image_filenames_in_html: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1482,6 +1488,7 @@ states:
         feedback:
           content_id: default_outcome
           html: ''
+          image_filenames_in_html: []
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -1753,7 +1760,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': '<p>Choice 1</p>'
+                            'html': '<p>Choice 1</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': True}
@@ -1789,7 +1797,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': '<p>Choice 1</p>'
+                            'html': '<p>Choice 1</p>',
+                            'image_filenames_in_html': []
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': True}

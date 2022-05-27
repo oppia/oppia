@@ -263,7 +263,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         state.update_next_content_id_index(1)
         state.update_linked_skill_id(None)
-        state.update_content(state_domain.SubtitledHtml('1', question_content))
+        state.update_content(state_domain.SubtitledHtml(
+            '1', question_content, []))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
         recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
@@ -277,10 +278,11 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         state.update_written_translations(written_translations)
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                'solution', '<p>This is a solution.</p>'))
+                'solution', '<p>This is a solution.</p>', []))
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>This is a hint.</p>', [])
             )
         ]
 
@@ -289,7 +291,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
-                    'feedback_id', '<p>Dummy Feedback</p>'),
+                    'feedback_id', '<p>Dummy Feedback</p>', []),
                 True, [], None, None
             )
         )
@@ -319,5 +321,6 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
-        skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
+        skill.update_explanation(
+            state_domain.SubtitledHtml('1', explanation, []))
         return skill

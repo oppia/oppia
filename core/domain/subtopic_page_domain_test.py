@@ -45,7 +45,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content',
+                    'image_filenames_in_html': []
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -78,7 +79,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content',
+                    'image_filenames_in_html': []
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -143,7 +145,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content',
+                    'image_filenames_in_html': []
                 },
                 'recorded_voiceovers': recorded_voiceovers_dict,
                 'written_translations': {
@@ -170,7 +173,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '<p>hello world</p>',
-                    'content_id': 'content'
+                    'content_id': 'content',
+                    'image_filenames_in_html': []
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -215,7 +219,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content',
+                    'image_filenames_in_html': []
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -285,7 +290,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         expected_subtopic_page_contents_dict = {
             'subtitled_html': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content',
+                'image_filenames_in_html': []
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -306,7 +312,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         subtopic_page_contents_dict = {
             'subtitled_html': {
                 'html': '<p>test</p>',
-                'content_id': 'content'
+                'content_id': 'content',
+                'image_filenames_in_html': []
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {

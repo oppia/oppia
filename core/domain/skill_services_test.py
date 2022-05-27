@@ -48,11 +48,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', [])
         )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>', []),
+            [example_1],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -129,11 +130,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-image>'
         )
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', example_explanation_html)
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', example_explanation_html, [])
         )
         self.skill.skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', explanation_html), [example_1],
+            state_domain.SubtitledHtml('1', explanation_html, []), [example_1],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -156,14 +157,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_descriptions_of_skills(self):
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', [])
         )
         self.save_new_skill(
             'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', []),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
@@ -181,7 +182,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_id_2', self.user_id_admin, description='Description 2',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', []),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
@@ -210,14 +211,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_rubrics_of_linked_skills(self):
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', [])
         )
         self.save_new_skill(
             'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', []),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
@@ -235,7 +236,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_id_2', self.user_id_admin, description='Description 2',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', []),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
@@ -998,8 +999,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_skill_explanation(self):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
-        old_explanation = {'content_id': '1', 'html': '<p>Explanation</p>'}
-        new_explanation = {'content_id': '1', 'html': '<p>New explanation</p>'}
+        old_explanation = {
+            'content_id': '1',
+            'html': '<p>Explanation</p>',
+            'image_filenames_in_html': []
+        }
+        new_explanation = {
+            'content_id': '1',
+            'html': '<p>New explanation</p>',
+            'image_filenames_in_html': []
+        }
 
         self.assertEqual(
             skill.skill_contents.explanation.to_dict(), old_explanation)
@@ -1023,12 +1032,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_update_skill_worked_examples(self):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         old_worked_example = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', []),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', [])
         ).to_dict()
         new_worked_example = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1 new</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1 new</p>')
+            state_domain.SubtitledHtml(
+                '2', '<p>Example Question 1 new</p>', []),
+            state_domain.SubtitledHtml(
+                '3', '<p>Example Explanation 1 new</p>', [])
         ).to_dict()
 
         self.assertEqual(len(skill.skill_contents.worked_examples), 1)
@@ -1528,27 +1539,31 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         worked_example_dict = {
             'question': {
                 'content_id': 'question1',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             },
             'explanation': {
                 'content_id': 'explanation1',
-                'html': ''
+                'html': '',
+                'image_filenames_in_html': []
             }
         }
         worked_example_dict_math = {
             'question': {
                 'content_id': 'question1',
-                'html': expected_html_content
+                'html': expected_html_content,
+                'image_filenames_in_html': []
             },
             'explanation': {
                 'content_id': 'explanation1',
-                'html': expected_html_content
+                'html': expected_html_content,
+                'image_filenames_in_html': []
             }
         }
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, ''),
+                explanation_content_id, '', []),
             [skill_domain.WorkedExample.from_dict(worked_example_dict)],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
@@ -1618,7 +1633,8 @@ class SkillMigrationTests(test_utils.GenericTestBase):
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION, []),
+            [],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
@@ -1678,7 +1694,8 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             '-noninteractive-math>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION, []),
+            [],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
