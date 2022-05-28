@@ -301,7 +301,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
         """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
-category: A category
+category: Algebra
 correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: Introduction
