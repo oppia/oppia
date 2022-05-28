@@ -1031,6 +1031,7 @@ def validate_exploration_for_story(exp, strict):
 
     Raises:
         ValidationError. Invalid language found for exploration.
+        ValidationError. Non default category found for exploration.
         ValidationError. Expected no exploration to have parameter values in it.
         ValidationError. Invalid interaction in exploration.
         ValidationError. RTE content in state of exploration with ID is not
@@ -1061,6 +1062,15 @@ def validate_exploration_for_story(exp, strict):
             'Expected all explorations in a story to '
             'have correctness feedback '
             'enabled. Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    if exp.category not in constants.ALL_CATEGORIES:
+        error_string = (
+            'Expected all explorations in a story to '
+            'be of a default category. '
+            'Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
