@@ -1698,3 +1698,30 @@ class ExplorationRestartEventHandler(base.BaseHandler):
                 self.user_id, exploration_id)
 
         self.render_json(self.values)
+
+
+class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
+    """Syncs logged out progress of a learner with the logged in progress."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'unique_progress_url_id': {
+                'schema': {
+                    'type': 'basestring',
+                }
+            },
+        }
+    }
+
+    def post(self):
+        """Handles POST requests."""
+        unique_progress_url_id = self.normalized_payload.get(
+            'unique_progress_url_id')
+        if self.user_id is not None:
+            exp_services.sync_logged_out_learner_progress_with_logged_in_progress( # pylint: disable=line-too-long
+                self.user_id,
+                unique_progress_url_id
+            )
+
+        self.render_json(self.values)

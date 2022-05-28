@@ -2226,6 +2226,75 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
     return exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
 
 
+def sync_logged_out_learner_progress_with_logged_in_progress(
+    user_id, unique_progress_url_id):
+
+    """Syncs logged out and logged in learner progress."""
+
+    logged_out_user_data = (
+        exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+
+    exp_id = logged_out_user_data.exploration_id
+    exp_data = exp_fetchers.get_exploration_by_id(exp_id)
+
+    logged_in_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id)
+
+    if logged_in_user_model is None:
+        logged_in_user_model = user_models.ExplorationUserDataModel.create(
+            user_id, exp_id)
+
+        logged_in_user_model.most_recently_reached_checkpoint_exp_version = (
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        logged_in_user_model.most_recently_reached_checkpoint_state_name = (
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        logged_in_user_model.furthest_reached_checkpoint_exp_version = (
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        logged_in_user_model.furthest_reached_checkpoint_state_name = (
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+        logged_in_user_model.update_timestamps()
+        logged_in_user_model.put()
+
+    else:
+        most_recently_reached_checkpoint_index_in_logged_in_progress = (
+            user_services.get_checkpoints_in_order(
+                exp_data.init_state_name,
+                exp_data.states
+            ).index(
+                logged_in_user_model.most_recently_reached_checkpoint_state_name
+                ))
+
+        most_recently_reached_checkpoint_index_in_logged_out_progress = (
+            user_services.get_checkpoints_in_order(
+                exp_data.init_state_name,
+                exp_data.states
+            ).index(
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+                ))
+
+        if logged_in_user_model.most_recently_reached_checkpoint_exp_version is None or ( # pylint: disable=line-too-long
+        most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress # pylint: disable=line-too-long
+        ):
+            logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
+            )
+            logged_in_user_model.most_recently_reached_checkpoint_state_name = (
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+            )
+            logged_in_user_model.furthest_reached_checkpoint_exp_version = (
+                logged_out_user_data.furthest_reached_checkpoint_exp_version
+            )
+            logged_in_user_model.furthest_reached_checkpoint_state_name = (
+                logged_out_user_data.furthest_reached_checkpoint_state_name
+            )
+            logged_in_user_model.update_timestamps()
+            logged_in_user_model.put()
+
+
 def set_exploration_edits_allowed(exp_id, edits_are_allowed):
     """Toggled edits allowed field in the exploration.
 

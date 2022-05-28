@@ -3062,3 +3062,56 @@ class TransientCheckpointUrlHandlerTests(test_utils.GenericTestBase):
             feconf.EXPLORATION_URL_PREFIX,
             exp_user_data.exploration_id,
             unique_progress_url_id)))
+
+
+class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for sync logged out learner progress handler."""
+
+    def test_logged_in_checkpoint_progress_is_synced_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Use a dummy unique_progress_url_id.
+        uid = 'uidABC'
+
+        # Update progress for logged out user.
+        exp_services.update_logged_out_user_progress(
+            exp_id,
+            uid,
+            'Welcome!',
+            1
+        )
+
+        self.login(self.VIEWER_EMAIL)
+        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Hit the handler for syncing logged out progress with
+        # logged in progress when the user signs-in.
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/sync_logged_out_learner_progress_with_logged_in_progress',
+            {
+                'unique_progress_url_id': uid,
+            },
+            csrf_token=csrf_token
+        )
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        self.logout()
