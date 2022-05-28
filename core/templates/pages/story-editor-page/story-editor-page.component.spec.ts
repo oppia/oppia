@@ -23,6 +23,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import { EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 require('pages/story-editor-page/story-editor-page.component.ts');
 
@@ -42,10 +44,13 @@ describe('Story editor page', function() {
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
+  var LocalStorageService = null;
+  var StoryEditorStalenessDetectionService = null;
   var UrlService = null;
 
   var mockedWindow = {
-    open: () => {}
+    open: () => {},
+    addEventListener: () => {}
   };
   var MockStoryEditorNavigationService = {
     activeTab: 'story_editor',
@@ -88,6 +93,9 @@ describe('Story editor page', function() {
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
+    LocalStorageService = $injector.get('LocalStorageService');
+    StoryEditorStalenessDetectionService = $injector.get(
+      'StoryEditorStalenessDetectionService');
     story = StoryObjectFactory.createFromBackendDict({
       id: '2',
       title: 'Story title',
@@ -133,6 +141,9 @@ describe('Story editor page', function() {
       validateExplorationsAsync: async() => Promise.resolve([])
     };
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
+    LocalStorageService.removeOpenedEntityEditorBrowserTabsInfo(
+      EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_STORY_EDITOR_BROWSER_TABS);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('storyEditorPage', {
@@ -343,5 +354,146 @@ describe('Story editor page', function() {
     mockUndoRedoChangeEventEmitter.emit();
     expect(PageTitleService.setDocumentTitle).toHaveBeenCalled();
     ctrl.$onDestroy();
+  });
+
+  it('should create story editor browser tabs info on ' +
+  'local storage when a new tab opens', () => {
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo).toBeNull();
+
+    // Opening the first tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo).toBeDefined();
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+
+    // Opening the second tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+  });
+
+  it('should update story editor browser tabs info on local storage when ' +
+  'some new changes are saved', () => {
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo).toBeNull();
+
+    // First time opening of the tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(1);
+
+    // Save some changes on the story and increasing its version.
+    story._version = 2;
+    StoryEditorStateService.onStoryReinitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
+  });
+
+  it('should decrement number of opened story editor tabs when ' +
+  'a tab is closed', () => {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    // Opening of the first tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    // Opening of the second tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+
+    let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    // Making some unsaved changes on the editor page.
+    storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+    LocalStorageService.updateEntityEditorBrowserTabsInfo(
+      storyEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_STORY_EDITOR_BROWSER_TABS);
+
+    expect(
+      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+
+    ctrl.onClosingStoryEditorBrowserTab();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+
+    // Since the tab containing unsaved changes is closed, the value of
+    // unsaved changes status will become false.
+    expect(
+      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+  });
+
+  it('should emit the stale tab and presence of unsaved changes events ' +
+  'when the \'storage\' event is triggered', () => {
+    spyOn(
+      StoryEditorStalenessDetectionService.staleTabEventEmitter, 'emit'
+    ).and.callThrough();
+    spyOn(
+      StoryEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter, 'emit'
+    ).and.callThrough();
+    spyOn(LocalStorageService, 'registerNewStorageEventListener').and.callFake(
+      (callback) => {
+        document.addEventListener('storage', callback);
+      });
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    let storageEvent = new StorageEvent('storage', {
+      key: EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_STORY_EDITOR_BROWSER_TABS
+    });
+    document.dispatchEvent(storageEvent);
+
+    expect(
+      StoryEditorStalenessDetectionService.staleTabEventEmitter.emit
+    ).toHaveBeenCalled();
+    expect(
+      StoryEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter.emit
+    ).toHaveBeenCalled();
   });
 });

@@ -220,6 +220,8 @@
 /core/templates/components/graph-services/ @kevintab95
 /core/templates/components/on-screen-keyboard/ @aks681
 /core/templates/components/save-pending-changes/ @kevintab95
+/core/templates/components/stale-tab-info/ @kevintab95
+/core/templates/components/unsaved-changes-status-info/ @kevintab95
 /core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
 /core/templates/domain/entity_editor_browser_tabs_info/ @kevintab95
