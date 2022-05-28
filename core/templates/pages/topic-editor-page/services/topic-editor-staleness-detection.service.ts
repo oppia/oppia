@@ -104,8 +104,10 @@ export class TopicEditorStalenessDetectionService {
         });
       this.unsavedChangesWarningModalRef.componentInstance.entity = 'topic';
       this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
-    } else if (this.unsavedChangesWarningModalRef) {
-      this.unsavedChangesWarningModalRef.dismiss();
+    } else {
+      if (this.unsavedChangesWarningModalRef) {
+        this.unsavedChangesWarningModalRef.dismiss();
+      }
     }
   }
 
