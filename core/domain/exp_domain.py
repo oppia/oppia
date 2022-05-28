@@ -1986,7 +1986,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict,
                     html_validation_service
-                    .convert_svg_diagram_tags_to_image_tags)
+                    .convert_svg_diagram_tags_to_image_tags, 46)
         return states_dict
 
     @classmethod
