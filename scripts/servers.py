@@ -448,6 +448,42 @@ def managed_webpack_compiler(
         yield proc
 
 
+def get_chrome_verison():
+     # Although there are spaces between Google and Chrome in the path, we
+        # don't need to escape them for Popen (as opposed to on the terminal, in
+        # which case we would need to escape them for the command to run).
+        chrome_command = (
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+            if common.is_mac_os() else 'google-chrome')
+        try:
+            output = subprocess.check_output([chrome_command, '--version'])
+        except OSError as e:
+            # For the error message on macOS, we need to add the backslashes in.
+            # This is because it is likely that a user will try to run the
+            # command on their terminal and, as mentioned above, the macOS
+            # chrome version command has spaces in the path which need to be
+            # escaped for successful terminal use.
+            raise Exception(
+                'Failed to execute "%s --version" command. This is used to '
+                'determine the chromedriver version to use. Please set the '
+                'chromedriver version manually using the '
+                '--chrome_driver_version flag. To determine the '
+                'chromedriver version to be used, please follow the '
+                'instructions mentioned in the following URL:\n'
+                'https://chromedriver.chromium.org/downloads/version-selection'
+                % chrome_command.replace(' ', r'\ ')) from e
+
+        installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
+        installed_version = '.'.join(
+            installed_version_parts.decode('utf-8').split('.')[:-1])
+        response = utils.url_open(
+            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
+                installed_version))
+        chrome_version = response.read().decode('utf-8')
+
+        return chrome_version
+
+
 @contextlib.contextmanager
 def managed_portserver():
     """Returns context manager to start/stop the portserver gracefully.
@@ -532,39 +568,10 @@ def managed_webdriver_server(chrome_version=None):
         Exception. Space instead of '\'.
     """
     if chrome_version is None:
-        # Although there are spaces between Google and Chrome in the path, we
-        # don't need to escape them for Popen (as opposed to on the terminal, in
-        # which case we would need to escape them for the command to run).
-        chrome_command = (
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-            if common.is_mac_os() else 'google-chrome')
-        try:
-            output = subprocess.check_output([chrome_command, '--version'])
-        except OSError as e:
-            # For the error message on macOS, we need to add the backslashes in.
-            # This is because it is likely that a user will try to run the
-            # command on their terminal and, as mentioned above, the macOS
-            # chrome version command has spaces in the path which need to be
-            # escaped for successful terminal use.
-            raise Exception(
-                'Failed to execute "%s --version" command. This is used to '
-                'determine the chromedriver version to use. Please set the '
-                'chromedriver version manually using the '
-                '--chrome_driver_version flag. To determine the '
-                'chromedriver version to be used, please follow the '
-                'instructions mentioned in the following URL:\n'
-                'https://chromedriver.chromium.org/downloads/version-selection'
-                % chrome_command.replace(' ', r'\ ')) from e
-
-        installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
-        installed_version = '.'.join(
-            installed_version_parts.decode('utf-8').split('.')[:-1])
-        response = utils.url_open(
-            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
-                installed_version))
-        chrome_version = response.read().decode('utf-8')
+       chrome_version = get_chrome_verison()
 
     print('\n\nCHROME VERSION: %s' % chrome_version)
+
     subprocess.check_call([
         common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
         '--versions.chrome', chrome_version,
@@ -683,10 +690,12 @@ def managed_webdriverIO_server(
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
 
+    chrome_version = get_chrome_verison()
+    print(chrome_version)
     webdriverIO_args = [
         common.NODE_BIN_PATH2,
         common.NODEMODULES_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
-        '--suite', suite_name,
+        '--suite', suite_name, chrome_version
     ]
 
     if debug_mode:

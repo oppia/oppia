@@ -58,7 +58,6 @@
     "babel-eslint": "^10.0.1",
     "browserstack-local": "^1.4.2",
     "cache-loader": "^4.1.0",
-    "chromedriver": "^89.0.0",
     "clean-webpack-plugin": "^3.0.0",
     "conditional-type-checks": "^1.0.5",
     "core-js": "^2.5.3",
@@ -188,6 +187,7 @@
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
     "vanilla-picker": "^2.10.1",
-    "wavesurfer.js": "^5.2.0"
+    "wavesurfer.js": "^5.2.0",
+    "wdio-timeline-reporter": "^5.1.4"
   }
 }

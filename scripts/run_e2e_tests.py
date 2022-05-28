@@ -150,7 +150,7 @@ RERUN_POLICIES = {
 }
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
-   'users'
+   'navigation'
 ]
 
 def is_oppia_server_already_running():
