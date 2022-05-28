@@ -83,26 +83,25 @@ export class SkillEditorStalenessDetectionService {
   }
 
   showPresenceOfUnsavedChangesModal(): void {
-    if (this.undoRedoService.getChangeCount() === 0) {
-      if (
-        this.stalenessDetectionService
-          .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_SKILL_EDITOR_BROWSER_TABS,
-            this.skillEditorStateService.getSkill().getId())
-      ) {
-        this.ngbModal.dismissAll();
-        this.unsavedChangesWarningModalRef = this.ngbModal.open(
-          UnsavedChangesStatusInfoModalComponent, {
-            backdrop: 'static',
-          });
-        this.unsavedChangesWarningModalRef.componentInstance.entity = 'skill';
-        this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
-      } else {
-        if (this.unsavedChangesWarningModalRef) {
-          this.unsavedChangesWarningModalRef.dismiss();
-        }
-      }
+    if (this.undoRedoService.getChangeCount() !== 0) {
+      return;
+    }
+    if (
+      this.stalenessDetectionService
+        .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_SKILL_EDITOR_BROWSER_TABS,
+          this.skillEditorStateService.getSkill().getId())
+    ) {
+      this.ngbModal.dismissAll();
+      this.unsavedChangesWarningModalRef = this.ngbModal.open(
+        UnsavedChangesStatusInfoModalComponent, {
+          backdrop: 'static',
+        });
+      this.unsavedChangesWarningModalRef.componentInstance.entity = 'skill';
+      this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
+    } else if (this.unsavedChangesWarningModalRef) {
+      this.unsavedChangesWarningModalRef.dismiss();
     }
   }
 
