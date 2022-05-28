@@ -54,7 +54,7 @@ describe('Topic and Story viewer functionality', function() {
 
   var createDummyExplorations = async function() {
     var EXPLORATION = {
-      category: 'Learning',
+      category: 'English',
       objective: 'The goal is to check story viewer functionality.',
       language: 'English'
     };
