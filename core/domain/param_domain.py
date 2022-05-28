@@ -24,7 +24,7 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
-from typing import Any, List
+from typing import Any, Dict, List
 from typing_extensions import TypedDict
 
 
@@ -203,15 +203,14 @@ class ParamChange:
             param_change_dict['customization_args']
         )
 
-    # The method `generate_value()` accepts first argument of type Any and it
-    # also returns values of type Any. So that's why argument context_params
-    # and the return type of `get_value()` is annotated as Any.
-    def get_value(self, context_params: Any) -> Any:
+    # This method returns the single value of a parameter which can be of type
+    # str, int and other types too. That's why Any is used as return type.
+    def get_value(self, context_params: Dict[str, Any]) -> Any:
         """Generates a single value for a parameter change."""
-        # The second argument of method `generate_value()` can only accept
-        # values of type Dict[str, Any], but here we are providing
-        # self.customization_args which is of type CustomizationArgsDict. Thus
-        # to avoid MyPy error, we added an ignore here.
+        # The generate_value() can accept different types of customization
+        # keyword args But here we are providing CustomizationArgsDict as
+        # keywords args which causes MyPy to throw error. Thus to silent
+        # the error we added an ignore here.
         return self.generator.generate_value(
             context_params, **self.customization_args)  # type: ignore[arg-type]
 
