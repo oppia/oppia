@@ -61,18 +61,28 @@
     background: rgb(243, 248, 255);
   }
   .oppia-sidebar-menu a,
-  .oppia-sidebar-expandable-button {
+  .oppia-sidebar-expandable-button,
+  .oppia-sidebar-menu button {
     color: #333;
     display: block;
     padding: 1em 0 1em 18px;
     text-decoration: none;
   }
   .oppia-sidebar-menu a:hover,
-  .oppia-sidebar-menu a:focus {
+  .oppia-sidebar-menu a:focus,
+  .oppia-sidebar-menu button:hover,
+  .oppia-sidebar-menu button:focus {
     background: rgb(243, 248, 255);
   }
-  .oppia-sidebar-menu li.active a {
+  .oppia-sidebar-menu li.active a,
+  .oppia-sidebar-menu li.active button {
     background: rgba(243, 248, 255, 0.5);
+  }
+  .oppia-sidebar-menu button {
+    background-color: transparent;
+    border: none;
+    text-align: start;
+    width: 100%;
   }
   .oppia-sidebar-logo-container {
     color: #333;
@@ -195,11 +205,10 @@
 
   <ul>
     <li class="oppia-sidebar-rows" *ngIf="userIsLoggedIn">
-      <a href="/"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
-         class="text-uppercase">
+      <button (click)="navigateToLearnerDashboard(); stopclickfurther($event)"
+              class="text-uppercase">
         <span >{{ 'I18N_SIDEBAR_HOME' | translate }}</span>
-      </a>
+      </button>
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
