@@ -88,25 +88,24 @@ export class TopicEditorStalenessDetectionService {
 
   showPresenceOfUnsavedChangesModal(): void {
     if (this.undoRedoService.getChangeCount() === 0) {
-      if (
-        this.stalenessDetectionService
-          .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-            this.topicEditorStateService.getTopic().getId())
-      ) {
-        this.ngbModal.dismissAll();
-        this.unsavedChangesWarningModalRef = this.ngbModal.open(
-          UnsavedChangesStatusInfoModalComponent, {
-            backdrop: 'static',
-          });
-        this.unsavedChangesWarningModalRef.componentInstance.entity = 'topic';
-        this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
-      } else {
-        if (this.unsavedChangesWarningModalRef) {
-          this.unsavedChangesWarningModalRef.dismiss();
-        }
-      }
+      return;
+    }
+    if (
+      this.stalenessDetectionService
+        .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_TOPIC_EDITOR_BROWSER_TABS,
+          this.topicEditorStateService.getTopic().getId())
+    ) {
+      this.ngbModal.dismissAll();
+      this.unsavedChangesWarningModalRef = this.ngbModal.open(
+        UnsavedChangesStatusInfoModalComponent, {
+          backdrop: 'static',
+        });
+      this.unsavedChangesWarningModalRef.componentInstance.entity = 'topic';
+      this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
+    } else if (this.unsavedChangesWarningModalRef) {
+      this.unsavedChangesWarningModalRef.dismiss();
     }
   }
 
