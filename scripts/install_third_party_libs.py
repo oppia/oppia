@@ -25,8 +25,12 @@ import sys
 import urllib.request as urlrequest
 import zipfile
 
-from scripts import common
 from typing import Tuple
+
+# Add third_party to path. Some script accesses feconf even before
+# python_libs is added to path.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.append(_THIRD_PARTY_PATH)
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
