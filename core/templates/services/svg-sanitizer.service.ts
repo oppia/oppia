@@ -178,12 +178,17 @@ export class SvgSanitizerService {
     let tagsToBeRemoved = invalidTagsAndAttributes.tags;
     let attrsToBeRemoved = invalidTagsAndAttributes.attrs;
     svg.querySelectorAll('*').forEach((node) => {
-      let nodeTagName: string = node.tagName.toLowerCase();
+      const nodeTagName: string = node.tagName;
       if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
         node.remove();
       } else {
         for (let i = 0; i < node.attributes.length; i++) {
-          let nodeAttrName: string = node.attributes[i].name.toLowerCase();
+          const nodeAttrName: string = node.attributes[i].name;
+          // Check if the tag name and attribute combination matches any value
+          // in attrsToBeRemoved. If so, remove that attribute from the node.
+          // Values in attrsToBeRemoved follow the format <tagName>:<attrName>
+          // where the tagName and attrName is in the original letter casing
+          // as in the node.
           if (
             attrsToBeRemoved.indexOf(nodeTagName + ':' + nodeAttrName) !== -1) {
             node.removeAttribute(nodeAttrName);
