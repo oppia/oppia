@@ -35,14 +35,20 @@ import urllib.parse
 import urllib.request
 import zlib
 
-from core import feconf
 from core.constants import constants
 
 from typing import (
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
 
-from typing_extensions import Literal
+# Add third_party to path. Some script accesses feconf even before
+# python_libs is added to path.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from core import feconf # pylint: disable=wrong-import-position
+
+from typing_extensions import Literal # pylint: disable=wrong-import-position
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
