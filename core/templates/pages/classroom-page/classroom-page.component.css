@@ -87,10 +87,13 @@
   font-size: 1.2em;
 }
 .oppia-classroom-viewer-container .oppia-classroom-banner {
+  height: auto;
+  margin-left: 25vw;
   margin-top: -120px;
   text-align: center;
 }
 .oppia-classroom-banner-img {
+  height: auto;
   max-width: 400px;
   width: 20vw;
 }

@@ -176,7 +176,7 @@ describe('Chapter editor functionality', function() {
   var explorationEditorPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
-    'Dummy exploration', 'Algorithm', 'Learn more about oppia', 'English'];
+    'Dummy exploration', 'Algorithms', 'Learn more about oppia', 'English'];
   var TOPIC_NAME = 'TASEFUF_4';
   var USER_EMAIL = 'creator@chapterTest.com';
 
