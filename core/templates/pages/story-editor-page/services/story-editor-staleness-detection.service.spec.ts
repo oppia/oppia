@@ -200,4 +200,23 @@ describe('Story editor staleness detection service', () => {
 
     expect(ngbModalRef.dismiss).toHaveBeenCalled();
   });
+
+  it('should not show the presence of unsaved changes modal on the page' +
+  'which itself contains those unsaved changes', () => {
+    class MockNgbModalRef {
+      result = Promise.resolve();
+      componentInstance = {};
+      dismiss() {}
+    }
+    const ngbModalRef = new MockNgbModalRef() as NgbModalRef;
+    spyOn(ngbModalRef, 'dismiss');
+    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+
+    storyEditorStalenessDetectionService.init();
+    storyEditorStalenessDetectionService
+      .presenceOfUnsavedChangesEventEmitter.emit();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  });
 });

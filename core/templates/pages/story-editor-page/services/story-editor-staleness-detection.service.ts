@@ -89,25 +89,24 @@ export class StoryEditorStalenessDetectionService {
 
   showPresenceOfUnsavedChangesModal(): void {
     const story = this.storyEditorStateService.getStory();
-    if (story && this.undoRedoService.getChangeCount() === 0) {
-      if (
-        this.stalenessDetectionService
-          .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
-            EntityEditorBrowserTabsInfoDomainConstants
-              .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId())
-      ) {
-        this.ngbModal.dismissAll();
-        this.unsavedChangesWarningModalRef = this.ngbModal.open(
-          UnsavedChangesStatusInfoModalComponent, {
-            backdrop: 'static',
-          });
-        this.unsavedChangesWarningModalRef.componentInstance.entity = 'story';
-        this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
-      } else {
-        if (this.unsavedChangesWarningModalRef) {
-          this.unsavedChangesWarningModalRef.dismiss();
-        }
-      }
+    if (!story || this.undoRedoService.getChangeCount() !== 0) {
+      return;
+    }
+    if (
+      this.stalenessDetectionService
+        .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId())
+    ) {
+      this.ngbModal.dismissAll();
+      this.unsavedChangesWarningModalRef = this.ngbModal.open(
+        UnsavedChangesStatusInfoModalComponent, {
+          backdrop: 'static',
+        });
+      this.unsavedChangesWarningModalRef.componentInstance.entity = 'story';
+      this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
+    } else if (this.unsavedChangesWarningModalRef) {
+      this.unsavedChangesWarningModalRef.dismiss();
     }
   }
 
