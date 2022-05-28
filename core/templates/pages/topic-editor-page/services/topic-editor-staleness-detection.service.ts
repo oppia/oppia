@@ -87,7 +87,7 @@ export class TopicEditorStalenessDetectionService {
   }
 
   showPresenceOfUnsavedChangesModal(): void {
-    if (this.undoRedoService.getChangeCount() === 0) {
+    if (this.undoRedoService.getChangeCount() !== 0) {
       return;
     }
     if (
@@ -104,10 +104,8 @@ export class TopicEditorStalenessDetectionService {
         });
       this.unsavedChangesWarningModalRef.componentInstance.entity = 'topic';
       this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
-    } else {
-      if (this.unsavedChangesWarningModalRef) {
-        this.unsavedChangesWarningModalRef.dismiss();
-      }
+    } else if (this.unsavedChangesWarningModalRef) {
+      this.unsavedChangesWarningModalRef.dismiss();
     }
   }
 
