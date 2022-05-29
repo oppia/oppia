@@ -42,7 +42,7 @@ from typing import (
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
 
-from typing_extensions import Literal # pylint: disable=wrong-import-position
+from typing_extensions import Literal
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
