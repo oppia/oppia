@@ -27,7 +27,6 @@ import pkg_resources
 import setuptools
 
 from scripts import common # pylint: disable=unused-import
-
 from core import feconf # pylint: disable=wrong-import-position
 
 # Configure the required packages and scripts to install.
