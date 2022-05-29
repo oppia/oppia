@@ -1278,6 +1278,9 @@ class LessonPlayerEntryPoint(EntryPoint):
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.lesson_player)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
+        if self.story_id is None:
+            raise utils.ValidationError(
+                'The story_id must be a string value, received None')
         if self.story_id is not None:
             story_domain.Story.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
