@@ -28,13 +28,11 @@ import subprocess
 import threading
 
 from core import utils
-
 from scripts import common
 from scripts import servers
 
 from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple
 from typing_extensions import TypedDict
-
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')

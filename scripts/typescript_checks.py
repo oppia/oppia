@@ -29,7 +29,6 @@ from typing import Optional, Sequence
 
 from . import common
 
-
 _PARSER = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
