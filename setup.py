@@ -20,14 +20,12 @@ The package is built by running 'python setup.py sdist' in the build.py.
 
 from __future__ import annotations
 
-import os
-import sys
+from scripts import common # pylint: disable=unused-import
 
 import pkg_resources
 import setuptools
 
-from scripts import common # pylint: disable=unused-import
-from core import feconf # pylint: disable=wrong-import-position
+from core import feconf # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 # Configure the required packages and scripts to install.
 with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
