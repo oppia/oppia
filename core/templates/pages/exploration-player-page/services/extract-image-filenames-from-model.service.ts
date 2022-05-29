@@ -115,11 +115,16 @@ export class ExtractImageFilenamesFromModelService {
    * @param {object} state - The state whose solution's html should be
    *                         returned.
    */
-  _getSolutionHtml(state: State): string {
+  _getSolutionHtml(state: State): string | null {
     let languageCode = (
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+
+    // The state.interaction.solution variable threw 'Object is possibly null
+    // error'. So to prevent this error there is a check to see that if
+    // solution is null, which means that the solution in the state does not
+    // exist. If it is null then function returns null.
     if (state.interaction.solution === null) {
-      return '';
+      return null;
     }
     return this.contentTranslationManagerService.getTranslatedHtml(
       state.writtenTranslations, languageCode,
@@ -164,7 +169,10 @@ export class ExtractImageFilenamesFromModelService {
     _allHtmlInTheState.push(this._getHintsHtml(state));
 
     let solutionHtml = this._getSolutionHtml(state);
-    if (solutionHtml !== '') {
+
+    // If solutionHtml is not null (which means that the solution in the state
+    // does exist), then add solutionHtml to _allHtmlInTheState.
+    if (solutionHtml !== null) {
       _allHtmlInTheState.push(solutionHtml);
     }
     return _allHtmlInTheState;
@@ -195,6 +203,10 @@ export class ExtractImageFilenamesFromModelService {
     let collapsibleTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-collapsible');
     for (let i = 0; i < collapsibleTagList.length; i++) {
+      // Created an attribute variable that gets the given attribute from
+      // a collapsible. If the given attribute does not exist, then attribute
+      // is null which means skip the current collapsible. If attribute is not
+      // null, then add images thatare embedded in the given collapsible.
       let attribute = collapsibleTagList[i].getAttribute('content-with-value');
       if (attribute !== null) {
         let contentWithValue = JSON.parse(attribute);
@@ -210,6 +222,10 @@ export class ExtractImageFilenamesFromModelService {
     let tabsTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-tabs');
     for (let i = 0; i < tabsTagList.length; i++) {
+      // Created an attribute variable that gets the given attribute from
+      // a tab. If the given attribute does not exist, then attribute is null
+      // which means skip the current tab. If attribute is not null, then add
+      // images that are embedded in the given tab.
       let attribute = tabsTagList[i].getAttribute('tab_contents-with-value');
       if (attribute !== null) {
         let contentsWithValue = JSON.parse(attribute);
@@ -229,6 +245,11 @@ export class ExtractImageFilenamesFromModelService {
         // tag. But it actually contains the filename only. We use the
         // variable filename instead of filepath since in the end we are
         // retrieving the filenames in the exploration.
+
+        // Created an attribute variable that gets the given filename attribute
+        // from an imageTag. If the given filename does not exist, then
+        // filename is null which means skip the current imageTag. If filename
+        // is not null, then add the file to filenames.
         let attribute = imageTagList[i].getAttribute('filepath-with-value');
         if (attribute !== null) {
           let filename = JSON.parse(
@@ -259,6 +280,10 @@ export class ExtractImageFilenamesFromModelService {
     let mathTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-math');
     for (let i = 0; i < mathTagList.length; i++) {
+      // Created an attribute variable that gets the given math-content
+      // attribute from a mathTag. If the given attribute does not exist, then
+      // attribute is null which means skip the current mathTag. If attribute
+      // is not null, then add the SVG filename to filenames.
       let attribute = mathTagList[i].getAttribute('math_content-with-value');
       if (attribute !== null) {
         let mathContentWithValue = JSON.parse(attribute);

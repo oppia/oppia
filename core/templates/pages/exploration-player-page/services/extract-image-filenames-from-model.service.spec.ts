@@ -40,8 +40,12 @@ describe('Extracting Image file names in the state service', () => {
   let ctms: ContentTranslationManagerService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: { [x: string]: string[];
-    'State 1': string[]; 'State 3': string[]; 'State 4': string[];
-    'State 5': string[]; 'State 6': string[]; 'State 7': string[];
+    'State 1': string[];
+    'State 3': string[];
+    'State 4': string[];
+    'State 5': string[];
+    'State 6': string[];
+    'State 7': string[];
     Introduction: string[]; };
   let skillDict: SkillBackendDict;
   let expectedImageFilenamesInSkill: string[];
