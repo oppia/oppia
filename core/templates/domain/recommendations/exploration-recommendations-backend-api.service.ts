@@ -85,8 +85,7 @@ export class ExplorationRecommendationsBackendApiService {
     return this.http.get<RecommendedExplorationSummariesBackendDict>(
       '/explorehandler/recommendations/' + explorationId, {
         params: recommendationsUrlParams
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any).toPromise().then(backendDict => backendDict.summaries.map(
+      }).toPromise().then(backendDict => backendDict.summaries.map(
       summaryDict => LearnerExplorationSummary.createFromBackendDict(
         summaryDict)));
   }
