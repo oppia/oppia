@@ -833,7 +833,7 @@ DEMO_EXPLORATIONS = {
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
-    u'16': 'all_interactions',
+    # u'16': 'all_interactions',
     u'17': 'audio_test',
     # Exploration with ID 18 was used for testing CodeClassifier functionality
     # which has been removed (#10060).
