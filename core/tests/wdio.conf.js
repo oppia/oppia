@@ -149,7 +149,7 @@ exports.config = {
         showPreface: false,
       }],
       ['timeline', {
-        outputDir: './results' 
+        outputDir: '../webdriverIO_tests_results'
     }]],
 
 
@@ -222,7 +222,7 @@ exports.config = {
     before: function() {
         // Set a wide enough window size for the navbar in the library pages to
         // display fully.
-        browser.maximizeWindow();
+        browser.setWindowSize(1285, 1000);
     },
     /**
      * Runs before a WebdriverIO command gets executed.

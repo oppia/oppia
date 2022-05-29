@@ -143,14 +143,54 @@ RERUN_POLICIES = {
     'users': RERUN_POLICY_NEVER,
     'wipeout': RERUN_POLICY_NEVER,
     'navigation': RERUN_POLICY_NEVER,
-    'test': RERUN_POLICY_NEVER,
     # The suite name is `full` when no --suite argument is passed. This
     # indicates that all the tests should be run.
     'full': RERUN_POLICY_NEVER,
 }
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
-   'navigation'
+    'navigation',
+]
+
+SUITES_STILL_IN_PROTRACTOR = [
+    'accessibility',
+    'additionalEditorFeatures',
+    'additionalEditorFeaturesModals',
+    'additionalPlayerFeatures',
+    'adminPage',
+    'blogDashboard',
+    'classroomPage',
+    'classroomPageFileUploadFeatures',
+    'collections',
+    'contributorDashboard',
+    'coreEditorAndPlayerFeatures',
+    'creatorDashboard',
+    'embedding',
+    'explorationImprovementsTab',
+    'explorationFeedbackTab',
+    'explorationHistoryTab',
+    'explorationStatisticsTab',
+    'explorationTranslationTab',
+    'extensions',
+    'featureGating',
+    'fileUploadFeatures',
+    'fileUploadExtensions',
+    'learnerDashboard',
+    'learner',
+    'library',
+    'playVoiceovers',
+    'preferences',
+    'profileFeatures',
+    'profileMenu',
+    'publication',
+    'subscriptions',
+    'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures',
+    'topicsAndSkillsDashboard',
+    'skillEditor',
+    'topicAndStoryViewer',
+    'users',
+    'wipeout'
 ]
 
 def is_oppia_server_already_running():
@@ -287,13 +327,19 @@ def run_tests(args):
                 suite_name=args.suite,
                 debug_mode=args.debug_mode,
                 stdout=subprocess.PIPE))
-        else:
+
+        elif args.suite in SUITES_STILL_IN_PROTRACTOR:
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
+        else:
+            print(
+                'The suite requested to run does not exists'
+                'Please provide a valid suite name')
+            sys.exit(1)
 
         print(
             'Servers have come up.\n'

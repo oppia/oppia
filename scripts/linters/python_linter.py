@@ -26,6 +26,7 @@ import sys
 from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
+from ..run_e2e_tests import SUITES_MIGRATED_TO_WEBDRIVERIO, SUITES_STILL_IN_PROTRACTOR
 
 _PATHS_TO_INSERT = [
     common.PYLINT_PATH,
@@ -41,6 +42,47 @@ from pylint.reporters import text  # isort:skip  pylint: disable=wrong-import-or
 import isort.api  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
+TOTAL_E2E_SUITES = [
+    'accessibility',
+    'additionalEditorFeatures',
+    'additionalEditorFeaturesModals',
+    'additionalPlayerFeatures',
+    'adminPage',
+    'blogDashboard',
+    'classroomPage',
+    'classroomPageFileUploadFeatures',
+    'collections',
+    'contributorDashboard',
+    'coreEditorAndPlayerFeatures',
+    'creatorDashboard',
+    'embedding',
+    'explorationImprovementsTab',
+    'explorationFeedbackTab',
+    'explorationHistoryTab',
+    'explorationStatisticsTab',
+    'explorationTranslationTab',
+    'extensions',
+    'featureGating',
+    'fileUploadFeatures',
+    'fileUploadExtensions',
+    'learnerDashboard',
+    'learner',
+    'library',
+    'navigation',
+    'playVoiceovers',
+    'preferences',
+    'profileFeatures',
+    'profileMenu',
+    'publication',
+    'subscriptions',
+    'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures',
+    'topicsAndSkillsDashboard',
+    'skillEditor',
+    'topicAndStoryViewer',
+    'users',
+    'wipeout'
+]
 
 class ThirdPartyPythonLintChecksManager:
     """Manages all the third party Python linting functions."""
@@ -174,6 +216,33 @@ class ThirdPartyPythonLintChecksManager:
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
+    
+    def check_all_e2e_suites(self):
+        """This function is used to check that each file
+        has imports placed in alphabetical order.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
+        """
+        name = 'All E2E Suites'
+        error_messages = []
+        failed = False
+
+        ALL_SUITES_PRESENT = (
+            SUITES_MIGRATED_TO_WEBDRIVERIO + SUITES_STILL_IN_PROTRACTOR)
+
+        if ALL_SUITES_PRESENT != TOTAL_E2E_SUITES:
+            failed = True;
+
+        if failed:
+                error_message = 'E2E suites missing from list in run_e2e_tests.py'
+                error_messages.append(error_message)
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+        
+        
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -192,6 +261,7 @@ class ThirdPartyPythonLintChecksManager:
 
         linter_stdout.append(self.lint_py_files())
         linter_stdout.append(self.check_import_order())
+        linter_stdout.append(self.check_all_e2e_suites())
 
         return linter_stdout
 
