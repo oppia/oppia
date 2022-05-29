@@ -21,11 +21,10 @@ from __future__ import annotations
 import os
 import re
 
-from scripts import common # pylint: disable=unused-import
+from core import utils 
 
 from typing import List
 
-from core import utils # isort:skip pylint: disable=wrong-import-position, wrong-import-order
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.

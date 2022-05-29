@@ -25,11 +25,10 @@ import fnmatch
 import os
 import sys
 
-from scripts import common # pylint: disable=unused-import
+from core import utils
 
 from typing import List
 
-from core import utils # isort:skip pylint: disable=wrong-import-position, wrong-import-order
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000

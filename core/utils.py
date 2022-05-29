@@ -35,14 +35,17 @@ import urllib.parse
 import urllib.request
 import zlib
 
-from core import feconf
 from core.constants import constants
+
+from scripts import common # pylint: disable=unused-import
 
 from typing import (
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
 
 from typing_extensions import Literal
+
+from core import feconf # isort:skip  # pylint: disable=wrong-import-position
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
