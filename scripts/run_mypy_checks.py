@@ -180,7 +180,7 @@ NOT_FULLY_COVERED_FILES = [
     'core/tests/test_utils.py',
     'core/tests/test_utils_test.py',
     'core/jobs/batch_jobs',
-    'core/jobs/decorators',
+    'core/jobs/decorators/validation_decorators_test.py',
     'core/jobs/transforms',
     'core/python_utils.py',
     'core/python_utils_test.py',
