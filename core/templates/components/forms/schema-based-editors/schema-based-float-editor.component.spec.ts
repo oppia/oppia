@@ -237,17 +237,17 @@ describe('Schema based float editor component', function() {
     component.localStringValue = '';
     component.parseInput();
     expect(component.localValue).toEqual(null);
-    expect(component.errorStringI18nKey).toEqual('');
+    expect(component.errorStringI18nKey).toEqual(null);
 
     component.localStringValue = '-12';
     component.parseInput();
     expect(component.localValue).toEqual(-12);
-    expect(component.errorStringI18nKey).toEqual('');
+    expect(component.errorStringI18nKey).toEqual(null);
 
     component.localStringValue = '-12e1';
     component.parseInput();
     expect(component.localValue).toEqual(-120);
-    expect(component.errorStringI18nKey).toEqual('');
+    expect(component.errorStringI18nKey).toEqual(null);
 
     spyOn(validator, 'validateNumericString').and.returnValue('Error');
     component.localStringValue = '--12';

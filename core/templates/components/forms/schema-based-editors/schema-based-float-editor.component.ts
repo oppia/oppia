@@ -58,7 +58,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @ViewChild('floatform', {'static': true}) floatForm: NgForm;
   userHasFocusedAtLeastOnce: boolean;
   userIsCurrentlyTyping: boolean;
-  errorStringI18nKey: string = '';
+  errorStringI18nKey: string | null = null;
   labelForErrorFocusTarget: string;
   hasLoaded: boolean;
   onChange: (value: number) => void = () => {};
@@ -185,7 +185,7 @@ implements ControlValueAccessor, OnInit, Validator {
       this.numericInputValidationService.validateNumber(
         this.localValue,
         this.checkRequireNonnegativeInputValue,
-        this.getCurrentDecimalSeparator())) || '';
+        this.getCurrentDecimalSeparator())) || null;
   }
 
   onKeypress(evt: KeyboardEvent): void {
@@ -230,7 +230,7 @@ implements ControlValueAccessor, OnInit, Validator {
           this.getCurrentDecimalSeparator());
       if (error !== undefined) {
         this.localValue = null;
-        this.errorStringI18nKey = error || '';
+        this.errorStringI18nKey = error || null;
       } else {
         // Parse number if the string is in proper format.
         this.localValue = this.numberConversionService
