@@ -26,10 +26,7 @@ import sys
 import pkg_resources
 import setuptools
 
-# Add third_party to path. Setup script accesses feconf even before
-# python_libs is added to path.
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
+from scripts import common # pylint: disable=unused-import
 
 from core import feconf # pylint: disable=wrong-import-position
 
