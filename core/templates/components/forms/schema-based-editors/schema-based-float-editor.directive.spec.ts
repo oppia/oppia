@@ -120,7 +120,7 @@ describe('Schema Based Float Editor Directive', () => {
   it('should not register keyboard event when user is typing', () => {
     let evt = new KeyboardEvent('', {
       keyCode: 14
-    });
+    } as KeyboardEvent);
 
     ctrl.isUserCurrentlyTyping = false;
 
@@ -138,7 +138,7 @@ describe('Schema Based Float Editor Directive', () => {
     };
     let evt = new KeyboardEvent('', {
       keyCode: 13
-    });
+    } as KeyboardEvent);
     ctrl.isUserCurrentlyTyping = true;
 
     ctrl.onKeypress(evt);
@@ -157,7 +157,7 @@ describe('Schema Based Float Editor Directive', () => {
     };
     let evt = new KeyboardEvent('', {
       keyCode: 13
-    });
+    } as KeyboardEvent);
 
     ctrl.onKeypress(evt);
 

@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
@@ -60,9 +60,11 @@ export class EmailDashboardBackendApiService {
       this.http.get<EmailDashboardQueryResultsBackendDict>(
         this.QUERY_DATA_URL, {
           params: params
-        }).toPromise().then(data => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any).toPromise().then(data => {
         let emailDashboardQueryResultsObject = (
-          EmailDashboardQueryResults.createFromBackendDict(data));
+          EmailDashboardQueryResults.createFromBackendDict(
+            data as unknown as EmailDashboardQueryResultsBackendDict));
         resolve(emailDashboardQueryResultsObject);
       }, errorResponse => {
         reject(errorResponse.error.error);

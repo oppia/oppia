@@ -61,7 +61,7 @@ describe('Schema Based Int Editor Directive', () => {
     spyOn(SchemaFormSubmittedService.onSubmittedSchemaBasedForm, 'emit');
     let evt = new KeyboardEvent('', {
       keyCode: 13
-    });
+    } as KeyboardEvent);
 
     ctrl.onKeypress(evt);
 

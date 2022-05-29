@@ -57,7 +57,7 @@ describe('Event Bus Group', () => {
 
   it('should throw uncaught errors', waitForAsync(() => {
     spyOn(Subject.prototype, 'subscribe').and.callFake(
-      (f) => {
+      (f: unknown) => {
         // This throws "Argument of type '(f: PartialObserver<void> |
         // ((value: string) => void)) => Subscription' is not assignable
         // to parameter of type '{ (observer?: PartialObserver<any> |
@@ -82,7 +82,7 @@ describe('Event Bus Group', () => {
   it('should throw uncaught errors that are not Error type', waitForAsync(
     () => {
       spyOn(Subject.prototype, 'subscribe').and.callFake(
-        (f) => {
+        (f: unknown) => {
           // This throws "This expression is not callable. Not all constituents
           // of type 'PartialObserver<any> | ((value: any) => void) |
           // ((value: any) => void)' are callable. Type 'NextObserver<any>'

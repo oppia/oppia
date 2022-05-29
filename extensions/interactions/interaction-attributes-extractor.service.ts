@@ -65,7 +65,7 @@ export class InteractionAttributesExtractorService {
     const caSpecs = (
       InteractionSpecsConstants.INTERACTION_SPECS[
         interactionId].customization_arg_specs);
-    caSpecs.forEach(caSpec => {
+    for (let caSpec of caSpecs) {
       const caName = caSpec.name;
       const attributesKey: string = `${caName}WithValue`;
       Object.defineProperty(caBackendDict, caName, {
@@ -76,7 +76,7 @@ export class InteractionAttributesExtractorService {
         },
         enumerable: true
       });
-    });
+    }
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
       interactionId, caBackendDict);

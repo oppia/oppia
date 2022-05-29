@@ -275,7 +275,7 @@ describe('TopNavigationBarComponent', () => {
     let keydownEvent = new KeyboardEvent('click', {
       shiftKey: true,
       keyCode: 9
-    });
+    } as KeyboardEvent);
 
     expect(component.activeMenuName).toBe(undefined);
 
