@@ -24,7 +24,7 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 from typing_extensions import TypedDict
 
 
@@ -209,10 +209,11 @@ class ParamChange:
         """Generates a single value for a parameter change."""
         # The generate_value() can accept different types of customization
         # keyword args But here we are providing CustomizationArgsDict as
-        # keywords args which causes MyPy to throw error. Thus to silent
-        # the error we added an ignore here.
+        # keywords args which causes MyPy to throw error. Thus to match
+        # the argument type we used cast here.
+        custom_args = cast(Dict[str, Any], self.customization_args)
         return self.generator.generate_value(
-            context_params, **self.customization_args)  # type: ignore[arg-type]
+            context_params, **custom_args)
 
     def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
