@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from core import utils 
+from core import utils
 
 from typing import List
 
