@@ -28,6 +28,7 @@ import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
@@ -72,6 +73,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private windowRef: WindowRef,
+    private localStorageService: LocalStorageService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private explorationPlayerStateService: ExplorationPlayerStateService
@@ -165,5 +167,11 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  setUniqueProgressIdToLocalStorage(): void {
+    console.log('uid set');
+    this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+      'abcdef');
   }
 }

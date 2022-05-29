@@ -25,7 +25,7 @@
           <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
             {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
           </h4>
-          <p class="progress-text">Progress</p>
+          <p class="progress-text">Progresssss</p>
           <div class="progress" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
             <div class="progress-bar-separator-container">
               <div class="progress-bar-separator"
@@ -57,7 +57,7 @@
           </button>
         </div>
         <div class="oppia-lesson-info-card-authors">
-          <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
+          <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">fake statement</div>
           <div [hidden]="!lessonAuthorsSubmenuIsShown" class="authors-dropdown-menu">
             <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
           </div>

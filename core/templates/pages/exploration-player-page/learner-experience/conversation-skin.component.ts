@@ -56,6 +56,7 @@ import { StatsReportingService } from '../services/stats-reporting.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UserService } from 'services/user.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -176,6 +177,7 @@ export class ConversationSkinComponent {
     private learnerParamsService: LearnerParamsService,
     private loaderService: LoaderService,
     private messengerService: MessengerService,
+    private localStorageService: LocalStorageService,
     private numberAttemptsService: NumberAttemptsService,
     private playerCorrectnessFeedbackEnabledService:
     PlayerCorrectnessFeedbackEnabledService,
@@ -204,6 +206,9 @@ export class ConversationSkinComponent {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+
+    let uid = this.localStorageService.getUniqueProgressIdOfLoggedOutLearner();
+    console.log(uid);
 
     if (this.collectionId) {
       this.readOnlyCollectionBackendApiService.loadCollectionAsync(
