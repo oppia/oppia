@@ -26,7 +26,7 @@ import os
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, Type
 
 
 class BaseValueGenerator:
