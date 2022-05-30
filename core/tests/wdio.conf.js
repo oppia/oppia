@@ -149,7 +149,7 @@ exports.config = {
         showPreface: false,
       }],
       ['timeline', {
-        outputDir: '../webdriverIO_tests_results'
+        outputDir: '../webdriverIO-tests-report'
     }]],
 
 

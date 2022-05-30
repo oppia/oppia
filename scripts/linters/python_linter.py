@@ -218,8 +218,8 @@ class ThirdPartyPythonLintChecksManager:
             name, failed, error_messages, error_messages)
     
     def check_all_e2e_suites(self):
-        """This function is used to check that each file
-        has imports placed in alphabetical order.
+        """This function is used to check that whether all
+        the e2e suites are present in run_e2e_tests.py file.
 
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
@@ -232,7 +232,7 @@ class ThirdPartyPythonLintChecksManager:
         ALL_SUITES_PRESENT = (
             SUITES_MIGRATED_TO_WEBDRIVERIO + SUITES_STILL_IN_PROTRACTOR)
 
-        if ALL_SUITES_PRESENT != TOTAL_E2E_SUITES:
+        if set(ALL_SUITES_PRESENT) != set(TOTAL_E2E_SUITES):
             failed = True;
 
         if failed:

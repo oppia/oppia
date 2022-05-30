@@ -80,6 +80,12 @@ jobs:
         with:
           name: protractor-screenshots
           path: /home/runner/work/oppia/protractor-screenshots
+      - name: Uploading WebdriverIO test report as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webdriverIO-tests-report
+          path: /home/runner/work/oppia/webdriverIO-tests-report
       - name: Checking Memory Usage
         if: ${{ always() }}
         run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
