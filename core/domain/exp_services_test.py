@@ -8020,7 +8020,41 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: false
+    card_is_checkpoint: true
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+  Third state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Third state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         content: {}
@@ -8052,7 +8086,7 @@ title: Title
         )
         self.assertIsNone(logged_out_user_data)
 
-        # First checkpoint reached.
+        # First checkpoint reached as logged out user.
         exp_services.update_logged_out_user_progress(
             self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
 
@@ -8094,3 +8128,4 @@ title: Title
             exp_user_data.furthest_reached_checkpoint_state_name,
             logged_out_user_data.furthest_reached_checkpoint_state_name
         )
+        self.logout()

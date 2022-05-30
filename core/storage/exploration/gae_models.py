@@ -908,7 +908,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model contains data to export corresponding to a logged-out user."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
