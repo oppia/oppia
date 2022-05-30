@@ -24,7 +24,7 @@
         {{ getSerialNumberForSkill(idx) }}.
       </td>
       <td class="protractor-test-skills-list-item">
-        <a [href]="getSkillEditorUrl(skill.id)" class="list-summary">
+        <a [href]="getSkillEditorUrl(skill.id)" class="list-summary protractor-test-open-skill-editor">
           <div class="skill-description protractor-test-skill-description">{{ skill.description }}</div>
           <div class="skill-topic">
             <span *ngIf="!skill.topicNames.length">
