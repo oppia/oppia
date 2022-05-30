@@ -149,7 +149,7 @@ RERUN_POLICIES = {
 }
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
-    'navigation',
+    
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
@@ -178,6 +178,7 @@ SUITES_STILL_IN_PROTRACTOR = [
     'learnerDashboard',
     'learner',
     'library',
+    'navigation',
     'playVoiceovers',
     'preferences',
     'profileFeatures',
@@ -320,12 +321,14 @@ def run_tests(args):
             proc =  stack.enter_context(servers.managed_webdriverIO_server(
                 suite_name=args.suite,
                 debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
                 stdout=subprocess.PIPE))
             
         elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
             proc =  stack.enter_context(servers.managed_webdriverIO_server(
                 suite_name=args.suite,
                 debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
                 stdout=subprocess.PIPE))
 
         elif args.suite in SUITES_STILL_IN_PROTRACTOR:

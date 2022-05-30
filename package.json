@@ -91,6 +91,7 @@
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
     "loader-utils": "^2.0.0",
+    "minimist": "^1.2.6",
     "mocha": "^9.0.0",
     "nyc": "^15.1.0",
     "postcss-html": "^1.3.0",
@@ -188,6 +189,7 @@
     "rxjs-marbles": "^6.0.0",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^5.2.0",
-    "wdio-timeline-reporter": "^5.1.4"
+    "wdio-timeline-reporter": "^5.1.4",
+    "wdio-video-reporter": "^3.2.1"
   }
 }

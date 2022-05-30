@@ -672,7 +672,8 @@ def managed_protractor_server(
 
 @contextlib.contextmanager
 def managed_webdriverIO_server(
-        suite_name='full', debug_mode=False, sharding_instances=1, **kwargs):
+        suite_name='full', debug_mode=False, sharding_instances=1,
+        chrome_version=None, **kwargs):
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
@@ -690,12 +691,13 @@ def managed_webdriverIO_server(
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
 
-    chrome_version = get_chrome_verison()
-    print(chrome_version)
+    if chrome_version is None:
+       chrome_version = get_chrome_verison()
+
     webdriverIO_args = [
         common.NODE_BIN_PATH2,
         common.NODEMODULES_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
-        '--suite', suite_name, chrome_version
+        '--suite', suite_name, '-c', chrome_version,
     ]
 
     if debug_mode:

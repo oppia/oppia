@@ -1,18 +1,43 @@
 const { TimelineService } = require('wdio-timeline-reporter/timeline-service');
-var args = process.argv;
-var chromedriverPath = './node_modules/webdriver-manager/selenium/chromedriver_' + args[5];
+const video = require('wdio-video-reporter');
+var args = require('minimist')(process.argv.slice(2));
+var chromedriverPath =
+'./node_modules/webdriver-manager/selenium/chromedriver_' + args.c;
+
+// To enable video recording of the failed tests cases change it to 1.
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
 
 var suites = {
-    // The tests on Travis are run individually to parallelize
-    // them. Therefore, we mention the complete directory
-    // in 'full'.
-    full: [
-      './core/tests/webdriverio/**/*.js',
-    ],
+  // The tests on Travis are run individually to parallelize
+  // them. Therefore, we mention the complete directory
+  // in 'full'.
+  full: [
+    './core/tests/webdriverio/**/*.js',
+  ],
+  navigation: [
+    './core/tests/webdriverio/navigation.js'
+  ],
+};
 
-    navigation: [
-        './core/tests/webdriverio/navigation.js'
-    ],
+repoterArray = [
+  ['spec', {
+    showPreface: false,
+  }],
+  ['timeline', {
+    outputDir: '../webdriverIO-tests-report',
+    embedImages: true,
+    screenshotStrategy: 'on:error'
+  }],
+];
+
+if ((process.env.GITHUB_ACTIONS &&
+    process.env.VIDEO_RECORDING_IS_ENABLED === 1) ||
+    LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
+  repoterArray.push([video, {
+    saveAllVideos: false,
+    videoSlowdownMultiplier: 3,
+    outputDir: '../webdriverIo-tests-videos'
+  }]);
 }
 
 exports.config = {
@@ -144,13 +169,7 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
-    reporters: [
-      ['spec', {
-        showPreface: false,
-      }],
-      ['timeline', {
-        outputDir: '../webdriverIO-tests-report'
-    }]],
+    reporters: repoterArray,
 
 
     //
