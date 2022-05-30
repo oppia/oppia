@@ -38,7 +38,7 @@ class GetTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
         """Returns a boolean indicating the validity of url fragment
 
         Returns:
-            Boolean. Returns PCollection of invalid topics.
+            Boolean. Returns validity of url fragment.
         """
         if url_frag is None:
             return False
