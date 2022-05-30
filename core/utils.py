@@ -37,18 +37,18 @@ import zlib
 
 from core.constants import constants
 
-# The third party library path is defined in common.py,
-# which is required to import typing_extensions.
-from scripts import common # pylint: disable=unused-import
-
 from typing import (
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
 from typing_extensions import Literal
 
+# The third party library path is defined in common.py,
+# which is required to import typing_extensions.
+from scripts import common # isort:skip pylint: disable=unused-import
 # Since feconf imports typing_extensions, it should be
 # imported after common is imported.
 from core import feconf # isort:skip  # pylint: disable=wrong-import-position
+
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
