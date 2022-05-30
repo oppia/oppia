@@ -2274,6 +2274,39 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         logged_in_user_model.put()
 
     elif logged_in_user_model.furthest_reached_checkpoint_exp_version < logged_out_user_data.furthest_reached_checkpoint_exp_version: # pylint: disable=line-too-long
+        most_recently_reached_checkpoint_index_in_logged_in_progress = (
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states
+            ).index(
+                exp_user_data.most_recently_reached_checkpoint_state_name
+                ))
+
+        most_recently_reached_checkpoint_index_in_logged_out_progress = (
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states
+            ).index(
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+                ))
+
+        if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
+            logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
+            )
+            logged_in_user_model.most_recently_reached_checkpoint_state_name = (
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+            )
+            logged_in_user_model.furthest_reached_checkpoint_exp_version = (
+                logged_out_user_data.furthest_reached_checkpoint_exp_version
+            )
+            logged_in_user_model.furthest_reached_checkpoint_state_name = (
+                logged_out_user_data.furthest_reached_checkpoint_state_name
+            )
+            logged_in_user_model.update_timestamps()
+            logged_in_user_model.put()
+
+    elif logged_in_user_model.furthest_reached_checkpoint_exp_version < logged_out_user_data.furthest_reached_checkpoint_exp_version: # pylint: disable=line-too-long
 
         most_recently_interacted_exploration = (
             exp_fetchers.get_exploration_by_id(
@@ -2336,37 +2369,37 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
             exp_user_data.furthest_reached_checkpoint_exp_version = (
                 latest_exploration.version)
 
-    most_recently_reached_checkpoint_index_in_logged_in_progress = (
-        user_services.get_checkpoints_in_order(
-            latest_exploration.init_state_name,
-            latest_exploration.states
-        ).index(
-            exp_user_data.most_recently_reached_checkpoint_state_name
-            ))
+        most_recently_reached_checkpoint_index_in_logged_in_progress = (
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states
+            ).index(
+                exp_user_data.most_recently_reached_checkpoint_state_name
+                ))
 
-    most_recently_reached_checkpoint_index_in_logged_out_progress = (
-        user_services.get_checkpoints_in_order(
-            latest_exploration.init_state_name,
-            latest_exploration.states
-        ).index(
-            logged_out_user_data.most_recently_reached_checkpoint_state_name
-            ))
+        most_recently_reached_checkpoint_index_in_logged_out_progress = (
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states
+            ).index(
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+                ))
 
-    if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
-        logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
-            logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
-        )
-        logged_in_user_model.most_recently_reached_checkpoint_state_name = (
-            logged_out_user_data.most_recently_reached_checkpoint_state_name
-        )
-        logged_in_user_model.furthest_reached_checkpoint_exp_version = (
-            logged_out_user_data.furthest_reached_checkpoint_exp_version
-        )
-        logged_in_user_model.furthest_reached_checkpoint_state_name = (
-            logged_out_user_data.furthest_reached_checkpoint_state_name
-        )
-        logged_in_user_model.update_timestamps()
-        logged_in_user_model.put()
+        if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
+            logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
+            )
+            logged_in_user_model.most_recently_reached_checkpoint_state_name = (
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+            )
+            logged_in_user_model.furthest_reached_checkpoint_exp_version = (
+                logged_out_user_data.furthest_reached_checkpoint_exp_version
+            )
+            logged_in_user_model.furthest_reached_checkpoint_state_name = (
+                logged_out_user_data.furthest_reached_checkpoint_state_name
+            )
+            logged_in_user_model.update_timestamps()
+            logged_in_user_model.put()
 
 
 def set_exploration_edits_allowed(exp_id, edits_are_allowed):
