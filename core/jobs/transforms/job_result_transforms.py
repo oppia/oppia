@@ -25,7 +25,7 @@ import result
 from typing import Any, Optional, Tuple
 
 
-class ResultsToJobRunResults(beam.PTransform):
+class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
     """Transforms result.Result into job_run_result.JobRunResult."""
 
     def __init__(
@@ -42,7 +42,7 @@ class ResultsToJobRunResults(beam.PTransform):
 
     # This is needed because the Beam annotations validator doesn't properly
     # work with result.Result.
-    @beam.typehints.no_annotations
+    @beam.typehints.no_annotations  # type: ignore[misc]
     def _transform_result_to_job_run_result(
         self, result_item: result.Result[Any, Any]
     ) -> job_run_result.JobRunResult:
@@ -87,7 +87,7 @@ class ResultsToJobRunResults(beam.PTransform):
 
     # This is needed because the Beam annotations validator doesn't properly
     # work with result.Result.
-    @beam.typehints.no_annotations
+    @beam.typehints.no_annotations  # type: ignore[misc]
     def expand(
         self, results: beam.PCollection[result.Result[Any, Any]]
     ) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -110,7 +110,7 @@ class ResultsToJobRunResults(beam.PTransform):
         )
 
 
-class CountObjectsToJobRunResult(beam.PTransform):
+class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
     """Transform that counts number of objects in a sequence and puts
     the count into job_run_result.JobRunResult.
     """
