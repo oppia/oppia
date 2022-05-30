@@ -1922,10 +1922,13 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             'total_hit_count'
         ] = 'invalid'
 
-        response = self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version}, expected_status_int=400)
+        response = self.post_json(
+            '/explorehandler/stats_events/%s' % self.exp_id,
+            {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+            }, expected_status_int=400
+        )
 
         error_msg = (
             'Schema validation for \'aggregated_stats\' '
