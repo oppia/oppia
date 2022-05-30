@@ -298,17 +298,6 @@ export class ConversationSkinComponent {
           this.statsReportingService.recordMaybeLeaveEvent(
             this.playerTranscriptService.getLastStateName(),
             this.learnerParamsService.getAllParams());
-          let confirmationMessage = (
-            'If you navigate away from this page, your progress on the ' +
-            'exploration will be lost.');
-          if (!this.isIframed && this.isLoggedIn) {
-            confirmationMessage = (
-              'If you navigate away from this page, your progress after the ' +
-              'last completed checkpoint will be lost.');
-          }
-          (e || this.windowRef.nativeWindow.event).returnValue = (
-            confirmationMessage);
-          return confirmationMessage;
         }
       });
 
