@@ -203,10 +203,10 @@ export class ExtractImageFilenamesFromModelService {
     let collapsibleTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-collapsible');
     for (let i = 0; i < collapsibleTagList.length; i++) {
-      // Created an attribute variable that gets the given attribute from
-      // a collapsible. If the given attribute does not exist, then attribute
-      // is null which means skip the current collapsible. If attribute is not
-      // null, then add images thatare embedded in the given collapsible.
+      // Get attribute from a collapsible. If the given attribute does not
+      // exist, then attribute is null which means skip the current
+      // collapsible. If the attribute is not null, then add images that are
+      // embedded in the given collapsible.
       let attribute = collapsibleTagList[i].getAttribute('content-with-value');
       if (attribute !== null) {
         let contentWithValue = JSON.parse(attribute);
@@ -222,10 +222,10 @@ export class ExtractImageFilenamesFromModelService {
     let tabsTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-tabs');
     for (let i = 0; i < tabsTagList.length; i++) {
-      // Created an attribute variable that gets the given attribute from
-      // a tab. If the given attribute does not exist, then attribute is null
-      // which means skip the current tab. If attribute is not null, then add
-      // images that are embedded in the given tab.
+      // Get attribute from a tab. If the given attribute does not exist,
+      // then attribute is null which means skip the current tab. If the
+      // attribute is not null, then add images that are embedded in the given
+      // tab.
       let attribute = tabsTagList[i].getAttribute('tab_contents-with-value');
       if (attribute !== null) {
         let contentsWithValue = JSON.parse(attribute);
@@ -246,10 +246,10 @@ export class ExtractImageFilenamesFromModelService {
         // variable filename instead of filepath since in the end we are
         // retrieving the filenames in the exploration.
 
-        // Created an attribute variable that gets the given filename attribute
-        // from an imageTag. If the given filename does not exist, then
-        // filename is null which means skip the current imageTag. If filename
-        // is not null, then add the file to filenames.
+        // Get filename attribute from an imageTag. If the given attribute does
+        // not exist, then attribute is null which means skip the current
+        // imageTag. If the attribute is not null, then add the file to
+        // filenames.
         let attribute = imageTagList[i].getAttribute('filepath-with-value');
         if (attribute !== null) {
           let filename = JSON.parse(
@@ -280,10 +280,9 @@ export class ExtractImageFilenamesFromModelService {
     let mathTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-math');
     for (let i = 0; i < mathTagList.length; i++) {
-      // Created an attribute variable that gets the given math-content
-      // attribute from a mathTag. If the given attribute does not exist, then
-      // attribute is null which means skip the current mathTag. If attribute
-      // is not null, then add the SVG filename to filenames.
+      // Get attribute from a mathTag. If the given attribute does not exist,
+      // then attribute is null which means skip the current mathTag.
+      // If the attribute is not null, then add the SVG filename to filenames.
       let attribute = mathTagList[i].getAttribute('math_content-with-value');
       if (attribute !== null) {
         let mathContentWithValue = JSON.parse(attribute);
