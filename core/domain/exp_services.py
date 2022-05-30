@@ -2273,7 +2273,7 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         logged_in_user_model.update_timestamps()
         logged_in_user_model.put()
 
-    elif logged_in_user_model.furthest_reached_checkpoint_exp_version < logged_out_user_data.furthest_reached_checkpoint_exp_version: # pylint: disable=line-too-long
+    elif logged_in_user_model.furthest_reached_checkpoint_exp_version == logged_out_user_data.furthest_reached_checkpoint_exp_version: # pylint: disable=line-too-long
         most_recently_reached_checkpoint_index_in_logged_in_progress = (
             user_services.get_checkpoints_in_order(
                 latest_exploration.init_state_name,
