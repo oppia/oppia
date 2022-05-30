@@ -12,30 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility functions for managing server processes required by Oppia."""
-
-from __future__ import annotations
-
-import contextlib
-import logging
-import os
-import re
-import shutil
-import signal
-import subprocess
-import sys
-import threading
-
-from core import feconf
-from core import utils
-from scripts import common
-
-
-@contextlib.contextmanager
-def managed_process(
-        command_args, human_readable_name='Process', shell=False,
-        timeout_secs=60, **popen_kwargs):
-    """Context manager for starting and stopping a process gracefully.
+"""Utility functions for managing server processes required by Oppia.
+    Context manager for starting and stopping a process gracefully.
 
     Args:
         command_args: list(int|str). A sequence of program arguments, where the
@@ -61,7 +39,29 @@ def managed_process(
     Raises:
         Exception. The process exited unexpectedly.
     """
-    # TODO(#11549): Move this to top of the file.
+from __future__ import annotations
+
+import contextlib
+import logging
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import threading
+
+from core import feconf
+from core import utils
+from scripts import common
+
+
+@contextlib.contextmanager
+def managed_process(
+        command_args, human_readable_name='Process', shell=False,
+        timeout_secs=60, **popen_kwargs):
+
+   
     if common.PSUTIL_DIR not in sys.path:
         sys.path.insert(1, common.PSUTIL_DIR)
     import psutil
