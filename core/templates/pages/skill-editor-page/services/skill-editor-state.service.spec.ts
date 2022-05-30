@@ -243,6 +243,10 @@ describe('Skill editor state service', () => {
     );
   });
 
+  it('should test getters', () => {
+    expect(skillEditorStateService.onSkillChange).toBeDefined();
+  });
+
   it('should request to load the skill from the backend', () => {
     spyOn(fakeSkillBackendApiService, 'fetchSkillAsync').and.callThrough();
     skillEditorStateService.loadSkill('skill_id_1');
@@ -285,6 +289,12 @@ describe('Skill editor state service', () => {
 
       expect(groupedSkillSummaries.current[0].id).toEqual('skill_id_1');
       expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
+
+      expect(
+        skillEditorStateService.getAssignedSkillTopicData()
+      ).toEqual({
+        topicName: ['tester']
+      });
     }));
 
   it('should return the last skill loaded as the same object',

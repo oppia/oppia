@@ -6725,5 +6725,7 @@ export default {
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
-  "ASSET_TYPE_THUMBNAIL": "thumbnail"
+  "ASSET_TYPE_THUMBNAIL": "thumbnail",
+
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
 } as const;

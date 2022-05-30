@@ -29,6 +29,9 @@ import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +39,10 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 export class SkillUpdateService {
   private _prerequisiteSkillChanged = new EventEmitter();
 
-  constructor(private undoRedoService: UndoRedoService) {}
+  constructor(
+    private undoRedoService: UndoRedoService,
+    private localStorageService: LocalStorageService
+  ) {}
 
   private _applyChange = (
       skill,
@@ -49,7 +55,27 @@ export class SkillUpdateService {
     changeDict.cmd = command;
     const changeObj = new Change(changeDict, apply, reverse);
     this.undoRedoService.applyChange(changeObj, skill);
+    this._updateSkillEditorBrowserTabsUnsavedChangesStatus(skill);
   };
+
+  private _updateSkillEditorBrowserTabsUnsavedChangesStatus(skill: Skill) {
+    const skillEditorBrowserTabsInfo:
+      EntityEditorBrowserTabsInfo = (
+        this.localStorageService.getEntityEditorBrowserTabsInfo(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+    if (
+      this.undoRedoService.getChangeCount() > 0 &&
+      skillEditorBrowserTabsInfo &&
+      !skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ) {
+      skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      this.localStorageService.updateEntityEditorBrowserTabsInfo(
+        skillEditorBrowserTabsInfo,
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_SKILL_EDITOR_BROWSER_TABS);
+    }
+  }
 
   private _applyPropertyChange = (
       skill,
