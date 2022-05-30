@@ -46,13 +46,13 @@ class GetTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             canonical_name='title',
             subtopic_schema_version=50,
             story_reference_schema_version=50,
-            next_subtopic_id='1',
+            next_subtopic_id=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='testFragment',
             practice_tab_is_displayed=False
         )
 
-        # This is an valid model.
+        # This is a valid model.
         self.topic_2 = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_ID_2,
@@ -60,7 +60,7 @@ class GetTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             canonical_name='title',
             subtopic_schema_version=50,
             story_reference_schema_version=50,
-            next_subtopic_id='1',
+            next_subtopic_id=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='test-fragment',
             practice_tab_is_displayed=False
@@ -74,7 +74,7 @@ class GetTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             canonical_name='title',
             subtopic_schema_version=50,
             story_reference_schema_version=50,
-            next_subtopic_id='1',
+            next_subtopic_id=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='test-test-test-test-test-test-test-test-test-test',
             practice_tab_is_displayed=False
