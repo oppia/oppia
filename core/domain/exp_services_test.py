@@ -8001,7 +8001,7 @@ states:
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
-        dest: New state
+        dest: Third state
         feedback:
           content_id: default_outcome
           html: ''
@@ -8141,6 +8141,94 @@ title: Title
         # New second checkpoint reached as logged out user.
         exp_services.update_logged_out_user_progress(
             self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'New state', 2)
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Mark 'Third state' as a checkpoint.
+        # Now version of the exploration becomes 3.
+        change_list = _get_change_list(
+            'Third state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # Unmark 'Next state' as a checkpoint.
+        # Now version of the exploration becomes 4.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # New third checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Third state', 4)
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Changing logged-in most recently reached state.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id,
+            self.EXP_ID,
+            'Introduction',
+            4
+        )
 
         exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
             self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
