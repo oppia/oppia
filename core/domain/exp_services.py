@@ -586,6 +586,37 @@ def apply_change_list(exploration_id, change_list):
         raise e
 
 
+def populate_exp_model_fields(exp_model, exploration):
+    """Populate exploration model with the data from Exploration object.
+
+    Args:
+        exp_model: ExplorationModel. The model to populate.
+        exploration: Exploration. THe exploration domain object which should be
+            used to populate the model.
+
+    Returns:
+        ExplorationModel. Populated model.
+    """
+    exp_model.title = exploration.title
+    exp_model.category = exploration.category
+    exp_model.objective = exploration.objective
+    exp_model.language_code = exploration.language_code
+    exp_model.tags = exploration.tags
+    exp_model.blurb = exploration.blurb
+    exp_model.author_notes = exploration.author_notes
+    exp_model.states_schema_version = exploration.states_schema_version
+    exp_model.init_state_name = exploration.init_state_name
+    exp_model.states = exploration.states
+    exp_model.param_specs = exploration.param_specs
+    exp_model.param_changes = exploration.param_changes
+    exp_model.auto_tts_enabled = exploration.auto_tts_enabled
+    exp_model.correctness_feedback_enabled = (
+        exploration.correctness_feedback_enabled)
+    exp_model.edits_allowed = exploration.edits_allowed
+
+    return exp_model
+
+
 def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
@@ -1208,7 +1239,7 @@ def regenerate_exploration_summary_with_new_contributor(
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if exploration is not None:
-        exp_summary = _compute_summary_of_exploration(exploration)
+        exp_summary = compute_summary_of_exploration(exploration)
         exp_summary.add_contribution_by_user(contributor_id)
         save_exploration_summary(exp_summary)
     else:
@@ -1224,13 +1255,13 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(exploration)
     exp_summary.contributors_summary = (
         compute_exploration_contributors_summary(exp_summary.id))
     save_exploration_summary(exp_summary)
 
 
-def _compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(exploration):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
