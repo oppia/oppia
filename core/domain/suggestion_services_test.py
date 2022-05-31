@@ -1418,15 +1418,34 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id_1, 'pt')
 
-        suggestion_target_ids = (
-            suggestion_services.
-            get_reviewable_translation_suggestion_target_ids(
+        suggestions = (
+            suggestion_services.get_reviewable_translation_suggestions(
                 self.reviewer_id_1))
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
-        self.assertItemsEqual(
-            suggestion_target_ids, [self.target_id_2, self.target_id_1])
+        self.assertEqual(len(suggestions), 3)
+        self.assertEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(suggestions[1].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[1].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(suggestions[2].target_id, self.target_id_2)
+        self.assertEqual(
+            suggestions[2].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[2].status,
+            suggestion_models.STATUS_IN_REVIEW)
 
     def test_get_reviewable_translation_suggestion_target_ids_with_no_reviewable_languages( # pylint: disable=line-too-long
         self
@@ -1438,14 +1457,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self._create_translation_suggestion('bn', self.target_id_3)
         self._create_translation_suggestion('bn', self.target_id_3)
 
-        suggestion_target_ids = (
-            suggestion_services.
-            get_reviewable_translation_suggestion_target_ids(
+        suggestions = (
+            suggestion_services.get_reviewable_translation_suggestions(
                 self.reviewer_id_1))
 
         # The user does not have rights to review any languages, so expect an
         # empty result.
-        self.assertEqual(len(suggestion_target_ids), 0)
+        self.assertEqual(len(suggestions), 0)
 
     def test_get_reviewable_translation_suggestions_with_valid_exp_ids(
             self):
