@@ -23,12 +23,19 @@ from core import utils
 from core.domain import image_services
 from core.platform import models
 
+from typing import Dict, List, Optional, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_identity_services
+    from mypy_imports import storage_services
+
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
 
-CHANGE_LIST_SAVE = [{'cmd': 'save'}]
+CHANGE_LIST_SAVE: List[Dict[str, str]] = [{'cmd': 'save'}]
 
-ALLOWED_ENTITY_NAMES = [
+ALLOWED_ENTITY_NAMES: List[str] = [
     feconf.ENTITY_TYPE_EXPLORATION,
     feconf.ENTITY_TYPE_BLOG_POST,
     feconf.ENTITY_TYPE_TOPIC,
@@ -37,7 +44,7 @@ ALLOWED_ENTITY_NAMES = [
     feconf.ENTITY_TYPE_QUESTION,
     feconf.ENTITY_TYPE_VOICEOVER_APPLICATION
 ]
-ALLOWED_SUGGESTION_IMAGE_CONTEXTS = [
+ALLOWED_SUGGESTION_IMAGE_CONTEXTS: List[str] = [
     feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
     feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 ]
@@ -51,7 +58,7 @@ class GeneralFileSystem:
         entity_id: str. The ID of the corresponding entity.
     """
 
-    def __init__(self, entity_name, entity_id):
+    def __init__(self, entity_name: str, entity_id: str) -> None:
         """Constructs a GeneralFileSystem object.
 
         Args:
@@ -62,7 +69,9 @@ class GeneralFileSystem:
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
-    def _validate_entity_parameters(self, entity_name, entity_id):
+    def _validate_entity_parameters(
+        self, entity_name: str, entity_id: str
+    ) -> None:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:
@@ -86,7 +95,7 @@ class GeneralFileSystem:
             raise utils.ValidationError('Entity id cannot be empty')
 
     @property
-    def assets_path(self):
+    def assets_path(self) -> str:
         """Returns the path of the parent folder of assets.
 
         Returns:
@@ -101,11 +110,11 @@ class GcsFileSystem(GeneralFileSystem):
     This implementation ignores versioning.
     """
 
-    def __init__(self, entity_name, entity_id):
+    def __init__(self, entity_name: str, entity_id: str) -> None:
         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         super(GcsFileSystem, self).__init__(entity_name, entity_id)
 
-    def _get_gcs_file_url(self, filepath):
+    def _get_gcs_file_url(self, filepath: str) -> str:
         """Returns the constructed GCS file URL.
 
         Args:
@@ -120,7 +129,7 @@ class GcsFileSystem(GeneralFileSystem):
         gcs_file_url = '%s/%s' % (self._assets_path, filepath)
         return gcs_file_url
 
-    def _check_filepath(self, filepath):
+    def _check_filepath(self, filepath: str) -> None:
         """Raises an error if a filepath is invalid.
 
         Args:
@@ -138,7 +147,7 @@ class GcsFileSystem(GeneralFileSystem):
         if not normalized_path.startswith(base_dir):
             raise IOError('Invalid filepath: %s' % filepath)
 
-    def isfile(self, filepath):
+    def isfile(self, filepath: str) -> bool:
         """Checks if the file with the given filepath exists in the GCS.
 
         Args:
@@ -152,7 +161,7 @@ class GcsFileSystem(GeneralFileSystem):
         return storage_services.isfile(
             self._bucket_name, self._get_gcs_file_url(filepath))
 
-    def get(self, filepath):
+    def get(self, filepath: str) -> bytes:
         """Gets a file as an unencoded stream of raw bytes.
 
         Args:
@@ -171,14 +180,19 @@ class GcsFileSystem(GeneralFileSystem):
         else:
             raise IOError('File %s not found.' % (filepath))
 
-    def commit(self, filepath, raw_bytes, mimetype=None):
+    def commit(
+        self,
+        filepath: str,
+        raw_bytes: Union[bytes, str],
+        mimetype: Optional[str] = None
+    ) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            raw_bytes: str. The content to be stored in the file.
-            mimetype: str. The content-type of the cloud file.
+            raw_bytes: Union[bytes, str]. The content to be stored in the file.
+            mimetype: Optional[str]. The content-type of the cloud file.
         """
         # Note that textual data needs to be converted to bytes so that it can
         # be stored in a file opened in binary mode. However, it is not
@@ -195,7 +209,7 @@ class GcsFileSystem(GeneralFileSystem):
             mimetype
         )
 
-    def delete(self, filepath):
+    def delete(self, filepath: str) -> None:
         """Deletes a file and the metadata associated with it.
 
         Args:
@@ -211,7 +225,7 @@ class GcsFileSystem(GeneralFileSystem):
         else:
             raise IOError('File does not exist: %s' % filepath)
 
-    def copy(self, source_assets_path, filepath):
+    def copy(self, source_assets_path: str, filepath: str) -> None:
         """Copy images from source_path.
 
         Args:
@@ -225,7 +239,7 @@ class GcsFileSystem(GeneralFileSystem):
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
 
-    def listdir(self, dir_name):
+    def listdir(self, dir_name: str) -> List[str]:
         """Lists all files in a directory.
 
         Args:
@@ -258,15 +272,20 @@ class GcsFileSystem(GeneralFileSystem):
 
 
 def save_original_and_compressed_versions_of_image(
-        filename, entity_type, entity_id, original_image_content,
-        filename_prefix, image_is_compressible):
+    filename: str,
+    entity_type: str,
+    entity_id: str,
+    original_image_content: bytes,
+    filename_prefix: str,
+    image_is_compressible: bool
+) -> None:
     """Saves the three versions of the image file.
 
     Args:
         filename: str. The name of the image file.
         entity_type: str. The type of the entity.
         entity_id: str. The id of the entity.
-        original_image_content: str. The content of the original image.
+        original_image_content: bytes. The content of the original image.
         filename_prefix: str. The string to prefix to the filename.
         image_is_compressible: bool. Whether the image can be compressed or
             not.
@@ -318,7 +337,17 @@ def save_original_and_compressed_versions_of_image(
             micro_image_filepath, micro_image_content, mimetype=mimetype)
 
 
-def save_classifier_data(exp_id, job_id, classifier_data_proto):
+# TODO(#15451): Add stubs for protobuf once we have enough info regarding
+# protobuf's library.
+# The argument classifier_data_proto can accept instances of
+# `TextClassifierFrozenModel` class. But since, we excluded
+# proto_files/ from the static type annotations. This argument
+# is annotated as general object type.
+def save_classifier_data(
+    exp_id: str,
+    job_id: str,
+    classifier_data_proto: object
+) -> None:
     """Store classifier model data in a file.
 
     Args:
@@ -330,12 +359,15 @@ def save_classifier_data(exp_id, job_id, classifier_data_proto):
     filepath = '%s-classifier-data.pb.xz' % (job_id)
     fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
     content = utils.compress_to_zlib(
-        classifier_data_proto.SerializeToString())
+        # Here, classifier_data_proto is of general object type and general
+        # objects do not contain any extra methods and properties. Thus to
+        # avoid MyPy error, we added an [attr-defined] ignore statement.
+        classifier_data_proto.SerializeToString())  # type: ignore[attr-defined]
     fs.commit(
         filepath, content, mimetype='application/octet-stream')
 
 
-def delete_classifier_data(exp_id, job_id):
+def delete_classifier_data(exp_id: str, job_id: str) -> None:
     """Delete the classifier data from file.
 
     Args:
@@ -349,8 +381,12 @@ def delete_classifier_data(exp_id, job_id):
 
 
 def copy_images(
-        source_entity_type, source_entity_id, destination_entity_type,
-        destination_entity_id, filenames):
+    source_entity_type: str,
+    source_entity_id: str,
+    destination_entity_type: str,
+    destination_entity_id: str,
+    filenames: List[str]
+) -> None:
     """Copy images from source to destination.
 
     Args:
