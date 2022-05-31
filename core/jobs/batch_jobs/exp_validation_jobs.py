@@ -108,6 +108,53 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     break
         return state_names
 
+    def get_states_having_invalid_cust_args(
+        self, exploration: exp_domain.Exploration
+    ) -> List[str]:
+        """Returns state names having multiple choice interaction with less
+        than 4 choices.
+        
+        Args:
+            exploration: Exploration. Exploration to be checked.
+
+        Returns:
+            list[str]. Returns state names having multiple choice interaction
+                with less than 4 choices.
+        """
+        state_names: List[str] = []
+        states: Dict[str, state_domain.State] = exploration.states
+        for state_name, state in states.items():
+            cust_args: dict[str, state_domain.InteractionCustomizationArg] = (
+                state.interaction.customization_args)
+            for ca_name, ca in cust_args.items():
+                if ca_name == 'choices' and len(ca.value) < 4:
+                    state_names.append(state_name)
+                    break
+        return state_names
+
+    def get_states_having_invalid_outcome(
+        self, exploration: exp_domain.Exploration
+    ) -> List[str]:
+        """Returns state names having default outcome with non-empty param
+        changes.
+        
+        Args:
+            exploration: Exploration. Exploration to be checked.
+
+        Returns:
+            list[str]. Returns state names having default outcome with
+                non-empty param changes.
+        """
+        state_names: List[str] = []
+        states: Dict[str, state_domain.State] = exploration.states
+        for state_name, state in states.items():
+            default_outcome: state_domain.Outcome = (
+                state.interaction.default_outcome)
+            if default_outcome is not None:
+                if len(default_outcome.param_changes) > 0:
+                    state_names.append(state_name)
+        return state_names
+
     def filter_curated_explorations(self, model_pair: Tuple[
         Optional[exp_models.ExplorationModel],
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
@@ -321,6 +368,61 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 ))
         )
 
+        curated_exps_having_invalid_cust_args = (
+            curated_explorations
+            | 'Filter explorations having invalid cust args' >>
+                beam.Filter(lambda exp: (
+                    len(self.get_states_having_invalid_cust_args(exp)) > 0))
+        )
+
+        report_number_of_exps_having_invalid_cust_args = (
+            curated_exps_having_invalid_cust_args
+            | 'Count explorations having invalid cust args' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'INVALID CUST ARGS'))
+        )
+
+        report_details_of_exps_having_invalid_cust_args = (
+            curated_exps_having_invalid_cust_args
+            | 'Save info on exps having invalid cust args' >> beam.Map(
+                lambda exp: job_run_result.JobRunResult.as_stderr(
+                    'The id of exp is %s and the states having multiple '
+                    'choice interaction with less than 4 choices are %s' % (
+                        exp.id,
+                        self.get_states_having_invalid_cust_args(exp)
+                    )
+                ))
+        )
+
+        curated_exp_having_invalid_outcome_param_changes = (
+            curated_explorations
+            | 'Filter explorations having invalid outcome param changes' >>
+                beam.Filter(lambda exp: (
+                    len(self.get_states_having_invalid_outcome(exp)) > 0
+                ))
+        )
+
+        report_number_of_exps_having_invalid_outcome_param_changes = (
+            curated_exp_having_invalid_outcome_param_changes
+            | 'Count explorations having invalid outcome param changes' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'INVALID OUTCOME PARAM CHANGES'))
+        )
+
+        report_details_of_exps_having_outcome_param_changes = (
+            curated_exps_having_invalid_cust_args
+            | 'Save info on exps having invalid outcome param changes' >>
+                beam.Map(
+                    lambda exp: job_run_result.JobRunResult.as_stderr(
+                        'The id of exp is %s and the states having outcome '
+                        'with non-empty param changes are %s' % (
+                            exp.id,
+                            self.get_states_having_invalid_outcome(exp)
+                        )
+                    )
+                )
+        )
+
         return (
             (
                 report_number_of_exps_queried,
@@ -332,7 +434,11 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 report_number_of_exps_having_invalid_param_specs,
                 report_details_of_exps_having_invalid_param_specs,
                 report_number_of_exps_having_invalid_training_data,
-                report_details_of_exps_having_invalid_training_data
+                report_details_of_exps_having_invalid_training_data,
+                report_number_of_exps_having_invalid_cust_args,
+                report_details_of_exps_having_invalid_cust_args,
+                report_number_of_exps_having_invalid_outcome_param_changes,
+                report_details_of_exps_having_outcome_param_changes
             )
             | 'Combine results' >> beam.Flatten()
         )
