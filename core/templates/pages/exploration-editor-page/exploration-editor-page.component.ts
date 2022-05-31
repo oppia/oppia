@@ -211,6 +211,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
+      ctrl.explorationEditorPageHasInitialized = false;
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -390,6 +391,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
+          ctrl.explorationEditorPageHasInitialized = true;
           $scope.$applyAsync();
         });
       };
