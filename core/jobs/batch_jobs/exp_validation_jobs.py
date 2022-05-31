@@ -113,13 +113,13 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
     ) -> List[str]:
         """Returns state names having multiple choice interaction with less
         than 4 choices.
-        
+
         Args:
             exploration: Exploration. Exploration to be checked.
 
         Returns:
             list[str]. Returns state names having multiple choice interaction
-                with less than 4 choices.
+            with less than 4 choices.
         """
         state_names: List[str] = []
         states: Dict[str, state_domain.State] = exploration.states
@@ -137,13 +137,13 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
     ) -> List[str]:
         """Returns state names having default outcome with non-empty param
         changes.
-        
+
         Args:
             exploration: Exploration. Exploration to be checked.
 
         Returns:
             list[str]. Returns state names having default outcome with
-                non-empty param changes.
+            non-empty param changes.
         """
         state_names: List[str] = []
         states: Dict[str, state_domain.State] = exploration.states
