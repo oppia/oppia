@@ -40,6 +40,10 @@ states:
           value:
           - r
           - "\u03C0"
+        customOskLetters:
+          value:
+          - r
+          - "\u03C0"
       default_outcome:
         dest: Algebraic Expression Input
         feedback:
@@ -964,6 +968,12 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         allowedVariables:
+          value:
+          - c
+          - m
+          - x
+          - y
+        customOskLetters:
           value:
           - c
           - m
