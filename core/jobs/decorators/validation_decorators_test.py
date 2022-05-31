@@ -69,6 +69,10 @@ class MockAuditsExisting(validation_decorators.AuditsExisting):
         cls._DO_FN_TYPES_BY_KIND.clear()
 
 
+# Due to incomplete typing of apache_beam library and absences of stubs in
+# Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid MyPy's
+# error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class DoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 
@@ -77,6 +81,10 @@ class DoFn(beam.DoFn):  # type: ignore[misc]
         pass
 
 
+# Due to incomplete typing of apache_beam library and absences of stubs in
+# Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid MyPy's
+# error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class UnrelatedDoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 

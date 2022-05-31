@@ -25,6 +25,10 @@ import result
 from typing import Any, Optional, Tuple
 
 
+# Due to incomplete typing of apache_beam library and absences of stubs in
+# Typeshed, MyPy assuming PTransform class is of type Any. Thus to avoid MyPy's
+# error (Class cannot subclass 'PTransform' (has type 'Any')) , we added an
+# ignore here.
 class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
     """Transforms result.Result into job_run_result.JobRunResult."""
 
@@ -42,6 +46,9 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
 
     # This is needed because the Beam annotations validator doesn't properly
     # work with result.Result.
+    # The decorator no_annotations is not annotated in apache_beam library,
+    # which causes MyPy to throw untyped decorator error. So to silent the
+    # error, we used ignore here.
     @beam.typehints.no_annotations  # type: ignore[misc]
     def _transform_result_to_job_run_result(
         self, result_item: result.Result[Any, Any]
@@ -87,6 +94,9 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
 
     # This is needed because the Beam annotations validator doesn't properly
     # work with result.Result.
+    # The decorator no_annotations is not annotated in apache_beam library,
+    # which causes MyPy to throw untyped decorator error. So to silent the
+    # error, we used ignore here.
     @beam.typehints.no_annotations  # type: ignore[misc]
     def expand(
         self, results: beam.PCollection[result.Result[Any, Any]]
@@ -110,6 +120,10 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
         )
 
 
+# Due to incomplete typing of apache_beam library and absences of stubs in
+# Typeshed, MyPy assuming PTransform class is of type Any. Thus to avoid MyPy's
+# error (Class cannot subclass 'PTransform' (has type 'Any')) , we added an
+# ignore here.
 class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
     """Transform that counts number of objects in a sequence and puts
     the count into job_run_result.JobRunResult.
