@@ -119,7 +119,7 @@ link before completing the signup process, they will be logged out.
           <input type="checkbox"
                  [(ngModel)]="hasAgreedToLatestTerms"
                  [ngModelOptions]="{standalone: true}"
-                 class="protractor-test-agree-to-terms-checkbox"
+                 class="oppia-checkbox-margin protractor-test-agree-to-terms-checkbox"
                  id="terms-checkbox">
           <span innerHTML="{{ 'I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION' | translate: { sitename: siteName } }}">
           </span>
@@ -161,5 +161,8 @@ link before completing the signup process, they will be logged out.
   }
   .oppia-signup-site-description-text {
     font-size: 1em;
+  }
+  .oppia-checkbox-margin {
+    margin-right: 6px;
   }
 </style>

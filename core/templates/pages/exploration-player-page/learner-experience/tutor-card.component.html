@@ -75,7 +75,7 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div *ngIf="isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div *ngIf="!displayedCardWasCompletedInPrevSession && isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((displayedCard.getInteractionHtml() && !displayedCard.isCompleted()) || displayedCard.isCompleted()) &&
     (!isOnTerminalCard() || !isIframed || displayedCard.isCompleted())">
       <div class="conversation-skin-inline-interaction">
@@ -107,6 +107,21 @@
           <span class="oppia-no-interaction-text">
             <strong>Error</strong>: No interaction specified for '{{ displayedCard.getStateName() }}'.
           </span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
+      <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
+        <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+           [href]="OPPIA_AVATAR_LINK_URL"
+           target="_blank"
+           rel="noopener">
+          <img class="conversation-skin-oppia-avatar rounded-circle"
+               [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+        </a>
+        <div class="conversation-skin-oppia-feedback-content">
+          {{ 'I18N_EXPLORATION_STATE_PREVIOUSLY_COMPLETED' | translate }}
         </div>
       </div>
     </div>
