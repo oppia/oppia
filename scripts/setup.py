@@ -49,8 +49,8 @@ def create_directory(directory_path):
 # if it does not match the expected prefix.
 def test_python_version():
     running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
-    if running_python_version != '3.7':
-        print('Please use Python 3.7. Exiting...')
+    if running_python_version != '3.8':
+        print('Please use Python 3.8. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
