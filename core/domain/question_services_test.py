@@ -3376,5 +3376,5 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(rule_specs[0].rule_type, 'MatchesExactlyWith')
 
         cust_args = question.question_state_data.interaction.customization_args
-        self.assertTrue('customOskLetters' not in cust_args)
-        self.assertTrue('allowedVariables' in cust_args)
+        self.assertNotIn('customOskLetters', cust_args)
+        self.assertIn('allowedVariables', cust_args)

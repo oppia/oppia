@@ -1014,9 +1014,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     @staticmethod
     def convert_customization_args_dict_to_customization_args(
-            interaction_id,
-            customization_args_dict,
-            state_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
+        interaction_id,
+        customization_args_dict,
+        state_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION
+    ):
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
         InteractionCustomizationArg domain object.

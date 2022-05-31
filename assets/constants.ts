@@ -6093,7 +6093,7 @@ export default {
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
 
-  // Allowed letters in the OSK.
+  // Valid allowed letters for math lessons.
   "VALID_ALLOWED_VARIABLES": [
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
