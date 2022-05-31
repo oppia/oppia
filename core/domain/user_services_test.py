@@ -305,10 +305,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         auth_id = 'someUser'
         email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, email).user_id
-        error_msg = 'User %s already exists for auth_id %s.' % (
-            user_id, auth_id)
 
-        with self.assertRaisesRegex(Exception, error_msg):
+        with self.assertRaisesRegex(
+            Exception,
+            'User %s already exists for auth_id %s.' % (user_id, auth_id)
+        ):
             user_services.create_new_user(auth_id, email)
 
     def test_email_truncation(self):
@@ -837,14 +838,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_bio, user_settings.user_bio)
 
     def test_update_preferred_language_codes(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
         language_codes = ['en']
 
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_id = user_services.create_new_user(
+            'someUser',
+            'user@example.com').user_id
         user_services.update_preferred_language_codes(
             user_id, language_codes)
-        user_settings = user_services.get_user_settings_from_email(user_email)
+        user_settings = user_services.get_user_settings(user_id)
 
         self.assertEqual(
             language_codes,
@@ -852,14 +853,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_preferred_site_language_code(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
         preferred_site_language_code = 'en'
 
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_id = user_services.create_new_user(
+            'someUser',
+            'user@example.com').user_id
         user_services.update_preferred_site_language_code(
             user_id, preferred_site_language_code)
-        user_settings = user_services.get_user_settings_from_email(user_email)
+        user_settings = user_services.get_user_settings(user_id)
 
         self.assertEqual(
             preferred_site_language_code,
@@ -867,14 +868,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_preferred_audio_language_code(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
         audio_code = 'en'
 
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_id = user_services.create_new_user(
+            'someUser',
+            'user@example.com').user_id
         user_services.update_preferred_audio_language_code(
             user_id, audio_code)
-        user_settings = user_services.get_user_settings_from_email(user_email)
+        user_settings = user_services.get_user_settings(user_id)
 
         self.assertEqual(
             audio_code,
@@ -882,13 +883,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_remove_user_role(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_id = user_services.create_new_user(
+            'someUser',
+            'user@example.com').user_id
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_services.add_user_role(user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        user_settings = user_services.get_user_settings_from_email(user_email)
+        user_settings = user_services.get_user_settings(user_id)
 
         user_services.remove_user_role(user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
@@ -898,10 +898,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_remove_user_role_for_default_role_raises_error(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_id = user_services.create_new_user(
+            'someUser',
+            'user@example.com').user_id
 
         with self.assertRaisesRegex(
             Exception,
@@ -1627,17 +1626,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_ids.append(user_services.create_new_user(
                 auth_id, user_emails[i]).user_id)
 
-        user_services.set_username(user_ids[0], 'username1')
+        user_services.set_username(user_ids[0], 'regularUsername')
         user_services.mark_user_for_deletion(user_ids[1])
 
-        user_settings3 = user_services.get_user_settings(user_ids[2])
+        user_settings_for_no_username = user_services.get_user_settings(
+            user_ids[2])
 
         usernames = [
-            'username1',
+            'regularUsername',
             user_services.LABEL_FOR_USER_BEING_DELETED,
             (
                 '[Awaiting user registration: %s]' %
-                user_settings3.truncated_email
+                user_settings_for_no_username.truncated_email
             )
         ]
 
@@ -1651,10 +1651,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_human_readable_user_ids(['unregistered_id'])
 
     def test_record_user_started_state_editor_tutorial(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_id = user_services.create_new_user(
+            'someUser',
+            'user@example.com').user_id
         user_services.record_user_started_state_editor_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
         prev_started_state = user_settings.last_started_state_editor_tutorial
