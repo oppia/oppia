@@ -307,50 +307,23 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             for topic in topics
             for reference in topic.get_all_story_references()
             if reference.story_is_published])
+        in_review_suggestions = (
+            suggestion_services.get_reviewable_translation_suggestions(user_id))
+        in_review_suggestion_target_ids = [
+            suggestion.target_id
+            for suggestion in
+            suggestion_services.get_suggestions_with_translatable_explorations(
+                in_review_suggestions)
+        ]
         exp_ids = [
             node.exploration_id
             for story in topic_stories
             for node in story.story_contents.get_ordered_nodes()
-            if node.exploration_id in self._get_in_review_suggestion_target_ids(
-                user_id)
+            if node.exploration_id in in_review_suggestion_target_ids
         ]
         return (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 exp_ids).values())
-
-    def _get_in_review_suggestion_target_ids(self, user_id):
-        """Returns the target IDs of translation suggestions for which the
-        supplied user can review.
-
-        Args:
-            user_id: str. The ID of the user.
-
-        Returns:
-            set(str). A set of target IDs of the translation suggestions that
-            the supplied user can review.
-        """
-        in_review_suggestions = (
-            suggestion_services.get_reviewable_translation_suggestions(user_id))
-        suggestion_exp_ids = {
-            suggestion.target_id for suggestion in in_review_suggestions}
-        suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
-            list(suggestion_exp_ids))
-        in_review_suggestion_target_ids = set()
-        for suggestion in in_review_suggestions:
-            exploration = suggestion_exp_id_to_exp[suggestion.target_id]
-            content_id_exists = False
-
-            # Checks whether the suggestion's change content still exists in the
-            # corresponding exploration.
-            # For more details, see https://github.com/oppia/oppia/issues/14339.
-            if suggestion.change.state_name in exploration.states:
-                content_id_exists = exploration.states[
-                    suggestion.change.state_name].has_content_id(
-                        suggestion.change.content_id)
-
-            if content_id_exists and exploration.edits_allowed:
-                in_review_suggestion_target_ids.add(suggestion.target_id)
-        return in_review_suggestion_target_ids
 
 
 class TranslatableTextHandler(base.BaseHandler):
