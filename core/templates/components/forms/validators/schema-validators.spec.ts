@@ -16,7 +16,7 @@
  * @fileoverview Tests for schema-validators.
  */
 
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { SchemaValidators } from './schema-validators';
 
 class MockFormControl extends AbstractControl {
@@ -69,7 +69,6 @@ describe('Schema validators', () => {
     }
     );
   });
-
   describe('when validating "has-length-at-most"', () => {
     it('should impose maximum length bounds', () => {
       const control: MockFormControl = new MockFormControl([], []);
@@ -276,6 +275,110 @@ describe('Schema validators', () => {
         ).withContext(testCase.toString()).toBeDefined();
       });
     }
+    );
+  });
+  describe('when validating isUrlFragment', () => {
+    let filter!: (control: AbstractControl) => ValidationErrors | null;
+    const errorMsg = {isUrlFragment: 'Not a url fragment'};
+
+    beforeEach(() => {
+      filter = SchemaValidators.isUrlFragment({
+        charLimit: 20
+      });
+    });
+
+    it('should validate non-emptiness', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('abc');
+      expect(filter(control)).toBe(null);
+      control.setValue('');
+      expect(filter(control)).toEqual(errorMsg);
+    });
+
+    it('should fail when there are caps characters', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('aBc');
+      expect(filter(control)).toEqual(errorMsg);
+      control.setValue('aaaAAA');
+      expect(filter(control)).toEqual(errorMsg);
+    });
+
+    it('should fail when there are numeric characters', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('abc-123');
+      expect(filter(control)).toEqual(errorMsg);
+      control.setValue('h4ck3r');
+      expect(filter(control)).toEqual(errorMsg);
+    });
+
+    it('should fail when there are special characters other than hyphen',
+      () => {
+        const control: MockFormControl = new MockFormControl([], []);
+        const testCases = [
+          {controlValue: 'special~chars', expectedResult: false },
+          {controlValue: 'special`chars', expectedResult: false },
+          {controlValue: 'special!chars', expectedResult: false },
+          {controlValue: 'special@chars', expectedResult: false },
+          {controlValue: 'special#chars', expectedResult: false },
+          {controlValue: 'special$chars', expectedResult: false },
+          {controlValue: 'special%chars', expectedResult: false },
+          {controlValue: 'special^chars', expectedResult: false },
+          {controlValue: 'special&chars', expectedResult: false },
+          {controlValue: 'special*chars', expectedResult: false },
+          {controlValue: 'special(chars', expectedResult: false },
+          {controlValue: 'special)chars', expectedResult: false },
+          {controlValue: 'special_chars', expectedResult: false },
+          {controlValue: 'special+chars', expectedResult: false },
+          {controlValue: 'special=chars', expectedResult: false },
+          {controlValue: 'special{chars', expectedResult: false },
+          {controlValue: 'special}chars', expectedResult: false },
+          {controlValue: 'special[chars', expectedResult: false },
+          {controlValue: 'special]chars', expectedResult: false },
+          {controlValue: 'special:chars', expectedResult: false },
+          {controlValue: 'special;chars', expectedResult: false },
+          {controlValue: 'special"chars', expectedResult: false },
+          {controlValue: 'special\'chars', expectedResult: false },
+          {controlValue: 'special|chars', expectedResult: false },
+          {controlValue: 'special<chars', expectedResult: false },
+          {controlValue: 'special,chars', expectedResult: false },
+          {controlValue: 'special>chars', expectedResult: false },
+          {controlValue: 'special.chars', expectedResult: false },
+          {controlValue: 'special?chars', expectedResult: false },
+          {controlValue: 'special/chars', expectedResult: false },
+          {controlValue: 'special\\chars', expectedResult: false },
+        ];
+        testCases.forEach((testCase) => {
+          control.setValue(testCase.controlValue);
+          expect(
+            filter(control)
+          ).withContext(testCase.toString()).toEqual(errorMsg);
+        });
+      });
+
+    it('should fail when there are spaces', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('url with spaces');
+      expect(filter(control)).toEqual(errorMsg);
+      control.setValue(' trailing space ');
+      expect(filter(control)).toEqual(errorMsg);
+    });
+
+    it(
+      'should fail when the length of the input is greater than the char limit',
+      () => {
+        const control: MockFormControl = new MockFormControl([], []);
+        control.setValue('a-lengthy-url-fragment');
+        expect(filter(control)).toEqual(errorMsg);
+      });
+
+    it('should pass when the passed value is a valid url fragment',
+      () => {
+        const control: MockFormControl = new MockFormControl([], []);
+        control.setValue('math');
+        expect(filter(control)).toBe(null);
+        control.setValue('computer-sciencet');
+        expect(filter(control)).toBe(null);
+      }
     );
   });
 });
