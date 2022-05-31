@@ -218,7 +218,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.value &&
       changes.value.currentValue.raw_latex !==
-      changes.value.previousValue.raw_latex) {
+      changes.value.previousValue?.raw_latex) {
       this.localValue = {
         label: this.value.raw_latex || '',
       };
