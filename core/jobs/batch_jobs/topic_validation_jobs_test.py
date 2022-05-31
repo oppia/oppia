@@ -49,7 +49,8 @@ class GetTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             next_subtopic_id=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='testFragment',
-            practice_tab_is_displayed=False
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='testing'
         )
 
         # This is a valid model.
@@ -63,7 +64,8 @@ class GetTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             next_subtopic_id=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='test-fragment',
-            practice_tab_is_displayed=False
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='testing'
         )
 
         # This is an invalid model.
@@ -77,7 +79,8 @@ class GetTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             next_subtopic_id=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='test-test-test-test-test-test-test-test-test-test',
-            practice_tab_is_displayed=False
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='testing'
         )
 
     def test_run_with_no_models(self) -> None:
