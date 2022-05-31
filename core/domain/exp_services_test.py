@@ -8020,7 +8020,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: true
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
@@ -8054,7 +8054,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: true
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
@@ -8128,4 +8128,47 @@ title: Title
             exp_user_data.furthest_reached_checkpoint_state_name,
             logged_out_user_data.furthest_reached_checkpoint_state_name
         )
+
+        # Mark 'New state' as a checkpoint.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # New second checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'New state', 2)
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
         self.logout()
