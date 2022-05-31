@@ -8,7 +8,7 @@ on:
       - develop
 
 jobs:
-  triage:
+  label:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/labeler@v4
