@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="graphIsShown">
   <graph-viz [graph]="value"
              (graphChange)="updateValue($event)"
              [canAddVertex]="true"

@@ -19,44 +19,58 @@
 // NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be
 // available in the context in which it is used.
 
-angular.module('oppia').component('parameterNameEditor', {
-  bindings: {
-    value: '='
-  },
-  template: require('./parameter-name-editor.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    '$scope', 'ExplorationParamSpecsService',
-    function($scope, ExplorationParamSpecsService) {
-      var ctrl = this;
-      ctrl.validate = function() {
-        return ctrl.availableParamNames.length !== 0;
-      };
-      ctrl.$onInit = function() {
-        // Reset the component each time the value changes (e.g. if this is
-        // part of an editable list).
-        $scope.$watch('$ctrl.value', function(newValue) {
-          if (newValue) {
-            ctrl.localValue = newValue;
-          }
-        }, true);
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-        $scope.$watch('$ctrl.localValue', function(newValue) {
-          ctrl.value = newValue;
-        });
-        ctrl.availableParamNames = (
-          ExplorationParamSpecsService.savedMemento.getParamNames());
+import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
-        if (ctrl.availableParamNames.length === 0) {
-          ctrl.localValue = null;
-        } else {
-          ctrl.localValue = ctrl.availableParamNames[0];
-        }
+@Component({
+  selector: 'parameter-name-editor',
+  templateUrl: './parameter-name-editor.component.html'
+})
+export class ParameterNameEditorComponent implements OnInit {
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  @Output() validityChange = new EventEmitter<Record<'error', boolean>>();
+  availableParamNames: string[];
+  SCHEMA: { type: 'unicode'; choices: string[] };
+  constructor(
+    private explorationParamSpecsService: ExplorationParamSpecsService
+  ) { }
 
-        ctrl.SCHEMA = {
-          type: 'unicode',
-          choices: ctrl.availableParamNames
-        };
-      };
-    }]
-});
+  private _validate() {
+    this.validityChange.emit({error: (
+      this.availableParamNames.length === 0) ? false : true});
+  }
+
+  ngOnInit(): void {
+    this.availableParamNames = (
+      (this.explorationParamSpecsService.savedMemento)
+        .getParamNames());
+
+    if (this.availableParamNames.length === 0) {
+      this.value = null;
+    } else {
+      this.value = this.availableParamNames[0];
+    }
+    this.valueChanged.emit(this.value);
+    this.SCHEMA = {
+      type: 'unicode',
+      choices: this.availableParamNames
+    };
+  }
+
+  getSchema(): { type: 'unicode'; choices: string[] } {
+    return this.SCHEMA;
+  }
+
+  updateValue(value: unknown): void {
+    this.value = value;
+    this._validate();
+    this.valueChanged.emit(this.value);
+  }
+}
+
+angular.module('oppia').directive('parameterNameEditor', downgradeComponent({
+  component: ParameterNameEditorComponent
+}));

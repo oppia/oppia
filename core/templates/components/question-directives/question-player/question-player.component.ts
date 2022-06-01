@@ -37,35 +37,35 @@ require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
+  'schema-based-bool-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
+  'schema-based-dict-editor.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
+  'schema-based-expression-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+  'schema-based-float-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
+  'schema-based-html-editor.component.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
+  'schema-based-list-editor.component.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.component.ts');
 require('components/score-ring/score-ring.component.ts');
 require(
   'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');

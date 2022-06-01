@@ -326,7 +326,7 @@ var ExplorationEditorMainTab = function() {
 
       var isVisible = await responseBody(responseNum).isPresent();
       if (!isVisible) {
-        await action.click('Response Editor Header', headerElem);
+        await action.click('Response Editor Header', headerElem, true);
       }
     } else {
       headerElem = addResponseHeader;

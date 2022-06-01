@@ -19,7 +19,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -50,6 +50,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: { labeledRegions: Region[]; imagePath: string };
+
   @Output() valueChanged = new EventEmitter();
   errorText!: string;
   SCHEMA!: { type: string; 'obj_type': string };
@@ -79,10 +80,12 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   hoveredRegion: number | null = null;
   // Selected Region will be null if no region is selected.
   selectedRegion: number | null = null;
+  editorIsInitialized: boolean = false;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
+    private changeDetectorDef: ChangeDetectorRef,
     private el: ElementRef,
     private utilsService: UtilsService,
     private ngbModal: NgbModal
@@ -202,14 +205,32 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.alwaysEditable = true;
-    // The initializeEditor function is written separately since it
-    // is also called in resetEditor function.
-    this.initializeEditor();
-    this.imageValueChanged(this.value.imagePath);
+    // The following check is used to prevent cases when the value is not
+    // defined. This is a dynamically created component and in some cases we get
+    // undefined. This happens when ngOnInit runs before we can assign
+    // this.value the value that is supposed to be passed from object editor
+    // component.
+    if (this.value) {
+      // The initializeEditor function is written separately since it
+      // is also called in resetEditor function.
+      this.initializeEditor();
+      this.imageValueChanged(this.value.imagePath);
+    }
     this.SCHEMA = {
       type: 'custom',
       obj_type: 'Filepath'
     };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      !changes.value ||
+      !changes.value.currentValue ||
+      changes.value.previousValue === changes.value.currentValue
+    ) {
+      return;
+    }
+    this.initializeEditor();
   }
 
   // Dynamically defines the CSS style for the region rectangle.
@@ -254,6 +275,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   initializeEditor(): void {
+    if (this.editorIsInitialized) {
+      return;
+    }
     // All coordinates have origin at top-left,
     // increasing in x to the right and increasing in y down
     // Current mouse position in SVG coordinates.
@@ -304,6 +328,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     this.selectedRegion = null;
     // Message to displayed when there is an error.
     this.errorText = '';
+    this.editorIsInitialized = true;
   }
 
   // Use these two functions to get the calculated image width and
@@ -459,7 +484,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
           }
         };
         this.value.labeledRegions.push(newRegion);
-        this.valueChanged.emit(this.value);
+        // In order to trigger change detection, we emit a new object by
+        // using the spread operator. This is because adding/modifying
+        // properties in an Object/Array doesn't always trigger
+        // change-detection cycles.
+        this.valueChanged.emit({...this.value});
         this.selectedRegion = (
           this.value.labeledRegions.length - 1);
       }
@@ -583,6 +612,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       backdrop: 'static',
       keyboard: false,
     }).result.then(() => {
+      this.editorIsInitialized = false;
       this.value.imagePath = '';
       this.value.labeledRegions = [];
       this.imageValueChanged('');
@@ -606,7 +636,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.hoveredRegion--;
     }
     this.value.labeledRegions.splice(index, 1);
-    this.valueChanged.emit(this.value);
+    // In order to trigger change detection, we emit a new object by
+    // using the spread operator. This is because adding/modifying
+    // properties in an Object/Array doesn't always trigger
+    // change-detection cycles.
+    this.valueChanged.emit({...this.value});
   }
 
   imageValueChanged(newVal: string): void {

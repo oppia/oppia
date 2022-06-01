@@ -16,7 +16,7 @@
       be auto-added.)
     </p>
 
-    <schema-based-editor [schema]="getSchema.bind(this)"
+    <schema-based-editor [schema]="EMAIL_BODY_SCHEMA"
                          [localValue]="emailBody"
                          (localValueChange)="updateValue($event)">
     </schema-based-editor>

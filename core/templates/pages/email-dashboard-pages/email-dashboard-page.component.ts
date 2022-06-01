@@ -22,17 +22,8 @@ import { AppConstants } from 'app.constants';
 import { QueryData } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from 'domain/email-dashboard/email-dashboard-query.model';
 import { LoaderService } from 'services/loader.service';
-import { Schema } from 'services/schema-default-value.service';
 import { UserService } from 'services/user.service';
 import { EmailDashboardDataService } from './email-dashboard-data.service';
-
-interface CustomizationArgSpec {
-  'backend_id': string;
-  'backend_attr': string;
-  'description': string;
-  'schema': Schema;
-  'default_value': number | boolean | string;
-}
 
 @Component({
   selector: 'oppia-email-dashboard-page',
@@ -75,17 +66,6 @@ export class EmailDashboardPageComponent {
       this.data[field] = newValue;
       this.changeDetectorRef.detectChanges();
     }
-  }
-
-  getSchema(customizationArgSpec: CustomizationArgSpec): () => Schema {
-    let callb = () => {
-      return customizationArgSpec.schema;
-    };
-    return callb.bind(this);
-  }
-
-  isFieldRequired(): boolean {
-    return this.isRequired;
   }
 
   resetForm(): void {

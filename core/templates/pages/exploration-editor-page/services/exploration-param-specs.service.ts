@@ -23,6 +23,7 @@ import { ExplorationPropertyService } from 'pages/exploration-editor-page/servic
 import { AlertsService } from 'services/alerts.service';
 import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class ExplorationParamSpecsService extends
   ExplorationPropertyService {
   propertyName: string = 'param_specs';
-
+  savedMemento: ParamSpecs;
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,

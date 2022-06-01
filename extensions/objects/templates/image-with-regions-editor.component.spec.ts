@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ImageWithRegionsEditorComponent } from './image-with-regions-editor.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContextService } from 'services/context.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -108,6 +108,32 @@ describe('ImageWithRegionsEditorComponent', () => {
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new MockImageObject(490, 864));
   });
+
+  it(
+    'should initialize editor when ngOnChanges is run with a new value only',
+    fakeAsync(() => {
+      expect(component.editorIsInitialized).toBe(false);
+      component.ngOnChanges({});
+      expect(component.editorIsInitialized).toBe(false);
+      component.ngOnChanges({
+        value: new SimpleChange(
+          undefined, {labeledRegion: [], imagePath: ''}, true
+        ),
+      });
+      expect(component.editorIsInitialized).toBe(true);
+    })
+  );
+
+  it(
+    'should not re-initialize editor once initialized',
+    fakeAsync(() => {
+      expect(component.editorIsInitialized).toBe(false);
+      component.initializeEditor();
+      expect(component.editorIsInitialized).toBe(true);
+      component.initializeEditor();
+      expect(component.editorIsInitialized).toBe(true);
+    })
+  );
 
   it('should initialize component when interaction editor is opened.', () => {
     spyOn(component, 'initializeEditor').and.callThrough();

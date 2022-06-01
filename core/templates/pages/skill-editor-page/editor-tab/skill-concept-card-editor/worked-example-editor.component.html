@@ -26,7 +26,7 @@
           (submit)="saveWorkedExample()">
       <div class="oppia-rule-details-header">
         <strong>Example Question</strong>
-        <schema-based-editor  [schema]="getSchema.bind(this)"
+        <schema-based-editor  [schema]="getSchema()"
                               [localValue]="container.workedExampleQuestionHtml"
                               (localValueChange)="this.updateLocalQues($event)">
         </schema-based-editor>

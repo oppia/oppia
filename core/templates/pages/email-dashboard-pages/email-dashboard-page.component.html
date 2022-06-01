@@ -13,8 +13,8 @@
                 <div class="col-2">
                   <schema-based-editor [localValue]="data[customizationArgSpec.backend_attr]"
                                        (localValueChange)="updateQueryData($event, customizationArgSpec.backend_attr)"
-                                       [schema]="getSchema(customizationArgSpec)"
-                                       [notRequired]="isFieldRequired.bind(this)"
+                                       [schema]="customizationArgSpec.schema"
+                                       [notRequired]="isRequired"
                                        class="protractor-test-email-dashboard-input-{{ idx }}">
                   </schema-based-editor>
                 </div>

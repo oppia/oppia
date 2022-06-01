@@ -16,12 +16,12 @@
   <div class="oppia-custom-letters">
     <div *ngIf="currentTab === latinTab && lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[0]" (click)="updateLettersList(letter)">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[0]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-2">
-        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[1]" (click)="updateLettersList(letter)">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[1]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
@@ -29,19 +29,19 @@
         <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[2]" (click)="updateLettersList(letter)">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[2]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
     </div>
     <div *ngIf="currentTab === latinTab && !lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[0]" (click)="updateLettersList(letter)">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[0]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-2">
-        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[1]" (click)="updateLettersList(letter)">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[1]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
@@ -49,19 +49,19 @@
         <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button id="custom-letter-{{ letter }}" [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[2]" (click)="updateLettersList(letter)">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[2]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
     </div>
     <div *ngIf="currentTab === greekTab && lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[0]" (click)="updateLettersList(letter)">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[0]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
       <div class="oppia-custom-letters-row-2">
-        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[1]" (click)="updateLettersList(letter)">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[1]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
@@ -69,14 +69,14 @@
         <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[2]" (click)="updateLettersList(letter)">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[2]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
     </div>
     <div *ngIf="currentTab === greekTab && !lettersAreLowercase" class="oppia-custom-letters-latin-lower">
       <div class="oppia-custom-letters-row-1">
-        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[0]" (click)="updateLettersList(letter)">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[0]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>
@@ -84,7 +84,7 @@
         <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
           <i class="fa fa-arrow-up"></i>
         </button>
-        <button [attr.class]="(value.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[1]" (click)="updateLettersList(letter)">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[1]" (click)="updateLettersList(letter)">
           {{ letter }}
         </button>
       </div>

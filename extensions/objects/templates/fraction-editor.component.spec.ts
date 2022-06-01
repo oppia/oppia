@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FractionEditorComponent } from './fraction-editor.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
@@ -25,7 +25,7 @@ describe('FractionEditorComponent', () => {
   let component: FractionEditorComponent;
   let fixture: ComponentFixture<FractionEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MockTranslatePipe, FractionEditorComponent],
       schemas: [NO_ERRORS_SCHEMA]
@@ -57,14 +57,6 @@ describe('FractionEditorComponent', () => {
 
     expect(component.currentFractionValueIsValid).toBeTrue();
     expect(component.errorMessageI18nKey).toBe('');
-    expect(component.eventBus.emit).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        message: {
-          value: false,
-          modalId: undefined
-        },
-        type: 'ObjectFormValidityChangeEvent'
-      }));
   });
 
   it('should display error message when user enters an invalid fraction',
@@ -77,14 +69,6 @@ describe('FractionEditorComponent', () => {
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS'
       );
-      expect(component.eventBus.emit).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          message: {
-            value: true,
-            modalId: undefined
-          },
-          type: 'ObjectFormValidityChangeEvent'
-        }));
     });
 
   it('should display error message when user enter an empty fraction', () => {

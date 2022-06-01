@@ -76,8 +76,10 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   }
 
   updateChanges($event: string): void {
-    this.outcomeNewStateName = $event;
-    this.getChanges.emit();
+    if ($event !== '') {
+      this.outcomeNewStateName = $event;
+      this.getChanges.emit();
+    }
   }
 
   onDestSelectorChange(): void {

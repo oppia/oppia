@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -29,14 +29,9 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
 
-class MockChangeDetectorRef {
-  detectChanges(): void {}
-}
-
 describe('StateHintsEditorComponent', () => {
   let component: StateContentEditorComponent;
   let fixture: ComponentFixture<StateContentEditorComponent>;
-  let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let changeListService: ChangeListService;
   let externalSaveService: ExternalSaveService;
   let stateContentService: StateContentService;
@@ -58,10 +53,6 @@ describe('StateHintsEditorComponent', () => {
         MockTranslatePipe
       ],
       providers: [
-        {
-          provide: ChangeDetectorRef,
-          useValue: changeDetectorRef
-        },
         ChangeListService,
         ExternalSaveService,
         StateContentService,
@@ -183,33 +174,5 @@ describe('StateHintsEditorComponent', () => {
 
     expect(component.saveStateContent.emit)
       .toHaveBeenCalled();
-  });
-
-  it('should get schema', () => {
-    expect(component.getHtmlSchema())
-      .toEqual(component.HTML_SCHEMA);
-  });
-
-  it('should invoke change detection when html is updated', () => {
-    stateContentService.displayed = (
-      _getContent('content', 'old'));
-    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
-
-    component.updateHtml('new');
-
-    expect(stateContentService.displayed).toEqual(
-      _getContent('content', 'new'));
-  });
-
-  it('should not invoke change detection when html is not updated', () => {
-    stateContentService.displayed = (
-      _getContent('content', 'old'));
-    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
-
-    component.updateHtml('old');
-
-    expect(stateContentService.displayed).toEqual(
-      _getContent('content', 'old'));
-    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 });

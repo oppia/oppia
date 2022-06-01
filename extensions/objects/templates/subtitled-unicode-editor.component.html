@@ -1,4 +1,4 @@
-<schema-based-editor [schema]="getSchema.bind(this)"
-                     [localValue]="value._unicode"
+<schema-based-editor [schema]="getSchema()"
+                     [localValue]="value ? value._unicode: ''"
                      (localValueChange)="updateValue($event)">
 </schema-based-editor>

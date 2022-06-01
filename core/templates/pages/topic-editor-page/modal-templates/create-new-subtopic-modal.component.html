@@ -46,8 +46,9 @@
         </div>
         <div class="description-editor protractor-test-subtopic-description-editor" *ngIf="schemaEditorIsShown">
           <div class="oppia-editor-card-body" >
-            <schema-based-editor [schema]="getSchema.bind(this)"
+            <schema-based-editor [schema]="getSchema()"
                                  class="protractor-test-create-subtopic-page-content"
+                                 [localValue]="htmlData"
                                  (localValueChange)="localValueChange($event)">
             </schema-based-editor>
           </div>

@@ -82,12 +82,12 @@ export class CustomOskLettersEditorComponent implements OnInit {
 
   getRemainingLettersCount(): number {
     return Math.max(
-      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value.length, 0);
+      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value?.length, 0);
   }
 
   isCustomizationArgOpen(): boolean {
     return document.getElementsByClassName(
-      'custom-letters-div').length !== 0;
+      'custom-letters-div')?.length !== 0;
   }
 
   keyDownCallBack(e: KeyboardEvent): void {
