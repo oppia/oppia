@@ -111,7 +111,7 @@ describe('rich-text components', function() {
 });
 
 
-describe('Interactions', function() {
+fdescribe('Interactions', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;

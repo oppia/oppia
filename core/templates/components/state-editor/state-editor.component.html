@@ -28,7 +28,7 @@
   </div>
 </md-card>
 
-<div ng-show="$ctrl.isInteractionShown()">
+<div ng-if="$ctrl.isInteractionShown()">
   <oppia-state-interaction-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"
                                   (on-save-interaction-id)="$ctrl.onSaveInteractionId($event)"
                                   (on-save-interaction-customization-args)="$ctrl.onSaveInteractionCustomizationArgs($event)"

@@ -123,7 +123,6 @@ implements ControlValueAccessor, OnInit, Validator {
     this.hasLoaded = false;
     this.userIsCurrentlyTyping = false;
     this.userHasFocusedAtLeastOnce = false;
-    this.errorStringI18nKey = '';
     this.labelForErrorFocusTarget = (
       this.focusManagerService.generateFocusLabel()
     );
