@@ -697,7 +697,7 @@ def managed_webdriverIO_server(
     webdriverIO_args = [
         common.NODE_BIN_PATH2,
         common.NODEMODULES_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
-        '--suite', suite_name, '-c', chrome_version,
+        '--suite', suite_name, chrome_version,
     ]
 
     if debug_mode:

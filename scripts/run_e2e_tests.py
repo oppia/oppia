@@ -149,7 +149,7 @@ RERUN_POLICIES = {
 }
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
-    
+    'navigation',
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
@@ -178,7 +178,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'learnerDashboard',
     'learner',
     'library',
-    'navigation',
     'playVoiceovers',
     'preferences',
     'profileFeatures',
@@ -330,6 +329,11 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 stdout=subprocess.PIPE))
+            
+            print(
+            'Servers have come up.\n'
+            'Note: You can find a detailed report of running tests '
+            'in ../webdriverIO-tests-report/')
 
         elif args.suite in SUITES_STILL_IN_PROTRACTOR:
             proc = stack.enter_context(servers.managed_protractor_server(
@@ -338,17 +342,18 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
+            
+            print(
+            'Servers have come up.\n'
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
+            'core/tests/protractor.conf.js, you can view screenshots of the '
+            'failed tests in ../protractor-screenshots/')
         else:
             print(
                 'The suite requested to run does not exists'
                 'Please provide a valid suite name')
             sys.exit(1)
 
-        print(
-            'Servers have come up.\n'
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots of the '
-            'failed tests in ../protractor-screenshots/')
 
         output_lines = []
         while True:

@@ -1,8 +1,16 @@
-const { TimelineService } = require('wdio-timeline-reporter/timeline-service');
+const {ReportAggregator, HtmlReporter} = require('wdio-html-nice-reporter');
 const video = require('wdio-video-reporter');
-var args = require('minimist')(process.argv.slice(2));
+var args = process.argv;
+var chromeVersion = '89.0.4389.90';
+
+if (args[0] === 'DEBUG=true') {
+  chromeVersion = args[6];
+} else {
+  chromeVersion = args[5];
+}
+
 var chromedriverPath =
-'./node_modules/webdriver-manager/selenium/chromedriver_' + args.c;
+'./node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
 var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
@@ -23,11 +31,20 @@ repoterArray = [
   ['spec', {
     showPreface: false,
   }],
-  ['timeline', {
-    outputDir: '../webdriverIO-tests-report',
-    embedImages: true,
-    screenshotStrategy: 'on:error'
-  }],
+  ['html-nice', {
+    outputDir: '../webdriverIO-tests-report/',
+    filename: 'report.html',
+    reportTitle: 'Test Report Title',
+    linkScreenshots: true,
+    // To show the report in a browser when done.
+    showInBrowser: true,
+    collapseTests: false,
+    // To turn on screenshots after every test.
+    useOnAfterCommandForScreenshot: true,
+
+    // To initialize the logger
+    // LOG: log4j.getLogger('default')
+  }]
 ];
 
 if ((process.env.GITHUB_ACTIONS &&
@@ -144,7 +161,7 @@ exports.config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: [[TimelineService],
+    services: [
     ['chromedriver', {
         chromedriverCustomPath: chromedriverPath
     }]],
@@ -199,8 +216,15 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function() {
-    // },
+     onPrepare: function(config, capabilities) {
+      reportAggregator = new ReportAggregator({
+          outputDir: '../webdriverIO-tests-report/',
+          filename: 'master-report.html',
+          reportTitle: 'Master Report',
+          browserName: capabilities[0].browserName,
+      });
+      reportAggregator.clean();
+    },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -327,8 +351,11 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    // onComplete: function(exitCode, config, capabilities, results) {
-    // },
+    onComplete: function(exitCode, config, capabilities, results) {
+      (async() => {
+        await reportAggregator.createReport();
+    })();
+    },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session
