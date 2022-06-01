@@ -85,9 +85,9 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private async _getAllTopicNamesAsync() {
+  private async _getTranslatableTopicNamesAsync() {
     return this.contributionOpportunitiesBackendApiService
-      .fetchAllTopicNamesAsync();
+      .fetchTranslatableTopicNamesAsync();
   }
 
   showRequiresLoginModal(): void {
@@ -101,13 +101,16 @@ export class ContributionOpportunitiesService {
   async getTranslationOpportunitiesAsync(
       languageCode: string, topicName: string):
   Promise<ExplorationOpportunitiesDict> {
-    return this._getTranslationOpportunitiesAsync(languageCode, topicName, '');
+    return this._getTranslationOpportunitiesAsync(
+      languageCode, topicName, '');
   }
 
-  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+  async getMoreSkillOpportunitiesAsync():
+      Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
+    throw new Error('No more skill opportunities available.');
   }
 
   async getMoreTranslationOpportunitiesAsync(
@@ -117,10 +120,11 @@ export class ContributionOpportunitiesService {
       return this._getTranslationOpportunitiesAsync(
         languageCode, topicName, this._translationOpportunitiesCursor);
     }
+    throw new Error('No more translation opportunities available.');
   }
 
-  async getAllTopicNamesAsync(): Promise<string[]> {
-    return this._getAllTopicNamesAsync();
+  async getTranslatableTopicNamesAsync(): Promise<string[]> {
+    return this._getTranslatableTopicNamesAsync();
   }
 
   get reloadOpportunitiesEventEmitter(): EventEmitter<void> {

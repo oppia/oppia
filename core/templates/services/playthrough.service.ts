@@ -98,8 +98,7 @@ class CyclicStateTransitionsTracker {
     this.pathOfVisitedStates.push(destStateName);
   }
 
-  generateIssueCustomizationArgs():
-    CyclicStateTransitionsCustomizationArgs {
+  generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
     return {
       state_names: {value: this.cycleOfVisitedStates}
     };
@@ -124,7 +123,8 @@ class EarlyQuitTracker {
   private expDurationInSecs!: number;
 
   foundAnIssue(): boolean {
-    // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // TODO(#15212): Remove the below non-null check (!==) after codebase
+    // is strictly typed.
     return (
       this.expDurationInSecs !== undefined &&
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
@@ -178,19 +178,18 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  // These properties are initialized using Angular lifecycle hooks
+  // These properties are initialized using initSession method
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationId!: string;
   private explorationVersion!: number;
-  private learnerIsInSamplePopulation: boolean = false;
-
   private eqTracker!: EarlyQuitTracker;
   private cstTracker!: CyclicStateTransitionsTracker;
   private misTracker!: MultipleIncorrectAnswersTracker;
   private recordedLearnerActions!: LearnerAction[];
   private playthroughStopwatch!: Stopwatch;
   private playthroughDurationInSecs!: number;
+  private learnerIsInSamplePopulation: boolean = false;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -235,6 +234,8 @@ export class PlaythroughService {
     }
 
     // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // And if check is needed, means we are actually passes null then add
+    // proper comment to explain why we are doing this check.
     if (
       this.recordedLearnerActions &&
       this.misTracker &&
@@ -262,6 +263,8 @@ export class PlaythroughService {
     }
 
     // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // And if check is needed, means we are actually passes null then add
+    // proper comment to explain why we are doing this check.
     if (
       this.recordedLearnerActions &&
       this.playthroughStopwatch &&
@@ -300,6 +303,8 @@ export class PlaythroughService {
    */
   private createNewPlaythrough(): Playthrough | null {
     // TODO(#15212): Remove the below check once codebase is strictly typed.
+    // And if check is needed, means we are actually passes null then add
+    // proper comment to explain why we are doing this check.
     if (
       this.explorationId &&
       this.explorationVersion &&
@@ -312,25 +317,17 @@ export class PlaythroughService {
             this.misTracker.generateIssueCustomizationArgs(),
             this.recordedLearnerActions);
       } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-        const cstTrackerIssueCustomizationArgs = (
-          this.cstTracker.generateIssueCustomizationArgs());
-        if (cstTrackerIssueCustomizationArgs !== undefined) {
-          return this.playthroughObjectFactory
-            .createNewCyclicStateTransitionsPlaythrough(
-              this.explorationId, this.explorationVersion,
-              cstTrackerIssueCustomizationArgs,
-              this.recordedLearnerActions);
-        }
+        return this.playthroughObjectFactory
+          .createNewCyclicStateTransitionsPlaythrough(
+            this.explorationId, this.explorationVersion,
+            this.cstTracker.generateIssueCustomizationArgs(),
+            this.recordedLearnerActions);
       } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-        const eqTrackerIssueCustomizationArgs = (
-          this.eqTracker.generateIssueCustomizationArgs());
-        if (eqTrackerIssueCustomizationArgs !== undefined) {
-          return this.playthroughObjectFactory
-            .createNewEarlyQuitPlaythrough(
-              this.explorationId, this.explorationVersion,
-              eqTrackerIssueCustomizationArgs,
-              this.recordedLearnerActions);
-        }
+        return this.playthroughObjectFactory
+          .createNewEarlyQuitPlaythrough(
+            this.explorationId, this.explorationVersion,
+            this.eqTracker.generateIssueCustomizationArgs(),
+            this.recordedLearnerActions);
       }
     }
     return null;
@@ -345,7 +342,9 @@ export class PlaythroughService {
   private hasRecordingBegun(): boolean {
     return (
       // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
+      // codebase is strictly typed. And if check is needed, means we are
+      // actually passes null then add proper comment to explain why we are
+      // doing this check.
       this.recordedLearnerActions &&
       this.isPlaythroughRecordingEnabled()
     );
@@ -354,7 +353,9 @@ export class PlaythroughService {
   private hasRecordingFinished(): boolean {
     return (
       // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
+      // codebase is strictly typed. And if check is needed, means we are
+      // actually passes null then add proper comment to explain why we are
+      // doing this check.
       this.recordedLearnerActions &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
@@ -365,7 +366,9 @@ export class PlaythroughService {
   private isRecordedPlaythroughHelpful(): boolean {
     return (
       // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
-      // codebase is strictly typed.
+      // codebase is strictly typed. And if check is needed, means we are
+      // actually passes null then add proper comment to explain why we are
+      // doing this check.
       this.recordedLearnerActions &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&

@@ -16,7 +16,8 @@
     <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
-  <div class="protractor-test-edit-content oppia-editable-section"
+  <div *ngIf="isContentEditable()"
+       class="protractor-test-edit-content oppia-editable-section"
        (click)="openStateContentEditor()">
     <i class="material-icons oppia-editor-edit-icon protractor-test-edit-content-pencil-button"
        title="Edit Card Content">&#xE254;
@@ -36,13 +37,26 @@
     <div class="oppia-editable-section-mask protractor-test-state-edit-content">
     </div>
   </div>
+  <div *ngIf="!isContentEditable()"
+       class="protractor-test-edit-content">
+    <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
+         title="Card Content">
+      <span [hidden]="!stateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
+        {{ stateContentPlaceholder }}
+      </span>
+      <span>
+        <oppia-rte-output-display [rteString]="stateContentService.savedMemento.html"
+                                  class="oppia-rte-editor protractor-test-state-content-display">
+        </oppia-rte-output-display>
+      </span>
+    </div>
+  </div>
 </div>
 
 <div *ngIf="contentEditorIsOpen" class="protractor-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-  <schema-based-editor [schema]="getHtmlSchema.bind(this)"
-                       [localValue]="stateContentService.displayed._html"
-                       (localValueChange)="updateHtml($event)">
+  <schema-based-editor [schema]="HTML_SCHEMA"
+                       [(localValue)]="stateContentService.displayed._html">
   </schema-based-editor>
   <div *ngIf="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning protractor-test-card-height-limit-warning mt-2">
     <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>

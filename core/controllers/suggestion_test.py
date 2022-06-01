@@ -28,7 +28,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -713,8 +712,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         text_to_translate = exploration.states['State 1'].content.html
         self.logout()
 
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         self.assertTrue(fs.isfile('image/img.png'))
 
@@ -751,9 +749,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             csrf_token=csrf_token
         )
 
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS, exp_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS, exp_id)
 
         self.assertTrue(fs.isfile('image/img.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
@@ -778,8 +775,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'review_message': u'This looks good!',
             }, csrf_token=csrf_token)
 
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         self.assertTrue(fs.isfile('image/img.png'))
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
@@ -1726,9 +1722,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         # are no images in the given directory before accepting the question
         # suggestion since the directory is created only after the suggestion
         # is accepted.
-        destination_fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, question.id))
+        destination_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_QUESTION, question.id)
         self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
 
     def test_create_suggestion_invalid_target_version_input(self):
@@ -2105,7 +2100,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -2216,6 +2211,26 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
 
         self.logout()
+
+    def test_suggestion_not_included_when_exploration_is_not_editable(self):
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+        self.assertEqual(len(response['suggestions']), 1)
+
+        exp_services.set_exploration_edits_allowed(self.EXP_ID, False)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+
+        self.assertEqual(len(response['suggestions']), 0)
 
     def test_exploration_handler_returns_data(self):
         self.login(self.AUTHOR_EMAIL)
@@ -2353,7 +2368,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [

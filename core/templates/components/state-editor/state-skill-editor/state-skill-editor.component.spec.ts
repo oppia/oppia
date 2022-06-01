@@ -199,9 +199,6 @@ describe('State Skill Editor Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
-    stateLinkedSkillIdService = (
-      stateLinkedSkillIdService as unknown) as
-      jasmine.SpyObj<StateLinkedSkillIdService>;
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
@@ -264,11 +261,18 @@ describe('State Skill Editor Component', () => {
       urlInterpolationService, 'interpolateUrl')
       .and.returnValue('/skill_editor/skill_1');
 
-    componentInstance.skillIsSelected = true;
     stateLinkedSkillIdService.displayed = 'skill_1';
     componentInstance.getSkillEditorUrl();
     fixture.detectChanges();
     expect(urlSpy).toHaveBeenCalled();
+  });
+
+  it('should throw error on call getSkillEditorUrl when there is no skill' +
+    'is selected', () => {
+    stateLinkedSkillIdService.displayed = undefined;
+    expect(() => {
+      componentInstance.getSkillEditorUrl();
+    }).toThrowError('Expected a skill id to be displayed');
   });
 
   it('should toggle skillEditorIsShown', () => {
@@ -300,7 +304,7 @@ describe('State Skill Editor Component', () => {
         prerequisite_skill_ids: [],
         all_questions_merged: false,
         next_misconception_id: 0,
-        superseding_skill_id: '',
+        superseding_skill_id: '2',
       };
       const fetchSkillResponse = {
         skill: skillObjectFactory.createFromBackendDict(skillBackendDict),
@@ -315,6 +319,7 @@ describe('State Skill Editor Component', () => {
       expect(componentInstance.skillName).toBeUndefined();
 
       componentInstance.ngOnInit();
+      stateLinkedSkillIdService.onStateLinkedSkillIdInitialized.emit();
       tick();
 
       expect(componentInstance.skillName).toEqual('skill 1');

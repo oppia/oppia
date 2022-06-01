@@ -105,6 +105,14 @@ describe('TopicManagerRoleEditorModalComponent', () => {
 
       expect(alertsService.addWarning).toHaveBeenCalled();
     }));
+
+    it('should throw error if no more topic left', fakeAsync(() => {
+      component.newTopicId = null;
+
+      expect(() => {
+        component.addTopic();
+      }).toThrowError('Expected newTopicId to be non-null.');
+    }));
   });
 
   describe('on calling removeTopicId', () => {

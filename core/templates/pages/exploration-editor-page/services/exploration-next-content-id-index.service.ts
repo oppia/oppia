@@ -25,21 +25,23 @@
  import { LoggerService } from 'services/contextual/logger.service';
 
 
- @Injectable({
-   providedIn: 'root'
- })
- export class ExplorationNextContentIdIndexService extends ExplorationPropertyService {
-   propertyName: string = 'next_content_id_index';
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationNextContentIdIndexService extends ExplorationPropertyService {
+  propertyName: string = 'next_content_id_index';
+  displayed: number;
+  savedMemento: number;
 
-   constructor(
-     protected alertsService: AlertsService,
-     protected changeListService: ChangeListService,
-     protected loggerService: LoggerService,
-   ) {
-     super(alertsService, changeListService, loggerService);
-   }
+  constructor(
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService,
+  ) {
+    super(alertsService, changeListService, loggerService);
+  }
 
- }
+}
 
- angular.module('oppia').factory('ExplorationNextContentIdIndexService',
-   downgradeInjectable(ExplorationNextContentIdIndexService));
+angular.module('oppia').factory('ExplorationNextContentIdIndexService',
+  downgradeInjectable(ExplorationNextContentIdIndexService));

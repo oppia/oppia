@@ -27,18 +27,19 @@ import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
+import { LoaderService } from 'services/loader.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoryEditorStateService {
-  constructor(
-    private alertsService: AlertsService,
-    private editableStoryBackendApiService: EditableStoryBackendApiService,
-    private storyObjectFactory: StoryObjectFactory,
-    private undoRedoService: UndoRedoService) {}
-
-  _story: Story = this.storyObjectFactory.createInterstitialStory();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  _story!: Story;
+  _topicName!: string;
+  _classroomUrlFragment!: string;
+  _topicUrlFragment!: string;
   _storyIsInitialized: boolean = false;
   _storyIsLoading: boolean = false;
   _storyIsBeingSaved: boolean = false;
@@ -47,20 +48,28 @@ export class StoryEditorStateService {
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
 
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  _classroomUrlFragment!: string;
-  _topicName!: string;
-  _topicUrlFragment!: string;
-
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
   _viewStoryNodeEditorEventEmitter = new EventEmitter();
   _recalculateAvailableNodesEventEmitter = new EventEmitter();
 
+  constructor(
+    private alertsService: AlertsService,
+    private editableStoryBackendApiService: EditableStoryBackendApiService,
+    private loaderService: LoaderService,
+    private storyObjectFactory: StoryObjectFactory,
+    private undoRedoService: UndoRedoService) {}
+
   private _setStory(story: Story): void {
-    this._story.copyFromStory(story);
+    if (!this._story) {
+      // The Story is set directly for the first load.
+      this._story = story;
+    } else {
+      // After first initialization, the story object will be retained for
+      // the lifetime of the editor and on every data reload or update, the new
+      // contents will be copied into the same retained object.
+      this._story.copyFromStory(story);
+    }
     if (this._storyIsInitialized) {
       this._storyReinitializedEventEmitter.emit();
     } else {
@@ -106,6 +115,7 @@ export class StoryEditorStateService {
    */
   loadStory(storyId: string): void {
     this._storyIsLoading = true;
+    this.loaderService.showLoadingScreen('Loading Story Editor');
     this.editableStoryBackendApiService.fetchStoryAsync(storyId).then(
       (newBackendStoryObject) => {
         this._setTopicName(newBackendStoryObject.topicName);
@@ -117,6 +127,7 @@ export class StoryEditorStateService {
         this._setClassroomUrlFragment(
           newBackendStoryObject.classroomUrlFragment);
         this._setTopicUrlFragment(newBackendStoryObject.topicUrlFragment);
+        this.loaderService.hideLoadingScreen();
       }, error => {
         this.alertsService.addWarning(
           error || 'There was an error when loading the story.');
@@ -200,11 +211,9 @@ export class StoryEditorStateService {
       commitMessage: string,
       successCallback: (value?: Object) => void,
       errorCallback: (value?: Object) => void): boolean {
-    const storyId = this._story.getId();
-    if (!storyId || !this._storyIsInitialized) {
+    if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');
-      return false;
     }
 
     // Don't attempt to save the story if there are no changes pending.
@@ -213,7 +222,7 @@ export class StoryEditorStateService {
     }
     this._storyIsBeingSaved = true;
     this.editableStoryBackendApiService.updateStoryAsync(
-      storyId, this._story.getVersion(), commitMessage,
+      this._story.getId(), this._story.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList() as StoryChange[]
     ).then(
       (storyBackendObject) => {
@@ -224,8 +233,7 @@ export class StoryEditorStateService {
           successCallback();
         }
       }, error => {
-        let errorMessage = error || (
-          'There was an error when saving the story.');
+        let errorMessage = error || 'There was an error when saving the story.';
         this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
         if (errorCallback) {

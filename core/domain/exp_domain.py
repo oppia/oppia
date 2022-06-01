@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import collections
 import copy
+import datetime
 import json
 import re
 import string
@@ -38,6 +39,8 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 from core.domain import translation_fetchers
+
+from typing import Dict, List
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -276,7 +279,7 @@ class ExplorationChange(change_domain.BaseChange):
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'next_content_id_index')
+        'next_content_id_index', 'edits_allowed')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -566,7 +569,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            next_content_id_index, created_on=None, last_updated=None):
+            next_content_id_index, edits_allowed,
+            created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -596,6 +600,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 enabled.
             next_content_id_index: int. The next content_id index to use for
                 generation of new content_ids.
+            edits_allowed: bool. True when edits to the exploration is allowed.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
@@ -630,6 +635,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.next_content_id_index = next_content_id_index
+        self.edits_allowed = edits_allowed
 
     def get_translatable_contents_collection(
         self
@@ -691,9 +697,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, 2)
-            # content_0 is the first index.
-
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, 2, True)
 
     @classmethod
     def from_dict(
@@ -734,6 +738,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'correctness_feedback_enabled']
         exploration.next_content_id_index = exploration_dict[
             'next_content_id_index']
+        exploration.edits_allowed = exploration_dict['edits_allowed']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -966,6 +971,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected next_content_id_index to be an int, received '
                 '%s' % self.next_content_id_index)
+        if not isinstance(self.edits_allowed, bool):
+            raise utils.ValidationError(
+                'Expected edits_allowed to be a bool, received '
+                '%s' % self.edits_allowed)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -2399,6 +2408,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index,
+            'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
@@ -2517,13 +2527,29 @@ class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
     def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids, voice_artist_ids,
-            viewer_ids, contributor_ids, contributors_summary, version,
-            exploration_model_created_on,
-            exploration_model_last_updated,
-            first_published_msec, deleted=False):
+        self,
+        exploration_id: str,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        ratings: Dict[str, int],
+        scaled_average_rating: float,
+        status: str,
+        community_owned: bool,
+        owner_ids: List[str],
+        editor_ids: List[str],
+        voice_artist_ids: List[str],
+        viewer_ids: List[str],
+        contributor_ids: List[str],
+        contributors_summary: Dict[str, int],
+        version: int,
+        exploration_model_created_on: datetime.datetime,
+        exploration_model_last_updated: datetime.datetime,
+        first_published_msec: int,
+        deleted: bool = False
+    ) -> None:
         """Initializes a ExplorationSummary domain object.
 
         Args:

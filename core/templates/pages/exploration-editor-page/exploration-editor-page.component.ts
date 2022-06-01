@@ -27,7 +27,7 @@ require(
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.component.ts');
@@ -218,6 +218,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
+      ctrl.explorationEditorPageHasInitialized = false;
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -244,6 +245,7 @@ angular.module('oppia').component('explorationEditorPage', {
       // Initializes the exploration page using data from the backend.
       // Called on page load.
       ctrl.initExplorationPage = () => {
+        EditabilityService.lockExploration(true);
         return $q.all([
           ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
@@ -291,6 +293,10 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.correctness_feedback_enabled);
           ExplorationNextContentIdIndexService.init(
             explorationData.next_content_id_index);
+          if (explorationData.edits_allowed) {
+            EditabilityService.lockExploration(false);
+          }
+
 
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
@@ -396,6 +402,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
+          ctrl.explorationEditorPageHasInitialized = true;
           $scope.$applyAsync();
         });
       };

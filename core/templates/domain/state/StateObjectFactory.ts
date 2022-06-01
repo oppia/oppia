@@ -102,7 +102,11 @@ export class State {
       }),
       recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
       solicit_answer_details: this.solicitAnswerDetails,
+<<<<<<< Updated upstream
       card_is_checkpoint: this.cardIsCheckpoint
+=======
+      card_is_checkpoint: this.cardIsCheckpoint,
+>>>>>>> Stashed changes
     };
   }
 
@@ -172,7 +176,7 @@ export class StateObjectFactory {
       param_changes: newStateTemplate.param_changes,
       recorded_voiceovers: newStateTemplate.recorded_voiceovers,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
-      card_is_checkpoint: newStateTemplate.card_is_checkpoint,
+      card_is_checkpoint: newStateTemplate.card_is_checkpoint
     });
     newState.content.contentId = contentIdForContent;
     newState.interaction.defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
