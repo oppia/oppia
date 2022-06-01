@@ -227,20 +227,6 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults(
                     'EXPLORATION PROCESSED'))
         )
-        # Remove after backup server investigation completed.
-        unmigrated_explorations = (
-            migrated_exploration_results
-            | 'Filter not oks' >> beam.Filter(
-                lambda result_item: result_item.is_err())
-            | 'Unwrap not oks' >> beam.Map(
-                lambda result_item: result_item.unwrap())
-        )
-        unmigrated_exploration_job_run_results = (
-            unmigrated_explorations
-            | 'Generate results for unmigrated exploration' >> (
-                job_result_transforms.ResultsToJobRunResults(
-                    'EXPLORATION UNMIGRATED'))
-        )
 
         # TODO(#15176): Investigate on how to found problematic exploration
         # and remove the type casting.
@@ -325,8 +311,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             (
                 cache_deletion_job_run_results,
                 migrated_exploration_job_run_results,
-                exploration_objects_list_job_run_results,
-                unmigrated_exploration_job_run_results
+                exploration_objects_list_job_run_results
             )
             | beam.Flatten()
         )
