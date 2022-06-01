@@ -57,7 +57,7 @@ def delete_models_marked_as_deleted() -> None:
             model_ids_to_hard_delete: List[str] = [
                 model.id for model in models_to_hard_delete
             ]
-            base_models.VersionedModel.delete_multi(
+            model_class.delete_multi(
                 model_ids_to_hard_delete, '', '', force_deletion=True)
         else:
             model_class.delete_multi(models_to_hard_delete)
