@@ -43,9 +43,6 @@ interface LanguageIdAndText {
   text: string;
 }
 
-import './search-bar.component.css';
-
-
 @Component({
   selector: 'oppia-search-bar',
   templateUrl: './search-bar.component.html'

@@ -18,7 +18,7 @@
  */
 
 import { Directive, EventEmitter, HostListener, Injectable, Input, ModuleWithProviders, NgModule, OnDestroy } from '@angular/core';
-import { Router, RouterModule, RouterLink } from '@angular/router';
+import { Router, RouterModule, RouterLink, RouterLinkWithHref } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
 
@@ -64,7 +64,7 @@ export class MockRouterModule {}
 @Directive({
   selector: 'a[smartRouterLink]'
 })
-export class SmartRouterLink extends RouterLink {
+export class SmartRouterLink extends RouterLinkWithHref {
   @Input()
   set smartRouterLink(commands: any[] | string) {
     this.routerLink = commands;
@@ -74,26 +74,53 @@ export class SmartRouterLink extends RouterLink {
   onClick(): boolean {
     let bodyContent = window.document.querySelector('body');
 
-    // Checks whether the page is using angular router.
-    if (bodyContent) {
-      // eslint-disable-next-line oppia/no-inner-html
-      if (bodyContent.innerHTML.includes('<router-outlet></router-outlet>')) {
-
     console.log(window.location.href);
     console.log(this.urlTree.toString());
     let lightweightRouterPagesRoutes = [];
     let routerPagesRoutes = [];
     for (let page of Object.values(AppConstants.PAGES_REGISTERED_WITH_FRONTEND)) {
+      let routeRegex = '^';
+      for (let partOfRoute of page.ROUTE.split('/')) {
+        if (partOfRoute.startsWith(':')) {
+          routeRegex += '/[a-zA-Z_:]*';
+        } else {
+          routeRegex += `/${partOfRoute}`;
+        }
+      }
+      routeRegex += '$';
       if ('LIGHTWEIGHT' in page) {
-        lightweightRouterPagesRoutes.push('/' + page.ROUTE);
+        lightweightRouterPagesRoutes.push(routeRegex);
       } else {
-        routerPagesRoutes.push('/' + page.ROUTE);
+        routerPagesRoutes.push(routeRegex);
       }
     }
-    console.log(lightweightRouterPagesRoutes);
-    console.log(routerPagesRoutes);
-    window.location.href = this.urlTree.toString();
-    return true;
+    for (let route of lightweightRouterPagesRoutes) {
+      if (this.urlTree.toString().match(route)) {
+        if (
+          // eslint-disable-next-line oppia/no-inner-html
+          bodyContent && bodyContent.innerHTML.includes('<router-outlet>')
+        ) {
+          console.log('navigate 1');
+          window.location.href = this.urlTree.toString();
+        }
+      }
+    }
+    for (let route of routerPagesRoutes) {
+      if (this.urlTree.toString().match(route)) {
+        if (
+          bodyContent &&
+          // eslint-disable-next-line oppia/no-inner-html
+          bodyContent.innerHTML.includes('<router-outlet custom="light">')
+        ) {
+          console.log('navigate 2');
+          window.location.href = this.urlTree.toString();
+        }
+      }
+    }
+    console.log(this.routerLink);
+    let ret = super.onClick();
+    console.log(ret);
+    return ret;
   }
 }
 
@@ -118,15 +145,11 @@ export class HybridRouterModuleProvider {
 
     // Checks whether the page is using angular router.
     if (bodyContent) {
-      // eslint-disable-next-line oppia/no-inner-html
-      if (bodyContent.innerHTML.includes('<router-outlet></router-outlet>')) {
-        return {
-          ngModule: SmartRouterModule
-        };
-      }
-      // eslint-disable-next-line oppia/no-inner-html
-      if (bodyContent.innerHTML.includes(
-        '<router-outlet custom="light"></router-outlet>')
+      if (
+        // eslint-disable-next-line oppia/no-inner-html
+        bodyContent.innerHTML.includes('<router-outlet>') ||
+        // eslint-disable-next-line oppia/no-inner-html
+        bodyContent.innerHTML.includes('<router-outlet custom="light">')
       ) {
         return {
           ngModule: SmartRouterModule

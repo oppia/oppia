@@ -18,8 +18,6 @@
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
@@ -487,16 +485,6 @@ module.exports = {
         },
       },
     }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css',
-      ignoreOrder: false,
-    }),
-    new WebpackRTLPlugin({
-      minify: {
-        zindex: false
-      }
-    })
   ],
   module: {
     rules: [{
@@ -544,12 +532,17 @@ module.exports = {
     {
       test: /\.css$/,
       include: [
-        path.resolve(__dirname, 'core/templates'),
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'node_modules'),
       ],
       use: [
-        MiniCssExtractPlugin.loader,
+        'cache-loader',
+        {
+          loader: 'style-loader',
+          options: {
+            esModule: false
+          }
+        },
         {
           loader: 'css-loader',
           options: {
@@ -563,7 +556,7 @@ module.exports = {
     jquery: 'jQuery'
   },
   optimization: {
-    runtimeChunk: true,
+    runtimeChunk: 'single',
     sideEffects: true,
     usedExports: true,
     splitChunks: {

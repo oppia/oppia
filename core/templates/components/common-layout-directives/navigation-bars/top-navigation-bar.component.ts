@@ -40,15 +40,11 @@ import { I18nService } from 'i18n/i18n.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
-import './top-navigation-bar.component.css';
-
 interface LanguageInfo {
   id: string;
   text: string;
   direction: string;
 }
-
-
 @Component({
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',

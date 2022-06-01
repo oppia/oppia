@@ -23,6 +23,7 @@ import { TermsPageComponent } from
 import { TermsPageRootComponent } from './terms-page-root.component';
 import { CommonModule } from '@angular/common';
 import { TermsPageRoutingModule } from './terms-page-routing.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
