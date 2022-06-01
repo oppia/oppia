@@ -113,7 +113,7 @@ describe('ImageWithRegionsEditorComponent', () => {
     'should initialize editor when ngOnChanges is run with a new value only',
     fakeAsync(() => {
       expect(component.editorIsInitialized).toBe(false);
-      component.ngOnChanges({value: undefined});
+      component.ngOnChanges({});
       expect(component.editorIsInitialized).toBe(false);
       component.ngOnChanges({
         value: new SimpleChange(
