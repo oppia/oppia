@@ -11,6 +11,65 @@ param_changes: []
 param_specs: {}
 schema_version: 47
 states:
+  Algebraic Expression Input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Algebraic Expression Input. Provide the formula for calculating the
+        area of a circle with radius = r.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Code Editor
+          feedback:
+            content_id: feedback_1
+            html: <p>That is exactly how you find the area of a circle! Good job!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: pi*r^2
+          rule_type: MatchesExactlyWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        customOskLetters:
+          value:
+          - r
+          - "\u03C0"
+      default_outcome:
+        dest: Algebraic Expression Input
+        feedback:
+          content_id: default_outcome
+          html: <p>That is not how the area of a circle is calculated. Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>The area of a circle is related to a constant called "pi".</p>
+      id: AlgebraicExpressionInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
   Code Editor:
     classifier_model_id: null
     content:
@@ -878,6 +937,68 @@ states:
         feedback_1: {}
         feedback_2: {}
         feedback_3: {}
+  Math Equation Input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Math Equation Input. Write the equation of a straight line in the slope-intercept
+        form. Consider the slope to be 'm' and the y-intercept to be 'c'</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Numeric Expression Input
+          feedback:
+            content_id: feedback_1
+            html: <p>That is the slope-intercept form of a straight line! Good job!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: y=m*x+c
+            y: both
+          rule_type: MatchesExactlyWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        customOskLetters:
+          value:
+          - c
+          - m
+          - x
+          - y
+      default_outcome:
+        dest: Math Equation Input
+        feedback:
+          content_id: default_outcome
+          html: <p>That is not the slope-intercept form of a straight line. Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>The slope-intercept form of a straight-line is 'y=m*x+c'.</p>
+      id: MathEquationInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
   Multiple Choice:
     classifier_model_id: null
     content:
@@ -1168,7 +1289,7 @@ states:
     interaction:
       answer_groups:
       - outcome:
-          dest: End Exploration
+          dest: Algebraic Expression Input
           feedback:
             content_id: feedback_1
             html: <p>That is perfect!</p>
@@ -1360,7 +1481,7 @@ states:
     interaction:
       answer_groups:
       - outcome:
-          dest: End Exploration
+          dest: Math Equation Input
           feedback:
             content_id: feedback_1
             html: <p>Nice! Orange, purple, and silver are all words that are exceptionally
