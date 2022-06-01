@@ -643,7 +643,7 @@ def _construct_exploration_suggestions(suggestions):
     suggestion_dicts = []
     translatable_suggestions = (
         suggestion_services.get_suggestions_with_translatable_explorations(
-                suggestions))
+            suggestions))
     exp_ids = {suggestion.target_id for suggestion in translatable_suggestions}
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
     for suggestion in translatable_suggestions:
