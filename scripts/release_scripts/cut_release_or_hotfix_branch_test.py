@@ -49,8 +49,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             (
                 'verify_hotfix_number_is_one_ahead_of_'
                 'previous_hotfix_number_is_called'): False,
-            'open_new_tab_in_browser_if_possible_is_called': False,
-            'ask_user_to_confirm_is_called': False
+            'open_new_tab_in_browser_if_possible_is_called': False
         }
         self.expected_check_function_calls = {
             'verify_local_repo_is_clean_is_called': True,
@@ -64,8 +63,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             (
                 'verify_hotfix_number_is_one_ahead_of_'
                 'previous_hotfix_number_is_called'): True,
-            'open_new_tab_in_browser_if_possible_is_called': True,
-            'ask_user_to_confirm_is_called': True
+            'open_new_tab_in_browser_if_possible_is_called': True
         }
 
         class MockResponse:
@@ -88,6 +86,9 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_check_call(cmd_tokens):
             self.all_cmd_tokens.extend(cmd_tokens)
             self.check_function_calls['check_call_is_called'] = True
+        def mock_run_cmd(cmd_tokens):
+            self.all_cmd_tokens.extend(cmd_tokens)
+            self.check_function_calls['run_cmd_is_called'] = True
         def mock_verify_target_branch(
                 unused_remote_alias, unused_new_branch_name):
             self.check_function_calls[
@@ -107,8 +108,6 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 'open_new_tab_in_browser_if_possible_is_called'] = True
         def mock_input():
             return 'y'
-        def mock_ask_user_to_confirm(unused_msg):
-            self.check_function_calls['ask_user_to_confirm_is_called'] = True
 
         self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
         self.verify_local_repo_swap = self.swap(
@@ -121,6 +120,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             common, 'get_remote_alias', mock_get_remote_alias)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
+        self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         self.verify_target_branch_swap = self.swap(
             cut_release_or_hotfix_branch,
             'verify_target_branch_does_not_already_exist',
@@ -136,8 +136,6 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         self.open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         self.input_swap = self.swap(builtins, 'input', mock_input)
-        self.ask_user_swap = self.swap(
-            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
 
     def test_exception_is_raised_if_target_branch_exists(self):
         def mock_check_output(unused_cmd_tokens):
@@ -389,8 +387,6 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         self.expected_check_function_calls[
             'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
-        self.expected_check_function_calls[
-            'ask_user_to_confirm_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
 
@@ -399,7 +395,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             with self.get_remote_alias_swap, self.check_call_swap:
                 with self.verify_target_branch_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
-                        with self.input_swap, self.ask_user_swap:
+                        with self.input_swap:
                             cut_release_or_hotfix_branch.execute_branch_cut(
                                 '1.2.3', 0)
         self.expected_check_function_calls[
@@ -415,41 +411,55 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_more_than_one(
             self):
+        def mock_get_current_branch_name():
+            return 'release-1.2.3-hotfix-2'
+        get_branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
-                with self.verify_target_branch_swap:
+                with self.verify_target_branch_swap, self.run_cmd_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
-                            with self.ask_user_swap:
+                            with get_branch_name_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
                                     '1.2.3', 3)
         self.expected_check_function_calls[
             'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
+        self.expected_check_function_calls['run_cmd_is_called'] = True
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
         expected_cmd_tokens = [
             'git', 'pull', 'upstream', 'develop',
+            'git', 'checkout', 'release-1.2.3-hotfix-2',
+            'git', 'pull', 'upstream', 'release-1.2.3-hotfix-2',
             'git', 'checkout', '-b', 'release-1.2.3-hotfix-3',
             'release-1.2.3-hotfix-2']
         self.assertEqual(self.all_cmd_tokens, expected_cmd_tokens)
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_equal_to_one(
             self):
+        def mock_get_current_branch_name():
+            return 'release-1.2.3'
+        get_branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
-                with self.verify_target_branch_swap:
+                with self.verify_target_branch_swap, self.run_cmd_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
-                            with self.ask_user_swap:
+                            with get_branch_name_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
                                     '1.2.3', 1)
         self.expected_check_function_calls[
             'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
+        self.expected_check_function_calls['run_cmd_is_called'] = True
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
         expected_cmd_tokens = [
             'git', 'pull', 'upstream', 'develop',
+            'git', 'checkout', 'release-1.2.3',
+            'git', 'pull', 'upstream', 'release-1.2.3',
             'git', 'checkout', '-b', 'release-1.2.3-hotfix-1', 'release-1.2.3']
         self.assertEqual(self.all_cmd_tokens, expected_cmd_tokens)

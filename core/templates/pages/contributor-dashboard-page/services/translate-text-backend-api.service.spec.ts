@@ -21,12 +21,13 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
-import { ImagesData } from 'services/image-local-storage.service';
+import { ImageLocalStorageService, ImagesData } from 'services/image-local-storage.service';
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 
 describe('TranslateTextBackendApiService', () => {
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let httpTestingController: HttpTestingController;
+  let imageLocalStorageService: ImageLocalStorageService;
   const getTranslatableItem = (text: string) => {
     return {
       data_format: 'html',
@@ -44,6 +45,7 @@ describe('TranslateTextBackendApiService', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     translateTextBackendApiService = TestBed.inject(
       TranslateTextBackendApiService);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
   });
 
   afterEach(() => {
@@ -176,8 +178,12 @@ describe('TranslateTextBackendApiService', () => {
     }));
 
     it('should append image data to form data', fakeAsync(() => {
-      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
-        Promise.resolve('imageBlob'));
+      spyOn(
+        imageLocalStorageService,
+        'getFilenameToBase64MappingAsync').and.returnValue(
+        Promise.resolve({
+          file1: 'imgBase64'
+        }));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -193,9 +199,8 @@ describe('TranslateTextBackendApiService', () => {
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
-      const images = Object.values(files);
       expect(req.request.method).toEqual('POST');
-      expect(images).toContain('imageBlob');
+      expect(files.file1).toContain('imgBase64');
       req.flush({});
       flushMicrotasks();
 
@@ -210,27 +215,19 @@ describe('TranslateTextBackendApiService', () => {
           type: 'imageBlob1'
         } as Blob
       }, {
-        filename: 'imageFilename1',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob2'
-        } as Blob
-      }, {
-        filename: 'imageFilename2',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob1'
-        } as Blob
-      }, {
         filename: 'imageFilename2',
         imageBlob: {
           size: 0,
           type: 'imageBlob2'
         } as Blob
       }];
-      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
-        Promise.resolve(['imageBlob1', 'imageBlob2'])
-      );
+      spyOn(
+        imageLocalStorageService,
+        'getFilenameToBase64MappingAsync').and.returnValue(
+        Promise.resolve({
+          imageFilename1: 'img1Base64',
+          imageFilename2: 'img2Base64'
+        }));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -247,14 +244,8 @@ describe('TranslateTextBackendApiService', () => {
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
       const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
-      const filename1Blobs = files.imageFilename1[0];
-      const filename2Blobs = files.imageFilename2[0];
-      const filename3Blobs = files.imageFilename1[1];
-      const filename4Blobs = files.imageFilename2[1];
-      expect(filename1Blobs).toContain('imageBlob1');
-      expect(filename2Blobs).toContain('imageBlob1');
-      expect(filename3Blobs).toContain('imageBlob2');
-      expect(filename4Blobs).toContain('imageBlob2');
+      expect(files.imageFilename1).toContain('img1Base64');
+      expect(files.imageFilename2).toContain('img2Base64');
       req.flush({});
       flushMicrotasks();
 
@@ -267,8 +258,10 @@ describe('TranslateTextBackendApiService', () => {
       failHandler = (error: HttpErrorResponse) => {
         expect(error.error).toBe(errorEvent);
       };
-      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
-        Promise.resolve('imageBlob'));
+      spyOn(
+        imageLocalStorageService,
+        'getFilenameToBase64MappingAsync').and.returnValue(
+        Promise.resolve({}));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',

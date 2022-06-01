@@ -78,9 +78,9 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id) # type: ignore[no-untyped-call]
         self.moderator = user_services.get_user_actions_info(self.moderator_id) # type: ignore[no-untyped-call]
 
-        self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id) # type: ignore[no-untyped-call]
-        self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id) # type: ignore[no-untyped-call]
-        self.save_new_valid_collection( # type: ignore[no-untyped-call]
+        self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
+        self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
     def test_update_featured_refs_correctly_promotes_activities(self) -> None:

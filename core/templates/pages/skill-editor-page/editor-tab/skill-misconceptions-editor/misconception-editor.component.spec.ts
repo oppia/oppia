@@ -191,38 +191,12 @@ describe('Misconception Editor Component', () => {
     let updatesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionMustBeAddressed')
       .and.returnValue(null);
+    spyOn(component.onMisconceptionChange, 'emit').and.callThrough();
 
     component.updateMustBeAddressed();
 
     expect(updatesSpy).toHaveBeenCalledWith(
       sampleSkill, 1, true, false);
-  });
-
-  it('should get schema for editing notes', () => {
-    expect(component.getSchemaNotes())
-      .toEqual(component.NOTES_FORM_SCHEMA);
-  });
-
-  it('should get schema for feedback', () => {
-    expect(component.getSchemaFeedback())
-      .toEqual(component.FEEDBACK_FORM_SCHEMA);
-  });
-
-  it('should update misconceptionNotes', () => {
-    component.container.misconceptionNotes = 'new note';
-
-    let notes = 'new note1';
-    component.updateLocalNotes(notes);
-
-    expect(component.container.misconceptionNotes).toEqual(notes);
-  });
-
-  it('should update misconceptionFeedback', () => {
-    component.container.misconceptionFeedback = 'new feedback';
-
-    let feedback = 'new feedback1';
-    component.updateLocalFeedback(feedback);
-
-    expect(component.container.misconceptionFeedback).toEqual(feedback);
+    expect(component.onMisconceptionChange.emit).toHaveBeenCalled();
   });
 });

@@ -33,7 +33,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 })
 export class CustomOskLettersEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: string[];
   @Output() valueChanged = new EventEmitter();
@@ -82,12 +82,12 @@ export class CustomOskLettersEditorComponent implements OnInit {
 
   getRemainingLettersCount(): number {
     return Math.max(
-      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value.length, 0);
+      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value?.length, 0);
   }
 
   isCustomizationArgOpen(): boolean {
     return document.getElementsByClassName(
-      'custom-letters-div').length !== 0;
+      'custom-letters-div')?.length !== 0;
   }
 
   keyDownCallBack(e: KeyboardEvent): void {

@@ -22,7 +22,7 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -340,9 +340,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)
         fs.commit(
             '%s/new_image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -363,6 +361,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'The node with id invalid_id is not part of this story'):
             self.story.update_node_thumbnail_filename(
                 'invalid_id', 'invalid_thumbnail.svg')
+
+    def test_story_description_validation(self):
+        self.story.description = 1
+        self._assert_validation_error(
+            'Expected description to be a string, received 1')
+
+        self.story.description = ''
+        self._assert_validation_error(
+            'Expected description field not to be empty')
+
+        self.story.description = 'a' * 1001
+        self._assert_validation_error(
+            'Expected description to be less than %d chars, received %s' % (
+            1000, 1001))
 
     def test_to_human_readable_dict(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
@@ -508,9 +520,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)
         fs.commit(
             '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -519,11 +529,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.update_thumbnail_filename('img.svg')
         self.assertEqual(self.story.thumbnail_filename, 'img.svg')
         self.assertEqual(self.story.thumbnail_size_in_bytes, len(raw_image))
-
-    def test_description_validation(self):
-        self.story.description = 1
-        self._assert_validation_error(
-            'Expected description to be a string, received 1')
 
     def test_notes_validation(self):
         self.story.notes = 1

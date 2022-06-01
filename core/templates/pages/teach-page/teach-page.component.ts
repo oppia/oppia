@@ -34,6 +34,7 @@ export interface Testimonial {
   imageUrl: string;
   imageUrlWebp: string;
   borderPresent: boolean;
+  altText: string;
 }
 
 @Component({
@@ -109,19 +110,22 @@ export class TeachPageComponent implements OnInit {
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
       imageUrl: '/teach/riya.jpg',
       imageUrlWebp: '/teach/riya.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Riya'
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_2',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
       imageUrl: '/teach/awad.jpg',
       imageUrlWebp: '/teach/awad.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Awad'
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_3',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
       imageUrl: '/teach/himanshu.jpg',
       imageUrlWebp: '/teach/himanshu.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Himanshu'
     }];
   }
 
