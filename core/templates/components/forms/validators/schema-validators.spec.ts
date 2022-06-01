@@ -66,8 +66,19 @@ describe('Schema validators', () => {
           errorsReturned.hasLengthAtLeast
         ).withContext(testCase.toString()).toBeDefined();
       });
-    }
-    );
+    });
+    it('should throw an error when the value is not a string', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(1);
+
+      const args = {
+        minValue: 3
+      };
+      const filter = SchemaValidators.hasLengthAtLeast(args);
+
+      expect(() => filter(control)).toThrowError(
+        'Invalid value passed in control. Expecting a string or Array');
+    });
   });
   describe('when validating "has-length-at-most"', () => {
     it('should impose maximum length bounds', () => {
@@ -101,6 +112,19 @@ describe('Schema validators', () => {
       });
     }
     );
+
+    it('should throw an error when the value is not a string', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(1);
+
+      const args = {
+        maxValue: 3
+      };
+      const filter = SchemaValidators.hasLengthAtMost(args);
+
+      expect(() => filter(control)).toThrowError(
+        'Invalid value passed in control. Expecting a string or Array');
+    });
   });
 
   describe('when validating "is-at-least"', () => {
@@ -277,6 +301,64 @@ describe('Schema validators', () => {
     }
     );
   });
+
+  describe('when validating isRegexMatched', () => {
+    let filter!: (control: AbstractControl) => ValidationErrors | null;
+    const control: MockFormControl = new MockFormControl([], []);
+    const errorMsg = {
+      isRegexMatched: 'Control Value doesn\'t match given regex'
+    };
+
+    const getFilter = (regex: string): typeof filter => {
+      return SchemaValidators.isRegexMatched({regexPattern: regex});
+    };
+
+    const expectValidationToPass = (controlValue: string) => {
+      control.setValue(controlValue);
+      expect(filter(control)).withContext(controlValue).toBe(null);
+    };
+
+    const expectValidationToFail = (controlValue: string) => {
+      control.setValue(controlValue);
+      expect(filter(control)).toEqual(errorMsg);
+    };
+    it('should pass if the string matches the given regular expression',
+      () => {
+        filter = getFilter('a.$');
+        expectValidationToPass('a ');
+        expectValidationToPass('a$');
+        expectValidationToPass('a2');
+
+        filter = getFilter('g(oog)+le');
+        expectValidationToPass('google ');
+        expectValidationToPass('googoogle');
+        expectValidationToPass('googoogoogoogle');
+
+        filter = getFilter('(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))');
+        expectValidationToPass('https://');
+        expectValidationToPass('https://any-string');
+        expectValidationToPass('https://www.oppia.com');
+        expectValidationToPass('www.oppia.com');
+      });
+
+    it('should fail if the string does not match the given regular expression',
+      () => {
+        filter = getFilter('a.$');
+        expectValidationToFail('a');
+        expectValidationToFail('a$a');
+        expectValidationToFail('bb');
+
+        filter = getFilter('g(oog)+le');
+        expectValidationToFail('gooogle ');
+        expectValidationToFail('gle');
+        expectValidationToFail('goole');
+
+        filter = getFilter('(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))');
+        expectValidationToFail('http://');
+        expectValidationToFail('abc://www.oppia.com');
+      });
+  });
+
   describe('when validating isUrlFragment', () => {
     let filter!: (control: AbstractControl) => ValidationErrors | null;
     const errorMsg = {isUrlFragment: 'Not a url fragment'};

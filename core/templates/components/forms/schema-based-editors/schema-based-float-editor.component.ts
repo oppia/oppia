@@ -220,7 +220,7 @@ implements ControlValueAccessor, OnInit, Validator {
     if (this.localStringValue === '') {
       this.localValue = null;
       // Clear errors if input is empty.
-      this.errorStringI18nKey = '';
+      this.errorStringI18nKey = null;
     } else {
       // Make sure number is in a correct format.
       let error = this.numericInputValidationService

@@ -94,7 +94,7 @@ describe('Schema based float editor component', function() {
     expect(component.hasLoaded).toBe(true);
     expect(component.userIsCurrentlyTyping).toBe(false);
     expect(component.userHasFocusedAtLeastOnce).toBe(false);
-    expect(component.errorStringI18nKey).toBe('');
+    expect(component.errorStringI18nKey).toBe(null);
     expect(component.localValue).toBe(0.0);
     expect(component.localStringValue).toBe('');
     expect(component.checkRequireNonnegativeInputValue).toBe(false);
@@ -179,7 +179,7 @@ describe('Schema based float editor component', function() {
   }));
 
   it('should generate error for wrong input', fakeAsync(() => {
-    expect(component.errorStringI18nKey).toBe('');
+    expect(component.errorStringI18nKey).toBe(null);
     spyOn(numericInputValidationService, 'validateNumber')
       .and.returnValue('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
     component.localValue = null;
