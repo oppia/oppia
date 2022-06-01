@@ -34,16 +34,16 @@ export class GraphEditorComponent implements AfterViewInit {
   @Input() value!: GraphAnswer;
   @Output() valueChanged: EventEmitter<GraphAnswer> = new EventEmitter();
 
-  // The graphIsShown is used to fix a problem where the graph component loads
-  // before the modal reaches it final width. Hence the graph svg is not scaled
-  // correctly. We use setTimeout to push this change on to next change
-  // detection cycle when the DOM is stable.
+  // The graphIsShown variable is used to fix a problem where the graph
+  // component loads before the modal reaches its final width. Hence the graph
+  // svg is not scaled correctly. We use setTimeout to push this change on to
+  // the next change detection cycle when the DOM is stable.
   graphIsShown = false;
   alwaysEditable = true;
 
   ngAfterViewInit(): void {
-    // Please check the note above the "graphIsShown" declaration for info
-    // on why setTimeout is used or why the "graphIsShown" is needed.
+    // Please check the note above the "graphIsShown" variable declaration for
+    // info on why setTimeout is used or why the "graphIsShown" is needed.
     setTimeout(() => this.graphIsShown = true);
   }
 
