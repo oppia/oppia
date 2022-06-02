@@ -365,7 +365,8 @@ class ExplorationChange(change_domain.BaseChange):
 
 class TransientCheckpointUrl:
     """Domain object representing the checkpoint progress of a
-    logged-out user."""
+    logged-out user.
+    """
 
     def __init__(
             self, exploration_id, unique_progress_url_id,
