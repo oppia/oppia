@@ -17,6 +17,10 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": false,
+    "strict": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": false,
     "baseUrl": ".",
     "paths": {
       "app.constants": ["core/templates/app.constants"],
@@ -41,14 +45,26 @@
       "tests/*": ["core/templates/tests/*"]
     }
   },
+  "angularCompilerOptions": {
+    "enableIvy": "ngtsc",
+    "strictInjectionParameters": false,
+    "strictInputAccessModifiers": false,
+    "strictTemplates": false,
+    "noImplicitUseStrict": true,
+    "forceConsistentCasingInFileNames": false,
+    "strict": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": false,
+  },
   "files": [
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
     "core/tests/karma.conf.ts"
   ],
-  "include": ["core", "extensions", "typings"],
+  "include": ["core/templates/pages/oppia-root/**/*"],
   "exclude": [
     "core/tests",
     "extensions/classifiers/proto"
   ]
 }
+// "core", "extensions", "typings"

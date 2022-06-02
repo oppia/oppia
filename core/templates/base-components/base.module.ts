@@ -20,7 +20,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { CookieModule } from 'ngx-cookie';
-
+import { RouterModule } from '@angular/router';
 import { DirectivesModule } from 'directives/directives.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { I18nModule } from 'i18n/i18n.module';
@@ -56,7 +56,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
     I18nModule,
     // TODO(#13443): Remove hybrid router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    RouterModule,
     SharedPipesModule,
   ],
 
