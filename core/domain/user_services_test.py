@@ -838,11 +838,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_bio, user_settings.user_bio)
 
     def test_update_preferred_language_codes(self):
-        language_codes = ['en']
+        language_codes = ['es']
 
         user_id = user_services.create_new_user(
             'someUser',
             'user@example.com').user_id
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertNotEqual(
+            language_codes,
+            user_settings.preferred_language_codes
+        )
+
         user_services.update_preferred_language_codes(
             user_id, language_codes)
         user_settings = user_services.get_user_settings(user_id)
@@ -853,11 +860,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_preferred_site_language_code(self):
-        preferred_site_language_code = 'en'
+        preferred_site_language_code = 'es'
 
         user_id = user_services.create_new_user(
             'someUser',
             'user@example.com').user_id
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertNotEqual(
+            'es',
+            user_settings.preferred_site_language_code
+        )
+
         user_services.update_preferred_site_language_code(
             user_id, preferred_site_language_code)
         user_settings = user_services.get_user_settings(user_id)
@@ -868,11 +882,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_preferred_audio_language_code(self):
-        audio_code = 'en'
+        audio_code = 'es'
 
         user_id = user_services.create_new_user(
             'someUser',
             'user@example.com').user_id
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertNotEqual(
+            'es',
+            user_settings.preferred_audio_language_code
+        )
         user_services.update_preferred_audio_language_code(
             user_id, audio_code)
         user_settings = user_services.get_user_settings(user_id)
@@ -1129,7 +1149,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_msg):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
 
-    def test_is_user_registered_with_existing_user_id_returns_true(self):
+    def test_is_user_registered_for_existing_user_id_returns_true(self):
         auth_id = 'test_id'
         user_email = 'test@email.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
@@ -1686,31 +1706,30 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_create_user_contributions_already_existing_raises_error(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
-        created_exp_ids = ['exp1', 'exp2', 'exp3']
-        edited_exp_ids = ['exp2', 'exp3', 'exp4']
-
         user_id = user_services.create_new_user(auth_id, user_email).user_id
+        contributions = user_services.get_user_contributions(user_id)
 
-        self.assertIsNotNone(user_services.get_user_contributions(user_id))
-        self.assertIsInstance(
-            user_services.get_user_contributions(user_id),
-            user_domain.UserContributions)
+        # assert that contributions for this user_id exist
+        self.assertIsNotNone(contributions)
+        # make sure the variable 'contributions' is actually an object of
+        # user_domain.UserContributions Class
+        self.assertIsInstance(contributions, user_domain.UserContributions)
 
-        error_msg = (
+        with self.assertRaisesRegex(
+            Exception,
             'User contributions model for user %s already exists.'
-            % user_id)
-
-        with self.assertRaisesRegex(Exception, error_msg):
+            % user_id
+        ):
             user_services.create_user_contributions(
                 user_id,
-                created_exp_ids,
-                edited_exp_ids)
+                ['expectedId1', 'expectedId2', 'expectedId3'],
+                ['expectedId2', 'expectedId3', 'expectedId4'])
 
     def test_create_user_contributions(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
-        created_exp_ids = ['exp1', 'exp2', 'exp3']
-        edited_exp_ids = ['exp2', 'exp3', 'exp4']
+        created_exp_ids = ['expectedId1', 'expectedId2', 'expectedId3']
+        edited_exp_ids = ['expectedId2', 'expectedId3', 'expectedId4']
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
 
@@ -1732,27 +1751,24 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertEqual(
-            ['exp1', 'exp2', 'exp3'],
+            ['expectedId1', 'expectedId2', 'expectedId3'],
             contributions.created_exploration_ids)
 
         self.assertEqual(
-            ['exp2', 'exp3', 'exp4'],
+            ['expectedId2', 'expectedId3', 'expectedId4'],
             contributions.edited_exploration_ids)
 
     def test_update_user_contributions(self):
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-        created_exp_ids = ['exp1', 'exp2', 'exp3']
-        edited_exp_ids = ['exp2', 'exp3', 'exp4']
+        created_exp_ids = ['expectedId1', 'expectedId2', 'expectedId3']
+        edited_exp_ids = ['expectedId2', 'expectedId3', 'expectedId4']
 
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-
+        user_id = user_services.create_new_user(
+            'someUser',
+            'user@example.com').user_id
         pre_add_contributions = user_services.get_user_contributions(user_id)
-
         self.assertEqual(
             [],
             pre_add_contributions.created_exploration_ids)
-
         self.assertEqual(
             [],
             pre_add_contributions.edited_exploration_ids)
@@ -1761,89 +1777,74 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id,
             created_exp_ids,
             edited_exp_ids)
-
         contributions = user_services.get_user_contributions(user_id)
-
         self.assertEqual(
-            ['exp1', 'exp2', 'exp3'],
+            ['expectedId1', 'expectedId2', 'expectedId3'],
             contributions.created_exploration_ids)
-
         self.assertEqual(
-            ['exp2', 'exp3', 'exp4'],
+            ['expectedId2', 'expectedId3', 'expectedId4'],
             contributions.edited_exploration_ids)
 
     def test_update_user_contributions_for_invalid_user_raises_error(self):
-        non_existent_user_id = 'id_x'
-        created_exp_ids = ['exp1', 'exp2', 'exp3']
-        edited_exp_ids = ['exp2', 'exp3', 'exp4']
-        error_msg = (
+        with self.assertRaisesRegex(
+            Exception,
             'User contributions model for user %s does not exist.'
-            % non_existent_user_id)
-
-        with self.assertRaisesRegex(Exception, error_msg):
+            % 'non_existent_user_id'
+        ):
             user_services.update_user_contributions(
-            non_existent_user_id,
-            created_exp_ids,
-            edited_exp_ids)
+            'non_existent_user_id',
+            ['expectedId1', 'expectedId2', 'expectedId3'],
+            ['expectedId2', 'expectedId3', 'expectedId4'])
 
     def test_add_created_exploration_id(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
-        created_exp_ids = ['exp1']
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-
-        user_services.add_created_exploration_id(user_id, 'exp1')
-
         contributions = user_services.get_user_contributions(user_id)
+        self.assertNotIn('exploration1', contributions.created_exploration_ids)
 
-        self.assertEqual(
-            created_exp_ids,
-            contributions.created_exploration_ids)
+        user_services.add_created_exploration_id(user_id, 'exploration1')
+        contributions = user_services.get_user_contributions(user_id)
+        self.assertIn('exploration1', contributions.created_exploration_ids)
 
     def test_add_created_exploration_id_creates_user_contribution(self):
         user_id = 'id_x'
-        created_exp_id = 'exp1'
 
         pre_add_contributions = user_services.get_user_contributions(user_id)
         self.assertIsNone(pre_add_contributions)
 
-        user_services.add_created_exploration_id(user_id, created_exp_id)
+        user_services.add_created_exploration_id(user_id, 'exploration1')
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertIsInstance(contributions, user_domain.UserContributions)
-        self.assertEqual(
-            ['exp1'],
-            contributions.created_exploration_ids)
+        self.assertIn('exploration1', contributions.created_exploration_ids)
 
     def test_add_edited_exploration_id(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
-        edited_exp_ids = ['exp1']
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-
-        user_services.add_edited_exploration_id(user_id, 'exp1')
-
         contributions = user_services.get_user_contributions(user_id)
+        self.assertNotIn('exploration1', contributions.edited_exploration_ids)
 
-        self.assertEqual(
-            edited_exp_ids,
-            contributions.edited_exploration_ids)
+        user_services.add_edited_exploration_id(user_id, 'exploration1')
+        contributions = user_services.get_user_contributions(user_id)
+        self.assertIn('exploration1', contributions.edited_exploration_ids)
 
     def test_add_edited_exploration_id_creates_user_contribution(self):
         user_id = 'id_x'
-        edited_exp_id = 'exp1'
+        edited_exp_id = 'expectedId'
 
         pre_add_contributions = user_services.get_user_contributions(user_id)
         self.assertIsNone(pre_add_contributions)
 
-        user_services.add_edited_exploration_id(user_id, edited_exp_id)
+        user_services.add_edited_exploration_id(user_id, 'expectedId')
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertEqual(
-            [edited_exp_id],
+            ['expectedId'],
             contributions.edited_exploration_ids)
 
     def test_is_moderator(self):
