@@ -47,6 +47,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { MessengerService } from 'services/messenger.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -116,6 +117,7 @@ describe('Conversation skin component', () => {
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let learnerParamsService: LearnerParamsService;
   let loaderService: LoaderService;
+  let localStorageService: LocalStorageService;
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
   let playerCorrectnessFeedbackEnabledService:
@@ -482,6 +484,7 @@ describe('Conversation skin component', () => {
     learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     loaderService = TestBed.inject(LoaderService);
+    localStorageService = TestBed.inject(LocalStorageService);
     messengerService = TestBed.inject(MessengerService);
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     playerCorrectnessFeedbackEnabledService = TestBed.inject(
@@ -768,6 +771,91 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+  }));
+
+  it('should convert logged out progress to logged in progress when user ' +
+  'signs in', fakeAsync(() => {
+    let collectionId = 'id';
+    let expId = 'exp_id';
+    let isInPreviewMode = false;
+    let isIframed = false;
+    let collectionSummary = {
+      is_admin: true,
+      summaries: [],
+      user_email: '',
+      is_topic_manager: false,
+      username: true
+    };
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+      .and.returnValues(collectionId, null);
+
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.returnValue(Promise.resolve(new Collection(
+        '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(explorationEngineService, 'isInPreviewMode')
+      .and.returnValue(isInPreviewMode);
+    spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('oppia_avatar_url');
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValues(true, false);
+    spyOn(componentInstance, 'initializePage');
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(
+        Promise.resolve(collectionSummary));
+    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(
+      guestCollectionProgressService, 'recordExplorationCompletedInCollection');
+    spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+      .and.returnValue(true);
+    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(sampleExpResponse));
+    spyOn(
+      editableExplorationBackendApiService,
+      'changeLoggedOutProgressToLoggedInProgress');
+
+    let mockOnHintConsumed = new EventEmitter();
+    let mockOnSolutionViewedEventEmitter = new EventEmitter();
+    let mockOnPlayerStateChange = new EventEmitter();
+
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
+      .and.returnValue(mockOnHintConsumed);
+    spyOnProperty(
+      hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
+      .and.returnValue(mockOnSolutionViewedEventEmitter);
+    spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+      .and.returnValue(mockOnPlayerStateChange);
+
+    componentInstance.nextCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+    componentInstance.hasInteractedAtLeastOnce = true;
+    componentInstance.displayedCard = displayedCard;
+
+    localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
+    componentInstance.ngOnInit();
+    expect(
+      editableExplorationBackendApiService
+        .changeLoggedOutProgressToLoggedInProgress).toHaveBeenCalled();
   }));
 
   it('should show alert when collection summaries are not loaded',

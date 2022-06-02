@@ -204,5 +204,32 @@ describe('LocalStorageService', () => {
 
       expect(callbackFnSpy).toHaveBeenCalled();
     });
+
+    it('should correctly save unique progress url id', () => {
+      expect(
+        localStorageService.getUniqueProgressIdOfLoggedOutLearner()).toBeNull();
+      localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
+      expect(
+        localStorageService.getUniqueProgressIdOfLoggedOutLearner())
+        .toEqual('abcdef');
+    });
+
+    it('should not save unique progress url id when storage is not ' +
+    'available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+      localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
+      expect(
+        localStorageService.getUniqueProgressIdOfLoggedOutLearner()).toBeNull();
+    });
+
+    it('should correctly remove unique progress url id', () => {
+      localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
+      expect(
+        localStorageService.getUniqueProgressIdOfLoggedOutLearner())
+        .toEqual('abcdef');
+      localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+      expect(
+        localStorageService.getUniqueProgressIdOfLoggedOutLearner()).toBeNull();
+    });
   });
 });

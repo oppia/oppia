@@ -384,6 +384,32 @@ describe('Editable exploration backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should convert logged out progress to logged in progress ' +
+    'successfully', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let payload = {
+      unique_progress_url_id: 'abcdef'
+    };
+
+    editableExplorationBackendApiService
+      .changeLoggedOutProgressToLoggedInProgress('abcdef')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/sync_logged_out_learner_progress_with_logged_in_progress');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should reset the exploration progress successfully',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');

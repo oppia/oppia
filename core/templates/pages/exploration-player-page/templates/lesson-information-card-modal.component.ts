@@ -168,10 +168,4 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
-
-  setUniqueProgressIdToLocalStorage(): void {
-    console.log('uid set');
-    this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
-      'abcdef');
-  }
 }
