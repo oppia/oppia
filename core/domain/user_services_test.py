@@ -1708,11 +1708,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         contributions = user_services.get_user_contributions(user_id)
-
-        # assert that contributions for this user_id exist
+        # Check contributions for this user id exist already.
         self.assertIsNotNone(contributions)
-        # make sure the variable 'contributions' is actually an object of
-        # user_domain.UserContributions Class
+        # Make sure the variable 'contributions' is actually an object of
+        # The UserContributions Class.
         self.assertIsInstance(contributions, user_domain.UserContributions)
 
         with self.assertRaisesRegex(
@@ -1834,7 +1833,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_add_edited_exploration_id_creates_user_contribution(self):
         user_id = 'id_x'
-        edited_exp_id = 'expectedId'
 
         pre_add_contributions = user_services.get_user_contributions(user_id)
         self.assertIsNone(pre_add_contributions)
