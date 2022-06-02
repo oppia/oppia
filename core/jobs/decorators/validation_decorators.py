@@ -49,7 +49,7 @@ _ALL_BASE_MODEL_TYPES: FrozenSet[Type[base_models.BaseModel]] = frozenset(
 _MODEL_TYPES_BY_BASE_CLASS: Dict[
     Type[base_models.BaseModel],
     FrozenSet[Type[base_models.BaseModel]]
-    ] = {
+] = {
     base_class: frozenset({base_class}).union(
         t for t in _ALL_MODEL_TYPES if issubclass(t, base_class))
     for base_class in _ALL_BASE_MODEL_TYPES
