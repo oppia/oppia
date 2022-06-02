@@ -1805,7 +1805,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Create exploration.
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
-                self.EXP_ID, self.editor_id, ['State 1', 'State 2'],
+                self.EXP_ID, self.editor_id,
+                ['State 1', 'State 2', 'End State'],
                 ['TextInput'], category='Algebra',
                 correctness_feedback_enabled=True))
 
@@ -2118,6 +2119,66 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
+
+    def test_get_suggestions_with_translatable_explorations(self):
+        # Create a translation suggestion for (state_name, content_id) =
+        # (State 2, content).
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        state_name = 'State 2'
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': state_name,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': exploration.states[state_name].content.html,
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_ID, 1, self.author_id, add_translation_change_dict,
+            'test description')
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+        self.assertEqual(len(suggestions), 1)
+
+        # Should return the created translation suggestion.
+        translatable_suggestions = (
+            suggestion_services.get_suggestions_with_translatable_explorations(
+                suggestions
+            )
+        )
+        self.assertEqual(len(translatable_suggestions), 1)
+
+        # Delete the exploration state corresponding to the translation
+        # suggestion.
+        init_state = exploration.states[exploration.init_state_name]
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = 'End State'
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': state_name,
+                }),
+            ], 'delete state')
+
+        # The suggestion no longer corresponds to an existing exploration state,
+        # so it should not be returned.
+        translatable_suggestions = (
+            suggestion_services.get_suggestions_with_translatable_explorations(
+                suggestions
+            )
+        )
+        self.assertEqual(len(translatable_suggestions), 0)
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
