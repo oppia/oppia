@@ -270,7 +270,7 @@ class ExplorationModel(base_models.VersionedModel):
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 

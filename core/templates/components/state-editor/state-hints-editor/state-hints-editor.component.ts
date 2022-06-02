@@ -27,7 +27,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { AlertsService } from 'services/alerts.service';
@@ -72,7 +71,6 @@ export class StateHintsEditorComponent implements OnInit {
     private stateEditorService: StateEditorService,
     private stateHintsService: StateHintsService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private stateSolutionService: StateSolutionService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,

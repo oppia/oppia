@@ -96,16 +96,14 @@ angular.module('oppia').component('stateEditor', {
     'StateContentService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateHintsService', 'StateInteractionIdService',
-    'StateLinkedSkillIdService', 'StateNameService',
-    'StateNextContentIdIndexService', 'StateParamChangesService',
+    'StateLinkedSkillIdService', 'StateNameService', 'StateParamChangesService',
     'StateSolicitAnswerDetailsService', 'StateSolutionService',
     'UrlInterpolationService', 'WindowDimensionsService', 'INTERACTION_SPECS',
     function(
         $rootScope, $scope, StateCardIsCheckpointService, StateContentService,
         StateCustomizationArgsService, StateEditorService,
         StateHintsService, StateInteractionIdService,
-        StateLinkedSkillIdService, StateNameService,
-        StateNextContentIdIndexService, StateParamChangesService,
+        StateLinkedSkillIdService, StateNameService, StateParamChangesService,
         StateSolicitAnswerDetailsService, StateSolutionService,
         UrlInterpolationService, WindowDimensionsService, INTERACTION_SPECS) {
       var ctrl = this;
@@ -172,8 +170,6 @@ angular.module('oppia').component('stateEditor', {
                 $scope.stateName, stateData.interaction.id);
               StateCustomizationArgsService.init(
                 $scope.stateName, stateData.interaction.customizationArgs);
-              StateNextContentIdIndexService.init(
-                $scope.stateName, stateData.nextContentIdIndex);
               StateNameService.init($scope.stateName, stateData.name);
               StateParamChangesService.init(
                 $scope.stateName, stateData.paramChanges);

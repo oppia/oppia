@@ -48,18 +48,9 @@ export class TranslationTabActiveContentIdService {
   setActiveContent(contentId: string, dataFormat: string): void {
     const displayStateRecordedVoiceovers = (
       this._stateRecordedVoiceoversService.displayed);
-<<<<<<< HEAD
-    if (displayStateRecordedVoiceovers !== null) {
-      let allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
-      alert(allContentIds + contentId);
-      if (allContentIds.indexOf(contentId) === -1) {
-        throw new Error('Invalid active content id: ' + contentId);
-      }
-=======
     let allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
     if (allContentIds.indexOf(contentId) === -1) {
       throw new Error('Invalid active content id: ' + contentId);
->>>>>>> bbf31c4d6616ce984890d5ce1b63094011e95d5e
     }
     this.activeContentId = contentId;
     this.activeDataFormat = dataFormat;

@@ -1936,7 +1936,7 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
-        'next_content_id_index': exploration.next_content_id_index
+        'next_content_id_index': exploration.next_content_id_index,
         'edits_allowed': exploration.edits_allowed
     }
 

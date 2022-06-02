@@ -47,7 +47,6 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateNameService } from 'components/state-editor/state-editor-properties-services/state-name.service';
-import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
@@ -762,7 +761,6 @@ export const angularServices: [string, Type<{}>][] = [
     StateInteractionStatsBackendApiService],
   ['StateInteractionStatsService', StateInteractionStatsService],
   ['StateNameService', StateNameService],
-  ['StateNextContentIdIndexService', StateNextContentIdIndexService],
   ['StateObjectFactory', StateObjectFactory],
   ['StateParamChangesService', StateParamChangesService],
   ['StatePropertyService', StatePropertyService],

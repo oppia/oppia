@@ -404,9 +404,6 @@ import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
-import { StateNextContentIdIndexService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
@@ -866,9 +863,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionIdService'] =
       new StateInteractionIdService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
-    upgradedServices['StateNextContentIdIndexService'] =
-      new StateNextContentIdIndexService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StatePropertyService'] = new StatePropertyService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateRecordedVoiceoversService'] =
@@ -1000,9 +994,6 @@ export class UpgradedServices {
       new ExplorationStatsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['GenerateContentIdService'] =
-     new GenerateContentIdService(
-       upgradedServices['StateNextContentIdIndexService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],

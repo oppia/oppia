@@ -83,6 +83,10 @@ export class GenerateContentIdService {
   getNextStateId(prefix: string): string {
     return this._getNextStateId(prefix);
   }
+
+  revertUnusedConetentIdIndex(): void {
+    this.explorationNextContentIdIndexService.restoreFromMemento();
+  }
 }
 
 angular.module('oppia').factory(

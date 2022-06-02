@@ -4540,12 +4540,6 @@ states:
       voiceovers_mapping:
         content: {}
     solicit_answer_details: false
-<<<<<<< HEAD
-states_schema_version: 50
-=======
-    written_translations:
-      translations_mapping:
-        content: {}
 states_schema_version: 49
 tags: []
 title: Title
@@ -4736,11 +4730,9 @@ states:
       translations_mapping:
         content: {}
 states_schema_version: 49
->>>>>>> bbf31c4d6616ce984890d5ce1b63094011e95d5e
 tags: []
 title: Title
 """)
-        exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 

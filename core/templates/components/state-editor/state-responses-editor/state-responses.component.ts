@@ -113,10 +113,10 @@ angular.module('oppia').component('stateResponses', {
   controller: [
     '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AnswerGroupObjectFactory',
-    'EditabilityService', 'ExternalSaveService', 'NgbModal', 'ResponsesService',
+    'EditabilityService', 'ExternalSaveService', 'GenerateContentIdService',
+    'NgbModal', 'ResponsesService',
     'StateCustomizationArgsService', 'StateEditorService',
-    'StateInteractionIdService', 'StateNextContentIdIndexService',
-    'StateSolicitAnswerDetailsService',
+    'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
     'UrlInterpolationService', 'WindowDimensionsService',
     'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
     'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
@@ -125,10 +125,10 @@ angular.module('oppia').component('stateResponses', {
     function(
         $filter, $rootScope, $scope, $uibModal, AlertsService,
         AnswerGroupObjectFactory,
-        EditabilityService, ExternalSaveService, NgbModal, ResponsesService,
+        EditabilityService, ExternalSaveService, GenerateContentIdService,
+        NgbModal, ResponsesService,
         StateCustomizationArgsService, StateEditorService,
-        StateInteractionIdService, StateNextContentIdIndexService,
-        StateSolicitAnswerDetailsService,
+        StateInteractionIdService, StateSolicitAnswerDetailsService,
         UrlInterpolationService, WindowDimensionsService,
         ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
         INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
@@ -347,6 +347,7 @@ angular.module('oppia').component('stateResponses', {
           }
         }, function() {
           AlertsService.clearWarnings();
+          GenerateContentIdService.revertUnusedConetentIdIndex();
         });
       };
 

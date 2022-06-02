@@ -1521,7 +1521,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """TODO
         """
         self.states[state_name] = state_domain.State.create_default_state(
-                state_name, content_id_for_state_content)
+                state_name, content_id_for_state_content,
+                content_id_for_default_outcome)
 
     def rename_state(self, old_state_name, new_state_name):
         """Renames the given state.

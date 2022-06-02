@@ -70,13 +70,11 @@ angular.module('oppia').component('answerGroupEditor', {
   controller: [
     'AlertsService', 'ExternalSaveService', 'ResponsesService',
     'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
-    'StateNextContentIdIndexService',
     'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
     'INTERACTION_SPECS',
     function(
         AlertsService, ExternalSaveService, ResponsesService,
         RuleObjectFactory, StateEditorService, StateInteractionIdService,
-        StateNextContentIdIndexService,
         TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
         INTERACTION_SPECS) {
       var ctrl = this;
@@ -280,9 +278,7 @@ angular.module('oppia').component('answerGroupEditor', {
         ctrl.changeActiveRuleIndex(-1);
         ctrl.rulesMemento = null;
         ctrl.getOnSaveAnswerGroupRulesFn()(ctrl.rules);
-        StateNextContentIdIndexService.saveDisplayedValue();
-        ctrl.getOnSaveNextContentIdIndex()(
-          StateNextContentIdIndexService.displayed);
+        ctrl.getOnSaveNextContentIdIndex()();
       };
 
       ctrl.changeActiveRuleIndex = function(newIndex) {

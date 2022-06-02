@@ -41,6 +41,8 @@ export type ExplorationChange = (
 export interface ExplorationChangeAddState {
   'cmd': 'add_state';
   'state_name': string;
+  'content_id_for_state_content': string;
+  'content_id_for_default_outcome': string;
 }
 
 export interface ExplorationChangeRenameState {

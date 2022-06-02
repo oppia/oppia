@@ -31,6 +31,8 @@ require('services/state-top-answers-stats.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
+
 
 angular.module('oppia').factory('ExplorationWarningsService', [
   '$injector', 'ExplorationInitStateNameService', 'ExplorationStatesService',
