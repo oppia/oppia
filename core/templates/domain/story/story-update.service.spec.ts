@@ -23,11 +23,14 @@ import { TestBed } from '@angular/core/testing';
 import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { LocalStorageService } from 'services/local-storage.service';
 
 describe('Story update service', () => {
   let storyObjectFactory: StoryObjectFactory;
   let storyUpdateService: StoryUpdateService;
   let undoRedoService: UndoRedoService;
+  let localStorageService: LocalStorageService;
   let _sampleStory: Story;
 
   beforeEach(() => {
@@ -38,6 +41,7 @@ describe('Story update service', () => {
     storyUpdateService = TestBed.inject(StoryUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     storyObjectFactory = TestBed.inject(StoryObjectFactory);
+    localStorageService = TestBed.inject(LocalStorageService);
 
     let sampleStoryBackendObject = {
       id: 'sample_story_id',
@@ -773,5 +777,26 @@ describe('Story update service', () => {
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getUrlFragment()).toBe('url');
+  });
+
+  it('should update story editor browser tabs unsaved changes status', () => {
+    let storyEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'story', 'story_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(storyEditorBrowserTabsInfo);
+    spyOn(
+      localStorageService, 'updateEntityEditorBrowserTabsInfo'
+    ).and.callFake(() => {});
+
+    expect(
+      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+
+    storyUpdateService.setStoryDescription(_sampleStory, 'new description');
+
+    expect(
+      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
   });
 });
