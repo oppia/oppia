@@ -2448,7 +2448,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['customOskLetters'].value, ['x', 'α', 'β'])
+            cust_args['allowedVariables'].value, ['x', 'α', 'β'])
 
     def test_migrate_question_state_from_v38_to_latest(self):
         answer_group = {

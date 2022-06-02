@@ -1142,7 +1142,8 @@ class Question(translation_domain.BaseTranslatableObject):
 
         state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            html_validation_service.convert_svg_diagram_tags_to_image_tags,
+            state_schema_version=46)
         return question_state_dict
 
     @classmethod
@@ -1227,9 +1228,11 @@ class Question(translation_domain.BaseTranslatableObject):
             # Renaming cust arg.
             customization_args = question_state_dict[
                 'interaction']['customization_args']
-            customization_args['allowedVariables'] = copy.deepcopy(
-                customization_args['customOskLetters'])
-            del customization_args['customOskLetters']
+            customization_args['allowedVariables'] = []
+            if 'customOskLetters' in customization_args:
+                customization_args['allowedVariables'] = copy.deepcopy(
+                    customization_args['customOskLetters'])
+                del customization_args['customOskLetters']
 
         return question_state_dict
 
