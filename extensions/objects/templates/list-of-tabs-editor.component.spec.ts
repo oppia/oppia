@@ -76,7 +76,7 @@ describe('ListOfTabsEditorComponent', () => {
       }
     });
   });
-  it('should update the value when user edits thee tabs', () => {
+  it('should only update the value when user edits the tabs', () => {
     spyOn(component.valueChanged, 'emit');
 
     component.value = [];
@@ -94,6 +94,12 @@ describe('ListOfTabsEditorComponent', () => {
     component.updateValue(listOfTabs);
 
     expect(component.value).toEqual(listOfTabs);
-    expect(component.valueChanged.emit).toHaveBeenCalledWith(listOfTabs);
+    expect(component.valueChanged.emit).toHaveBeenCalledOnceWith(listOfTabs);
+    expect(component.valueChanged.emit).toHaveBeenCalledTimes(1);
+
+    component.updateValue(listOfTabs);
+
+    expect(component.value).toEqual(listOfTabs);
+    expect(component.valueChanged.emit).toHaveBeenCalledTimes(1);
   });
 });

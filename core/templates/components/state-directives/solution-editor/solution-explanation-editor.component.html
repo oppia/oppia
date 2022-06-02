@@ -24,7 +24,7 @@
     <div class="oppia-rule-details-header">
       <strong>Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-      <schema-based-editor [schema]="getSchema.bind(this)"
+      <schema-based-editor [schema]="getSchema()"
                            [localValue]="stateSolutionService.displayed.explanation._html"
                            (localValueChange)="updateExplanationHtml($event)">
       </schema-based-editor>
