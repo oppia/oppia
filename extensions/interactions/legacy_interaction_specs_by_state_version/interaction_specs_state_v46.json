@@ -85,6 +85,13 @@
         "content_id": null,
         "unicode_str": "Type an expression here, using only numbers."
       }
+    }, {
+      "description": "Represent division using fractions (rather than ÷).",
+      "name": "useFractionForDivision",
+      "schema": {
+        "type": "bool"
+      },
+      "default_value": false
     }],
     "is_terminal": false,
     "default_outcome_heading": null,
@@ -567,12 +574,19 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "allowedVariables",
+        "name": "customOskLetters",
         "schema": {
-          "obj_type": "AllowedVariables",
+          "obj_type": "CustomOskLetters",
           "type": "custom"
         },
         "default_value": []
+      }, {
+        "description": "Represent division using fractions (rather than ÷).",
+        "name": "useFractionForDivision",
+        "schema": {
+          "type": "bool"
+        },
+        "default_value": false
       }
     ],
     "is_terminal": false,
@@ -861,12 +875,19 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "allowedVariables",
+        "name": "customOskLetters",
         "schema": {
-          "obj_type": "AllowedVariables",
+          "obj_type": "CustomOskLetters",
           "type": "custom"
         },
         "default_value": []
+      }, {
+        "description": "Represent division using fractions (rather than ÷).",
+        "name": "useFractionForDivision",
+        "schema": {
+          "type": "bool"
+        },
+        "default_value": false
       }
     ],
     "is_terminal": false,

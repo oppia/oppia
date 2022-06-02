@@ -567,9 +567,9 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "allowedVariables",
+        "name": "customOskLetters",
         "schema": {
-          "obj_type": "AllowedVariables",
+          "obj_type": "CustomOskLetters",
           "type": "custom"
         },
         "default_value": []
@@ -861,9 +861,9 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "allowedVariables",
+        "name": "customOskLetters",
         "schema": {
-          "obj_type": "AllowedVariables",
+          "obj_type": "CustomOskLetters",
           "type": "custom"
         },
         "default_value": []
