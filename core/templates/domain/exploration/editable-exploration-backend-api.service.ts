@@ -140,7 +140,7 @@ export class EditableExplorationBackendApiService {
         most_recently_reached_checkpoint_state_name:
           mostRecentlyReachedCheckpointStateName
       }).toPromise();
-    } else {
+    } else if (!isUserLoggedIn && uniqueProgressUrlId) {
       requestUrl =
         '/explorehandler/states_completed_by_logged_out_user/' + explorationId;
       return this.httpClient.put<void>(requestUrl, {
@@ -167,6 +167,14 @@ export class EditableExplorationBackendApiService {
         most_recently_reached_checkpoint_state_name:
           mostRecentlyReachedCheckpointStateName
       }).toPromise();
+  }
+
+  async changeLoggedOutProgressToLoggedInProgress(uid: string): Promise<void> {
+    const requestUrl =
+      '/sync_logged_out_learner_progress_with_logged_in_progress';
+    return this.httpClient.post<void>(requestUrl, {
+      unique_progress_url_id: uid
+    }).toPromise();
   }
 
   async resetExplorationProgressAsync(explorationId: string): Promise<void> {

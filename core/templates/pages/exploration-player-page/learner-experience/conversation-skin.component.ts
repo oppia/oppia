@@ -145,7 +145,6 @@ export class ConversationSkinComponent {
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
   alertMessageTimeout = 6000;
-  checkpointProgressId: string | null = null;
 
   constructor(
     private windowRef: WindowRef,
@@ -208,7 +207,11 @@ export class ConversationSkinComponent {
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 
     let uid = this.localStorageService.getUniqueProgressIdOfLoggedOutLearner();
-    console.log(uid);
+    if (uid) {
+      this.editableExplorationBackendApiService
+        .changeLoggedOutProgressToLoggedInProgress(uid);
+      this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+    }
 
     if (this.collectionId) {
       this.readOnlyCollectionBackendApiService.loadCollectionAsync(
@@ -360,28 +363,17 @@ export class ConversationSkinComponent {
               );
               // If the exploration is freshly started, mark the first state
               // as the most recently reached checkpoint.
-              if (!this.mostRecentlyReachedCheckpoint) {
-                if (this.isLoggedIn) {
-                  this.editableExplorationBackendApiService.
-                    recordMostRecentlyReachedCheckpointAsync(
-                      this.explorationId,
-                      expVersion,
-                      firstStateName,
-                      true
-                    );
-                } else {
-                  this.editableExplorationBackendApiService.
-                    recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
-                      this.explorationId,
-                      expVersion,
-                      firstStateName
-                    )
-                    .then((response) => {
-                      this.checkpointProgressId = (
-                        response.unique_progress_url_id);
-                    });
-                }
+              if (!this.mostRecentlyReachedCheckpoint && this.isLoggedIn) {
+                this.editableExplorationBackendApiService.
+                  recordMostRecentlyReachedCheckpointAsync(
+                    this.explorationId,
+                    expVersion,
+                    firstStateName,
+                    true
+                  );
               }
+              this.explorationPlayerStateService.setLastCompletedCheckpoint(
+                firstStateName);
             }
           );
         this.visitedStateNames.push(firstStateName);
@@ -712,13 +704,15 @@ export class ConversationSkinComponent {
         this.readOnlyExplorationBackendApiService.
           loadLatestExplorationAsync(this.explorationId).then(
             response => {
+              this.explorationPlayerStateService.setLastCompletedCheckpoint(
+                currentStateName);
               this.editableExplorationBackendApiService.
                 recordMostRecentlyReachedCheckpointAsync(
                   this.explorationId,
                   response.version,
                   currentStateName,
                   this.isLoggedIn,
-                  this.checkpointProgressId
+                  this.explorationPlayerStateService.getUniqueProgressUrlId()
                 );
             }
           );
