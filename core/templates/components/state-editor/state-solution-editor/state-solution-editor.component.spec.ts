@@ -35,8 +35,6 @@ import { StateHintsService } from '../state-editor-properties-services/state-hin
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { StateSolutionEditorComponent } from './state-solution-editor.component';
-import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
-import { InteractionCustomizationArgs, DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('State Solution Editor Component', () => {
   let component: StateSolutionEditorComponent;
@@ -52,7 +50,6 @@ describe('State Solution Editor Component', () => {
   let stateHintsService: StateHintsService;
   let stateSolutionService: StateSolutionService;
   let stateInteractionIdService: StateInteractionIdService;
-  let stateCustomizationArgsService: StateCustomizationArgsService;
   let windowDimensionsService: WindowDimensionsService;
 
   let solution: Solution;
@@ -95,8 +92,6 @@ describe('State Solution Editor Component', () => {
     stateHintsService = TestBed.inject(StateHintsService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    stateCustomizationArgsService = TestBed.inject(
-      StateCustomizationArgsService);
     solutionValidityService = TestBed.inject(SolutionValidityService);
     alertsService = TestBed.inject(AlertsService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
@@ -263,69 +258,6 @@ describe('State Solution Editor Component', () => {
     expect(component.getSolutionSummary()).toBe(
       'One solution is "&quot;This is a correct answer!&quot;".' +
       ' This is the explanation to the answer.');
-  });
-
-  it('should not pass customization args as an argument when getting ' +
-    'solution summary for non drag and drop sort input interactions', () => {
-    stateSolutionService.savedMemento = solution;
-    spyOn(solution, 'getSummary').and.callFake(
-      (interactionId: string, custArgs?: InteractionCustomizationArgs) => {
-        let subtitledHtmlChoice = '';
-        if (custArgs) {
-          subtitledHtmlChoice =
-            (custArgs as DragAndDropSortInputCustomizationArgs)
-              .choices.value[0]._html;
-        }
-        return interactionId + ' ' + subtitledHtmlChoice;
-      });
-    spyOn(convertToPlainTextPipe, 'transform').and.callFake(
-      (solutionString: string) => {
-        return solutionString;
-      });
-    stateInteractionIdService.savedMemento = 'NotDragAndDropSortInput';
-    stateCustomizationArgsService.savedMemento = {
-      choices: {
-        value: [
-          new SubtitledHtml('html_1', 'content_id_1'),
-          new SubtitledHtml('html_2', 'content_id_2'),
-          new SubtitledHtml('html_3', 'content_id_3')
-        ]
-      }
-    };
-
-    expect(component.getSolutionSummary()).toEqual('NotDragAndDropSortInput ');
-  });
-
-  it('should pass customization args as an argument when getting ' +
-    'solution summary for drag and drop sort input interaction', () => {
-    stateSolutionService.savedMemento = solution;
-    spyOn(solution, 'getSummary').and.callFake(
-      (interactionId: string, custArgs?: InteractionCustomizationArgs) => {
-        let subtitledHtmlChoice = '';
-        if (custArgs) {
-          subtitledHtmlChoice =
-            (custArgs as DragAndDropSortInputCustomizationArgs)
-              .choices.value[0]._html;
-        }
-        return interactionId + ' ' + subtitledHtmlChoice;
-      });
-    spyOn(convertToPlainTextPipe, 'transform').and.callFake(
-      (solutionString: string) => {
-        return solutionString;
-      });
-    stateInteractionIdService.savedMemento = 'DragAndDropSortInput';
-    stateCustomizationArgsService.savedMemento = {
-      choices: {
-        value: [
-          new SubtitledHtml('html_1', 'content_id_1'),
-          new SubtitledHtml('html_2', 'content_id_2'),
-          new SubtitledHtml('html_3', 'content_id_3')
-        ]
-      }
-    };
-
-    expect(component.getSolutionSummary()).toEqual(
-      'DragAndDropSortInput html_1');
   });
 
   it('should check if current interaction is linear or not', () => {

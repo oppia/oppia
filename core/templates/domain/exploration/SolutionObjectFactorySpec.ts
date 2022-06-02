@@ -87,12 +87,12 @@ describe('Solution object factory', () => {
     });
 
     it('should create summary correctly', () => {
-      expect(solution.getSummary('GraphInput')).toEqual(
+      expect(solution.getSummary('GraphInput', {})).toEqual(
         'One solution is "[Graph]". This is the explanation to the answer.');
-      expect(solution.getSummary('MusicNotesInput')).toEqual(
+      expect(solution.getSummary('MusicNotesInput', {})).toEqual(
         'One solution is "[Music Notes]". This is the explanation to the' +
         ' answer.');
-      expect(solution.getSummary('TextInput')).toEqual(
+      expect(solution.getSummary('TextInput', {})).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
 
@@ -102,7 +102,7 @@ describe('Solution object factory', () => {
         evaluation: '',
         output: ''
       });
-      expect(solution.getSummary('CodeRepl')).toEqual(
+      expect(solution.getSummary('CodeRepl', {})).toEqual(
         'One solution is "a=10". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -111,7 +111,7 @@ describe('Solution object factory', () => {
         numerator: 1,
         denominator: 6
       });
-      expect(solution.getSummary('FractionInput')).toEqual(
+      expect(solution.getSummary('FractionInput', {})).toEqual(
         'One solution is "1/6". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -125,14 +125,14 @@ describe('Solution object factory', () => {
         },
         units: []
       });
-      expect(solution.getSummary('NumberWithUnits')).toEqual(
+      expect(solution.getSummary('NumberWithUnits', {})).toEqual(
         'One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
         ['content_id_1', 'content_id_3'],
         ['content_id_2']
       ]);
-      let dragAndDropCustomizationArgs = {
+      const dragAndDropCustomizationArgs = {
         choices: {
           value: [
             new SubtitledHtml('html_1', 'content_id_1'),
@@ -148,19 +148,6 @@ describe('Solution object factory', () => {
       ).toEqual(
         'One solution is "[[html_1,html_3],[html_2]]". ' +
         'This is the explanation to the answer.');
-    });
-
-    it('should throw error when obtaining summary for drag and drop ' +
-      'if customization args are missing', () => {
-      solution.setCorrectAnswer([
-        ['content_id_1', 'content_id_3'],
-        ['content_id_2']
-      ]);
-
-      expect(() => {
-        solution.getSummary('DragAndDropSortInput');
-      }).toThrowError(
-        'Customization args for the drag and drop interaction are missing');
     });
 
     it('should get oppia short answer', () => {
@@ -205,7 +192,7 @@ describe('Solution object factory', () => {
       });
 
       expect(solution.answerIsExclusive).toBe(true);
-      expect(solution.getSummary('TestInput')).toEqual(
+      expect(solution.getSummary('TestInput', {})).toEqual(
         'The only solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
     });
@@ -220,7 +207,7 @@ describe('Solution object factory', () => {
       expect(solution.explanation).toBe(newExplanation);
       expect(solution.getOppiaSolutionExplanationResponseHtml()).toBe(
         newExplanation.html);
-      expect(solution.getSummary('TestInput')).toEqual(
+      expect(solution.getSummary('TestInput', {})).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the new explanation to the answer.');
     });
