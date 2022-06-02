@@ -2096,7 +2096,7 @@ def update_logged_out_user_progress(
     if model.furthest_reached_checkpoint_state_name is None:
         model.furthest_reached_checkpoint_exp_version = exp_version
         model.furthest_reached_checkpoint_state_name = state_name
-    elif model.furthest_reached_checkpoint_exp_version < exp_version:
+    elif model.furthest_reached_checkpoint_exp_version <= exp_version:
         furthest_reached_checkpoint_exp = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
@@ -2239,7 +2239,7 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
 def sync_logged_out_learner_progress_with_logged_in_progress(
     user_id, unique_progress_url_id):
 
-    """Syncs logged out and logged in learner progress."""
+    """Syncs logged out and logged in learner's checkpoints progress."""
 
     logged_out_user_data = (
         exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
@@ -2274,18 +2274,23 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         logged_in_user_model.put()
 
     elif logged_in_user_model.most_recently_reached_checkpoint_exp_version == logged_out_user_data.most_recently_reached_checkpoint_exp_version: # pylint: disable=line-too-long
+        current_exploration = exp_fetchers.get_exploration_by_id(
+            exp_id,
+            False,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
         most_recently_reached_checkpoint_index_in_logged_in_progress = (
             user_services.get_checkpoints_in_order(
-                latest_exploration.init_state_name,
-                latest_exploration.states
+                current_exploration.init_state_name,
+                current_exploration.states
             ).index(
                 exp_user_data.most_recently_reached_checkpoint_state_name
                 ))
 
         most_recently_reached_checkpoint_index_in_logged_out_progress = (
             user_services.get_checkpoints_in_order(
-                latest_exploration.init_state_name,
-                latest_exploration.states
+                current_exploration.init_state_name,
+                current_exploration.states
             ).index(
                 logged_out_user_data.most_recently_reached_checkpoint_state_name
                 ))
