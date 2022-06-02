@@ -1142,7 +1142,8 @@ class Question(translation_domain.BaseTranslatableObject):
 
         state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            html_validation_service.convert_svg_diagram_tags_to_image_tags,
+            state_schema_version=46)
         return question_state_dict
 
     @classmethod
@@ -1188,6 +1189,51 @@ class Question(translation_domain.BaseTranslatableObject):
                     'value': False
                 }
             })
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
+        """Converts from version 49 to 50. Version 50 removes rules from
+        explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict[
+                'interaction']['id'] in exp_domain.MATH_INTERACTION_TYPES:
+            filtered_answer_groups = []
+            for answer_group_dict in question_state_dict[
+                    'interaction']['answer_groups']:
+                filtered_rule_specs = []
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    if rule_type not in (
+                            exp_domain.MATH_INTERACTION_DEPRECATED_RULES):
+                        filtered_rule_specs.append(
+                            copy.deepcopy(rule_spec_dict))
+                answer_group_dict['rule_specs'] = filtered_rule_specs
+                if len(filtered_rule_specs) > 0:
+                    filtered_answer_groups.append(
+                        copy.deepcopy(answer_group_dict))
+            question_state_dict[
+                'interaction']['answer_groups'] = filtered_answer_groups
+
+            # Renaming cust arg.
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args['allowedVariables'] = []
+            if 'customOskLetters' in customization_args:
+                customization_args['allowedVariables'] = copy.deepcopy(
+                    customization_args['customOskLetters'])
+                del customization_args['customOskLetters']
+
         return question_state_dict
 
     @classmethod
