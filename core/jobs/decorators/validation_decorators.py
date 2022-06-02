@@ -67,16 +67,6 @@ ModelRelationshipsType = Callable[
     ]
 ]
 
-ModelPropertyAndModelKindType = Dict[
-    str,
-    Tuple[
-        Tuple[
-            model_property.ModelProperty,
-            Tuple[str]
-        ]
-    ]
-]
-
 
 class AuditsExisting:
     """Decorator for registering DoFns that audit storage models.
@@ -249,7 +239,10 @@ class RelationshipsOf:
     @classmethod
     def get_id_referencing_properties_by_kind_of_possessor(
         cls
-    ) -> ModelPropertyAndModelKindType:
+    ) -> Dict[
+        str,
+        Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
+    ]:
         """Returns properties whose values refer to the IDs of the corresponding
         set of model kinds, grouped by the kind of model the properties belong
         to.
@@ -268,14 +261,11 @@ class RelationshipsOf:
         references_of: (
             Callable[[model_property.ModelProperty], Set[str]]
         ) = lambda p: cls._ID_REFERENCING_PROPERTIES[p]
-        return cast(
-            ModelPropertyAndModelKindType,
-            {
-                kind: tuple((p, tuple(references_of(p))) for p in properties)
-                    for kind, properties in (
-                        id_referencing_properties_by_kind_of_possessor)
-            }
-        )
+        return {
+            kind: tuple((p, tuple(references_of(p))) for p in properties)
+            for kind, properties in (
+                id_referencing_properties_by_kind_of_possessor)
+        }
 
     @classmethod
     def get_all_model_kinds_referenced_by_properties(cls) -> Set[str]:
