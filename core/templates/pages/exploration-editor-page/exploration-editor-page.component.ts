@@ -27,7 +27,7 @@ require(
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.component.ts');
@@ -211,6 +211,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
+      ctrl.explorationEditorPageHasInitialized = false;
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -390,6 +391,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
+          ctrl.explorationEditorPageHasInitialized = true;
           $scope.$applyAsync();
         });
       };
