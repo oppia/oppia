@@ -15,29 +15,42 @@
 /**
  * @fileoverview Unit tests for parameter name editor.
  */
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ParameterNameEditorComponent } from './parameter-name-editor.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
-import { TestBed } from '@angular/core/testing';
+import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
-describe('parameterNameEditor', () => {
-  let ctrl = null;
-  var $rootScope = null;
-  var $scope = null;
-  let explorationParamSpecsService = null;
-  var paramSpecsObjectFactory = null;
+describe('StateHintsEditorComponent', () => {
+  let component: ParameterNameEditorComponent;
+  let fixture: ComponentFixture<ParameterNameEditorComponent>;
+  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
+  let explorationParamSpecsService: ExplorationParamSpecsService;
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(function() {
-    paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
-  });
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    explorationParamSpecsService =
-      $injector.get('ExplorationParamSpecsService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        ParameterNameEditorComponent
+      ],
+      providers: [
+        ParamSpecsObjectFactory,
+        ExplorationParamSpecsService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
-    ctrl = $componentController('parameterNameEditor');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ParameterNameEditorComponent);
+    component = fixture.componentInstance;
+
+    paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
+    explorationParamSpecsService = TestBed.inject(ExplorationParamSpecsService);
 
     explorationParamSpecsService.init(
       paramSpecsObjectFactory.createFromBackendDict({
@@ -47,54 +60,42 @@ describe('parameterNameEditor', () => {
         a: {
           obj_type: 'UnicodeString'
         }
-      }));
-  }));
+      }) as unknown as string);
+    fixture.detectChanges();
+  });
 
   it('should initialise component when user open editor', () => {
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.availableParamNames).toEqual(['y', 'a']);
-    expect(ctrl.localValue).toBe('y');
-    expect(ctrl.SCHEMA).toEqual({
+    expect(component.availableParamNames).toEqual(['y', 'a']);
+    expect(component.value).toBe('y');
+    expect(component.SCHEMA).toEqual({
       type: 'unicode',
       choices: ['y', 'a']
     });
   });
 
-  it('should return true if the available param names are not empty', () => {
-    ctrl.$onInit();
+  it('should set value null if the available param names is empty', () => {
+    spyOn(
+      explorationParamSpecsService.savedMemento,
+      'getParamNames'
+    ).and.returnValue([]);
 
-    expect(ctrl.validate()).toBeTrue();
+    component.ngOnInit();
+
+    expect(component.value).toBeNull();
   });
 
-  it('should return false if the available param names is empty', () => {
-    spyOn(explorationParamSpecsService.savedMemento, 'getParamNames').
-      and.returnValue([]);
-    ctrl.$onInit();
-
-    expect(ctrl.validate()).toBeFalse();
+  it('should get schema', () => {
+    expect(component.getSchema())
+      .toEqual(component.SCHEMA);
   });
 
   it('should update value when user enter new local value', () => {
-    ctrl.$onInit();
+    component.value = 'y';
 
-    expect(ctrl.localValue).toBe('y');
-    expect(ctrl.value).toBeUndefined();
+    component.updateValue('a');
 
-    ctrl.localValue = 'test';
-    $scope.$apply();
-
-    expect(ctrl.value).toBe('test');
-  });
-
-  it('should update localvalue when value gets updated', () => {
-    ctrl.$onInit();
-
-    expect(ctrl.localValue).toBe('y');
-
-    ctrl.value = 'test';
-    $scope.$apply();
-
-    expect(ctrl.localValue).toBe('test');
+    expect(component.value).toBe('a');
   });
 });

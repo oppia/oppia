@@ -1,10 +1,12 @@
-<span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($ctrl.value)'">
-  <span class="text-danger" ng-if="$ctrl.availableParamNames.length === 0">
+<span>
+  <span class="text-danger" *ngIf="availableParamNames.length === 0">
     <em>No available parameters to follow. Please add one first.</em>
   </span>
 
-  <span ng-if="$ctrl.availableParamNames.length > 0">
-    <schema-based-editor schema="$ctrl.SCHEMA" local-value="$ctrl.localValue">
+  <span *ngIf="availableParamNames.length > 0">
+    <schema-based-editor [schema]="SCHEMA"
+                         [localValue]="localValue"
+                         (localValueChange)="updateValue($event)">
     </schema-based-editor>
   </span>
 </span>

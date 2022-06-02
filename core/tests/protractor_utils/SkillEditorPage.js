@@ -121,6 +121,11 @@ var SkillEditorPage = function() {
   var conceptCardExplanationEditorInput = element(
     by.css('.protractor-test-concept-card-text .protractor-test-rte'));
 
+  var staleTabInfoModal = element(
+    by.css('.protractor-test-stale-tab-info-modal'));
+  var unsavedChangesStatusInfoModal = element(
+    by.css('.protractor-test-unsaved-changes-info-modal'));
+
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
     await waitFor.pageToFullyLoad();
@@ -396,6 +401,18 @@ var SkillEditorPage = function() {
     await waitFor.invisibilityOf(
       deleteMisconceptionModal,
       'Delete Misconception Modal takes too long to close');
+  };
+
+  this.expectStaleTabInfoModalToBeVisible = async function() {
+    await waitFor.visibilityOf(
+      staleTabInfoModal,
+      'Stale tab info modal is taking too long to display');
+  };
+
+  this.expectUnsavedChangesStatusInfoModalToBeVisible = async function() {
+    await waitFor.visibilityOf(
+      unsavedChangesStatusInfoModal,
+      'Unsaved changes status info modal is taking too long to display');
   };
 };
 
