@@ -1708,7 +1708,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         contributions = user_services.get_user_contributions(user_id)
-        # Check contributions for this user id exist already.
+        # Check contributions for this user id is created from creating a
+        # New user.
         self.assertIsNotNone(contributions)
         # Make sure the variable 'contributions' is actually an object of
         # The UserContributions Class.
