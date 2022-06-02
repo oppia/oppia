@@ -2,7 +2,7 @@
   "ImageClickInput": {
     "can_have_solution": false,
     "show_generic_submit_button": false,
-    "instructions": "I18N_INTERACTIONS_IMAGE_CLICK_INSTRUCTION",
+    "instructions": "Click on the image",
     "is_trainable": false,
     "narrow_instructions": "View image",
     "description": "Allows learners to click on regions of an image.",
@@ -85,20 +85,14 @@
         "content_id": null,
         "unicode_str": "Type an expression here, using only numbers."
       }
-    }, {
-      "description": "Represent division using fractions (rather than ÷).",
-      "name": "useFractionForDivision",
-      "schema": {
-        "type": "bool"
-      },
-      "default_value": false
     }],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
-      "MatchesUpToTrivialManipulations": "matches {{x|NumericExpression}}, taking into account commutativity and associativity",
-      "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}"
+      "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
+      "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
     }
   },
   "NumericInput": {
@@ -114,14 +108,7 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "NumericInput",
-    "customization_arg_specs": [{
-      "description": "Allow only input greater than or equal to zero.",
-      "name": "requireNonnegativeInput",
-      "schema": {
-        "type": "bool"
-      },
-     "default_value": false
-    }],
+    "customization_arg_specs": [],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
@@ -137,13 +124,13 @@
   "DragAndDropSortInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION",
+    "instructions": "Drag and drop items",
     "is_trainable": false,
-    "narrow_instructions": "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION",
+    "narrow_instructions": "Drag and drop items",
     "description": "Allows learners to drag and drop items for sorting.",
     "needs_summary": true,
     "name": "Drag And Drop Sort",
-    "answer_type": "ListOfSetsOfTranslatableHtmlContentIds",
+    "answer_type": "ListOfSetsOfHtmlStrings",
     "is_linear": false,
     "display_mode": "supplemental",
     "id": "DragAndDropSortInput",
@@ -192,10 +179,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "HasElementXAtPositionY": "has element {{x|TranslatableHtmlContentId}} at position {{y|DragAndDropPositiveInt}}",
-      "IsEqualToOrdering": "is equal to ordering {{x|ListOfSetsOfTranslatableHtmlContentIds}}",
-      "HasElementXBeforeElementY": "has element {{x|TranslatableHtmlContentId}} before element {{y|TranslatableHtmlContentId}}",
-      "IsEqualToOrderingWithOneItemAtIncorrectPosition": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
+      "HasElementXAtPositionY": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}",
+      "IsEqualToOrdering": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}",
+      "HasElementXBeforeElementY": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}",
+      "IsEqualToOrderingWithOneItemAtIncorrectPosition": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
     }
   },
   "ItemSelectionInput": {
@@ -207,7 +194,7 @@
     "description": "Allows learners to select various options.",
     "needs_summary": false,
     "name": "Item Selection",
-    "answer_type": "SetOfTranslatableHtmlContentIds",
+    "answer_type": "SetOfHtmlString",
     "is_linear": false,
     "display_mode": "inline",
     "id": "ItemSelectionInput",
@@ -265,10 +252,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "DoesNotContainAtLeastOneOf": "omits at least one of {{x|SetOfTranslatableHtmlContentIds}}",
-      "IsProperSubsetOf": "is a proper subset of {{x|SetOfTranslatableHtmlContentIds}}",
-      "ContainsAtLeastOneOf": "contains at least one of {{x|SetOfTranslatableHtmlContentIds}}",
-      "Equals": "is equal to {{x|SetOfTranslatableHtmlContentIds}}"
+      "DoesNotContainAtLeastOneOf": "omits at least one of {{x|SetOfHtmlString}}",
+      "IsProperSubsetOf": "is a proper subset of {{x|SetOfHtmlString}}",
+      "ContainsAtLeastOneOf": "contains at least one of {{x|SetOfHtmlString}}",
+      "Equals": "is equal to {{x|SetOfHtmlString}}"
     }
   },
   "Continue": {
@@ -305,9 +292,9 @@
   "GraphInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "I18N_INTERACTIONS_GRAPH_INPUT_INSTRUCTION",
+    "instructions": "Create a graph",
     "is_trainable": false,
-    "narrow_instructions": "I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION",
+    "narrow_instructions": "View graph",
     "description": "Allows learners to create and manipulate graphs.",
     "needs_summary": true,
     "name": "Graph Theory",
@@ -443,10 +430,6 @@
             "type": "unicode"
           },
           "type": "list",
-          "validators": [{
-            "id": "has_length_at_most",
-            "max_value": 3
-          }],
           "ui_config": {
             "add_element_text": "Add exploration ID"
           }
@@ -500,9 +483,9 @@
   "CodeRepl": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION",
+    "instructions": "Type code in the editor",
     "is_trainable": true,
-    "narrow_instructions": "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION",
+    "narrow_instructions": "Go to code editor",
     "description": "Allows learners to enter code and get it evaluated.",
     "needs_summary": true,
     "name": "Code Editor",
@@ -584,28 +567,22 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "allowedVariables",
+        "name": "customOskLetters",
         "schema": {
-          "obj_type": "AllowedVariables",
+          "obj_type": "CustomOskLetters",
           "type": "custom"
         },
         "default_value": []
-      },
-      {
-        "description": "Represent division using fractions (rather than ÷).",
-        "name": "useFractionForDivision",
-        "schema": {
-          "type": "bool"
-        },
-        "default_value": false
       }
     ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
-      "MatchesUpToTrivialManipulations": "matches {{x|MathEquation}} {{y|PositionOfTerms}}, taking into account commutativity and associativity",
-      "IsEquivalentTo": "is equivalent to {{x|MathEquation}}"
+      "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
+      "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "MatchesWithGeneralForm": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "MultipleChoiceInput": {
@@ -669,9 +646,9 @@
   "PencilCodeEditor": {
     "can_have_solution": true,
     "show_generic_submit_button": false,
-    "instructions": "I18N_INTERACTIONS_PENCILCODE_INSTRUCTION",
+    "instructions": "Edit the code. Click 'Play' to check it!",
     "is_trainable": false,
-    "narrow_instructions": "I18N_INTERACTIONS_PENCILCODE_NARROW_INSTRUCTION",
+    "narrow_instructions": "Show code editor",
     "description": "Allows learners to edit code in Pencil Code.",
     "needs_summary": true,
     "name": "Pencil Code Editor",
@@ -741,7 +718,7 @@
               "id": "is_at_least"
             },
             {
-              "max_value": 10,
+              "max_value": 200,
               "id": "is_at_most"
             }
           ]
@@ -761,9 +738,9 @@
   "InteractiveMap": {
     "can_have_solution": false,
     "show_generic_submit_button": false,
-    "instructions": "I18N_INTERACTIONS_MAP_INSTRUCTION",
+    "instructions": "Click on the map",
     "is_trainable": false,
-    "narrow_instructions": "I18N_INTERACTIONS_MAP_NARROW_INSTRUCTION",
+    "narrow_instructions": "View map",
     "description": "Allows learners to specify a position on a world map.",
     "needs_summary": true,
     "name": "World Map",
@@ -827,9 +804,9 @@
   "MusicNotesInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "I18N_INTERACTIONS_MUSIC_INSTRUCTION",
+    "instructions": "Drag notes to the staff to form a sequence",
     "is_trainable": false,
-    "narrow_instructions": "I18N_INTERACTIONS_MUSIC_NARROW_INSTRUCTION",
+    "narrow_instructions": "Show music staff",
     "description": "Allows learners to drag and drop notes onto the lines of a music staff.",
     "needs_summary": true,
     "name": "Music Notes Input",
@@ -884,28 +861,22 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "allowedVariables",
+        "name": "customOskLetters",
         "schema": {
-          "obj_type": "AllowedVariables",
+          "obj_type": "CustomOskLetters",
           "type": "custom"
         },
         "default_value": []
-      },
-      {
-        "description": "Represent division using fractions (rather than ÷).",
-        "name": "useFractionForDivision",
-        "schema": {
-          "type": "bool"
-        },
-        "default_value": false
       }
     ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
-      "MatchesUpToTrivialManipulations": "matches {{x|AlgebraicExpression}}, taking into account commutativity and associativity",
-      "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}"
+      "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}",
+      "ContainsSomeOf": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
+      "MatchesWithGeneralForm": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "FractionInput": {
@@ -971,7 +942,7 @@
       "IsGreaterThan": "is greater than {{f|Fraction}}",
       "HasIntegerPartEqualTo": "has integer part equal to {{x|Int}}",
       "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
-      "HasDenominatorEqualTo": "has denominator equal to {{x|PositiveInt}}"
+      "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
     }
   },
   "RatioExpressionInput": {
@@ -1001,7 +972,7 @@
         }
       },
       {
-        "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted. The number of elements should not be greater than 10.",
+        "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted.",
         "name": "numberOfTerms",
         "schema": {
           "type": "int",
@@ -1009,10 +980,6 @@
             {
               "min_value": 0,
               "id": "is_at_least"
-            },
-            {
-              "max_value": 10,
-              "id": "is_at_most"
             }
           ]
         },
@@ -1024,8 +991,7 @@
     "rule_descriptions": {
       "Equals": "is equal to {{x|RatioExpression}}",
       "IsEquivalent": "is equivalent to {{x|RatioExpression}}",
-      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|PositiveInt}}",
-      "HasSpecificTermEqualTo": "has term {{x|PositiveInt}} equal to {{y|PositiveInt}}"
+      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|NonnegativeInt}}"
     }
   }
 }

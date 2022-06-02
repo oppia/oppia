@@ -138,6 +138,13 @@ TYPE_INVALID_EXPRESSION = 'Invalid'
 TYPE_VALID_ALGEBRAIC_EXPRESSION = 'AlgebraicExpressionInput'
 TYPE_VALID_NUMERIC_EXPRESSION = 'NumericExpressionInput'
 TYPE_VALID_MATH_EQUATION = 'MathEquationInput'
+MATH_INTERACTION_TYPES = [
+    TYPE_VALID_ALGEBRAIC_EXPRESSION,
+    TYPE_VALID_NUMERIC_EXPRESSION,
+    TYPE_VALID_MATH_EQUATION
+]
+MATH_INTERACTION_DEPRECATED_RULES = [
+    'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
 
 def clean_math_expression(math_expression):
@@ -1933,7 +1940,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_domain.InteractionInstance
                     .convert_customization_args_dict_to_customization_args(
                         state_dict['interaction']['id'],
-                        state_dict['interaction']['customization_args']))
+                        state_dict['interaction']['customization_args'],
+                        state_schema_version=45))
                 for ca_name in customisation_args:
                     list_of_subtitled_unicode_content_ids.extend(
                         state_domain.InteractionCustomizationArg
@@ -1981,7 +1989,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict,
                     html_validation_service
-                    .convert_svg_diagram_tags_to_image_tags)
+                    .convert_svg_diagram_tags_to_image_tags, 46)
         return states_dict
 
     @classmethod
@@ -2037,6 +2045,50 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
+        """Converts from version 49 to 50. Version 50 removes rules from
+        explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] in MATH_INTERACTION_TYPES:
+                filtered_answer_groups = []
+                for answer_group_dict in state_dict[
+                        'interaction']['answer_groups']:
+                    filtered_rule_specs = []
+                    for rule_spec_dict in answer_group_dict['rule_specs']:
+                        rule_type = rule_spec_dict['rule_type']
+                        if rule_type not in MATH_INTERACTION_DEPRECATED_RULES:
+                            filtered_rule_specs.append(
+                                copy.deepcopy(rule_spec_dict))
+                    answer_group_dict['rule_specs'] = filtered_rule_specs
+                    if len(filtered_rule_specs) > 0:
+                        filtered_answer_groups.append(
+                            copy.deepcopy(answer_group_dict))
+                state_dict[
+                    'interaction']['answer_groups'] = filtered_answer_groups
+
+                # Renaming cust arg.
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args['allowedVariables'] = []
+                if 'customOskLetters' in customization_args:
+                    customization_args['allowedVariables'] = copy.deepcopy(
+                        customization_args['customOskLetters'])
+                    del customization_args['customOskLetters']
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -2073,7 +2125,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 54
+    CURRENT_EXP_SCHEMA_VERSION = 55
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2257,6 +2309,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
+        """Converts a v54 exploration dict into a v55 exploration dict.
+        Removes rules from explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v54.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
+        """
+        exploration_dict['schema_version'] = 55
+
+        exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 50
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2331,6 +2406,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v53_dict_to_v54_dict(
                 exploration_dict)
             exploration_schema_version = 54
+
+        if exploration_schema_version == 54:
+            exploration_dict = cls._convert_v54_dict_to_v55_dict(
+                exploration_dict)
+            exploration_schema_version = 55
 
         return exploration_dict
 

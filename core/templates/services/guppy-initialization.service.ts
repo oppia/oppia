@@ -40,7 +40,7 @@ export class GuppyInitializationService {
   private guppyInstances: GuppyObject[] = [];
   private onScreenKeyboardShown = false;
   static interactionType: string;
-  private static customOskLetters: string[] = [];
+  private static allowedVariables: string[] = [];
 
   init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
       void {
@@ -99,12 +99,12 @@ export class GuppyInitializationService {
     this.onScreenKeyboardShown = value;
   }
 
-  getCustomOskLetters(): string[] {
-    return GuppyInitializationService.customOskLetters;
+  getAllowedVariables(): string[] {
+    return GuppyInitializationService.allowedVariables;
   }
 
-  setCustomOskLetters(customOskLetters: string[]): void {
-    GuppyInitializationService.customOskLetters = customOskLetters;
+  setAllowedVariables(allowedVariables: string[]): void {
+    GuppyInitializationService.allowedVariables = allowedVariables;
   }
 }
 

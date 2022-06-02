@@ -61,11 +61,11 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    let customOskLetters = (
-      this.guppyInitializationService.getCustomOskLetters());
+    let allowedVariables = (
+      this.guppyInitializationService.getAllowedVariables());
 
     let choices = (
-      customOskLetters ? customOskLetters :
+      allowedVariables ? allowedVariables :
       AppConstants.VALID_ALGEBRAIC_IDENTIFIERS);
 
     this.SCHEMA = {

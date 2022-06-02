@@ -135,7 +135,7 @@ describe('AlgebraicExpressionEditor', () => {
       component.warningText).toBe('Please enter an answer before submitting.');
 
     component.currentValue = 'x/2';
-    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue(
       ['x']);
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');

@@ -1264,7 +1264,7 @@ class OskCharacters(BaseObject):
         """
         return {
             'type': 'unicode',
-            'choices': constants.VALID_CUSTOM_OSK_LETTERS
+            'choices': constants.VALID_ALLOWED_VARIABLES
         }
 
 
@@ -1407,7 +1407,7 @@ class RatioExpression(BaseObject):
         }
 
 
-class CustomOskLetters(BaseObject):
+class AllowedVariables(BaseObject):
     """Class for custom OSK letters. These are the letters that will be
     displayed to the learner for AlgebraicExpressionInput and MathEquationInput
     interactions when the on-screen keyboard is being used. This includes Latin

@@ -95,7 +95,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     fixture = TestBed.createComponent(
       AlgebraicExpressionInputInteractionComponent);
     component = fixture.componentInstance;
-    component.customOskLettersWithValue = '[&quot;a&quot;, &quot;b&quot;]';
+    component.allowedVariablesWithValue = '[&quot;a&quot;, &quot;b&quot;]';
     fixture.detectChanges();
   });
 
