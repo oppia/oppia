@@ -56,7 +56,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
     I18nModule,
     // TODO(#13443): Remove hybrid router module provider once all pages are
     // migrated to angular router.
-    RouterModule,
+    HybridRouterModuleProvider.provide(),
     SharedPipesModule,
   ],
 
