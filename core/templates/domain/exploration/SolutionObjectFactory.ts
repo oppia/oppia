@@ -85,7 +85,7 @@ export class Solution {
   }
 
   getSummary(
-      interactionId: string, customizationArgs?: InteractionCustomizationArgs
+      interactionId: string, customizationArgs: InteractionCustomizationArgs
   ): string {
     const solutionType = this.answerIsExclusive ? 'The only' : 'One';
     let correctAnswer = null;
@@ -104,21 +104,17 @@ export class Solution {
         new UnitsObjectFactory())).fromDict(
           this.correctAnswer as NumberWithUnitsAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
-      if (!customizationArgs) {
-        throw new Error(
-          'Customization args for the drag and drop interaction are missing');
-      }
       correctAnswer = [];
-      let subtitledHtmlChoices = (
+      const subtitledHtmlChoices = (
         customizationArgs as DragAndDropSortInputCustomizationArgs)
         .choices.value;
-      let subtitledHtmlChoicesContentIds = subtitledHtmlChoices.map(
-        choice => choice._contentId);
+      const subtitledHtmlChoicesContentIds = subtitledHtmlChoices.map(
+        choice => choice.contentId);
       for (const arr of this.correctAnswer as DragAndDropAnswer) {
         const transformedArray = [];
         for (const elem of arr) {
-          let choiceIndex = subtitledHtmlChoicesContentIds.indexOf(elem);
-          transformedArray.push(subtitledHtmlChoices[choiceIndex]._html);
+          const choiceIndex = subtitledHtmlChoicesContentIds.indexOf(elem);
+          transformedArray.push(subtitledHtmlChoices[choiceIndex].html);
         }
         correctAnswer.push(transformedArray);
       }

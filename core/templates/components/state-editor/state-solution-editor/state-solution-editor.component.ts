@@ -130,20 +130,13 @@ export class StateSolutionEditorComponent implements OnInit {
   }
 
   getSolutionSummary(): string {
-    let solution = this.stateSolutionService.savedMemento;
-    let interactionId = this.stateInteractionIdService.savedMemento;
-    let solutionAsPlainText = '';
-    if (interactionId === 'DragAndDropSortInput') {
-      solutionAsPlainText = (
-        solution.getSummary(
-          interactionId, this.stateCustomizationArgsService.savedMemento
-        ));
-    } else {
-      solutionAsPlainText = (
-        solution.getSummary(this.stateInteractionIdService.savedMemento));
-    }
-    solutionAsPlainText = (
-      this.convertToPlainText.transform(solutionAsPlainText));
+    const solution = this.stateSolutionService.savedMemento;
+    const interactionId = this.stateInteractionIdService.savedMemento;
+    const solutionSummary = (
+      solution.getSummary(
+        interactionId, this.stateCustomizationArgsService.savedMemento));
+    const solutionAsPlainText = (
+      this.convertToPlainText.transform(solutionSummary));
     return solutionAsPlainText;
   }
 
