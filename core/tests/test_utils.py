@@ -2592,7 +2592,7 @@ title: Title
         exploration_id: str,
         owner_id: str,
         title: str = 'A title',
-        category: str = 'A category',
+        category: str = 'Algebra',
         objective: str = 'An objective',
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         end_state_name: Optional[str] = None,
