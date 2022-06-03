@@ -17,49 +17,13 @@
  * in components which registered both on hybrid and angular pages.
  */
 
-import { Directive, EventEmitter, HostListener, Injectable, Input, ModuleWithProviders, NgModule } from '@angular/core';
-import { Router, RouterModule, RouterLinkWithHref } from '@angular/router';
+import { Directive, HostListener, Input, NgModule } from '@angular/core';
+import { RouterModule, RouterLinkWithHref } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
 
 // TODO(#13443): Remove hybrid router module provider once all pages are
 // migrated to angular router.
-
-/** Mock routerLink directive will be used in pages which are yet to be migrated
- *  to angular router.
- */
-@Directive({
-  selector: '[smartRouterLink]'
-})
-export class MockRouterLink {
-  @Input() routerLink!: string;
-}
-
-@Injectable()
-export class MockRouter {
-  events = new EventEmitter<void>();
-
-  ngOnInit(): void {
-    this.events.emit();
-  }
-}
-
-@NgModule({
-  declarations: [
-    MockRouterLink
-  ],
-  exports: [
-    MockRouterLink,
-  ],
-  providers: [
-    {
-      provide: Router,
-      useClass: MockRouter
-    }
-  ]
-})
-export class MockRouterModule {}
-
 
 @Directive({
   selector: '[smartRouterLink]'
@@ -149,33 +113,7 @@ export class SmartRouterLink extends RouterLinkWithHref {
     SmartRouterLink
   ],
   exports: [
-    SmartRouterLink,
-    RouterModule
+    SmartRouterLink
   ]
 })
 export class SmartRouterModule {}
-
-
-export class HybridRouterModuleProvider {
-  static provide(): ModuleWithProviders<MockRouterModule | RouterModule> {
-    let bodyContent = window.document.querySelector('body');
-
-    // Checks whether the page is using angular router.
-    if (bodyContent) {
-      if (
-        // eslint-disable-next-line oppia/no-inner-html
-        bodyContent.innerHTML.includes('<router-outlet>') ||
-        // eslint-disable-next-line oppia/no-inner-html
-        bodyContent.innerHTML.includes('<router-outlet custom="light">')
-      ) {
-        return {
-          ngModule: SmartRouterModule
-        };
-      }
-    }
-
-    return {
-      ngModule: MockRouterModule,
-    };
-  }
-}

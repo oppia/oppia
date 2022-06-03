@@ -17,8 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { HybridRouterModuleProvider, MockRouter, MockRouterModule } from 'hybrid-router-module-provider';
+import { MockRouter } from 'hybrid-router-module-provider';
 
 describe('Hybrid router module provider', () => {
   let mockRouter: MockRouter;
@@ -33,23 +32,4 @@ describe('Hybrid router module provider', () => {
   beforeEach(() => {
     mockRouter.ngOnInit();
   });
-
-  it('should provide router module for pages using angular router', () => {
-    let bodyElement = window.document.createElement('body');
-    // eslint-disable-next-line oppia/no-inner-html
-    bodyElement.innerHTML = '<router-outlet></router-outlet>';
-
-    spyOn(window.document, 'querySelector').and.returnValue(bodyElement);
-
-    expect(HybridRouterModuleProvider.provide().ngModule).toEqual(RouterModule);
-  });
-
-  it('should provide mock router module for pages not using angular router',
-    () => {
-      let bodyTag = window.document.createElement('body');
-      spyOn(window.document, 'querySelector').and.returnValue(bodyTag);
-
-      expect(HybridRouterModuleProvider.provide().ngModule).toEqual(
-        MockRouterModule);
-    });
 });
