@@ -17,8 +17,8 @@
  * in components which registered both on hybrid and angular pages.
  */
 
-import { Directive, EventEmitter, HostListener, Injectable, Input, ModuleWithProviders, NgModule, OnDestroy } from '@angular/core';
-import { Router, RouterModule, RouterLink, RouterLinkWithHref } from '@angular/router';
+import { Directive, EventEmitter, HostListener, Injectable, Input, ModuleWithProviders, NgModule } from '@angular/core';
+import { Router, RouterModule, RouterLinkWithHref } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
 
@@ -62,23 +62,47 @@ export class MockRouterModule {}
 
 
 @Directive({
-  selector: 'a[smartRouterLink]'
+  selector: '[smartRouterLink]'
 })
 export class SmartRouterLink extends RouterLinkWithHref {
   @Input()
-  set smartRouterLink(commands: any[] | string) {
+  set smartRouterLink(commands: string[] | string) {
     this.routerLink = commands;
   }
 
-  @HostListener('click')
-  onClick(): boolean {
+  @HostListener('click', [
+    '$event.button',
+    '$event.ctrlKey',
+    '$event.shiftKey',
+    '$event.altKey',
+    '$event.metaKey'
+  ])
+  onClick(
+      button: number,
+      ctrlKey: boolean,
+      shiftKey: boolean,
+      altKey: boolean,
+      metaKey: boolean
+  ): boolean {
     let bodyContent = window.document.querySelector('body');
+    let currentPageIsInRouter = (
+      // eslint-disable-next-line oppia/no-inner-html
+      bodyContent && bodyContent.innerHTML.includes('<router-outlet>'));
+    let currentPageIsInLightweightRouter = (
+      bodyContent &&
+      // eslint-disable-next-line oppia/no-inner-html
+      bodyContent.innerHTML.includes('<router-outlet custom="light">')
+    );
+    if (!currentPageIsInRouter && !currentPageIsInLightweightRouter) {
+      window.location.href = this.urlTree.toString();
+      return true;
+    }
 
-    console.log(window.location.href);
-    console.log(this.urlTree.toString());
     let lightweightRouterPagesRoutes = [];
     let routerPagesRoutes = [];
-    for (let page of Object.values(AppConstants.PAGES_REGISTERED_WITH_FRONTEND)) {
+    for (
+      let page of Object.values(AppConstants.PAGES_REGISTERED_WITH_FRONTEND)
+    ) {
       let routeRegex = '^';
       for (let partOfRoute of page.ROUTE.split('/')) {
         if (partOfRoute.startsWith(':')) {
@@ -94,33 +118,26 @@ export class SmartRouterLink extends RouterLinkWithHref {
         routerPagesRoutes.push(routeRegex);
       }
     }
-    for (let route of lightweightRouterPagesRoutes) {
-      if (this.urlTree.toString().match(route)) {
-        if (
-          // eslint-disable-next-line oppia/no-inner-html
-          bodyContent && bodyContent.innerHTML.includes('<router-outlet>')
-        ) {
-          console.log('navigate 1');
+
+    if (currentPageIsInRouter) {
+      for (let route of lightweightRouterPagesRoutes) {
+        if (this.urlTree.toString().match(route)) {
           window.location.href = this.urlTree.toString();
+          return true;
         }
       }
     }
-    for (let route of routerPagesRoutes) {
-      if (this.urlTree.toString().match(route)) {
-        if (
-          bodyContent &&
-          // eslint-disable-next-line oppia/no-inner-html
-          bodyContent.innerHTML.includes('<router-outlet custom="light">')
-        ) {
-          console.log('navigate 2');
+
+    if (currentPageIsInLightweightRouter) {
+      for (let route of routerPagesRoutes) {
+        if (this.urlTree.toString().match(route)) {
           window.location.href = this.urlTree.toString();
+          return true;
         }
       }
     }
-    console.log(this.routerLink);
-    let ret = super.onClick();
-    console.log(ret);
-    return ret;
+
+    return super.onClick(button, ctrlKey, shiftKey, altKey, metaKey);
   }
 }
 

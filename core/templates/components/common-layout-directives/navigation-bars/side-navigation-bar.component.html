@@ -232,7 +232,7 @@
                  alt="learn-math-logo">
           </picture>
         </div>
-        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link mb-1">
+        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link mb-1">
           <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
           <p class="oppia-sidebar-learn-subtext mt-2">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
@@ -251,7 +251,9 @@
           </div>
         </div>
         <div class="submenu-notop-margin">
-          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
+          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+             smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+             class="protractor-mobile-test-mathematics-link">
             <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
             <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
           </a>
@@ -290,7 +292,7 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/volunteer" routerLink="/volunteer">
+          <a href="/volunteer" smartRouterLink="/volunteer">
             <i class="material-icons oppia-sidebar-submenu-icon volunteer-icon">people</i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>

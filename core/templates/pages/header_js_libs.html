@@ -1,7 +1,8 @@
+
 <!-- This code is used for inserting webpack bundles
     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-  <link rel="preload" as="script" href="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <link rel="preload" as="script" href="<%= htmlWebpackPlugin.files.js[chunk] %>">
 <% } %>
 
 <% if (!htmlWebpackPlugin.options.lightweight) { %>
