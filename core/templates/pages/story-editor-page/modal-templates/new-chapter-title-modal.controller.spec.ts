@@ -137,6 +137,7 @@ describe('Create New Chapter Modal Controller', function() {
       expect($scope.nodeTitles).toEqual(nodeTitles);
       expect($scope.errorMsg).toBe(null);
       expect($scope.correctnessFeedbackDisabled).toBe(false);
+      expect($scope.categoryIsDefault).toBe(true);
     });
 
   it('should validate explorationId correctly',
@@ -243,10 +244,13 @@ describe('Create New Chapter Modal Controller', function() {
       .and.returnValue(deferred.promise);
     const correctnessFeedbackSpy =
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled');
+    const categorySpy =
+      spyOn(explorationIdValidationService, 'isDefaultCategoryAsync');
     $scope.save();
     $rootScope.$apply();
     expect($scope.invalidExpId).toEqual(true);
     expect(correctnessFeedbackSpy).not.toHaveBeenCalled();
+    expect(categorySpy).not.toHaveBeenCalled();
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 
@@ -267,6 +271,29 @@ describe('Create New Chapter Modal Controller', function() {
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 
+  it('should prevent exploration from being added if its category ' +
+  'is not default', function() {
+    $scope.title = 'dummy_title';
+
+    var deferred = $q.defer();
+    deferred.resolve(true);
+    var deferred2 = $q.defer();
+    deferred2.resolve(false);
+
+    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+      .and.returnValue(deferred.promise);
+    spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
+      .and.returnValue(deferred.promise);
+    spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
+      .and.returnValue(deferred2.promise);
+
+    $scope.save();
+    $rootScope.$apply();
+
+    expect($scope.categoryIsDefault).toBe(false);
+    expect($uibModalInstance.close).not.toHaveBeenCalled();
+  });
+
   it('should attempt to save exploration when all validation checks pass',
     function() {
       $scope.title = 'dummy_title';
@@ -274,10 +301,10 @@ describe('Create New Chapter Modal Controller', function() {
       deferred.resolve(true);
       spyOn(explorationIdValidationService, 'isExpPublishedAsync')
         .and.returnValue(deferred.promise);
-      var deferred2 = $q.defer();
-      deferred2.resolve(true);
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
-        .and.returnValue(deferred2.promise);
+        .and.returnValue(deferred.promise);
+      spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
+        .and.returnValue(deferred.promise);
       const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
       const updateTitleSpy = spyOn($scope, 'updateTitle');
       $scope.save();

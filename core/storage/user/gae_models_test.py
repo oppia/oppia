@@ -2206,8 +2206,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         retrieved_object = user_models.StoryProgressModel.get(
             self.USER_ID_1, self.STORY_ID_1)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
         self.assertEqual(retrieved_object.story_id, self.STORY_ID_1)
         self.assertEqual(
@@ -2371,8 +2369,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             submitter_id=self.USER_ID_1).put()
 
         query_model = user_models.UserQueryModel.get(self.QUERY_1_ID)
-        # Ruling out the possibility of None for mypy type checking.
-        assert query_model is not None
         self.assertEqual(query_model.submitter_id, self.USER_ID_1)
         self.assertEqual(
             query_model.inactive_in_last_n_days, inactive_in_last_n_days)
@@ -2628,8 +2624,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         retrieved_object = user_models.UserSkillMasteryModel.get(
             constructed_model_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.skill_id, self.SKILL_ID_1)
         self.assertEqual(retrieved_object.degree_of_mastery, 0.5)
