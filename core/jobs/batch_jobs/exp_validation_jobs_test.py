@@ -51,6 +51,9 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
     EXPLORATION_ID_7 = '7'
     EXPLORATION_ID_8 = '8'
     EXPLORATION_ID_9 = '9'
+    EXPLORATION_ID_10 = '10'
+    EXPLORATION_ID_11 = '11'
+    EXPLORATION_ID_12 = '12'
 
     STATE_1 = state_domain.State.create_default_state(
         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
@@ -149,6 +152,10 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
 
     INVALID_STATE_1 = state_domain.State.create_default_state('state 1')
     INVALID_STATE_2 = state_domain.State.create_default_state('state 2')
+    INVALID_STATE_3 = state_domain.State.create_default_state('state 3')
+    INVALID_STATE_4 = state_domain.State.create_default_state('state 4')
+    INVALID_STATE_5 = state_domain.State.create_default_state('state 5')
+    INVALID_STATE_6 = state_domain.State.create_default_state('state 6')
 
     def setUp(self):
         super().setUp()
@@ -167,6 +174,49 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             self.STATE_ANSWER_GROUPS_1)
         self.INVALID_STATE_2.interaction.answer_groups = (
             self.STATE_ANSWER_GROUPS_2)
+
+        self.INVALID_STATE_3.update_interaction_id('MultipleChoiceInput')
+        self.INVALID_STATE_3.update_interaction_customization_args({
+            'choices': {
+                'value': [{
+                    'content_id': '1',
+                    'html': '1'
+                }, {
+                    'content_id': '2',
+                    'html': '2'
+                }]
+            },
+            'showChoicesInShuffledOrder': {'value': True}
+        })
+
+        self.INVALID_STATE_4.interaction.default_outcome = (
+            state_domain.Outcome(
+                'state 1', state_domain.SubtitledHtml(
+                    'default_outcome', '<p>Default outcome for state 4</p>'
+                ), False, [param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['3', '4'],
+                        'parse_with_jinja': True
+                    }
+                )], None, None
+            )
+        )
+
+        self.INVALID_STATE_5.update_content(
+            state_domain.SubtitledHtml(
+                '1', '<p><oppia-noninteractive-video autoplay-with-value="false" '
+                'end-with-value="0" start-with-value="0">'
+                '</oppia-noninteractive-video></p>'
+            )
+        )
+
+        self.INVALID_STATE_6.update_content(
+            state_domain.SubtitledHtml(
+                '2', '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
+                'a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com&amp'
+                ';quot;"></oppia-noninteractive-link></p>'
+            )
+        )
 
         # Valid exploration model for all cases.
         self.exp_1 = self.create_model(
@@ -383,6 +433,73 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             }
         )
 
+        # Exploration model with invalid customization args.
+        self.exp_10 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_10,
+            title='title 10',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+                'state 3': self.INVALID_STATE_3.to_dict()
+            }
+        )
+
+        # Exploration model with invalid outcome param changes.
+        self.exp_11 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_11,
+            title='title 11',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+                'state 4': self.INVALID_STATE_4.to_dict()
+            }
+        )
+
+        # Exploration model with invalid links or videos.
+        self.exp_12 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_12,
+            title='title 12',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+                'state 5': self.INVALID_STATE_5.to_dict(),
+                'state 6': self.INVALID_STATE_6.to_dict()
+            }
+        )
+
         # Valid opportunity model.
         self.opportunity_1 = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
@@ -486,6 +603,54 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             topic_id='topic_id9',
             topic_name='a_topic name',
             story_id='story_id9',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+        # Valid opportunity model.
+        self.opportunity_8 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_10,
+            topic_id='topic_id10',
+            topic_name='a_topic name',
+            story_id='story_id10',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+        # Valid opportunity model.
+        self.opportunity_9 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_11,
+            topic_id='topic_id11',
+            topic_name='a_topic name',
+            story_id='story_id11',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+        # Valid opportunity model.
+        self.opportunity_10 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_12,
+            topic_id='topic_id12',
+            topic_name='a_topic name',
+            story_id='story_id12',
             story_title='A story title',
             chapter_title='A chapter title',
             content_count=20,
@@ -599,6 +764,50 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                     self.EXPLORATION_ID_9,
                     ['state 1', 'state 2']
                 )
+            )
+        ])
+
+    def test_run_with_invalid_cust_args(self) -> None:
+        self.put_multi([self.exp_10, self.opportunity_8])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('CURATED EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(
+                'INVALID CUST ARGS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                'The id of exp is %s and the states having interaction '
+                'cust args with less than 4 options are %s' % (
+                    self.EXPLORATION_ID_10,
+                    ['state 3']
+                )
+            )
+        ])
+
+    def test_run_with_invalid_outcome_param_changes(self) -> None:
+        self.put_multi([self.exp_11, self.opportunity_9])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('CURATED EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(
+                'INVALID OUTCOME PARAM CHANGES SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                'The id of exp is %s and the states having outcome '
+                'with non-empty param changes are %s' % (
+                    self.EXPLORATION_ID_11, ['state 4']
+                )
+            )
+        ])
+
+    def test_run_with_links_or_videos(self) -> None:
+        self.put_multi([self.exp_12, self.opportunity_10])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout('CURATED EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(
+                'VIDEOS OR LINKS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+                'The id of exp is %s and the number of video '
+                'or link tags is %s' % (self.EXPLORATION_ID_12, 2)
             )
         ])
 
