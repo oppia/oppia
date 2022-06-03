@@ -1708,11 +1708,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         contributions = user_services.get_user_contributions(user_id)
-        # Check contributions for this user id is created from creating a
-        # New user.
+        # Check that the user contributions for this user ID already exist.
+        # (Note that user contributions are created automatically when a new
+        # User is created).
         self.assertIsNotNone(contributions)
-        # Make sure the variable 'contributions' is actually an object of
-        # The UserContributions Class.
         self.assertIsInstance(contributions, user_domain.UserContributions)
 
         with self.assertRaisesRegex(
@@ -1728,8 +1727,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_create_user_contributions(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
-        created_exp_ids = ['expectedId1', 'expectedId2', 'expectedId3']
-        edited_exp_ids = ['expectedId2', 'expectedId3', 'expectedId4']
+        created_exp_ids = ['exp1', 'exp2', 'exp3']
+        edited_exp_ids = ['exp2', 'exp3', 'exp4']
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
 
@@ -1751,16 +1750,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertEqual(
-            ['expectedId1', 'expectedId2', 'expectedId3'],
+            ['exp1', 'exp2', 'exp3'],
             contributions.created_exploration_ids)
 
         self.assertEqual(
-            ['expectedId2', 'expectedId3', 'expectedId4'],
+            ['exp2', 'exp3', 'exp4'],
             contributions.edited_exploration_ids)
 
     def test_update_user_contributions(self):
-        created_exp_ids = ['expectedId1', 'expectedId2', 'expectedId3']
-        edited_exp_ids = ['expectedId2', 'expectedId3', 'expectedId4']
+        created_exp_ids = ['exp1', 'exp2', 'exp3']
+        edited_exp_ids = ['exp2', 'exp3', 'exp4']
 
         user_id = user_services.create_new_user(
             'someUser',
@@ -1779,10 +1778,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             edited_exp_ids)
         contributions = user_services.get_user_contributions(user_id)
         self.assertEqual(
-            ['expectedId1', 'expectedId2', 'expectedId3'],
+            ['exp1', 'exp2', 'exp3'],
             contributions.created_exploration_ids)
         self.assertEqual(
-            ['expectedId2', 'expectedId3', 'expectedId4'],
+            ['exp2', 'exp3', 'exp4'],
             contributions.edited_exploration_ids)
 
     def test_update_user_contributions_for_invalid_user_raises_error(self):
@@ -1793,8 +1792,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ):
             user_services.update_user_contributions(
             'non_existent_user_id',
-            ['expectedId1', 'expectedId2', 'expectedId3'],
-            ['expectedId2', 'expectedId3', 'expectedId4'])
+            ['exp1', 'exp2', 'exp3'],
+            ['exp2', 'exp3', 'exp4'])
 
     def test_add_created_exploration_id(self):
         auth_id = 'someUser'
@@ -1802,11 +1801,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         contributions = user_services.get_user_contributions(user_id)
-        self.assertNotIn('exploration1', contributions.created_exploration_ids)
+        self.assertNotIn('exp1', contributions.created_exploration_ids)
 
-        user_services.add_created_exploration_id(user_id, 'exploration1')
+        user_services.add_created_exploration_id(user_id, 'exp1')
         contributions = user_services.get_user_contributions(user_id)
-        self.assertIn('exploration1', contributions.created_exploration_ids)
+        self.assertIn('exp1', contributions.created_exploration_ids)
 
     def test_add_created_exploration_id_creates_user_contribution(self):
         user_id = 'id_x'
@@ -1814,11 +1813,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         pre_add_contributions = user_services.get_user_contributions(user_id)
         self.assertIsNone(pre_add_contributions)
 
-        user_services.add_created_exploration_id(user_id, 'exploration1')
+        user_services.add_created_exploration_id(user_id, 'exp1')
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertIsInstance(contributions, user_domain.UserContributions)
-        self.assertIn('exploration1', contributions.created_exploration_ids)
+        self.assertIn('exp1', contributions.created_exploration_ids)
 
     def test_add_edited_exploration_id(self):
         auth_id = 'someUser'
@@ -1826,11 +1825,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         contributions = user_services.get_user_contributions(user_id)
-        self.assertNotIn('exploration1', contributions.edited_exploration_ids)
+        self.assertNotIn('exp1', contributions.edited_exploration_ids)
 
-        user_services.add_edited_exploration_id(user_id, 'exploration1')
+        user_services.add_edited_exploration_id(user_id, 'exp1')
         contributions = user_services.get_user_contributions(user_id)
-        self.assertIn('exploration1', contributions.edited_exploration_ids)
+        self.assertIn('exp1', contributions.edited_exploration_ids)
 
     def test_add_edited_exploration_id_creates_user_contribution(self):
         user_id = 'id_x'
@@ -1838,12 +1837,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         pre_add_contributions = user_services.get_user_contributions(user_id)
         self.assertIsNone(pre_add_contributions)
 
-        user_services.add_edited_exploration_id(user_id, 'expectedId')
+        user_services.add_edited_exploration_id(user_id, 'exp1')
         contributions = user_services.get_user_contributions(user_id)
 
         self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertEqual(
-            ['expectedId'],
+            ['exp1'],
             contributions.edited_exploration_ids)
 
     def test_is_moderator(self):
