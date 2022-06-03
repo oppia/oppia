@@ -452,6 +452,27 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
             self.user_id, suggestion_type, limit, offset))
+        if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            translatable_suggestions = (
+                suggestion_services
+                .get_suggestions_with_translatable_explorations(
+                    suggestions))
+            while (
+                len(suggestions) > 0 and
+                len(translatable_suggestions) == 0
+            ):
+                # If all of the fetched suggestions are filtered out, then keep
+                # fetching until we have some suggestions to return or there
+                # are no more results.
+                suggestions, next_offset = (
+                    suggestion_services.get_submitted_suggestions_by_offset(
+                    self.user_id, suggestion_type, limit, next_offset))
+                translatable_suggestions = (
+                    suggestion_services
+                    .get_suggestions_with_translatable_explorations(
+                        suggestions))
+            suggestions = translatable_suggestions
+
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -627,7 +648,10 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
 
 
 def _construct_exploration_suggestions(suggestions):
-    """Returns exploration suggestions with current exploration content.
+    """Returns exploration suggestions with current exploration content. This
+    method assumes that the supplied suggestions represent changes that are
+    still valid, e.g. the suggestions refer to content that still exist in the
+    linked exploration.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions.
@@ -635,18 +659,12 @@ def _construct_exploration_suggestions(suggestions):
     Returns:
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
-        exploration's current content. If the given suggestion refers to an
-        invalid content ID in the current exploration (this can happen if that
-        content was deleted after the suggestion was made), the corresponding
-        suggestion dict will be omitted from the return value.
+        exploration's current content.
     """
     suggestion_dicts = []
-    translatable_suggestions = (
-        suggestion_services.get_suggestions_with_translatable_explorations(
-            suggestions))
-    exp_ids = {suggestion.target_id for suggestion in translatable_suggestions}
+    exp_ids = {suggestion.target_id for suggestion in suggestions}
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
-    for suggestion in translatable_suggestions:
+    for suggestion in suggestions:
         exploration = exp_id_to_exp[suggestion.target_id]
         content_html = exploration.get_content_html(
             suggestion.change.state_name, suggestion.change.content_id)

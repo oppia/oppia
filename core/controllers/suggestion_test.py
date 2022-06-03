@@ -2300,6 +2300,53 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['target_id_to_opportunity_dict'][self.EXP_ID], None)
 
+    def test_translation_suggestions_fetches_extra_page_if_filtered_result_is_empty( # pylint: disable=line-too-long
+        self
+    ):
+        # Create a new exploration, link a new story, and create a corresponding
+        # translation suggestion.
+        self.login(self.AUTHOR_EMAIL)
+        exp_id = 'exp2'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Exploration title',
+            category='Algebra', end_state_name='End State',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, exp_id)
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_2', self.TOPIC_ID, exp_id)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'translation_html': 'translation2',
+            'data_format': 'html'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, 1, self.author_id, add_translation_change_dict,
+            'test description')
+        # Disable the new exploration so that its corresponding translation
+        # suggestion is filtered out.
+        exp_services.set_exploration_edits_allowed(exp_id, False)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': 1,
+                'offset': 0
+            })
+
+        # The new translation suggestion is returned first, but because it is
+        # filtered out, the controller performs another fetch.
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(
+            response['suggestions'][0]['change']['translation_html'],
+            '<p>new content html in Hindi</p>')
+        # Offset reflects the extra fetch.
+        self.assertEqual(response['next_offset'], 2)
+
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
 

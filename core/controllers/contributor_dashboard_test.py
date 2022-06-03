@@ -87,10 +87,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.skill_id_1 = 'skill_id_1'
         self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
 
-        self._create_story_for_translation_opportunity(
-            'story_id_0', self.topic_id, '0')
-        self._create_story_for_translation_opportunity(
-            'story_id_1', self.topic_id, '1')
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_0', self.topic_id, '0')
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_1', self.topic_id, '1')
 
         self.topic_id_1 = '1'
         topic = topic_domain.Topic.create_default_topic(
@@ -98,8 +98,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.skill_id_2 = 'skill_id_2'
         self._publish_valid_topic(topic, [self.skill_id_2])
 
-        self._create_story_for_translation_opportunity(
-            'story_id_2', self.topic_id_1, '2')
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_2', self.topic_id_1, '2')
 
         # Add skill opportunity topic to a classroom.
         config_services.set_property(
@@ -497,8 +497,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exp_100.id)
-        self._create_story_for_translation_opportunity(
-            'story_id_100', self.topic_id, exp_100.id)
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
+            exp_100.id)
 
         # Add two pieces of content to the exploration multiple choice
         # interaction state.
@@ -606,8 +607,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exp_100.id)
-        self._create_story_for_translation_opportunity(
-            'story_id_100', self.topic_id, exp_100.id)
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
+            exp_100.id)
 
         # Add two pieces of content to the exploration multiple choice
         # interaction state.
@@ -905,42 +907,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 skill_id, self.admin_id, description='skill_description')
             topic_services.add_uncategorized_skill(
                 self.admin_id, topic.id, skill_id)
-
-    def _create_story_for_translation_opportunity(
-            self, story_id, topic_id, exploration_id):
-        """Creates a story and links it to the supplied topic and exploration.
-
-        Args:
-            story_id: str. The ID of new story.
-            topic_id: str. The ID of the topic for which to link the story.
-            exploration_id: str. The ID of the exploration that will be added
-                as a node to the story.
-        """
-        story = story_domain.Story.create_default_story(
-            story_id,
-            'title %s' % story_id,
-            'description',
-            topic_id,
-            'url-fragment')
-
-        story.language_code = 'en'
-        story_services.save_new_story(self.owner_id, story)
-        topic_services.add_canonical_story(
-            self.owner_id, topic_id, story.id)
-        topic_services.publish_story(
-            topic_id, story.id, self.admin_id)
-        story_services.update_story(
-            self.owner_id, story.id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': exploration_id
-            })], 'Changes.')
 
 
 class TranslatableTextHandlerTest(test_utils.GenericTestBase):
