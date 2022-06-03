@@ -48,6 +48,11 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
       c) The exploration is curated and has non-empty param specs.
       d) The exploration is curated and has one or more states which have
           interaction having answer group(s) with non-empty training data.
+      e) The exploration is curated and has any state with MultipleChoiceInput
+          interaction having less than 4 choices.
+      f) The exploration is curated and any state with default outcome where
+          param changes is not empty.
+      g) The exploration is curated and contains videos or links.
     """
 
     def get_states_having_invalid_state_classifier_id(
