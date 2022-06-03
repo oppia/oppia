@@ -204,7 +204,8 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
 
         self.INVALID_STATE_5.update_content(
             state_domain.SubtitledHtml(
-                '1', '<p><oppia-noninteractive-video autoplay-with-value="false" '
+                '1',
+                '<p><oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="0">'
                 '</oppia-noninteractive-video></p>'
             )
@@ -212,8 +213,9 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
 
         self.INVALID_STATE_6.update_content(
             state_domain.SubtitledHtml(
-                '2', '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
-                'a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com&amp'
+                '2', '<p><oppia-noninteractive-link '
+                'text-with-value="&amp;quot;What is a link?&amp;quot;" '
+                'url-with-value="&amp;quot;htt://link.com&amp'
                 ';quot;"></oppia-noninteractive-link></p>'
             )
         )
