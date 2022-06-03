@@ -84,24 +84,26 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             state.classifier_model_id is not None for state in states.values()
         )
 
-    def filter_exps_having_videos_or_links(
+    def get_number_of_videos_or_links(
         self, exploration: exp_domain.Exploration
-    ) -> bool:
-        """Returns True if any state has video or link.
+    ) -> int:
+        """Returns the number of videos or links in the exploration.
 
         Args:
             exploration: Exploration. Exploration to be checked.
 
         Returns:
-            bool. Returns True if any state has video or link.
+            int. Returns the number of videos or links in the exploration.
         """
+        count = 0
         html_list: List[str] = exploration.get_all_html_content_strings()
         video_tag = 'oppia-noninteractive-video'
         link_tag = 'oppia-noninteractive-link'
-        return any(
-            video_tag in html_string or link_tag in html_string
-            for html_string in html_list
-        )
+
+        for html_string in html_list:
+            if video_tag in html_string or link_tag in html_string:
+                count += 1
+        return count
 
     def get_states_having_invalid_training_data(
         self, exploration: exp_domain.Exploration
@@ -445,7 +447,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         curated_exp_having_videos_or_links = (
             curated_explorations
             | 'Filter explorations having videos or links' >>
-                beam.Filter(self.filter_exps_having_videos_or_links)
+                beam.Filter(lambda exp: (
+                    self.get_number_of_videos_or_links(exp) > 0))
         )
 
         report_number_of_exps_having_videos_or_links = (
@@ -455,15 +458,18 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                     'VIDEOS OR LINKS'))
         )
 
-        # report_details_on_exps_having_videos_or_links = (
-        #     curated_exp_having_videos_or_links
-        #     | 'Save info on exps having videos or links' >> beam.Map(
-        #         lambda exp: job_run_result.JobRunResult.as_stderr(
-        #             'The id of exp is %s and the states having outcome '
-        #             'with non-empty param changes are %s' % (
-        #         )
-        #     )
-        # )
+        report_details_on_exps_having_videos_or_links = (
+            curated_exp_having_videos_or_links
+            | 'Save info on exps having videos or links' >> beam.Map(
+                lambda exp: job_run_result.JobRunResult.as_stderr(
+                    'The id of exp is %s and the number of video '
+                    'or link tags is %s' % (
+                        exp.id,
+                        self.get_number_of_videos_or_links(exp)
+                    )
+                )
+            )
+        )
 
         return (
             (
@@ -480,7 +486,9 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 report_number_of_exps_having_invalid_cust_args,
                 report_details_of_exps_having_invalid_cust_args,
                 report_number_of_exps_having_invalid_outcome_param_changes,
-                report_details_of_exps_having_outcome_param_changes
+                report_details_of_exps_having_outcome_param_changes,
+                report_number_of_exps_having_videos_or_links,
+                report_details_on_exps_having_videos_or_links
             )
             | 'Combine results' >> beam.Flatten()
         )
