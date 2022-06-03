@@ -31,6 +31,8 @@ from typing import Any, Dict, List
 from typing_extensions import Final, TypedDict
 
 
+# Here the type chosen for `customization_args` is Dict[str, Any] because
+# the values of this dictionary can be various data types.
 class ComponentsDict(TypedDict):
     """Dictionary that represents RTE Components."""
 
