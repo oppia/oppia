@@ -76,52 +76,6 @@ export class NumericExpressionInputRulesService {
       nerdamer(inputs.x).toString()
     );
   }
-
-  ContainsSomeOf(
-      answer: NumericExpressionAnswer,
-      inputs: NumericExpressionRuleInputs): boolean {
-    // At least one term should match between answer and input.
-    let mis = new MathInteractionsService();
-
-    // The expression is first split into terms by addition and subtraction.
-    let answerTerms = mis.getTerms(answer);
-    let inputTerms = mis.getTerms(inputs.x);
-
-    for (let answerTerm of answerTerms) {
-      for (let inputTerm of inputTerms) {
-        if (mis.doTermsMatch(answerTerm, inputTerm)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  OmitsSomeOf(
-      answer: NumericExpressionAnswer,
-      inputs: NumericExpressionRuleInputs): boolean {
-    // There must be at least one term in the input that is not present in the
-    // answer.
-    let mis = new MathInteractionsService();
-
-    // The expression is first split into terms by addition and subtraction.
-    let answerTerms = mis.getTerms(answer);
-    let inputTerms = mis.getTerms(inputs.x);
-
-    for (let inputTerm of inputTerms) {
-      let matched = false;
-      for (let answerTerm of answerTerms) {
-        if (mis.doTermsMatch(answerTerm, inputTerm)) {
-          matched = true;
-          break;
-        }
-      }
-      if (!matched) {
-        return true;
-      }
-    }
-    return false;
-  }
 }
 
 angular.module('oppia').factory(

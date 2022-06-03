@@ -129,7 +129,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
       this.currentValue);
     var answerIsValid = this.mathInteractionsService.validateEquation(
       this.currentValue,
-      this.guppyInitializationService.getCustomOskLetters());
+      this.guppyInitializationService.getAllowedVariables());
     if (
       this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive
