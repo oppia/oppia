@@ -52,13 +52,7 @@ describe('RuleEditorComponent', () => {
     AlgebraicExpressionInput: {
       rule_descriptions: {
         MatchesExactlyWith: 'matches exactly with {{x|AlgebraicExpression}}',
-        IsEquivalentTo: 'is equivalent to {{x|AlgebraicExpression}}',
-        ContainsSomeOf: 'contains at least one of the terms present in' +
-          ' {{x|AlgebraicExpression}}',
-        OmitsSomeOf: 'omits at least one of the terms present in' +
-          ' {{x|AlgebraicExpression}}',
-        MatchesWithGeneralForm: 'matches the form of {{x|Algebraic' +
-          'Expression}} with placeholders {{y|SetOfAlgebraicIdentifier}}'
+        IsEquivalentTo: 'is equivalent to {{x|AlgebraicExpression}}'
       }
     },
     DummyInteraction1: {
@@ -235,18 +229,16 @@ describe('RuleEditorComponent', () => {
     };
     ctrl.currentInteractionId = 'AlgebraicExpressionInput';
 
-    ctrl.onSelectNewRuleType('MatchesWithGeneralForm');
+    ctrl.onSelectNewRuleType('IsEquivalentTo');
     $timeout.flush(10);
 
     expect(ctrl.rule).toEqual({
-      type: 'MatchesWithGeneralForm',
+      type: 'IsEquivalentTo',
       inputTypes: {
-        x: 'AlgebraicExpression',
-        y: 'SetOfAlgebraicIdentifier'
+        x: 'AlgebraicExpression'
       },
       inputs: {
-        x: {contentId: null, normalizedStrSet: []},
-        y: []
+        x: {contentId: null, normalizedStrSet: []}
       }
     });
   });
