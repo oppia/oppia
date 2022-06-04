@@ -52,7 +52,7 @@ describe('Donation flow', () => {
     await browser.url('/donate');
     var payPalButton = await $('.protractor-test-paypal-donate-button');
     await action.click('PayPal button', payPalButton);
-    expect(await browser.getUrl()).toContain('www.paypal.com');
+    await expect(await browser.getUrl()).toContain('www.paypal.com');
   });
 
   it('should be able to donate via credit card', async() => {
@@ -60,7 +60,7 @@ describe('Donation flow', () => {
     var creditCardButton = await $(
       '.protractor-test-credit-card-donate-button');
     await action.click('Credit Card button', creditCardButton);
-    expect(await browser.getUrl()).toContain('www.paypal.com');
+    await expect(await browser.getUrl()).toContain('www.paypal.com');
   });
 });
 
@@ -69,7 +69,7 @@ describe('Static Pages Tour', () => {
 
   it('should visit the Get started page', async() => {
     await getStartedPage.get();
-    expect(await $(
+    await expect(await $(
       '.protractor-test-get-started-page').isExisting()).toBeTrue();
   });
 
@@ -81,61 +81,61 @@ describe('Static Pages Tour', () => {
 
   it('should visit the Teach page', async() => {
     await browser.url('/teach');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-teach-page').isExisting()).toBeTrue();
   });
 
   it('should visit the Home page', async() => {
     await browser.url('/');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-splash-page').isExisting()).toBeTrue();
   });
 
   it('should visit the About page', async() => {
     await browser.url('/about');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-about-page').isExisting()).toBeTrue();
   });
 
   it('should visit the Contact page', async() => {
     await browser.url('/contact');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-contact-page').isExisting()).toBeTrue();
   });
 
   it('should visit the Donate page', async() => {
     await browser.url('/donate');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-donate-page').isExisting()).toBeTrue();
   });
 
   it('should visit the Partnerships page', async() => {
     await browser.url('/partnerships');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-partnerships-page').isExisting()).toBeTrue();
   });
 
   it('should visit the About the Oppia Foundation page', async() => {
     await browser.url('/about-foundation');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-about-foundation-page').isExisting()).toBeTrue();
   });
 
   it('should visit the Privacy page', async() => {
     await browser.url('/privacy-policy');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-privacy-page').isExisting()).toBeTrue();
   });
 
   it('should visit the Terms page', async() => {
     await browser.url('/terms');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-terms-page').isExisting()).toBeTrue();
   });
 
   it('should visit the Thanks page', async() => {
     await browser.url('/thanks');
-    expect(await $(
+    await expect(await $(
       '.protractor-test-thanks-page').isExisting()).toBeTrue();
   });
 
@@ -157,7 +157,7 @@ describe('Static Pages Tour', () => {
 describe('DEV MODE Test', () => {
   it('should not show Dev Mode label in prod', async() => {
     await browser.url('/');
-    expect(await $('.protractor-test-dev-mode').isExisting())
+    await expect(await $('.protractor-test-dev-mode').isExisting())
       .toBeFalse();
   });
 });

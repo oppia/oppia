@@ -3,7 +3,7 @@ const video = require('wdio-video-reporter');
 var args = process.argv;
 var chromeVersion = '89.0.4389.90';
 
-if (args[0] === 'DEBUG=true') {
+if (args[0] == 'DEBUG=true') {
   chromeVersion = args[6];
 } else {
   chromeVersion = args[5];
@@ -13,7 +13,7 @@ var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
 
 var suites = {
   // The tests on Travis are run individually to parallelize
@@ -48,8 +48,8 @@ repoterArray = [
 ];
 
 if ((process.env.GITHUB_ACTIONS &&
-    process.env.VIDEO_RECORDING_IS_ENABLED === 1) ||
-    LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
+    process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
+    LOCAL_VIDEO_RECORDING_IS_ENABLED == 1) {
   repoterArray.push([video, {
     saveAllVideos: true,
     videoSlowdownMultiplier: 3,
