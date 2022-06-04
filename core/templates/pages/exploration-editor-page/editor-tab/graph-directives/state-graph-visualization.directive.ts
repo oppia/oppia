@@ -13,24 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the state graph visualization.
+ * @fileoverview Component for the state graph visualization.
  */
 
 import * as d3 from 'd3';
-
-require('components/graph-services/graph-layout.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('filters/string-utility-filters/truncate.filter.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-status.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-card-is-checkpoint.service.ts');
-
+import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
+import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
+import {} from 'pages/exploration-editor-page/services/router.service';
 import { Subscription } from 'rxjs';
 
 /* eslint-disable-next-line angular/directive-restrict */

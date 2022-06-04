@@ -81,6 +81,7 @@ import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObject
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from 'domain/exploration/ParamTypeObjectFactory';
+import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
@@ -407,6 +408,8 @@ import { ExplorationImprovementsService } from './exploration-improvements.servi
 import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
+import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -507,6 +510,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EndExplorationBackendApiService', EndExplorationBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
+  ['ExplorationWarningsService', ExplorationWarningsService],
   ['ExplorationCategoryService', ExplorationCategoryService],
   ['ExplorationCreationBackendApiService',
     ExplorationCreationBackendApiService],
@@ -664,6 +668,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ParamSpecObjectFactory', ParamSpecObjectFactory],
   ['ParamSpecsObjectFactory', ParamSpecsObjectFactory],
   ['ParamTypeObjectFactory', ParamTypeObjectFactory],
+  ['ParameterMetadataService', ParameterMetadataService],
   ['PencilCodeEditorRulesService', PencilCodeEditorRulesService],
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
   ['PlatformFeatureAdminBackendApiService',
@@ -817,6 +822,7 @@ export const angularServices: [string, Type<{}>][] = [
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TranslationTopicService', TranslationTopicService],
+  ['TranslationStatusService', TranslationStatusService],
   ['TruncatePipe', TruncatePipe],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
