@@ -74,9 +74,7 @@ class SubmittedAnswerDict(TypedDict):
     answer_group_index: int
     rule_spec_index: int
     classification_categorization: str
-    # Type Dict[str, Any] is used here because the type of the params values can
-    # differ.
-    params: Dict[str, Any]
+    params: Dict[str, Union[str, int]]
     session_id: str
     time_spent_in_sec: float
     rule_spec_str: Optional[str]
@@ -87,9 +85,7 @@ class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
 
     issue_type: str
-    # Type Dict[str, Dict[str, Any]] is used here because the type of the args
-    # value can differ.
-    issue_customization_args: Dict[str, Dict[str, Any]]
+    issue_customization_args: Dict[str, Dict[str, Union[str, int]]]
     playthrough_ids: List[str]
     schema_version: int
     is_valid: bool
@@ -101,9 +97,7 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
-    # Type Dict[str, Any] is used here because the type of the args
-    # value can differ.
-    issue_customization_args: Dict[str, Any]
+    issue_customization_args: Dict[str, Union[str, int, Dict[Union[str, int], Union[str, int]]]]
     actions: List[LearnerActionDict]
 
 
@@ -156,9 +150,7 @@ class LearnerActionDict(TypedDict):
     """Dictionary representing the LearnerAction object."""
 
     action_type: str
-    # Type Dict[str, Any] is used here because the type of the value
-    # of the args can differ.
-    action_customization_args: Dict[str, Any]
+    action_customization_args: Dict[str, Union[str, int, Dict[Union[str, int], Union[str, int]]]]
     schema_version: int
 
 
@@ -915,9 +907,7 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        # Type Dict[str, Any] is used here because the type of the
-        # args value can differ.
-        issue_customization_args: Dict[str, Any],
+        issue_customization_args: Dict[str, Union[str, int, Dict[Union[str, int], Union[str, int]]]],
         actions: List[LearnerAction]
     ):
         """Constructs a Playthrough domain object.
@@ -1035,9 +1025,7 @@ class ExplorationIssue:
     def __init__(
         self,
         issue_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the type of the
-        # value of the args can differ.
-        issue_customization_args: Dict[str, Dict[str, Any]],
+        issue_customization_args: Dict[str, Dict[str, Union[str, int]]],
         playthrough_ids: List[str],
         schema_version: int,
         is_valid: bool
@@ -1196,9 +1184,7 @@ class LearnerAction:
     def __init__(
         self,
         action_type: str,
-        # Type Dict[str, Dict[str, Any]] is used here because the type of the
-        # value of the args can differ.
-        action_customization_args: Dict[str, Dict[str, Any]],
+        action_customization_args: Dict[str, Union[str, int, Dict[Union[str, int], Union[str, int]]]],
         schema_version: int
     ):
         """Constructs a LearnerAction domain object.
@@ -1404,9 +1390,7 @@ class SubmittedAnswer:
         answer_group_index: int,
         rule_spec_index: int,
         classification_categorization: str,
-        # Type Dict[str, Any] is used here because the type of the params value
-        # can differ.
-        params: Dict[str, Any],
+        params: Dict[str, Union[str, int]],
         session_id: str,
         time_spent_in_sec: float,
         rule_spec_str: Optional[str] = None,
