@@ -51,9 +51,9 @@ if ((process.env.GITHUB_ACTIONS &&
     process.env.VIDEO_RECORDING_IS_ENABLED === 1) ||
     LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
   repoterArray.push([video, {
-    saveAllVideos: false,
+    saveAllVideos: true,
     videoSlowdownMultiplier: 3,
-    outputDir: '../webdriverIo-tests-videos'
+    outputDir: '../webdriverio-video'
   }]);
 }
 
