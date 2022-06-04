@@ -32,6 +32,9 @@ import { StoryEditorStateService } from 'pages/story-editor-page/services/story-
 import { Story } from 'domain/story/StoryObjectFactory';
 import { StoryContents } from 'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
@@ -60,7 +63,8 @@ export class StoryUpdateService {
   constructor(
     private _undoRedoService: UndoRedoService,
     private _alertsService: AlertsService,
-    private _storyEditorStateService: StoryEditorStateService
+    private _storyEditorStateService: StoryEditorStateService,
+    private _localStorageService: LocalStorageService
   ) {}
 
   // Creates a change using an apply function, reverse function, a change
@@ -75,6 +79,7 @@ export class StoryUpdateService {
       changeDict, apply as ChangeBackendDict, reverse as ChangeBackendDict);
     try {
       this._undoRedoService.applyChange(changeObj, story);
+      this._updateStoryEditorBrowserTabsUnsavedChangesStatus(story);
     // The catch parameter type can only be any or unknown. The type 'unknown'
     // is safer than type 'any' because it reminds us that we need to perform
     // some sorts of type-checks before operating on our values.
@@ -83,6 +88,25 @@ export class StoryUpdateService {
         this._alertsService.addWarning(err.message);
       }
       throw err;
+    }
+  }
+
+  private _updateStoryEditorBrowserTabsUnsavedChangesStatus(story: Story) {
+    var storyEditorBrowserTabsInfo:
+      EntityEditorBrowserTabsInfo | null = (
+        this._localStorageService.getEntityEditorBrowserTabsInfo(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+    if (
+      this._undoRedoService.getChangeCount() > 0 &&
+      storyEditorBrowserTabsInfo &&
+      !storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ) {
+      storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      this._localStorageService.updateEntityEditorBrowserTabsInfo(
+        storyEditorBrowserTabsInfo,
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS);
     }
   }
 
