@@ -1710,7 +1710,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         contributions = user_services.get_user_contributions(user_id)
         # Check that the user contributions for this user ID already exist.
         # (Note that user contributions are created automatically when a new
-        # User is created).
+        # user is created.)
         self.assertIsNotNone(contributions)
         self.assertIsInstance(contributions, user_domain.UserContributions)
 
