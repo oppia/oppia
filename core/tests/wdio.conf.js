@@ -13,7 +13,7 @@ var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
 
 var suites = {
   // The tests on Travis are run individually to parallelize
@@ -30,6 +30,7 @@ var suites = {
 repoterArray = [
   ['spec', {
     showPreface: false,
+    realtimeReporting: true,
   }],
   ['html-nice', {
     outputDir: '../webdriverIO-tests-report/',
@@ -307,9 +308,16 @@ exports.config = {
      * @param {Boolean} result.passed    true if test has passed, otherwise false
      * @param {Object}  result.retries   informations to spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
-    // afterTest: function(test, context, { error, result, duration, passed, retries }) {
-    // },
-
+    afterTest: function(
+      test,
+      context,
+      { error, result, duration, passed, retries }
+    ) {
+      // take a screenshot anytime a test fails and throws an error
+      if (error) {
+        browser.takeScreenshot();
+      }
+    },
 
     /**
      * Hook that gets executed after the suite has ended
