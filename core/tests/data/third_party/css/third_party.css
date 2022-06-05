@@ -21220,9 +21220,6 @@ readers do not read off random characters that represent icons */
 .fa-arrow-up:before {
   content: "\f062"; }
 
-.fa-arrow-up-right-from-square:before {
-  content: "\f08e"; }
-
 .fa-arrows-alt:before {
   content: "\f0b2"; }
 
