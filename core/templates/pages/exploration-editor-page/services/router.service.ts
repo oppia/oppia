@@ -77,7 +77,7 @@ export class RouterService {
 
     if (newPath.indexOf(this.TABS.TRANSLATION.path) === 0) {
       this._activeTabName = this.TABS.TRANSLATION.name;
-      var waitForStatesToLoad = setInterval(() => {
+      let waitForStatesToLoad = setInterval(() => {
         if (this.explorationStatesService.isInitialized()) {
           clearInterval(waitForStatesToLoad);
           if (!this.stateEditorService.getActiveStateName()) {
@@ -128,9 +128,9 @@ export class RouterService {
   }
 
   _doNavigationWithState(path: string, pathType: string): void {
-    var pathBase = '/' + pathType + '/';
-    var putativeStateName = path.substring(pathBase.length);
-    var waitForStatesToLoad = setInterval(() => {
+    let pathBase = '/' + pathType + '/';
+    let putativeStateName = path.substring(pathBase.length);
+    let waitForStatesToLoad = setInterval(() => {
       if (this.explorationStatesService.isInitialized()) {
         clearInterval(waitForStatesToLoad);
         if (this.explorationStatesService.hasState(putativeStateName)) {
@@ -154,7 +154,7 @@ export class RouterService {
   }
 
   _getCurrentStateFromLocationPath(): string | null {
-    var location = this.windowRef.nativeWindow.location.hash;
+    let location = this.windowRef.nativeWindow.location.hash;
     if (location.indexOf('/gui/') !== -1) {
       return location.substring('/gui/'.length);
     } else {
@@ -181,7 +181,11 @@ export class RouterService {
   }
 
   isLocationSetToNonStateEditorTab(): boolean {
-    var currentPath = this.windowRef.nativeWindow.location.hash.split('#')[1];
+    this._changeTab(this.windowRef.nativeWindow.location.hash.split('#')[1]);
+
+    let currentPath = (
+      '/' +
+      this.windowRef.nativeWindow.location.hash.split('#')[1].split('/')[1]);
 
     return (
       currentPath === this.TABS.MAIN.path ||
