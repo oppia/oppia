@@ -81,15 +81,12 @@ export class ExplorationPropertyService {
     return !angular.equals(this.savedMemento, this.displayed);
   }
 
-<<<<<<< HEAD
-=======
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
   _normalize(value: unknown): unknown {
     return value;
   }
 
->>>>>>> upstream/develop
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
