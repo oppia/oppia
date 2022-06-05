@@ -27,12 +27,12 @@ var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
 
   var tabsDropdown = element(by.css('.protractor-test-navbar-dropdown-toggle'));
-  var configTab = element(by.css('.protractor-test-admin-config-tab'));
+  var configTab = element(by.css('.protractor-test-admin-config-tab-mobile'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
   var configProperties = element.all(by.css(
     '.protractor-test-config-property'
   ));
-  var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
+  var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab-mobile'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
   var usernameInputFieldForRolesEditing = element(
