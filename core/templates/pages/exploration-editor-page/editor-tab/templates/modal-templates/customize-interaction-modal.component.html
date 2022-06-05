@@ -53,8 +53,8 @@
         {{ customizationArgSpec.description }}
       </div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
-                           [schema]="getSchemaCallback(customizationArgSpec.schema)"
-                           [(localValue)]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
+                           [schema]="customizationArgSpec.schema"
+                           [(ngModel)]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
       </schema-based-editor>
       <div *ngIf="customizationArgSpec.schema.type === 'bool'"
            class="oppia-interaction-customization-label">

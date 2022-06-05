@@ -19,7 +19,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Output } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -31,14 +31,14 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  displayed!: string | boolean;
-  savedMemento!: string | boolean;
+  public displayed: unknown;
+  savedMemento: unknown;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
   propertyName: string = null;
 
-  @Output() _explorationPropertyChangedEventEmitter = new EventEmitter();
+  _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
@@ -81,10 +81,19 @@ export class ExplorationPropertyService {
     return !angular.equals(this.savedMemento, this.displayed);
   }
 
+<<<<<<< HEAD
+=======
+  // Transforms the given value into a normalized form. THIS CAN BE
+  // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
+  _normalize(value: unknown): unknown {
+    return value;
+  }
+
+>>>>>>> upstream/develop
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: string | boolean): boolean {
+  _isValid(value: unknown): boolean {
     return true;
   }
 
