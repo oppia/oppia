@@ -46,16 +46,10 @@ export class RouterService {
   private SLUG_GUI = 'gui';
   private SLUG_PREVIEW = 'preview';
   private PREVIEW_TAB_WAIT_TIME_MSEC = 200;
-
   private _activeTabName = this.TABS.MAIN.name;
-
-  /** @private */
   private refreshSettingsTabEventEmitter = new EventEmitter();
-  /** @private */
   private refreshStatisticsTabEventEmitter = new EventEmitter();
-  /** @private */
   private refreshTranslationTabEventEmitter = new EventEmitter();
-  /** @private */
   private refreshVersionHistoryEventEmitter = new EventEmitter();
 
   constructor(
@@ -69,6 +63,11 @@ export class RouterService {
   ) { }
 
   private _changeTab(newPath: string) {
+    if (newPath === undefined) {
+      this._changeTab('/');
+      return;
+    }
+
     this.windowRef.nativeWindow.location.hash = newPath;
 
     // TODO(oparry): Determine whether this is necessary, since
