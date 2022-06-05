@@ -18,9 +18,7 @@
 
 import { Injectable, EventEmitter } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PageTitleService } from 'services/page-title.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
@@ -60,12 +58,8 @@ export class RouterService {
   /** @private */
   private refreshVersionHistoryEventEmitter = new EventEmitter();
 
-  private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
-
   constructor(
     private windowRef: WindowRef,
-    private pageTitleService: PageTitleService,
-    private urlInterpolationService: UrlInterpolationService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private stateEditorRefreshService: StateEditorRefreshService,
     private explorationStatesService: ExplorationStatesService,
@@ -109,7 +103,7 @@ export class RouterService {
         this.explorationImprovementsService.isImprovementsTabEnabledAsync()
       ).then(improvementsTabIsEnabled => {
         if (this._activeTabName === this.TABS.IMPROVEMENTS.name &&
-              !improvementsTabIsEnabled) {
+          !improvementsTabIsEnabled) {
           // Redirect to the main tab.
           this._actuallyNavigate(this.SLUG_GUI, null);
         }
@@ -133,7 +127,7 @@ export class RouterService {
     }
   }
 
-  _doNavigationWithState(path: any, pathType: any): any {
+  _doNavigationWithState(path: string, pathType: string): void {
     var pathBase = '/' + pathType + '/';
     var putativeStateName = path.substring(pathBase.length);
     var waitForStatesToLoad = setInterval(() => {
@@ -142,6 +136,7 @@ export class RouterService {
         if (this.explorationStatesService.hasState(putativeStateName)) {
           this.stateEditorService.setActiveStateName(putativeStateName);
           if (pathType === this.SLUG_GUI) {
+            this.windowRef.nativeWindow.location.hash = path;
             this.stateEditorRefreshService.onRefreshStateEditor.emit();
             // Fire an event to center the Graph in the Editor.
             this.centerGraphEventEmitter.emit();
@@ -158,7 +153,7 @@ export class RouterService {
     this.externalSaveService.onExternalSave.emit();
   }
 
-  _getCurrentStateFromLocationPath(): any {
+  _getCurrentStateFromLocationPath(): string | null {
     var location = this.windowRef.nativeWindow.location.hash;
     if (location.indexOf('/gui/') !== -1) {
       return location.substring('/gui/'.length);
@@ -167,7 +162,7 @@ export class RouterService {
     }
   }
 
-  _actuallyNavigate(pathType: any, newStateName: any): any {
+  _actuallyNavigate(pathType: string, newStateName: string): void {
     if (newStateName) {
       this.stateEditorService.setActiveStateName(newStateName);
     }
@@ -186,7 +181,8 @@ export class RouterService {
   }
 
   isLocationSetToNonStateEditorTab(): boolean {
-    var currentPath = this.windowRef.nativeWindow.location.hash;
+    var currentPath = this.windowRef.nativeWindow.location.hash.split('#')[1];
+
     return (
       currentPath === this.TABS.MAIN.path ||
       currentPath === this.TABS.TRANSLATION.path ||
@@ -198,11 +194,11 @@ export class RouterService {
       currentPath === this.TABS.FEEDBACK.path);
   }
 
-  getCurrentStateFromLocationPath(): any {
+  getCurrentStateFromLocationPath(): string | null {
     return this._getCurrentStateFromLocationPath();
   }
 
-  navigateToMainTab(stateName: any): any {
+  navigateToMainTab(stateName: string): void {
     this._savePendingChanges();
 
     if (this._getCurrentStateFromLocationPath() === stateName) {
@@ -220,7 +216,6 @@ export class RouterService {
         // link for more information -
         // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
 
-        // $rootScope.$applyAsync();
         setTimeout(() => {
           $('.oppia-editor-cards-container').fadeIn();
         }, 150);
@@ -269,23 +264,23 @@ export class RouterService {
     this._changeTab(this.TABS.FEEDBACK.path);
   }
 
-  get onCenterGraph(): any {
+  get onCenterGraph(): EventEmitter<void> {
     return this.centerGraphEventEmitter;
   }
 
-  get onRefreshSettingsTab(): any {
+  get onRefreshSettingsTab(): EventEmitter<void> {
     return this.refreshSettingsTabEventEmitter;
   }
 
-  get onRefreshStatisticsTab(): any {
+  get onRefreshStatisticsTab(): EventEmitter<void> {
     return this.refreshStatisticsTabEventEmitter;
   }
 
-  get onRefreshTranslationTab(): any {
+  get onRefreshTranslationTab(): EventEmitter<void> {
     return this.refreshTranslationTabEventEmitter;
   }
 
-  get onRefreshVersionHistory(): any {
+  get onRefreshVersionHistory(): EventEmitter<void> {
     return this.refreshVersionHistoryEventEmitter;
   }
 }
