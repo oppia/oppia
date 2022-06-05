@@ -117,7 +117,7 @@ angular.module('oppia').component('stateResponses', {
     'StateCustomizationArgsService', 'StateEditorService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
     'StateSolicitAnswerDetailsService',
-    'UrlInterpolationService', 'WindowDimensionsService',
+    'UrlInterpolationService',
     'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
     'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
     'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
@@ -129,7 +129,7 @@ angular.module('oppia').component('stateResponses', {
         StateCustomizationArgsService, StateEditorService,
         StateInteractionIdService, StateNextContentIdIndexService,
         StateSolicitAnswerDetailsService,
-        UrlInterpolationService, WindowDimensionsService,
+        UrlInterpolationService,
         ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
         INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
         PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
@@ -630,8 +630,7 @@ angular.module('oppia').component('stateResponses', {
         $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
           SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
         $scope.EditabilityService = EditabilityService;
-        $scope.responseCardIsShown = (
-          !WindowDimensionsService.isWindowNarrow());
+        $scope.responseCardIsShown = true;
         $scope.stateName = StateEditorService.getActiveStateName();
         $scope.enableSolicitAnswerDetailsFeature = (
           ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
