@@ -261,7 +261,8 @@
 }
 
 .language-icon {
-  font-size: 20px
+  font-size: 20px;
+  vertical-align: text-bottom;
 }
 
 .language-padding-left {
