@@ -87,7 +87,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
         schema version.
 
         Args:
-            exp_id: str. The ID of the exploration.
+            exploration: Exploration. The exploration domain object for which to
+                generate the change objects.
             exp_model: ExplorationModel. The exploration for which to generate
                 the change objects.
 
@@ -139,6 +140,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
         Args:
             exp_model: ExplorationModel. The exploration which should be
                 updated.
+            exp_rights_model: ExplorationRightsModel. The exploration rights
+                model which is to be updated.
             migrated_exp: Exploration. The migrated exploration domain
                 object.
             exp_changes: sequence(ExplorationChange). The exploration changes
@@ -178,25 +181,25 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
 
         unmigrated_exploration_models = (
-                self.pipeline
-                | 'Get all non-deleted exploration models' >> (
-                    ndb_io.GetModels(
-                        exp_models.ExplorationModel.get_all(
-                            include_deleted=False)))
-                # Pylint disable is needed because pylint is not able to correctly
-                # detect that the value is passed through the pipe.
-                | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+            self.pipeline
+            | 'Get all non-deleted exploration models' >> (
+                ndb_io.GetModels(
+                    exp_models.ExplorationModel.get_all(
+                        include_deleted=False)))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
             lambda exp_model: exp_model.id)
         )
         exploration_rights_models = (
-                self.pipeline
-                | 'Get all non-deleted exploration rights models' >> (
-                    ndb_io.GetModels(
-                        exp_models.ExplorationRightsModel.get_all(
-                            include_deleted=False)))
-                # Pylint disable is needed because pylint is not able to correctly
-                # detect that the value is passed through the pipe.
-                | 'Add exploration rights keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+            self.pipeline
+            | 'Get all non-deleted exploration rights models' >> (
+                ndb_io.GetModels(
+                    exp_models.ExplorationRightsModel.get_all(
+                        include_deleted=False)))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration rights keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
             lambda exploration_rights_model: exploration_rights_model.id)
         )
 
@@ -220,18 +223,18 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         migrated_exploration_object_list = (
-                {
-                    'exp_model': unmigrated_exploration_models,
-                    'exploration': migrated_explorations,
-                }
-                | 'Merge object' >> beam.CoGroupByKey()
-                | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-                | 'Remove unmigrated exploration object' >> beam.Filter(
-            lambda x: len(x['exploration']) > 0)
-                | 'Reorganize the exploration object' >> beam.Map(lambda objects: {
-            'exp_model': objects['exp_model'][0],
-            'exploration': objects['exploration'][0]
-            }))
+            {
+                'exp_model': unmigrated_exploration_models,
+                'exploration': migrated_explorations,
+            }
+            | 'Merge object' >> beam.CoGroupByKey()
+            | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated exploration object' >> beam.Filter(
+        lambda x: len(x['exploration']) > 0)
+            | 'Reorganize the exploration object' >> beam.Map(lambda objects: {
+        'exp_model': objects['exp_model'][0],
+        'exploration': objects['exploration'][0]
+        }))
 
         exploration_changes = (
                 migrated_exploration_object_list
@@ -253,20 +256,21 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
                 | 'Remove unmigrated exploration' >> beam.Filter(
             lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0)  # pylint: disable=line-too-long
-                | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
-            'exp_model': objects['exp_model'][0],
-            'exploration': objects['exploration'][0],
-            'exploration_changes': objects['exploration_changes'],
-            'exploration_rights_model': (
-                objects['exploration_rights_model'][0])
+                | 'Reorganize the exploration objects' >> beam.Map(
+            lambda objects: {
+                'exp_model': objects['exp_model'][0],
+                'exploration': objects['exploration'][0],
+                'exploration_changes': objects['exploration_changes'],
+                'exploration_rights_model': (
+                    objects['exploration_rights_model'][0])
         })
         )
 
         exploration_objects_list_job_run_results = (
                 exploration_objects_list
                 | 'Transform exploration objects into job run results' >> (
-                    job_result_transforms.CountObjectsToJobRunResult(
-                        'EXPLORATION POPULATED WITH android_proto_size_in_bytes'))
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXPLORATION POPULATED WITH android_proto_size_in_bytes'))
         )
 
         cache_deletion_job_run_results = (
@@ -276,7 +280,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 self._delete_exploration_from_cache(
                     exploration_object['exploration'])))
                 | 'Generate results for cache deletion' >> (
-                    job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
+                    job_result_transforms.ResultsToJobRunResults(
+                        'CACHE DELETION'))
         )
 
         exp_models_to_put = (
