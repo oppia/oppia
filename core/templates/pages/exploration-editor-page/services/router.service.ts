@@ -16,7 +16,7 @@
  * @fileoverview Service that handles routing for the exploration editor page.
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, HostListener } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -25,6 +25,9 @@ import { StateEditorRefreshService } from 'pages/exploration-editor-page/service
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
 import { ExternalSaveService } from 'services/external-save.service';
+import { PlatformLocation } from '@angular/common';
+import { Router } from '@angular/router';
+import { forEach } from 'lodash';
 
 @Injectable({
   providedIn: 'root'
@@ -60,7 +63,14 @@ export class RouterService {
     private explorationImprovementsService: ExplorationImprovementsService,
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
-  ) { }
+    private location: PlatformLocation,
+  ) {
+    this.location.onPopState(() => {
+      if (window.location.hash === '') {
+        window.history.go(-1);
+      }
+    });
+  }
 
   private _changeTab(newPath: string) {
     if (newPath === undefined) {
