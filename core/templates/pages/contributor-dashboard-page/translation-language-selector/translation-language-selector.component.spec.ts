@@ -219,11 +219,9 @@ describe('Translation language selector', () => {
 
     component.ngOnInit();
 
-    // fixture.whenStable().then(() => {
-      fixture.detectChanges();
-      expect(component.languageSelection).toBe('Select a language...');
-      expect(component.activeLanguageCode).toBe(null);
-    // });
+    fixture.detectChanges();
+    expect(component.languageSelection).toBe('Select a language...');
+    expect(component.activeLanguageCode).toBe(null);
   }));
 
   it('should show the correct language when the language is changed'
