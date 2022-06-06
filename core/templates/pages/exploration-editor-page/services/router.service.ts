@@ -72,7 +72,7 @@ export class RouterService {
     });
   }
 
-  private _changeTab(newPath: string) {
+  _changeTab(newPath: string): void {
     if (newPath === undefined) {
       this._changeTab('/');
       return;
