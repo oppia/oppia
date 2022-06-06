@@ -2237,26 +2237,25 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
 
 
 def sync_logged_out_learner_progress_with_logged_in_progress(
-    user_id, unique_progress_url_id):
+    user_id, exploration_id, unique_progress_url_id):
 
     """Syncs logged out and logged in learner's checkpoints progress."""
 
     logged_out_user_data = (
         exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
 
-    exp_id = logged_out_user_data.exploration_id
-    latest_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_user_data = exp_fetchers.get_exploration_user_data(
         user_id,
-        exp_id
+        exploration_id
     )
 
     logged_in_user_model = user_models.ExplorationUserDataModel.get(
-        user_id, exp_id)
+        user_id, exploration_id)
 
     if logged_in_user_model is None:
         logged_in_user_model = user_models.ExplorationUserDataModel.create(
-            user_id, exp_id)
+            user_id, exploration_id)
 
         logged_in_user_model.most_recently_reached_checkpoint_exp_version = (
             logged_out_user_data.most_recently_reached_checkpoint_exp_version
@@ -2275,7 +2274,7 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
 
     elif logged_in_user_model.most_recently_reached_checkpoint_exp_version == logged_out_user_data.most_recently_reached_checkpoint_exp_version: # pylint: disable=line-too-long
         current_exploration = exp_fetchers.get_exploration_by_id(
-            exp_id,
+            exploration_id,
             False,
             logged_out_user_data.most_recently_reached_checkpoint_exp_version
         )
@@ -2315,14 +2314,14 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
 
         most_recently_interacted_exploration = (
             exp_fetchers.get_exploration_by_id(
-                exp_id,
+                exploration_id,
                 True,
                 exp_user_data.most_recently_reached_checkpoint_exp_version
             )
         )
         furthest_reached_exploration = (
             exp_fetchers.get_exploration_by_id(
-                exp_id,
+                exploration_id,
                 True,
                 exp_user_data.furthest_reached_checkpoint_exp_version
             )

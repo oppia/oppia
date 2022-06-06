@@ -1734,6 +1734,7 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
         if self.user_id is not None:
             exp_services.sync_logged_out_learner_progress_with_logged_in_progress( # pylint: disable=line-too-long
                 self.user_id,
+                exploration_id,
                 unique_progress_url_id
             )
 
