@@ -1705,7 +1705,17 @@ class ExplorationRestartEventHandler(base.BaseHandler):
 class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
     """Syncs logged out progress of a learner with the logged in progress."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'unique_progress_url_id': {
@@ -1717,7 +1727,7 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_play_exploration
-    def post(self):
+    def post(self, exploration_id):
         """Handles POST requests."""
         unique_progress_url_id = self.normalized_payload.get(
             'unique_progress_url_id')
