@@ -1036,7 +1036,7 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
 class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
     """Test for the TranslationPreferenceHandler."""
 
-    def test_get_preferred_translation_language(self):
+    def test_get_preferred_translation_language_when_user_is_logged_in(self):
         user_email = 'user@example.com'
         self.signup(user_email, 'user')
         self.login(user_email)
@@ -1054,3 +1054,7 @@ class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
         response = self.get_json('/preferredtranslationlanguage')
         self.assertEqual(response['preferred_translation_language_code'], 'en')
         self.logout()
+
+    def test_get_preferred_translation_language_with_guest_user(self):
+        response = self.get_json('/preferredtranslationlanguage')
+        self.assertEqual(response['preferred_translation_language_code'], '')

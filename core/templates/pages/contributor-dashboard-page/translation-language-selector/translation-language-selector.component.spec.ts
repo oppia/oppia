@@ -27,6 +27,7 @@ import { ContributionOpportunitiesBackendApiService } from
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { EventEmitter } from '@angular/core';
+import constants from 'assets/constants';
 
 describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
@@ -51,11 +52,13 @@ describe('Translation language selector', () => {
       fetchFeaturedTranslationLanguagesAsync: async() =>
         Promise.resolve(featuredLanguages),
       getPreferredTranslationLanguageAsync: async() => {
-        component.populateLanguageSelection(preferredLanguageCode);
+        if(preferredLanguageCode) {
+          component.populateLanguageSelection(preferredLanguageCode);
+        }
         return Promise.resolve(preferredLanguageCode);
       },
-      savePreferredTranslationLanguageAsync: async(languageCode: string) =>
-        Promise.resolve(languageCode)
+      savePreferredTranslationLanguageAsync: async() =>
+        Promise.resolve()
     };
 
   let clickDropdown: () => void;
@@ -188,7 +191,8 @@ describe('Translation language selector', () => {
   it('should display the preferred language when the preferred' +
     ' language is defined', async(() => {
     preferredLanguageCode = 'en';
-    let languageDescription = component.languageIdToDescription.en;
+    const languageDescription = constants.SUPPORTED_AUDIO_LANGUAGES.find(
+      e => e.id === 'en').description;
     component.activeLanguageCode = null;
 
     spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
@@ -213,14 +217,13 @@ describe('Translation language selector', () => {
     preferredLanguageCode = '';
     component.activeLanguageCode = null;
 
-    spyOn(component.setActiveLanguageCode, 'emit');
-
     component.ngOnInit();
 
-    fixture.detectChanges();
-    expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('');
-    expect(component.languageSelection).toBe('Select a language...');
-    expect(component.activeLanguageCode).toBe(null);
+    // fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.languageSelection).toBe('Select a language...');
+      expect(component.activeLanguageCode).toBe(null);
+    // });
   }));
 
   it('should show the correct language when the language is changed'
@@ -238,7 +241,7 @@ describe('Translation language selector', () => {
 
   it('should indiacate selection and save the language' +
     ' on selecting a new language', () => {
-    let selectedLanguage = 'fr';
+    const selectedLanguage = 'fr';
     spyOn(component.setActiveLanguageCode, 'emit');
     spyOn(
       contributionOpportunitiesBackendApiServiceStub,

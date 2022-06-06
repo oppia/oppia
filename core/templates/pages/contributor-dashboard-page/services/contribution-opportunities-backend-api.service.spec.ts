@@ -346,7 +346,7 @@ describe('Contribution Opportunities backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should return empty response if \'gettranslatabletopicnames call fails',
+  it('should return empty response if \'gettranslatabletopicnames\' call fails',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -447,8 +447,8 @@ describe('Contribution Opportunities backend API service', function() {
     })
   );
 
-  it('should return empty string if \'preferredtranslationlanguage call fails',
-    fakeAsync(() => {
+  it('should return empty string if \'preferredtranslationlanguage\' ' +
+    'call fails', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
       const emptyString: string = '';
@@ -472,6 +472,5 @@ describe('Contribution Opportunities backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith(emptyString);
       expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+  }));
 });
