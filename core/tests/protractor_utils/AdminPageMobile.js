@@ -17,7 +17,7 @@
  * tests.
  */
 
-const { element } = require('protractor');
+const { element, browser } = require('protractor');
 var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
@@ -26,13 +26,10 @@ var waitFor = require('./waitFor.js');
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
 
-  var tabsDropdown = element(by.css('.protractor-test-navbar-dropdown-toggle'));
-  var configTab = element(by.css('.protractor-test-admin-config-tab-mobile'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
   var configProperties = element.all(by.css(
     '.protractor-test-config-property'
   ));
-  var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab-mobile'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
   var usernameInputFieldForRolesEditing = element(
@@ -132,8 +129,7 @@ var AdminPage = function() {
   }
 
   var _switchToRolesTab = async function() {
-    await action.click('Navbar dropdown', tabsDropdown);
-    await action.click('Admin roles tab button', adminRolesTab);
+    await browser.get('/admin#/roles');
 
     await waitFor.visibilityOf(
       adminRolesTabContainer, 'Roles tab page is not visible.');
@@ -236,8 +232,9 @@ var AdminPage = function() {
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();
-    await action.click('Config Tab', tabsDropdown);
-    await action.click('Config Tab', configTab);
+
+    await browser.get('admin#/config');
+
     await waitFor.elementToBeClickable(saveAllConfigs);
 
     var results = [];
