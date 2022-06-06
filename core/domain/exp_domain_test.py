@@ -457,15 +457,12 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(TransientCheckpointUrlTests, self).setUp()
         self.transient_checkpoint_url = exp_domain.TransientCheckpointUrl(
-            'exp_id', 'url_id', 'frcs_name', 1, 'mrrcs_name', 1, 100)
+            'exp_id', 'frcs_name', 1, 'mrrcs_name', 1, 100)
 
     def test_initialization(self) -> None:
         """Testing init method."""
 
         self.assertEqual(self.transient_checkpoint_url.exploration_id, 'exp_id')
-        self.assertEqual(
-            self.transient_checkpoint_url
-            .unique_progress_url_id, 'url_id')
         self.assertEqual(
             self.transient_checkpoint_url
             .furthest_reached_checkpoint_state_name,
@@ -481,23 +478,21 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             .most_recently_reached_checkpoint_exp_version, 1)
         self.assertEqual(
             self.transient_checkpoint_url
-            .creation_timestamp, 100)
+            .last_updated, 100)
 
     def test_to_dict(self):
         logged_out_learner_progress_dict = {
             'exploration_id': 'exploration_id',
-            'unique_progress_url_id': 'unique_progress_url_id',
             'furthest_reached_checkpoint_exp_version': 1,
             'furthest_reached_checkpoint_state_name': (
                 'furthest_reached_checkpoint_state_name'),
             'most_recently_reached_checkpoint_exp_version': 1,
             'most_recently_reached_checkpoint_state_name': (
                 'most_recently_reached_checkpoint_state_name'),
-            'creation_timestamp': 100
+            'last_updated': 100
         }
         logged_out_learner_progress_object = exp_domain.TransientCheckpointUrl(
             'exploration_id',
-            'unique_progress_url_id',
             'furthest_reached_checkpoint_state_name', 1,
             'most_recently_reached_checkpoint_state_name', 1,
             100
@@ -511,13 +506,6 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected exploration_id to be a str'):
-            self.transient_checkpoint_url.validate()
-
-    def test_unique_progress_url_id_incorrect_type(self) -> None:
-        self.transient_checkpoint_url.unique_progress_url_id = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected unique_progress_url_id to be a str'):
             self.transient_checkpoint_url.validate()
 
     def test_furthest_reached_checkpoint_state_name_incorrect_type(

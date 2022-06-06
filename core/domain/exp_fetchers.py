@@ -484,12 +484,11 @@ def get_logged_out_user_progress(unique_progress_url_id: str):
 
     return exp_domain.TransientCheckpointUrl(
         logged_out_user_progress_model.exploration_id,
-        logged_out_user_progress_model.unique_progress_url_id,
         logged_out_user_progress_model.furthest_reached_checkpoint_state_name,
         logged_out_user_progress_model.furthest_reached_checkpoint_exp_version,
         logged_out_user_progress_model.
             most_recently_reached_checkpoint_state_name,
         logged_out_user_progress_model.
             most_recently_reached_checkpoint_exp_version,
-        logged_out_user_progress_model.creation_timestamp,
+        logged_out_user_progress_model.last_updated,
     )

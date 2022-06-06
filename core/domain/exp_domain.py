@@ -369,18 +369,16 @@ class TransientCheckpointUrl:
     """
 
     def __init__(
-            self, exploration_id, unique_progress_url_id,
+            self, exploration_id,
             furthest_reached_checkpoint_state_name,
             furthest_reached_checkpoint_exp_version,
             most_recently_reached_checkpoint_state_name,
             most_recently_reached_checkpoint_exp_version,
-            creation_timestamp):
+            last_updated):
         """Initializes a TransientCheckpointUrl domain object.
 
         Args:
             exploration_id: str. Id of the exploration.
-            unique_progress_url_id: str. Unique 6-digit url to track a
-                logged-out user's progress.
             furthest_reached_checkpoint_state_name: str. State name of the
                 furthest reached checkpoint in the exploration.
             furthest_reached_checkpoint_exp_version: int. Exploration version
@@ -389,11 +387,10 @@ class TransientCheckpointUrl:
                 the most recently reached checkpoint in the exploration.
             most_recently_reached_checkpoint_exp_version: int. Exploration
                 version in which a checkpoint was most recently reached.
-            creation_timestamp: datetime.datetime. Date and time when the model
+            last_updated: datetime.datetime. Date and time when the model
                 was created.
         """
         self.exploration_id = exploration_id
-        self.unique_progress_url_id = unique_progress_url_id
         self.furthest_reached_checkpoint_state_name = (
             furthest_reached_checkpoint_state_name)
         self.furthest_reached_checkpoint_exp_version = (
@@ -402,7 +399,7 @@ class TransientCheckpointUrl:
             most_recently_reached_checkpoint_state_name)
         self.most_recently_reached_checkpoint_exp_version = (
             most_recently_reached_checkpoint_exp_version)
-        self.creation_timestamp = creation_timestamp
+        self.last_updated = last_updated
 
     def to_dict(self):
         """Convert the TransientCheckpointUrl domain instance into a dictionary
@@ -415,7 +412,6 @@ class TransientCheckpointUrl:
 
         return {
             'exploration_id': self.exploration_id,
-            'unique_progress_url_id': self.unique_progress_url_id,
             'furthest_reached_checkpoint_exp_version': (
                 self.furthest_reached_checkpoint_exp_version),
             'furthest_reached_checkpoint_state_name': (
@@ -424,7 +420,7 @@ class TransientCheckpointUrl:
                 self.most_recently_reached_checkpoint_exp_version),
             'most_recently_reached_checkpoint_state_name': (
                 self.most_recently_reached_checkpoint_state_name),
-            'creation_timestamp': self.creation_timestamp
+            'last_updated': self.last_updated
         }
 
     def validate(self):
@@ -438,11 +434,6 @@ class TransientCheckpointUrl:
             raise utils.ValidationError(
             'Expected exploration_id to be a str, received %s'
                 % self.exploration_id)
-
-        if not isinstance(self.unique_progress_url_id, str):
-            raise utils.ValidationError(
-            'Expected unique_progress_url_id to be a str, received %s'
-                % self.unique_progress_url_id)
 
         if not isinstance(self.furthest_reached_checkpoint_state_name, str):
             raise utils.ValidationError(

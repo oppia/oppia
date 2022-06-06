@@ -320,12 +320,11 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
 
         expected_progress_dict = {
             'exploration_id': self.EXP_1_ID,
-            'unique_progress_url_id': self.UNIQUE_PROGRESS_URL_ID,
             'furthest_reached_checkpoint_state_name': 'Introduction',
             'furthest_reached_checkpoint_exp_version': 1,
             'most_recently_reached_checkpoint_state_name': 'Introduction',
             'most_recently_reached_checkpoint_exp_version': 1,
-            'creation_timestamp': None
+            'last_updated': None
         }
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID)
@@ -333,9 +332,6 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_progress_dict['exploration_id'],
             logged_out_user_data.exploration_id)
-        self.assertEqual(
-            expected_progress_dict['unique_progress_url_id'],
-            logged_out_user_data.unique_progress_url_id)
         self.assertEqual(
             expected_progress_dict['furthest_reached_checkpoint_state_name'],
             logged_out_user_data.furthest_reached_checkpoint_state_name)

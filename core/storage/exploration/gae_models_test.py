@@ -911,7 +911,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_export_policy(self) -> None:
         expected_dict = {
-            'creation_timestamp':
+            'last_updated':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -923,14 +923,12 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'most_recently_reached_checkpoint_state_name':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'unique_progress_url_id':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         fetched_dict = (
             exp_models.TransientCheckpointUrlModel.get_export_policy())
         self.assertEqual(
-            expected_dict['creation_timestamp'],
-            fetched_dict['creation_timestamp'])
+            expected_dict['last_updated'],
+            fetched_dict['last_updated'])
         self.assertEqual(
             expected_dict['exploration_id'],
             fetched_dict['exploration_id'])
@@ -946,9 +944,6 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             expected_dict['most_recently_reached_checkpoint_state_name'],
             fetched_dict['most_recently_reached_checkpoint_state_name'])
-        self.assertEqual(
-            expected_dict['unique_progress_url_id'],
-            fetched_dict['unique_progress_url_id'])
 
     def test_create_new_object(self) -> None:
         exp_models.TransientCheckpointUrlModel.create(
@@ -962,9 +957,6 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             transient_checkpoint_url_model.exploration_id,
             'exp_id')
-        self.assertEqual(
-            transient_checkpoint_url_model.unique_progress_url_id,
-            'progress_id')
         self.assertIsNone(
             transient_checkpoint_url_model.
             most_recently_reached_checkpoint_exp_version)
@@ -979,19 +971,18 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             furthest_reached_checkpoint_state_name)
         self.assertIsNone(
             transient_checkpoint_url_model.
-            creation_timestamp)
+            last_updated)
 
     def test_get_object(self) -> None:
         exp_models.TransientCheckpointUrlModel.create(
             'exp_id', 'progress_id')
         expected_model = exp_models.TransientCheckpointUrlModel(
             exploration_id='exp_id',
-            unique_progress_url_id='progress_id',
             most_recently_reached_checkpoint_exp_version=None,
             most_recently_reached_checkpoint_state_name=None,
             furthest_reached_checkpoint_exp_version=None,
             furthest_reached_checkpoint_state_name=None,
-            creation_timestamp=None)
+            last_updated=None)
 
         actual_model = (
             exp_models.TransientCheckpointUrlModel.get(
@@ -1003,9 +994,6 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             actual_model.exploration_id,
             expected_model.exploration_id)
-        self.assertEqual(
-            actual_model.unique_progress_url_id,
-            expected_model.unique_progress_url_id)
         self.assertEqual(
             actual_model.most_recently_reached_checkpoint_exp_version,
             expected_model.most_recently_reached_checkpoint_exp_version)
@@ -1019,8 +1007,8 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             actual_model.furthest_reached_checkpoint_state_name,
             expected_model.furthest_reached_checkpoint_state_name)
         self.assertEqual(
-            actual_model.creation_timestamp,
-            expected_model.creation_timestamp)
+            actual_model.last_updated,
+            expected_model.last_updated)
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         """Tests get_new_progress_id method for raising exception."""

@@ -1460,6 +1460,7 @@ class TransientCheckpointUrlHandler(base.BaseHandler):
         'GET': {}
     }
 
+    @acl_decorators.open_access
     def get(self, unique_progress_url_id):
         """Handles GET requests. Fetches the logged-out learner's progress."""
 
@@ -1715,6 +1716,7 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
         }
     }
 
+    @acl_decorators.can_play_exploration
     def post(self):
         """Handles POST requests."""
         unique_progress_url_id = self.normalized_payload.get(

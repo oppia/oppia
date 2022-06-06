@@ -2140,7 +2140,7 @@ def update_logged_out_user_progress(
 
     model.most_recently_reached_checkpoint_exp_version = exp_version
     model.most_recently_reached_checkpoint_state_name = state_name
-    model.creation_timestamp = datetime.datetime.utcnow()
+    model.last_updated = datetime.datetime.utcnow()
     model.update_timestamps()
     model.put()
 

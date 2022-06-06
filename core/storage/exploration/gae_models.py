@@ -876,9 +876,6 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
     # The exploration id.
     exploration_id = (
         datastore_services.StringProperty(required=True, indexed=True))
-    # The 6 digit unique id assigned to progress made by a logged-out user.
-    unique_progress_url_id = (
-        datastore_services.StringProperty(required=True))
     # The state name of the furthest reached checkpoint.
     furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
         default=None)
@@ -892,7 +889,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
     most_recently_reached_checkpoint_exp_version = (
         datastore_services.IntegerProperty(default=None))
     # Timestamp to store the creation time of the model.
-    creation_timestamp = (
+    last_updated = (
        datastore_services.DateTimeProperty(default=None))
 
     @staticmethod
@@ -912,8 +909,6 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'unique_progress_url_id':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'furthest_reached_checkpoint_state_name':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'furthest_reached_checkpoint_exp_version':
@@ -922,7 +917,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'most_recently_reached_checkpoint_exp_version':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'creation_timestamp':
+            'last_updated':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -967,8 +962,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         """
         entity = cls(
             id=unique_progress_url_id,
-            exploration_id=exploration_id,
-            unique_progress_url_id=unique_progress_url_id)
+            exploration_id=exploration_id)
 
         entity.update_timestamps()
         entity.put()
