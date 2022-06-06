@@ -51,9 +51,10 @@
       </mat-card>
     </div>
     <div *ngIf="activeTab === 'practice'">
-      <practice-tab *ngIf="practiceTabIsDisplayed"
+      <practice-tab *ngIf="practiceTabIsDisplayed && topicId"
                     [subtopicsList]="subtopics"
-                    [topicName]="topicName">
+                    [topicName]="topicName"
+                    [topicId]="topicId">
       </practice-tab>
       <mat-card dir="auto" *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">

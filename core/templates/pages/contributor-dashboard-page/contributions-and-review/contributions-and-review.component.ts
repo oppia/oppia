@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
 
 require('base-components/base-content.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.component.ts');
