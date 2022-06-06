@@ -617,42 +617,6 @@ def populate_exp_model_fields(exp_model, exploration):
     return exp_model
 
 
-def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
-    """Populate exploration summary model with the data from exp summary
-    object.
-
-    Args:
-        exp_summary_model: ExpSummaryModel. The model to populate.
-        exp_summary: ExplorationSummary. The exploration summary domain object
-            which should be used to populate the model.
-
-    Returns:
-        ExpSummaryModel. Populated model.
-    """
-    exp_summary_model.title = exp_summary.title
-    exp_summary_model.category = exp_summary.category
-    exp_summary_model.objective = exp_summary.objective
-    exp_summary_model.language_code = exp_summary.language_code
-    exp_summary_model.tags = exp_summary.tags
-    exp_summary_model.ratings = exp_summary.ratings
-    exp_summary_model.scaled_average_rating = (
-        exp_summary.scaled_average_rating)
-    exp_summary_model.exploration_model_last_updated = (
-        exp_summary.exploration_model_last_updated)
-    exp_summary_model.exploration_model_created_on = (
-        exp_summary.exploration_model_created_on)
-    exp_summary_model.first_published_msec = exp_summary.first_published_msec
-    exp_summary_model.status = exp_summary.status
-    exp_summary_model.community_owned = exp_summary.community_owned
-    exp_summary_model.owner_ids = exp_summary.owner_ids
-    exp_summary.editor_ids = exp_summary.editor_ids
-    exp_summary.voice_artist_ids = exp_summary.voice_artist_ids
-    exp_summary.viewer_ids = exp_summary.viewer_ids
-    exp_summary.contributor_ids = exp_summary.contributor_ids
-    exp_summary.contributor_summary = exp_summary.contributor_summary
-    exp_summary.version = exp_summary.version
-
-
 def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
