@@ -407,6 +407,8 @@ import { ExplorationImprovementsService } from './exploration-improvements.servi
 import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
+import { CuratedExplorationValidationService } from 'pages/exploration-editor-page/services/curated-exploration-validation.service';
+import { CuratedExplorationValidationBackendApiService } from 'pages/exploration-editor-page/services/curated-exploration-validation-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -484,6 +486,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['CreateNewSkillModalService', CreateNewSkillModalService],
   ['CreatorDashboardBackendApiService', CreatorDashboardBackendApiService],
   ['CsrfTokenService', CsrfTokenService],
+  ['CuratedExplorationValidationBackendApiService',
+    CuratedExplorationValidationBackendApiService],
+  ['CuratedExplorationValidationService', CuratedExplorationValidationService],
   ['CurrentInteractionService', CurrentInteractionService],
   ['DateTimeFormatService', DateTimeFormatService],
   ['DebouncerService', DebouncerService],

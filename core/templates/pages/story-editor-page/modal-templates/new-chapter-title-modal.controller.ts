@@ -23,16 +23,21 @@ require(
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'curated-exploration-validation.service.ts');
 
 import newChapterConstants from 'assets/constants';
 
 angular.module('oppia').controller('CreateNewChapterModalController', [
   '$controller', '$scope', '$uibModalInstance',
+  'CuratedExplorationValidationService',
   'ExplorationIdValidationService', 'StoryEditorStateService',
   'StoryUpdateService', 'ValidatorsService', 'nodeTitles',
   'MAX_CHARS_IN_EXPLORATION_TITLE',
   function(
       $controller, $scope, $uibModalInstance,
+      CuratedExplorationValidationService,
       ExplorationIdValidationService, StoryEditorStateService,
       StoryUpdateService, ValidatorsService, nodeTitles,
       MAX_CHARS_IN_EXPLORATION_TITLE) {
@@ -130,6 +135,17 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         $scope.errorMsg = 'A chapter with this title already exists';
         return;
       }
+      CuratedExplorationValidationService.canExplorationBeCurated(
+        $scope.explorationId
+      ).then((result) => {
+        console.log(result);
+        if (!result.canBeCurated) {
+          $scope.invalidExpErrorString = result.errorMessage;
+          $scope.invalidExpId = true;
+          $scope.$applyAsync();
+          return;
+        }
+      });
       ExplorationIdValidationService.isExpPublishedAsync($scope.explorationId)
         .then((expIsPublished) => {
           if (!expIsPublished) {

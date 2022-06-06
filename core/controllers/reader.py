@@ -1539,3 +1539,36 @@ class ExplorationRestartEventHandler(base.BaseHandler):
                 self.user_id, exploration_id)
 
         self.render_json(self.values)
+
+
+class CuratedExplorationValidationHandler(base.BaseHandler):
+    """Handler for validating that an exploration can be used as a chapter
+    of a story.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False)
+
+        if exploration is None:
+            raise self.PageNotFoundException
+
+        exp_can_be_curated = (
+            exp_services.can_exploration_be_curated(exploration))
+
+        self.values.update({
+            'can_be_curated': exp_can_be_curated[0],
+            'error_message': exp_can_be_curated[1]
+        })
+        self.render_json(self.values)
