@@ -34,6 +34,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {RouterModule} from "@angular/router";
+import {APP_BASE_HREF} from "@angular/common";
 
 declare var angular: ng.IAngularStatic;
 
@@ -45,6 +47,7 @@ declare var angular: ng.IAngularStatic;
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
+    RouterModule.forRoot([]),
     MatCardModule,
     ReactiveFormsModule,
     SharedComponentsModule,
@@ -75,6 +78,10 @@ declare var angular: ng.IAngularStatic;
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ],
 })
