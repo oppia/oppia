@@ -142,7 +142,7 @@ describe('Static Pages Tour', () => {
   it('should visit the Volunteer page', async() => {
     await browser.url('/volunteer');
     await waitFor.visibilityOf(
-      $('.protractor-test-volunteer-page'),
+      $('.protractor-test-volunteer'),
       'Volunteer page taking too long to appear');
   });
 

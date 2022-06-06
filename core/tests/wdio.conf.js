@@ -1,5 +1,9 @@
-const {ReportAggregator, HtmlReporter} = require('wdio-html-nice-reporter');
+const allureReporter = require('@wdio/allure-reporter').default;
+const allure = require('allure-commandline');
 const video = require('wdio-video-reporter');
+var path = require('path');
+var Constants = require('./protractor_utils/ProtractorConstants');
+var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
 var chromeVersion = '89.0.4389.90';
 
@@ -32,30 +36,23 @@ repoterArray = [
     showPreface: false,
     realtimeReporting: true,
   }],
-  ['html-nice', {
-    outputDir: '../webdriverIO-tests-report/',
-    filename: 'report.html',
-    reportTitle: 'Test Report Title',
-    linkScreenshots: true,
-    // To show the report in a browser when done.
-    showInBrowser: true,
-    collapseTests: false,
-    // To turn on screenshots after every test.
-    useOnAfterCommandForScreenshot: true,
-
-    // To initialize the logger
-    // LOG: log4j.getLogger('default')
-  }]
+  ['allure', {
+    outputDir: 'allure-results',
+    disableWebdriverStepsReporting: true,
+    disableWebdriverScreenshotsReporting: false,
+  }],
 ];
 
 if ((process.env.GITHUB_ACTIONS &&
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
     LOCAL_VIDEO_RECORDING_IS_ENABLED == 1) {
-  repoterArray.push([video, {
+  videoReporter = [video, {
     saveAllVideos: true,
     videoSlowdownMultiplier: 3,
-    outputDir: '../webdriverio-video'
-  }]);
+  }];
+
+  repoterArray.splice(1, 0, videoReporter);
+  repoterArray.join();
 }
 
 exports.config = {
@@ -99,8 +96,26 @@ exports.config = {
     // order to group specific specs to a specific capability.
     capabilities: [{
         browserName: 'chrome',
-        'wdio:devtoolsOptions': {
-            headless: false
+        'goog:chromeOptions': {
+          args: [
+            '--lang=en-EN',
+            '--window-size=1285x1000',
+            // These arguments let us simulate recording from a microphone.
+            '--use-fake-device-for-media-stream',
+            '--use-fake-ui-for-media-stream',
+            '--use-file-for-fake-audio-capture=data/cafe.mp3',
+            // These arguments are required to run the tests on GitHub
+            // Actions.
+            '--no-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+          ],
+          prefs: {
+            download: {
+                'prompt_for_download': false,
+                'default_directory': DOWNLOAD_PATH,
+              }
+          }
         }
     }],
     // First, you can define how many instances should be started at the same time. Let's
@@ -308,15 +323,10 @@ exports.config = {
      * @param {Boolean} result.passed    true if test has passed, otherwise false
      * @param {Object}  result.retries   informations to spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
-    afterTest: function(
-      test,
-      context,
-      { error, result, duration, passed, retries }
-    ) {
-      // take a screenshot anytime a test fails and throws an error
-      if (error) {
-        browser.takeScreenshot();
-      }
+    afterTest: async function (step, scenario, { error, duration, passed }, context) {
+     if (error) {
+       await browser.takeScreenshot();
+     }
     },
 
     /**
@@ -359,11 +369,26 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    onComplete: function(exitCode, config, capabilities, results) {
-      (async() => {
-        await reportAggregator.createReport();
-    })();
-    },
+     onComplete: function() {
+      const reportError = new Error('Could not generate Allure report')
+      const generation = allure(['generate', 'allure-results', '--clean'])
+      return new Promise((resolve, reject) => {
+          const generationTimeout = setTimeout(
+              () => reject(reportError),
+              5000)
+
+          generation.on('exit', function(exitCode) {
+              clearTimeout(generationTimeout)
+
+              if (exitCode !== 0) {
+                  return reject(reportError)
+              }
+
+              console.log('Allure report successfully generated')
+              resolve()
+          })
+      })
+  }
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session
