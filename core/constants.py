@@ -24,8 +24,6 @@ import os
 import pkgutil
 import re
 
-from core import python_utils
-
 from typing import Any, Dict
 
 
@@ -112,11 +110,8 @@ class Constants(dict):  # type: ignore[type-arg]
 
 
 constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
-    python_utils.get_package_file_contents('assets', 'constants.ts')))
+    get_package_file_contents('assets', 'constants.ts')))
 
 release_constants = Constants( # pylint:disable=invalid-name
-    json.loads(
-        python_utils.get_package_file_contents(
-            'assets', 'release_constants.json')
-    )
+    json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )
