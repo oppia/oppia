@@ -162,3 +162,90 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
                 )
             )
         ])
+
+
+class FindMathExplorationsWithNonTrivialFunctionsJobTests(
+        job_test_utils.JobTestBase):
+
+    JOB_CLASS = (
+        math_interactions_audit_jobs
+        .FindMathExplorationsWithNonTrivialFunctionsJob)
+
+    EXP_1_ID = 'exp_1_id'
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_job_finds_math_explorations_with_non_trivial_functions(
+            self) -> None:
+        exp_model_1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='cs',
+            init_state_name='state',
+            states_schema_version=48,
+            states={
+                'init_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state', is_initial_state=True
+                ).to_dict(),
+                'trivial_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state', is_initial_state=True
+                ).to_dict(),
+                'non_trivial_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state', is_initial_state=True
+                ).to_dict(),
+                'end_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state', is_initial_state=True
+                ).to_dict(),
+            }
+        )
+        exp_model_1.states['trivial_state']['interaction']['id'] = (
+            'AlgebraicExpressionInput')
+        exp_model_1.states['trivial_state']['interaction']['answer_groups'] = [
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'sqrt(a) + b'
+                    },
+                    'rule_type': 'IsEquivalentTo'
+                }, {
+                    'inputs': {
+                        'x': 'a - abs(b)'
+                    },
+                    'rule_type': 'ContainsSomeOf'
+                }]
+            }
+        ]
+        exp_model_1.states['non_trivial_state']['interaction']['id'] = (
+            'AlgebraicExpressionInput')
+        exp_model_1.states['non_trivial_state']['interaction'][
+                'answer_groups'] = [
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'log(x) - sin(y)'
+                    },
+                    'rule_type': 'MatchesExactlyWith'
+                }, {
+                    'inputs': {
+                        'x': 'x - y'
+                    },
+                    'rule_type': 'MatchesExactlyWith'
+                }]
+            }
+        ]
+        exp_model_1.update_timestamps()
+
+        datastore_services.put_multi([exp_model_1, ])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=(
+                    '(\'exp_1_id\', \'non_trivial_state\', '
+                    '[\'log(x) - sin(y)\', \'x - y\'])'
+                )
+            )
+        ])
