@@ -181,8 +181,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs/batch_jobs',
     'core/jobs/decorators',
     'core/jobs/transforms',
-    'core/python_utils.py',
-    'core/python_utils_test.py',
     'extensions/',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',

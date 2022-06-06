@@ -34,7 +34,7 @@ class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     class Response:
-        """Class to mock python_utils.url_open responses."""
+        """Class to mock utils.url_open responses."""
 
         def __init__(
             self, url: MailgunQueryType, expected_url: MailgunQueryType

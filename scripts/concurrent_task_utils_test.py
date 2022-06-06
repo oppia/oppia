@@ -22,14 +22,13 @@ import builtins
 import threading
 import time
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import concurrent_task_utils
 
 
 def test_function(unused_arg):
-    return python_utils.OBJECT
+    return object
 
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):

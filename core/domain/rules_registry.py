@@ -21,8 +21,8 @@ from __future__ import annotations
 import json
 import os
 
+from core import constants
 from core import feconf
-from core import python_utils
 
 
 class Registry:
@@ -56,7 +56,7 @@ class Registry:
         if not cached and state_schema_version is None:
             cls._state_schema_version_to_html_field_types_to_rule_specs[
                 state_schema_version] = json.loads(
-                    python_utils.get_package_file_contents(
+                    constants.get_package_file_contents(
                         'extensions',
                         feconf
                         .HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH))
@@ -70,7 +70,7 @@ class Registry:
 
             try:
                 specs_from_json = json.loads(
-                    python_utils.get_package_file_contents(
+                    constants.get_package_file_contents(
                         'extensions', spec_file))
             except Exception as e:
                 raise Exception(

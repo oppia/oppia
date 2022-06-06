@@ -24,7 +24,6 @@ import pkgutil
 
 from core import constants
 from core import feconf
-from core import python_utils
 from core import utils
 
 
@@ -40,7 +39,7 @@ class Registry:
         package, filepath = os.path.split(
             feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
         cls._rte_components = constants.parse_json_from_ts(
-            python_utils.get_package_file_contents(package, filepath))
+            constants.get_package_file_contents(package, filepath))
 
     @classmethod
     def get_all_rte_components(cls):

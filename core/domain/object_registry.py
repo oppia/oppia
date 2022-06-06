@@ -20,8 +20,8 @@ import copy
 import inspect
 import json
 
+from core import constants
 from core import feconf
-from core import python_utils
 from extensions.objects.models import objects
 
 
@@ -74,5 +74,5 @@ def get_default_object_values():
     """Returns a dictionary containing the default object values."""
     # TODO(wxy): Cache this as it is accessed many times.
 
-    return json.loads(python_utils.get_package_file_contents(
+    return json.loads(constants.get_package_file_contents(
         'extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH))

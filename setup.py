@@ -20,10 +20,15 @@ The package is built by running 'python setup.py sdist' in the build.py.
 
 from __future__ import annotations
 
-from core import feconf
-
 import pkg_resources
 import setuptools
+
+# The third party library path is defined in common.py,
+# which is required to import typing_extensions.
+from scripts import common # isort:skip pylint: disable=unused-import
+# Since feconf imports typing_extensions, it should be
+# imported after common is imported.
+from core import feconf # isort:skip
 
 
 # Configure the required packages and scripts to install.
