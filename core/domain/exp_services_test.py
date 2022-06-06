@@ -8105,7 +8105,7 @@ title: Title
                 most_recently_reached_checkpoint_state_name, 'Introduction')
 
         exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
-            self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
         )
 
         exp_user_data = exp_fetchers.get_exploration_user_data(
@@ -8143,7 +8143,7 @@ title: Title
             self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'New state', 2)
 
         exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
-            self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
         )
 
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
@@ -8194,7 +8194,7 @@ title: Title
             self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Third state', 4)
 
         exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
-            self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
         )
 
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
@@ -8231,7 +8231,7 @@ title: Title
         )
 
         exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
-            self.viewer_id, self.UNIQUE_PROGRESS_URL_ID
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
         )
 
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
