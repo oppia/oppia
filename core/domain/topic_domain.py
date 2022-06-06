@@ -1079,6 +1079,11 @@ class Topic:
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
                 'Topic thumbnail image is not provided.')
+        if self.canonical_story_references:
+            for reference in self.canonical_story_references:
+                if not isinstance(reference.story_is_published, bool):
+                    raise utils.ValidationError(
+                        'story_is_published value should be boolean type')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
