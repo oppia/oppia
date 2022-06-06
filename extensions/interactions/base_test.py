@@ -25,8 +25,8 @@ import re
 import string
 import struct
 
+from core import constants
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import schema_utils_test
 from core import utils
@@ -286,7 +286,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # The file having the information about the assembly of the html in the
         # rule specs.
         html_field_types_to_rule_specs_dict = json.loads(
-            python_utils.get_package_file_contents(
+            constants.get_package_file_contents(
                 'extensions',
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH))
 
@@ -294,7 +294,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # Contents of the file html_field_types_to_rule_specs.json will be
         # verified against this file.
         rule_descriptions_dict = json.loads(
-            python_utils.get_package_file_contents(
+            constants.get_package_file_contents(
                 'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
 
         # In the following part, we generate the html_field_types_to_rule_specs
