@@ -66,4 +66,4 @@ firebase-debug.log
 debug.log
 # allure reports are generated after each test run so needs to be ignored.
 allure-report/*
-allure-results/*
+_results_/*

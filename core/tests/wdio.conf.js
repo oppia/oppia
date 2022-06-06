@@ -17,7 +17,7 @@ var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
 
 var suites = {
   // The tests on Travis are run individually to parallelize
@@ -37,7 +37,7 @@ repoterArray = [
     realtimeReporting: true,
   }],
   ['allure', {
-    outputDir: 'allure-results',
+    outputDir: './_results_/allure-raw',
     disableWebdriverStepsReporting: true,
     disableWebdriverScreenshotsReporting: false,
   }],
@@ -47,7 +47,7 @@ if ((process.env.GITHUB_ACTIONS &&
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
     LOCAL_VIDEO_RECORDING_IS_ENABLED == 1) {
   videoReporter = [video, {
-    saveAllVideos: true,
+    saveAllVideos: false,
     videoSlowdownMultiplier: 3,
   }];
 
@@ -232,15 +232,9 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-     onPrepare: function(config, capabilities) {
-      reportAggregator = new ReportAggregator({
-          outputDir: '../webdriverIO-tests-report/',
-          filename: 'master-report.html',
-          reportTitle: 'Master Report',
-          browserName: capabilities[0].browserName,
-      });
-      reportAggregator.clean();
-    },
+    //  onPrepare: function(config, capabilities) {
+      
+    // },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -370,8 +364,8 @@ exports.config = {
      * @param {<Object>} results object containing test results
      */
      onComplete: function() {
-      const reportError = new Error('Could not generate Allure report')
-      const generation = allure(['generate', 'allure-results', '--clean'])
+      const reportError = new Error('Could not generate Allure report');
+      const generation = allure(['generate', '_results_/allure-raw', '--clean']);
       return new Promise((resolve, reject) => {
           const generationTimeout = setTimeout(
               () => reject(reportError),
