@@ -50,8 +50,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
           interaction having answer group(s) with non-empty training data.
       e) The exploration is curated and has any state with MultipleChoiceInput
           interaction having less than 4 choices.
-      f) The exploration is curated and any state with default outcome where
-          param changes is not empty.
+      f) The exploration is curated and any state has interaction having
+          non-empty param changes in its default outcome.
       g) The exploration is curated and contains videos or links.
     """
 
