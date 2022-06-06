@@ -243,7 +243,7 @@ describe('StateResponsesComponent', () => {
 
     ctrl.$onInit();
 
-    expect($scope.responseCardIsShown).toBe(false);
+    expect($scope.responseCardIsShown).toBe(true);
     expect($scope.enableSolicitAnswerDetailsFeature).toBe(true);
     expect($scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
     expect($scope.stateName).toBe('Hola');

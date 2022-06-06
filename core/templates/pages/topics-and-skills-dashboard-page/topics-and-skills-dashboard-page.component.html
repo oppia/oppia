@@ -17,8 +17,7 @@
     </div>
   </div>
   <div class="create-button-mobile">
-    <div *ngIf="(activeTab === TAB_NAME_TOPICS) && totalTopicSummaries.length"
-         class="protractor-test-create-topic-button">
+    <div *ngIf="(activeTab === TAB_NAME_TOPICS) && totalTopicSummaries.length">
       <i class="fa fa-plus-circle" aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
     </div>
     <div *ngIf="activeTab === TAB_NAME_SKILLS">
