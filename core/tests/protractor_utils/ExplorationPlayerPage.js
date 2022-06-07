@@ -188,6 +188,18 @@ var ExplorationPlayerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.clickCloseLessonInfoTooltipIfPresent = async function(
+    closeLessonInfoTooltipElement
+  ) {
+    if (await closeLessonInfoTooltipElement.isPresent()) {
+      await waitFor.elementToBeClickable(
+        closeLessonInfoTooltipElement,
+        'Close Lesson Info Tooltip takes too long to appear');
+      await action.click(
+        'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
+    }
+  };
+
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
   // sent a handler (as given in forms.RichTextChecker) to which calls such as

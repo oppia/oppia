@@ -256,6 +256,11 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();
 
+    var closeLessonInfoTooltipElement = element(by.css(
+      '.protractor-test-close-lesson-info-tooltip'));
+    await explorationPlayerPage.clickCloseLessonInfoTooltipIfPresent(
+      closeLessonInfoTooltipElement
+    );
     await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
     await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');

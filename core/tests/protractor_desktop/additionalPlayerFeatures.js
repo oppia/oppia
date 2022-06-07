@@ -257,6 +257,11 @@ describe('Full exploration editor', function() {
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
       await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
+      var closeLessonInfoTooltipElement = element(by.css(
+        '.protractor-test-close-lesson-info-tooltip'));
+      await explorationPlayerPage.clickCloseLessonInfoTooltipIfPresent(
+        closeLessonInfoTooltipElement
+      );
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
       await explorationPlayerPage.submitAnswer('NumericInput', 21);
