@@ -16,7 +16,7 @@
  * @fileoverview Module for the preferences page.
  */
 
-import {APP_INITIALIZER, NgModule} from '@angular/core';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { PreferencesPageComponent } from './preferences-page.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -25,17 +25,11 @@ import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-
 import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
 import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
 import { PreferencesPageRootComponent } from './preferences-page-root.component';
-import {APP_BASE_HREF, CommonModule} from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { PreferencesPageRoutingModule } from './preferences-page-routing.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import {RouterModule} from "@angular/router";
-import {HTTP_INTERCEPTORS} from "@angular/common/http";
-import {RequestInterceptor} from "services/request-interceptor.service";
-import {platformFeatureInitFactory, PlatformFeatureService} from "services/platform-feature.service";
-import {HAMMER_GESTURE_CONFIG} from "@angular/platform-browser";
-import {MyHammerConfig} from "pages/oppia-root/app.module";
 
 @NgModule({
   imports: [
@@ -44,7 +38,6 @@ import {MyHammerConfig} from "pages/oppia-root/app.module";
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
-    RouterModule.forRoot([]),
     ReactiveFormsModule,
     SharedComponentsModule,
     PreferencesPageRoutingModule,
@@ -65,12 +58,6 @@ import {MyHammerConfig} from "pages/oppia-root/app.module";
     PreferredLanguagesComponent,
     PreferredSiteLanguageSelectorComponent,
     SubjectInterestsComponent
-  ],
-  providers: [
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
   ]
 })
 export class PreferencesPageModule {}
