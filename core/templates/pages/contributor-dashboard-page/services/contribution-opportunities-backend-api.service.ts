@@ -238,7 +238,7 @@ export class ContributionOpportunitiesBackendApiService {
   Promise<string> {
     const emptyResponse = {
       preferred_translation_language_code: ''
-    }
+    };
     const response = await this.http
       .get<PreferredTranslationLanguageBackendDict>(
         '/preferredtranslationlanguage').toPromise().catch(

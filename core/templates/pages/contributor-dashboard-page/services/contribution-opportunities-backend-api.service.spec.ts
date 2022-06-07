@@ -449,28 +449,28 @@ describe('Contribution Opportunities backend API service', function() {
 
   it('should return empty string if \'preferredtranslationlanguage\' ' +
     'call fails', fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-      const emptyString: string = '';
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const emptyString: string = '';
 
-      contributionOpportunitiesBackendApiService
-        .getPreferredTranslationLanguageAsync()
-        .then(successHandler, failHandler);
+    contributionOpportunitiesBackendApiService
+      .getPreferredTranslationLanguageAsync()
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(
-        '/preferredtranslationlanguage'
-      );
+    const req = httpTestingController.expectOne(
+      '/preferredtranslationlanguage'
+    );
 
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: '500 Internal Server Error'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: '500 Internal Server Error'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(emptyString);
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(emptyString);
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 });

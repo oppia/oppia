@@ -52,7 +52,7 @@ describe('Translation language selector', () => {
       fetchFeaturedTranslationLanguagesAsync: async() =>
         Promise.resolve(featuredLanguages),
       getPreferredTranslationLanguageAsync: async() => {
-        if(preferredLanguageCode) {
+        if (preferredLanguageCode) {
           component.populateLanguageSelection(preferredLanguageCode);
         }
         return Promise.resolve(preferredLanguageCode);
@@ -190,10 +190,15 @@ describe('Translation language selector', () => {
 
   it('should display the preferred language when the preferred' +
     ' language is defined', async(() => {
+    component.activeLanguageCode = null;
     preferredLanguageCode = 'en';
+    // This throws "TS2532". We need to suppress this error because
+    // "constants.SUPPORTED_AUDIO_LANGUAGES" is always defined. Also, it must
+    // contain description for language code 'en' and if it doesn't
+    // then this test should fail.
+    // @ts-ignore
     const languageDescription = constants.SUPPORTED_AUDIO_LANGUAGES.find(
       e => e.id === 'en').description;
-    component.activeLanguageCode = null;
 
     spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
       (languageCode) => {
