@@ -202,7 +202,8 @@ describe('Translation language selector', () => {
 
     spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
       (languageCode) => {
-        component.activeLanguageCode = languageCode;
+        component.activeLanguageCode = (
+          languageCode ? languageCode : null);
       });
 
     component.ngOnInit();
