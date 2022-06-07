@@ -44,7 +44,7 @@ export class AlgebraicExpressionInputInteractionComponent
   hasBeenTouched = false;
   viewIsDestroyed: boolean = false;
   warningText: string = '';
-  @Input() customOskLettersWithValue: string = '';
+  @Input() allowedVariablesWithValue: string = '';
   @Input() savedSolution: InteractionAnswer;
   @Input() useFractionForDivisionWithValue: string;
 
@@ -71,7 +71,7 @@ export class AlgebraicExpressionInputInteractionComponent
         this.value);
       let answerIsValid = (
         this.mathInteractionsService.validateAlgebraicExpression(
-          this.value, this.guppyInitializationService.getCustomOskLetters()));
+          this.value, this.guppyInitializationService.getAllowedVariables()));
       this.warningText = this.mathInteractionsService.getWarningText();
       return answerIsValid;
     }
@@ -93,9 +93,9 @@ export class AlgebraicExpressionInputInteractionComponent
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
       JSON.parse(this.useFractionForDivisionWithValue || 'false'));
-    this.guppyInitializationService.setCustomOskLetters(
+    this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.customOskLettersWithValue) as string[]
+        this.allowedVariablesWithValue) as string[]
     );
     let translatedPlaceholder = this.translateService.instant(
       constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
