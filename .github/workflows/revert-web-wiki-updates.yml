@@ -33,7 +33,11 @@ jobs:
           # can be retrieved from
           # https://api.github.com/users/oppia-wiki-synchronizer[bot].
           git config user.email 102317631+oppia-wiki-synchronizer[bot]@users.noreply.github.com
-          git revert --no-edit source/develop..origin/master
+          git revert --no-commit source/develop..origin/master
+          msg_file=$(mktemp)
+          echo "Reverting the following changes made through the web interface:\n" > $msg_file
+          git log soure/develop..origin/master | while read line; do echo "    ${line}"; done >> $msg_file
+          git commit -F $msg_file
       - name: Push to deployment repository
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: git push source master:develop
