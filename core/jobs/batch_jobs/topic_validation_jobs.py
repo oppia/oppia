@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import re
+from typing import Tuple
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -31,7 +32,7 @@ import apache_beam as beam
 (topic_models, ) = models.Registry.import_models([models.NAMES.topic])
 
 
-class GetTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
+class GetSubTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
     """Job that returns invalid topic models."""
 
     def is_fragment_valid(self, url_frag: str) -> bool:
@@ -43,14 +44,12 @@ class GetTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
         if url_frag is None:
             return False
 
-        if len(url_frag) > 25:
+        if len(url_frag) > 25 or len(url_frag) == 0:
             return False
 
         regex = '^[a-z]+(-[a-z]+)*$'
 
-        result = re.match(regex, url_frag)
-
-        return bool(result)
+        return bool(re.match(regex, url_frag))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid topics
@@ -62,15 +61,20 @@ class GetTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all TopicModels' >> ndb_io.GetModels(
                 topic_models.TopicModel.get_all(include_deleted=False))
-            | 'Get topic id and url fragment' >> beam.Map(
-                lambda topic: (topic.id, topic.url_fragment)
+            | 'Get topic id and subtopics' >> beam.Map(
+                lambda topic: (topic.id, list(topic.subtopics))
+            )
+            | 'Group subtopic info with topic id' >> beam.FlatMap(
+                lambda topic: [
+                    (topic[0], x['id'], x['url_fragment']) for x in topic[1]
+                    ]
             )
         )
 
         invalid_topic_models = (
             total_topics
             | 'Filter topics with invalid url fragments' >>
-                beam.Filter(lambda topic: not self.is_fragment_valid(topic[1]))
+                beam.Filter(lambda topic: not self.is_fragment_valid(topic[2]))
         )
 
         report_number_of_topics_queried = (
@@ -87,12 +91,12 @@ class GetTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
 
         report_invalid_ids = (
             invalid_topic_models
-            | 'Save info on invalid topics' >> beam.MapTuple(
-                lambda topic_id, frag: job_run_result.JobRunResult.as_stderr(
-                    'The id of topic is %s and the invalid url-frag is "%s"'
-                    % (topic_id, frag)
+            | 'Save info on invalid topics' >> beam.Map(
+                lambda topic:
+                job_run_result.JobRunResult.as_stderr(
+                    'Topic_id: %s, subtopic_id: %s, invalid url_frag: "%s"'
+                    % (topic[0], topic[1], topic[2]))
                 ))
-        )
 
         return (
             (
