@@ -45,7 +45,7 @@
       <div *ngIf="this.explanationEditorIsOpen[this.rubric.getDifficulty()][idx]">
         <div class="oppia-rule-details-header">
           <schema-based-editor class="protractor-test-rubric-explanation-text"
-                               [schema]="getSchema.bind(this)"
+                               [schema]="EXPLANATION_FORM_SCHEMA"
                                [localValue]="this.editableExplanations[this.rubric.getDifficulty()][idx]"
                                (localValueChange)="this.updateExplanation($event, idx)">
           </schema-based-editor>

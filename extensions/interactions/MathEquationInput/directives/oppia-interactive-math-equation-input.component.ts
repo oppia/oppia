@@ -43,7 +43,7 @@ export class InteractiveMathEquationInput implements OnInit {
   warningText: string = '';
   @Input() savedSolution: InteractionAnswer;
   @Input() useFractionForDivisionWithValue;
-  @Input() customOskLettersWithValue;
+  @Input() allowedVariablesWithValue;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -65,7 +65,7 @@ export class InteractiveMathEquationInput implements OnInit {
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
         this.value);
       let answerIsValid = this.mathInteractionsService.validateEquation(
-        this.value, this.guppyInitializationService.getCustomOskLetters());
+        this.value, this.guppyInitializationService.getAllowedVariables());
       this.warningText = this.mathInteractionsService.getWarningText();
       return answerIsValid;
     }
@@ -99,9 +99,9 @@ export class InteractiveMathEquationInput implements OnInit {
       (this.savedSolution as string) !==
       undefined ? this.savedSolution as string : ''
     );
-    this.guppyInitializationService.setCustomOskLetters(
+    this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.customOskLettersWithValue) as unknown as string[]);
+        this.allowedVariablesWithValue) as unknown as string[]);
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
