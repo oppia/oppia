@@ -33,6 +33,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 
 export interface InputResponsePair {
   learnerInput: string;
@@ -266,6 +267,15 @@ export class StateCard {
 
   get contentId(): string {
     return this._contentId;
+  }
+
+  swapContentsWithTranslation(entityTranslations: EntityTranslation) {
+    if (entityTranslations.hasWrittenTranslation(this._contentId)) {
+      this.contentHtml = (
+        entityTranslations.getWrittenTranslation(this._contentId).translation as string);
+
+    }
+    this._interaction.swapContentsWithTranslation(entityTranslations);
   }
 
   /**

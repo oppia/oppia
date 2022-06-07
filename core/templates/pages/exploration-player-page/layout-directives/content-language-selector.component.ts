@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -45,6 +46,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,

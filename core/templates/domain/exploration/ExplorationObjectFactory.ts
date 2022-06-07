@@ -47,6 +47,7 @@ import { UrlInterpolationService } from
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface ExplorationBackendDict {
   'auto_tts_enabled'?: boolean;
@@ -64,7 +65,7 @@ export interface ExplorationBackendDict {
   'next_content_id_index': number;
 }
 
-export class Exploration {
+export class Exploration extends BaseTranslatableObject {
   initStateName: string;
   paramChanges: ParamChange[];
   paramSpecs: ParamSpecs;
@@ -81,6 +82,8 @@ export class Exploration {
       nextContentIdIndex: number, languageCode: string,
       loggerService: LoggerService,
       urlInterpolationService: UrlInterpolationService) {
+    super();
+
     this.initStateName = initStateName;
     this.paramChanges = paramChanges;
     this.paramSpecs = paramSpecs;
@@ -90,6 +93,8 @@ export class Exploration {
     this.logger = loggerService;
     this.urlInterpolationService = urlInterpolationService;
     this.nextContentIdIndex = nextContentIdIndex;
+
+    this._translatableObjects = Object.values(this.states.getStateObjects());
   }
 
   // ---- Instance methods ----
@@ -190,17 +195,6 @@ export class Exploration {
 
   getAllVoiceoverLanguageCodes(): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
-  }
-
-  getDisplayableWrittenTranslationLanguageCodes(): string[] {
-    const allLanguageCodes = (
-      this.states.getAllWrittenTranslationLanguageCodes());
-
-    const displayableLanguageCodes = allLanguageCodes.filter(
-      languageCode => this.states.areWrittenTranslationsDisplayable(
-        languageCode));
-
-    return displayableLanguageCodes;
   }
 }
 

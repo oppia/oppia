@@ -166,6 +166,7 @@ export class ExplorationPlayerStateService {
       returnDict.preferred_audio_language_code,
       returnDict.auto_tts_enabled,
       returnDict.preferred_language_codes,
+      returnDict.displayable_language_codes,
       arePretestsAvailable ? () => {} : callback);
   }
 
@@ -232,7 +233,7 @@ export class ExplorationPlayerStateService {
         states: explorationData.states
       }, featuresData);
       this.explorationEngineService.init(
-        explorationData, null, null, null, null, callback);
+        explorationData, null, null, null, null, [], callback);
       this.playerCorrectnessFeedbackEnabledService.init(
         explorationData.correctness_feedback_enabled);
       this.numberAttemptsService.reset();

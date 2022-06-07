@@ -325,6 +325,59 @@ class BaseTranslatableObject:
 
         return content_id_to_translatable_content
 
+    def are_translations_displayable(
+        self,
+        entity_translation: EntityTranslation
+    ) -> bool:
+        """Whether the given EntityTranslation in the given lanaguage is
+        displayable.
+
+        A language's translations are ready to be displayed if there are less
+        than five missing or update-needed translations. In addition, all
+        rule-related translations must be present.
+
+        Args:
+            entity_translation: EntityTranslation. An object storing the
+                existing translations of an entity.
+
+        Returns:
+            list(TranslatableContent). Returns a list of TranslatableContent.
+        """
+        translations_needing_update = 0
+        translations_missing = 0
+
+        min_non_displayable_translation_count = (
+            feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS)
+
+        content_id_to_translatable_content = (
+            self.get_translatable_contents_collection()
+            .content_id_to_translatable_content)
+
+        content_id_to_translated_content = entity_translation.translations
+
+        translatable_content_count = len(
+            content_id_to_translatable_content.keys())
+        translated_content_count = len(
+            content_id_to_translated_content.keys())
+        translations_missing_count = (
+            translatable_content_count - translated_content_count)
+        if  translations_missing_count > (
+                feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
+            ):
+            return False
+
+        translation_requires_updates_count = 0
+        for translated_content in content_id_to_translated_content.values():
+            if translated_content.needs_update:
+                translation_requires_updates_count += 1
+
+        if  translations_missing_count + translation_requires_updates_count > (
+                feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
+            ):
+            return False
+
+        return True
+
 
 class EntityTranslation:
     """A domain object to store all translations for a given versioned-entity

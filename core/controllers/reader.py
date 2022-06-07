@@ -46,6 +46,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
+from core.domain import translation_services
 from core.domain import user_services
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
@@ -282,6 +283,13 @@ class ExplorationHandler(base.BaseHandler):
         preferred_language_codes = None
         has_viewed_lesson_info_modal_once = None
 
+        displayable_language_codes = (
+            translation_services.get_displayable_translation_languages(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exploration
+            )
+        )
+
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
@@ -353,9 +361,62 @@ class ExplorationHandler(base.BaseHandler):
             'most_recently_reached_checkpoint_exp_version': (
                 most_recently_reached_checkpoint_exp_version),
             'most_recently_reached_checkpoint_state_name': (
-                most_recently_reached_checkpoint_state_name)
+                most_recently_reached_checkpoint_state_name),
+            'displayable_language_codes': ['hi'] or displayable_language_codes
         })
         self.render_json(self.values)
+
+
+class EntityTranslationhandler(base.BaseHandler):
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema':{
+                'type': 'basestring',
+                'choices': [
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    feconf.ENTITY_TYPE_QUESTION
+                ]
+            }
+        },
+        'entity_id': {
+            'schema':{
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'entity_version': {
+            'schema':{
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    # Version must be greater than zero.
+                    'min_value': 1
+                }]
+            }
+        },
+        'language_code': {
+            'schema':{
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, entity_type, entity_id, entity_version, language_code):
+        entity_translations = translation_fetchers.get_entity_translation(
+            entity_type, entity_id, entity_version, language_code)
+
+        self.render_json(entity_translation.to_dict())
 
 
 class PretestHandler(base.BaseHandler):

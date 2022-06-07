@@ -185,50 +185,6 @@ export class States {
     }
     return allAudioTranslations;
   }
-
-  areWrittenTranslationsDisplayable(languageCode: string): boolean {
-    // A language's translations are ready to be displayed if there are less
-    // than five missing or update-needed translations. In addition, all
-    // rule-related translations must be present.
-    let translationsNeedingUpdate = 0;
-    let translationsMissing = 0;
-
-    for (const stateName in this._states) {
-      const state = this._states[stateName];
-
-      const requiredContentIds = (
-        state.getRequiredWrittenTranslationContentIds());
-
-      const contentIds = state.writtenTranslations.getAllContentIds();
-      for (const contentId of contentIds) {
-        if (!requiredContentIds.has(contentId)) {
-          continue;
-        }
-
-        const writtenTranslation = (
-          state.writtenTranslations.getWrittenTranslation(
-            contentId, languageCode));
-        if (writtenTranslation === undefined) {
-          translationsMissing += 1;
-          if (contentId.startsWith(AppConstants.COMPONENT_NAME_RULE_INPUT)) {
-            // Rule-related translations cannot be missing.
-            return false;
-          }
-        } else if (writtenTranslation.needsUpdate) {
-          translationsNeedingUpdate += 1;
-        }
-
-        if (
-          translationsMissing + translationsNeedingUpdate >
-          MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
-        ) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
 }
 
 @Injectable({

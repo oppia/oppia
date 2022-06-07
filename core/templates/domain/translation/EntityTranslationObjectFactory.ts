@@ -24,7 +24,6 @@ import {
   DataFormatToDefaultValuesKey,
   TranslatedContent,
   TranslatedContentBackendDict,
-  TranslatedContentObjectFactory
 } from 'domain/exploration/TranslatedContentObjectFactory'
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 
@@ -66,16 +65,12 @@ export class EntityTranslation {
     this.translationMapping[contentId].markAsNeedingUpdate();
   }
 
-  getLanguageCode(contentId: string): string {
+  getLanguageCode(): string {
     return this.languageCode;
   }
 
-  hasWrittenTranslation(contentId: string, languageCode: string): boolean {
-    if (!this.translationMapping.hasOwnProperty(contentId)) {
-      return false;
-    }
-    return this.getLanguageCode(
-      contentId).indexOf(languageCode) !== -1;
+  hasWrittenTranslation(contentId: string): boolean {
+    return this.translationMapping.hasOwnProperty(contentId);
   }
 
   hasUnflaggedWrittenTranslations(contentId: string): boolean {
@@ -85,34 +80,17 @@ export class EntityTranslation {
     return false;
   }
 
-  addWrittenTranslation(
-    contentId: string, languageCode: string,
-    dataFormat: DataFormatToDefaultValuesKey,
-    translations: string|string[]
-  ): void {
-    // todo.
-  }
-
-  updateWrittenTranslation(
-      contentId: string, languageCode: string,
-      translations: string|string[]): void {
-    const writtenTranslations = this.translationMapping[contentId];
-    // todo
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class EntityTranlationObjectFactory {
-  createTranslationMappingFromBackendDict(backendDict): TranslationMapping {
+  static createTranslationMappingFromBackendDict(backendDict): TranslationMapping {
     const translationsMapping: TranslationMapping = {};
-    Object.keys(backendDict.translations).forEach(
-      (contentId) => translationsMapping[contentId]);
+    Object.keys(backendDict).forEach((contentId) => {
+      translationsMapping[contentId] = TranslatedContent.createFromBackendDict(
+        backendDict[contentId])
+    });
 
     return translationsMapping;
   }
-  createFromBackendDict(
+
+  static createFromBackendDict(
     backendDict: EntityTranslationBackendDict
   ): EntityTranslation {
     return new EntityTranslation(
@@ -120,11 +98,8 @@ export class EntityTranlationObjectFactory {
       backendDict.entity_type,
       backendDict.entity_version,
       backendDict.language_code,
-      this.createTranslationMappingFromBackendDict(backendDict.translations)
+      EntityTranslation.createTranslationMappingFromBackendDict(
+        backendDict.translations)
     );
   }
 }
-
-angular.module('oppia').factory(
-  'EntityTranlationObjectFactory',
-  downgradeInjectable(EntityTranlationObjectFactory));

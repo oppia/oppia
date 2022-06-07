@@ -95,27 +95,6 @@ export class TranslatedContent {
       needs_update: this.needsUpdate
     };
   }
-}
-
-@Injectable({
-    providedIn: 'root'
-})
-export class TranslatedContentObjectFactory {
-  createNew(dataFormat: string): TranslatedContent {
-    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
-      throw new Error('Invalid translation data format: ' + dataFormat);
-    }
-
-    return new TranslatedContent(
-      cloneDeep(
-        DATA_FORMAT_TO_DEFAULT_VALUES[
-          dataFormat as DataFormatToDefaultValuesKey
-        ]
-      ),
-      dataFormat as DataFormatToDefaultValuesKey,
-      false
-    );
-  }
 
   static createFromBackendDict(
       translationBackendDict: TranslatedContentBackendDict): TranslatedContent {
@@ -125,7 +104,3 @@ export class TranslatedContentObjectFactory {
       translationBackendDict.needs_update);
   }
 }
-
-angular.module('oppia').factory(
-    'TranslatedContentObjectFactory',
-    downgradeInjectable(TranslatedContentObjectFactory));

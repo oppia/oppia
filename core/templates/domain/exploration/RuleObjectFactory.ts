@@ -22,6 +22,7 @@ import { Injectable } from '@angular/core';
 import isEqual from 'lodash/isEqual';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -38,15 +39,27 @@ export interface RuleInputTypes {
   [propName: string]: string;
 }
 
-export class Rule {
+export class Rule extends BaseTranslatableObject {
   type: string;
   inputs: RuleInputs;
   inputTypes: RuleInputTypes;
 
   constructor(type: string, inputs: RuleInputs, inputTypes: RuleInputTypes) {
+    super();
+
     this.type = type;
     this.inputs = inputs;
     this.inputTypes = inputTypes;
+
+    Object.keys(this.inputs).forEach(inputName => {
+      const ruleInput = this.inputs[inputName];
+      // All rules input types which are translatable are subclasses of
+      // BaseTranslatableObject having dict structure with contentId
+      // as a key.
+      if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+        this._translatableFields.push(ruleInput);
+      }
+    });
   }
 
   toBackendDict(): RuleBackendDict {

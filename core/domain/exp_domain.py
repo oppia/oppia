@@ -761,8 +761,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if state_name != init_state_name:
                 exploration.add_state(
                     state_name,
-                    sdict['content']['content_id']
-                )
+                    # These are placeholder values which will be repalced with
+                    # correct values below.
+                    '<placeholder1>', '<placeholder2>')
 
             state = exploration.states[state_name]
 

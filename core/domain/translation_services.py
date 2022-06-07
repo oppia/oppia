@@ -162,6 +162,26 @@ def get_languages_with_complete_translation(exploration):
     return language_code_list
 
 
+def get_displayable_translation_languages(entity_type, entity):
+    """Returns a list of language code in which the exploration translation
+    is 100%.
+
+    Returns:
+        list(str). A list of language code in which the translation for the
+        exploration is complete i.e, 100%.
+    """
+    language_code_list = []
+    entity_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
+            entity_type, entity.id, entity.version))
+
+    for entity_translation in entity_translations:
+        if entity_translation.are_translations_displayable(entity_translation):
+            language_code_list.append(entity_translation.language_code)
+
+    return language_code_list
+
+
 def get_translation_counts(entity_type, entity_id, entity_version):
     """Returns a dict representing the number of translations available in a
     language for which there exists at least one translation in the

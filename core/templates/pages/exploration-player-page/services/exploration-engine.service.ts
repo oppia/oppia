@@ -38,6 +38,7 @@ import { AnswerClassificationService, InteractionRulesService } from './answer-c
 import { AudioPreloaderService } from './audio-preloader.service';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
 import { ContentTranslationLanguageService } from './content-translation-language.service';
+import { ContentTranslationManagerService } from './content-translation-manager.service';
 import { ImagePreloaderService } from './image-preloader.service';
 import { ExplorationParams, LearnerParamsService } from './learner-params.service';
 import { PlayerTranscriptService } from './player-transcript.service';
@@ -76,6 +77,7 @@ export class ExplorationEngineService {
     private audioTranslationLanguageService: AudioTranslationLanguageService,
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
     private contextService: ContextService,
     private explorationFeaturesBackendApiService:
       ExplorationFeaturesBackendApiService,
@@ -329,6 +331,7 @@ export class ExplorationEngineService {
       preferredAudioLanguage: string,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
+      displayableLanguageCodes,
       successCallback: (stateCard: StateCard, label: string) => void
   ): void {
     this.exploration = this.explorationObjectFactory.createFromBackendDict(
@@ -365,10 +368,13 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     }
     this.contentTranslationLanguageService.init(
-      this.exploration.getDisplayableWrittenTranslationLanguageCodes(),
+      displayableLanguageCodes,
       preferredContentLanguageCodes,
       this.exploration.getLanguageCode()
     );
+
+    this.contentTranslationManagerService.init(
+      'exploration', this._explorationId, this.version);
   }
 
   moveToExploration(successCallback: (StateCard, string) => void): void {

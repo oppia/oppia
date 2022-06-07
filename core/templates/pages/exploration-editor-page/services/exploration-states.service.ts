@@ -164,47 +164,27 @@ export class ExplorationStatesService {
 
   private _CONTENT_ID_EXTRACTORS = {
     answer_groups: (answerGroups) => {
-      let contentIds = new Set();
-      answerGroups.forEach((answerGroup) => {
-        contentIds.add(answerGroup.outcome.feedback.contentId);
-        answerGroup.rules.forEach((rule) => {
-          Object.keys(rule.inputs).forEach(inputName => {
-            const ruleInput = rule.inputs[inputName];
-            // All rules input types which are translatable are subclasses of
-            // BaseTranslatableObject having dict structure with contentId
-            // as a key.
-            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-              contentIds.add(ruleInput.contentId);
-            }
-          });
-        });
-      });
-      return contentIds;
+      let contentIds = [];
+      return contentIds.concat(
+        answerGroups.map((answerGroup) => answerGroup.getAllContentIds()));
     },
     default_outcome: (defaultOutcome) => {
-      let contentIds = new Set();
-      if (defaultOutcome) {
-        contentIds.add(defaultOutcome.feedback.contentId);
-      }
-      return contentIds;
+      return defaultOutcome ? defaultOutcome.getAllContentIds() : [];
     },
     hints: (hints) => {
-      let contentIds = new Set();
-      hints.forEach((hint) => {
-        contentIds.add(hint.hintContent.contentId);
-      });
-      return contentIds;
+      let contentIds = [];
+      return contentIds.concat(
+        hints.map((hint) => hint.getAllContentIds()));
     },
     solution: (solution) => {
-      let contentIds = new Set();
-      if (solution) {
-        contentIds.add(solution.explanation.contentId);
-      }
-      return contentIds;
+      return solution ? solution.getAllContentIds() : [];
     },
     widget_customization_args: (customizationArgs) => {
-      return new Set(
-        Interaction.getCustomizationArgContentIds(customizationArgs));
+      let contentIds = new Set();
+      Interaction.getCustomizationArgContents(customizationArgs).forEach(
+        (content) => contentIds.add(content.contentId)
+      )
+      return contentIds;
     }
   };
 
@@ -353,8 +333,10 @@ export class ExplorationStatesService {
       let accessorList = this.PROPERTY_REF_DATA[backendName];
 
       if (this._CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this._CONTENT_ID_EXTRACTORS[backendName](oldValue);
-        let newContentIds = this._CONTENT_ID_EXTRACTORS[backendName](newValue);
+        let oldContentIds = new Set(
+          this._CONTENT_ID_EXTRACTORS[backendName](oldValue));
+        let newContentIds = new Set(
+          this._CONTENT_ID_EXTRACTORS[backendName](newValue));
         let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
           oldContentIds, newContentIds);
         let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
@@ -591,59 +573,6 @@ export class ExplorationStatesService {
     this.saveStateProperty(
       stateName, 'card_is_checkpoint', newCardIsCheckpoint);
   }
-
-  // getWrittenTranslationsMemento(stateName: string): WrittenTranslations {
-  //   return this._states.getState(stateName).;
-  // }
-
-  // saveWrittenTranslation(
-  //     contentId: string,
-  //     dataFormat: DataFormatToDefaultValuesKey,
-  //     languageCode: string,
-  //     stateName: string,
-  //     translationHtml: string
-  // ): void {
-  //   this.changeListService.addWrittenTranslation(
-  //     contentId, dataFormat, languageCode, stateName, translationHtml);
-  //   let stateData = this._states.getState(stateName);
-  //   if (
-  //     stateData.writtenTranslations.hasWrittenTranslation(
-  //       contentId, languageCode)
-  //   ) {
-  //     stateData.writtenTranslations.updateWrittenTranslation(
-  //       contentId, languageCode, translationHtml);
-  //   } else {
-  //     stateData.writtenTranslations.addWrittenTranslation(
-  //       contentId, languageCode, dataFormat, translationHtml);
-  //   }
-  //   this._states.setState(stateName, cloneDeep(stateData));
-  // }
-
-  // markWrittenTranslationAsNeedingUpdate(
-  //     contentId: string, languageCode: string, stateName: string
-  // ): void {
-  //   this.changeListService.markTranslationAsNeedingUpdate(
-  //     contentId, languageCode, stateName);
-  //   let stateData = this._states.getState(stateName);
-  //   stateData.writtenTranslations.translationsMapping[contentId][
-  //     languageCode].markAsNeedingUpdate();
-  //   this._states.setState(stateName, cloneDeep(stateData));
-  // }
-
-  // markWrittenTranslationsAsNeedingUpdate(
-  //     contentId: string, stateName: string
-  // ): void {
-  //   this.changeListService.markTranslationsAsNeedingUpdate(
-  //     contentId, stateName);
-  //   let stateData = this._states.getState(stateName);
-  //   const translationMapping = (
-  //     stateData.writtenTranslations.translationsMapping[contentId]);
-  //   for (const languageCode in translationMapping) {
-  //     stateData.writtenTranslations.translationsMapping[contentId][
-  //       languageCode].markAsNeedingUpdate();
-  //   }
-  //   this._states.setState(stateName, cloneDeep(stateData));
-  // }
 
   isInitialized(): boolean {
     return this._states !== null;

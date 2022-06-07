@@ -2909,14 +2909,19 @@ class State(translation_domain.BaseTranslatableObject):
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
+
+        recorded_voiceovers = RecordedVoiceovers({})
+        recorded_voiceovers.add_content_id_for_voiceover(
+            content_id_for_state_content)
+        recorded_voiceovers.add_content_id_for_voiceover(
+            content_id_for_default_outcome)
+
         return cls(
             SubtitledHtml(content_id_for_state_content, content_html),
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name, content_id_for_default_outcome),
-            RecordedVoiceovers.from_dict(copy.deepcopy(
-                feconf.DEFAULT_RECORDED_VOICEOVERS)),
-            False, is_initial_state)
+            recorded_voiceovers, False, is_initial_state)
 
     @classmethod
     def convert_html_fields_in_state(

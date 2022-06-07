@@ -406,20 +406,6 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Content id assigned to rule inputs that do not match any interaction
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
-# Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
-    'voiceovers_mapping': {
-        'content': {},
-        'default_outcome': {}
-    }
-}
-# Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
-    'translations_mapping': {
-        'content': {},
-        'default_outcome': {}
-    }
-}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -1046,10 +1032,6 @@ USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
-ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE = (
-    '/entity-translations-handler/<entity_type>/<entity_id>/<entity_version>/'
-    '<language_code>'
-)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1589,6 +1571,7 @@ COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 # BaseTranslatableObject.
 ContentValueType = Union[str, List[str]]
 
+MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5
 
 class TranslatableEntityType(enum.Enum):
     """Represents all possible entity types which support new translations

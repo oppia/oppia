@@ -5948,7 +5948,7 @@ export default {
     "linked_skill_id": null,
     "content": {
       "html": "",
-      "content_id": "content"
+      "content_id": "<placholder1>"
     },
     "interaction": {
       "id": null,
@@ -5957,7 +5957,7 @@ export default {
       "default_outcome": {
         "dest": "Introduction",
         "feedback": {
-          "content_id": "default_outcome",
+          "content_id": "<placholder2>",
           "html": ""
         },
         "labelled_as_correct": false,
@@ -5972,10 +5972,7 @@ export default {
     "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
-      "voiceovers_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
+      "voiceovers_mapping": {}
     },
     "solicit_answer_details": false,
     "card_is_checkpoint": false,

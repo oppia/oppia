@@ -44,6 +44,7 @@ import {
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface ExplanationBackendDict {
   // A null 'content_id' indicates that the 'Solution' has been created
@@ -64,7 +65,7 @@ export interface ShortAnswerResponse {
   answer: string;
 }
 
-export class Solution {
+export class Solution extends BaseTranslatableObject {
   ehfs: ExplorationHtmlFormatterService;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
@@ -73,10 +74,14 @@ export class Solution {
       ehfs: ExplorationHtmlFormatterService,
       answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
       explanation: SubtitledHtml) {
+    super();
+
     this.ehfs = ehfs;
     this.answerIsExclusive = answerIsExclusive;
     this.correctAnswer = correctAnswer;
     this.explanation = explanation;
+
+    this._translatableFields = [this.explanation];
   }
 
   toBackendDict(): SolutionBackendDict {

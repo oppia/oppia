@@ -57,6 +57,7 @@ export interface FetchExplorationBackendResponse {
   'furthest_completed_checkpoint_state_name': string;
   'most_recently_reached_checkpoint_state_name': string;
   'most_recently_reached_checkpoint_exp_version': number;
+  'displayable_language_codes': string[];
 }
 
 @Injectable({

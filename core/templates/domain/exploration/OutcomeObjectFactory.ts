@@ -26,6 +26,7 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 import { ParamChangeBackendDict } from
   'domain/exploration/ParamChangeObjectFactory';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface OutcomeBackendDict {
   'dest': string;
@@ -36,7 +37,7 @@ export interface OutcomeBackendDict {
   'missing_prerequisite_skill_id': string | null;
 }
 
-export class Outcome {
+export class Outcome extends BaseTranslatableObject {
   dest: string;
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
@@ -48,12 +49,16 @@ export class Outcome {
       paramChanges: readonly ParamChangeBackendDict[],
       refresherExplorationId: string | null,
       missingPrerequisiteSkillId: string | null) {
+    super();
+
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
     this.paramChanges = paramChanges;
     this.refresherExplorationId = refresherExplorationId;
     this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
+
+    this._translatableFields = [this.feedback];
   }
 
   setDestination(newValue: string): void {

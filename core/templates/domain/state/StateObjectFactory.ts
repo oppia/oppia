@@ -33,16 +33,12 @@ import {
   SubtitledHtmlBackendDict,
   SubtitledHtml
 } from 'domain/exploration/subtitled-html.model';
-import {
-  WrittenTranslationsBackendDict,
-  WrittenTranslations,
-  WrittenTranslationsObjectFactory
-} from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model'
 
 export interface StateBackendDict {
   // The classifier model ID associated with a state, if applicable,
@@ -58,7 +54,7 @@ export interface StateBackendDict {
   'linked_skill_id': string | null;
 }
 
-export class State {
+export class State extends BaseTranslatableObject {
   // Name is null before saving a state.
   name: string | null;
   classifierModelId: string | null;
@@ -76,6 +72,7 @@ export class State {
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
       solicitAnswerDetails: boolean, cardIsCheckpoint: boolean) {
+    super();
     this.name = name;
     this.classifierModelId = classifierModelId;
     this.linkedSkillId = linkedSkillId;
@@ -85,6 +82,9 @@ export class State {
     this.recordedVoiceovers = recordedVoiceovers;
     this.solicitAnswerDetails = solicitAnswerDetails;
     this.cardIsCheckpoint = cardIsCheckpoint;
+
+    this._translatableFields = [this.content];
+    this._translatableObjects = [this.interaction];
   }
 
   setName(newName: string): void {
@@ -102,11 +102,7 @@ export class State {
       }),
       recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
       solicit_answer_details: this.solicitAnswerDetails,
-<<<<<<< Updated upstream
-      card_is_checkpoint: this.cardIsCheckpoint
-=======
       card_is_checkpoint: this.cardIsCheckpoint,
->>>>>>> Stashed changes
     };
   }
 
@@ -120,33 +116,6 @@ export class State {
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
     this.cardIsCheckpoint = otherState.cardIsCheckpoint;
   }
-
-  // getRequiredWrittenTranslationContentIds(): Set<string> {
-  //   let interactionId = this.interaction.id;
-
-  //   let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
-
-  //   // As of now we do not delete interaction.hints when a user deletes
-  //   // interaction, so these hints' written translations are not counted in
-  //   // checking status of a state.
-  //   if (
-  //     !interactionId ||
-  //     INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear ||
-  //     INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
-  //   ) {
-  //     allContentIds.forEach(contentId => {
-  //       if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
-  //         allContentIds.delete(contentId);
-  //       }
-  //     });
-  //     // Excluding default_outcome content status as default outcome's
-  //     // content is left empty so the translation or voiceover is not
-  //     // required.
-  //     allContentIds.delete('default_outcome');
-  //   }
-
-  //   return allContentIds;
-  // }
 }
 
 @Injectable({
@@ -155,8 +124,7 @@ export class State {
 export class StateObjectFactory {
   constructor(
     private interactionObject: InteractionObjectFactory,
-    private paramchangesObject: ParamChangesObjectFactory,
-    private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
+    private paramchangesObject: ParamChangesObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
@@ -180,6 +148,8 @@ export class StateObjectFactory {
     });
     newState.content.contentId = contentIdForContent;
     newState.interaction.defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
+    newState.recordedVoiceovers.addContentId(contentIdForContent);
+    newState.recordedVoiceovers.addContentId(contentIdForDefaultOutcome);
     if (
       newState.interaction.defaultOutcome !== null &&
       newStateName !== null

@@ -912,8 +912,8 @@ URLS = [
             .CategorizedAndUntriagedSkillsDataHandler),
 
     get_redirect_route(
-        feconf.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE,
-        contributor_dashboard.EntityTranslationhandler)
+        r'/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/<language_code>',
+        reader.EntityTranslationhandler)
 ]
 
 # Adding redirects for topic landing pages.

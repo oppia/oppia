@@ -64,7 +64,7 @@ export class ExtractImageFilenamesFromModelService {
     let languageCode = (
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
     return this.contentTranslationManagerService.getTranslatedHtml(
-      state.writtenTranslations, languageCode, state.content);
+      languageCode, state.content);
   }
 
   /**
@@ -80,14 +80,14 @@ export class ExtractImageFilenamesFromModelService {
     state.interaction.answerGroups.forEach(answerGroup => {
       let answerGroupHtml = (
         this.contentTranslationManagerService.getTranslatedHtml(
-          state.writtenTranslations, languageCode,
+          languageCode,
           answerGroup.outcome.feedback));
       outcomesHtml = outcomesHtml.concat(answerGroupHtml);
     });
     if (state.interaction.defaultOutcome !== null) {
       let defaultOutcomeHtml = (
         this.contentTranslationManagerService.getTranslatedHtml(
-          state.writtenTranslations, languageCode,
+          languageCode,
           state.interaction.defaultOutcome.feedback));
       outcomesHtml = outcomesHtml.concat(defaultOutcomeHtml);
     }
@@ -104,7 +104,7 @@ export class ExtractImageFilenamesFromModelService {
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
     state.interaction.hints.forEach(hint => {
       let hintHtml = this.contentTranslationManagerService.getTranslatedHtml(
-        state.writtenTranslations, languageCode, hint.hintContent);
+        languageCode, hint.hintContent);
       hintsHtml = hintsHtml.concat(hintHtml);
     });
     return hintsHtml;
@@ -119,7 +119,7 @@ export class ExtractImageFilenamesFromModelService {
     let languageCode = (
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
     return this.contentTranslationManagerService.getTranslatedHtml(
-      state.writtenTranslations, languageCode,
+      languageCode,
       state.interaction.solution.explanation);
   }
 
@@ -151,7 +151,7 @@ export class ExtractImageFilenamesFromModelService {
           customizationArgsHtml = (
             customizationArgsHtml.concat(
               self.contentTranslationManagerService.getTranslatedHtml(
-                state.writtenTranslations, languageCode, value)));
+                languageCode, value)));
         });
       _allHtmlInTheState.push(customizationArgsHtml);
     }
@@ -270,7 +270,8 @@ export class ExtractImageFilenamesFromModelService {
       ).imageAndRegions.value.imagePath);
       filenamesInState.push(filename);
     }
-    let allHtmlOfState = this._getAllHtmlOfState(state);
+    let allHtmlOfState = state.getAllHTMLs();
+    console.log(state.getAllContentIds());
     return [
       ...filenamesInState,
       ...this._extractFilenamesFromHtmlList(allHtmlOfState)
