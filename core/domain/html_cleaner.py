@@ -27,9 +27,20 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
+from typing import Any, Dict, List
+from typing_extensions import Final, TypedDict
 
 
-def filter_a(tag, name, value):
+# Here the type chosen for `customization_args` is Dict[str, Any] because
+# the values of this dictionary can be various data types.
+class ComponentsDict(TypedDict):
+    """Dictionary that represents RTE Components."""
+
+    id: str
+    customization_args: Dict[str, Any]
+
+
+def filter_a(tag: str, name: str, value: str) -> bool:
     """Returns whether the described attribute of a tag should be
     whitelisted.
 
@@ -57,7 +68,7 @@ def filter_a(tag, name, value):
     return False
 
 
-ATTRS_WHITELIST = {
+ATTRS_WHITELIST: Final = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -82,7 +93,7 @@ ATTRS_WHITELIST = {
 }
 
 
-def clean(user_submitted_html):
+def clean(user_submitted_html: str) -> str:
     """Cleans a piece of user submitted HTML.
 
     This only allows HTML from a restricted set of tags, attrs and styles.
@@ -95,7 +106,7 @@ def clean(user_submitted_html):
         and attributes.
     """
     oppia_custom_tags = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())
+        rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
 
     core_tags = ATTRS_WHITELIST.copy()
     core_tags.update(oppia_custom_tags)
@@ -107,7 +118,7 @@ def clean(user_submitted_html):
         user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
 
 
-def strip_html_tags(html_string):
+def strip_html_tags(html_string: str) -> str:
     """Strips all HTML markup from an HTML string.
 
     Args:
@@ -120,7 +131,7 @@ def strip_html_tags(html_string):
     return bleach.clean(html_string, tags=[], attributes={}, strip=True)
 
 
-def get_image_filenames_from_html_strings(html_strings):
+def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
     """Extracts the image filename from the oppia-noninteractive-image and
     oppia-noninteractive-math RTE component from all the html strings
     passed in.
@@ -149,7 +160,7 @@ def get_image_filenames_from_html_strings(html_strings):
     return list(set(filenames))
 
 
-def get_rte_components(html_string):
+def get_rte_components(html_string: str) -> List[ComponentsDict]:
     """Extracts the RTE components from an HTML string.
 
     Args:
@@ -161,20 +172,22 @@ def get_rte_components(html_string):
         - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
     """
-    components = []
+    components: List[ComponentsDict] = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())
+        rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
     for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:
-            component = {'id': tag_name}
             customization_args = {}
             for attr in tag_attrs:
                 # Unescape special HTML characters such as '&quot;'.
                 attr_val = html.unescape(component_tag[attr])
                 customization_args[attr] = json.loads(attr_val)
 
-            component['customization_args'] = customization_args
+            component: ComponentsDict = {
+                'id': tag_name,
+                'customization_args': customization_args
+            }
             components.append(component)
     return components
