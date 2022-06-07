@@ -270,7 +270,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 exploration_objects_list
                 | 'Transform exploration objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPLORATION POPULATED WITH android_proto_size_in_bytes'))
+                    'EXPLORATION MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
