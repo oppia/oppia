@@ -1,13 +1,13 @@
 <style>
   .oppia-sidebar-expand-icon {
     float: right;
+    font-size: 22px;
     height: 22px;
     margin: 0 35px 3px 6px;
+    padding-left: 5px;
     transition-duration: 0.5s;
     vertical-align: middle;
     width: 22px;
-    font-size: 22px;
-    padding-left: 5px;
   }
   .oppia-sidebar-menu {
     background: #fff;
@@ -228,7 +228,8 @@
     <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
       <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button protractor-mobile-test-learn" >
         <i class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon oppia-sidebar-menu-icon-transition"
-          [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}"></i>
+          [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">
+        </i>
         <span class="oppia-sidebar-submenu-toggle text-uppercase" [ngClass]="{'oppia-sidebar-submenu-toggle': learnSubmenuIsShown}">
               {{ 'I18N_SIDEBAR_LEARN' | translate }}
         </span>

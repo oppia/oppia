@@ -366,9 +366,9 @@
 }
 .oppia-navbar-close-icon {
   color: #fff;
+  font-size: 22px;
   margin-right: 4px;
   margin-top: -5px;
-  font-size: 22px;
 }
 .oppia-launch-icon {
   color: #009688;
@@ -419,8 +419,8 @@
 }
 .oppia-navbar-menu-icon {
   color: #fff;
-  margin-top: -5px;
   font-size: 22px;
+  margin-top: -5px;
 }
 .nav-mobile-header-text-container {
   display: none;
@@ -485,8 +485,8 @@
 }
 .oppia-navbar-arrow-right {
   font-size: 12px;
-  padding-top: 1.5px;
   padding-left: 8px;
+  padding-top: 1.5px;
 }
 .oppia-tick-mark {
   font-size: 15px;
