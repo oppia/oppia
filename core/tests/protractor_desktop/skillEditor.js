@@ -167,6 +167,31 @@ describe('Skill Editor functionality', function() {
     await skillEditorPage.expectNumberOfMisconceptionsToBe(1);
   });
 
+  it('should show stale tab and unsaved changes status info modals',
+    async function() {
+      await topicsAndSkillsDashboardPage.get();
+      var handle = await browser.getWindowHandle();
+      await topicsAndSkillsDashboardPage
+        .createSkillWithDescriptionAndExplanation(
+          'Skill 2', 'Concept card explanation', false);
+      await browser.switchTo().window(handle);
+      await topicsAndSkillsDashboardPage
+        .navigateToSkillWithDescription('Skill 2');
+
+      var handles = await browser.getAllWindowHandles();
+
+      await skillEditorPage.changeSkillDescription('new description');
+      await browser.switchTo().window(handles[handles.length - 1]);
+      await skillEditorPage.expectUnsavedChangesStatusInfoModalToBeVisible();
+
+      await browser.switchTo().window(handles[handles.length - 2]);
+      await skillEditorPage.saveOrPublishSkill('Changed skill description.');
+      await browser.switchTo().window(handles[handles.length - 1]);
+      await skillEditorPage.expectStaleTabInfoModalToBeVisible();
+
+      await general.closeCurrentTabAndSwitchTo(handles[handles.length - 2]);
+    });
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
     await users.logout();

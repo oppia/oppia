@@ -22,6 +22,7 @@
 
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -135,6 +136,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   graphOptions: GraphOption[];
   svgViewBox: string;
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private deviceInfoService: DeviceInfoService,
     private element: ElementRef,
     private focusManagerService: FocusManagerService,
@@ -193,6 +195,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.interactionIsActive) {
       this.init();
     }
+    this.changeDetectorRef.detectChanges();
   }
 
   getEdgeColor(index: number): string {
