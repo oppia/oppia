@@ -36,8 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(skill_models, topic_models,) = models.Registry.import_models([
-    models.NAMES.skill, models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
 def _migrate_subtopics_to_latest_schema(
@@ -272,8 +271,7 @@ def get_topic_by_url_fragment(
     if topic_model is None:
         return None
 
-    topic: topic_domain.Topic = get_topic_from_model(topic_model)
-    return topic
+    return get_topic_from_model(topic_model)
 
 
 def get_all_topics() -> List[topic_domain.Topic]:
