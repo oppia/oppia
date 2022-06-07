@@ -189,7 +189,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickCloseLessonInfoTooltipIfPresent = async function(
-    closeLessonInfoTooltipElement
+      closeLessonInfoTooltipElement
   ) {
     if (await closeLessonInfoTooltipElement.isPresent()) {
       await waitFor.elementToBeClickable(
