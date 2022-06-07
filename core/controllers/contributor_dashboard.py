@@ -559,10 +559,11 @@ class TranslationPreferenceHandler(base.BaseHandler):
         else:
             self.render_json({'preferred_translation_language_code': ''})
 
-    @acl_decorators.can_manage_own_account
+    @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""
-        language_code = self.normalized_payload.get('language_code')
-        user_services.update_preferred_translation_language_code(
-            self.user_id, language_code)
+        if self.user_id:
+            language_code = self.normalized_payload.get('language_code')
+            user_services.update_preferred_translation_language_code(
+                self.user_id, language_code)
         self.render_json({})
