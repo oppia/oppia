@@ -189,11 +189,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickCloseLessonInfoTooltip = async function(
-      closeLessonInfoTooltipElement
+      closeLessonInfoTooltipElement, location='1st'
   ) {
     await waitFor.elementToBeClickable(
       closeLessonInfoTooltipElement,
-      'Lesson Info Tooltip takes too long to appear');
+      'Lesson Info Tooltip takes too long to appear at ' + location);
     await action.click(
       'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
   };
