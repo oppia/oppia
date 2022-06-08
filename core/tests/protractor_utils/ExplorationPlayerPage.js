@@ -188,12 +188,14 @@ var ExplorationPlayerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.clickCloseLessonInfoTooltip = async function(closeLessonInfoTooltipElement) {
-      await waitFor.elementToBeClickable(
-        closeLessonInfoTooltipElement,
-        'Lesson Info Tooltip takes too long to appear');
-      await action.click(
-        'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
+  this.clickCloseLessonInfoTooltip = async function(
+      closeLessonInfoTooltipElement
+  ) {
+    await waitFor.elementToBeClickable(
+      closeLessonInfoTooltipElement,
+      'Lesson Info Tooltip takes too long to appear');
+    await action.click(
+      'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
   };
 
   // This verifies the question just asked, including formatting and
