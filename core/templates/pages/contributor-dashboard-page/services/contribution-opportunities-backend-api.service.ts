@@ -235,8 +235,8 @@ export class ContributionOpportunitiesBackendApiService {
       });
   }
 
-  async getPreferredTranslationLanguageAsync():
-  Promise<string> {
+  async getPreferredTranslationLanguageAsync(
+  ): Promise<string> {
     const emptyResponse = {
       preferred_translation_language_code: ''
     };
