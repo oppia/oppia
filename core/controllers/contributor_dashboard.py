@@ -550,14 +550,13 @@ class TranslationPreferenceHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        if self.user_id:
-            user_settings = user_services.get_user_settings(self.user_id)
-            self.render_json({
-                'preferred_translation_language_code': (
-                    user_settings.preferred_translation_language_code)
-            })
-        else:
-            self.render_json({'preferred_translation_language_code': ''})
+          user_settings = user_services.get_user_settings(self.user_id)
+          if user_settings is None:
+            return self.render_json({'preferred_translation_language_code': ''})
+          return self.render_json({
+              'preferred_translation_language_code': (
+                  user_settings.preferred_translation_language_code)
+          })
 
     @acl_decorators.open_access
     def post(self):
