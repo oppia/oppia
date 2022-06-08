@@ -224,7 +224,6 @@ describe('Learner dashboard functionality', function() {
     // able to leave the page directly without getting any alert message.
     await action.click('Oppia logo', oppiaLogo);
 
-
     // Go to 'Test Exploration'.
     await libraryPage.get();
     await libraryPage.findExploration('Test Exploration');
