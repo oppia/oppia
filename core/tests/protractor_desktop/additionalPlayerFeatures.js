@@ -257,9 +257,11 @@ describe('Full exploration editor', function() {
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
       await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
+
+      // Lesson info tooltip should appear when the 2nd checkpoint is reached.
       var closeLessonInfoTooltipElement = element(by.css(
         '.protractor-test-close-lesson-info-tooltip'));
-      await explorationPlayerPage.clickCloseLessonInfoTooltipIfPresent(
+      await explorationPlayerPage.clickCloseLessonInfoTooltip(
         closeLessonInfoTooltipElement
       );
       await explorationPlayerPage.expectContentToMatch(
