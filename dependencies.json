@@ -154,7 +154,7 @@
         "version": "5.17.0",
         "downloadFormat": "zip",
         "url": "https://github.com/codemirror/CodeMirror/archive/5.17.0.zip",
-        "rootDirPrefix": "CodeMirror-",
+        "rootDirPrefix": "codemirror5-",
         "targetDirPrefix": "code-mirror-",
         "bundle": {
           "css": ["lib/codemirror.css", "addon/merge/merge.css"]
