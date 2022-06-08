@@ -271,7 +271,7 @@ class StoryNode:
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
-        self.outline = html_cleaner.clean(outline)  # type: ignore[no-untyped-call]
+        self.outline = html_cleaner.clean(outline)
         self.outline_is_finalized = outline_is_finalized
         self.exploration_id = exploration_id
 
@@ -814,7 +814,7 @@ class Story:
         self.thumbnail_bg_color = thumbnail_bg_color
         self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.description = description
-        self.notes = html_cleaner.clean(notes)  # type: ignore[no-untyped-call]
+        self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
         self.story_contents_schema_version = story_contents_schema_version
         self.language_code = language_code
