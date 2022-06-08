@@ -10,7 +10,7 @@
       <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index" class="oppia-customization-arg-editor">
         <strong><[customizationArgSpec.description]></strong>
         <div class="oppia-customization-arg-editor-inner">
-          <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
+          <schema-based-editor ng-model="tmpCustomizationArgs[$index].value" ng-model-change="$applyAsync()" [schema]="customizationArgSpec.schema">
           </schema-based-editor>
         </div>
       </div>
