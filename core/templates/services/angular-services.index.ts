@@ -410,6 +410,7 @@ import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/se
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -602,6 +603,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ImprovementsService', ImprovementsService],
   ['InteractionAttributesExtractorService',
     InteractionAttributesExtractorService],
+  ['RouterService', RouterService],
   ['InteractionDetailsCacheService', InteractionDetailsCacheService],
   ['InteractionObjectFactory', InteractionObjectFactory],
   ['InteractionRulesRegistryService', InteractionRulesRegistryService],
