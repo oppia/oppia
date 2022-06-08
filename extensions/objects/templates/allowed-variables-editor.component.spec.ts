@@ -18,24 +18,24 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { CustomOskLettersEditorComponent } from './custom-osk-letters-editor.component';
+import { AllowedVariablesEditorComponent } from './allowed-variables-editor.component';
 
 describe('OnScreenKeyboard', function() {
-  let component: CustomOskLettersEditorComponent;
-  let fixture: ComponentFixture<CustomOskLettersEditorComponent>;
+  let component: AllowedVariablesEditorComponent;
+  let fixture: ComponentFixture<AllowedVariablesEditorComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule(
       {
         imports: [HttpClientTestingModule],
-        declarations: [CustomOskLettersEditorComponent],
+        declarations: [AllowedVariablesEditorComponent],
       }
     ).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      CustomOskLettersEditorComponent);
+      AllowedVariablesEditorComponent);
     component = fixture.componentInstance;
     component.value = [];
     component.ngOnInit();
