@@ -28,8 +28,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Exploration history', function() {
+describe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
