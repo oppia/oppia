@@ -489,6 +489,5 @@ def get_logged_out_user_progress(unique_progress_url_id: str):
         logged_out_user_progress_model.
             most_recently_reached_checkpoint_state_name,
         logged_out_user_progress_model.
-            most_recently_reached_checkpoint_exp_version,
-        logged_out_user_progress_model.last_updated,
+            most_recently_reached_checkpoint_exp_version
     )

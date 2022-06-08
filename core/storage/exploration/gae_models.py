@@ -34,8 +34,8 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services  # pylint: disable=unused-import
 
-# Constants used for generating ids.
-MAX_ID_LENGTH = 6
+# Constant used for generating unique progress url ID.
+_MAX_PID_LENGTH = 6
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -888,9 +888,6 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
     # The exploration version of the most recently reached checkpoint.
     most_recently_reached_checkpoint_exp_version = (
         datastore_services.IntegerProperty(default=None))
-    # Timestamp to store the creation time of the model.
-    last_updated = (
-       datastore_services.DateTimeProperty(default=None))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -916,8 +913,6 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
             'most_recently_reached_checkpoint_state_name':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'most_recently_reached_checkpoint_exp_version':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -985,7 +980,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             new_id = '%s' % ''.join(
                 random.choice(string.ascii_letters)
-                for _ in range(MAX_ID_LENGTH))
+                for _ in range(_MAX_PID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 

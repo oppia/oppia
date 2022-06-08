@@ -457,7 +457,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(TransientCheckpointUrlTests, self).setUp()
         self.transient_checkpoint_url = exp_domain.TransientCheckpointUrl(
-            'exp_id', 'frcs_name', 1, 'mrrcs_name', 1, 100)
+            'exp_id', 'frcs_name', 1, 'mrrcs_name', 1)
 
     def test_initialization(self) -> None:
         """Testing init method."""
@@ -476,9 +476,6 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.transient_checkpoint_url
             .most_recently_reached_checkpoint_exp_version, 1)
-        self.assertEqual(
-            self.transient_checkpoint_url
-            .last_updated, 100)
 
     def test_to_dict(self):
         logged_out_learner_progress_dict = {
@@ -488,14 +485,12 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
                 'furthest_reached_checkpoint_state_name'),
             'most_recently_reached_checkpoint_exp_version': 1,
             'most_recently_reached_checkpoint_state_name': (
-                'most_recently_reached_checkpoint_state_name'),
-            'last_updated': 100
+                'most_recently_reached_checkpoint_state_name')
         }
         logged_out_learner_progress_object = exp_domain.TransientCheckpointUrl(
             'exploration_id',
             'furthest_reached_checkpoint_state_name', 1,
-            'most_recently_reached_checkpoint_state_name', 1,
-            100
+            'most_recently_reached_checkpoint_state_name', 1
         )
         self.assertEqual(
             logged_out_learner_progress_object.to_dict(),

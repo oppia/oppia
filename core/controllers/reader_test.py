@@ -3006,7 +3006,7 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
 class TransientCheckpointUrlHandlerTests(test_utils.GenericTestBase):
     """Tests for transient checkpoint url handler."""
 
-    def test_exploration_page_raises_error_with_invalid_uid(self):
+    def test_exploration_page_raises_error_with_invalid_pid(self):
         unique_progress_url_id = 'invalidID'
 
         self.get_html_response(
@@ -3058,13 +3058,13 @@ class TransientCheckpointUrlHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             response.headers['Location'].endswith(
-                '%s/%s?uid=%s' % (
+                '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
             exp_user_data.exploration_id,
             unique_progress_url_id)))
 
         exploration_dict = self.get_json(
-            '%s/%s?uid=%s' % (
+            '%s/%s?pid=%s' % (
                 feconf.EXPLORATION_INIT_URL_PREFIX,
                 exp_user_data.exploration_id,
                 unique_progress_url_id
@@ -3140,13 +3140,13 @@ class TransientCheckpointUrlHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             response.headers['Location'].endswith(
-                '%s/%s?uid=%s' % (
+                '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
             exp_user_data.exploration_id,
             unique_progress_url_id)))
 
         exploration_dict = self.get_json(
-            '%s/%s?uid=%s' % (
+            '%s/%s?pid=%s' % (
                 feconf.EXPLORATION_INIT_URL_PREFIX,
                 exp_user_data.exploration_id,
                 unique_progress_url_id
@@ -3176,12 +3176,12 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Use a dummy unique_progress_url_id.
-        uid = 'uidABC'
+        pid = 'pidABC'
 
         # Update progress for logged out user.
         exp_services.update_logged_out_user_progress(
             exp_id,
-            uid,
+            pid,
             'Welcome!',
             1
         )
@@ -3196,7 +3196,7 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
         self.post_json(
             '/sync_logged_out_learner_progress_with_logged_in_progress/%s' % exp_id, # pylint: disable=line-too-long
             {
-                'unique_progress_url_id': uid,
+                'unique_progress_url_id': pid,
             },
             csrf_token=csrf_token
         )

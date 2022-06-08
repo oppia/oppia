@@ -373,8 +373,7 @@ class TransientCheckpointUrl:
             furthest_reached_checkpoint_state_name,
             furthest_reached_checkpoint_exp_version,
             most_recently_reached_checkpoint_state_name,
-            most_recently_reached_checkpoint_exp_version,
-            last_updated):
+            most_recently_reached_checkpoint_exp_version):
         """Initializes a TransientCheckpointUrl domain object.
 
         Args:
@@ -387,8 +386,6 @@ class TransientCheckpointUrl:
                 the most recently reached checkpoint in the exploration.
             most_recently_reached_checkpoint_exp_version: int. Exploration
                 version in which a checkpoint was most recently reached.
-            last_updated: datetime.datetime. Date and time when the model
-                was created.
         """
         self.exploration_id = exploration_id
         self.furthest_reached_checkpoint_state_name = (
@@ -399,7 +396,6 @@ class TransientCheckpointUrl:
             most_recently_reached_checkpoint_state_name)
         self.most_recently_reached_checkpoint_exp_version = (
             most_recently_reached_checkpoint_exp_version)
-        self.last_updated = last_updated
 
     def to_dict(self):
         """Convert the TransientCheckpointUrl domain instance into a dictionary
@@ -419,8 +415,7 @@ class TransientCheckpointUrl:
             'most_recently_reached_checkpoint_exp_version': (
                 self.most_recently_reached_checkpoint_exp_version),
             'most_recently_reached_checkpoint_state_name': (
-                self.most_recently_reached_checkpoint_state_name),
-            'last_updated': self.last_updated
+                self.most_recently_reached_checkpoint_state_name)
         }
 
     def validate(self):

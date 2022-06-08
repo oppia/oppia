@@ -255,7 +255,7 @@ class ExplorationHandler(base.BaseHandler):
                 },
                 'default_value': None
             },
-            'uid': {
+            'pid': {
                 'schema': {
                     'type': 'basestring',
                 },
@@ -272,7 +272,7 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.normalized_request.get('v')
-        unique_progress_url_id = self.normalized_request.get('uid')
+        unique_progress_url_id = self.normalized_request.get('pid')
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
@@ -1470,7 +1470,7 @@ class TransientCheckpointUrlHandler(base.BaseHandler):
         if logged_out_user_data is None:
             raise self.PageNotFoundException()
 
-        redirect_url = '%s/%s?uid=%s' % (
+        redirect_url = '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
             logged_out_user_data.exploration_id,
             unique_progress_url_id)
@@ -1483,7 +1483,7 @@ class SaveTransientCheckpointProgressHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-                'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
         },
     }
     HANDLER_ARGS_SCHEMAS = {

@@ -911,8 +911,6 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_export_policy(self) -> None:
         expected_dict = {
-            'last_updated':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'furthest_reached_checkpoint_exp_version':
@@ -926,9 +924,6 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         }
         fetched_dict = (
             exp_models.TransientCheckpointUrlModel.get_export_policy())
-        self.assertEqual(
-            expected_dict['last_updated'],
-            fetched_dict['last_updated'])
         self.assertEqual(
             expected_dict['exploration_id'],
             fetched_dict['exploration_id'])
@@ -969,9 +964,6 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         self.assertIsNone(
             transient_checkpoint_url_model.
             furthest_reached_checkpoint_state_name)
-        self.assertIsNone(
-            transient_checkpoint_url_model.
-            last_updated)
 
     def test_get_object(self) -> None:
         exp_models.TransientCheckpointUrlModel.create(
@@ -981,8 +973,8 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             most_recently_reached_checkpoint_exp_version=None,
             most_recently_reached_checkpoint_state_name=None,
             furthest_reached_checkpoint_exp_version=None,
-            furthest_reached_checkpoint_state_name=None,
-            last_updated=None)
+            furthest_reached_checkpoint_state_name=None
+        )
 
         actual_model = (
             exp_models.TransientCheckpointUrlModel.get(
@@ -1006,9 +998,6 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             actual_model.furthest_reached_checkpoint_state_name,
             expected_model.furthest_reached_checkpoint_state_name)
-        self.assertEqual(
-            actual_model.last_updated,
-            expected_model.last_updated)
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         """Tests get_new_progress_id method for raising exception."""
