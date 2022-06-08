@@ -384,7 +384,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'The node with id invalid_id is not part of this story'):
+            'The node with id invalid_id is not part of this story.'):
             self.story.update_node_thumbnail_filename(
                 'invalid_id', 'invalid_thumbnail.svg')
 

@@ -628,6 +628,29 @@ class StoryContents:
                 return ind
         return None
 
+    def strict_get_node_index(self, node_id: str) -> int:
+        """Returns the index of the story node with the given node
+        id, or raises an ValueError if the node id is not in the story
+        contents dict.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Returns:
+            int. The index of the corresponding node.
+
+        Raises:
+            ValueError. If the node id is not in the story contents dict.
+        """
+        index: Optional[int] = None
+        for ind, node in enumerate(self.nodes):
+            if node.id == node_id:
+                index = ind
+        if index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story.' % node_id)
+        return index
+
     def get_ordered_nodes(self) -> List[StoryNode]:
         """Returns a list of nodes ordered by how they would appear sequentially
         to a learner.
@@ -640,16 +663,12 @@ class StoryContents:
         """
         # Ruling out the possibility of None for mypy type checking.
         assert self.initial_node_id is not None
-        initial_index = self.get_node_index(self.initial_node_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert initial_index is not None
+        initial_index = self.strict_get_node_index(self.initial_node_id)
         current_node = self.nodes[initial_index]
         ordered_nodes_list = [current_node]
         while current_node.destination_node_ids:
             next_node_id = current_node.destination_node_ids[0]
-            next_index = self.get_node_index(next_node_id)
-            # Ruling out the possibility of None for mypy type checking.
-            assert next_index is not None
+            next_index = self.strict_get_node_index(next_node_id)
             current_node = self.nodes[next_index]
             ordered_nodes_list.append(current_node)
         return ordered_nodes_list
@@ -1437,12 +1456,10 @@ class Story:
             node_id: str. The id of the node.
 
         Raises:
-            ValueError. The node is not part of the story.
+            ValueError. The node is the starting node for story, change the
+                starting node before deleting it.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         if node_id == self.story_contents.initial_node_id:
             if len(self.story_contents.nodes) == 1:
                 self.story_contents.initial_node_id = None
@@ -1461,14 +1478,8 @@ class Story:
         Args:
             node_id: str. The id of the node.
             new_outline: str. The new outline of the given node.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].outline = new_outline
 
     def update_node_title(self, node_id: str, new_title: str) -> None:
@@ -1477,14 +1488,8 @@ class Story:
         Args:
             node_id: str. The id of the node.
             new_title: str. The new title of the given node.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].title = new_title
 
     def update_node_description(
@@ -1497,15 +1502,8 @@ class Story:
         Args:
             node_id: str. The id of the node.
             new_description: str. The new description of the given node.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
-
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].description = new_description
 
     def update_node_thumbnail_filename(
@@ -1521,13 +1519,9 @@ class Story:
                 given node.
 
         Raises:
-            ValueError. The node is not part of the story.
             Exception. The node with the given id doesn't exist.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
@@ -1553,14 +1547,8 @@ class Story:
             node_id: str. The id of the node.
             new_thumbnail_bg_color: str|None. The new thumbnail background
                 color of the given node.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].thumbnail_bg_color = (
             new_thumbnail_bg_color)
 
@@ -1570,14 +1558,8 @@ class Story:
 
         Args:
             node_id: str. The id of the node.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].outline_is_finalized = True
 
     def mark_node_outline_as_unfinalized(self, node_id: str) -> None:
@@ -1586,14 +1568,8 @@ class Story:
 
         Args:
             node_id: str. The id of the node.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].outline_is_finalized = False
 
     def update_node_acquired_skill_ids(
@@ -1607,14 +1583,8 @@ class Story:
             node_id: str. The id of the node.
             new_acquired_skill_ids: list(str). The updated acquired skill id
                 list.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].acquired_skill_ids = (
             new_acquired_skill_ids)
 
@@ -1629,14 +1599,8 @@ class Story:
             node_id: str. The id of the node.
             new_prerequisite_skill_ids: list(str). The updated prerequisite
                 skill id list.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].prerequisite_skill_ids = (
             new_prerequisite_skill_ids)
 
@@ -1651,14 +1615,8 @@ class Story:
             node_id: str. The id of the node.
             new_destination_node_ids: list(str). The updated destination
                 node id list.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
         self.story_contents.nodes[node_index].destination_node_ids = (
             new_destination_node_ids)
 
@@ -1707,12 +1665,9 @@ class Story:
             new_exploration_id: str. The updated exploration id for a node.
 
         Raises:
-            ValueError. The node is not part of the story.
+            ValueError. A node with given exploration id is already exists.
         """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story.' % node_id)
+        node_index = self.story_contents.strict_get_node_index(node_id)
 
         if (
                 self.story_contents.nodes[node_index].exploration_id ==
@@ -1733,15 +1688,8 @@ class Story:
 
         Args:
             new_initial_node_id: str. The new starting node id.
-
-        Raises:
-            ValueError. The node is not part of the story.
         """
-        node_index = self.story_contents.get_node_index(new_initial_node_id)
-        if node_index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story.'
-                % new_initial_node_id)
+        self.story_contents.strict_get_node_index(new_initial_node_id)
         self.story_contents.initial_node_id = new_initial_node_id
 
 
