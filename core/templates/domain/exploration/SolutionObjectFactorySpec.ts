@@ -87,12 +87,67 @@ describe('Solution object factory', () => {
     });
 
     it('should create summary correctly', () => {
-      expect(solution.getSummary('GraphInput', {})).toEqual(
+      const graphInputCustomizationArgs = {
+        graph: {
+          value: { },
+        },
+        canAddVertex: {
+          value: true,
+        },
+        canDeleteVertex: {
+          value: true,
+        },
+        canEditVertexLabel: {
+          value: true,
+        },
+        canMoveVertex: {
+          value: true,
+        },
+        canAddEdge: {
+          value: true,
+        },
+        canDeleteEdge: {
+          value: true,
+        },
+        canEditEdgeWeight: {
+          value: true,
+        }
+      };
+      expect(solution.getSummary(
+        'GraphInput', graphInputCustomizationArgs)).toEqual(
         'One solution is "[Graph]". This is the explanation to the answer.');
-      expect(solution.getSummary('MusicNotesInput', {})).toEqual(
+      const musicNotesInputCustomizationArgs = {
+        sequenceToGuess: {
+          value: [{
+            readableNoteName: 'name',
+            noteDuration: {
+              num: 1,
+              den: 1
+            }}]
+        },
+        initialSequence: {
+          value: [{
+            readableNoteName: 'name',
+            noteDuration: {
+              num: 1,
+              den: 1
+            }}]
+        }
+      };
+      expect(solution.getSummary(
+        'MusicNotesInput', musicNotesInputCustomizationArgs)).toEqual(
         'One solution is "[Music Notes]". This is the explanation to the' +
         ' answer.');
-      expect(solution.getSummary('TextInput', {})).toEqual(
+      const textInputCustomizationArgs = {
+        placeholder: {
+          value: { }
+        },
+        rows: {
+          value: 1
+        }
+      };
+      expect(solution.getSummary(
+        'TextInput', textInputCustomizationArgs)).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
 
@@ -102,7 +157,22 @@ describe('Solution object factory', () => {
         evaluation: '',
         output: ''
       });
-      expect(solution.getSummary('CodeRepl', {})).toEqual(
+      const codeReplCustomizationArgs = {
+        language: {
+          value: 'lang'
+        },
+        placeholder: {
+          value: 'placeholder'
+        },
+        preCode: {
+          value: 'preCode'
+        },
+        postCode: {
+          value: 'postCode'
+        }
+      };
+      expect(solution.getSummary(
+        'CodeRepl', codeReplCustomizationArgs)).toEqual(
         'One solution is "a=10". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -111,7 +181,22 @@ describe('Solution object factory', () => {
         numerator: 1,
         denominator: 6
       });
-      expect(solution.getSummary('FractionInput', {})).toEqual(
+      const fractionInputCustomizationArgs = {
+        requireSimplestForm: {
+          value: true
+        },
+        allowImproperFraction: {
+          value: true
+        },
+        allowNonzeroIntegerPart: {
+          value: true
+        },
+        customPlaceholder: {
+          value: { }
+        }
+      };
+      expect(solution.getSummary(
+        'FractionInput', fractionInputCustomizationArgs)).toEqual(
         'One solution is "1/6". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -125,7 +210,9 @@ describe('Solution object factory', () => {
         },
         units: []
       });
-      expect(solution.getSummary('NumberWithUnits', {})).toEqual(
+      const numberWithUnitsCustomizationArgs = { };
+      expect(solution.getSummary(
+        'NumberWithUnits', numberWithUnitsCustomizationArgs)).toEqual(
         'One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
