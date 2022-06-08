@@ -16,8 +16,6 @@
  * @fileoverview Directive for the answer group editor.
  */
 
-require(
-  'components/state-directives/outcome-editor/outcome-editor.component.ts');
 require('components/state-directives/rule-editor/rule-editor.component.ts');
 require(
   'components/question-directives/question-misconception-editor/' +
