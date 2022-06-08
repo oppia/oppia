@@ -100,7 +100,7 @@
       </li>
     </div>
   </div>
-  <div ng-if="$ctrl.EditabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">This exploration is currently locked to new edits. Please contact an admin for assistance.</div>
+  <div ng-if="$ctrl.explorationEditorPageHasInitialized && $ctrl.EditabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">This exploration is currently locked to new edits. Please contact an admin for assistance.</div>
 </div>
 <div class="exploration-editor-content" ng-cloak>
   <div class="container-fluid oppia-editor-page-container">
