@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation jobs for topic models"""
+"""Validation jobs for topic models."""
 
 from __future__ import annotations
 
@@ -46,9 +46,7 @@ class GetSubTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
         if len(url_frag) > 25 or len(url_frag) == 0:
             return False
 
-        regex = '^[a-z]+(-[a-z]+)*$'
-
-        return bool(re.match(regex, url_frag))
+        return bool(re.match('^[a-z]+(-[a-z]+)*$', url_frag))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns PCollection of invalid topics
