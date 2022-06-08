@@ -38,8 +38,7 @@ TRIVIAL_FUNCTIONS = ['abs', 'sqrt']
 
 
 class Utils:
-    """Utitlity functions for math interaction audit jobs.
-    """
+    """Utitlity functions for math interaction audit jobs."""
 
     @staticmethod
     def contains_math_interactions(model: exp_models.ExplorationModel) -> bool:
