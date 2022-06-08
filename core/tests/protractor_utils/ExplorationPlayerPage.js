@@ -189,7 +189,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickCloseLessonInfoTooltip = async function(
-      closeLessonInfoTooltipElement, location = '1st'
+      closeLessonInfoTooltipElement, location = 'Test 1'
   ) {
     await waitFor.elementToBeClickable(
       closeLessonInfoTooltipElement,
