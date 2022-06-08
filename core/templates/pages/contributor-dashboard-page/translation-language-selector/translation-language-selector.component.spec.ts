@@ -27,7 +27,7 @@ import { ContributionOpportunitiesBackendApiService } from
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { EventEmitter } from '@angular/core';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
@@ -197,13 +197,12 @@ describe('Translation language selector', () => {
     // contain description for language code 'en' and if it doesn't
     // then this test should fail.
     // @ts-ignore
-    const languageDescription = constants.SUPPORTED_AUDIO_LANGUAGES.find(
+    const languageDescription = AppConstants.SUPPORTED_AUDIO_LANGUAGES.find(
       e => e.id === 'en').description;
 
     spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
-      (languageCode) => {
-        component.activeLanguageCode = (
-          languageCode ? languageCode : null);
+      (languageCode: string) => {
+        component.activeLanguageCode = languageCode;
       });
 
     component.ngOnInit();
