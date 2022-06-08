@@ -1239,7 +1239,8 @@ def update_preferred_audio_language_code(
 
 
 def update_preferred_translation_language_code(
-        user_id, preferred_translation_language_code):
+    user_id, preferred_translation_language_code
+):
     """Updates preferred_translation_language_code of user with
     given user_id.
 
