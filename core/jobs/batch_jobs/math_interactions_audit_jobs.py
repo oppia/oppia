@@ -26,14 +26,18 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
+datastore_services = models.Registry.import_datastore_services()
+
+# Most commonly used functions that are supported by the android app as well.
 TRIVIAL_FUNCTIONS = ['abs', 'sqrt']
 
 
@@ -75,7 +79,8 @@ class Utils:
 
     @staticmethod
     def map_with_rule_types(
-            tup: Tuple[str, str, dict]) -> Tuple[str, str, List[str]]:
+        tup: Tuple[str, str, dict]
+    ) -> Tuple[str, str, List[str]]:
         """Maps state tuple with it's rule types.
 
         Args:
@@ -85,17 +90,19 @@ class Utils:
             Tuple[str, str, List[str]]. Mapped tuple
             (exp_id, state_name, list of rules).
         """
-        answer_groups = tup[2]['interaction']['answer_groups']
+        exp_id, state_name, state_dict = tup
+        answer_groups = state_dict['interaction']['answer_groups']
         rule_types = []
         for answer_group in answer_groups:
             for rule_spec in answer_group['rule_specs']:
                 rule_types.append(rule_spec['rule_type'])
 
-        return (tup[0], tup[1], rule_types)
+        return (exp_id, state_name, rule_types)
 
     @staticmethod
     def map_with_rule_inputs(
-            tup: Tuple[str, str, dict]) -> Tuple[str, str, List[str]]:
+        tup: Tuple[str, str, dict]
+    ) -> Tuple[str, str, List[str]]:
         """Maps state tuple with it's rule inputs.
 
         Args:
@@ -105,19 +112,21 @@ class Utils:
             Tuple[str, str, List[str]]. Mapped tuple
             (exp_id, state_name, list of rules).
         """
-        answer_groups = tup[2]['interaction']['answer_groups']
+        exp_id, state_name, state_dict = tup
+        answer_groups = state_dict['interaction']['answer_groups']
         rule_inputs = []
         for answer_group in answer_groups:
             for rule_spec in answer_group['rule_specs']:
                 rule_inputs.append(rule_spec['inputs']['x'])
 
-        return (tup[0], tup[1], rule_inputs)
+        return (exp_id, state_name, rule_inputs)
 
     @staticmethod
     def uses_non_trivial_functions(
-            tup: Tuple[str, str, List[str]]) -> bool:
-        """Checks if the state contains any rule input that uses functions other
-        than sqrt and abs.
+        tup: Tuple[str, str, List[str]]
+    ) -> bool:
+        """Checks if the state contains any rule input that uses non-trivial
+        functions.
 
         Args:
             tup: Tuple[str, str, List[str]]. Mapped tuple
@@ -135,26 +144,19 @@ class Utils:
                     return True
         return False
 
+    @staticmethod
+    def fetch_math_explorations_with_states(
+        exp_models_pcoll: datastore_services.Query
+    ) -> Iterable[Tuple[str, str, dict]]:
+        """Fetches all explorations that use math interactions along with their
+        state dicts.
 
-class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
-    """Finds explorations that use at least one of the math interactions
-    and accumulates the output along with the rules.
+        Args:
+            exp_models_pcoll: datastore_services.Query. All exploration models.
 
-    Expected output:
-    (exp_id_1, state_name_1, [rule_type_1, rule_type_2, ...])
-    (exp_id_2, state_name_4, [rule_type_1, rule_type_2, ...])
-    ...
-    """
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
-        exp_models_pcoll = (
-            self.pipeline
-            | 'Get all ExplorationModels' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all()
-            )
-        )
-
+        Returns:
+            Iterable[Tuple[str, str, dict]]. Math exploration state tuples.
+        """
         exp_models_filtered = (
             exp_models_pcoll
             | 'Filter Math ExplorationModels' >> beam.Filter(
@@ -179,8 +181,32 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
             )
         )
 
+        return exp_models_with_states_filtered
+
+
+class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
+    """Finds explorations that use at least one of the math interactions
+    and accumulates the output along with the rules.
+
+    Expected output:
+    (exp_id_1, state_name_1, [rule_type_1, rule_type_2, ...])
+    (exp_id_2, state_name_4, [rule_type_1, rule_type_2, ...])
+    ...
+    """
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        exp_models_pcoll = (
+            self.pipeline
+            | 'Get all ExplorationModels' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all()
+            )
+        )
+
+        math_exp_models_with_states = Utils.fetch_math_explorations_with_states(
+            exp_models_pcoll)
+
         exp_models_with_states_and_rules = (
-            exp_models_with_states_filtered
+            math_exp_models_with_states
             | 'Mapping with rule types list' >> (
                 beam.Map(Utils.map_with_rule_types)
             )
@@ -211,32 +237,11 @@ class FindMathExplorationsWithNonTrivialFunctionsJob(base_jobs.JobBase):
             )
         )
 
-        exp_models_filtered = (
-            exp_models_pcoll
-            | 'Filter Math ExplorationModels' >> beam.Filter(
-                Utils.contains_math_interactions
-            )
-        )
-
-        exp_models_with_states = (
-            exp_models_filtered
-            | 'Mapping exp_ids with states' >> (
-                beam.FlatMap(Utils.flat_map_exp_with_states)
-            )
-        )
-
-        exp_models_with_states_filtered = (
-            exp_models_with_states
-            | 'Filtering out states without math interactions' >> (
-                beam.Filter(
-                    lambda tup: tup[2][
-                        'interaction']['id'] in feconf.MATH_INTERACTION_IDS
-                )
-            )
-        )
+        math_exp_models_with_states = Utils.fetch_math_explorations_with_states(
+            exp_models_pcoll)
 
         exp_models_with_states_and_rules = (
-            exp_models_with_states_filtered
+            math_exp_models_with_states
             | 'Mapping with rule inputs list' >> (
                 beam.Map(Utils.map_with_rule_inputs)
             )
