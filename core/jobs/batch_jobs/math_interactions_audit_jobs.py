@@ -38,8 +38,7 @@ TRIVIAL_FUNCTIONS = ['abs', 'sqrt']
 
 
 class Utils:
-    """Utitlity functions for math interaction audit jobs.
-    """
+    """Utitlity functions for math interaction audit jobs."""
 
     @staticmethod
     def contains_math_interactions(model: exp_models.ExplorationModel) -> bool:
@@ -58,7 +57,8 @@ class Utils:
 
     @staticmethod
     def flat_map_exp_with_states(
-            model: exp_models.ExplorationModel) -> List[Tuple[str, str, dict]]:
+        model: exp_models.ExplorationModel
+    ) -> List[Tuple[str, str, dict]]:
         """Maps exploration model with it's states data.
 
         Args:
