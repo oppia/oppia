@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import re
-from typing import Tuple
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io

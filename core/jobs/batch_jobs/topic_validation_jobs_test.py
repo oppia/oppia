@@ -51,17 +51,18 @@ class GetSubTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             url_fragment='test-fragment',
             practice_tab_is_displayed=False,
             page_title_fragment_for_web='testing',
-            subtopics=[{"id":1,"title":"Dummy Subtopic Title",
-                      "skill_ids":["Mzmt5VPws3yR","8tVlyXZSEQFC"],
-                      "thumbnail_filename":None,"thumbnail_bg_color":None,
-                      "thumbnail_size_in_bytes":None,"url_fragment":
-                      "testIng"},
-                      {"id":2,"title":"test","skill_ids":[],
-                      "thumbnail_filename"
-                      :"img_20220607_065755_fj62p0ywjz_height_64_width_64.svg",
-                      "thumbnail_bg_color":"#FFFFFF",
-                      "thumbnail_size_in_bytes":1090,
-                      "url_fragment":"test-test-test-test-test-test-test-test"}],
+            subtopics=[{'id': 1, 'title': 'Dummy Subtopic Title',
+                      'skill_ids': ['Mzmt5VPws3yR', '8tVlyXZSEQFC'],
+                      'thumbnail_filename': None, 'thumbnail_bg_color': None,
+                      'thumbnail_size_in_bytes': None, 'url_fragment':
+                      'testIng'},
+                      {'id': 2, 'title': 'test', 'skill_ids': [],
+                      'thumbnail_filename':
+                      'img_20220607_065755_fj62p0ywjz_height_64_width_64.svg',
+                      'thumbnail_bg_color': '#FFFFFF',
+                      'thumbnail_size_in_bytes': 1090,
+                      'url_fragment': 'test-test-test-test-test-test-test'}
+                      ],
         )
 
         # This is a valid model.
@@ -77,17 +78,17 @@ class GetSubTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             url_fragment='test-fragment',
             practice_tab_is_displayed=False,
             page_title_fragment_for_web='testing',
-            subtopics=[{"id":1,"title":"Dummy Subtopic Title",
-                      "skill_ids":["Mzmt5VPws3yR","8tVlyXZSEQFC"],
-                      "thumbnail_filename":None,"thumbnail_bg_color":None,
-                      "thumbnail_size_in_bytes":None,"url_fragment":
-                      "test-ing"},
-                      {"id":2,"title":"test","skill_ids":[],
-                      "thumbnail_filename"
-                      :"img_20220607_065755_fj62p0ywjz_height_64_width_64.svg",
-                      "thumbnail_bg_color":"#FFFFFF",
-                      "thumbnail_size_in_bytes":1090,
-                      "url_fragment":"test"}],
+            subtopics=[{'id': 1, 'title': 'Dummy Subtopic Title',
+                      'skill_ids': ['Mzmt5VPws3yR', '8tVlyXZSEQFC'],
+                      'thumbnail_filename':None, 'thumbnail_bg_color':None,
+                      'thumbnail_size_in_bytes': None, 'url_fragment':
+                      'test-ing'},
+                      {'id': 2, 'title': 'test', 'skill_ids': [],
+                      'thumbnail_filename':
+                      'img_20220607_065755_fj62p0ywjz_height_64_width_64.svg',
+                      'thumbnail_bg_color': '#FFFFFF',
+                      'thumbnail_size_in_bytes': 1090,
+                      'url_fragment': 'test'}],
         )
 
         # This is an invalid model.
@@ -103,10 +104,10 @@ class GetSubTopicsWithInvalidUrlFragJobTests(job_test_utils.JobTestBase):
             url_fragment='test-test',
             practice_tab_is_displayed=False,
             page_title_fragment_for_web='testing',
-            subtopics=[{"id":1,"title":"Dummy Subtopic Title",
-                      "skill_ids":["Mzmt5VPws3yR","8tVlyXZSEQFC"],
-                      "thumbnail_filename":None,"thumbnail_bg_color":None,
-                      "thumbnail_size_in_bytes":None,"url_fragment":
+            subtopics=[{'id': 1, 'title': 'Dummy Subtopic Title',
+                      'skill_ids': ['Mzmt5VPws3yR', '8tVlyXZSEQFC'],
+                      'thumbnail_filename': None, 'thumbnail_bg_color': None,
+                      'thumbnail_size_in_bytes': None, 'url_fragment':
                       None}],
         )
 
