@@ -220,8 +220,9 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async savePreferredTranslationLanguageAsync(languageCode: string):
-  Promise<void> {
+  async savePreferredTranslationLanguageAsync(
+      languageCode: string
+  ): Promise<void> {
     const postData: {'language_code': string} = {
       language_code: languageCode,
     };
