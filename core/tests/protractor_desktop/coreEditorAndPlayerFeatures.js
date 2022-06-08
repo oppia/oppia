@@ -260,7 +260,7 @@ describe('Enable correctness feedback and set correctness', function() {
     var closeLessonInfoTooltipElement = element(by.css(
       '.protractor-test-close-lesson-info-tooltip'));
     await explorationPlayerPage.clickCloseLessonInfoTooltip(
-      closeLessonInfoTooltipElement, "Test 1st"
+      closeLessonInfoTooltipElement, 'Test 1st'
     );
     await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
@@ -275,7 +275,7 @@ describe('Enable correctness feedback and set correctness', function() {
     var closeLessonInfoTooltipElement = element(by.css(
       '.protractor-test-close-lesson-info-tooltip'));
     await explorationPlayerPage.clickCloseLessonInfoTooltip(
-      closeLessonInfoTooltipElement, "Test 2nd"
+      closeLessonInfoTooltipElement, 'Test 2'
     );
     await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
