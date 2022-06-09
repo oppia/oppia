@@ -22,6 +22,7 @@ import os
 import shutil
 import subprocess
 import sys
+from typing import List
 
 from core import utils
 
@@ -386,7 +387,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts', # pylint: disable=line-too-long
     'core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.spec.ts', # pylint: disable=line-too-long
     'core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.ts', # pylint: disable=line-too-long
-    'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.directive.spec', # pylint: disable=line-too-long
+    'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.directive.spec.ts', # pylint: disable=line-too-long
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.directive.ts', # pylint: disable=line-too-long
     'core/templates/pages/exploration-editor-page/preview-tab/preview-tab.component.spec.ts', # pylint: disable=line-too-long
     'core/templates/pages/exploration-editor-page/preview-tab/preview-tab.component.ts', # pylint: disable=line-too-long
@@ -775,7 +776,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.spec.ts', # pylint: disable=line-too-long
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.ts', # pylint: disable=line-too-long
     'extensions/visualizations/oppia-visualization-sorted-tiles.directive.spec.ts', # pylint: disable=line-too-long
-    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
+    # 'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
 ]
 
 _PARSER = argparse.ArgumentParser(
@@ -795,7 +796,7 @@ TSCONFIG_FILEPATH = 'tsconfig.json'
 STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 
 
-def validate_compiled_js_dir():
+def validate_compiled_js_dir() -> None:
     """Validates that compiled JS dir matches out dir in tsconfig."""
     with utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
         config_data = json.load(f)
@@ -806,7 +807,7 @@ def validate_compiled_js_dir():
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
-def compile_and_check_typescript(config_path):
+def compile_and_check_typescript(config_path: str) -> None:
     """Compiles typescript files and checks the compilation errors.
 
     Args:
@@ -827,7 +828,8 @@ def compile_and_check_typescript(config_path):
         shutil.rmtree(COMPILED_JS_DIR)
 
     # Generate a list of files that are not strict typescript.
-    error_messages = list(iter(process.stdout.readline, ''))
+    if process.stdout is not None:
+        error_messages = list(iter(process.stdout.readline, ''))
 
     errors = [x.strip() for x in error_messages]
     # Remove the empty lines and error explanation lines.
@@ -862,7 +864,7 @@ def compile_and_check_typescript(config_path):
     new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
 
     with open(file_name, 'w', encoding='utf-8') as f:
-        f.write(new_index_yaml_dict)
+        f.write(new_index_yaml_dict + '\n')
 
     # Compile tsconfig-strict.json with updated "include" property.
     os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
@@ -879,7 +881,8 @@ def compile_and_check_typescript(config_path):
 
     # Error messages for files that are neither strict typed nor present in
     # NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
-    error_messages = list(iter(process.stdout.readline, ''))
+    if process.stdout is not None:
+        error_messages = list(iter(process.stdout.readline, ''))
 
     # Update tsconfig-strict.json and set to its intial "include" state
     # example "include": ["core", "extensions", "typings"].
@@ -890,7 +893,7 @@ def compile_and_check_typescript(config_path):
     new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
 
     with open(file_name, 'w', encoding='utf-8') as f:
-        f.write(new_index_yaml_dict)
+        f.write(new_index_yaml_dict + '\n')
 
     if error_messages:
         print('\n' + '\n'.join(error_messages))
@@ -900,7 +903,7 @@ def compile_and_check_typescript(config_path):
         print('Compilation successful!')
 
 
-def main(args=None):
+def main(args: List[str] | None=None) -> None:
     """Run the typescript checks."""
     parsed_args = _PARSER.parse_args(args=args)
     compile_and_check_typescript(
