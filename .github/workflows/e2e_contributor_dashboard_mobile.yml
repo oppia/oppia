@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e_miscellaneous_tests:
+  e2e_contributor_tests_mobile:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
