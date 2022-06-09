@@ -17,7 +17,7 @@
  * tests.
  */
 
-const { element } = require('protractor');
+const { element, browser } = require('protractor');
 var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
@@ -131,7 +131,13 @@ var AdminPage = function() {
   }
 
   var _switchToRolesTab = async function() {
-    await action.click('Admin roles tab button', adminRolesTab);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 711) {
+      // TODO(#15562): Add proper mobile navigation after this has been fixed.
+      await browser.get('/admin#/roles');
+    } else {
+      await action.click('Admin roles tab button', adminRolesTab);
+    }
 
     expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     await waitFor.visibilityOf(
@@ -235,7 +241,15 @@ var AdminPage = function() {
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();
-    await action.click('Config Tab', configTab);
+    let width = (await browser.manage().window().getSize()).width;
+
+    if (width < 711) {
+      // TODO(#15562): Add proper mobile navigation after this has been fixed.
+      await browser.get('admin#/config');
+    } else {
+      await action.click('Config Tab', configTab);
+    }
+
     await waitFor.elementToBeClickable(saveAllConfigs);
 
     var results = [];

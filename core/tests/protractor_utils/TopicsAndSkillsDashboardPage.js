@@ -21,6 +21,7 @@ var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('./workflow.js');
 var general = require('../protractor_utils/general.js');
+const { browser } = require('protractor');
 
 var TopicsAndSkillsDashboardPage = function() {
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
@@ -32,10 +33,14 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-create-skill-button'));
   var createSkillButtonSecondary = element(
     by.css('.protractor-test-create-skill-button-circle'));
+  var createSkillButtonSecondaryMobile = element(
+    by.css('.protractor-test-create-skill-button-secondary-mobile'));
   var deleteSkillButton = element(
     by.css('.protractor-test-delete-skill-button'));
   var topicsTable = element(by.css('.protractor-test-topics-table'));
   var skillsTable = element(by.css('.protractor-test-skills-table'));
+  var skillsTableMobile = element(
+    by.css('.protractor-test-skills-table-mobile'));
   var topicsListItems = element.all(
     by.css('.protractor-test-topics-list-item'));
   var topicNamesClass = '.protractor-test-topic-name-in-topic-select-modal';
@@ -86,6 +91,8 @@ var TopicsAndSkillsDashboardPage = function() {
   );
   var assignSkillToTopicButtons = element.all(
     by.css('.protractor-test-assign-skill-to-topic-button'));
+  var assignSkillToTopicButtonsMobile = element(
+    by.css('.protractor-test-assign-skill-to-topic-button-mobile'));
   var confirmMoveButton = element(
     by.css('.protractor-test-confirm-move-button'));
   var mergeSkillsButton = element(
@@ -116,6 +123,15 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-skill-description-field'));
   var openSkillEditorButtons = element.all(
     by.css('.protractor-test-open-skill-editor'));
+  var openFilter = element(
+    by.css('.protractor-test-toggle-filter')
+  );
+  var closeSkillFilter = element(
+    by.css('.protractor-test-filter-close')
+  );
+  var skillOptions = element(
+    by.css('.protractor-test-skills-option')
+  );
 
   this.get = async function() {
     await waitFor.clientSideRedirection(async() => {
@@ -133,10 +149,18 @@ var TopicsAndSkillsDashboardPage = function() {
   // Only use this if the skills count is not zero. This is supposed to be used
   // for actions being performed on the skills like deleting, assigning etc.
   this.waitForSkillsToLoad = async function() {
-    await waitFor.visibilityOf(
-      skillsTable, 'Skills table taking too long to appear.');
-    await waitFor.invisibilityOf(
-      noSkillsPresentMessage, 'Skills list taking too long to appear.');
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await waitFor.visibilityOf(
+        skillsTableMobile, 'Skills table taking too long to appear.');
+      await waitFor.invisibilityOf(
+        noSkillsPresentMessage, 'Skills list taking too long to appear.');
+    } else {
+      await waitFor.visibilityOf(
+        skillsTable, 'Skills table taking too long to appear.');
+      await waitFor.invisibilityOf(
+        noSkillsPresentMessage, 'Skills list taking too long to appear.');
+    }
   };
 
   // Only use this if the topics count is not zero. This is supposed to be used
@@ -197,12 +221,20 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
-    await waitFor.visibilityOf(
-      assignSkillToTopicButtons.first(),
-      'Assign skill to topic buttons taking too long to appear');
-    expect(await assignSkillToTopicButtons.count()).toEqual(1);
-    await action.click(
-      'Assign skill to topic button', assignSkillToTopicButtons.first());
+
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await action.click('Skill Options', skillOptions);
+      await action.click(
+        'Assign skill to topic button', assignSkillToTopicButtonsMobile);
+    } else {
+      await waitFor.visibilityOf(
+        assignSkillToTopicButtons.first(),
+        'Assign skill to topic buttons taking too long to appear');
+      expect(await assignSkillToTopicButtons.count()).toEqual(1);
+      await action.click(
+        'Assign skill to topic button', assignSkillToTopicButtons.first());
+    }
 
     var topic = element(by.cssContainingText(topicNamesClass, topicName));
     await action.click('Topic list item', topic);
@@ -262,15 +294,29 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.filterSkillsByStatus = async function(status) {
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await action.click('Skill Filter', openFilter);
+    }
+
     await action.click(
       'Skill Dashboard status filter', skillStatusFilterDropdown);
     var dropdownOption = element(
       by.cssContainingText('mat-option .mat-option-text', status));
     await action.click(
       'Skill status filter option: ' + status, dropdownOption);
+
+    if (width < 831) {
+      await action.click('Close Filter', closeSkillFilter);
+    }
   };
 
   this.filterTopicsByKeyword = async function(keyword) {
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await action.click('Skill Filter', openFilter);
+    }
+
     await waitFor.visibilityOf(
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.');
@@ -280,6 +326,10 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.sendKeys(
       'Topic Dashboard keyword filter: ' + keyword,
       filterKeywordInput, keyword + '\n');
+
+    if (width < 831) {
+      await action.click('Close Filter', closeSkillFilter);
+    }
   };
 
   this.filterTopicsByClassroom = async function(keyword) {
@@ -327,11 +377,23 @@ var TopicsAndSkillsDashboardPage = function() {
     var handles = await browser.getAllWindowHandles();
     initialHandles = handles;
     var parentHandle = await browser.getWindowHandle();
-    try {
-      await action.click('Create Skill button', createSkillButton);
-    } catch (e) {
-      await this.navigateToSkillsTab();
-      await action.click('Create Skill button', createSkillButtonSecondary);
+
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      try {
+        await action.click('Create Skill button', createSkillButton);
+      } catch (e) {
+        await this.navigateToSkillsTab();
+        await action.click(
+          'Create Skill button', createSkillButtonSecondaryMobile);
+      }
+    } else {
+      try {
+        await action.click('Create Skill button', createSkillButton);
+      } catch (e) {
+        await this.navigateToSkillsTab();
+        await action.click('Create Skill button', createSkillButtonSecondary);
+      }
     }
 
     await action.sendKeys('Skill Name Field', skillNameField, description);
