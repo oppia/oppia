@@ -194,8 +194,8 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should check if exploration is editable', function() {
-    spyOn(editabilityService, 'isEditable').and.returnValue(true);
-    expect($scope.isEditable()).toBe(true);
+    spyOn(editabilityService, 'isLockedByAdmin').and.returnValue(true);
+    expect($scope.isLockedByAdmin()).toBe(true);
   });
 
   it('should publish exploration when show publish exploration is shown',
