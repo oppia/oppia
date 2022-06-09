@@ -24,8 +24,7 @@ import nerdamer from 'nerdamer';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
 import {
-  AlgebraicExpressionRuleInputsWithPlaceholder,
-  AlgebraicExpressionRuleInputsWithoutPlaceholder
+  AlgebraicExpressionRuleInputs
 } from 'interactions/rule-input-defs';
 import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
@@ -39,7 +38,7 @@ export class AlgebraicExpressionInputRulesService {
 
   MatchesExactlyWith(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+      inputs: AlgebraicExpressionRuleInputs): boolean {
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
     if (
@@ -58,7 +57,7 @@ export class AlgebraicExpressionInputRulesService {
 
   MatchesUpToTrivialManipulations(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder
+      inputs: AlgebraicExpressionRuleInputs
   ): boolean {
     // Inserting '*' signs between variables if not present.
     answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
@@ -69,7 +68,7 @@ export class AlgebraicExpressionInputRulesService {
 
   IsEquivalentTo(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+      inputs: AlgebraicExpressionRuleInputs): boolean {
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
     if (
@@ -93,69 +92,6 @@ export class AlgebraicExpressionInputRulesService {
     return nerdamer(
       simplifiedLearnerAnswer
     ).eq(simplifiedCreatorAnswer);
-  }
-
-  ContainsSomeOf(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
-    // At least one term should match between answer and input.
-    // Inserting '*' signs between variables if not present.
-    answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
-    inputs.x = this.mathInteractionsService.insertMultiplicationSigns(inputs.x);
-
-    // The expression is first split into terms by addition and subtraction.
-    let answerTerms = this.mathInteractionsService.getTerms(answer);
-    let inputTerms = this.mathInteractionsService.getTerms(inputs.x);
-
-    for (let answerTerm of answerTerms) {
-      for (let inputTerm of inputTerms) {
-        if (this.mathInteractionsService.doTermsMatch(answerTerm, inputTerm)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  OmitsSomeOf(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
-    // There must be at least one term in the input that is not present in the
-    // answer.
-    // Inserting '*' signs between variables if not present.
-    answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
-    inputs.x = this.mathInteractionsService.insertMultiplicationSigns(inputs.x);
-
-    // The expression is first split into terms by addition and subtraction.
-    let answerTerms = this.mathInteractionsService.getTerms(answer);
-    let inputTerms = this.mathInteractionsService.getTerms(inputs.x);
-
-    for (let inputTerm of inputTerms) {
-      let matched = false;
-      for (let answerTerm of answerTerms) {
-        if (this.mathInteractionsService.doTermsMatch(answerTerm, inputTerm)) {
-          matched = true;
-          break;
-        }
-      }
-      if (!matched) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  MatchesWithGeneralForm(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputsWithPlaceholder): boolean {
-    // Inserting '*' signs between variables if not present.
-    answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
-    inputs.x = this.mathInteractionsService.insertMultiplicationSigns(inputs.x);
-
-    let placeholders = inputs.y;
-
-    return this.mathInteractionsService.expressionMatchWithPlaceholders(
-      inputs.x, answer, placeholders);
   }
 }
 

@@ -2,10 +2,10 @@
 <div class="text-input-container">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <form (ngSubmit)="submitAnswer(answer)" role="form" class="form-horizontal">
-    <schema-based-editor [schema]="getSchema.bind(this)"
+    <schema-based-editor [schema]="getSchema()"
                          [localValue]="answer"
                          (localValueChange)="updateAnswer($event)"
-                         [labelForFocusTarget]="getLabelForFocusTarget.bind(this)">
+                         [labelForFocusTarget]="getLabelForFocusTarget()">
     </schema-based-editor>
   </form>
 </div>
