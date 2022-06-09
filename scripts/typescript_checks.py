@@ -776,7 +776,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.spec.ts', # pylint: disable=line-too-long
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.ts', # pylint: disable=line-too-long
     'extensions/visualizations/oppia-visualization-sorted-tiles.directive.spec.ts', # pylint: disable=line-too-long
-    # 'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
+    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
 ]
 
 _PARSER = argparse.ArgumentParser(
