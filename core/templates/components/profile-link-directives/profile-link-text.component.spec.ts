@@ -50,7 +50,7 @@ describe('ProfileLinkTextComponent', () => {
 
 
   it('should set profile URL when the username is set', () => {
-    expect(component.profileUrl).toEqual(undefined);
+    expect(component.profileUrl).not.toBeDefined();
 
     component.username = 'dummy';
 
@@ -62,7 +62,7 @@ describe('ProfileLinkTextComponent', () => {
   });
 
   it('should set username correctly', () => {
-    expect(component.username).toEqual(undefined);
+    expect(component.username).not.toBeDefined();
 
     component.username = 'dummy';
 

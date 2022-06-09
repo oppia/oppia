@@ -29,8 +29,8 @@ export class ProfileLinkTextComponent {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private _profileUrl: string;
-  private _username: string;
+  private _profileUrl!: string;
+  private _username!: string;
 
   @Input() set username(username: string) {
     this._username = username;
