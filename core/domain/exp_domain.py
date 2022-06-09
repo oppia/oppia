@@ -691,8 +691,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             Exploration. The Exploration domain object with default
             values.
         """
+        contentIdGenerator = translation_domain.ContentIdGenerator()
+
         init_state_dict = state_domain.State.create_default_state(
-            init_state_name, 'content_0', 'default_outcome_1',
+            init_state_name,
+            contentIdGenerator.generate(translation_domain.ContentType.CONTENT),
+            contentIdGenerator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True).to_dict()
 
         states_dict = {
@@ -704,7 +709,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, 2, True)
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED,
+            contentIdGenerator.next_content_id_index, True)
 
     @classmethod
     def from_dict(
@@ -1506,26 +1512,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.next_content_id_index = next_content_id_index
 
-    # Methods relating to states.
-    # def add_states(self, state_names):
-    #     """Adds multiple states to the exploration.
-
-    #     Args:
-    #         state_names: list(str). List of state names to add.
-
-    #     Raises:
-    #         ValueError. At least one of the new state names already exists in
-    #             the states dict.
-    #     """
-    #     for state_name in state_names:
-    #         if state_name in self.states:
-    #             raise ValueError('Duplicate state name %s' % state_name)
-
-    #     for state_name in state_names:
-    #         self.states[state_name] = state_domain.State.create_default_state(
-    #             state_name)
-
-    def add_state(self, state_name, content_id_for_state_content, content_id_for_default_outcome):
+    def add_state(
+        self, state_name, content_id_for_state_content,
+        content_id_for_default_outcome):
         """TODO
         """
         self.states[state_name] = state_domain.State.create_default_state(
@@ -2094,7 +2083,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
-        elif current_states_schema_version == 49:
+        elif current_states_schema_version == 50:
             versioned_exploration_states['states'], next_content_id_index = (
                 conversion_fn(
                     versioned_exploration_states['states'],
@@ -2110,7 +2099,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 55
+    CURRENT_EXP_SCHEMA_VERSION = 56
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2334,7 +2323,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['schema_version'] = 56
 
         exploration_dict['states'], next_content_id_index = (
-            cls._convert_states_v49_dict_to_v50_dict(
+            cls._convert_states_v50_dict_to_v51_dict(
                 exploration_dict['states'])
         )
         exploration_dict['states_schema_version'] = 51
@@ -2423,6 +2412,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 exploration_dict)
             exploration_schema_version = 55
 
+        if exploration_schema_version == 55:
+            exploration_dict = cls._convert_v55_dict_to_v56_dict(
+                exploration_dict)
+            exploration_schema_version = 56
+
         return exploration_dict
 
     @classmethod
@@ -2443,6 +2437,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 CURRENT_EXP_SCHEMA_VERSION].
         """
         exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
+
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

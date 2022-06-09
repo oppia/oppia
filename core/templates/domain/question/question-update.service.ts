@@ -60,40 +60,6 @@ angular.module('oppia').factory('QuestionUpdateService', [
       return _getParameterFromChangeDict(changeDict, 'new_value');
     };
 
-    var _getAllContentIds = function(state) {
-      var allContentIdsSet = new Set();
-      allContentIdsSet.add(state.content.contentId);
-      state.interaction.answerGroups.forEach(function(answerGroup) {
-        allContentIdsSet.add(answerGroup.outcome.feedback.contentId);
-        answerGroup.rules.forEach(rule => {
-          Object.keys(rule.inputs).forEach(inputName => {
-            const ruleInput = rule.inputs[inputName];
-            // All rules input types which are translatable are subclasses of
-            // BaseTranslatableObject having dict structure with contentId
-            // as a key.
-            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-              allContentIdsSet.add(ruleInput.contentId);
-            }
-          });
-        });
-      });
-      if (state.interaction.defaultOutcome) {
-        allContentIdsSet.add(
-          state.interaction.defaultOutcome.feedback.contentId);
-      }
-      state.interaction.hints.forEach(function(hint) {
-        allContentIdsSet.add(hint.hintContent.contentId);
-      });
-      if (state.interaction.solution) {
-        allContentIdsSet.add(
-          state.interaction.solution.explanation.contentId);
-      }
-      const custArgs = state.interaction.customizationArgs;
-      Interaction.getCustomizationArgContentIds(custArgs)
-        .forEach(allContentIdsSet.add, allContentIdsSet);
-      return allContentIdsSet;
-    };
-
     var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
       var diffList = Array.from(setA).filter(function(element) {
         return !setB.has(element);
@@ -102,15 +68,14 @@ angular.module('oppia').factory('QuestionUpdateService', [
     };
 
     var _updateContentIdsInAssets = function(newState, oldState) {
-      var newContentIds = _getAllContentIds(newState);
-      var oldContentIds = _getAllContentIds(oldState);
+      var newContentIds = new Set(newState.getAllContentIds());
+      var oldContentIds = new Set(oldState.getAllContentIds());
       var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
         oldContentIds, newContentIds);
       var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
         newContentIds, oldContentIds);
       contentIdsToDelete.forEach(function(contentId) {
         newState.recordedVoiceovers.deleteContentId(contentId);
-        newState.writtenTranslations.deleteContentId(contentId);
       });
       contentIdsToAdd.forEach(function(contentId) {
         newState.recordedVoiceovers.addContentId(contentId);

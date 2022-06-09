@@ -134,7 +134,10 @@ export class StateObjectFactory {
   // created from start.
   // Create a default state until the actual state is saved.
   // Passes name as null before saving a state.
-  createDefaultState(newStateName: string | null, contentIdForContent, contentIdForDefaultOutcome): State {
+  createDefaultState(
+    newStateName: string | null,
+    contentIdForContent,
+    contentIdForDefaultOutcome): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,

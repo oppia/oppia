@@ -494,22 +494,6 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (
-                    change.property_name ==
-                    exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS
-                ):
-                    if not isinstance(change.new_value, dict):
-                        raise Exception(
-                            'Expected written_translations to be a dict, '
-                            'received %s' % change.new_value)
-                    cleaned_written_translations_dict = (
-                        state_domain.WrittenTranslations
-                        .convert_html_in_written_translations(
-                            change.new_value, html_cleaner.clean))
-                    written_translations = (
-                        state_domain.WrittenTranslations.from_dict(
-                            cleaned_written_translations_dict))
-                    state.update_written_translations(written_translations)
             elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
                 # DEPRECATED: This command is deprecated. Please do not use.
                 # The command remains here to support old suggestions.

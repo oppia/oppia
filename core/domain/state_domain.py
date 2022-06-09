@@ -2516,23 +2516,6 @@ class State(translation_domain.BaseTranslatableObject):
 
             self.recorded_voiceovers.add_content_id_for_voiceover(content_id)
 
-    def add_written_translation(
-            self, content_id, language_code, translation, data_format):
-        """Adds a translation for the given content id in a given language.
-
-        Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code of the translated html.
-            translation: str|list(str). The translated content.
-            data_format: str. The data format of the translated content.
-        """
-        # # TODO: Modify this method.
-        # written_translation = WrittenTranslation(
-        #     data_format, translation, False)
-        # self.written_translations.translations_mapping[content_id][
-        #     language_code] = written_translation
-        pass
-
     def update_content(self, content):
         """Update the content of this state.
 
@@ -2974,12 +2957,6 @@ class State(translation_domain.BaseTranslatableObject):
                 AnswerGroup.convert_html_in_answer_group(
                     answer_group, conversion_fn, html_field_types_to_rule_specs)
             )
-
-        # if 'written_translations' in state_dict.keys():
-        #     state_dict['written_translations'] = (
-        #         WrittenTranslations.
-        #         convert_html_in_written_translations(
-        #             state_dict['written_translations'], conversion_fn))
 
         for hint_index, hint in enumerate(state_dict['interaction']['hints']):
             state_dict['interaction']['hints'][hint_index] = (

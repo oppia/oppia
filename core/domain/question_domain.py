@@ -138,7 +138,7 @@ class Question(translation_domain.BaseTranslatableObject):
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
             linked_skill_ids, inapplicable_skill_misconception_ids,
-            created_on=None, last_updated=None):
+            next_content_id_index, created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
         Args:
@@ -156,6 +156,8 @@ class Question(translation_domain.BaseTranslatableObject):
             inapplicable_skill_misconception_ids: list(str). Optional
                 misconception ids that are marked as not relevant to the
                 question.
+            next_content_id_index: int. The next content_id index to use for
+                generation of new content_ids.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -170,6 +172,7 @@ class Question(translation_domain.BaseTranslatableObject):
         self.linked_skill_ids = linked_skill_ids
         self.inapplicable_skill_misconception_ids = (
             inapplicable_skill_misconception_ids)
+        self.next_content_id_index = next_content_id_index
         self.created_on = created_on
         self.last_updated = last_updated
 
@@ -208,7 +211,7 @@ class Question(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def create_default_question_state(cls):
+    def create_default_question_state(cls, contentIdGenerator):
         """Return a State domain object with default value for being used as
         question state data.
 
@@ -216,7 +219,12 @@ class Question(translation_domain.BaseTranslatableObject):
             State. The corresponding State domain object.
         """
         return state_domain.State.create_default_state(
-            None, is_initial_state=True)
+            None,
+            contentIdGenerator.generate(
+                translation_domain.ContentType.CONTENT),
+            contentIdGenerator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
 
     @classmethod
     def _convert_state_v27_dict_to_v28_dict(cls, question_state_dict):
@@ -1237,6 +1245,23 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
+        """Converts from v50 to v51. Version 51 removes next_content_id_index
+        and WrittenTranslation from State. This version also updates the
+        content-ids for each translatable field in the state with its new
+        content-id.
+        """
+        del question_state_dict['next_content_id_index']
+        del question_state_dict['written_translations']
+        states_dict, next_content_id_index = (
+            state_domain.State
+            .update_old_content_id_to_new_content_id_in_v49_states(
+                [states_dict])
+        )
+
+        return states_dict[0], next_content_id_index
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
@@ -1259,6 +1284,15 @@ class Question(translation_domain.BaseTranslatableObject):
 
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
+
+        if current_state_schema_version == 50:
+            versioned_exploration_states['states'], next_content_id_index = (
+                conversion_fn(
+                    versioned_exploration_states['states'],
+                    init_state_name
+                )
+            )
+            return next_content_id_index
 
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
@@ -1415,12 +1449,15 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             Question. A Question domain object with default values.
         """
-        default_question_state_data = cls.create_default_question_state()
+        contentIdGenerator = translation_domain.ContentIdGenerator()
+        default_question_state_data = cls.create_default_question_state(
+            contentIdGenerator)
 
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [])
+            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [],
+            contentIdGenerator.next_content_id_index)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.

@@ -109,10 +109,14 @@ def get_question_from_model(question_model):
             question_model.question_state_data)
     }
 
+    next_content_id_index = None
     # Migrate the question if it is not using the latest schema version.
     if (question_model.question_state_data_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_state_schema(versioned_question_state)
+        next_content_id_index = _migrate_state_schema(versioned_question_state)
+
+    if next_content_id_index is not None:
+        question_model.next_content_id_index = next_content_id_index
 
     return question_domain.Question(
         question_model.id,
@@ -121,6 +125,7 @@ def get_question_from_model(question_model):
         question_model.language_code, question_model.version,
         question_model.linked_skill_ids,
         question_model.inapplicable_skill_misconception_ids,
+        question_model.next_content_id_index,
         question_model.created_on, question_model.last_updated)
 
 
@@ -152,7 +157,22 @@ def _migrate_state_schema(versioned_question_state):
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
+    next_content_id_index = None
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
-        question_domain.Question.update_state_from_model(
-            versioned_question_state, state_schema_version)
+        if state_schema_version == 50:
+            # State conversion function from 50 to 51 removes
+            # next_content_id_index from the state level, hence this if case
+            # populates the next_content_id_index from the old state, which will
+            # be used for introducing next_content_id_index into
+            # exploration level.
+            next_content_id_index = (
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states,
+                    states_schema_version, init_state_name)
+            )
+        else:
+            question_domain.Question.update_state_from_model(
+                versioned_question_state, state_schema_version)
         state_schema_version += 1
+
+    return next_content_id_index

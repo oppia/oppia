@@ -55,6 +55,11 @@ import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subt
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
+import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
+
+interface ContentsMapping {
+  [contentId: string]: SubtitledHtml;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -65,6 +70,8 @@ export class ExplorationStatesService {
   stateRenamedCallbacks: (
     (oldStateName: string, newStateName: string) => void
   )[] = [];
+  initalContentsMapping: ContentsMapping = {};
+  contentChangesCanAffectTranslations: boolean = false;
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
   private _states: States | null = null;
@@ -162,31 +169,74 @@ export class ExplorationStatesService {
     widget_customization_args: ['interaction', 'customizationArgs']
   };
 
-  private _CONTENT_ID_EXTRACTORS = {
+  private _CONTENT_EXTRACTORS = {
     answer_groups: (answerGroups) => {
-      let contentIds = [];
-      return contentIds.concat(
-        answerGroups.map((answerGroup) => answerGroup.getAllContentIds()));
+      let contents = [];
+      answerGroups.forEach(
+        answerGroup => {
+          contents = contents.concat(answerGroup.getAllContents())
+      });
+
+      return contents;
     },
     default_outcome: (defaultOutcome) => {
-      return defaultOutcome ? defaultOutcome.getAllContentIds() : [];
+      return defaultOutcome ? defaultOutcome.getAllContents() : [];
     },
     hints: (hints) => {
-      let contentIds = [];
-      return contentIds.concat(
-        hints.map((hint) => hint.getAllContentIds()));
+      let contents = [];
+      hints.forEach(hint => {
+        contents = contents.concat(hint.getAllContentIds())
+      });
+      return contents;
     },
     solution: (solution) => {
       return solution ? solution.getAllContentIds() : [];
     },
     widget_customization_args: (customizationArgs) => {
-      let contentIds = new Set();
-      Interaction.getCustomizationArgContents(customizationArgs).forEach(
-        (content) => contentIds.add(content.contentId)
-      )
-      return contentIds;
+      return customizationArgs ? Interaction.getCustomizationArgContents(
+        customizationArgs) : [];
     }
   };
+
+  _extractContentIds(backendName, value) {
+    let contents = this._CONTENT_EXTRACTORS[backendName](value);
+    return new Set(contents.map(content => content.contentId));
+  }
+
+  _verifyChangesInitialContents(backendName, value) {
+    let contents: SubtitledHtml[];
+
+    if (backendName === 'content') {
+      contents = [value];
+    } else if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
+      contents = this._CONTENT_EXTRACTORS[backendName](value);
+    } else {
+      return;
+    }
+
+    for (const content of contents) {
+      if (!this.initalContentsMapping.hasOwnProperty(content.contentId)) {
+        continue;
+      }
+      let intialContent = this.initalContentsMapping[content.contentId];
+
+      if (content.html === intialContent.html) {
+        return;
+      }
+
+      const modalRef = this.ngbModal.open(
+        MarkTranslationsAsNeedingUpdateModalComponent, {
+          size: 'lg',
+          backdrop: 'static',
+          // TODO(#12768): Remove the backdropClass & windowClass once the
+          // rte-component-modal is migrated to Angular. Currently, the custom
+          // class is used for correctly stacking AngularJS modal on top of
+          // Angular modal.
+          backdropClass: 'forced-modal-stack',
+          windowClass: 'forced-modal-stack'
+        });
+    }
+  }
 
   private _getElementsInFirstSetButNotInSecond(setA, setB): string[] {
     let diffList = Array.from(setA).filter((element) => {
@@ -331,12 +381,13 @@ export class ExplorationStatesService {
 
       let newStateData = this._states.getState(stateName);
       let accessorList = this.PROPERTY_REF_DATA[backendName];
+      if (this.contentChangesCanAffectTranslations) {
+        this._verifyChangesInitialContents(backendName, newValue);
+      }
 
-      if (this._CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = new Set(
-          this._CONTENT_ID_EXTRACTORS[backendName](oldValue));
-        let newContentIds = new Set(
-          this._CONTENT_ID_EXTRACTORS[backendName](newValue));
+      if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
+        let oldContentIds = this._extractContentIds(backendName, oldValue);
+        let newContentIds = this._extractContentIds(backendName, newValue);
         let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
           oldContentIds, newContentIds);
         let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
@@ -373,19 +424,24 @@ export class ExplorationStatesService {
     return conversionFunction(frontendValue);
   }
 
-  init(statesBackendDict: StateObjectsBackendDict): void {
+  init(
+    statesBackendDict: StateObjectsBackendDict,
+    contentChangesCanAffectTranslations: boolean): void {
     this._states = (
       this.statesObjectFactory.createFromBackendDict(statesBackendDict));
-    // Initialize the solutionValidityService.
+    this.contentChangesCanAffectTranslations = (
+      contentChangesCanAffectTranslations);
+      // Initialize the solutionValidityService.
     this.solutionValidityService.init(this._states.getStateNames());
     this._states.getStateNames().forEach((stateName: string) => {
-      let solution = this._states.getState(stateName).interaction.solution;
+      const state = this._states.getState(stateName);
+      let solution = state.interaction.solution;
       if (solution) {
-        let interactionId = this._states.getState(stateName).interaction.id;
+        let interactionId = state.interaction.id;
         let result = (
           this.answerClassificationService.getMatchingClassificationResult(
             stateName,
-            this._states.getState(stateName).interaction,
+            state.interaction,
             solution.correctAnswer,
             this.interactionRulesRegistryService.getRulesServiceByInteractionId(
               interactionId
@@ -396,6 +452,9 @@ export class ExplorationStatesService {
         this.solutionValidityService.updateValidity(
           stateName, solutionIsValid);
       }
+
+      state.getAllContents().forEach(
+        content => this.initalContentsMapping[content.contentId] = content);
     });
   }
 

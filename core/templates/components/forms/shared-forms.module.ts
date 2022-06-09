@@ -47,6 +47,7 @@ import { SchemaBasedListEditorComponent } from './schema-based-editors/schema-ba
 import { SchemaBasedExpressionEditorComponent } from './schema-based-editors/schema-based-expression-editor.component';
 import { SchemaBasedUnicodeEditor } from './schema-based-editors/schema-based-unicode-editor.component';
 import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
+import { MarkTranslationsAsNeedingUpdateModalComponent } from './forms-templates/mark-translations-as-needing-update-modal.component';
 
 @NgModule({
   imports: [
@@ -75,6 +76,7 @@ import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
     SchemaBasedEditorComponent,
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
     MarkAudioAsNeedingUpdateModalComponent,
+    MarkTranslationsAsNeedingUpdateModalComponent,
     SchemaBasedExpressionEditorComponent,
     SchemaBasedFloatEditorComponent,
     SchemaBasedHtmlEditorComponent,
@@ -98,6 +100,7 @@ import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
     SchemaBasedUnicodeEditor,
     ObjectEditorComponent,
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+    MarkTranslationsAsNeedingUpdateModalComponent,
     MarkAudioAsNeedingUpdateModalComponent,
   ],
   exports: [
@@ -116,6 +119,7 @@ import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
     SchemaBasedListEditorComponent,
     SchemaBasedUnicodeEditor,
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+    MarkTranslationsAsNeedingUpdateModalComponent,
     MarkAudioAsNeedingUpdateModalComponent,
     ObjectEditorComponent
   ],

@@ -76,8 +76,8 @@ def _migrate_states_schema(versioned_exploration_states, init_state_name):
     next_content_id_index = None
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):
-        if state_schema_version == 49:
-            # State conversion function from 49 to 50 removes
+        if state_schema_version == 50:
+            # State conversion function from 50 to 51 removes
             # next_content_id_index from the state level, hence this if case
             # populates the next_content_id_index from the old state, which will
             # be used for introducing next_content_id_index into
@@ -87,9 +87,10 @@ def _migrate_states_schema(versioned_exploration_states, init_state_name):
                     versioned_exploration_states,
                     states_schema_version, init_state_name)
             )
-        exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states,
-            states_schema_version, init_state_name)
+        else:
+            exp_domain.Exploration.update_states_from_model(
+                versioned_exploration_states,
+                states_schema_version, init_state_name)
         states_schema_version += 1
     return next_content_id_index
 

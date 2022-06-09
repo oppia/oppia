@@ -115,6 +115,9 @@ class QuestionModel(base_models.VersionedModel):
     # The schema version for the question state data.
     question_state_data_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
+    # The next_content_id index to use for generation of new content ids.
+    next_content_id_index = datastore_services.IntegerProperty(
+        required=True, default=0, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
