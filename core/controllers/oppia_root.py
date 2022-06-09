@@ -45,7 +45,10 @@ class OppiaLightweightRootPage(base.BaseHandler):
 
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
+    # The '**kwargs' argument is needed because some routes pass keyword
+    # arguments and even when we don't use them we need to allow them so that
+    # there is no error in the callsite.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self) -> None:
+    def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
         self.render_template('lightweight-oppia-root.mainpage.html') # type: ignore[no-untyped-call]
