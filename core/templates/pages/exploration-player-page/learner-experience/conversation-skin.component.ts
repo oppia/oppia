@@ -143,6 +143,7 @@ export class ConversationSkinComponent {
   completedStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
+  furthestCompletedCheckpoint: string;
   alertMessageTimeout = 6000;
 
   constructor(
@@ -613,6 +614,9 @@ export class ConversationSkinComponent {
           this.mostRecentlyReachedCheckpoint = (
             response.most_recently_reached_checkpoint_state_name
           );
+          this.furthestCompletedCheckpoint = (
+            response.furthest_reached_checkpoint_state_name
+          );
 
           this.prevSessionStatesProgress = (
             this.explorationEngineService.getShortestPathToState(
@@ -648,6 +652,19 @@ export class ConversationSkinComponent {
           this.prevSessionStatesProgress.pop();
 
           if (indexToRedirectTo > 0) {
+            setTimeout(() => {
+              let alertInfoElement = document.querySelector(
+                '.oppia-exploration-checkpoints-message');
+
+              // Remove the alert message after 6 sec.
+              if (alertInfoElement) {
+                alertInfoElement.remove();
+              }
+            }, this.alertMessageTimeout);
+          }
+
+          if (!this.mostRecentlyReachedCheckpoint &&
+              this.furthestCompletedCheckpoint) {
             setTimeout(() => {
               let alertInfoElement = document.querySelector(
                 '.oppia-exploration-checkpoints-message');
@@ -890,7 +907,6 @@ export class ConversationSkinComponent {
 
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
     this._addNewCard(initialCard);
-    this.playerPositionService.onNewCardAvailable.emit();
 
     this.nextCard = initialCard;
     this.explorationPlayerStateService.onPlayerStateChange.emit(
