@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -72,7 +72,7 @@ describe('Side Navigation Bar Component', () => {
         HttpClientTestingModule,
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
-        MockRouterModule
+        SmartRouterModule
       ],
       declarations: [
         SideNavigationBarComponent,

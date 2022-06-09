@@ -16,20 +16,5 @@
  * @fileoverview Unit tests for hybrid router module provider.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { MockRouter } from 'hybrid-router-module-provider';
-
 describe('Hybrid router module provider', () => {
-  let mockRouter: MockRouter;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [MockRouter]
-    });
-    mockRouter = TestBed.inject(MockRouter);
-  });
-
-  beforeEach(() => {
-    mockRouter.ngOnInit();
-  });
 });

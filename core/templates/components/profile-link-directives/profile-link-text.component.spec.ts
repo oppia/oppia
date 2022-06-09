@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ProfileLinkTextComponent } from './profile-link-text.component';
 
 /**
@@ -27,7 +27,9 @@ describe('ProfileLinkTextComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule
       ],
       declarations: [ProfileLinkTextComponent]
     }).compileComponents();

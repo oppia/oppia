@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 
@@ -40,7 +40,9 @@ describe('Contributor dashboard admin navbar component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule
       ],
       declarations: [ContributorDashboardAdminNavbarComponent]
     }).compileComponents();

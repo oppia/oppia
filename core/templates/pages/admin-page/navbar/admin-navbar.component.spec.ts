@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { UserInfo } from 'domain/user/user-info.model';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
@@ -43,7 +43,9 @@ describe('Admin Navbar component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule
       ],
       declarations: [AdminNavbarComponent]
     }).compileComponents();

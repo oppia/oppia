@@ -43,11 +43,6 @@ class OppiaLightweightRootPage(base.BaseHandler):
     registered with angular router.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]

@@ -19,7 +19,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
 import { ErrorPageComponent } from './error-page.component';
@@ -27,17 +26,14 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageRootComponent } from './error-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { ErrorPageRoutingModule } from 'pages/error-pages/error-page-routing.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     SharedComponentsModule,
+    ErrorPageRoutingModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [

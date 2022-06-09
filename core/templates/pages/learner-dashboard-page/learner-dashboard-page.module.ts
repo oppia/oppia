@@ -23,6 +23,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
 import { LearnerTopicGoalsSummaryTileComponent } from 'components/summary-tile/learner-topic-goals-summary-tile.component';
@@ -106,8 +108,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import {RouterModule} from "@angular/router";
-import {APP_BASE_HREF} from "@angular/common";
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
