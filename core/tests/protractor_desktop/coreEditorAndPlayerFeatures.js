@@ -256,12 +256,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();
 
-    // Lesson info tooltip should appear when the 2nd checkpoint is reached.
-    var closeLessonInfoTooltipElement = element(by.css(
-      '.protractor-test-close-lesson-info-tooltip'));
-    await explorationPlayerPage.clickCloseLessonInfoTooltip(
-      closeLessonInfoTooltipElement, 'Test 1st'
-    );
     await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
     await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
@@ -275,17 +269,29 @@ describe('Enable correctness feedback and set correctness', function() {
     var closeLessonInfoTooltipElement = element(by.css(
       '.protractor-test-close-lesson-info-tooltip'));
     await explorationPlayerPage.clickCloseLessonInfoTooltip(
-      closeLessonInfoTooltipElement, 'Test 2'
+      closeLessonInfoTooltipElement, 'Test first'
     );
     await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
     await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
     await explorationPlayerPage.clickThroughToNextCard();
 
+    // Lesson info tooltip should appear when the 2nd checkpoint is reached.
+    var closeLessonInfoTooltipElement = element(by.css(
+      '.protractor-test-close-lesson-info-tooltip'));
+    await explorationPlayerPage.clickCloseLessonInfoTooltip(
+      closeLessonInfoTooltipElement, 'Test second'
+    );
     await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();
 
+    // Lesson info tooltip should appear when the 2nd checkpoint is reached.
+    var closeLessonInfoTooltipElement = element(by.css(
+      '.protractor-test-close-lesson-info-tooltip'));
+    await explorationPlayerPage.clickCloseLessonInfoTooltip(
+      closeLessonInfoTooltipElement, 'Test third'
+    );
     await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();
