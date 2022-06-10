@@ -36,7 +36,6 @@ if MYPY:
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
 class VersionedQuestionStateDict(TypedDict):
@@ -84,6 +83,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         skill_descriptions: List[Optional[str]] = []
         for skill in skills:
             if skill:
+                # Ruling out the possibility of None for mypy type checking.
                 assert isinstance(skill.description, str)
                 skill_descriptions.append(skill.description)
             else:

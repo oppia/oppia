@@ -71,9 +71,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 2, ['skill_1'], 0))
 
         self.assertEqual(len(questions), 1)
-        assert isinstance(questions[0], str)
+        assert isinstance(questions[0], question_domain.Question)
         self.assertEqual(
-            questions[0].to_dict(), self.question.to_dict())
+            questions[0].to_dict(), self.question.to_dict()) # type: ignore[no-untyped-call]
 
     def test_get_no_questions_with_no_skill_ids(self) -> None:
         questions, _ = (
@@ -97,9 +97,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 2, ['skill_1', 'skill_2'], 0))
 
         self.assertEqual(len(questions), 1)
-        assert isinstance(questions[0], str)
+        assert isinstance(questions[0], question_domain.Question)
         self.assertEqual(
-            questions[0].to_dict(), question_1.to_dict())
+            questions[0].to_dict(), question_1.to_dict()) # type: ignore[no-untyped-call]
 
     def test_get_questions_by_ids(self) -> None:
         question_id_2 = question_services.get_new_question_id() # type: ignore[no-untyped-call]
@@ -109,10 +109,10 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)
-        assert isinstance(questions[0], str)
+        assert isinstance(questions[0], question_domain.Question)
         self.assertEqual(questions[0].id, self.question_id)
         self.assertIsNone(questions[1])
-        assert isinstance(questions[2], str)
+        assert isinstance(questions[2], question_domain.Question)
         self.assertEqual(questions[2].id, question_id_2)
 
     def test_cannot_get_question_from_model_with_invalid_schema_version(
@@ -182,9 +182,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
-        # Ignore[assignment] is used here because invalid question ids may lead
-        # to type None for all_question_models.get().
-        question_model = all_question_models.get() # type: ignore[assignment]
+        assert isinstance (all_question_models, question_models.QuestionModel)
+        question_model = all_question_models.get() 
         updated_question_model = question_fetchers.get_question_from_model(
             question_model)
         self.assertEqual(
