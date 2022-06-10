@@ -182,8 +182,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
-        assert isinstance (all_question_models, question_models.QuestionModel)
-        question_model = all_question_models.get() 
+        assert isinstance(all_question_models, question_models.QuestionModel)
+        question_model = all_question_models.get()
         updated_question_model = question_fetchers.get_question_from_model(
             question_model)
         self.assertEqual(
