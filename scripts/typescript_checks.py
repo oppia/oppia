@@ -25,7 +25,7 @@ import sys
 
 from core import utils
 
-from typing import List
+from typing import Optional, Sequence
 
 import yaml
 
@@ -777,7 +777,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.spec.ts', # pylint: disable=line-too-long
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.ts', # pylint: disable=line-too-long
     'extensions/visualizations/oppia-visualization-sorted-tiles.directive.spec.ts', # pylint: disable=line-too-long
-    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
+    # 'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
 ]
 
 _PARSER = argparse.ArgumentParser(
@@ -828,85 +828,97 @@ def compile_and_check_typescript(config_path: str) -> None:
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
-    # Generate a list of files that are not strict typescript.
-    if process.stdout is not None:
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert process.stdout is not None
+    error_messages = list(iter(process.stdout.readline, ''))
+
+    if config_path == STRICT_TSCONFIG_FILEPATH:
+        errors = [x.strip() for x in error_messages]
+        # Remove the empty lines and error explanation lines.
+        prefixes = ('core', 'extension', 'typings')
+        errors = [x for x in errors if x.startswith(prefixes)]
+        # Remove error explanation lines.
+        errors = [x.split('(', 1)[0] for x in errors]
+        # Remove the dublin core prefixes.
+        errors = list(dict.fromkeys(errors))
+        files_with_errors = sorted(errors)
+
+        # List of missing files that are neither strict typed nor present in
+        # NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
+        files_not_type_strict = []
+        for filename in files_with_errors:
+            if filename not in NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH:
+                files_not_type_strict.append(filename)
+        files_not_type_strict.append('typings')
+        # Show successfull compilation message, if there are no missing files.
+        if files_not_type_strict == []:
+            print('Compilation successful!')
+            sys.exit(1)
+
+        # Update "include" field of tsconfig-strict.json with files that are
+        # neither strict typed nor present in
+        # NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
+        # Example: List "files_not_type_strict".
+        file_name = os.path.join(os.getcwd(), 'tsconfig-strict.json')
+        with open(file_name, 'r', encoding='utf-8') as f:
+            jg_dict = yaml.safe_load(f)
+            jg_dict['include'] = files_not_type_strict
+
+        new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
+
+        with open(file_name, 'w', encoding='utf-8') as f:
+            f.write(new_index_yaml_dict + '\n')
+
+        # Compile tsconfig-strict.json with updated "include" property.
+        os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+        validate_compiled_js_dir()
+
+        if os.path.exists(COMPILED_JS_DIR):
+            shutil.rmtree(COMPILED_JS_DIR)
+
+        cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
+        process = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, encoding='utf-8')
+
+        if os.path.exists(COMPILED_JS_DIR):
+            shutil.rmtree(COMPILED_JS_DIR)
+
+        # The value of `process.stdout` should not be None since we passed
+        # the `stdout=subprocess.PIPE` argument to `Popen`.
+        assert process.stdout is not None
         error_messages = list(iter(process.stdout.readline, ''))
 
-    errors = [x.strip() for x in error_messages]
-    # Remove the empty lines and error explanation lines.
-    prefixes = ('core', 'extension', 'typings')
-    errors = [x for x in errors if x.startswith(prefixes)]
-    # Remove error explanation lines.
-    errors = [x.split('(', 1)[0] for x in errors]
-    # Remove the dublin core prefixes.
-    errors = list(dict.fromkeys(errors))
-    files_with_errors = sorted(errors)
+        # Update tsconfig-strict.json and set to its intial "include" state
+        # example "include": ["core", "extensions", "typings"].
+        with open(file_name, 'r', encoding='utf-8') as f:
+            jg_dict = yaml.safe_load(f)
+            jg_dict['include'] = ['core', 'extensions', 'typings']
 
-    # List of missing files that are neither strict typed nor present in
-    # NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
-    files_not_type_strict = []
-    for filename in files_with_errors:
-        if filename not in NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH:
-            files_not_type_strict.append(filename)
-    files_not_type_strict.append('typings')
-    # Show successfull compilation message, if there are no missing files.
-    if files_not_type_strict == []:
-        print('Compilation successful!')
-        sys.exit(1)
+        new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
 
-    # Update "include" field of tsconfig-strict.json with files that are neither
-    # strict typed nor present in NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
-    # Example: List "files_not_type_strict".
-    file_name = os.path.join(os.getcwd(), 'tsconfig-strict.json')
-    with open(file_name, 'r', encoding='utf-8') as f:
-        jg_dict = yaml.safe_load(f)
-        jg_dict['include'] = files_not_type_strict
+        with open(file_name, 'w', encoding='utf-8') as f:
+            f.write(new_index_yaml_dict + '\n')
 
-    new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
+        if error_messages:
+            print('\n' + '\n'.join(error_messages))
+            print(
+                str(len([x for x in error_messages if x.startswith(prefixes)]))
+                + ' Errors found during compilation.\n')
+            sys.exit(1)
+        else:
+            print('Compilation successful!')
 
-    with open(file_name, 'w', encoding='utf-8') as f:
-        f.write(new_index_yaml_dict + '\n')
-
-    # Compile tsconfig-strict.json with updated "include" property.
-    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
-    validate_compiled_js_dir()
-
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
-
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
-
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
-
-    # Error messages for files that are neither strict typed nor present in
-    # NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
-    if process.stdout is not None:
-        error_messages = list(iter(process.stdout.readline, ''))
-
-    # Update tsconfig-strict.json and set to its intial "include" state
-    # example "include": ["core", "extensions", "typings"].
-    with open(file_name, 'r', encoding='utf-8') as f:
-        jg_dict = yaml.safe_load(f)
-        jg_dict['include'] = ['core', 'extensions', 'typings']
-
-    new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
-
-    with open(file_name, 'w', encoding='utf-8') as f:
-        f.write(new_index_yaml_dict + '\n')
-
-    if error_messages:
-        print('\n' + '\n'.join(error_messages))
-        print(
-            str(len([x for x in error_messages if x.startswith(prefixes)])) +
-            ' Errors found during compilation.\n')
-        sys.exit(1)
     else:
-        print('Compilation successful!')
+        if error_messages:
+            print('Errors found during compilation\n')
+            print('\n'.join(error_messages))
+            sys.exit(1)
+        else:
+            print('Compilation successful!')
 
 
-def main(args: List[str] | None=None) -> None:
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Run the typescript checks."""
     parsed_args = _PARSER.parse_args(args=args)
     compile_and_check_typescript(
