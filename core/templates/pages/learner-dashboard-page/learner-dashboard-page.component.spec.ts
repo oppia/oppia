@@ -1013,19 +1013,6 @@ describe('Learner dashboard page', () => {
 
       expect(result).toBe('шеллы');
     });
-
-    it('should set active tab when the enter key is pressed over a tab', ()=> {
-      spyOn(component, 'setActiveTab').and.callThrough();
-      spyOn(component, 'setActiveSection').and.callThrough();
-
-      let event = new KeyboardEvent('keyup', {key: 'Enter'});
-      let tab = 'LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS';
-
-      component.setActiveTab(event, tab);
-
-      expect(component.setActiveSection).toHaveBeenCalled();
-      expect(component.activeSection).toEqual(tab);
-    });
   });
 
   describe('when fetching dashboard data fails', () => {

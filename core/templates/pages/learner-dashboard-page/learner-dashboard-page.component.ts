@@ -378,12 +378,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  setActiveTab(event: KeyboardEvent, tab: string): void {
-    if (event.key === 'Enter') {
-      this.setActiveSection(tab);
-    }
-  }
-
   setActiveSubsection(newActiveSubsectionName: string): void {
     this.activeSubsection = newActiveSubsectionName;
     if (this.activeSubsection ===
