@@ -57,8 +57,6 @@ import socket
 import sys
 import threading
 
-from core import utils
-
 _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
 
@@ -73,9 +71,7 @@ def _get_process_command_line(pid):
         str. The command that started the process.
     """
     try:
-        with utils.open_file(
-            '/proc/{}/cmdline'.format(pid), 'rt'
-        ) as f:
+        with open('/proc/{}/cmdline'.format(pid), 'rt') as f:
             return f.read()
     except IOError:
         return ''
@@ -91,9 +87,7 @@ def _get_process_start_time(pid):
         str. The time when the process started.
     """
     try:
-        with utils.open_file(
-            '/proc/{}/stat'.format(pid), 'rt'
-        ) as f:
+        with open('/proc/{}/stat'.format(pid), 'rt') as f:
             return int(f.readline().split()[21])
     except IOError:
         return 0
