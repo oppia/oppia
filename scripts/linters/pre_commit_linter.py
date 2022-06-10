@@ -63,6 +63,8 @@ import subprocess
 import sys
 import threading
 
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
 from core import utils
 
 # Install third party dependencies before proceeding.
@@ -74,7 +76,6 @@ from . import js_ts_linter
 from . import linter_utils
 from . import other_files_linter
 from . import python_linter
-from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
 

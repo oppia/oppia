@@ -26,6 +26,8 @@ import argparse
 import os
 import subprocess
 
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
 from core import utils
 
 _PARSER = argparse.ArgumentParser(
