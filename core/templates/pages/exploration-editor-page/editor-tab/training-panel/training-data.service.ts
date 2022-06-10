@@ -26,7 +26,14 @@ import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/servi
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { State } from 'domain/state/StateObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
+interface answerGroupData {
+  answerGroupIndex: number;
+  answers: InteractionAnswer[];
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -38,24 +45,26 @@ export class TrainingDataService {
    private stateEditorService: StateEditorService,
   ) {}
 
-  _getIndexOfTrainingData(answer: any, trainingData: any): number {
+  _getIndexOfTrainingData(
+      answer: InteractionAnswer, trainingData: InteractionAnswer[]): number {
     let index = -1;
     for (let i = 0; i < trainingData.length; i++) {
-      if (trainingData[i].isEqual(answer)) {
+      if (trainingData[i] === answer) {
         index = i;
         break;
       }
     }
     return index;
-  };
+  }
 
   // Attempts to remove a given answer from a list of trained answers. This
   // function returns the index of the answer that was removed if it was
   // successfully removed from the training data, or -1 otherwise.
-  _removeAnswerFromTrainingData(answer: any, trainingData: any): number {
+  _removeAnswerFromTrainingData(
+      answer: InteractionAnswer, trainingData: InteractionAnswer[]): number {
     let index = this._getIndexOfTrainingData(answer, trainingData);
     if (index !== -1) {
-      trainingData.splice(index, 1);
+      trainingData.slice(index, 1);
     }
     return index;
   }
@@ -64,7 +73,7 @@ export class TrainingDataService {
   // or the confirmed unclassified answer list. It also removes the answer
   // from the training data being presented to the user so that it does not
   // show up again.
-  _removeAnswer(answer: any): any {
+  _removeAnswer(answer: InteractionAnswer): void {
     let answerGroups = this.responsesService.getAnswerGroups();
     let confirmedUnclassifiedAnswers = [...(
       this.responsesService.getConfirmedUnclassifiedAnswers())];
@@ -76,7 +85,8 @@ export class TrainingDataService {
       let answerGroup = answerGroups[i];
       let trainingData = answerGroup.trainingData;
       if (trainingData &&
-        this._removeAnswerFromTrainingData(answer, trainingData) !== -1) {
+        this._removeAnswerFromTrainingData(
+          answer, [...trainingData]) !== -1) {
         updatedAnswerGroups = true;
       }
     }
@@ -110,7 +120,7 @@ export class TrainingDataService {
     }
   }
 
-  getTrainingDataAnswers(): any {
+  getTrainingDataAnswers(): answerGroupData[] {
     let trainingDataAnswers = [];
     let answerGroups = this.responsesService.getAnswerGroups();
 
@@ -124,11 +134,12 @@ export class TrainingDataService {
     return trainingDataAnswers;
   }
 
-  getTrainingDataOfAnswerGroup(answerGroupIndex: number): any {
-    return this.responsesService.getAnswerGroup(answerGroupIndex).trainingData;
+  getTrainingDataOfAnswerGroup(answerGroupIndex: number): InteractionAnswer[] {
+    return [
+      ...this.responsesService.getAnswerGroup(answerGroupIndex).trainingData];
   }
 
-  getAllPotentialOutcomes(state: any): any {
+  getAllPotentialOutcomes(state: State): Outcome[] {
     let potentialOutcomes = [];
     let interaction = state.interaction;
 
@@ -143,7 +154,8 @@ export class TrainingDataService {
     return potentialOutcomes;
   }
 
-  associateWithAnswerGroup(answerGroupIndex: any, answer: any): void {
+  associateWithAnswerGroup(
+      answerGroupIndex: number, answer: InteractionAnswer): void {
     // Remove answer from traning data of any answer group or
     // confirmed unclassified answers.
     this._removeAnswer(answer);
@@ -152,7 +164,9 @@ export class TrainingDataService {
     let answerGroup: AnswerGroup = answerGroups[answerGroupIndex];
 
     // Train the rule to include this answer.
-    answerGroup.trainingData = [answerGroup.trainingData, ...answer];
+    answerGroup.trainingData = [
+      ...answerGroup.trainingData,
+      answer];
     this.responsesService.updateAnswerGroup(answerGroupIndex, {
       trainingData: answerGroup.trainingData
     } as AnswerGroup, (newAnswerGroups) => {
@@ -164,7 +178,7 @@ export class TrainingDataService {
     });
   }
 
-  associateWithDefaultResponse(answer: any): any {
+  associateWithDefaultResponse(answer: InteractionAnswer): void {
     // Remove answer from traning data of any answer group or
     // confirmed unclassified answers.
     this._removeAnswer(answer);
@@ -180,15 +194,16 @@ export class TrainingDataService {
       confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
   }
 
-  isConfirmedUnclassifiedAnswer(answer: any): any {
+  isConfirmedUnclassifiedAnswer(answer: InteractionAnswer): boolean {
     return (this._getIndexOfTrainingData(
-      answer, this.responsesService.getConfirmedUnclassifiedAnswers()) !== -1);
+      answer,
+      [...this.responsesService.getConfirmedUnclassifiedAnswers()]) !== -1);
   }
 
   removeAnswerFromAnswerGroupTrainingData(
-      answer: any, answerGroupIndex: number): any {
-    let trainingData = this.responsesService.getAnswerGroup(
-      answerGroupIndex).trainingData;
+      answer: InteractionAnswer, answerGroupIndex: number): void {
+    let trainingData = [...this.responsesService.getAnswerGroup(
+      answerGroupIndex).trainingData];
     this._removeAnswerFromTrainingData(answer, trainingData);
 
     let answerGroups = this.responsesService.getAnswerGroups();
@@ -196,7 +211,7 @@ export class TrainingDataService {
 
     this.responsesService.updateAnswerGroup(answerGroupIndex, {
       trainingData: trainingData
-    } as AnswerGroup, (newAnswerGroups) => {
+    } as unknown as AnswerGroup, (newAnswerGroups) => {
       this.explorationStatesService.saveInteractionAnswerGroups(
         this.stateEditorService.getActiveStateName(),
         [newAnswerGroups]);
