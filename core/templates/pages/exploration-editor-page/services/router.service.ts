@@ -17,7 +17,7 @@
  */
 
 import { PlatformLocation } from '@angular/common';
-import { Injectable, EventEmitter, NgZone } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -61,8 +61,7 @@ export class RouterService {
     private explorationImprovementsService: ExplorationImprovementsService,
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
-    private location: PlatformLocation,
-    private ngZone: NgZone,
+    private location: PlatformLocation
   ) {
     this._changeTab(this.windowRef.nativeWindow.location.hash.split('#')[1]);
 
@@ -87,18 +86,16 @@ export class RouterService {
 
     if (newPath.indexOf(this.TABS.TRANSLATION.path) === 0) {
       this._activeTabName = this.TABS.TRANSLATION.name;
-      this.ngZone.runOutsideAngular(() => {
-        let waitForStatesToLoad = setInterval(() => {
-          if (this.explorationStatesService.isInitialized()) {
-            clearInterval(waitForStatesToLoad);
-            if (!this.stateEditorService.getActiveStateName()) {
-              this.stateEditorService.setActiveStateName(
-                this.explorationInitStateNameService.savedMemento);
-            }
-            this.refreshTranslationTabEventEmitter.emit();
+      let waitForStatesToLoad = setInterval(() => {
+        if (this.explorationStatesService.isInitialized()) {
+          clearInterval(waitForStatesToLoad);
+          if (!this.stateEditorService.getActiveStateName()) {
+            this.stateEditorService.setActiveStateName(
+              this.explorationInitStateNameService.savedMemento);
           }
-        }, 300);
-      });
+          this.refreshTranslationTabEventEmitter.emit();
+        }
+      }, 300);
     } else if (newPath.indexOf(this.TABS.PREVIEW.path) === 0) {
       this._activeTabName = this.TABS.PREVIEW.name;
       this._doNavigationWithState(newPath, this.SLUG_PREVIEW);
@@ -142,25 +139,23 @@ export class RouterService {
   _doNavigationWithState(path: string, pathType: string): void {
     let pathBase = '/' + pathType + '/';
     let putativeStateName = path.substring(pathBase.length);
-    this.ngZone.runOutsideAngular(() => {
-      let waitForStatesToLoad = setInterval(() => {
-        if (this.explorationStatesService.isInitialized()) {
-          clearInterval(waitForStatesToLoad);
-          if (this.explorationStatesService.hasState(putativeStateName)) {
-            this.stateEditorService.setActiveStateName(putativeStateName);
-            if (pathType === this.SLUG_GUI) {
-              this.windowRef.nativeWindow.location.hash = path;
-              this.stateEditorRefreshService.onRefreshStateEditor.emit();
-              // Fire an event to center the Graph in the Editor.
-              this.centerGraphEventEmitter.emit();
-            }
-          } else {
-            this._changeTab(
-              pathBase + this.explorationInitStateNameService.savedMemento);
+    let waitForStatesToLoad = setInterval(() => {
+      if (this.explorationStatesService.isInitialized()) {
+        clearInterval(waitForStatesToLoad);
+        if (this.explorationStatesService.hasState(putativeStateName)) {
+          this.stateEditorService.setActiveStateName(putativeStateName);
+          if (pathType === this.SLUG_GUI) {
+            this.windowRef.nativeWindow.location.hash = path;
+            this.stateEditorRefreshService.onRefreshStateEditor.emit();
+            // Fire an event to center the Graph in the Editor.
+            this.centerGraphEventEmitter.emit();
           }
+        } else {
+          this._changeTab(
+            pathBase + this.explorationInitStateNameService.savedMemento);
         }
-      }, 300);
-    });
+      }
+    }, 300);
   }
 
   _savePendingChanges(): void {
