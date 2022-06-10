@@ -1445,9 +1445,9 @@ class QuestionPlayerHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TransientCheckpointUrlHandler(base.BaseHandler):
+class TransientCheckpointUrlPage(base.BaseHandler):
     """Responsible for redirecting the learner to the checkpoint
-    last reached in the exploration as a logged out user."""
+    last reached on the exploration page as a logged out user."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'unique_progress_url_id': {

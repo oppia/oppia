@@ -3003,7 +3003,7 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
             'What language')
 
 
-class TransientCheckpointUrlHandlerTests(test_utils.GenericTestBase):
+class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
     """Tests for transient checkpoint url handler."""
 
     def test_exploration_page_raises_error_with_invalid_pid(self):
