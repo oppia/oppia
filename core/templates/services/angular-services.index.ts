@@ -407,6 +407,7 @@ import { ExplorationImprovementsService } from './exploration-improvements.servi
 import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
+import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -817,6 +818,7 @@ export const angularServices: [string, Type<{}>][] = [
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TranslationTopicService', TranslationTopicService],
+  ['TrainingDataService', TrainingDataService],
   ['TruncatePipe', TruncatePipe],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
