@@ -519,10 +519,21 @@ class UsernameCheckHandler(base.BaseHandler):
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
-        username = self.payload.get('username')
+        username = self.normalized_payload.get('username')
         try:
             user_domain.UserSettings.require_valid_username(username)
         except utils.ValidationError as e:
