@@ -59,7 +59,7 @@ export class SmartRouterLink extends RouterLinkWithHref {
     );
     if (!currentPageIsInRouter && !currentPageIsInLightweightRouter) {
       window.location.href = this.urlTree.toString();
-      return true;
+      return false;
     }
 
     let lightweightRouterPagesRoutes = [];
@@ -87,7 +87,7 @@ export class SmartRouterLink extends RouterLinkWithHref {
       for (let route of lightweightRouterPagesRoutes) {
         if (this.urlTree.toString().match(route)) {
           window.location.href = this.urlTree.toString();
-          return true;
+          return false;
         }
       }
     }
@@ -96,7 +96,7 @@ export class SmartRouterLink extends RouterLinkWithHref {
       for (let route of routerPagesRoutes) {
         if (this.urlTree.toString().match(route)) {
           window.location.href = this.urlTree.toString();
-          return true;
+          return false;
         }
       }
     }
