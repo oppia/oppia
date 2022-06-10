@@ -119,20 +119,6 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.TSCONFIG_FILEPATH)
 
-    def test_error_is_produced_for_invalid_compilation(self) -> None:
-        """Test that error is produced if stdout is not empty."""
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
-            return process
-
-        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
-            with self.assertRaisesRegex(SystemExit, '1'):  # type: ignore[no-untyped-call]
-                typescript_checks.compile_and_check_typescript(
-                    typescript_checks.TSCONFIG_FILEPATH)
-
     def test_config_path_when_no_arg_is_used(self) -> None:
         """Test if the config path is correct when no arg is used."""
         def mock_compile_and_check_typescript(config_path: str) -> None:

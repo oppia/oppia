@@ -898,7 +898,9 @@ def compile_and_check_typescript(config_path: str) -> None:
 
     if error_messages:
         print('\n' + '\n'.join(error_messages))
-        print(str(len(error_messages)) + ' Errors found during compilation.\n')
+        print(
+            str(len([x for x in error_messages if x.startswith(prefixes)])) +
+            ' Errors found during compilation.\n')
         sys.exit(1)
     else:
         print('Compilation successful!')
