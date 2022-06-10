@@ -22,9 +22,10 @@ import os
 import subprocess
 import sys
 
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
 from core.constants import constants
 from scripts import build
-from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
 from scripts import servers
