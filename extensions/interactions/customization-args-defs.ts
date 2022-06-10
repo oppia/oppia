@@ -46,13 +46,13 @@ export interface ReadableMusicNote {
 
 export interface AlgebraicExpressionInputCustomizationArgs {
   useFractionForDivision: boolean;
-  customOskLetters: {
+  allowedVariables: {
     value: string[];
   };
 }
 export interface AlgebraicExpressionInputCustomizationArgsBackendDict {
   useFractionForDivision: boolean;
-  customOskLetters: {
+  allowedVariables: {
     value: string[];
   };
 }
@@ -283,13 +283,13 @@ export interface ItemSelectionInputCustomizationArgs {
 
 export interface MathEquationInputCustomizationArgsBackendDict {
   useFractionForDivision: boolean;
-  customOskLetters: {
+  allowedVariables: {
     value: string[];
   };
 }
 export interface MathEquationInputCustomizationArgs {
   useFractionForDivision: boolean;
-  customOskLetters: {
+  allowedVariables: {
     value: string[];
   };
 }

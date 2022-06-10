@@ -130,7 +130,7 @@ export class OnScreenKeyboardComponent {
       this.engine = this.guppyInstance.engine;
       this.interactionType = GuppyInitializationService.interactionType;
       this.customLetters =
-        this.guppyInitializationService.getCustomOskLetters();
+        this.guppyInitializationService.getAllowedVariables();
       return true;
     }
     return false;

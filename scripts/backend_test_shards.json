@@ -22,7 +22,6 @@
         "core.controllers.concept_card_viewer_test",
         "core.controllers.story_editor_test",
         "core.controllers.subtopic_viewer_test",
-        "core.python_utils_test",
         "core.controllers.questions_list_test",
         "core.constants_test",
         "core.controllers.topic_viewer_test",
