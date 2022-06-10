@@ -21,6 +21,8 @@ from __future__ import annotations
 import os
 import re
 
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
 from core import utils
 
 from typing import List
