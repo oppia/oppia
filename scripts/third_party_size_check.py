@@ -25,8 +25,6 @@ import fnmatch
 import os
 import sys
 
-from core import utils
-
 from typing import List
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
@@ -45,7 +43,7 @@ def _get_skip_files_list() -> List[str]:
         IOError. If failed to open .gcloudignore in read mode.
     """
     try:
-        with utils.open_file('.gcloudignore', 'r') as gcloudignore:
+        with open('.gcloudignore', 'r') as gcloudignore:
             gcloudignore_lines = gcloudignore.read().split('\n')
 
             skip_files_list = [

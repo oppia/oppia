@@ -23,9 +23,10 @@ import os
 import subprocess
 import sys
 
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
 from core.constants import constants
 from scripts import build
-from scripts import common
 from scripts import servers
 
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'

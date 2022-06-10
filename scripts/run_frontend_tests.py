@@ -21,11 +21,12 @@ import os
 import subprocess
 import sys
 
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
 from typing import Optional, Sequence
 
 from . import build
 from . import check_frontend_test_coverage
-from . import common
 from . import install_third_party_libs
 
 # These is a relative path from the oppia/ folder. They are relative because the

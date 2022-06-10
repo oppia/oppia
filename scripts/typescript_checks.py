@@ -23,11 +23,11 @@ import shutil
 import subprocess
 import sys
 
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
 from core import utils
 
 from typing import Optional, Sequence
-
-from . import common
 
 _PARSER = argparse.ArgumentParser(
     description="""
