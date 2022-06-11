@@ -25,7 +25,14 @@ import fnmatch
 import os
 import sys
 
-from typing import List
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core import utils  # isort:skip
+
+from typing import List  # isort:skip
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000
@@ -43,7 +50,7 @@ def _get_skip_files_list() -> List[str]:
         IOError. If failed to open .gcloudignore in read mode.
     """
     try:
-        with open('.gcloudignore', 'r') as gcloudignore:
+        with utils.open_file('.gcloudignore', 'r') as gcloudignore:
             gcloudignore_lines = gcloudignore.read().split('\n')
 
             skip_files_list = [

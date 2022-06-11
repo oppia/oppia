@@ -57,6 +57,13 @@ import socket
 import sys
 import threading
 
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core import utils   # isort:skip
+
 _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
 
@@ -71,7 +78,7 @@ def _get_process_command_line(pid):
         str. The command that started the process.
     """
     try:
-        with open('/proc/{}/cmdline'.format(pid), 'rt') as f:
+        with utils.open_file('/proc/{}/cmdline'.format(pid), 'r') as f:
             return f.read()
     except IOError:
         return ''
@@ -87,7 +94,7 @@ def _get_process_start_time(pid):
         str. The time when the process started.
     """
     try:
-        with open('/proc/{}/stat'.format(pid), 'rt') as f:
+        with utils.open_file('/proc/{}/stat'.format(pid), 'r') as f:
             return int(f.readline().split()[21])
     except IOError:
         return 0
