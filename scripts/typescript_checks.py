@@ -850,11 +850,13 @@ def compile_and_check_typescript(config_path: str) -> None:
         for filename in files_with_errors:
             if filename not in NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH:
                 files_not_type_strict.append(filename)
-        files_not_type_strict.append('typings')
+
         # Show successfull compilation message, if there are no missing files.
         if files_not_type_strict == []:
             print('Compilation successful!')
             sys.exit(1)
+
+        files_not_type_strict.append('typings')
 
         # Update "include" field of tsconfig-strict.json with files that are
         # neither strict typed nor present in
@@ -900,14 +902,11 @@ def compile_and_check_typescript(config_path: str) -> None:
         with open(file_name, 'w', encoding='utf-8') as f:
             f.write(new_index_yaml_dict + '\n')
 
-        if error_messages:
-            print('\n' + '\n'.join(error_messages))
-            print(
-                str(len([x for x in error_messages if x.startswith(prefixes)]))
-                + ' Errors found during compilation.\n')
-            sys.exit(1)
-        else:
-            print('Compilation successful!')
+        print('\n' + '\n'.join(error_messages))
+        print(
+            str(len([x for x in error_messages if x.startswith(prefixes)])) +
+            ' Errors found during compilation.\n')
+        sys.exit(1)
 
     else:
         if error_messages:
