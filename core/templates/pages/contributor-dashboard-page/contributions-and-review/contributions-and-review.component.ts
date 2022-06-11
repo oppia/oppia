@@ -19,6 +19,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 
 require('base-components/base-content.component.ts');
 require(
@@ -91,6 +92,7 @@ angular.module('oppia').component('contributionsAndReview', {
       var SUGGESTION_TYPE_TRANSLATE = 'translate_content';
       ctrl.TAB_TYPE_CONTRIBUTIONS = 'contributions';
       ctrl.TAB_TYPE_REVIEWS = 'reviews';
+      ctrl.activeExplorationId = null;
 
       var tabNameToOpportunityFetchFunction = {
         [SUGGESTION_TYPE_QUESTION]: {
@@ -118,7 +120,7 @@ angular.module('oppia').component('contributionsAndReview', {
             return ContributionAndReviewService
               .getReviewableTranslationSuggestionsAsync(
                 shouldResetOffset,
-                TranslationTopicService.getActiveTopicName());
+                ctrl.activeExplorationId);
           }
         }
       };
@@ -299,6 +301,12 @@ angular.module('oppia').component('contributionsAndReview', {
           ctrl.activeSuggestionType === suggestionType);
       };
 
+      ctrl.isReviewTranslationsTab = function() {
+        return (
+          ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS &&
+          ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE);
+      };
+
       const openQuestionSuggestionModal = function(
           suggestionId, suggestion, reviewable, question = undefined) {
         var contributionDetails = ctrl.contributions[suggestionId].details;
@@ -364,11 +372,42 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.activeDropdownTabChoice = ctrl.getActiveDropdownTabChoice();
         ctrl.dropdownShown = false;
         ctrl.contributions = {};
+        ctrl.activeExplorationId = null;
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
       ctrl.toggleDropdown = function() {
         ctrl.dropdownShown = !ctrl.dropdownShown;
+      };
+
+      ctrl.loadReviewableTranslationOpportunities = function() {
+        return ContributionOpportunitiesService
+          .getReviewableTranslationOpportunitiesAsync(
+            TranslationTopicService.getActiveTopicName())
+          .then(function(response) {
+            const opportunitiesDicts = [];
+            response.opportunities.forEach(opportunity => {
+              const opportunityDict = {
+                id: opportunity.getExplorationId(),
+                heading: opportunity.getOpportunityHeading(),
+                subheading: opportunity.getOpportunitySubheading(),
+                actionButtonTitle: 'Translations'
+              };
+              opportunitiesDicts.push(opportunityDict);
+            });
+            return {
+              opportunitiesDicts: opportunitiesDicts,
+              more: response.more
+            };
+          });
+      };
+
+      ctrl.onClickReviewableTranslations = function(explorationId) {
+        ctrl.activeExplorationId = explorationId;
+      };
+
+      ctrl.onClickBackToReviewableLessons = function() {
+        ctrl.activeExplorationId = null;
       };
 
       ctrl.loadOpportunities = function() {
@@ -438,8 +477,14 @@ angular.module('oppia').component('contributionsAndReview', {
             enabled: true
           }
         ];
+        ctrl.directiveSubscriptions = new Subscription();
         TranslationTopicService.setActiveTopicName(
           DEFAULT_OPPORTUNITY_TOPIC_NAME);
+
+        // Reset active exploration when changing topics.
+        ctrl.directiveSubscriptions.add(
+          TranslationTopicService.onActiveTopicChanged.subscribe(
+            () => ctrl.activeExplorationId = null));
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
@@ -502,6 +547,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
         $(document).off('click', ctrl.closeDropdownWhenClickedOutside);
       };
     }

@@ -123,6 +123,18 @@ export class ContributionOpportunitiesService {
     throw new Error('No more translation opportunities available.');
   }
 
+  async getReviewableTranslationOpportunitiesAsync(topicName: string):
+  Promise<ExplorationOpportunitiesDict> {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchReviewableTranslationOpportunitiesAsync(topicName)
+      .then(({ opportunities }) => {
+        return {
+          opportunities: opportunities,
+          more: false
+        };
+      });
+  }
+
   async getTranslatableTopicNamesAsync(): Promise<string[]> {
     return this._getTranslatableTopicNamesAsync();
   }

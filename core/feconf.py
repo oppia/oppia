@@ -992,6 +992,7 @@ EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
+REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -1552,10 +1553,6 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
-
-# This represents a literal constant for All and is used whereever
-# we need to compare a value with value All (for example, all topics)
-ALL_LITERAL_CONSTANT = 'All'
 
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
