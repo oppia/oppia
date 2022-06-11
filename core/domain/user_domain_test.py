@@ -374,7 +374,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_create_new_user_with_existing_auth_id_raises_error(self) -> None:
         user_id = self.user_settings.user_id
-        user_auth_id = auth_services.get_auth_id_from_user_id(user_id)  # type: ignore[no-untyped-call]
+        user_auth_id = auth_services.get_auth_id_from_user_id(user_id)
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'User %s already exists for auth_id %s.'
             % (user_id, user_auth_id)

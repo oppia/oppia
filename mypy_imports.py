@@ -25,6 +25,7 @@ from __future__ import annotations
 
 from core.platform.app_identity import (
     gae_app_identity_services as app_identity_services)
+from core.platform.auth import firebase_auth_services as platform_auth_services
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
@@ -84,6 +85,7 @@ __all__ = [
     'job_models',
     'memory_cache_services',
     'opportunity_models',
+    'platform_auth_services',
     'question_models',
     'recommendations_models',
     'search_services',
