@@ -74,7 +74,7 @@ jobs:
         with:
           name: protractor-video
           path: /home/runner/work/oppia/protractor-video
-       - name: Uploading webdriverio-video as Artifacts
+      - name: Uploading webdriverio-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
