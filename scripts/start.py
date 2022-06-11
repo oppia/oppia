@@ -28,7 +28,7 @@ from typing import Iterator, Optional, Sequence
 # import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
+# libraries that use the builtins python module (e.g. build).
 install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

@@ -1014,7 +1014,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     @staticmethod
     def convert_customization_args_dict_to_customization_args(
-            interaction_id, customization_args_dict):
+        interaction_id,
+        customization_args_dict,
+        state_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION
+    ):
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
         InteractionCustomizationArg domain object.
@@ -1025,6 +1028,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 argument name to a customization argument dict, which is a dict
                 of the single key 'value' to the value of the customization
                 argument.
+            state_schema_version: int. The state schema version.
 
         Returns:
             dict. A dictionary of customization argument names to the
@@ -1033,8 +1037,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if interaction_id is None:
             return {}
 
-        ca_specs_dict = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).to_dict()['customization_arg_specs']
+        ca_specs_dict = (
+            interaction_registry.Registry
+            .get_all_specs_for_state_schema_version(
+                state_schema_version,
+                can_fetch_latest_specs=True
+            )[interaction_id]['customization_arg_specs']
+        )
 
         return (
             InteractionCustomizationArg

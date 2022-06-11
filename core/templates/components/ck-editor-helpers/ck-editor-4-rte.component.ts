@@ -121,7 +121,14 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
-    let value = this.value;
+
+    // Angular lifecycle methods on NgModel write null to the value property.
+    // Initializing this properly won't work as Angular will overwrite the
+    // value after it has been initialized.
+    // Since string methods are used on value variable, so it can't be null or
+    // undefined. When we move to reactive forms, this won't be a problem.
+    // TODO(#15458): Change the ternary statement to "let value = this.value".
+    let value = this.value ? this.value : '';
     // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<oppia-noninteractive-/g,

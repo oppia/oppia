@@ -30,6 +30,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class ExplorationCorrectnessFeedbackService extends
   ExplorationPropertyService {
   propertyName: string = 'correctness_feedback_enabled';
+  savedMemento: string | boolean;
 
   constructor(
     protected alertsService: AlertsService,
