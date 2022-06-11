@@ -101,7 +101,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   MODE_UPLOADED = 2;
   MODE_SAVED = 3;
 
-  IMAGE_UPLOADING = false;
+  imageIsUploading = false;
 
   // We only use PNG format since that is what canvas can export to in
   // all browsers.
@@ -560,7 +560,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       metadata: {},
       crop: true
     };
-    this.IMAGE_UPLOADING = false;
+    this.imageIsUploading = false;
     this.imageResizeRatio = 1;
     this.invalidTagsAndAttributes = {
       tags: [],
@@ -915,7 +915,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       },
       crop: true
     };
-    this.IMAGE_UPLOADING = false;
+    this.imageIsUploading = false;
     if (updateParent) {
       this.alertsService.clearWarnings();
       this.value = filename;
@@ -948,7 +948,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   saveUploadedFile(): void {
     this.alertsService.clearWarnings();
     this.processedImageIsTooLarge = false;
-    this.IMAGE_UPLOADING = true;
+    this.imageIsUploading = true;
 
     if (!this.data.metadata.uploadedFile) {
       this.alertsService.addWarning('No image file detected.');
@@ -970,7 +970,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
           this.validateProcessedFilesize(obj.image);
           if (this.processedImageIsTooLarge) {
             document.body.style.cursor = 'default';
-            this.IMAGE_UPLOADING = false;
+            this.imageIsUploading = false;
             return;
           }
           resampledFile = (
@@ -979,7 +979,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
           if (resampledFile === null) {
             this.alertsService.addWarning('Could not get resampled file.');
             document.body.style.cursor = 'default';
-            this.IMAGE_UPLOADING = false;
+            this.imageIsUploading = false;
             return;
           }
           this.saveImage(dimensions, resampledFile, 'gif');
@@ -1000,7 +1000,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         imageDataURI, dimensions.width, dimensions.height);
       this.validateProcessedFilesize(resampledImageData);
       if (this.processedImageIsTooLarge) {
-        this.IMAGE_UPLOADING = false;
+        this.imageIsUploading = false;
         return;
       }
       resampledFile = (
@@ -1008,7 +1008,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
           resampledImageData));
       if (resampledFile === null) {
         this.alertsService.addWarning('Could not get resampled file.');
-        this.IMAGE_UPLOADING = false;
+        this.imageIsUploading = false;
         return;
       }
       this.saveImage(dimensions, resampledFile, 'png');
