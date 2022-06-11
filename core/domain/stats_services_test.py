@@ -1499,7 +1499,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'rule_spec_index': 1, 'classification_categorization': 'explicit',
             'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {}
         }]
-    
+
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, first_state_name)
         self.assertEqual(
@@ -1700,7 +1700,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}, 
+            'params': {},
             'answer_str': None,
             'rule_spec_str': None
         }, {

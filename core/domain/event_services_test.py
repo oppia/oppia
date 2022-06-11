@@ -454,7 +454,7 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': {},
             'rule_spec_str': None,
-            'answer_str': None, 
+            'answer_str': None,
         }])
 
         all_models = (
