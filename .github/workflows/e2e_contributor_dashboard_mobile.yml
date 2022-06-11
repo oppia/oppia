@@ -45,7 +45,7 @@ jobs:
         run: sudo apt install ffmpeg
       - name: Run Contributor Dashboard Tests
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 600x1000x24" python -m scripts.run_e2e_tests --suite="contributorDashboard" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 600x1000x24" python -m scripts.run_e2e_tests --suite="contributorDashboard" --mobile --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 1
       - name: Uploading protractor-video as Artifacts

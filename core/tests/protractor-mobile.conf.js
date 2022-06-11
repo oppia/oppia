@@ -275,7 +275,7 @@ exports.config = {
       w3c: false,
       args: [
         '--lang=en-EN',
-        '--window-size=1285x1000',
+        '--window-size=600x1000',
         // These arguments let us simulate recording from a microphone.
         '--use-fake-device-for-media-stream',
         '--use-fake-ui-for-media-stream',
@@ -320,7 +320,7 @@ exports.config = {
   // You can specify a file containing code to run by setting onPrepare to
   // the filename string.
   onPrepare: function() {
-    browser.isMobile = false;
+    browser.isMobile = true;
     // At this point, global 'protractor' object will be set up, and jasmine
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
@@ -341,7 +341,7 @@ exports.config = {
             '-y',
             '-r', '30',
             '-f', 'x11grab',
-            '-s', '1285x1000',
+            '-s', '600x1000',
             '-i', process.env.DISPLAY,
             '-g', '300',
             '-loglevel', '16',
@@ -397,7 +397,7 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    browser.driver.manage().window().setSize(1285, 1000);
+    browser.driver.manage().window().setSize(600, 1000);
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';

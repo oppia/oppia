@@ -193,6 +193,8 @@ PROTRACTOR_BIN_PATH = (
     os.path.join(NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'))
 PROTRACTOR_CONFIG_FILE_PATH = (
     os.path.join('core', 'tests', 'protractor.conf.js'))
+PROTRACTOR_MOBILE_CONFIG_FILE_PATH = (
+    os.path.join('core', 'tests', 'protractor-mobile.conf.js'))
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,

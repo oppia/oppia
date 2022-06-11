@@ -134,7 +134,7 @@ var AdminPage = function() {
     let width = (await browser.manage().window().getSize()).width;
     if (width < 711) {
       // TODO(#15562): Add proper mobile navigation after this has been fixed.
-      await browser.get('/admin#/roless');
+      await browser.get('/admin#/roles');
     } else {
       await action.click('Admin roles tab button', adminRolesTab);
     }
