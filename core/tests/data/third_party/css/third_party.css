@@ -25138,9 +25138,6 @@ readers do not read off random characters that represent icons */
 .fa-wrench:before {
   content: "\f0ad"; }
 
-.fa-x-mark:before {
-  content: "\f00d"; }  
-
 .fa-x-ray:before {
   content: "\f497"; }
 
