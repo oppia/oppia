@@ -32,6 +32,8 @@ from core.platform.datastore import (
 from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
 from core.platform.storage import dev_mode_storage_services as storage_services
+from core.platform.taskqueue import (
+    dev_mode_taskqueue_services as platform_taskqueue_services)
 from core.platform.transactions import (
     cloud_transaction_services as transaction_services)
 from core.platform.translate import (
@@ -86,6 +88,7 @@ __all__ = [
     'memory_cache_services',
     'opportunity_models',
     'platform_auth_services',
+    'platform_taskqueue_services',
     'question_models',
     'recommendations_models',
     'search_services',
