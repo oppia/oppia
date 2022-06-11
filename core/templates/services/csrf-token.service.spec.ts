@@ -28,7 +28,7 @@ describe('Csrf Token Service', function() {
     });
   });
 
-  fit('should correctly set the csrf token', (done) => {
+  it('should correctly set the csrf token', (done) => {
     csrfTokenService.initializeToken();
 
     csrfTokenService.getTokenAsync().then(function(token) {

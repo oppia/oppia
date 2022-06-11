@@ -36,10 +36,8 @@ export class CsrfTokenService {
     this.tokenPromise = fetch(
       '/csrfhandler'
     ).then((response: Response) => {
-      console.log(response);
       return response.text();
     }).then((responseText: string) => {
-      console.log(responseText);
       return JSON.parse(responseText.substring(5)).token;
     });
   }
