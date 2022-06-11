@@ -32,7 +32,6 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.domain import user_domain
@@ -43,8 +42,8 @@ from core.tests import test_utils
 import requests_mock
 
 auth_models, user_models, audit_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user,
-        models.NAMES.audit]))
+    models.Registry.import_models(
+        [models.NAMES.auth, models.NAMES.user, models.NAMES.audit]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
 
@@ -851,7 +850,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
             'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
             'CAN_MANAGE_VOICE_ARTIST'])
-        expected_roles = set(['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
+        expected_roles = set(
+            ['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
             'VOICEOVER_ADMIN'])
 
         self.assertEqual(set(system_user_action.actions), expected_actions)
@@ -1938,7 +1938,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         def mock_get_current_time_in_millisec():
             return 1.00
 
-        with self.swap(utils, 'get_current_time_in_millisecs',
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
             mock_get_current_time_in_millisec):
             committer_id = 'someUser'
             audit = audit_models.UsernameChangeAuditModel()
@@ -2713,7 +2714,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
     def test_get_user_impact_score(self):
         expected_impact_score = 3
-        with self.swap(user_models.UserStatsModel, 'impact_score',
+        with self.swap(
+            user_models.UserStatsModel, 'impact_score',
             expected_impact_score
         ):
             user_with_no_model_score = user_services.get_user_impact_score(
@@ -2755,12 +2757,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
     def test_update_dashboard_stats_log_with_invalid_schema_version(self):
         with self.swap(user_models.UserStatsModel, 'schema_version', 5):
-            model = user_models.UserStatsModel.get_or_create(self.owner_id)
-
             with self.assertRaisesRegex(
                 Exception,
-                ('Sorry, we can only process v1-v%d dashboard stats schemas at'
-                ' present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
+                'Sorry, we can only process v1-v%d dashboard stats schemas at'
+                ' present.' % (feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
             ):
                 user_services.update_dashboard_stats_log(self.owner_id)
 
