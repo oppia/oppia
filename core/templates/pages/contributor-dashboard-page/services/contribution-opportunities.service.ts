@@ -119,6 +119,18 @@ export class ContributionOpportunitiesService {
     }
   }
 
+  async getReviewableTranslationOpportunitiesAsync(topicName: string):
+  Promise<ExplorationOpportunitiesDict> {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchReviewableTranslationOpportunitiesAsync(topicName)
+      .then(({ opportunities }) => {
+        return {
+          opportunities: opportunities,
+          more: false
+        };
+      });
+  }
+
   async getTranslatableTopicNamesAsync(): Promise<string[]> {
     return this._getTranslatableTopicNamesAsync();
   }
