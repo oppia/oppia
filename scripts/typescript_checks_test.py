@@ -113,20 +113,20 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             self.assertFalse(
                 os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
-    def test_no_error_is_produced_for_valid_compilation_of_tsconfig_file(self) -> None:
+    def test_no_error_is_produced_for_valid_compilation_of_tsconfig_file(self) -> None: # pylint: disable=line-too-long
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.TSCONFIG_FILEPATH)
 
-    def test_no_error_is_produced_for_valid_compilation_of_strict_tsconfig_file(self) -> None:
+    def test_no_error_is_produced_for_valid_compilation_of_strict_tsconfig_file(self) -> None: # pylint: disable=line-too-long
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:
             with self.assertRaisesRegex(SystemExit, '1'):  # type: ignore[no-untyped-call]
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.STRICT_TSCONFIG_FILEPATH)
 
-    def test_error_is_produced_for_invalid_compilation_of_tsconfig_file(self) -> None:
+    def test_error_is_produced_for_invalid_compilation_of_tsconfig_file(self) -> None: # pylint: disable=line-too-long
         """Test that error is produced if stdout is not empty."""
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
