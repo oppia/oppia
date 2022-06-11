@@ -61,8 +61,29 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
   }
 ]);
 
-import { Directive, ElementRef, Injector, Input, SimpleChanges } from '@angular/core';
+import { TemplatePortal } from '@angular/cdk/portal';
+import { ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Injector, Input, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
+import { AlgebraicExpressionInputInteractionComponent } from 'interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component';
+import { InteractiveCodeReplComponent } from 'interactions/CodeRepl/directives/oppia-interactive-code-repl.component';
+import { OppiaInteractiveContinue } from 'interactions/Continue/directives/oppia-interactive-continue.component';
+import { InteractiveDragAndDropSortInputComponent } from 'interactions/DragAndDropSortInput/directives/oppia-interactive-drag-and-drop-sort-input.component';
+import { InteractiveEndExplorationComponent } from 'interactions/EndExploration/directives/oppia-interactive-end-exploration.component';
+import { InteractiveFractionInputComponent } from 'interactions/FractionInput/directives/oppia-interactive-fraction-input.component';
+import { InteractiveGraphInput } from 'interactions/GraphInput/directives/oppia-interactive-graph-input.component';
+import { InteractiveImageClickInput } from 'interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component';
+import { InteractiveInteractiveMapComponent } from 'interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component';
+import { InteractiveItemSelectionInputComponent } from 'interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component';
+import { InteractiveMathEquationInput } from 'interactions/MathEquationInput/directives/oppia-interactive-math-equation-input.component';
+import { InteractiveMultipleChoiceInputComponent } from 'interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component';
+import { MusicNotesInputComponent } from 'interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component';
+import { InteractiveNumberWithUnitsComponent } from 'interactions/NumberWithUnits/directives/oppia-interactive-number-with-units.component';
+import { InteractiveNumericExpressionInput } from 'interactions/NumericExpressionInput/directives/oppia-interactive-numeric-expression-input.component';
+import { InteractiveNumericInput } from 'interactions/NumericInput/directives/oppia-interactive-numeric-input.component';
+import { PencilCodeEditor } from 'interactions/PencilCodeEditor/directives/oppia-interactive-pencil-code-editor.component';
+import { InteractiveRatioExpressionInputComponent } from 'interactions/RatioExpressionInput/directives/oppia-interactive-ratio-expression-input.component';
+import { InteractiveSetInputComponent } from 'interactions/SetInput/directives/oppia-interactive-set-input.component';
+import { InteractiveTextInputComponent } from 'interactions/TextInput/directives/oppia-interactive-text-input.component';
 // Allow $scope to be provided to parent Component.
 export const ScopeProvider = {
   deps: ['$injector'],
@@ -73,7 +94,7 @@ export const ScopeProvider = {
   selector: 'angular-html-bind-wrapper',
   providers: [ScopeProvider],
 })
-export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
+export class AngularHtmlBindWrapperDirectiveA extends UpgradeComponent {
   @Input() htmlData: string;
   @Input() parentScope;
   @Input() classStr = '';
@@ -81,3 +102,121 @@ export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
     super('angularHtmlBindWrapper', elementRef, injector);
   }
 }
+
+@Component({
+  selector: 'angular-html-bind-wrapper',
+  templateUrl: './angular-html-bind-wrapper.directive.html'
+})
+export class AngularHtmlBindWrapperDirective {
+  @Input() htmlData: string;
+  @Input() parentScope;
+  @Input() classStr = '';
+  @ViewChild('templatePortalContent') templatePortalContent:
+  TemplateRef<unknown>;
+
+  templatePortal: TemplatePortal<unknown>;
+
+  mapping = {
+    'OPPIA-INTERACTIVE-CODE-REPL': InteractiveCodeReplComponent,
+    'OPPIA-INTERACTIVE-END-EXPLORATION': InteractiveEndExplorationComponent,
+    'OPPIA-INTERACTIVE_CONTINUE': OppiaInteractiveContinue,
+    'OPPIA-INTERACTIVE-IMAGE-CLICK-INPUT': InteractiveImageClickInput,
+    'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT':
+    InteractiveItemSelectionInputComponent,
+    'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT':
+    InteractiveMultipleChoiceInputComponent,
+    'OPPIA-INTERACTIVE-NUMERIC-INPUT': InteractiveNumericInput,
+    'OPPIA-INTERACTIVE-TEXT-INPUT': InteractiveTextInputComponent,
+    'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT':
+    InteractiveDragAndDropSortInputComponent,
+    'OPPIA-INTERACTIVE-FRACTION-INPUT': InteractiveFractionInputComponent,
+    'OPPIA-INTERACTIVE-GRAPH-INPUT': InteractiveGraphInput,
+    'OPPIA-INTERACTIVE-SET-INPUT': InteractiveSetInputComponent,
+    'OPPIA-INTERACTIVE-NUMERIC-EXPRESSION-INPUT':
+    InteractiveNumericExpressionInput,
+    'OPPIA-INTERACTIVE-ALGEBRAIC-EXPRESSION-INPUT':
+    AlgebraicExpressionInputInteractionComponent,
+    'OPPIA-INTERACTIVE-MATH-EQUATION-INPUT': InteractiveMathEquationInput,
+    'OPPIA-INTERACTIVE-NUMBER-WITH-UNITS': InteractiveNumberWithUnitsComponent,
+    'OPPIA-INTERACTIVE-RATIO-EXPRESSION-INPUT':
+    InteractiveRatioExpressionInputComponent,
+    'OPPIA-INTERACTIVE-PENCIL-CODE-EDITOR': PencilCodeEditor,
+    'OPPIA-INTERACTIVE-MUSIC-NOTES-INPUT': MusicNotesInputComponent,
+    'OPPIA-INTERACTIVE-INTERACTIVE-MAP': InteractiveInteractiveMapComponent,
+  };
+
+  camelCaseFromHyphen(str: string): string {
+    const newStr = str.replace(/[\])}[{(]/g, '');
+    return newStr.replace(
+      /-([a-z])/g,
+      function(g) {
+        return g[1].toUpperCase();
+      });
+  }
+
+  constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private viewContainerRef: ViewContainerRef,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  ngAfterViewInit(): void {
+    this.templatePortal = new TemplatePortal(
+      this.templatePortalContent, this.viewContainerRef);
+    this.changeDetectorRef.detectChanges();
+    let domparser = new DOMParser();
+    if (this.htmlData) {
+      let dom = domparser.parseFromString(this.htmlData, 'text/html');
+      if (this.mapping[dom.body.firstElementChild.tagName]) {
+        const componentFactory = this.componentFactoryResolver
+          .resolveComponentFactory(
+            this.mapping[dom.body.firstElementChild.tagName]);
+
+        const componentRef = this.viewContainerRef.createComponent(
+          componentFactory);
+        let attributes = dom.body.firstElementChild.attributes;
+
+        for (let i = 0; i < attributes.length; i++) {
+          if (/[\])}[{(]/g.test(attributes[i].name)) {
+            if (this.parentScope) {
+              componentRef.instance[
+                this.camelCaseFromHyphen(attributes[i].name)] =
+              this.parentScope[this.camelCaseFromHyphen(attributes[i].name)];
+            } else {
+              componentRef.instance[
+                this.camelCaseFromHyphen(attributes[i].name)] = null;
+            }
+          } else {
+            componentRef.instance[
+              this.camelCaseFromHyphen(attributes[i].name)] =
+              attributes[i].value;
+          }
+        }
+
+        componentRef.changeDetectorRef.detectChanges();
+      }
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // When there are trailing spaces in the HTML, CKEditor adds &nbsp;
+    // to the HTML (eg: '<p> Text &nbsp; &nbsp; %nbsp;</p>'), which can
+    // lead to UI issues when displaying it. Hence, the following block
+    // replaces the trailing ' &nbsp; &nbsp; %nbsp;</p>' with just '</p>'.
+    // We can't just find and replace '&nbsp;' here since, those in the
+    // middle may actually be required. Only the trailing ones need to be
+    // replaced.
+    if (changes.htmlData) {
+      this.htmlData = changes.htmlData.currentValue
+        .replace(/^(<p>\&nbsp\;<\/p>\n\n)+/g, '');
+      this.htmlData = this.htmlData.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
+      // The following line is required since blank newlines in between
+      // paragraphs are treated as <p>&nbsp;</p> by ckedior. So, these
+      // have to be restored, as this will get reduced to <p></p> above.
+      // There is no other via user input to get <p></p>, so this wouldn't
+      // affect any other data.
+      this.htmlData = this.htmlData.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
+    }
+  }
+}
+
