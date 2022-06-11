@@ -721,6 +721,48 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'subject': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'feedback': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': 10000
+                    }]
+                },
+                'default_value': None
+            },
+            'include_author': {
+                'schema': {
+                    'type': 'bool'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests.
@@ -728,9 +770,10 @@ class ReaderFeedbackHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        subject = self.payload.get('subject', 'Feedback from a learner')
-        feedback = self.payload.get('feedback')
-        include_author = self.payload.get('include_author')
+        subject = self.normalized_payload.get('subject')
+        subject = subject if subject else 'Feedback from a learner'
+        feedback = self.normalized_payload.get('feedback')
+        include_author = self.normalized_payload.get('include_author')
 
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,
