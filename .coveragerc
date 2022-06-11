@@ -8,9 +8,6 @@ omit =
     *core/tests/*
     *scripts/linters/test_files/*
     *__init__.py
-    # TODO(#13935): Remove python_utils from the list once the codebase is
-    # run under Python 3.
-    core/python_utils.py
 
 # The 'exclude_lines' is used to skip a particular clause in coverage.
 # We exclude any line with a comment of “pragma: no cover” as this is the default option
