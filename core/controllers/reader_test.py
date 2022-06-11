@@ -3194,7 +3194,7 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/sync_logged_out_learner_progress_with_logged_in_progress/%s' % exp_id, # pylint: disable=line-too-long
+            '/sync_logged_out_and_logged_in_progress/%s' % exp_id, # pylint: disable=line-too-long
             {
                 'unique_progress_url_id': pid,
             },

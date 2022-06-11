@@ -258,6 +258,10 @@ class ExplorationHandler(base.BaseHandler):
             'pid': {
                 'schema': {
                     'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_PID_LENGTH
+                    }]
                 },
                 'default_value': None
             }
@@ -1452,8 +1456,8 @@ class TransientCheckpointUrlPage(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'unique_progress_url_id': {
             'schema': {
-                    'type': 'basestring',
-                }
+                'type': 'basestring',
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -1505,7 +1509,7 @@ class SaveTransientCheckpointProgressHandler(base.BaseHandler):
             'unique_progress_url_id': {
                 'schema': {
                     'type': 'basestring',
-                    }
+                }
             },
             'most_recently_reached_checkpoint_state_name': {
                 'schema': {

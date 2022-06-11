@@ -531,7 +531,7 @@ URLS = [
         '/explorehandler/solution_hit_event/<exploration_id>',
         reader.SolutionHitEventHandler),
     get_redirect_route(
-        '/sync_logged_out_learner_progress_with_logged_in_progress/<exploration_id>', # pylint: disable=line-too-long
+        '/sync_logged_out_and_logged_in_progress/<exploration_id>',
         reader.SyncLoggedOutLearnerProgressHandler),
     get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
