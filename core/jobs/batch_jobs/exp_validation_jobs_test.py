@@ -39,7 +39,7 @@ class ExpStateValidationJobTests(
     EXPLORATION_ID_3 = '3'
 
     EXP_1_STATE_1 = state_domain.State.create_default_state(
-        "EXP_1_STATE_1", is_initial_state=True).to_dict()
+        "EXP_1_STATE_2", is_initial_state=True).to_dict()
 
     EXP_1_STATE_1['interaction'] = {
       "id": "NumericInput",
@@ -899,31 +899,26 @@ class ExpStateValidationJobTests(
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 1, and the state interaction erroneous data " +
               "are [{'state_name': 'EXP_1_STATE_1'}, {'state_name': " +
-              "'EXP_1_STATE_2'}]"),
+              "'EXP_1_STATE_2'}, {'state_name': 'EXP_1_STATE_3'}, " +
+              "{'state_name': 'EXP_1_STATE_4'}, {'state_name': " +
+              "'EXP_1_STATE_5'}, {'state_name': 'EXP_1_STATE_6'}, " +
+              "{'state_name': 'EXP_1_STATE_7'}, {'state_name': " +
+              "'EXP_1_STATE_8'}, {'state_name': 'EXP_1_STATE_9'}]"),
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 1, and the state erroneous data are " +
               "[{'state_name': 'EXP_1_STATE_1', " +
               "'tagged_skill_misconception_ids': ['The " +
               "tagged_skill_misconception_id of answer group 0 is not None.']" +
-              ", 'wrong_labelled_as_correct_values': ['The value of " +
-              "labelled_as_correct of answer group 0 is True but the " +
-              "destination is the state itself.'], 'not_sinle_rule_spec': " +
-              "['There is no rule presentin answer group 0, atleast one " +
+              ", 'not_single_rule_spec': " +
+              "['There is no rule present in answer group 0, atleast one " +
               "is required.'], 'invalid_destinations': ['The destination " +
               "Not valid state of answer group 0 is not valid.'], " +
               "'invalid_default_outcome_dest': ['The destination of default " +
               "outcome is not valid, the value is Not valid state']}, " +
-              "{'state_name': 'EXP_1_STATE_2', " +
-              "'tagged_skill_misconception_ids': ['The " +
-              "tagged_skill_misconception_id of answer group 0 is not None.'],"
+              "{'state_name': 'EXP_1_STATE_2',"
               +" 'wrong_labelled_as_correct_values': ['The value of " +
               "labelled_as_correct of answer group 0 is True but the " +
-              "destination is the state itself.'], 'not_sinle_rule_spec': " +
-              "['There is no rule presentin answer group 0, atleast " +
-              "one is required.'], 'invalid_destinations': ['The destination "+
-              "Not valid state of answer group 0 is not valid.'], " +
-              "'invalid_default_outcome_dest': ['The destination of " +
-              "default outcome is not valid, the value is Not valid state']}]"
+              "destination is the state itself.']}]"
             )
         ])
 
@@ -948,9 +943,13 @@ class ExpStateValidationJobTests(
               "review tag text value is empty.', 'State - EXP_3_STATE_1 " +
               "Video tag start value is greater than end value.']}]"),
             job_run_result.JobRunResult.as_stderr(
-              "The id of exp is 3, and the state interaction erroneous " +
-              "data are [{'state_name': 'EXP_3_STATE_1'}]"
-            ),
+              "The id of exp is 1, and the state interaction erroneous data " +
+              "are [{'state_name': 'EXP_1_STATE_1'}, {'state_name': " +
+              "'EXP_1_STATE_2'}, {'state_name': 'EXP_1_STATE_3'}, " +
+              "{'state_name': 'EXP_1_STATE_4'}, {'state_name': " +
+              "'EXP_1_STATE_5'}, {'state_name': 'EXP_1_STATE_6'}, " +
+              "{'state_name': 'EXP_1_STATE_7'}, {'state_name': " +
+              "'EXP_1_STATE_8'}, {'state_name': 'EXP_1_STATE_9'}]"),
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 3, and the state erroneous data " +
               "are [{'state_name': 'EXP_3_STATE_1'}]")

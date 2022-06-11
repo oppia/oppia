@@ -610,7 +610,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         states_list = []
         tagged_skill_misconception_ids = []
         wrong_labelled_as_correct_values = []
-        not_sinle_rule_spec = []
+        not_single_rule_spec = []
         invalid_refresher_exploration_id = []
         invalid_destinations = []
         invalid_default_outcome_dest = []
@@ -629,7 +629,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         f'{str(answer_groups.index(answer_group))}' +
                         " is not None.")
 
-                if (answer_group.outcome.dest != key
+                if (answer_group.outcome.dest == key
                 and answer_group.outcome.labelled_as_correct == True):
                     wrong_labelled_as_correct_values.append(
                         "The value of labelled_as_correct"
@@ -638,9 +638,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         + "is the state itself.")
 
                 if len(answer_group.rule_specs) == 0:
-                    not_sinle_rule_spec.append(
+                    not_single_rule_spec.append(
                         "There is no rule present"
-                        + "in answer group " + str(answer_groups.index(
+                        + " in answer group " + str(answer_groups.index(
                         answer_group)) + ", atleast one is required.")
 
                 if answer_group.outcome.refresher_exploration_id != None:
@@ -669,7 +669,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 tagged_skill_misconception_ids,
                 "wrong_labelled_as_correct_values":
                 wrong_labelled_as_correct_values,
-                "not_sinle_rule_spec": not_sinle_rule_spec,
+                "not_single_rule_spec": not_single_rule_spec,
                 "invalid_refresher_exploration_id":
                 invalid_refresher_exploration_id,
                 "invalid_destinations": invalid_destinations,
