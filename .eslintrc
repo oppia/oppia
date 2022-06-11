@@ -44,7 +44,9 @@
       "files": [
         "core/tests/protractor/*.js",
         "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js"
+        "core/tests/protractor_desktop/*.js",
+        "core/tests/webdriverio/*.js",
+        "core/tests/webdriverio_utils/*.js"
       ],
       "excludedFiles": [
         "ClassroomPage.js",

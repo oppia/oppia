@@ -332,8 +332,8 @@ def run_tests(args):
             
             print(
             'Servers have come up.\n'
-            'Note: You can find a detailed report of running tests '
-            'in ../webdriverIO-tests-report/')
+            'Note: You can view screenshots of failed tests '
+            'in ../webdriverio-screenshots/')
 
         elif args.suite in SUITES_STILL_IN_PROTRACTOR:
             proc = stack.enter_context(servers.managed_protractor_server(

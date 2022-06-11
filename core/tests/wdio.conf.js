@@ -1,7 +1,6 @@
-const allureReporter = require('@wdio/allure-reporter').default;
-const allure = require('allure-commandline');
 const video = require('wdio-video-reporter');
 var path = require('path');
+var fs = require('fs');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
@@ -13,11 +12,17 @@ if (args[0] == 'DEBUG=true') {
   chromeVersion = args[5];
 }
 
+var dirPath = path.resolve('__dirname', '..', '..', 'webdriverio-screenshots/');
+try {
+  fs.mkdirSync(dirPath, { recursive: true });
+  var screenshotPath = '../webdriverio-screenshots';
+} catch (err) {}
+
 var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
 
 var suites = {
   // The tests on Travis are run individually to parallelize
@@ -35,24 +40,30 @@ repoterArray = [
   ['spec', {
     showPreface: false,
     realtimeReporting: true,
-  }],
-  ['allure', {
-    outputDir: './_results_/allure-raw',
-    disableWebdriverStepsReporting: true,
-    disableWebdriverScreenshotsReporting: false,
-  }],
+  }]
 ];
 
+// Only running videos recorder on Github Action when its enabled
+// using environment variables, since running it on
+// CicleCI causes RAM issues (meaning very high flakiness).
 if ((process.env.GITHUB_ACTIONS &&
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
-    LOCAL_VIDEO_RECORDING_IS_ENABLED == 1) {
+    LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
   videoReporter = [video, {
+    outputDir: '../webdriverio-videos',
+    // Enable saveAllVideos if you want success videos to be saved.
     saveAllVideos: false,
     videoSlowdownMultiplier: 3,
   }];
 
-  repoterArray.splice(1, 0, videoReporter);
-  repoterArray.join();
+  repoterArray.push(videoReporter);
+  console.log('Videos of the failed tests can be viewed ' +
+  'in ../webdriverio-videos');
+} else {
+  console.log(
+    'Videos will not be recorded for this suite either because videos' +
+    ' have been disabled for it (using environment variables) or' +
+    ' because it\'s on CircleCI');
 }
 
 exports.config = {
@@ -137,7 +148,7 @@ exports.config = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'info',
+    logLevel: 'warn',
     //
     // Set specific log levels per logger
     // loggers:
@@ -317,10 +328,14 @@ exports.config = {
      * @param {Boolean} result.passed    true if test has passed, otherwise false
      * @param {Object}  result.retries   informations to spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
-    afterTest: async function (step, scenario, { error, duration, passed }, context) {
-     if (error) {
-       await browser.takeScreenshot();
-     }
+    afterTest: async function (test, context, { error, result, duration, passed, retries }) {
+      if (error) {
+        var testName = encodeURIComponent(test.fullName.replace(/\s+/g, '-'));
+        var fileName = testName + '.png';
+        var filePath = path.join(screenshotPath, fileName);
+        // save screenshot
+        await browser.saveScreenshot(filePath);
+      }
     },
 
     /**
@@ -363,26 +378,8 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-     onComplete: function() {
-      const reportError = new Error('Could not generate Allure report');
-      const generation = allure(['generate', '_results_/allure-raw', '--clean']);
-      return new Promise((resolve, reject) => {
-          const generationTimeout = setTimeout(
-              () => reject(reportError),
-              5000)
-
-          generation.on('exit', function(exitCode) {
-              clearTimeout(generationTimeout)
-
-              if (exitCode !== 0) {
-                  return reject(reportError)
-              }
-
-              console.log('Allure report successfully generated')
-              resolve()
-          })
-      })
-  }
+  //    onComplete: function() {
+  // },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session
