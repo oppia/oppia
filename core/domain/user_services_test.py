@@ -32,6 +32,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.domain import user_domain
@@ -41,8 +42,9 @@ from core.tests import test_utils
 
 import requests_mock
 
-auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+auth_models, user_models, audit_models = (
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.user,
+        models.NAMES.audit]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
 
@@ -822,6 +824,39 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             set(user_services.get_user_ids_by_role(
                 feconf.ROLE_ID_CURRICULUM_ADMIN)),
             set([user_ids[2], user_ids[3]]))
+
+    def test_get_system_user_returns_system_user_action_info(self):
+        system_user_action = user_services.get_system_user()
+        expected_actions = set([
+            'MANAGE_TOPIC_RIGHTS', 'EDIT_ANY_PUBLIC_ACTIVITY',
+            'DELETE_ANY_SKILL', 'PUBLISH_OWNED_SKILL', 'DELETE_TOPIC',
+            'EDIT_OWNED_TOPIC', 'CREATE_NEW_TOPIC', 'ACCESS_MODERATOR_PAGE',
+            'RATE_ANY_PUBLIC_EXPLORATION', 'DELETE_ANY_PUBLIC_ACTIVITY',
+            'MANAGE_ACCOUNT', 'MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY',
+            'CREATE_EXPLORATION', 'UNPUBLISH_ANY_PUBLIC_ACTIVITY',
+            'CHANGE_TOPIC_STATUS', 'SEND_MODERATOR_EMAILS', 'FLAG_EXPLORATION',
+            'ACCESS_CREATOR_DASHBOARD', 'EDIT_ANY_TOPIC',
+            'ACCEPT_ANY_SUGGESTION', 'PUBLISH_OWNED_ACTIVITY',
+            'PLAY_ANY_PUBLIC_ACTIVITY',
+            'ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION',
+            'EDIT_ANY_SUBTOPIC_PAGE', 'VISIT_ANY_QUESTION_EDITOR_PAGE',
+            'ACCESS_LEARNER_DASHBOARD', 'ACTION_SUBMIT_VOICEOVER_APPLICATION',
+            'EDIT_ANY_ACTIVITY', 'VISIT_ANY_TOPIC_EDITOR_PAGE',
+            'SUGGEST_CHANGES', 'DELETE_OWNED_PRIVATE_ACTIVITY',
+            'EDIT_OWNED_ACTIVITY', 'EDIT_SKILL_DESCRIPTION',
+            'DELETE_ANY_ACTIVITY', 'SUBSCRIBE_TO_USERS',
+            'PLAY_ANY_PRIVATE_ACTIVITY', 'MANAGE_QUESTION_SKILL_STATUS',
+            'MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY',
+            'ACCESS_TOPICS_AND_SKILLS_DASHBOARD', 'EDIT_SKILL',
+            'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
+            'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
+            'CAN_MANAGE_VOICE_ARTIST'])
+        expected_roles = set(['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
+            'VOICEOVER_ADMIN'])
+
+        self.assertEqual(set(system_user_action.actions), expected_actions)
+        self.assertEqual(set(system_user_action.roles), expected_roles)
+        self.assertEqual(system_user_action.user_id, 'admin')
 
     def test_update_user_bio(self):
         auth_id = 'someUser'
@@ -1899,6 +1934,29 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_settings_model.has_viewed_lesson_info_modal_once)
 
+    def test_log_username_change(self):
+        def mock_get_current_time_in_millisec():
+            return 1.00
+
+        with self.swap(utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisec):
+            committer_id = 'someUser'
+            audit = audit_models.UsernameChangeAuditModel()
+            model_id = '%s.%d' % (
+                committer_id, mock_get_current_time_in_millisec())
+
+            user_audit_model = audit.get(model_id, strict=False)
+            self.assertIsNone(user_audit_model)
+
+            user_services.log_username_change(
+                committer_id, 'oldUsername', 'newUsername')
+
+            user_audit_model = audit.get(model_id)
+            self.assertIsNotNone(user_audit_model)
+            self.assertEqual(user_audit_model.committer_id, committer_id)
+            self.assertEqual(user_audit_model.old_username, 'oldUsername')
+            self.assertEqual(user_audit_model.new_username, 'newUsername')
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
@@ -2644,7 +2702,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.migrate_dashboard_stats_to_latest_schema(
                 user_stats_model)
 
-    def test_get_user_impact_score_non_existing_user_id_returns_zero(self):
+    def test_get_user_impact_score_with_no_user_stats_model_returns_zero(self):
         auth_id = 'someUser'
         user_email = 'user@example.com'
 
@@ -2652,6 +2710,36 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         impact_score = user_services.get_user_impact_score(user_id)
 
         self.assertEqual(0, impact_score)
+
+    def test_get_user_impact_score(self):
+        expected_impact_score = 3
+        with self.swap(user_models.UserStatsModel, 'impact_score',
+            expected_impact_score
+        ):
+            user_with_no_model_score = user_services.get_user_impact_score(
+                self.owner_id)
+            self.assertEqual(user_with_no_model_score, 0)
+
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id, end_state_name='End')
+            init_state_name = exploration.init_state_name
+            event_services.StartExplorationEventHandler.record(
+                self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StatsEventsHandler.record(
+                self.EXP_ID, 1, {
+                    'num_starts': 1,
+                    'num_actual_starts': 0,
+                    'num_completions': 0,
+                    'state_stats_mapping': {}
+                })
+
+            model = user_models.UserStatsModel.get_or_create(self.owner_id)
+            self.assertEqual(model.impact_score, expected_impact_score)
+
+            user_with_model_score = user_services.get_user_impact_score(
+                self.owner_id)
+            self.assertEqual(user_with_model_score, expected_impact_score)
 
     def test_get_dashboard_stats_for_user_with_no_stats_model(self):
         fake_user_id = 'id_x'
@@ -2664,6 +2752,17 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'num_ratings': 0,
                 'average_ratings': None
             })
+
+    def test_update_dashboard_stats_log_with_invalid_schema_version(self):
+        with self.swap(user_models.UserStatsModel, 'schema_version', 5):
+            model = user_models.UserStatsModel.get_or_create(self.owner_id)
+
+            with self.assertRaisesRegex(
+                Exception,
+                ('Sorry, we can only process v1-v%d dashboard stats schemas at'
+                ' present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
+            ):
+                user_services.update_dashboard_stats_log(self.owner_id)
 
 
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):
@@ -3284,6 +3383,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     QUESTION_REVIEWER_EMAIL = 'question@community.org'
     QUESTION_REVIEWER_USERNAME = 'questionreviewer'
 
+    QUESTION_SUBMITTER_EMAIL = 'submitter@community.org'
+    QUESTION_SUBMITTER_USERNAME = 'questionsubmitter'
+
     def setUp(self):
         super(UserContributionReviewRightsTests, self).setUp()
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
@@ -3297,6 +3399,11 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
         self.question_reviewer_id = (
             self.get_user_id_from_email(self.QUESTION_REVIEWER_EMAIL))
+
+        self.signup(
+            self.QUESTION_SUBMITTER_EMAIL, self.QUESTION_SUBMITTER_USERNAME)
+        self.question_submitter_id = (
+            self.get_user_id_from_email(self.QUESTION_SUBMITTER_EMAIL))
 
     def test_assign_user_review_translation_suggestion_in_language(self):
         self.assertFalse(
@@ -3615,6 +3722,39 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             Exception, 'Invalid category: invalid_category'):
             user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')
+
+    def test_get_contributor_usernames_for_translation_returns_correctly(self):
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            language_code='hi')
+        self.assertEqual(usernames, [])
+
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            language_code='hi')
+        self.assertEqual(usernames, [self.TRANSLATOR_USERNAME])
+
+    def test_get_contributor_usernames_for_question_returns_correctly(self):
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION)
+        self.assertEqual(usernames, [])
+
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION)
+        self.assertEqual(usernames, [self.QUESTION_REVIEWER_USERNAME])
+
+    def test_get_contributor_usernames_for_submit_returns_correctly(self):
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+        self.assertEqual(usernames, [])
+
+        user_services.allow_user_to_submit_question(self.question_submitter_id)
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+        self.assertEqual(usernames, [self.QUESTION_SUBMITTER_USERNAME])
 
     def test_remove_question_submit_rights(self):
         auth_id = 'someUser'
