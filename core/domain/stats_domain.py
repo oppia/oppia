@@ -70,13 +70,13 @@ class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""
 
     answer: Optional[str]
-    interaction_id: str
+    time_spent_in_sec: float
     answer_group_index: int
     rule_spec_index: int
     classification_categorization: str
-    params: Dict[str, Union[str, int]]
     session_id: str
-    time_spent_in_sec: float
+    interaction_id: str
+    params: Dict[str, Union[str, int]]
     rule_spec_str: Optional[str]
     answer_str: Optional[str]
 
