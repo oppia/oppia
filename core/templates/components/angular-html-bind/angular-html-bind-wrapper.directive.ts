@@ -97,7 +97,7 @@ export const ScopeProvider = {
 export class AngularHtmlBindWrapperDirectiveA extends UpgradeComponent {
   @Input() htmlData: string;
   @Input() parentScope;
-  @Input() classStr = '';
+  @Input() class = '';
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);
   }
@@ -110,7 +110,7 @@ export class AngularHtmlBindWrapperDirectiveA extends UpgradeComponent {
 export class AngularHtmlBindWrapperDirective {
   @Input() htmlData: string;
   @Input() parentScope;
-  @Input() classStr = '';
+  @Input() class = '';
   @ViewChild('templatePortalContent') templatePortalContent:
   TemplateRef<unknown>;
 
@@ -167,7 +167,8 @@ export class AngularHtmlBindWrapperDirective {
     let domparser = new DOMParser();
     if (this.htmlData) {
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
-      if (this.mapping[dom.body.firstElementChild.tagName]) {
+      if (dom.body.firstElementChild &&
+        this.mapping[dom.body.firstElementChild.tagName]) {
         const componentFactory = this.componentFactoryResolver
           .resolveComponentFactory(
             this.mapping[dom.body.firstElementChild.tagName]);
@@ -219,4 +220,3 @@ export class AngularHtmlBindWrapperDirective {
     }
   }
 }
-

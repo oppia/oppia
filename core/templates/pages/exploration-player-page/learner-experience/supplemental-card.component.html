@@ -18,7 +18,7 @@
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback-latest"
+      <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback-latest"
                                  [htmlData]="helpCardHtml"
                                  [parentScope]="this"
                                  [ngClass]="getFeedbackAudioHighlightClass()">
@@ -37,7 +37,7 @@
   correctly. More details about the class can be found in extensions/interactions/
   DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
   <div class="conversation-skin-interaction-container" #interactionContainer>
-    <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
+    <angular-html-bind-wrapper class="protractor-test-conversation-input"
                                [parentScope]="this"
                                [htmlData]="currentDisplayedCard.getInteractionHtml()">
     </angular-html-bind-wrapper>
