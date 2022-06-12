@@ -114,6 +114,9 @@ export class AngularHtmlBindWrapperDirective {
   @ViewChild('templatePortalContent') templatePortalContent:
   TemplateRef<unknown>;
 
+  @ViewChild('interactionContainer', {read: ViewContainerRef}) viewContainerRef:
+  ViewContainerRef;
+
   templatePortal: TemplatePortal<unknown>;
 
   mapping = {
@@ -156,7 +159,6 @@ export class AngularHtmlBindWrapperDirective {
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
-    private viewContainerRef: ViewContainerRef,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
