@@ -1935,28 +1935,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings_model.has_viewed_lesson_info_modal_once)
 
     def test_log_username_change(self):
-        def mock_get_current_time_in_millisec():
-            return 1.00
+        committer_id = 'someUser'
 
-        with self.swap(
-            utils, 'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisec):
-            committer_id = 'someUser'
-            audit = audit_models.UsernameChangeAuditModel()
-            model_id = '%s.%d' % (
-                committer_id, mock_get_current_time_in_millisec())
+        all_models_before_update = (
+            audit_models.UsernameChangeAuditModel.get_all())
+        self.assertEqual(all_models_before_update.count(), 0)
 
-            user_audit_model = audit.get(model_id, strict=False)
-            self.assertIsNone(user_audit_model)
+        user_services.log_username_change(
+            committer_id, 'oldUsername', 'newUsername')
 
-            user_services.log_username_change(
-                committer_id, 'oldUsername', 'newUsername')
+        all_models_after_update = (
+            audit_models.UsernameChangeAuditModel.get_all())
+        self.assertEqual(all_models_after_update.count(), 1)
 
-            user_audit_model = audit.get(model_id)
-            self.assertIsNotNone(user_audit_model)
-            self.assertEqual(user_audit_model.committer_id, committer_id)
-            self.assertEqual(user_audit_model.old_username, 'oldUsername')
-            self.assertEqual(user_audit_model.new_username, 'newUsername')
+        user_audit_model = all_models_after_update.get()
+        self.assertEqual(user_audit_model.committer_id, committer_id)
+        self.assertEqual(user_audit_model.old_username, 'oldUsername')
+        self.assertEqual(user_audit_model.new_username, 'newUsername')
 
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
@@ -2718,9 +2713,9 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_models.UserStatsModel, 'impact_score',
             expected_impact_score
         ):
-            user_with_no_model_score = user_services.get_user_impact_score(
-                self.owner_id)
-            self.assertEqual(user_with_no_model_score, 0)
+            impact_score_for_user_with_no_activity = (
+                user_services.get_user_impact_score(self.owner_id))
+            self.assertEqual(impact_score_for_user_with_no_activity, 0)
 
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id, end_state_name='End')
@@ -2739,9 +2734,11 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             model = user_models.UserStatsModel.get_or_create(self.owner_id)
             self.assertEqual(model.impact_score, expected_impact_score)
 
-            user_with_model_score = user_services.get_user_impact_score(
-                self.owner_id)
-            self.assertEqual(user_with_model_score, expected_impact_score)
+            impact_score_for_user_with_some_learner_activity = (
+                user_services.get_user_impact_score(self.owner_id))
+            self.assertEqual(
+                impact_score_for_user_with_some_learner_activity,
+                expected_impact_score)
 
     def test_get_dashboard_stats_for_user_with_no_stats_model(self):
         fake_user_id = 'id_x'
