@@ -22,6 +22,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
+import './subtopics-list.component.css';
+
+
 @Component({
   selector: 'subtopics-list',
   templateUrl: './subtopics-list.component.html',

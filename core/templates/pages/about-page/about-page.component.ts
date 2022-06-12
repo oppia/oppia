@@ -27,6 +27,9 @@ import { WindowRef } from
   'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './about-page.component.css';
+
+
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html'

@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/button-directives/hint-and-solution-buttons.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/button-directives/hint-and-solution-buttons.component.rtl.css" as="style">
-
 <div *ngIf="isHintButtonVisible(0) && currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-left">
   <ul [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}" class="list-inline">
     <span class="float-left footer-hints-label" translate="I18N_PLAYER_HINTS"></span>
@@ -38,7 +35,3 @@
     </div>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/button-directives/hint-and-solution-buttons.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/button-directives/hint-and-solution-buttons.component.rtl.css">

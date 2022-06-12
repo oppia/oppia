@@ -37,6 +37,9 @@ import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
+import './library-page.component.css';
+
+
 interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
   buttonText: string;

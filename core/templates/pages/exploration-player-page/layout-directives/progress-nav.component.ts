@@ -32,6 +32,9 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 
+import './progress-nav.component.css';
+
+
 @Component({
   selector: 'oppia-progress-nav',
   templateUrl: './progress-nav.component.html'

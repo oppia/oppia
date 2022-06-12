@@ -18,7 +18,11 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './social-buttons.component.css';
+
 
 @Component({
   selector: 'oppia-social-buttons',

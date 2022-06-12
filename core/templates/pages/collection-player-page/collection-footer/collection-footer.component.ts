@@ -25,6 +25,9 @@ import { UrlInterpolationService } from
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './collection-footer.component.css';
+
+
 @Component({
   selector: 'collection-footer',
   templateUrl: './collection-footer.component.html',

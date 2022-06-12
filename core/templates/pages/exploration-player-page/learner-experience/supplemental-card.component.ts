@@ -31,6 +31,9 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './supplemental-card.component.css';
+
+
 @Component({
   selector: 'oppia-supplemental-card',
   templateUrl: './supplemental-card.component.html'

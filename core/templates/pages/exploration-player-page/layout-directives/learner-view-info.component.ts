@@ -37,6 +37,9 @@ import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { InformationCardModalComponent } from '../templates/information-card-modal.component';
 
+import './learner-view-info.component.css';
+
+
 @Component({
   selector: 'oppia-learner-view-info',
   templateUrl: './learner-view-info.component.html'

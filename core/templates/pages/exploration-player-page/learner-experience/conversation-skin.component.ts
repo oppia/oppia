@@ -74,6 +74,9 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
+import './conversation-skin.component.css';
+
+
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
 const TIME_FADEOUT_MSEC = 100;

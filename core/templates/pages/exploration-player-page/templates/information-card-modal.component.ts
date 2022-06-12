@@ -26,6 +26,9 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './information-card-modal.component.css';
+
+
 interface ExplorationTagSummary {
   tagsToShow: string[];
   tagsInTooltip: string[];

@@ -35,6 +35,9 @@ import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
+import './story-viewer-page.component.css';
+
+
 interface IconParametersArray {
   thumbnailIconUrl: string;
   left: string;

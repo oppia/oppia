@@ -35,6 +35,9 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
 import { LoaderService } from 'services/loader.service';
 
+import './practice-tab.component.css';
+
+
 @Component({
   selector: 'practice-tab',
   templateUrl: './practice-tab.component.html',

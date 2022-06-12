@@ -35,6 +35,8 @@ import { NumberConversionService } from 'services/number-conversion.service';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 
+import './input-response-pair.component.css';
+
 
 @Component({
   selector: 'oppia-input-response-pair',

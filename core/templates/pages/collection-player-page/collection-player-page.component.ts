@@ -36,6 +36,9 @@ import { CollectionPlayerBackendApiService } from './services/collection-player-
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './collection-player-page.component.css';
+
+
 export interface IconParametersArray {
   thumbnailIconUrl: string;
   left: string;

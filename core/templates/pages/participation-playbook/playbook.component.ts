@@ -26,6 +26,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
+import './playbook.component.css';
+
+
 @Component({
   selector: 'participation-playbook',
   templateUrl: './playbook.component.html',

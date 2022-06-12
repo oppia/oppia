@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.rtl.css" as="style">
-
 <mat-card class="oppia-lesson-info-card">
   <div class="oppia-lesson-info-content" [ngClass]="{'oppia-non-story-mode' : !storyTitleIsPresent}">
     <div *ngIf="storyTitleIsPresent">
@@ -125,7 +122,3 @@
   <i class="material-icons md-18">&#xE5CD;</i>
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.rtl.css">

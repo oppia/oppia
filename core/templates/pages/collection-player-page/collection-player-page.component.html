@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-player-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-player-page.component.rtl.css" as="style">
-
 <div>
   <background-banner></background-banner>
   <div *ngIf="!collection?.getCollectionNodeCount()" class="no-exploration-created">
@@ -260,7 +257,3 @@
   </div>
 </div>
 <attribution-guide></attribution-guide>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-player-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-player-page.component.rtl.css">

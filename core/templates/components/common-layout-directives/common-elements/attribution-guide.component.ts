@@ -27,6 +27,9 @@ import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
+import './attribution-guide.component.css';
+
+
 @Component({
   selector: 'attribution-guide',
   templateUrl: './attribution-guide.component.html',

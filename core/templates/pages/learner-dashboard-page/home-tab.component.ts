@@ -25,6 +25,9 @@ import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './home-tab.component.css';
+
+
  @Component({
    selector: 'oppia-home-tab',
    templateUrl: './home-tab.component.html'

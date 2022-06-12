@@ -19,6 +19,9 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './story-viewer-page-root.component.css';
+
+
 @Component({
   selector: 'oppia-story-viewer-page-root',
   templateUrl: './story-viewer-page-root.component.html',

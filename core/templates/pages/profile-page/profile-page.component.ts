@@ -30,6 +30,9 @@ import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
 
+import './profile-page.component.css';
+
+
 interface ViewedProfileUsername {
   title: string;
   value: string;

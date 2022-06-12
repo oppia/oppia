@@ -44,6 +44,9 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
 
+import './tutor-card.component.css';
+
+
 @Component({
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',

@@ -18,8 +18,12 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './oppia-footer.component.css';
+
 
 @Component({
   selector: 'oppia-footer',

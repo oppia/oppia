@@ -33,6 +33,9 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
+import './subtopic-viewer-page.component.css';
+
+
 @Component({
   selector: 'oppia-subtopic-viewer-page',
   templateUrl: './subtopic-viewer-page.component.html',

@@ -22,15 +22,9 @@ import { AppConstants } from 'app.constants';
 import { TranslateCacheService } from 'ngx-translate-cache';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, LanguageInfo } from 'services/i18n-language-code.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
-
-interface LanguageInfo {
-  id: string;
-  text: string;
-  direction: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -54,6 +48,16 @@ export class I18nService {
     } catch (exception) {}
   }());
 
+  supportedSiteLanguageCodes = Object.assign(
+    {},
+    ...AppConstants.SUPPORTED_SITE_LANGUAGES.map(
+      (languageInfo: LanguageInfo) => (
+        {[languageInfo.id]: languageInfo.direction}
+      )
+    )
+  );
+
+
   constructor(
     private documentAttributeCustomizationService:
     DocumentAttributeCustomizationService,
@@ -64,6 +68,15 @@ export class I18nService {
     private translateService: TranslateService,
     private windowRef: WindowRef
   ) {}
+
+  setLocalStorageKeys(langCode: string): void {
+    if (this.localStorage) {
+      this.localStorage.setItem('lang', langCode);
+      this.localStorage.setItem(
+        'direction', this.supportedSiteLanguageCodes[langCode]
+      );
+    }
+  }
 
   initialize(): void {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
@@ -86,15 +99,8 @@ export class I18nService {
     const searchParams = this.url.searchParams;
 
     if (searchParams.has('lang')) {
-      let supportedSiteLanguageCodes: string[] = (
-        AppConstants.SUPPORTED_SITE_LANGUAGES.map(
-          (languageInfo: LanguageInfo) => {
-            return languageInfo.id;
-          }
-        )
-      );
       let siteLanguageCode = searchParams.get('lang') || '';
-      if (supportedSiteLanguageCodes.includes(siteLanguageCode)) {
+      if (siteLanguageCode in this.supportedSiteLanguageCodes) {
         // When translation cache is initialized, language code stored in local
         // storage is used to set the site language. To have a single source of
         // truth, we first directly update the language code in local storage
@@ -102,16 +108,12 @@ export class I18nService {
         // language code from the local storage to set site language.
         // This removes the need of continously syncing URL lang param and
         // cache, and avoids race conditions.
-        if (this.localStorage) {
-          this.localStorage.setItem('lang', siteLanguageCode);
-        }
+        this.setLocalStorageKeys(siteLanguageCode);
       } else {
         // In the case where the URL contains an invalid language code, we
         // load the site using last cached language code and remove the language
         // param from the URL.
-        this.url.searchParams.delete('lang');
-        this.windowRef.nativeWindow.history.pushState(
-          {}, '', this.url.toString());
+        this.removeUrlLangParam();
       }
     }
 
@@ -138,6 +140,14 @@ export class I18nService {
 
 
   updateUserPreferredLanguage(newLangCode: string): void {
+    this.setLocalStorageKeys(newLangCode);
+    if (
+      this.i18nLanguageCodeService.getCurrentLanguageDirection() !==
+      this.supportedSiteLanguageCodes[newLangCode]
+    ) {
+      window.location.reload();
+      return;
+    }
     this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
     this.userService.getUserInfoAsync().then((userInfo) => {
       if (userInfo.isLoggedIn()) {
@@ -145,6 +155,7 @@ export class I18nService {
           newLangCode);
       }
     });
+
     // When user changes site language, it will override the lang parameter in
     // the URL and render it invalid, so we remove it (if it's present) to avoid
     // confusion.

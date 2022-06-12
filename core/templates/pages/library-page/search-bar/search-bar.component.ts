@@ -33,6 +33,9 @@ import { ConstructTranslationIdsService } from 'services/construct-translation-i
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslateService } from '@ngx-translate/core';
 
+import './search-bar.component.css';
+
+
 interface SearchDropDownCategories {
   id: string;
   text: string;

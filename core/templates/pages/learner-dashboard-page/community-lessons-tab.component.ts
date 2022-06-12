@@ -28,6 +28,9 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { Subscription } from 'rxjs';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './community-lessons-tab.component.css';
+
+
  @Component({
    selector: 'oppia-community-lessons-tab',
    templateUrl: './community-lessons-tab.component.html'

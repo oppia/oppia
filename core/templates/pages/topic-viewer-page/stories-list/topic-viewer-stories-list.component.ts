@@ -24,6 +24,9 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
+import './topic-viewer-stories-list.component.css';
+
+
 @Component({
   selector: 'stories-list',
   templateUrl: './topic-viewer-stories-list.component.html',
