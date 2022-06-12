@@ -42,13 +42,18 @@ describe('End chapter check mark component', function() {
   it('should animate the check mark', fakeAsync(() => {
     expect(component.circleIsShown).toBe(false);
     expect(component.innerTickIsShown).toBe(false);
+
     component.animateCheckMark();
+
     tick(501);
     expect(component.circleIsShown).toBe(true);
+
     tick(751);
     expect(component.innerTickIsShown).toBe(true);
+
     tick(2301);
     expect(component.circleIsShown).toBe(false);
+
     tick(2551);
     expect(component.innerTickIsShown).toBe(false);
   }));
