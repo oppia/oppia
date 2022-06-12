@@ -105,6 +105,16 @@ export class StateContentEditorComponent implements OnInit {
     return (height > 630);
   }
 
+  limitIsReached = false;
+
+  ngAfterViewChecked(): void {
+    let limitIsReached = this.isCardHeightLimitReached();
+    if (limitIsReached !== this.limitIsReached) {
+      this.limitIsReached = limitIsReached;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
   hideCardHeightLimitWarning(): void {
     this.cardHeightLimitWarningIsShown = false;
   }

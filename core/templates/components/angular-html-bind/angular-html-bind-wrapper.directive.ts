@@ -97,7 +97,7 @@ export const ScopeProvider = {
 export class AngularHtmlBindWrapperDirectiveA extends UpgradeComponent {
   @Input() htmlData: string;
   @Input() parentScope;
-  @Input() class = '';
+  @Input() classStr = '';
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);
   }
@@ -119,7 +119,7 @@ export class AngularHtmlBindWrapperDirective {
   mapping = {
     'OPPIA-INTERACTIVE-CODE-REPL': InteractiveCodeReplComponent,
     'OPPIA-INTERACTIVE-END-EXPLORATION': InteractiveEndExplorationComponent,
-    'OPPIA-INTERACTIVE_CONTINUE': OppiaInteractiveContinue,
+    'OPPIA-INTERACTIVE-CONTINUE': OppiaInteractiveContinue,
     'OPPIA-INTERACTIVE-IMAGE-CLICK-INPUT': InteractiveImageClickInput,
     'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT':
     InteractiveItemSelectionInputComponent,
