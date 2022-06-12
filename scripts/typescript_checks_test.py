@@ -139,6 +139,13 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.TSCONFIG_FILEPATH)
 
+    def test_error_is_produced_for_invalid_compilation_of_strict_tsconfig_file(self) -> None: # pylint: disable=line-too-long
+        """Test that error is produced if stdout is not empty."""
+        typescript_checks.NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = []
+        with self.assertRaisesRegex(SystemExit, '1'):  # type: ignore[no-untyped-call]
+            typescript_checks.compile_and_check_typescript(
+                typescript_checks.STRICT_TSCONFIG_FILEPATH)
+
     def test_config_path_when_no_arg_is_used(self) -> None:
         """Test if the config path is correct when no arg is used."""
         def mock_compile_and_check_typescript(config_path: str) -> None:

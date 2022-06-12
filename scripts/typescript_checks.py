@@ -818,7 +818,6 @@ def compile_and_check_typescript(config_path: str) -> None:
     os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
     validate_compiled_js_dir()
 
-    print(os.path.exists(COMPILED_JS_DIR))
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
@@ -826,7 +825,6 @@ def compile_and_check_typescript(config_path: str) -> None:
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
 
-    print(os.path.exists(COMPILED_JS_DIR))
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
@@ -877,7 +875,6 @@ def compile_and_check_typescript(config_path: str) -> None:
         process = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, encoding='utf-8')
 
-        print(os.path.exists(COMPILED_JS_DIR))
         if os.path.exists(COMPILED_JS_DIR):
             shutil.rmtree(COMPILED_JS_DIR)
 
