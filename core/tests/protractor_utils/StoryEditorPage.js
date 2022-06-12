@@ -212,7 +212,7 @@ var StoryEditorPage = function() {
     }
     expect(chapterIndex).not.toEqual(-1);
 
-    await action.click('Chapter list item', chapterTitles.get(i), true);
+    await action.click('Chapter list item', chapterTitles.get(i));
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       nodeOutlineEditor, 'Chapter editor is taking too long to appear.');
