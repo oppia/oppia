@@ -29,12 +29,16 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import fs_domain
 from core.domain import subtopic_page_domain
 
 from typing import List, Optional
 from typing_extensions import TypedDict
 
+# The fs_services module is required in one of the migration
+# functions in Topic class. This import should be removed
+# once the schema migration functions are moved outside the
+# domain file.
+from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -1075,6 +1079,11 @@ class Topic:
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
                 'Topic thumbnail image is not provided.')
+        if self.canonical_story_references:
+            for reference in self.canonical_story_references:
+                if not isinstance(reference.story_is_published, bool):
+                    raise utils.ValidationError(
+                        'story_is_published value should be boolean type')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
@@ -1149,7 +1158,8 @@ class Topic:
 
     @classmethod
     def create_default_topic(
-        cls, topic_id: str, name: str, url_fragment: str, description: str
+        cls, topic_id: str, name: str, url_fragment: str, description: str,
+        page_title_frag: str
     ) -> Topic:
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
@@ -1160,6 +1170,7 @@ class Topic:
             name: str. The initial name for the topic.
             url_fragment: str. The url fragment for the topic.
             description: str. The description for the topic.
+            page_title_frag: str. The page title fragment for web.
 
         Returns:
             Topic. The Topic domain object with the default values.
@@ -1169,7 +1180,8 @@ class Topic:
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
+            False, page_title_frag)
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
@@ -1187,12 +1199,11 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, topic_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
         subtopic_dict['thumbnail_size_in_bytes'] = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
         return subtopic_dict
 
@@ -1334,31 +1345,18 @@ class Topic:
         """
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename(
-        self, new_thumbnail_filename: Optional[str]
+    def update_thumbnail_filename_and_size(
+        self, new_thumbnail_filename: str, new_thumbnail_size: int
     ) -> None:
         """Updates the thumbnail filename and file size of a topic object.
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
-
-        Raises:
-            Exception. The thumbnail does not exist for expected topic in
-                the filesystem.
+            new_thumbnail_size: int. The updated thumbnail file size.
         """
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.id))
-
-        filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
-            self.thumbnail_filename = new_thumbnail_filename
-            self.thumbnail_size_in_bytes = len(fs.get(filepath))  # type: ignore[no-untyped-call]
-        else:
-            raise Exception(
-                'The thumbnail %s for topic with id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id))
+        self.thumbnail_filename = new_thumbnail_filename
+        self.thumbnail_size_in_bytes = new_thumbnail_size
 
     def update_thumbnail_bg_color(
         self, new_thumbnail_bg_color: Optional[str]
@@ -1543,34 +1541,29 @@ class Topic:
         subtopic_index = self.get_subtopic_index(subtopic_id)
         self.subtopics[subtopic_index].title = new_title
 
-    def update_subtopic_thumbnail_filename(
-        self, subtopic_id: int, new_thumbnail_filename: str
+    def update_subtopic_thumbnail_filename_and_size(
+        self,
+        subtopic_id: int,
+        new_thumbnail_filename: str,
+        new_thumbnail_size: int
     ) -> None:
-        """Updates the thumbnail filename property of the new subtopic.
+        """Updates the thumbnail filename and file size property
+         of the new subtopic.
 
         Args:
             subtopic_id: int. The id of the subtopic to edit.
             new_thumbnail_filename: str. The new thumbnail filename for the
                 subtopic.
+            new_thumbnail_size: int. The updated thumbnail file size.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-            feconf.ENTITY_TYPE_TOPIC, self.id))
-        filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-        if fs.isfile(filepath):  # type: ignore[no-untyped-call]
-            self.subtopics[subtopic_index].thumbnail_filename = (
-                new_thumbnail_filename)
-            self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-                len(fs.get(filepath)))  # type: ignore[no-untyped-call]
-        else:
-            raise Exception(
-                'The thumbnail %s for subtopic with topic_id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id))
+        self.subtopics[subtopic_index].thumbnail_filename = (
+            new_thumbnail_filename)
+        self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
+            new_thumbnail_size)
 
     def update_subtopic_url_fragment(
         self, subtopic_id: int, new_url_fragment: str

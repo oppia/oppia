@@ -40,6 +40,14 @@ class ConstantsTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
 
+    def test_loading_non_existing_file_throws_error(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            IOError,
+            'No such file or directory: \'assets/non_exist_file.xy\''
+        ):
+            constants.get_package_file_contents('assets', 'non_exist_file.xy')
+
     def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the
         various constants.
@@ -122,3 +130,8 @@ class ConstantsTests(test_utils.GenericTestBase):
             set(rtl_audio_languages) & set(ltr_content_languages)
         )
         self.assertFalse(conflicts)
+
+    def test_constants_can_be_set(self) -> None:
+        """Test __setattr__ to see if constants can be set as needed."""
+        with self.swap(constants.constants, 'TESTING_CONSTANT', 'test_2'):
+            self.assertEqual(constants.constants.TESTING_CONSTANT, 'test_2')

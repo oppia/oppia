@@ -362,11 +362,12 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
 import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
 import { QuestionSuggestionBackendApiService } from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
 import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
-import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { DeleteAccountBackendApiService } from 'pages/delete-account-page/services/delete-account-backend-api.service';
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
-import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
+import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
 import { NavigationService } from './navigation.service';
@@ -391,7 +392,7 @@ import { ExplorationRightsService } from 'pages/exploration-editor-page/services
 import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
 import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
-import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import { ExplorationEditsAllowedBackendApiService } from 'pages/exploration-editor-page/services/exploration-edits-allowed-backend-api.service';
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
 import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
@@ -404,6 +405,8 @@ import { FaviconService } from './favicon.service';
 import { StalenessDetectionService } from './staleness-detection.service';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
 import { PlaythroughIssuesService } from './playthrough-issues.service';
+import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
+import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -511,9 +514,12 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationCreationService],
   ['ExplorationCorrectnessFeedbackService',
     ExplorationCorrectnessFeedbackService],
+  ['ExplorationEditsAllowedBackendApiService',
+    ExplorationEditsAllowedBackendApiService],
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationParamSpecsService', ExplorationParamSpecsService],
   ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationRightsBackendApiService', ExplorationRightsBackendApiService],
   ['ExplorationPropertyService', ExplorationPropertyService],
@@ -536,7 +542,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
   ['ExplorationPlayerStateService', ExplorationPlayerStateService],
-  ['ExplorationParamSpecsService', ExplorationParamSpecsService],
   ['ExplorationParamChangesService', ExplorationParamChangesService],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
@@ -726,6 +731,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
   ['SkillCreationService', SkillCreationService],
+  ['SkillEditorStalenessDetectionService',
+    SkillEditorStalenessDetectionService],
   ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
@@ -770,6 +777,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
+  ['StoryEditorStalenessDetectionService',
+    StoryEditorStalenessDetectionService],
   ['StoryEditorStateService', StoryEditorStateService],
   ['StoryObjectFactory', StoryObjectFactory],
   ['StoryUpdateService', StoryUpdateService],

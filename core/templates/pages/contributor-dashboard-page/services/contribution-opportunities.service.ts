@@ -85,9 +85,9 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private async _getAllTopicNamesAsync() {
+  private async _getTranslatableTopicNamesAsync() {
     return this.contributionOpportunitiesBackendApiService
-      .fetchAllTopicNamesAsync();
+      .fetchTranslatableTopicNamesAsync();
   }
 
   showRequiresLoginModal(): void {
@@ -123,8 +123,20 @@ export class ContributionOpportunitiesService {
     throw new Error('No more translation opportunities available.');
   }
 
-  async getAllTopicNamesAsync(): Promise<string[]> {
-    return this._getAllTopicNamesAsync();
+  async getReviewableTranslationOpportunitiesAsync(topicName: string):
+  Promise<ExplorationOpportunitiesDict> {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchReviewableTranslationOpportunitiesAsync(topicName)
+      .then(({ opportunities }) => {
+        return {
+          opportunities: opportunities,
+          more: false
+        };
+      });
+  }
+
+  async getTranslatableTopicNamesAsync(): Promise<string[]> {
+    return this._getTranslatableTopicNamesAsync();
   }
 
   get reloadOpportunitiesEventEmitter(): EventEmitter<void> {

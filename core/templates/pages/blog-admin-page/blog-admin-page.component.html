@@ -68,7 +68,7 @@
                   <em>{{ property.value.description }}</em>
                 </span>
                 <span class="col-lg-6 col-md-6 col-sm-6">
-                  <schema-based-editor [schema]="getSchemaCallback(property.value.schema)" [(localValue)]="property.value.value">
+                  <schema-based-editor [schema]="property.value.schema" [(ngModel)]="property.value.value">
                   </schema-based-editor>
                 </span>
                 <span class="col-lg-2 col-md-2 col-sm-2">

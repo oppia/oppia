@@ -20,6 +20,7 @@ import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter } fro
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ContextService } from 'services/context.service';
+import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
@@ -42,8 +43,8 @@ interface HTMLSchema {
 export class StateContentEditorComponent implements OnInit {
   @Output() intialize: EventEmitter<void> = new EventEmitter();
   @Output() saveStateContent = new EventEmitter<SubtitledHtml>();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
-    new EventEmitter<string[]>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+    new EventEmitter<string[]>());
 
   @Input() stateContentPlaceholder: string;
   @Input() stateContentSaveButtonPlaceholder: string;
@@ -61,6 +62,7 @@ export class StateContentEditorComponent implements OnInit {
     private externalSaveService: ExternalSaveService,
     private stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
+    private editabilityService: EditabilityService
   ) {}
 
   ngOnInit(): void {
@@ -137,15 +139,8 @@ export class StateContentEditorComponent implements OnInit {
     this.contentEditorIsOpen = false;
   }
 
-  getHtmlSchema(): HTMLSchema {
-    return this.HTML_SCHEMA;
-  }
-
-  updateHtml($event: string): void {
-    if ($event !== this.stateContentService.displayed._html) {
-      this.stateContentService.displayed._html = $event;
-      this.changeDetectorRef.detectChanges();
-    }
+  isContentEditable(): boolean {
+    return this.editabilityService.isEditable();
   }
 
   ngOnDestroy(): void {

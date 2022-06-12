@@ -469,6 +469,33 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
+    def get_in_review_translation_suggestions(
+        cls,
+        user_id: str,
+        language_codes: List[str]
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Fetches all translation suggestions that are in-review where the
+        author_id != user_id and language_code matches one of the supplied
+        language_codes.
+
+        Args:
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
+            language_codes: list(str). List of language codes that the
+                suggestions should match.
+
+        Returns:
+            list(SuggestionModel). A list of the matching suggestions.
+        """
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.author_id != user_id,
+            cls.language_code.IN(language_codes)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
     def get_in_review_translation_suggestions_by_offset(
         cls,
         limit: int,
@@ -992,15 +1019,14 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls) -> Optional[CommunityContributionStatsModel]: # type: ignore[override]
+    def get(cls) -> CommunityContributionStatsModel: # type: ignore[override]
         """Gets the CommunityContributionStatsModel instance. If the
         CommunityContributionStatsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
-            CommunityContributionStatsModel|None. The single model instance,
-            or None if no such model instance exists.
+            CommunityContributionStatsModel. The single model instance.
         """
         community_contribution_stats_model = cls.get_by_id(
             COMMUNITY_CONTRIBUTION_STATS_MODEL_ID

@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import base64
 import os
 
 from core import feconf
@@ -231,7 +232,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[], next_subtopic_id=1,
+            page_title_fragment_for_web='testing')
         subtopic = topic_domain.Subtopic.from_dict({
             'id': 1,
             'title': 'subtopic1',
@@ -247,7 +249,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
-            subtopics=[subtopic], next_subtopic_id=2)
+            subtopics=[subtopic], next_subtopic_id=2,
+            page_title_fragment_for_web='testing')
 
         json_response = self.get_json(
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
@@ -630,7 +633,8 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
-            'url_fragment': 'name-one'
+            'url_fragment': 'name-one',
+            'page_title_fragment': 'testing'
         }
 
         with utils.open_file(
@@ -668,7 +672,8 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',
-            'url_fragment': 'name-three'
+            'url_fragment': 'name-three',
+            'page_title_fragment': 'testing'
         }
 
         with utils.open_file(
@@ -717,11 +722,16 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'rubrics': rubrics,
                 'explanation_dict': state_domain.SubtitledHtml(
                     '1', '<p>Explanation</p>').to_dict(),
-                'thumbnail_filename': 'image.svg'
+                'linked_topic_ids': [],
+                'files': {
+                    'img.png': (
+                        base64.b64encode(
+                            self.original_image_content
+                        ).decode('utf-8')
+                    )
+                }
             },
-            csrf_token=csrf_token,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            csrf_token=csrf_token)
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -733,17 +743,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'description': 'Skill Description',
-            'linked_topic_ids': ['topic'],
             'rubrics': [],
+            'linked_topic_ids': [topic_fetchers.get_new_topic_id()],
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            expected_status_int=400)
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -770,7 +778,10 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', explanation_html).to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'linked_topic_ids': [],
+            'files': {
+                'img.svg': None
+            }
         }
 
         response_dict = self.post_json(
@@ -779,7 +790,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         self.assertIn(
-            'No image data provided for file with name img.svg',
+            'Schema validation for \'files\' failed: No image supplied',
             response_dict['error'])
 
         large_image = '<svg><path d="%s" /></svg>' % (
@@ -789,14 +800,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', explanation_html).to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'linked_topic_ids': [],
+            'files': {
+                'img.svg': large_image
+            }
         }
         response_dict = self.post_json(
             self.url, post_data,
             csrf_token=csrf_token,
-            upload_files=(
-                ('img.svg', 'img.svg', large_image),
-            ), expected_status_int=400)
+            expected_status_int=400)
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -806,8 +818,6 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_with_valid_images(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        filename = 'img.png'
-        filename_2 = 'img_2.png'
         explanation_html = (
             '<oppia-noninteractive-image filepath-with-value='
             '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
@@ -828,13 +838,6 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'difficulty': constants.SKILL_DIFFICULTIES[2],
             'explanations': ['Explanation 3']
         }]
-        post_data = {
-            'description': 'Skill Description',
-            'rubrics': rubrics,
-            'explanation_dict': state_domain.SubtitledHtml(
-                '1', explanation_html).to_dict(),
-            'thumbnail_filename': 'image.svg'
-        }
 
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
@@ -842,12 +845,21 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         ) as f:
             raw_image = f.read()
 
+        post_data = {
+            'description': 'Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'linked_topic_ids': [],
+            'files': {
+                'img.png': base64.b64encode(raw_image).decode('utf-8'),
+                'img_2.png': base64.b64encode(raw_image).decode('utf-8')
+            }
+        }
+
         json_response = self.post_json(
             self.url, post_data,
-            csrf_token=csrf_token,
-            upload_files=(
-                (filename, filename, raw_image),
-                (filename_2, filename_2, raw_image),)
+            csrf_token=csrf_token
         )
         skill_id = json_response['skillId']
         self.assertIsNotNone(
@@ -861,13 +873,13 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': 'invalid',
-            'thumbnail_filename': 'image.svg'
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict(),
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            expected_status_int=400)
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -878,14 +890,11 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
-            'explanation_dict': 'explanation',
-            'thumbnail_filename': 'image.svg'
+            'explanation_dict': 'explanation'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            expected_status_int=400)
         self.assertEqual(json_response['status_code'], 400)
 
         payload = {
@@ -895,7 +904,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'explanation_dict': {
                 'explanation': 'Explanation'
             },
-            'thumbnail_filename': 'image.svg'
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -922,12 +931,10 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'files': {}
         }
         json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            self.url, payload, csrf_token=csrf_token)
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -956,7 +963,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'linked_topic_ids': [],
+            'files': {}
         }
 
         # No errors when we publish the skill description for the first time.

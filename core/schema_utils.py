@@ -160,7 +160,6 @@ def normalize_against_schema(
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
-        schema_value_type = schema[SCHEMA_KEY_VALUES]
         normalized_obj = {}
         for key, value in obj.items():
             normalized_key = normalize_against_schema(
@@ -168,7 +167,7 @@ def normalize_against_schema(
                 global_validators=global_validators
             )
             normalized_obj[normalized_key] = normalize_against_schema(
-                value, schema_value_type[SCHEMA_KEY_SCHEMA],
+                value, schema[SCHEMA_KEY_VALUES][SCHEMA_KEY_SCHEMA],
                 global_validators=global_validators
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
@@ -202,7 +201,7 @@ def normalize_against_schema(
             obj = str(obj)
         assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
-        normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
+        normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
@@ -378,7 +377,7 @@ class Normalizers:
             urllib.parse.quote(component) for component in url_components]
         raw = urllib.parse.urlunsplit(quoted_url_components)
 
-        acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
+        acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)

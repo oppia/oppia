@@ -68,7 +68,6 @@ angular.module('oppia').component('contributorDashboardPage', {
         OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
-
       var getLanguageDescriptions = function(languageCodes) {
         var languageDescriptions = [];
         languageCodes.forEach(function(languageCode) {
@@ -214,7 +213,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.topicName = DEFAULT_OPPORTUNITY_TOPIC_NAME;
         TranslationTopicService.setActiveTopicName(ctrl.topicName);
 
-        ContributionOpportunitiesService.getAllTopicNamesAsync()
+        ContributionOpportunitiesService.getTranslatableTopicNamesAsync()
           .then(function(topicNames) {
             if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
               ctrl.topicName = prevSelectedTopicName;

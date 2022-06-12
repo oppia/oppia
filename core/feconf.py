@@ -52,6 +52,12 @@ class ValidCmdDict(TypedDict):
     deprecated_values: Dict[str, List[str]]
 
 
+# Supported object types for ParamSpec.
+SUPPORTED_OBJ_TYPES = {
+    'UnicodeString',
+}
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -321,7 +327,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 49
+CURRENT_STATE_SCHEMA_VERSION = 50
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -563,7 +569,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.4'
+OPPIA_VERSION = '3.2.5'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -986,6 +992,7 @@ EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
+REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -1546,10 +1553,6 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
-
-# This represents a literal constant for All and is used whereever
-# we need to compare a value with value All (for example, all topics)
-ALL_LITERAL_CONSTANT = 'All'
 
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is

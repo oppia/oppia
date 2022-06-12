@@ -250,6 +250,33 @@ describe('Contribution Opportunities Service', () => {
     expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
   }));
 
+  it('should return reviewable translation opportunities when calling ' +
+    '\'getReviewableTranslationOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const translationOpportunitiesDict: ExplorationOpportunitiesDict = {
+      opportunities: sampleTranslationOpportunitiesResponse,
+      more: false
+    };
+    const getReviewableTranslationOpportunitiesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchReviewableTranslationOpportunitiesAsync')
+      .and.returnValue(Promise.resolve(
+        {
+          opportunities: sampleTranslationOpportunitiesResponse,
+          more: false
+        }
+      ));
+
+    contributionOpportunitiesService
+      .getReviewableTranslationOpportunitiesAsync('Topic')
+      .then(successHandler, failHandler);
+    tick();
+
+    expect(getReviewableTranslationOpportunitiesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
+  }));
+
   it('should throw error if no more translation opportunities is available ' +
     'when calling \'getMoreTranslationOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
@@ -282,23 +309,23 @@ describe('Contribution Opportunities Service', () => {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should return all topic names when calling \'getAllTopicNamesAsync\'',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should return topic names when calling ' +
+    '\'getTranslatableTopicNamesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      let topicNamesDict = ['Topic 1', 'Topic 2'];
+    let topicNamesDict = ['Topic 1', 'Topic 2'];
 
-      let getAllTopicNamesSpy = spyOn(
-        contributionOpportunitiesBackendApiService,
-        'fetchAllTopicNamesAsync')
-        .and.returnValue(Promise.resolve(topicNamesDict));
+    let getTranslatableTopicNamesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchTranslatableTopicNamesAsync')
+      .and.returnValue(Promise.resolve(topicNamesDict));
 
-      contributionOpportunitiesService.getAllTopicNamesAsync()
-        .then(successHandler, failHandler);
-      tick();
+    contributionOpportunitiesService.getTranslatableTopicNamesAsync()
+      .then(successHandler, failHandler);
+    tick();
 
-      expect(getAllTopicNamesSpy).toHaveBeenCalled();
-      expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
-    }));
+    expect(getTranslatableTopicNamesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
+  }));
 });

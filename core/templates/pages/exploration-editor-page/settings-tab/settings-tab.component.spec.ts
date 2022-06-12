@@ -48,6 +48,8 @@ import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationEditsAllowedBackendApiService } from '../services/exploration-edits-allowed-backend-api.service';
+import { EditabilityService } from 'services/editability.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -85,6 +87,8 @@ describe('Settings Tab Component', () => {
   let routerService = null;
   let settingTabBackendApiService = null;
   let ngbModal: NgbModal = null;
+  let eeabas: ExplorationEditsAllowedBackendApiService = null;
+  let editabilityService: EditabilityService = null;
 
   let testSubscriptipns = null;
   let refreshGraphSpy = null;
@@ -142,6 +146,8 @@ describe('Settings Tab Component', () => {
     mockWindowDimensionsService = {
       isWindowNarrow: () => true
     };
+    eeabas = TestBed.inject(ExplorationEditsAllowedBackendApiService);
+    editabilityService = TestBed.inject(EditabilityService);
   });
 
   beforeEach(angular.mock.module('oppia', ($provide) => {
@@ -249,7 +255,7 @@ describe('Settings Tab Component', () => {
     });
 
     it('should initialize controller properties after its initialization',
-      () => {
+      (done) => {
         expect(ctrl.isRolesFormOpen).toBe(false);
         expect(ctrl.canDelete).toBe(true);
         expect(ctrl.canModifyRoles).toBe(true);
@@ -257,25 +263,37 @@ describe('Settings Tab Component', () => {
         expect(ctrl.canUnpublish).toBe(true);
         expect(ctrl.explorationId).toBe(explorationId);
         expect(ctrl.canManageVoiceArtist).toBe(true);
-
-        expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
-          id: 'Astrology',
-          text: 'Astrology'
-        });
-
-        expect(ctrl.stateNames).toEqual(['Introduction']);
-        expect(ctrl.hasPageLoaded).toBe(true);
         expect(ctrl.loggedInUser).toBe('username1');
+
+        setTimeout(()=>{
+          $scope.$apply();
+
+          expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
+            id: 'Astrology',
+            text: 'Astrology'
+          });
+
+          expect(ctrl.stateNames).toEqual(['Introduction']);
+          expect(ctrl.hasPageLoaded).toBe(true);
+
+          done();
+        }, 501);
       });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
-        'broadcasted', () => {
+        'broadcasted', fakeAsync(() => {
+      spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
+
       routerService.onRefreshSettingsTab.emit();
+      $scope.$apply();
+
+      tick(500);
       $scope.$apply();
 
       expect(ctrl.stateNames).toEqual(['Introduction']);
       expect(ctrl.hasPageLoaded).toBe(true);
-    });
+      expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
+    }));
 
     it('should get explore page url based on the exploration id', () => {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -830,6 +848,28 @@ describe('Settings Tab Component', () => {
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
     });
 
+    it('should evaluate when edits are allowed', fakeAsync(() => {
+      spyOn(eeabas, 'setEditsAllowed').and.callFake(
+        async(unusedValue, unusedId, cb) => cb());
+      spyOn(editabilityService, 'lockExploration');
+      ctrl.enableEdits();
+      tick();
+
+      expect(editabilityService.lockExploration).toHaveBeenCalledWith(false);
+      expect(ctrl.isExplorationEditable()).toEqual(true);
+    }));
+
+    it('should evaluate when edits are not allowed', fakeAsync(() => {
+      spyOn(eeabas, 'setEditsAllowed').and.callFake(
+        async(unusedValue, unusedId, cb) => cb());
+      spyOn(editabilityService, 'lockExploration');
+      ctrl.disableEdits();
+      tick();
+
+      expect(editabilityService.lockExploration).toHaveBeenCalledWith(true);
+      expect(ctrl.isExplorationEditable()).toEqual(false);
+    }));
+
     it('should check if exploration is locked for editing', () => {
       let changeListSpy = spyOn(
         changeListService, 'isExplorationLockedForEditing');
@@ -876,7 +916,7 @@ describe('Settings Tab Component', () => {
       expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
     });
 
-    it('should check if parameters are used', () => {
+    it('should check if parameters are used', fakeAsync(() => {
       let paramChangeBackendDict = {
         customization_args: {
           parse_with_jinja: false,
@@ -886,10 +926,15 @@ describe('Settings Tab Component', () => {
         name: 'test',
       };
 
+      ctrl.refreshSettingsTab();
+
+      tick(500);
+      $scope.$apply();
+
       expect(ctrl.areParametersUsed()).toBe(false);
       explorationDataService.data.param_changes.push(paramChangeBackendDict);
       expect(ctrl.areParametersUsed()).toBe(true);
-    });
+    }));
 
     describe('on calling onRolesFormUsernameBlur', function() {
       it('should disable save button when exploration title is empty', () => {
@@ -963,13 +1008,6 @@ describe('Settings Tab Component', () => {
       expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
         true);
     });
-
-    it('should refresh settings tab when refreshSettingsTab event occurs',
-      () => {
-        spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
-        routerService.onRefreshSettingsTab.emit();
-        expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
-      });
 
     it('should toggle the preview cards', () => {
       expect(ctrl.basicSettingIsShown).toEqual(false);
