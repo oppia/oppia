@@ -51,10 +51,10 @@
   <span id="getInputResponsePairId()"></span>
   <div dir="auto">
     <angular-html-bind *ngIf="data.oppiaResponse !== null"
-                        [htmlData]="data.oppiaResponse"
-                        [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'protractor-test-conversation-feedback-latest' : '')"
-                        [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
-                        [ngClass]="getFeedbackAudioHighlightClass()">
+                       [htmlData]="data.oppiaResponse"
+                       [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'protractor-test-conversation-feedback-latest' : '')"
+                       [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
+                       [ngClass]="getFeedbackAudioHighlightClass()">
     </angular-html-bind>
   </div>
 </div>
