@@ -30,6 +30,26 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 import { State } from 'domain/state/StateObjectFactory';
 import { GraphLink, GraphNodes } from 'services/compute-graph.service';
+import { AlgebraicExpressionInputValidationService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
+import { CodeReplValidationService } from 'interactions/CodeRepl/directives/code-repl-validation.service';
+import { ContinueValidationService } from 'interactions/Continue/directives/continue-validation.service';
+import { DragAndDropSortInputValidationService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
+import { EndExplorationValidationService } from 'interactions/EndExploration/directives/end-exploration-validation.service';
+import { FractionInputValidationService } from 'interactions/FractionInput/directives/fraction-input-validation.service';
+import { GraphInputValidationService } from 'interactions/GraphInput/directives/graph-input-validation.service';
+import { InteractiveMapValidationService } from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
+import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
+import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
+import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
+import { NumericExpressionInputValidationService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
+import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
+import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
+import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
 
 interface _getStatesAndAnswerGroupsWithEmptyClassifiersResult {
   groupIndexes: number[];
@@ -43,6 +63,31 @@ interface _getReversedLinksResult {
   source: string;
   target: string;
 }
+
+const INTERACTION_SERVICE_MAPPING = {
+  AlgebraicExpressionInputValidationService:
+    AlgebraicExpressionInputValidationService,
+  CodeReplValidationService: CodeReplValidationService,
+  ContinueValidationService: ContinueValidationService,
+  DragAndDropSortInputValidationService: DragAndDropSortInputValidationService,
+  EndExplorationValidationService: EndExplorationValidationService,
+  FractionInputValidationService: FractionInputValidationService,
+  GraphInputValidationService: GraphInputValidationService,
+  ImageClickInputValidationService: ImageClickInputValidationService,
+  InteractiveMapValidationService: InteractiveMapValidationService,
+  ItemSelectionInputValidationService: ItemSelectionInputValidationService,
+  MathEquationInputValidationService: MathEquationInputValidationService,
+  MultipleChoiceInputValidationService: MultipleChoiceInputValidationService,
+  MusicNotesInputValidationService: MusicNotesInputValidationService,
+  NumberWithUnitsValidationService: NumberWithUnitsValidationService,
+  NumericExpressionInputValidationService:
+    NumericExpressionInputValidationService,
+  NumericInputValidationService: NumericInputValidationService,
+  PencilCodeEditorValidationService: PencilCodeEditorValidationService,
+  RatioExpressionInputValidationService: RatioExpressionInputValidationService,
+  SetInputValidationService: SetInputValidationService,
+  TextInputValidationService: TextInputValidationService,
+};
 
 @Injectable({
   providedIn: 'root'
@@ -252,7 +297,8 @@ export class ExplorationWarningsService {
         let validatorServiceName =
           _states.getState(stateName).interaction.id + 'ValidationService';
 
-        let validatorService = this.injector.get(validatorServiceName);
+        let validatorService = this.injector.get(
+          INTERACTION_SERVICE_MAPPING[validatorServiceName]);
 
         let interactionWarnings = validatorService.getAllWarnings(
           stateName, interaction.customizationArgs,
