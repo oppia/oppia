@@ -14,8 +14,8 @@
     </div>
     <div class="oppia-page-contents-viewer">
       <div>
-        <angular-html-bind-wrapper *ngIf="pageContents" [htmlData]="pageContents.getHtml()">
-        </angular-html-bind-wrapper>
+        <angular-html-bind *ngIf="pageContents" [htmlData]="pageContents.getHtml()">
+        </angular-html-bind>
       </div>
     </div>
   </div>

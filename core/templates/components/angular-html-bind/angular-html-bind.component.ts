@@ -13,57 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview AngularHtmlBind Directive wrapper upgrade.
- * This is specifically for use in TranslationModalComponent. angular-html-bind
- * should not be used in migrated files unless strictly necessary.
+ * @fileoverview AngularHtmlBind Component (not associated with reusable
+ * components.)
+ * NB: Reusable component directives should go in the components/ folder.
  */
 
-require('directives/angular-html-bind.directive');
-
-angular.module('oppia').directive('angularHtmlBindWrapper', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        htmlData: '<',
-        parentScope: '<',
-        classStr: '<'
-      },
-      template:
-        '<angular-html-bind class="<[$ctrl.classStr]>" ' +
-        'html-data="$ctrl.htmlData"></angular-html-bind>',
-      controllerAs: '$ctrl',
-      controller: [
-        '$rootScope', '$scope',
-        function($rootScope, $scope) {
-          var ctrl = this;
-          ctrl.$onInit = function() {
-            if (ctrl.parentScope) {
-              for (let key of Object.keys(ctrl.parentScope)) {
-                $scope[key] = ctrl.parentScope[key];
-              }
-            }
-            $rootScope.$applyAsync();
-          };
-          // Manually implementing the OnChanges lifecycle hook to trigger the
-          // digest loop. Without this, there seems to be change detection
-          // issues.
-          ctrl.$onChanges = (changes: SimpleChanges) => {
-            let htmlData = changes.htmlData;
-            if (htmlData && htmlData.currentValue !== htmlData.previousValue) {
-              $rootScope.$applyAsync();
-            }
-          };
-        }
-      ]
-    };
-  }
-]);
+// HTML bind component that trusts the value it is given and also evaluates
+// custom component tags in the provided value.
 
 import { TemplatePortal } from '@angular/cdk/portal';
-import { ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Injector, Input, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
+import { ChangeDetectorRef, Component, ComponentFactoryResolver, Input,
+  SimpleChanges, TemplateRef, ViewChild, ViewContainerRef }
+  from '@angular/core';
+
 import { AlgebraicExpressionInputInteractionComponent } from 'interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component';
 import { InteractiveCodeReplComponent } from 'interactions/CodeRepl/directives/oppia-interactive-code-repl.component';
 import { OppiaInteractiveContinue } from 'interactions/Continue/directives/oppia-interactive-continue.component';
@@ -84,33 +46,14 @@ import { PencilCodeEditor } from 'interactions/PencilCodeEditor/directives/oppia
 import { InteractiveRatioExpressionInputComponent } from 'interactions/RatioExpressionInput/directives/oppia-interactive-ratio-expression-input.component';
 import { InteractiveSetInputComponent } from 'interactions/SetInput/directives/oppia-interactive-set-input.component';
 import { InteractiveTextInputComponent } from 'interactions/TextInput/directives/oppia-interactive-text-input.component';
-// Allow $scope to be provided to parent Component.
-export const ScopeProvider = {
-  deps: ['$injector'],
-  provide: '$scope',
-  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
-};
-@Directive({
-  selector: 'angular-html-bind-wrapper',
-  providers: [ScopeProvider],
-})
-export class AngularHtmlBindWrapperDirectiveA extends UpgradeComponent {
-  @Input() htmlData: string;
-  @Input() parentScope;
-  @Input() classStr = '';
-  constructor(elementRef: ElementRef, injector: Injector) {
-    super('angularHtmlBindWrapper', elementRef, injector);
-  }
-}
 
 @Component({
-  selector: 'angular-html-bind-wrapper',
-  templateUrl: './angular-html-bind-wrapper.directive.html'
+  selector: 'angular-html-bind',
+  templateUrl: './angular-html-bind.component.html'
 })
-export class AngularHtmlBindWrapperDirective {
+export class AngularHtmlBindComponent {
   @Input() htmlData: string;
   @Input() parentScope;
-  @Input() class = '';
   @ViewChild('templatePortalContent') templatePortalContent:
   TemplateRef<unknown>;
 

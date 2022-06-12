@@ -20,8 +20,8 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
 import {PortalModule} from '@angular/cdk/portal';
+import { AngularHtmlBindComponent } from './angular-html-bind.component';
 
 @NgModule({
   imports: [
@@ -29,12 +29,12 @@ import {PortalModule} from '@angular/cdk/portal';
     PortalModule
   ],
   declarations: [
-    AngularHtmlBindWrapperDirective
+    AngularHtmlBindComponent
   ],
   entryComponents: [
   ],
   exports: [
-    AngularHtmlBindWrapperDirective
+    AngularHtmlBindComponent
   ],
 })
 

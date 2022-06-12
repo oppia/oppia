@@ -62,7 +62,7 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
         LearnerDashboardSuggestionModalComponent,
         MockTranslatePipe,
         MockAngularHtmlBindWrapperDirective({
-          selector: 'angular-html-bind-wrapper',
+          selector: 'angular-html-bind',
           inputs: ['htmlData'] })
       ],
       providers: [

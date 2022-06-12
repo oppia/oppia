@@ -80,7 +80,7 @@ describe('Display Solution Modal', () => {
         DisplaySolutionModalComponent,
         MockTranslatePipe,
         MockAngularHtmlBindWrapperDirective({
-          selector: 'angular-html-bind-wrapper',
+          selector: 'angular-html-bind',
           inputs: ['htmlData'] })
       ],
       providers: [

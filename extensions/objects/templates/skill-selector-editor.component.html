@@ -21,19 +21,19 @@
       <div *ngIf="skill.id === value" class="oppia-skill-summary-text">
         <strong> Explanation </strong>
         <div class="skill-explanation-container">
-          <angular-html-bind-wrapper [htmlData]="skill.skill_contents.explanation.html">
-          </angular-html-bind-wrapper>
+          <angular-html-bind [htmlData]="skill.skill_contents.explanation.html">
+          </angular-html-bind>
         </div>
         <strong> Worked Examples </strong>
         <ul>
           <li *ngFor="let example of skill.skill_contents.worked_examples" class="worked-example-container">
             <b> Question: </b>
-            <angular-html-bind-wrapper [htmlData]="example.question.html">
-            </angular-html-bind-wrapper>
+            <angular-html-bind [htmlData]="example.question.html">
+            </angular-html-bind>
             <div class="worked-example-explanation-section">
               <b> Explanation: </b>
-              <angular-html-bind-wrapper [htmlData]="example.explanation.html">
-              </angular-html-bind-wrapper>
+              <angular-html-bind [htmlData]="example.explanation.html">
+              </angular-html-bind>
             </div>
           </li>
         </ul>
