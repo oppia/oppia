@@ -103,13 +103,22 @@
                  [style.width.%]="0">
             </div>
           </div>
-          <button type="button"
+          <div class="oppia-lesson-info-card-buttons">
+            <button type="button"
                   class="btn btn-secondary restart-lesson-btn"
                   *ngIf="userIsLoggedIn"
                   [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
                   (click)="restartExploration()">
-            {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
-          </button>
+              {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+            </button>
+            <button type="button"
+                  class="btn btn-secondary save-progress-btn"
+                  *ngIf="!userIsLoggedIn"
+                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                  (click)="saveLoggedOutProgress()">
+              Save Progress
+            </button>
+          </div>
         </div>
         <div class="oppia-lesson-info-card-authors">
           <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
@@ -125,6 +134,27 @@
   <i class="material-icons md-18">&#xE5CD;</i>
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
+<div class="save-progress-menu"
+     *ngIf="saveProgressMenuIsShown">
+    <h3>Save Progress</h3>
+    <div class="sign-in-box">
+      <p>Your learning progress will be automatically saved if you have an account.</p>
+      <button type="button"
+              class="btn btn-secondary create-account-btn">
+            Create Account
+      </button>
+    </div>
+    <div class="separator">
+      <div class="bars"></div>
+      <div class="mid">or</div>
+      <div class="bars"></div>
+    </div>
+    <div class="unique-progress-url-id-box"></div>
+    <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
+      <i class="material-icons md-24">&#xE5CD;</i>
+      <span class="oppia-icon-accessibility-label">Close</span>
+    </button>
+</div>
 
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.css">

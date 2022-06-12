@@ -135,11 +135,27 @@
   top: 0;
 }
 
+.oppia-lesson-info-card .oppia-lesson-info-card-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
 .oppia-lesson-info-card .restart-lesson-btn {
   background-color: #00645c;
   color: white;
   cursor: pointer;
   margin-top: 20px;
+  cursor: pointer;
+}
+
+.oppia-lesson-info-card .save-progress-btn {
+  background-color: #00645c;
+  color: white;
+  cursor: pointer;
+  margin-top: 20px;
+  cursor: pointer;
 }
 
 .oppia-lesson-info-card .lesson-progress-bar {
@@ -169,4 +185,87 @@
   position: absolute;
   width: 100%;
   z-index: 0;
+}
+
+.save-progress-menu {
+  height: 700px;
+  position: fixed;
+  top: 8vh;
+  left: 50%;
+  background-color: white;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
+  animation: slideUp 0.8s;
+}
+
+.save-progress-menu h3 {
+  font-family: capriola;
+  font-weight: 400;
+  font-size: 24px;
+  margin: 40px auto 20px 18px;
+}
+
+.save-progress-menu .sign-in-box {
+  height: 40%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-progress-menu .sign-in-box p {
+  margin: 10px 20px;
+}
+
+.save-progress-menu .sign-in-box .create-account-btn {
+  background-color: #00645c;
+  color: white;
+  cursor: pointer;
+  height: 38px;
+  width: 169px;
+  font-family: Capriola;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.save-progress-menu .separator {
+  height: 10%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.save-progress-menu .separator .bars{
+  height: 2px;
+  width: 30%;
+  background-color: #B7B7B7;
+}
+.save-progress-menu .separator .bars{
+  width: 30%;
+  padding: auto;
+}
+
+.save-progress-menu .save-progress-close-button {
+  outline: none;
+  position: absolute;
+  padding: 0;
+  right: 10px;
+  top: 10px;
+  background: transparent;
+  border: none;
+}
+
+@keyframes slideUp {
+  0% {
+    -webkit-transform: translate(-50%, 90vh);
+  }
+  100% {
+    -webkit-transform: translate(-50%, 0);
+  }
 }

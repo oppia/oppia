@@ -65,6 +65,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   separatorArray: number[] = [];
   userIsLoggedIn: boolean = false;
   lessonAuthorsSubmenuIsShown: boolean = false;
+  loggedOutProgressUniqueUrlId: string;
+  saveProgressMenuIsShown: boolean = false;
 
 
   constructor(
@@ -167,5 +169,16 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  saveLoggedOutProgress(): void {
+    // this.explorationPlayerStateService.setUniqueProgressUrlId();
+    // this.loggedOutProgressUniqueUrlId = (
+    //   this.explorationPlayerStateService.getUniqueProgressUrlId());
+    this.saveProgressMenuIsShown = true;
+  }
+
+  closeSaveProgressMenu(): void {
+    this.saveProgressMenuIsShown = false;
   }
 }
