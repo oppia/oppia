@@ -94,8 +94,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/platform_parameter_list_test.py',
     'core/domain/platform_parameter_registry.py',
     'core/domain/platform_parameter_registry_test.py',
-    'core/domain/playthrough_issue_registry.py',
-    'core/domain/playthrough_issue_registry_test.py',
     'core/domain/question_domain.py',
     'core/domain/question_domain_test.py',
     'core/domain/question_fetchers.py',
