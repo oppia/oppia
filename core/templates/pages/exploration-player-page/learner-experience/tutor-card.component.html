@@ -4,7 +4,12 @@
 <oppia-audio-bar *ngIf="showAudioBar()"></oppia-audio-bar>
 <div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard"
      [ngStyle]="{'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
-  <div class="oppia-learner-view-card-content">
+  <oppia-end-chapter-check-mark #checkMark
+                                [ngClass]="{'hide-check-mark': hideCheckMark, 'skip-check-mark': skipCheckMark}"
+                                class="check-mark-transition">
+  </oppia-end-chapter-check-mark>
+  <div class="oppia-learner-view-card-content"
+       [ngClass]="{'card-transition': isOnTerminalCard(), 'hide-card-content': !hideCheckMark}">
     <div class="oppia-learner-view-card-top-section">
       <oppia-content-language-selector></oppia-content-language-selector>
       <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
@@ -131,3 +136,26 @@
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css">
 <link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.rtl.css">
+
+
+<style>
+  .hide-check-mark {
+    display: none;
+  }
+  .skip-check-mark {
+    opacity: 0;
+  }
+  .check-mark-transition {
+    transition-property: opacity;
+    transition-duration: 0.5s;
+  }
+  .card-transition {
+    transition-property: transform, opacity;
+    transition-duration: 1s;
+  }
+  .hide-card-content {
+    opacity: 0;
+    position: fixed;
+    transform: translate(0, 7px);
+  }
+</style>

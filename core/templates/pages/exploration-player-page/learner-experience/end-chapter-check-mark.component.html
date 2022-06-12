@@ -1,0 +1,55 @@
+<div class="end-chapter-celebration-check-mark">
+  <svg class="tick-svg" viewBox="0 0 40 40">
+    <circle class="enclosing-circle"
+            stroke="#00645c"
+            stroke-width="3"
+            fill="none"
+            r="15"
+            cx="20"
+            cy="20"
+            [ngClass]="{'check-mark-transition': circleIsShown}">
+    </circle>
+    <polyline class="inner-tick"
+              fill="none"
+              stroke="#00645c"
+              stroke-width="3"
+              points="11,20 16,25 28,15"
+              [ngClass]="{'check-mark-transition': innerTickIsShown}"/>
+  </svg>
+</div>
+
+<style>
+  .enclosing-circle {
+    stroke-dasharray: 94.26;
+    stroke-dashoffset: 94.26;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.1, 0.5, 0, 1);
+  }
+
+  .inner-tick {
+    stroke-dasharray: 23;
+    stroke-dashoffset: 23;
+    transition: stroke-dashoffset 0.7s cubic-bezier(0.1, 0.5, 0, 1);
+  }
+
+  .check-mark-transition {
+    stroke-dashoffset: 0;
+  }
+
+  @media (prefers-reduced-motion) {
+    .enclosing-circle {
+      opacity: 0;
+      transition-property: opacity;
+      transition-duration: 1.5s;
+    }
+    
+    .inner-tick {
+      opacity: 0;
+      transition-property: opacity;
+      transition-duration: 0.7s;
+    }
+    
+    .check-mark-transition {
+      opacity: 1;
+    }
+  }
+</style>

@@ -16,7 +16,7 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, HostListener, Input, SimpleChanges, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
@@ -43,6 +43,7 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
+import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -77,10 +78,12 @@ import { animate, keyframes, state, style, transition, trigger } from '@angular/
   ]
 })
 export class TutorCardComponent {
+  @ViewChild('checkMark') checkMarkComponent: EndChapterCheckMarkComponent;
   @Input() displayedCard: StateCard;
   @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
+  @Input() inStoryMode: boolean;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;
@@ -95,6 +98,9 @@ export class TutorCardComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   OPPIA_AVATAR_LINK_URL: string;
   profilePicture: string;
+  hideCheckMark: boolean = true;
+  animationHasPlayedOnce: boolean = false;
+  skipCheckMark: boolean = false;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -168,6 +174,18 @@ export class TutorCardComponent {
         changes.displayedCard.previousValue,
         changes.displayedCard.currentValue)) {
       this.updateDisplayedCard();
+    }
+    if (
+      this.isOnTerminalCard() &&
+      !this.animationHasPlayedOnce &&
+      this.inStoryMode
+    ) {
+      this.hideCheckMark = false;
+      this.checkMarkComponent.animateCheckMark();
+      this.animationHasPlayedOnce = true;
+      setTimeout(() => {
+        this.hideCheckMark = true;
+      }, 4000);
     }
   }
 
@@ -277,6 +295,16 @@ export class TutorCardComponent {
 
   getInputResponsePairId(index: number): string {
     return 'input-response-pair-' + index;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.hideCheckMark) {
+      this.skipCheckMark = true;
+      setTimeout(() => {
+        this.hideCheckMark = true;
+      }, 500);
+    }
   }
 }
 
