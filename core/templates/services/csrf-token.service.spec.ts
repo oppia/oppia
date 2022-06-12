@@ -21,7 +21,7 @@ describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService;
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
-    spyOn(window, 'fetch').and.callFake((path: string) => {
+    spyOn(window, 'fetch').and.callFake((reqInfo: RequestInfo) => {
       return Promise.resolve(
         new Response('12345{"token": "sample-csrf-token"}')
       );

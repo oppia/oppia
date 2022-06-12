@@ -18,9 +18,11 @@
  */
 
 import { Directive, HostListener, Input, NgModule } from '@angular/core';
-import { RouterModule, RouterLinkWithHref } from '@angular/router';
+import { LocationStrategy } from '@angular/common';
+import { RouterModule, RouterLinkWithHref, Router, ActivatedRoute } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 // TODO(#13443): Remove hybrid router module provider once all pages are
 // migrated to angular router.
@@ -29,6 +31,15 @@ import { AppConstants } from 'app.constants';
   selector: '[smartRouterLink]'
 })
 export class SmartRouterLink extends RouterLinkWithHref {
+  constructor(
+      router: Router,
+      route: ActivatedRoute,
+      locationStrategy: LocationStrategy,
+      private windowRef: WindowRef
+  ) {
+    super(router, route, locationStrategy);
+  }
+
   @Input()
   set smartRouterLink(commands: string[] | string) {
     this.routerLink = commands;
@@ -58,7 +69,7 @@ export class SmartRouterLink extends RouterLinkWithHref {
       bodyContent.innerHTML.includes('<router-outlet custom="light">')
     );
     if (!currentPageIsInRouter && !currentPageIsInLightweightRouter) {
-      window.location.href = this.urlTree.toString();
+      this.windowRef.nativeWindow.location.href = this.urlTree.toString();
       return false;
     }
 
@@ -86,7 +97,7 @@ export class SmartRouterLink extends RouterLinkWithHref {
     if (currentPageIsInRouter) {
       for (let route of lightweightRouterPagesRoutes) {
         if (this.urlTree.toString().match(route)) {
-          window.location.href = this.urlTree.toString();
+          this.windowRef.nativeWindow.location.href = this.urlTree.toString();
           return false;
         }
       }
@@ -95,7 +106,7 @@ export class SmartRouterLink extends RouterLinkWithHref {
     if (currentPageIsInLightweightRouter) {
       for (let route of routerPagesRoutes) {
         if (this.urlTree.toString().match(route)) {
-          window.location.href = this.urlTree.toString();
+          this.windowRef.nativeWindow.location.href = this.urlTree.toString();
           return false;
         }
       }
