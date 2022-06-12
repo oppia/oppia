@@ -35,8 +35,7 @@ class MockNgbModal {
     };
   }
 }
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Translation status service', () => {
+describe('Translation status service', () => {
   let ess = null;
   let srvs = null;
   let swts = null;
