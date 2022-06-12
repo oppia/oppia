@@ -59,8 +59,7 @@ class MockExplorationParamChangesService {
     name: 'ParamChange3'
   }];
 }
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Exploration Warnings Service', () => {
+describe('Exploration Warnings Service', () => {
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationWarningsService: ExplorationWarningsService;
   let explorationStatesService: ExplorationStatesService;
@@ -1590,6 +1589,10 @@ fdescribe('Exploration Warnings Service', () => {
         },
       },
       End: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1601,8 +1604,15 @@ fdescribe('Exploration Warnings Service', () => {
         param_changes: [],
         interaction: {
           id: 'EndExploration',
+          confirmed_unclassified_answers: null,
+          solution: null,
           answer_groups: [{
+            tagged_skill_misconception_id: null,
             outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
               dest: '',
               feedback: {
                 content_id: 'feedback_2',
