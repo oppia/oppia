@@ -72,8 +72,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/improvements_services_test.py',
     'core/domain/interaction_registry.py',
     'core/domain/interaction_registry_test.py',
-    'core/domain/learner_goals_services.py',
-    'core/domain/learner_goals_services_test.py',
     'core/domain/learner_playlist_services.py',
     'core/domain/learner_playlist_services_test.py',
     'core/domain/learner_progress_services.py',
