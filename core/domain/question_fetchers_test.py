@@ -71,6 +71,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 2, ['skill_1'], 0))
 
         self.assertEqual(len(questions), 1)
+        # Ruling out the possibility of None for mypy type checking.
         assert isinstance(questions[0], question_domain.Question)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict()) # type: ignore[no-untyped-call]
@@ -97,6 +98,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 2, ['skill_1', 'skill_2'], 0))
 
         self.assertEqual(len(questions), 1)
+        # Ruling out the possibility of None for mypy type checking.
         assert isinstance(questions[0], question_domain.Question)
         self.assertEqual(
             questions[0].to_dict(), question_1.to_dict()) # type: ignore[no-untyped-call]
@@ -109,9 +111,11 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)
+        # Ruling out the possibility of None for mypy type checking.
         assert isinstance(questions[0], question_domain.Question)
         self.assertEqual(questions[0].id, self.question_id)
         self.assertIsNone(questions[1])
+        # Ruling out the possibility of None for mypy type checking.
         assert isinstance(questions[2], question_domain.Question)
         self.assertEqual(questions[2].id, question_id_2)
 
@@ -129,8 +133,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
 
-        question_model: Optional[
-            question_models.QuestionModel] = question_models.QuestionModel(
+        question_model: Optional[question_models.QuestionModel] = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
                 self._create_valid_question_data('ABC').to_dict()), # type: ignore[no-untyped-call]
@@ -138,6 +141,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             version=0,
             question_state_data_schema_version=0)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert isinstance(question_model, question_models.QuestionModel)
         question_model.commit(
             self.editor_id, 'question model created',
@@ -151,6 +155,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION):
+            # Ruling out the possibility of None for mypy type checking.
             assert isinstance(question_model, question_models.QuestionModel)
             question_fetchers.get_question_from_model(question_model)
 
@@ -182,6 +187,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
+        # Ruling out the possibility of None for mypy type checking.
         assert isinstance(all_question_models, question_models.QuestionModel)
         question_model = all_question_models.get()
         updated_question_model = question_fetchers.get_question_from_model(
