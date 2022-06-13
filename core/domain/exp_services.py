@@ -620,15 +620,16 @@ def populate_exp_model_fields(exp_model, exploration):
 
 
 def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
-    """Populate exploration summary model with the data from ExplorationSummary object.
+    """Populate exploration summary model with the data from
+    ExplorationSummary object.
 
     Args:
-        exp_model: ExplorationModel. The model to populate.
-        exploration: Exploration. THe exploration domain object which should be
-            used to populate the model.
+        exp_summary_model: ExpSummaryModel. The model to populate.
+        exp_summary: ExplorationSummary. THe exploration domain object which
+            should be used to populate the model.
 
     Returns:
-        ExplorationModel. Populated model.
+        ExpSummaryModel. Populated model.
     """
     exp_summary_dict = {
         'title': exp_summary.title,
@@ -638,8 +639,10 @@ def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
         'tags': exp_summary.tags,
         'ratings': exp_summary.ratings,
         'scaled_average_rating': exp_summary.scaled_average_rating,
-        'exploration_model_last_updated': exp_summary.exploration_model_last_updated,
-        'exploration_model_created_on': exp_summary.exploration_model_created_on,
+        'exploration_model_last_updated': (
+            exp_summary.exploration_model_last_updated),
+        'exploration_model_created_on': (
+            exp_summary.exploration_model_created_on),
         'first_published_msec': exp_summary.first_published_msec,
         'status': exp_summary.status,
         'community_owned': exp_summary.community_owned,

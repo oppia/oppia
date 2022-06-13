@@ -87,8 +87,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         schema version.
 
         Args:
-            exploration: Exploration. The exploration domain object for which to
-                generate the change objects.
+            exp_id: str. The ID of the exploration.
             exp_model: ExplorationModel. The exploration for which to generate
                 the change objects.
 
