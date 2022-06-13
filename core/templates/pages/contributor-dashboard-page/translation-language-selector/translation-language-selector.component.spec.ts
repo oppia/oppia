@@ -191,6 +191,7 @@ describe('Translation language selector', () => {
   it('should display the preferred language when the preferred' +
     ' language is defined', async(() => {
     component.activeLanguageCode = null;
+    component.languageSelection = null;
     preferredLanguageCode = 'en';
     // This throws "TS2532". We need to suppress this error because
     // "constants.SUPPORTED_AUDIO_LANGUAGES" is always defined. Also, it must
@@ -241,7 +242,7 @@ describe('Translation language selector', () => {
       expect(component.languageSelection).toBe('français (French)');
     });
 
-  it('should indiacate selection and save the language' +
+  it('should indicate selection and save the language' +
     ' on selecting a new language', () => {
     const selectedLanguage = 'fr';
     spyOn(component.setActiveLanguageCode, 'emit');

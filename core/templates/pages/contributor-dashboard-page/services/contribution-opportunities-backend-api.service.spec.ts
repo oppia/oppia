@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
@@ -27,6 +27,8 @@ import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { UserService } from 'services/user.service';
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
@@ -35,6 +37,7 @@ describe('Contribution Opportunities backend API service', function() {
     ContributionOpportunitiesBackendApiService;
   let httpTestingController: HttpTestingController;
   let urlInterpolationService: UrlInterpolationService;
+  let userService: UserService;
   const skillOpportunityResponse = {
     opportunities: [{
       id: 'skill_id',
@@ -63,6 +66,19 @@ describe('Contribution Opportunities backend API service', function() {
     next_cursor: '6',
     more: true
   };
+  const userInfoDict = {
+    'roles': ['USER_ROLE'],
+    'is_moderator': false,
+    'is_curriculum_admin': false,
+    'is_super_admin': false,
+    'is_topic_manager': false,
+    'can_create_collections': false,
+    'preferred_site_language_code': 'en',
+    'username': 'user',
+    'email': 'user@example.com',
+    'user_is_logged_in': true
+  };
+  let userInfo: UserInfo;
   let sampleSkillOpportunitiesResponse: SkillOpportunity[];
   let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
   let sampleVoiceoverOpportunitiesResponse: ExplorationOpportunitySummary[];
@@ -75,6 +91,8 @@ describe('Contribution Opportunities backend API service', function() {
       TestBed.get(ContributionOpportunitiesBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
+    userService = TestBed.get(UserService);
+    userInfo = UserInfo.createFromBackendDict(userInfoDict);
     sampleSkillOpportunitiesResponse = [
       SkillOpportunity.createFromBackendDict(
         skillOpportunityResponse.opportunities[0])
@@ -436,9 +454,13 @@ describe('Contribution Opportunities backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
       const params = 'en';
 
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo));
+
       contributionOpportunitiesBackendApiService
         .savePreferredTranslationLanguageAsync(params)
         .then(successHandler, failHandler);
+      tick();
 
       const req = httpTestingController.expectOne(
         '/preferredtranslationlanguage'
@@ -458,9 +480,13 @@ describe('Contribution Opportunities backend API service', function() {
     const failHandler = jasmine.createSpy('fail');
     const params = 'en';
 
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo));
+
     contributionOpportunitiesBackendApiService
       .savePreferredTranslationLanguageAsync(params)
       .then(successHandler, failHandler);
+    tick();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(

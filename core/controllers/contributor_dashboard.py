@@ -619,6 +619,9 @@ class TranslationPreferenceHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
+    # TODO(#15559): Rename 'is_supported_audio_language_code' and
+    # 'SUPPORTED_AUDIO_LANGUAGES' constant to make sure that the name
+    # clearly defines the purpose.
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -646,11 +649,10 @@ class TranslationPreferenceHandler(base.BaseHandler):
                 user_settings.preferred_translation_language_code)
         })
 
-    @acl_decorators.open_access
+    @acl_decorators.can_manage_own_account
     def post(self):
         """Handles POST requests."""
-        if self.user_id:
-            language_code = self.normalized_payload.get('language_code')
-            user_services.update_preferred_translation_language_code(
-                self.user_id, language_code)
+        language_code = self.normalized_payload.get('language_code')
+        user_services.update_preferred_translation_language_code(
+            self.user_id, language_code)
         self.render_json({})

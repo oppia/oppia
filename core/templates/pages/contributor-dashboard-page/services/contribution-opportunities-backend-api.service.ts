@@ -33,6 +33,7 @@ import {
   FeaturedTranslationLanguage,
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
+import { UserService } from 'services/user.service';
 
 import constants from 'assets/constants';
 
@@ -100,6 +101,7 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
+    private userService: UserService,
   ) {}
 
   private _getExplorationOpportunityFromDict(
@@ -255,16 +257,18 @@ export class ContributionOpportunitiesBackendApiService {
   async savePreferredTranslationLanguageAsync(
       languageCode: string
   ): Promise<void> {
-    const postData: {'language_code': string} = {
-      language_code: languageCode,
-    };
-    const body = new FormData();
-    body.append('payload', JSON.stringify(postData));
-    return this.http.post<void>(
-      '/preferredtranslationlanguage', body).toPromise().catch(
-      (errorResponse) => {
-        throw new Error(errorResponse.error.error);
-      });
+    return this.userService.getUserInfoAsync().then(
+      (userInfo) => {
+        if(userInfo?.isLoggedIn()){
+          return this.http.post<void>(
+            '/preferredtranslationlanguage',
+            {language_code: languageCode}
+          ).toPromise().catch((errorResponse) => {
+            throw new Error(errorResponse.error.error);
+          });
+        }
+      }
+    );
   }
 
   async getPreferredTranslationLanguageAsync(

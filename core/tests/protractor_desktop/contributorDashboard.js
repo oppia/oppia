@@ -114,13 +114,11 @@ describe('Contributor dashboard page', function() {
   });
 
   it('should allow user to switch to translate text tab', async function() {
-    await users.login(USER_EMAILS[0]);
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(GERMAN_LANGUAGE);
     await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
       GERMAN_LANGUAGE);
-    await users.logout();
   });
 
   it('should persist user\'s preferred translation language across sessions',
