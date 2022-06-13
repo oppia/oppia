@@ -32,7 +32,6 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import takeout_service
-from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 
