@@ -128,6 +128,36 @@ class MigrateExplorationJob(base_jobs.JobBase):
             return result.Err(e)
 
     @staticmethod
+    def _update_exp_summary(
+        migrated_exp: exp_domain.Exploration,
+        exp_summary_model: exp_models.ExpSummaryModel,
+        exp_rights_model: exp_models.ExplorationRightsModel
+    ) -> exp_models.ExpSummaryModel:
+        """Generates a newly updated exploration summary model.
+
+        Args:
+            migrated_exp: Exploration. The migrated exploration domain object.
+            exp_summary_model: ExpSummaryModel. The exploration summary model
+                to update.
+            exp_rights_model: ExplorationRightsmodel. The exploration rights
+                model used to update the exploration summary.
+
+        Returns:
+            ExpSummaryModel. The updated exploration summary model to put into
+            the datastore.
+        """
+        exp_summary = exp_services.compute_summary_of_exploration(
+            migrated_exp, exp_rights_model, exp_summary_model)
+        exp_summary.version += 1
+        updated_exp_summary_model = (
+            exp_services.populate_exp_summary_model_fields(
+                exp_summary_model, exp_summary
+            )
+        )
+
+        return updated_exp_summary_model
+
+    @staticmethod
     def _update_exploration(
         exp_model: exp_models.ExplorationModel,
         exp_rights_model: exp_models.ExplorationRightsModel,
@@ -199,6 +229,14 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 lambda exp_rights_model: exp_rights_model.id)
         )
 
+        exp_summary_models = (
+                self.pipeline
+                | 'Get all non-deleted exploration summary models' >> (
+                    ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+                | 'Add exploration summary ID' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
+            lambda exp_summary_model: exp_summary_model.id)
+        )
+
         migrated_exp_results = (
             unmigrated_exploration_models
             | 'Transform and migrate model' >> beam.MapTuple( # pylint: disable=no-value-for-parameter
@@ -228,6 +266,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_objects_list = (
             {
                 'exp_model': unmigrated_exploration_models,
+                'exp_summary_model': exp_summary_models,
                 'exp_rights_model': exp_rights_models,
                 'exploration': migrated_exp,
                 'exp_changes': exp_changes
@@ -241,6 +280,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0],
                 'exp_rights_model': objects['exp_rights_model'][0],
+                'exp_summary_model': objects['exp_summary_model'][0],
                 'exp_changes': objects['exp_changes']
             })
         )
@@ -272,8 +312,19 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
+        exp_summary_models_to_put = (
+            exp_objects_list
+            | 'Generate exp summary models to put' >> beam.Map(
+                lambda exp_objects: self._update_exp_summary(
+                    exp_objects['exploration'],
+                    exp_objects['exp_summary_model'],
+                    exp_objects['exp_rights_model']
+                ))
+        )
+
         unused_put_results = (
-            exp_models_to_put
+            (exp_models_to_put, exp_summary_models_to_put)
+            | 'Merge models' >> beam.Flatten()
             | 'Put models into datastore' >> ndb_io.PutModels()
         )
 

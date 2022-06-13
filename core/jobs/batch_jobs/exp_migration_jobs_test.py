@@ -78,7 +78,8 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
-            self.assertEqual(exploration.states_schema_version, 48)
+            self.assertEqual(
+                exploration.states_schema_version, 48)
 
         with cache_swap:
             self.assert_job_output_is([
@@ -91,8 +92,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
         self.assertEqual(
-            migrated_exp_model.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+            migrated_exp_model.states_schema_version, 48)
 
     def test_broken_exp_is_not_migrated(self) -> None:
         exploration_rights = rights_domain.ActivityRights(

@@ -118,6 +118,7 @@ def get_exploration_titles_and_categories(exp_ids):
         dicts with the keys 'title' and 'category'. Any invalid exploration
         ids are excluded.
     """
+
     explorations = [
         (exp_fetchers.get_exploration_from_model(e) if e else None)
         for e in exp_models.ExplorationModel.get_multi(
@@ -1268,8 +1269,11 @@ def regenerate_exploration_summary_with_new_contributor(
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
+    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
+    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration_id)
     if exploration is not None:
-        exp_summary = compute_summary_of_exploration(exploration)
+        exp_summary = compute_summary_of_exploration(
+            exploration, exp_rights, exp_summary_model)
         exp_summary.add_contribution_by_user(contributor_id)
         save_exploration_summary(exp_summary)
     else:
@@ -1285,25 +1289,31 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
+    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration_id)
+    exp_summary = compute_summary_of_exploration(
+        exploration, exp_rights, exp_summary_model)
     exp_summary.contributors_summary = (
         compute_exploration_contributors_summary(exp_summary.id))
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(
+        exploration, exp_rights, exp_summary_model):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
+        exp_rights: ExplorationRightsModel. The exploration rights model, used
+            to compute summary.
+        exp_summary_model: ExplorationSummaryModel. The exploration summary
+            model, whose summary is computed.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
     """
-    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
-    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model:
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
