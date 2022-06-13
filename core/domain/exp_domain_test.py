@@ -1913,7 +1913,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_metadata(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
-
         metadata_dict_1 = exploration.get_metadata().to_dict()
         metadata_dict_2 = {
             'title': exploration.title,
@@ -11157,7 +11156,6 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
 
     def test_exploration_metadata_gets_created(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
-
         metadata_dict_1 = exp_domain.ExplorationMetadata(
             exploration.title, exploration. category, exploration.objective,
             exploration.language_code, exploration.tags, exploration.blurb,
@@ -11166,7 +11164,6 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
             exploration.param_changes, exploration.auto_tts_enabled,
             exploration.correctness_feedback_enabled, exploration.edits_allowed
         ).to_dict()
-
         metadata_dict_2 = {
             'title': exploration.title,
             'category': exploration.category,

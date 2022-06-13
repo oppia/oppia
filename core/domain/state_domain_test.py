@@ -5333,3 +5333,36 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected duration_secs to be positive number, '
             'or zero if not yet specified'):
             self.voiceover.validate()
+
+
+class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
+    
+    def test_state_version_history_gets_created(self):
+        state_version_history_dict_1 = {
+            'previously_edited_on_version': 1,
+            'state_name_in_previous_version': 'state 1',
+            'committer_id': 'user_1'
+        }
+        state_version_history_dict_2 = state_domain.StateVersionHistory(
+            1, 'state 1', 'user_1').to_dict()
+
+        self.assertEqual(
+            state_version_history_dict_1, state_version_history_dict_2)
+
+    def test_state_version_history_gets_created_from_dict(self):
+        state_version_history_dict = {
+            'previously_edited_on_version': 1,
+            'state_name_in_previous_version': 'state 1',
+            'committer_id': 'user_1'
+        }
+        state_version_history = state_domain.StateVersionHistory.from_dict(
+            state_version_history_dict)
+
+        self.assertEqual(
+            state_version_history.previously_edited_on_version,
+            state_version_history_dict['previously_edited_on_version'])
+        self.assertEqual(
+            state_version_history.state_name_in_previous_version,
+            state_version_history_dict['state_name_in_previous_version'])
+        self.assertEqual(
+            state_version_history.to_dict(), state_version_history_dict)
