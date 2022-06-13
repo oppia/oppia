@@ -30,9 +30,15 @@ import sys
 import time
 
 from core import constants
-from core import utils
 
 from typing import Dict, Generator, List, Optional, Union
+
+# Add third_party to path. Some scripts access feconf even before
+# python_libs is added to path.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from core import utils # pylint: disable=wrong-import-position
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -48,7 +54,7 @@ PYLINT_VERSION = '2.11.1'
 PYLINT_QUOTES_VERSION = '0.2.4'
 PYGITHUB_VERSION = '1.55'
 WEBTEST_VERSION = '3.0.0'
-PIP_TOOLS_VERSION = '6.6.1'
+PIP_TOOLS_VERSION = '6.6.2'
 GRPCIO_VERSION = '1.41.1'
 PROTOBUF_VERSION = '3.13.0'
 SETUPTOOLS_VERSION = '58.5.3'
