@@ -115,9 +115,17 @@ export class ExtractImageFilenamesFromModelService {
    * @param {object} state - The state whose solution's html should be
    *                         returned.
    */
-  _getSolutionHtml(state: State): string {
+  _getSolutionHtml(state: State): string | null {
     let languageCode = (
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+
+    // The state.interaction.solution variable threw 'Object is possibly null
+    // error'. So to prevent this error there is a check to see that if
+    // solution is null, which means that the solution in the state does not
+    // exist. If it is null then function returns null.
+    if (state.interaction.solution === null) {
+      return null;
+    }
     return this.contentTranslationManagerService.getTranslatedHtml(
       state.writtenTranslations, languageCode,
       state.interaction.solution.explanation);
@@ -160,8 +168,12 @@ export class ExtractImageFilenamesFromModelService {
 
     _allHtmlInTheState.push(this._getHintsHtml(state));
 
-    if (state.interaction.solution !== null) {
-      _allHtmlInTheState.push(this._getSolutionHtml(state));
+    let solutionHtml = this._getSolutionHtml(state);
+
+    // If solutionHtml is not null (which means that the solution in the state
+    // does exist), then add solutionHtml to _allHtmlInTheState.
+    if (solutionHtml !== null) {
+      _allHtmlInTheState.push(solutionHtml);
     }
     return _allHtmlInTheState;
   }
@@ -191,26 +203,39 @@ export class ExtractImageFilenamesFromModelService {
     let collapsibleTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-collapsible');
     for (let i = 0; i < collapsibleTagList.length; i++) {
-      let contentWithValue = JSON.parse(
-        collapsibleTagList[i].getAttribute('content-with-value'));
-      let collapsibleDocument = (
-        new DOMParser().parseFromString(contentWithValue, 'text/html'));
-      imageTagLists.push(
-        collapsibleDocument.getElementsByTagName('oppia-noninteractive-image'));
+      // Get attribute from a collapsible. If the given attribute does not
+      // exist, then attribute is null which means skip the current
+      // collapsible. If the attribute is not null, then add images that are
+      // embedded in the given collapsible.
+      let attribute = collapsibleTagList[i].getAttribute('content-with-value');
+      if (attribute !== null) {
+        let contentWithValue = JSON.parse(attribute);
+        let collapsibleDocument = (
+          new DOMParser().parseFromString(contentWithValue, 'text/html'));
+        imageTagLists.push(
+          collapsibleDocument.getElementsByTagName(
+            'oppia-noninteractive-image'));
+      }
     }
 
     // Add images that are embedded in tabs.
     let tabsTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-tabs');
     for (let i = 0; i < tabsTagList.length; i++) {
-      let contentsWithValue = JSON.parse(
-        tabsTagList[i].getAttribute('tab_contents-with-value'));
-      for (let contentWithValue of contentsWithValue) {
-        let tabDocument = (
-          new DOMParser().parseFromString(contentWithValue.content, 'text/html')
-        );
-        imageTagLists.push(
-          tabDocument.getElementsByTagName('oppia-noninteractive-image'));
+      // Get attribute from a tab. If the given attribute does not exist,
+      // then attribute is null which means skip the current tab. If the
+      // attribute is not null, then add images that are embedded in the given
+      // tab.
+      let attribute = tabsTagList[i].getAttribute('tab_contents-with-value');
+      if (attribute !== null) {
+        let contentsWithValue = JSON.parse(attribute);
+        for (let contentWithValue of contentsWithValue) {
+          let tabDocument = (
+            new DOMParser().parseFromString(
+              contentWithValue.content, 'text/html'));
+          imageTagLists.push(
+            tabDocument.getElementsByTagName('oppia-noninteractive-image'));
+        }
       }
     }
 
@@ -220,10 +245,18 @@ export class ExtractImageFilenamesFromModelService {
         // tag. But it actually contains the filename only. We use the
         // variable filename instead of filepath since in the end we are
         // retrieving the filenames in the exploration.
-        let filename = JSON.parse(
-          this.htmlEscaperService.escapedStrToUnescapedStr(
-            imageTagList[i].getAttribute('filepath-with-value')));
-        filenames.push(filename);
+
+        // Get filename attribute from an imageTag. If the given attribute does
+        // not exist, then attribute is null which means skip the current
+        // imageTag. If the attribute is not null, then add the file to
+        // filenames.
+        let attribute = imageTagList[i].getAttribute('filepath-with-value');
+        if (attribute !== null) {
+          let filename = JSON.parse(
+            this.htmlEscaperService.escapedStrToUnescapedStr(
+              attribute));
+          filenames.push(filename);
+        }
       }
     }
     return filenames;
@@ -247,9 +280,14 @@ export class ExtractImageFilenamesFromModelService {
     let mathTagList = dummyDocument.getElementsByTagName(
       'oppia-noninteractive-math');
     for (let i = 0; i < mathTagList.length; i++) {
-      let mathContentWithValue = JSON.parse(
-        mathTagList[i].getAttribute('math_content-with-value'));
-      filenames.push(mathContentWithValue.svg_filename);
+      // Get attribute from a mathTag. If the given attribute does not exist,
+      // then attribute is null which means skip the current mathTag.
+      // If the attribute is not null, then add the SVG filename to filenames.
+      let attribute = mathTagList[i].getAttribute('math_content-with-value');
+      if (attribute !== null) {
+        let mathContentWithValue = JSON.parse(attribute);
+        filenames.push(mathContentWithValue.svg_filename);
+      }
     }
     return filenames;
   }
@@ -299,7 +337,7 @@ export class ExtractImageFilenamesFromModelService {
   }
 
   _extractFilenamesFromHtmlList(htmlList: string[]): string[] {
-    let filenames = [];
+    let filenames: string[] = [];
     htmlList.forEach((htmlStr) => {
       filenames.push(
         ...this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr),

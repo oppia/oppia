@@ -5899,6 +5899,10 @@ export default {
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
 
+  // Represents the string value indicating "All topics" in the Contributor
+  // Dashboard topic selector.
+  "TOPIC_SENTINEL_NAME_ALL": "All",
+
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
 
@@ -6093,8 +6097,8 @@ export default {
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
 
-  // Allowed letters in the OSK.
-  "VALID_CUSTOM_OSK_LETTERS": [
+  // Valid allowed letters for math lessons.
+  "VALID_ALLOWED_VARIABLES": [
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
     "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
@@ -6725,5 +6729,7 @@ export default {
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
-  "ASSET_TYPE_THUMBNAIL": "thumbnail"
+  "ASSET_TYPE_THUMBNAIL": "thumbnail",
+
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
 } as const;
