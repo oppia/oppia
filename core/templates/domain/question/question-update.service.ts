@@ -16,15 +16,22 @@
  * @fileoverview Service to handle the updating of a question.
  */
 
-import { Change } from 'domain/editor/undo_redo/change.model';
+import { BackendChangeObject, Change, DomainObject } from 'domain/editor/undo_redo/change.model';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { State } from 'domain/state/StateObjectFactory';
+import { State, StateBackendDict } from 'domain/state/StateObjectFactory';
 import { Question } from './QuestionObjectFactory';
+
+interface ApplyParams {
+  property_name: string;
+  new_value: StateBackendDict | string | string[];
+  old_value: StateBackendDict | string | string[];
+  cmd: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,37 +42,46 @@ export class QuestionUpdateService {
   ) {}
 
   _applyChange(
-      question: Question, command: any,
-      params: any, apply: any, reverse: any): void {
+      question: Question,
+      command: string,
+      params: ApplyParams | BackendChangeObject,
+      apply: Function, reverse: Function): void {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
-    let changeObj = new Change(changeDict, apply, reverse);
+    let changeObj = new Change(
+      changeDict as BackendChangeObject, apply as (
+        backendChangeObject: BackendChangeObject,
+        domainObject: DomainObject) => void, reverse as (
+          backendChangeObject: BackendChangeObject,
+          domainObject: DomainObject) => void);
     this.questionUndoRedoService.applyChange(changeObj, question);
   }
 
   _applyPropertyChange(
-      question: Question, propertyName: any,
-      newValue: any, oldValue: any,
-      apply: any, reverse: any): any {
+      question: Question, propertyName: string,
+      newValue: StateBackendDict | string | string[],
+      oldValue: StateBackendDict | string | string[],
+      apply: Function, reverse: Function): void {
     this._applyChange(
       question,
       QuestionDomainConstants.CMD_UPDATE_QUESTION_PROPERTY, {
         property_name: propertyName,
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
+        cmd: ''
       }, apply, reverse);
   }
 
-  _getParameterFromChangeDict(changeDict: any, paramName: any): any {
+  _getParameterFromChangeDict(changeDict: unknown, paramName: string): string {
     return changeDict[paramName];
   }
 
-  _getNewPropertyValueFromChangeDict(changeDict: any): any {
+  _getNewPropertyValueFromChangeDict(changeDict: unknown): string {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
-  _getAllContentIds(state: State): Set<unknown> {
-    let allContentIdsSet = new Set();
+  _getAllContentIds(state: State): Set<string> {
+    let allContentIdsSet = new Set<string>();
     allContentIdsSet.add(state.content.contentId);
     state.interaction.answerGroups.forEach((answerGroup) => {
       allContentIdsSet.add(answerGroup.outcome.feedback.contentId);
@@ -95,10 +111,12 @@ export class QuestionUpdateService {
     const custArgs = state.interaction.customizationArgs;
     Interaction.getCustomizationArgContentIds(custArgs)
       .forEach(allContentIdsSet.add, allContentIdsSet);
+
     return allContentIdsSet;
   }
 
-  _getElementsInFirstSetButNotInSecond(setA: any, setB: any): any {
+  _getElementsInFirstSetButNotInSecond(
+      setA: Set<string>, setB: Set<string>): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
@@ -137,7 +155,7 @@ export class QuestionUpdateService {
 
   setQuestionInapplicableSkillMisconceptionIds(
       question: Question,
-      newInapplicableSkillMisconceptionIds: string[]): void {
+      newInapplicableSkillMisconceptionIds: string[] | string): void {
     let oldInapplicableSkillMisconceptionIds = cloneDeep(
       question.getInapplicableSkillMisconceptionIds());
     this._applyPropertyChange(
