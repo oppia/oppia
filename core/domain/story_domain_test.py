@@ -1367,7 +1367,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             self.story.story_contents.get_node_index(
                 'invalid_node_id',
-                strict = False
+                strict=False
             )
         )
 
