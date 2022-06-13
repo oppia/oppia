@@ -18,52 +18,197 @@
 
 from __future__ import annotations
 
-import copy
-import datetime
+import types
 
-from core import feconf
-from core.constants import constants
 from core.platform import models
-from core.storage import learner_group
 from core.tests import test_utils
-
-from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import learner_group_models
-    from mypy_imports import user_models
 
-(base_models, exp_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
-
+(base_models, learner_group_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.learner_group])
 
 
 class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
     """Test the LearnerGroupDataModel class."""
+
+    def setUp(self) -> None:
+        """Set up blog post models in datastore for use in testing."""
+        super(LearnerGroupDataModelUnitTest, self).setUp()
+
+        self.learner_group_model = learner_group_models.LearnerGroupDataModel(
+            '3232', 'title', 'description',
+            ['user_1'],
+            ['user_2', 'user_3', 'user_4'],
+            ['user_5', 'user_6'],
+            ['subtopic_1', 'subtopic_2'],
+            ['story_1', 'story_2'])
+        self.learner_group_model.update_timestamps()
+        self.learner_group_model.put()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             learner_group_models.LearnerGroupDataModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_has_reference_to_user_id(self) -> None:
-        learner_group = learner_group_models.LearnerGroupDataModel.create(
-            '3232', 'title', 'description',
-            ['user_1'], ['user_2', 'user_3', 'user_4'],
-            ['user_5', 'user_6'])
-        learner_group.update_timestamps()
-        learner_group.put()
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            learner_group_models.LearnerGroupDataModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.
+                ONE_INSTANCE_SHARED_ACROSS_USERS
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.EXPORTED,
+            'description': base_models.EXPORT_POLICY.EXPORTED,
+            'facilitators': base_models.EXPORT_POLICY.EXPORTED,
+            'members': base_models.EXPORT_POLICY.EXPORTED,
+            'invitations': base_models.EXPORT_POLICY.EXPORTED,
+            'subtopic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'story_ids': base_models.EXPORT_POLICY.EXPORTED
+        }
+        self.assertEqual(
+            learner_group_models.LearnerGroupDataModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
+    def test_get_field_names_for_takeout(self) -> None:
+        expected_results = {
+            'facilitator': 'facilitators',
+            'member': 'members',
+            'invitation': 'invitations'
+        }
+        self.assertEqual(
+            learner_group_models.LearnerGroupDataModel
+            .get_field_names_for_takeout(),
+            expected_results)
+
+    def test_raise_exception_by_mocking_collision(self) -> None:
+        """Tests get_new_id method for raising exception."""
+        learner_group_data_model_cls = (
+            learner_group_models.LearnerGroupDataModel)
+
+        # Test get_new_id method.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'New id generator is producing too many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                learner_group_data_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    learner_group_data_model_cls)):
+                learner_group_data_model_cls.get_new_id()
+
+    def test_export_data_on_members(self) -> None:
+        """Test export data on users that are members of the learner group."""
+
+        member_user_data = (
+            learner_group_models.LearnerGroupDataModel.export_data('user_2'))
+        expected_member_user_data = {
+            'title': 'title',
+            'description': 'description',
+            'member': 'user_2',
+            'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+            'story_ids': ['story_1', 'story_2']
+        }
+        self.assertEqual(expected_member_user_data, member_user_data)
+
+    def test_export_data_on_invited_users(self) -> None:
+        """Test export data on users that have been invited to join the
+        learner group."""
+
+        invited_user_data = (
+            learner_group_models.LearnerGroupDataModel.export_data('user_6'))
+        expected_invited_user_data = {
+            'title': 'title',
+            'description': 'description',
+            'invited': 'user_6',
+            'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+            'story_ids': ['story_1', 'story_2']
+        }
+        self.assertEqual(expected_invited_user_data, invited_user_data)
+
+    def test_export_data_on_facilitators(self) -> None:
+        """Test export data on users that are facilitators of
+        the learner group."""
+
+        facilitator_user_data = (
+            learner_group_models.LearnerGroupDataModel.export_data('user_1'))
+        expected_facilitator_user_data = {
+            'title': 'title',
+            'description': 'description',
+            'facilitator': 'user_1',
+            'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+            'story_ids': ['story_1', 'story_2']
+        }
+        self.assertEqual(expected_facilitator_user_data,
+            facilitator_user_data)
+
+    def test_export_data_on_uninvolved_user(self) -> None:
+        """Test export data on users who do not have any involvement with
+        the learner group."""
+        uninvolved_user_data = (
+            learner_group_models.LearnerGroupDataModel.export_data('user_31'))
+        expected_uninvolved_user_data = {}
+        self.assertEqual(expected_uninvolved_user_data,
+            uninvolved_user_data)
+
+    def test_apply_deletion_policy_on_members(self) -> None:
+        """Test apply_deletion_policy on users that are members of
+        the learner group."""
+
         self.assertTrue(
-            learner_group.LearnerGroupDataModel
-            .has_reference_to_user_id('user_1'))
-        self.assertTrue(
-            learner_group.LearnerGroupDataModel
+            learner_group_models.LearnerGroupDataModel
             .has_reference_to_user_id('user_2'))
-        self.assertTrue(
-            learner_group.LearnerGroupDataModel
-            .has_reference_to_user_id('user_5'))
+
+        (
+            learner_group_models.LearnerGroupDataModel
+            .apply_deletion_policy('user_2')
+        )
+
         self.assertFalse(
-            learner_group.LearnerGroupDataModel
-            .has_reference_to_user_id('user_32'))
+            learner_group_models.LearnerGroupDataModel
+            .has_reference_to_user_id('user_2'))
+
+    def test_apply_deletion_policy_on_invited_users(self) -> None:
+        """Test apply_deletion_policy on users that have been
+        invited to join the learner group."""
+
+        self.assertTrue(
+            learner_group_models.LearnerGroupDataModel
+            .has_reference_to_user_id('user_5'))
+
+        (
+            learner_group_models.LearnerGroupDataModel
+            .apply_deletion_policy('user_5')
+        )
+
+        self.assertFalse(
+            learner_group_models.LearnerGroupDataModel
+            .has_reference_to_user_id('user_5'))
+
+    def test_apply_deletion_policy_on_facilitators(self) -> None:
+        """Test apply_deletion_policy on users that are facilitators of
+        the learner group."""
+
+        self.assertTrue(
+            learner_group_models.LearnerGroupDataModel
+            .has_reference_to_user_id('user_1'))
+
+        (
+            learner_group_models.LearnerGroupDataModel
+            .apply_deletion_policy('user_1')
+        )
+
+        self.assertFalse(
+            learner_group_models.LearnerGroupDataModel
+            .has_reference_to_user_id('user_1'))

@@ -86,7 +86,6 @@ class LearnerGroupDataModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains user data to be exported."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'group_id': base_models.EXPORT_POLICY.EXPORTED,
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'description': base_models.EXPORT_POLICY.EXPORTED,
             'facilitators': base_models.EXPORT_POLICY.EXPORTED,
