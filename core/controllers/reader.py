@@ -738,7 +738,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 },
-                'default_value': None
+                'default_value': 'Feedback from a learner'
             },
             'feedback': {
                 'schema': {
@@ -757,7 +757,11 @@ class ReaderFeedbackHandler(base.BaseHandler):
             },
             'state_name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
                 }
             }
         }
@@ -771,7 +775,6 @@ class ReaderFeedbackHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         subject = self.normalized_payload.get('subject')
-        subject = subject if subject else 'Feedback from a learner'
         feedback = self.normalized_payload.get('feedback')
         include_author = self.normalized_payload.get('include_author')
 
