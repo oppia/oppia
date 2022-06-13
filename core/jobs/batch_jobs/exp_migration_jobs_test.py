@@ -22,6 +22,7 @@ from core import feconf
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
 from core.jobs.types import job_run_result
@@ -94,6 +95,49 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             migrated_exp_model.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    def test_broken_exp_is_not_migrated(self) -> None:
+        exploration_rights = rights_domain.ActivityRights(
+            self.NEW_EXP_ID, [feconf.SYSTEM_COMMITTER_ID],
+            [], [], [])
+        commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
+        exp_models.ExplorationRightsModel(
+            id=exploration_rights.id,
+            owner_ids=exploration_rights.owner_ids,
+            editor_ids=exploration_rights.editor_ids,
+            voice_artist_ids=exploration_rights.voice_artist_ids,
+            viewer_ids=exploration_rights.viewer_ids,
+            community_owned=exploration_rights.community_owned,
+            status=exploration_rights.status,
+            viewable_if_private=exploration_rights.viewable_if_private,
+            first_published_msec=exploration_rights.first_published_msec,
+        ).commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.NEW_EXP_ID,
+            title='title',
+            category=' category',
+            init_state_name='Introduction',
+            states_schema_version=49)
+        exp_model.update_timestamps()
+        exp_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create exploration', [{
+                'cmd': exp_domain.CMD_CREATE_NEW
+        }])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'EXP PROCESSED ERROR: "(\'exp_1\', ''ValidationError('
+                    '\'Names should not start or end with whitespace.\'))": 1'
+                )
+            )
+        ])
+
+        migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
+        self.assertEqual(migrated_exp_model.version, 1)
 
     def test_unmigrated_exp_is_migrated(self) -> None:
         swap_states_schema_48 = self.swap(
