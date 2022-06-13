@@ -1911,6 +1911,30 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exploration.get_content_count(), 6)
 
+    def test_get_metadata(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        metadata_dict_1 = exploration.get_metadata().to_dict()
+        metadata_dict_2 = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
+            'param_specs': {},
+            'param_changes': [],
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
+            'edits_allowed': exploration.edits_allowed
+        }
+
+        self.assertEqual(metadata_dict_1, metadata_dict_2)
+
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
@@ -11127,3 +11151,38 @@ class ExplorationChangesMergeabilityUnitTests(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
             self.assertEqual(expected_email_html_body_2, messages[1].html)
+
+
+class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_exploration_metadata_gets_created(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        metadata_dict_1 = exp_domain.ExplorationMetadata(
+            exploration.title, exploration. category, exploration.objective,
+            exploration.language_code, exploration.tags, exploration.blurb,
+            exploration.author_notes, exploration.states_schema_version,
+            exploration.init_state_name, exploration.param_specs,
+            exploration.param_changes, exploration.auto_tts_enabled,
+            exploration.correctness_feedback_enabled, exploration.edits_allowed
+        ).to_dict()
+
+        metadata_dict_2 = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
+            'param_specs': {},
+            'param_changes': [],
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
+            'edits_allowed': exploration.edits_allowed
+        }
+
+        self.assertEqual(metadata_dict_1, metadata_dict_2)
