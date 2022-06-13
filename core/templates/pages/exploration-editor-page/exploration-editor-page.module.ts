@@ -60,7 +60,7 @@ import { PreviewSetParametersModalComponent } from './preview-tab/templates/prev
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
 import { TrainingPanelComponent } from './editor-tab/training-panel/training-panel.component';
 import { TrainingModalComponent } from './editor-tab/training-panel/training-modal.component';
-import { TrainingDataEditorPanelServiceModalComponent } from './editor-tab/training-panel/training-data-editor-panel-modal.component';
+import { TrainingDataEditorPanelComponent } from './editor-tab/training-panel/training-data-editor-panel-modal.component';
 import { TestInteractionPanel } from './editor-tab/test-interaction-panel/test-interaction-panel.component';
 
 @NgModule({
@@ -104,7 +104,7 @@ import { TestInteractionPanel } from './editor-tab/test-interaction-panel/test-i
     TranslationTabBusyModalComponent,
     TrainingPanelComponent,
     TrainingModalComponent,
-    TrainingDataEditorPanelServiceModalComponent,
+    TrainingDataEditorPanelComponent,
     TestInteractionPanel
   ],
   entryComponents: [
@@ -138,7 +138,7 @@ import { TestInteractionPanel } from './editor-tab/test-interaction-panel/test-i
     TranslationTabBusyModalComponent,
     TrainingPanelComponent,
     TrainingModalComponent,
-    TrainingDataEditorPanelServiceModalComponent,
+    TrainingDataEditorPanelComponent,
     TestInteractionPanel
   ],
   providers: [

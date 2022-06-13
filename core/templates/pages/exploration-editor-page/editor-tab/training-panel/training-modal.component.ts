@@ -43,7 +43,7 @@ interface classification {
 
 @Component({
   selector: 'oppia-training-modal',
-  templateUrl: './training-unresolved-answer-modal.component.html'
+  templateUrl: './training-modal.component.html'
 })
 export class TrainingModalComponent
   extends ConfirmOrCancelModal implements OnInit {

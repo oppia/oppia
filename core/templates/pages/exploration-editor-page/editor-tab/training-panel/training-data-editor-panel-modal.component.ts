@@ -75,11 +75,11 @@ interface TrainingData {
 }
 
 @Component({
-  selector: 'training-data-editor-panel-service-modal',
-  templateUrl: './training-data-editor.component.html'
+  selector: 'training-data-editor-panel',
+  templateUrl: './training-data-editor-panel-modal.component.html'
 })
 
-export class TrainingDataEditorPanelServiceModalComponent
+export class TrainingDataEditorPanelComponent
   extends ConfirmOrCancelModal implements OnInit {
   _stateName: string | null;
   stateName: string | null;
@@ -266,7 +266,7 @@ export class TrainingDataEditorPanelServiceModalComponent
   }
 }
 
-angular.module('oppia').factory('trainingDataEditorPanelServiceModalComponent',
+angular.module('oppia').factory('trainingDataEditorPanel',
   downgradeComponent({
-    component: TrainingDataEditorPanelServiceModalComponent
+    component: TrainingDataEditorPanelComponent
   }) as angular.IDirectiveFactory);

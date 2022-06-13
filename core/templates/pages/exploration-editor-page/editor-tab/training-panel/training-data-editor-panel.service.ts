@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TrainingDataEditorPanelServiceModalComponent } from './training-data-editor-panel-modal.component';
+import { TrainingDataEditorPanelComponent } from './training-data-editor-panel-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +40,7 @@ export class TrainingDataEditorPanelService {
   openTrainingDataEditor(): void {
     this.alertsService.clearWarnings();
 
-    this.ngbModal.open(TrainingDataEditorPanelServiceModalComponent, {
+    this.ngbModal.open(TrainingDataEditorPanelComponent, {
       backdrop: 'static',
     }).result.then(() => {}, () => {});
 

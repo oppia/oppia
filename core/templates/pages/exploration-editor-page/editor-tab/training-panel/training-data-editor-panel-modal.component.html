@@ -64,7 +64,7 @@
         </div>
       </div>
       <div *ngIf="(answerGroupHasNonEmptyRules && (trainingData.length > 0)) || (trainingData.length > 1)">
-        <div *ngFor="answer in trainingData; let index = index" class="training-data-answer">
+        <div *ngFor="let answer of trainingData; let index = index" class="training-data-answer">
           <div class="training-data-answer-html" (click)="openTrainUnresolvedAnswerModal(index)">
             <angular-html-bind-wrapper [htmlData]="answer.answerTemplate"></angular-html-bind-wrapper>
           </div>
