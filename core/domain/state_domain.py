@@ -1262,6 +1262,7 @@ class Outcome:
         """
         return {
             'dest': self.dest,
+            'dest_if_really_stuck': self.dest_if_really_stuck,
             'feedback': self.feedback.to_dict(),
             'labelled_as_correct': self.labelled_as_correct,
             'param_changes': [
@@ -1284,6 +1285,7 @@ class Outcome:
         feedback.validate()
         return cls(
             outcome_dict['dest'],
+            outcome_dict['dest_if_really_stuck'],
             feedback,
             outcome_dict['labelled_as_correct'],
             [param_domain.ParamChange(
@@ -1295,12 +1297,15 @@ class Outcome:
         )
 
     def __init__(
-            self, dest, feedback, labelled_as_correct, param_changes,
-            refresher_exploration_id, missing_prerequisite_skill_id):
+            self, dest, dest_if_really_stuck, feedback, labelled_as_correct,
+            param_changes, refresher_exploration_id,
+            missing_prerequisite_skill_id):
         """Initializes a Outcome domain object.
 
         Args:
             dest: str. The name of the destination state.
+            dest_if_really_stuck: str or None. The name of the optional state
+            to redirect the learner to strengthen their concepts. 
             feedback: SubtitledHtml. Feedback to give to the user if this rule
                 is triggered.
             labelled_as_correct: bool. Whether this outcome has been labelled
@@ -1319,6 +1324,9 @@ class Outcome:
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
         self.dest = dest
+        # An optional destination state to redirect the learner to
+        # strengthen their concepts corresponding to a particular card.
+        self.dest_if_really_stuck = dest_if_really_stuck
         # Feedback to give the reader if this rule is triggered.
         self.feedback = feedback
         # Whether this outcome has been labelled by the creator as

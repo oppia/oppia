@@ -2041,7 +2041,7 @@ class Exploration:
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 54
+    CURRENT_EXP_SCHEMA_VERSION = 55
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
