@@ -117,3 +117,125 @@ class LearnerGroupDataModel(base_models.BaseModel):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
+
+    @staticmethod
+    def get_field_names_for_takeout() -> Dict[str, str]:
+        """We do not want to export all user ids in the facilitators, members
+        and invitations fields, so we export them as fields only containing
+        the current user's id."""
+        return {
+            'facilitator': 'facilitators',
+            'member': 'members',
+            'invitation': 'invitations'
+        }
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, List[str]]]:
+        """Takeout: Export LearnerGroupDataModel user-based properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict containing the user-relevant properties of
+            LearnerGroupDataModel.
+        """
+        found_models = cls.get_all().filter(
+            user_id in cls.members or
+            user_id in cls.invitations or
+            user_id in cls.facilitators)
+        user_data = {}
+        for learner_group_model in found_models:
+            # If the user is a member, we export all fields except
+            # facilitators, invitations and the member field is
+            # exported only containing the current user's id.
+            if user_id in learner_group_model.members :
+                user_data[learner_group_model.id] = {
+                    'title': learner_group_model.title,
+                    'description': learner_group_model.description,
+                    'member': user_id,
+                    'subtopic_ids': learner_group_model.subtopic_ids,
+                    'story_ids': learner_group_model.story_ids
+                }
+            
+            # If the user has been invited to join the group,
+            # we export all fields except facilitators, members and
+            # the invitation field is exported only containing the
+            # current user's id.
+            elif user_id in learner_group_model.invitations:
+                user_data[learner_group_model.id] = {
+                    'title': learner_group_model.title,
+                    'description': learner_group_model.description,
+                    'invitation': user_id,
+                    'subtopic_ids': learner_group_model.subtopic_ids,
+                    'story_ids': learner_group_model.story_ids
+                }
+
+            # If the user is the facilitator of the group, we export all
+            # fields except members, invitations and the facilitator field is
+            # exported only containing the current user's id.
+            elif user_id in learner_group_model.facilitators:
+                user_data[learner_group_model.id] = {
+                    'title': learner_group_model.title,
+                    'description': learner_group_model.description,
+                    'facilitator': user_id,
+                    'subtopic_ids': learner_group_model.subtopic_ids,
+                    'story_ids': learner_group_model.story_ids
+                }
+        return user_data
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id) -> bool:
+        """Check whether LearnerGroupDataModel contains data of a given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (
+            cls.query().filter(
+            user_id in cls.members or
+            user_id in cls.invitations or
+            user_id in cls.facilitators).count() > 0
+        )
+    
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete all LearnerGroupDataModel instances associated with the
+        user.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to delete.
+        """
+        found_models = cls.query().filter(
+            user_id in cls.members or
+            user_id in cls.invitations or
+            user_id in cls.facilitators)
+
+        for learner_group_model in found_models:
+            # If the user is a member, delete the user from the members list.
+            if user_id in learner_group_model.members:
+                learner_group_model.members.remove(user_id)
+                learner_group_model.put()
+
+            # If the user has been invited to join the group, delete the
+            # user from the invitations list.
+            elif user_id in learner_group_model.invitations:
+                learner_group_model.invitations.remove(user_id)
+                learner_group_model.put()
+
+            # If the user is the facilitator of the group and there are
+            # more then one facilitators, delete the user from the
+            # facilitators list.
+            elif user_id in learner_group_model.facilitators and (
+                    len(learner_group_model.facilitators) > 1):
+                learner_group_model.facilitators.remove(user_id)
+                learner_group_model.put()
+
+            # If the user is the facilitator of the group and there is
+            # only one facilitator, delete the group.
+            elif user_id in learner_group_model.facilitators and (
+                    len(learner_group_model.facilitators) == 1):
+                learner_group_model.delete()
