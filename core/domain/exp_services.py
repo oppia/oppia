@@ -609,8 +609,8 @@ def populate_exp_model_fields(exp_model, exploration):
     exp_model.states = {
         state_name: state.to_dict()
         for (state_name, state) in exploration.states.items()}
-    exp_model.param_specs = exploration.param_specs
-    exp_model.param_changes = exploration.param_changes
+    exp_model.param_specs = exploration.param_specs_dict
+    exp_model.param_changes = exploration.param_changes_dict
     exp_model.auto_tts_enabled = exploration.auto_tts_enabled
     exp_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
