@@ -650,7 +650,7 @@ def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
         'editor_ids': exp_summary.editor_ids,
         'voice_artist_ids': exp_summary.voice_artist_ids,
         'viewer_ids': exp_summary.viewer_ids,
-        'contributor_ids': exp_summary.contributor_ids,
+        'contributor_ids': list(exp_summary.contributors_summary.keys()),
         'contributors_summary': exp_summary.contributors_summary,
         'version': exp_summary.version
     }
@@ -702,24 +702,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     old_states = exp_fetchers.get_exploration_from_model(
         exploration_model).states
-    exploration_model.category = exploration.category
-    exploration_model.title = exploration.title
-    exploration_model.objective = exploration.objective
-    exploration_model.language_code = exploration.language_code
-    exploration_model.tags = exploration.tags
-    exploration_model.blurb = exploration.blurb
-    exploration_model.author_notes = exploration.author_notes
-
-    exploration_model.states_schema_version = exploration.states_schema_version
-    exploration_model.init_state_name = exploration.init_state_name
-    exploration_model.states = {
-        state_name: state.to_dict()
-        for (state_name, state) in exploration.states.items()}
-    exploration_model.param_specs = exploration.param_specs_dict
-    exploration_model.param_changes = exploration.param_change_dicts
-    exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
-    exploration_model.correctness_feedback_enabled = (
-        exploration.correctness_feedback_enabled)
+    exploration_model = populate_exp_model_fields(
+        exploration_model, exploration)
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
@@ -1399,42 +1383,13 @@ def save_exploration_summary(exp_summary):
     Args:
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
-    exp_summary_dict = {
-        'title': exp_summary.title,
-        'category': exp_summary.category,
-        'objective': exp_summary.objective,
-        'language_code': exp_summary.language_code,
-        'tags': exp_summary.tags,
-        'ratings': exp_summary.ratings,
-        'scaled_average_rating': exp_summary.scaled_average_rating,
-        'status': exp_summary.status,
-        'community_owned': exp_summary.community_owned,
-        'owner_ids': exp_summary.owner_ids,
-        'editor_ids': exp_summary.editor_ids,
-        'voice_artist_ids': exp_summary.voice_artist_ids,
-        'viewer_ids': exp_summary.viewer_ids,
-        'contributor_ids': list(exp_summary.contributors_summary.keys()),
-        'contributors_summary': exp_summary.contributors_summary,
-        'version': exp_summary.version,
-        'exploration_model_last_updated': (
-            exp_summary.exploration_model_last_updated),
-        'exploration_model_created_on': (
-            exp_summary.exploration_model_created_on),
-        'first_published_msec': (
-            exp_summary.first_published_msec)
-    }
 
-    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
-    if exp_summary_model is not None:
-        exp_summary_model.populate(**exp_summary_dict)
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-    else:
-        exp_summary_dict['id'] = exp_summary.id
-        model = exp_models.ExpSummaryModel(**exp_summary_dict)
-        model.update_timestamps()
-        model.put()
-
+    existing_exp_summary_model = (
+        exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    exp_summary_model = populate_exp_summary_model_fields(
+        existing_exp_summary_model, exp_summary)
+    exp_summary_model.update_timestamps()
+    exp_summary_model.put()
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the
     # index contains documents computed on basis of exploration
