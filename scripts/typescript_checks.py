@@ -864,7 +864,8 @@ def compile_and_check_typescript(config_path: str) -> None:
             tsconfig_strict_json_dict = yaml.safe_load(f)
             tsconfig_strict_json_dict['include'] = files_not_type_strict
 
-        tsconfig_strict_json_dict = json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True)
+        tsconfig_strict_json_dict = (
+            json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True))
 
         with open(file_name, 'w', encoding='utf-8') as f:
             f.write(tsconfig_strict_json_dict + '\n')
@@ -892,9 +893,11 @@ def compile_and_check_typescript(config_path: str) -> None:
         # example "include": ["core", "extensions", "typings"].
         with open(file_name, 'r', encoding='utf-8') as f:
             tsconfig_strict_json_dict = yaml.safe_load(f)
-            tsconfig_strict_json_dict['include'] = ['core', 'extensions', 'typings']
+            tsconfig_strict_json_dict['include'] = (
+                ['core', 'extensions', 'typings'])
 
-        tsconfig_strict_json_dict = json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True)
+        tsconfig_strict_json_dict = (
+            json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True))
 
         with open(file_name, 'w', encoding='utf-8') as f:
             f.write(tsconfig_strict_json_dict + '\n')

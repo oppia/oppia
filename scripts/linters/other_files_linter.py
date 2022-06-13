@@ -252,7 +252,7 @@ class CustomLintChecksManager:
 
     def check_github_workflows_use_merge_action(self):
         """Checks that all github actions workflows use the merge action.
-   
+
         Returns:
             TaskResult. A TaskResult object describing any workflows
             that failed to use the merge action.
