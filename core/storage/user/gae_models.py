@@ -3026,7 +3026,6 @@ class LearnerGroupUserModel(base_models.BaseModel):
     progress_sharing_permissions = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
-
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to delete corresponding to a user: id field."""

@@ -18,23 +18,21 @@
 
 from __future__ import annotations
 
-import datetime
 import random
 import string
 
 from core import feconf
-from core import utils
-from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services  # pylint: disable=unused-import
 
 datastore_services = models.Registry.import_datastore_services()
+
 
 class LearnerGroupDataModel(base_models.BaseModel):
     """Class for storing learner group data.
@@ -68,7 +66,8 @@ class LearnerGroupDataModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to delete corresponding
-        to a user: members, invitations and facilitators fields"""
+        to a user: members, invitations and facilitators fields.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -112,7 +111,7 @@ class LearnerGroupDataModel(base_models.BaseModel):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase + string.ascii_uppercase)
                 for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
-            if (not cls.get_by_id(new_id)):
+            if not cls.get_by_id(new_id):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -121,7 +120,8 @@ class LearnerGroupDataModel(base_models.BaseModel):
     def get_field_names_for_takeout() -> Dict[str, str]:
         """We do not want to export all user ids in the facilitators, members
         and invitations fields, so we export them as fields only containing
-        the current user's id."""
+        the current user's id.
+        """
         return {
             'facilitator': 'facilitators',
             'member': 'members',
@@ -148,7 +148,7 @@ class LearnerGroupDataModel(base_models.BaseModel):
             # If the user is a member, we export all fields except
             # facilitators, invitations and the member field is
             # exported only containing the current user's id.
-            if user_id in learner_group_model.members :
+            if user_id in learner_group_model.members:
                 user_data[learner_group_model.id] = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
@@ -156,7 +156,7 @@ class LearnerGroupDataModel(base_models.BaseModel):
                     'subtopic_ids': learner_group_model.subtopic_ids,
                     'story_ids': learner_group_model.story_ids
                 }
-            
+
             # If the user has been invited to join the group,
             # we export all fields except facilitators, members and
             # the invitation field is exported only containing the
@@ -199,7 +199,7 @@ class LearnerGroupDataModel(base_models.BaseModel):
             user_id in cls.invitations or
             user_id in cls.facilitators).count() > 0
         )
-    
+
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
         """Delete all LearnerGroupDataModel instances associated with the

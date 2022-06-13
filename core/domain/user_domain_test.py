@@ -1539,11 +1539,14 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(learner_group_user.user_id, 'user1')
-        self.assertEqual(learner_group_user.invited_to_learner_groups,
+        self.assertEqual(
+            learner_group_user.invited_to_learner_groups,
             ['123', '432'])
-        self.assertEqual(learner_group_user.member_of_learner_groups,
+        self.assertEqual(
+            learner_group_user.member_of_learner_groups,
             ['654', '234'])
-        self.assertEqual(learner_group_user.progress_sharing_permissions,
+        self.assertEqual(
+            learner_group_user.progress_sharing_permissions,
             [
                 {
                     'group_id': '754',
@@ -1590,11 +1593,14 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(learner_group_user.user_id, 'user1')
-        self.assertEqual(learner_group_user.invited_to_learner_groups,
+        self.assertEqual(
+            learner_group_user.invited_to_learner_groups,
             ['123', '432'])
-        self.assertEqual(learner_group_user.member_of_learner_groups,
+        self.assertEqual(
+            learner_group_user.member_of_learner_groups,
             ['654', '234'])
-        self.assertEqual(learner_group_user.progress_sharing_permissions,
+        self.assertEqual(
+            learner_group_user.progress_sharing_permissions,
             [
                 {
                     'group_id': '754',
@@ -1610,18 +1616,16 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             expected_learner_group_user_dict)
 
     def test_validation(self) -> None:
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Learner group user cannot be a member and be invited at the '
-            'same time in the same learner group.'):
+        self._assert_validation_error(
             user_domain.LearnerGroupUser(
                 'user1', ['123'], ['123'],
-                [{'group_id': '123', 'sharing_is_turned_on': True}])
+                [{'group_id': '123', 'sharing_is_turned_on': True}]),
+            'Learner group user cannot be a member and be invited at the '
+            'same time in the same learner group.')
 
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Learner cannot have progress sharing permissions of groups '
-            'that they are not a member of.'):
+        self._assert_validation_error(
             user_domain.LearnerGroupUser(
                 'user1', ['123'], ['367'],
-                [{'group_id': '345', 'sharing_is_turned_on': True}])
+                [{'group_id': '345', 'sharing_is_turned_on': True}]),
+            'Learner cannot have progress sharing permissions of '
+            'group 345 since they are not it\'s member.')

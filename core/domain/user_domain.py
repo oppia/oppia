@@ -1485,17 +1485,19 @@ class ExplorationUserData:
 
 class LearnerGroupUserDict(TypedDict):
     """Dictionary for LearnerGroupUser domain object."""
-    
+
     user_id: str
     invited_to_learner_groups: List[str]
     member_of_learner_groups: List[str]
     progress_sharing_permissions: List[ProgressSharingPermissionsDict]
+
 
 class ProgressSharingPermissionsDict(TypedDict):
     """Dictionary for Progress Sharing Permissions of learner groups."""
 
     group_id: str
     sharing_is_turned_on: bool
+
 
 class LearnerGroupUser:
     """Domain object for learner group user."""
@@ -1522,7 +1524,7 @@ class LearnerGroupUser:
         self.invited_to_learner_groups = invited_to_learner_groups
         self.member_of_learner_groups = member_of_learner_groups
         self.progress_sharing_permissions = progress_sharing_permissions
-        
+
     def to_dict(self) -> LearnerGroupUserDict:
         """Convert the LearnerGroupUser domain instance into a dictionary
         form with its keys as the attributes of this class.
@@ -1543,7 +1545,7 @@ class LearnerGroupUser:
         """Validates the LearnerGroupUser domain object.
 
         Raises:
-            ValidationError: One or more attributes of the LearnerGroupUser
+            ValidationError. One or more attributes of the LearnerGroupUser
                 are invalid.
         """
 
@@ -1551,15 +1553,17 @@ class LearnerGroupUser:
             self.invited_to_learner_groups)
         member_of_learner_groups_set = set(
             self.member_of_learner_groups)
+
         if len(invited_to_learner_groups_set.intersection(
-            member_of_learner_groups_set)) > 0:
+                member_of_learner_groups_set)) > 0:
             raise utils.ValidationError(
                 'Learner group user cannot be a member and be invited '
                 'at the same time in the same learner group.')
 
         for progress_sharing_permission in self.progress_sharing_permissions:
             if progress_sharing_permission.group_id not in (
-                self.member_of_learner_groups):
+                    self.member_of_learner_groups):
                 raise utils.ValidationError(
-                    'Learner cannot have progress sharing permissions of groups '
-                    'that they are not a member of.')
+                    'Learner cannot have progress sharing permissions of '
+                    'group %s since they are not it\'s member.' % (
+                        progress_sharing_permission.group_id))

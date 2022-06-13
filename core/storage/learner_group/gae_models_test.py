@@ -93,6 +93,7 @@ class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         """Tests get_new_id method for raising exception."""
+
         learner_group_data_model_cls = (
             learner_group_models.LearnerGroupDataModel)
 
@@ -124,8 +125,8 @@ class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
 
     def test_export_data_on_invited_users(self) -> None:
         """Test export data on users that have been invited to join the
-        learner group."""
-
+        learner group.
+        """
         invited_user_data = (
             learner_group_models.LearnerGroupDataModel.export_data('user_6'))
         expected_invited_user_data = {
@@ -139,8 +140,8 @@ class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
 
     def test_export_data_on_facilitators(self) -> None:
         """Test export data on users that are facilitators of
-        the learner group."""
-
+        the learner group.
+        """
         facilitator_user_data = (
             learner_group_models.LearnerGroupDataModel.export_data('user_1'))
         expected_facilitator_user_data = {
@@ -150,22 +151,27 @@ class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
             'subtopic_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
-        self.assertEqual(expected_facilitator_user_data,
+
+        self.assertEqual(
+            expected_facilitator_user_data,
             facilitator_user_data)
 
     def test_export_data_on_uninvolved_user(self) -> None:
         """Test export data on users who do not have any involvement with
-        the learner group."""
+        the learner group.
+        """
         uninvolved_user_data = (
             learner_group_models.LearnerGroupDataModel.export_data('user_31'))
         expected_uninvolved_user_data = {}
-        self.assertEqual(expected_uninvolved_user_data,
+
+        self.assertEqual(
+            expected_uninvolved_user_data,
             uninvolved_user_data)
 
     def test_apply_deletion_policy_on_members(self) -> None:
         """Test apply_deletion_policy on users that are members of
-        the learner group."""
-
+        the learner group.
+        """
         self.assertTrue(
             learner_group_models.LearnerGroupDataModel
             .has_reference_to_user_id('user_2'))
@@ -181,8 +187,8 @@ class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy_on_invited_users(self) -> None:
         """Test apply_deletion_policy on users that have been
-        invited to join the learner group."""
-
+        invited to join the learner group.
+        """
         self.assertTrue(
             learner_group_models.LearnerGroupDataModel
             .has_reference_to_user_id('user_5'))
@@ -198,8 +204,8 @@ class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy_on_facilitators(self) -> None:
         """Test apply_deletion_policy on users that are facilitators of
-        the learner group."""
-
+        the learner group.
+        """
         self.assertTrue(
             learner_group_models.LearnerGroupDataModel
             .has_reference_to_user_id('user_1'))
