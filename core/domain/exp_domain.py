@@ -1696,8 +1696,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return content_count
 
     def get_metadata(self):
-        """Returns the ExplorationMetadata domain object for the exploration.
-        
+        """Gets the ExplorationMetadata domain object for the exploration.
+
         Returns:
             ExplorationMetadata: The ExplorationMetadata domain object.
         """
@@ -3330,7 +3330,7 @@ class ExplorationMetadata:
         edits_allowed
     ):
         """Initializes an ExplorationMetadata domain object.
-        
+
         Args:
             title: str. The exploration title.
             category: str. The category of the exploration.
@@ -3370,10 +3370,10 @@ class ExplorationMetadata:
 
     def to_dict(self):
         """Gets the dict representation of ExplorationMetadata domain object.
-        
+
         Returns:
             dict. The dict representation of the ExplorationMetadata
-                domain object.
+            domain object.
         """
         return {
             'title': self.title,

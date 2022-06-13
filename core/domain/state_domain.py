@@ -3810,14 +3810,15 @@ class StateVersionHistory:
         state_name_in_previous_version, committer_id
     ):
         """Initializes the StateVersionHistory domain object.
-        
+
         Args:
             previously_edited_on_version: int. The version number of the
                 exploration on which the state was previously edited.
             state_name_in_previous_version: str. The name of the state in the
-                previously edited version. It is useful in case of state renames.
-            committer_id: str. The id of the user who committed the changes in the
-                previously edited version.
+                previously edited version. It is useful in case of state
+                renames.
+            committer_id: str. The id of the user who committed the changes in
+                the previously edited version.
         """
         self.previously_edited_on_version = previously_edited_on_version
         self.state_name_in_previous_version = state_name_in_previous_version
@@ -3826,10 +3827,10 @@ class StateVersionHistory:
     def to_dict(self):
         """Returns a dict representation of the StateVersionHistory domain
         object.
-        
+
         Returns:
             dict. The dict representation of the StateVersionHistory domain
-                object.
+            object.
         """
         return {
             'previously_edited_on_version': self.previously_edited_on_version,

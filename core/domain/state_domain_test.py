@@ -5336,7 +5336,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
 
 
 class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
-    
+
     def test_state_version_history_gets_created(self):
         state_version_history_dict_1 = {
             'previously_edited_on_version': 1,
