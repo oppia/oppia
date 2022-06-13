@@ -1365,7 +1365,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_node_index_with_invalid_node_id(self) -> None:
         self.assertIsNone(
-            self.story.story_contents.get_node_index('invalid_node_id'))
+            self.story.story_contents.get_node_index(
+                'invalid_node_id',
+                strict = False
+            )
+        )
 
     def test_validate_empty_title(self) -> None:
         self.story.title = ''

@@ -352,5 +352,5 @@ def get_node_index_by_story_id_and_node_id(story_id, node_id):
     if story is None:
         raise Exception('Story with id %s does not exist.' % story_id)
 
-    node_index = story.story_contents.strict_get_node_index(node_id)
+    node_index = story.story_contents.get_node_index(node_id)
     return node_index

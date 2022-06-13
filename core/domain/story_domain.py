@@ -28,7 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import List, Optional
+from typing import List, Optional, overload
 from typing_extensions import Final, TypedDict
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
@@ -612,32 +612,35 @@ class StoryContents:
                 raise utils.ValidationError(
                     'Expected all chapter titles to be distinct.')
 
-    def get_node_index(self, node_id: str) -> Optional[int]:
+    @overload
+    def get_node_index(
+        self,
+        node_id: str,
+    ) -> int: ...
+
+    @overload
+    def get_node_index(
+        self,
+        node_id: str,
+        strict: bool = False
+    ) -> Optional[int]: ...
+
+    def get_node_index(
+        self,
+        node_id: str,
+        strict: bool = True
+    ) -> Optional[int]:
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
 
         Args:
             node_id: str. The id of the node.
+            strict: bool. Whether to fail noisily if no node with the given
+                node_id exists. Default is True.
 
         Returns:
             int or None. The index of the corresponding node, or None if there
-            is no such node.
-        """
-        for ind, node in enumerate(self.nodes):
-            if node.id == node_id:
-                return ind
-        return None
-
-    def strict_get_node_index(self, node_id: str) -> int:
-        """Returns the index of the story node with the given node
-        id, or raises an ValueError if the node id is not in the story
-        contents dict.
-
-        Args:
-            node_id: str. The id of the node.
-
-        Returns:
-            int. The index of the corresponding node.
+            is no such node and strict == False.
 
         Raises:
             ValueError. If the node id is not in the story contents dict.
@@ -646,7 +649,7 @@ class StoryContents:
         for ind, node in enumerate(self.nodes):
             if node.id == node_id:
                 index = ind
-        if index is None:
+        if strict and index is None:
             raise ValueError(
                 'The node with id %s is not part of this story.' % node_id)
         return index
@@ -663,12 +666,12 @@ class StoryContents:
         """
         # Ruling out the possibility of None for mypy type checking.
         assert self.initial_node_id is not None
-        initial_index = self.strict_get_node_index(self.initial_node_id)
+        initial_index = self.get_node_index(self.initial_node_id)
         current_node = self.nodes[initial_index]
         ordered_nodes_list = [current_node]
         while current_node.destination_node_ids:
             next_node_id = current_node.destination_node_ids[0]
-            next_index = self.strict_get_node_index(next_node_id)
+            next_index = self.get_node_index(next_node_id)
             current_node = self.nodes[next_index]
             ordered_nodes_list.append(current_node)
         return ordered_nodes_list
@@ -1459,7 +1462,7 @@ class Story:
             ValueError. The node is the starting node for story, change the
                 starting node before deleting it.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         if node_id == self.story_contents.initial_node_id:
             if len(self.story_contents.nodes) == 1:
                 self.story_contents.initial_node_id = None
@@ -1479,7 +1482,7 @@ class Story:
             node_id: str. The id of the node.
             new_outline: str. The new outline of the given node.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].outline = new_outline
 
     def update_node_title(self, node_id: str, new_title: str) -> None:
@@ -1489,7 +1492,7 @@ class Story:
             node_id: str. The id of the node.
             new_title: str. The new title of the given node.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].title = new_title
 
     def update_node_description(
@@ -1503,7 +1506,7 @@ class Story:
             node_id: str. The id of the node.
             new_description: str. The new description of the given node.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].description = new_description
 
     def update_node_thumbnail_filename(
@@ -1521,7 +1524,7 @@ class Story:
         Raises:
             Exception. The node with the given id doesn't exist.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
@@ -1548,7 +1551,7 @@ class Story:
             new_thumbnail_bg_color: str|None. The new thumbnail background
                 color of the given node.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].thumbnail_bg_color = (
             new_thumbnail_bg_color)
 
@@ -1559,7 +1562,7 @@ class Story:
         Args:
             node_id: str. The id of the node.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].outline_is_finalized = True
 
     def mark_node_outline_as_unfinalized(self, node_id: str) -> None:
@@ -1569,7 +1572,7 @@ class Story:
         Args:
             node_id: str. The id of the node.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].outline_is_finalized = False
 
     def update_node_acquired_skill_ids(
@@ -1584,7 +1587,7 @@ class Story:
             new_acquired_skill_ids: list(str). The updated acquired skill id
                 list.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].acquired_skill_ids = (
             new_acquired_skill_ids)
 
@@ -1600,7 +1603,7 @@ class Story:
             new_prerequisite_skill_ids: list(str). The updated prerequisite
                 skill id list.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].prerequisite_skill_ids = (
             new_prerequisite_skill_ids)
 
@@ -1616,7 +1619,7 @@ class Story:
             new_destination_node_ids: list(str). The updated destination
                 node id list.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].destination_node_ids = (
             new_destination_node_ids)
 
@@ -1667,7 +1670,7 @@ class Story:
         Raises:
             ValueError. A node with given exploration id is already exists.
         """
-        node_index = self.story_contents.strict_get_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
 
         if (
                 self.story_contents.nodes[node_index].exploration_id ==
@@ -1689,7 +1692,7 @@ class Story:
         Args:
             new_initial_node_id: str. The new starting node id.
         """
-        self.story_contents.strict_get_node_index(new_initial_node_id)
+        self.story_contents.get_node_index(new_initial_node_id)
         self.story_contents.initial_node_id = new_initial_node_id
 
 
