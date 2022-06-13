@@ -96,7 +96,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration ID and
             ExplorationChange object.
         """
-        exp_states_version = exp_model.states_schema_version
+        exp_states_version = exploration.states_schema_version
         if exp_states_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
@@ -104,7 +104,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'from_version': exp_states_version,
                 'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
             })
-            yield (exploration.id, exp_change)
+            yield (exp_model.id, exp_change)
 
     @staticmethod
     def _delete_exploration_from_cache(
@@ -191,120 +191,98 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
             lambda exp_model: exp_model.id)
         )
-        exploration_rights_models = (
+
+        exp_rights_models = (
             self.pipeline
             | 'Get all non-deleted exploration rights models' >> (
-                ndb_io.GetModels(
-                    exp_models.ExplorationRightsModel.get_all(
-                        include_deleted=False)))
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Add exploration rights keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
-            lambda exploration_rights_model: exploration_rights_model.id)
+                ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
+            | 'Add exploration rights ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda exp_rights_model: exp_rights_model.id)
         )
 
-        migrated_exploration_results = (
-                unmigrated_exploration_models
-                | 'Transform and migrate model' >> beam.MapTuple(
-            self._migrate_exploration)
-        )
-        migrated_explorations = (
-                migrated_exploration_results
-                | 'Filter oks' >> beam.Filter(
-            lambda result_item: result_item.is_ok())
-                | 'Unwrap oks' >> beam.Map(
-            lambda result_item: result_item.unwrap())
-        )
-        migrated_exploration_job_run_results = (
-                migrated_exploration_results
-                | 'Generate results for migration' >> (
-                    job_result_transforms.ResultsToJobRunResults(
-                        'EXPLORATION PROCESSED'))
+        migrated_exp_results = (
+            unmigrated_exploration_models
+            | 'Transform and migrate model' >> beam.MapTuple( # pylint: disable=no-value-for-parameter
+                self._migrate_exploration)
         )
 
-        migrated_exploration_object_list = (
+        migrated_exp = (
+            migrated_exp_results
+            | 'Filter oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+
+        migrated_exp_job_run_results = (
+            migrated_exp_results
+            | 'Generate results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
+        )
+
+        exp_changes = (
+            unmigrated_exploration_models
+            | 'Generate exploration changes' >> beam.FlatMapTuple(
+                self._generate_exploration_changes)
+        )
+
+        exp_objects_list = (
             {
                 'exp_model': unmigrated_exploration_models,
-                'exploration': migrated_explorations,
+                'exp_rights_model': exp_rights_models,
+                'exploration': migrated_exp,
+                'exp_changes': exp_changes
             }
-            | 'Merge object' >> beam.CoGroupByKey()
-            | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Remove unmigrated exploration object' >> beam.Filter(
-        lambda x: len(x['exploration']) > 0)
-            | 'Reorganize the exploration object' >> beam.Map(lambda objects: {
-        'exp_model': objects['exp_model'][0],
-        'exploration': objects['exploration'][0]
-        }))
-
-        exploration_changes = (
-                migrated_exploration_object_list
-                | 'Generate exploration changes' >> beam.FlatMap(
-            lambda exp_objects: self._generate_exploration_changes(
-                exp_objects['exp_model'],
-                exp_objects['exploration']
-            ))
-        )
-
-        exploration_objects_list = (
-                {
-                    'exp_model': unmigrated_exploration_models,
-                    'exploration': migrated_explorations,
-                    'exploration_changes': exploration_changes,
-                    'exploration_rights_model': exploration_rights_models
-                }
-                | 'Merge objects' >> beam.CoGroupByKey()
-                | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-                | 'Remove unmigrated exploration' >> beam.Filter(
-            lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0)  # pylint: disable=line-too-long
-                | 'Reorganize the exploration objects' >> beam.Map(
-            lambda objects: {
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated explorations' >> beam.Filter(
+                lambda x: len(x['exp_changes']) > 0
+                    and len(x['exploration']) > 0)
+            | 'Reorganize the skill objects' >> beam.Map(lambda objects: {
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0],
-                'exploration_changes': objects['exploration_changes'],
-                'exploration_rights_model': (
-                    objects['exploration_rights_model'][0])
-        })
+                'exp_rights_model': objects['exp_rights_model'][0],
+                'exp_changes': objects['exp_changes']
+            })
         )
 
-        exploration_objects_list_job_run_results = (
-                exploration_objects_list
-                | 'Transform exploration objects into job run results' >> (
+        exp_objects_list_job_run_results = (
+            exp_objects_list
+            | 'Transform exp objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPLORATION MIGRATED'))
+                    'EXP MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
-                exploration_objects_list
-                | 'Delete exploration from cache' >> beam.Map(
-            lambda exploration_object: (
-                self._delete_exploration_from_cache(
-                    exploration_object['exploration'])))
-                | 'Generate results for cache deletion' >> (
-                    job_result_transforms.ResultsToJobRunResults(
-                        'CACHE DELETION'))
+            exp_objects_list
+            | 'Delete exploration from cache' >> beam.Map(
+                lambda exp_object: self._delete_exploration_from_cache(
+                    exp_object['exploration']))
+            | 'Generate results for cache deletion' >> (
+                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
         )
 
         exp_models_to_put = (
-                exploration_objects_list
-                | 'Generate exploration models to put' >> beam.FlatMap(
-            lambda exp_objects: self._update_exploration(
-                exp_objects['exp_model'],
-                exp_objects['exploration'],
-                exp_objects['exploration_changes'],
-                exp_objects['exploration_rights_model']
-            ))
+            exp_objects_list
+            | 'Generate exploration models to put' >> beam.FlatMap(
+                lambda exp_objects: self._update_exploration(
+                    exp_objects['exp_model'],
+                    exp_objects['exp_rights_model'],
+                    exp_objects['exploration'],
+                    exp_objects['exp_changes'],
+                ))
         )
 
         unused_put_results = (
-                exp_models_to_put
-                | 'Put models into the datastore' >> ndb_io.PutModels()
+            (exp_models_to_put)
+            | 'Put models into datastore' >> ndb_io.PutModels()
         )
 
         return (
-                (
-                    cache_deletion_job_run_results,
-                    migrated_exploration_job_run_results,
-                    exploration_objects_list_job_run_results
-                )
-                | beam.Flatten()
+            (
+                cache_deletion_job_run_results,
+                migrated_exp_job_run_results,
+                exp_objects_list_job_run_results
+            )
+            | beam.Flatten()
         )
