@@ -51,7 +51,7 @@ if ((process.env.GITHUB_ACTIONS &&
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
     LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
   videoReporter = [video, {
-    outputDir: '../webdriverio-videos',
+    outputDir: '../webdriverio-video',
     // Enable saveAllVideos if you want success videos to be saved.
     saveAllVideos: false,
     videoSlowdownMultiplier: 3,
