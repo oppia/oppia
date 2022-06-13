@@ -606,7 +606,9 @@ def populate_exp_model_fields(exp_model, exploration):
     exp_model.author_notes = exploration.author_notes
     exp_model.states_schema_version = exploration.states_schema_version
     exp_model.init_state_name = exploration.init_state_name
-    exp_model.states = exploration.states
+    exp_model.states = {
+        state_name: state.to_dict()
+        for (state_name, state) in exploration.states.items()}
     exp_model.param_specs = exploration.param_specs
     exp_model.param_changes = exploration.param_changes
     exp_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -615,6 +617,47 @@ def populate_exp_model_fields(exp_model, exploration):
     exp_model.edits_allowed = exploration.edits_allowed
 
     return exp_model
+
+
+def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
+    """Populate exploration summary model with the data from ExplorationSummary object.
+
+    Args:
+        exp_model: ExplorationModel. The model to populate.
+        exploration: Exploration. THe exploration domain object which should be
+            used to populate the model.
+
+    Returns:
+        ExplorationModel. Populated model.
+    """
+    exp_summary_dict = {
+        'title': exp_summary.title,
+        'category': exp_summary.category,
+        'objective': exp_summary.objective,
+        'language_code': exp_summary.language_code,
+        'tags': exp_summary.tags,
+        'ratings': exp_summary.ratings,
+        'scaled_average_rating': exp_summary.scaled_average_rating,
+        'exploration_model_last_updated': exp_summary.exploration_model_last_updated,
+        'exploration_model_created_on': exp_summary.exploration_model_created_on,
+        'first_published_msec': exp_summary.first_published_msec,
+        'status': exp_summary.status,
+        'community_owned': exp_summary.community_owned,
+        'owner_ids': exp_summary.owner_ids,
+        'editor_ids': exp_summary.editor_ids,
+        'voice_artist_ids': exp_summary.voice_artist_ids,
+        'viewer_ids': exp_summary.viewer_ids,
+        'contributor_ids': exp_summary.contributor_ids,
+        'contributors_summary': exp_summary.contributors_summary,
+        'version': exp_summary.version
+    }
+    if exp_summary_model is not None:
+        exp_summary_model.populate(**exp_summary_dict)
+    else:
+        exp_summary_dict['id'] = exp_summary.id
+        exp_summary_model = exp_models.ExpSummaryModel(**exp_summary_dict)
+
+    return exp_summary_model
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):

@@ -79,7 +79,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_exploration_changes(
-            exploration: exp_domain.Exploration,
+            exp_id: str,
             exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. ExplorationChange object is
@@ -96,7 +96,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration ID and
             ExplorationChange object.
         """
-        exp_states_version = exploration.states_schema_version
+        exp_states_version = exp_model.states_schema_version
         if exp_states_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
@@ -104,7 +104,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'from_version': exp_states_version,
                 'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
             })
-            yield (exp_model.id, exp_change)
+            yield (exp_id, exp_change)
 
     @staticmethod
     def _delete_exploration_from_cache(
@@ -274,7 +274,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         unused_put_results = (
-            (exp_models_to_put)
+            exp_models_to_put
             | 'Put models into datastore' >> ndb_io.PutModels()
         )
 
