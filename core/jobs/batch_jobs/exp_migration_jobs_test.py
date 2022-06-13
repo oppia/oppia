@@ -61,8 +61,6 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
         self.assertEqual(exp_model.version, 1)
-        exp_services.delete_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_model.id)
 
     def test_broken_cache_is_reported(self) -> None:
         cache_swap = self.swap_to_always_raise(
@@ -160,6 +158,3 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(
                 stdout='EXP MIGRATED SUCCESS: 1', stderr='')
         ])
-
-        exp_services.delete_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.NEW_EXP_ID)
