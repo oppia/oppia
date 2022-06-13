@@ -939,6 +939,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings.preferred_audio_language_code
         )
 
+    def test_update_preferred_translation_language_code(self):
+        language_code = 'es'
+
+        user_id = user_services.create_new_user(
+            'someUser', 'user@example.com').user_id
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertNotEqual(
+            user_settings.preferred_translation_language_code, 'es')
+
+        user_services.update_preferred_translation_language_code(
+            user_id, language_code)
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertEqual(
+            language_code, user_settings.preferred_translation_language_code)
+
     def test_remove_user_role(self):
         user_id = user_services.create_new_user(
             'someUser',
