@@ -524,7 +524,10 @@ class UsernameCheckHandler(base.BaseHandler):
         'POST': {
             'username': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
                 }
             }
         }
@@ -534,10 +537,6 @@ class UsernameCheckHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         username = self.normalized_payload.get('username')
-        try:
-            user_domain.UserSettings.require_valid_username(username)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
 
         username_is_taken = user_services.is_username_taken(username)
         self.render_json({
