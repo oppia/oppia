@@ -179,8 +179,6 @@
     "core/templates/domain/exploration/exploration-draft.model.spec.ts",
     "core/templates/domain/exploration/exploration-id-validation.service.ts",
     "core/templates/domain/exploration/exploration-id-validation.service.spec.ts",
-    "core/templates/domain/exploration/exploration-metadata.model.ts",
-    "core/templates/domain/exploration/exploration-metadata.model.spec.ts",
     "core/templates/domain/exploration/exploration-permissions-backend-api.service.ts",
     "core/templates/domain/exploration/exploration-permissions-backend-api.service.spec.ts",
     "core/templates/domain/exploration/exploration-permissions.model.ts",
