@@ -216,6 +216,7 @@ describe('Translation language selector', () => {
     ' language is not defined', async(() => {
     preferredLanguageCode = '';
     component.activeLanguageCode = null;
+    component.languageSelection = '';
 
     component.ngOnInit();
 
