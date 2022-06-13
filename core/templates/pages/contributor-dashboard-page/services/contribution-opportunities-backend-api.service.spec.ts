@@ -45,20 +45,21 @@ describe('Contribution Opportunities backend API service', function() {
     next_cursor: '6',
     more: true
   };
-  const skillOpportunity = {
-    opportunities: [{
-      id: 'exp_id',
-      topic_name: 'Topic',
-      story_title: 'A new story',
-      chapter_title: 'Introduction',
-      content_count: 100,
-      translation_counts: {
-        hi: 15
-      },
-      translation_in_review_counts: {
-        hi: 15
-      }
-    }],
+  const translationOpportunities = [{
+    id: 'exp_id',
+    topic_name: 'Topic',
+    story_title: 'A new story',
+    chapter_title: 'Introduction',
+    content_count: 100,
+    translation_counts: {
+      hi: 15
+    },
+    translation_in_review_counts: {
+      hi: 15
+    }
+  }];
+  const translationOpportunityResponse = {
+    opportunities: translationOpportunities,
     next_cursor: '6',
     more: true
   };
@@ -80,12 +81,12 @@ describe('Contribution Opportunities backend API service', function() {
     ];
     sampleTranslationOpportunitiesResponse = [
       ExplorationOpportunitySummary.createFromBackendDict(
-        skillOpportunity.opportunities[0]
+        translationOpportunityResponse.opportunities[0]
       )
     ];
     sampleVoiceoverOpportunitiesResponse = [
       ExplorationOpportunitySummary.createFromBackendDict(
-        skillOpportunity.opportunities[0]
+        translationOpportunityResponse.opportunities[0]
       )
     ];
   });
@@ -168,14 +169,14 @@ describe('Contribution Opportunities backend API service', function() {
         ) + '?language_code=hi&topic_name=&cursor='
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(skillOpportunity);
+      req.flush(translationOpportunityResponse);
 
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
         opportunities: sampleTranslationOpportunitiesResponse,
-        nextCursor: skillOpportunity.next_cursor,
-        more: skillOpportunity.more
+        nextCursor: translationOpportunityResponse.next_cursor,
+        more: translationOpportunityResponse.more
       });
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -228,14 +229,14 @@ describe('Contribution Opportunities backend API service', function() {
         ) + '?language_code=hi&cursor='
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(skillOpportunity);
+      req.flush(translationOpportunityResponse);
 
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
         opportunities: sampleVoiceoverOpportunitiesResponse,
-        nextCursor: skillOpportunity.next_cursor,
-        more: skillOpportunity.more
+        nextCursor: translationOpportunityResponse.next_cursor,
+        more: translationOpportunityResponse.more
       });
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -269,6 +270,63 @@ describe('Contribution Opportunities backend API service', function() {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       new Error('Failed to fetch voiceover opportunities data.'));
+  }));
+
+  it('should successfully fetch reviewable translation opportunities',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      contributionOpportunitiesBackendApiService
+        .fetchReviewableTranslationOpportunitiesAsync('All').then(
+          successHandler, failHandler
+        );
+      const req = httpTestingController.expectOne(
+        urlInterpolationService.interpolateUrl(
+          '/getreviewableopportunitieshandler',
+          {}
+        )
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({opportunities: translationOpportunities});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        opportunities: sampleTranslationOpportunitiesResponse
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should fail to fetch reviewable translation opportunities ' +
+    'given invalid topic name when calling ' +
+    'fetchReviewableTranslationOpportunitiesAsync', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchReviewableTranslationOpportunitiesAsync('invalid').then(
+        successHandler, failHandler
+      );
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        '/getreviewableopportunitieshandler',
+        {}
+      ) + '?topic_name=invalid'
+    );
+
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to fetch reviewable translation opportunities.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch reviewable translation opportunities.'));
   }));
 
   it('should successfully fetch the featured translation languages',

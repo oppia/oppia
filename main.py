@@ -286,6 +286,9 @@ URLS = [
         r'/preferredtranslationlanguage',
         contributor_dashboard.TranslationPreferenceHandler),
     get_redirect_route(
+        r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+        contributor_dashboard.ReviewableOpportunitiesHandler),
+    get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
