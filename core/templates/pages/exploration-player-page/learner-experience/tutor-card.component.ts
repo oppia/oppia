@@ -180,9 +180,24 @@ export class TutorCardComponent {
       !this.animationHasPlayedOnce &&
       this.inStoryMode
     ) {
-      this.hideCheckMark = false;
-      this.checkMarkComponent.animateCheckMark();
-      this.animationHasPlayedOnce = true;
+      this.triggerCheckMarkAnimation();
+    }
+  }
+
+  triggerCheckMarkAnimation(): void {
+    this.hideCheckMark = false;
+    this.checkMarkComponent.animateCheckMark();
+    this.animationHasPlayedOnce = true;
+    let mediaQuery =
+      this.windowRef.nativeWindow.matchMedia('(prefers-reduced-motion)');
+    if (mediaQuery.matches) {
+      setTimeout(() => {
+        this.skipCheckMark = true;
+        setTimeout(() => {
+          this.hideCheckMark = true;
+        }, 500);
+      }, 2000);
+    } else {
       setTimeout(() => {
         this.hideCheckMark = true;
       }, 4000);
