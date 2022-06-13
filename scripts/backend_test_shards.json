@@ -226,7 +226,7 @@
         "core.jobs.types.feedback_validation_errors_test",
         "core.jobs.types.improvements_validation_errors_test",
         "core.domain.moderator_services_test",
-        "core.jobs.batch_jobs.exp_migration_jobs",
+        "core.jobs.batch_jobs.exp_migration_jobs_test",
         "core.jobs.batch_jobs.exp_recommendation_computation_jobs_test",
         "core.jobs.batch_jobs.exp_search_indexing_jobs_test",
         "core.jobs.batch_jobs.suggestion_stats_computation_jobs_test",
