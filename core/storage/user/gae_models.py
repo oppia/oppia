@@ -3011,3 +3011,90 @@ class DeletedUsernameModel(base_models.BaseModel):
         """
         empty_dict: Dict[str, base_models.EXPORT_POLICY] = {}
         return dict(super(cls, cls).get_export_policy(), **empty_dict)
+
+
+class LearnerGroupUserModel(base_models.BaseModel):
+    """Model for storing user's learner groups related data.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    invited_to_learner_groups = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    member_of_learner_groups = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    progress_sharing_permissions = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether LearnerGroupUserModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of LearnerGroupUserModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def export_data(
+            cls,
+            user_id: str
+    ) -> Dict[str, Union[bool, List[str], None]]:
+        """(Takeout) Exports the data from LearnerGroupUserModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from LearnerGroupUserModel.
+        """
+        learner_group_user_model = cls.get_by_id(user_id)
+
+        if learner_group_user_model is None:
+            return {}
+
+        return {
+            'invited_to_learner_groups': (
+                learner_group_user_model.invited_to_learner_groups),
+            'member_of_learner_groups': (
+                learner_group_user_model.member_of_learner_groups),
+            'progress_sharing_permissions': (
+                learner_group_user_model.progress_sharing_permissions)
+        }
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'invited_to_learner_groups':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'member_of_learner_groups':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'progress_sharing_permissions':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
