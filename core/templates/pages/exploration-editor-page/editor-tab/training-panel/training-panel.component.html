@@ -15,7 +15,7 @@
 
     <div class="trained-feedback-selection-form-container">
       <form>
-        <div class="trained-feedback-selection-container" *ngFor="outcome in allOutcomes; let index = index">
+        <div class="trained-feedback-selection-container" *ngFor="let outcome of allOutcomes; let index = index">
           <button class="trained-feedback-selection"
                   (click)="selectAnswerGroupIndex(index)"
                   [ngClass]="{'trained-feedback-selected': index == selectedAnswerGroupIndex}">
