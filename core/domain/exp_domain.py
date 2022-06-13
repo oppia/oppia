@@ -1696,11 +1696,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return content_count
 
     def get_metadata(self):
-        """Gets the ExplorationMetadata domain object for the exploration.
-
-        Returns:
-            ExplorationMetadata: The ExplorationMetadata domain object.
-        """
+        """Gets the ExplorationMetadata domain object for the exploration."""
         return ExplorationMetadata(
             self.title, self. category, self.objective, self.language_code,
             self.tags, self.blurb, self.author_notes,
