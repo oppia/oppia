@@ -64,7 +64,7 @@ class GetSubTopicsWithInvalidUrlFragJob(base_jobs.JobBase):
             | 'Group subtopic info with topic id' >> beam.FlatMap(
                 lambda topic: [
                     (topic[0], x['id'], x['url_fragment']) for x in topic[1]
-                    ]
+                ]
             )
         )
 
