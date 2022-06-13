@@ -142,7 +142,6 @@ RERUN_POLICIES = {
     'topicsandskillsdashboard': RERUN_POLICY_NEVER,
     'users': RERUN_POLICY_NEVER,
     'wipeout': RERUN_POLICY_NEVER,
-    'navigation': RERUN_POLICY_NEVER,
     # The suite name is `full` when no --suite argument is passed. This
     # indicates that all the tests should be run.
     'full': RERUN_POLICY_NEVER,
@@ -306,10 +305,10 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        stack.enter_context(servers.managed_webdriver_server(
-            chrome_version=args.chrome_driver_version))
-
         if args.suite == 'full':
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
+
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
@@ -322,32 +321,36 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 stdout=subprocess.PIPE))
-            
+
         elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
             proc =  stack.enter_context(servers.managed_webdriverIO_server(
                 suite_name=args.suite,
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 stdout=subprocess.PIPE))
-            
+
             print(
             'Servers have come up.\n'
             'Note: You can view screenshots of failed tests '
             'in ../webdriverio-screenshots/')
 
         elif args.suite in SUITES_STILL_IN_PROTRACTOR:
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
+
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
-            
+
             print(
             'Servers have come up.\n'
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
             'core/tests/protractor.conf.js, you can view screenshots of the '
             'failed tests in ../protractor-screenshots/')
+
         else:
             print(
                 'The suite requested to run does not exists'

@@ -117,16 +117,6 @@
       }
     },
     {
-      // We only run the e2e action checks on end-to-end test files, and
-      // we exclude files that we haven't fixed yet.
-      "files": [
-        "core/tests/webdriverio/*.js"
-      ],
-      "rules": {
-        "oppia/e2e-action-webdriverio": "error"
-      }
-    },
-    {
       // We only run the protractor practices checks on protractor end-to-end test files.
       "files": [
         "core/tests/protractor/*.js",
