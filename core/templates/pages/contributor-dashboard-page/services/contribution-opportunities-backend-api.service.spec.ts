@@ -67,16 +67,16 @@ describe('Contribution Opportunities backend API service', function() {
     more: true
   };
   const userInfoDict = {
-    'roles': ['USER_ROLE'],
-    'is_moderator': false,
-    'is_curriculum_admin': false,
-    'is_super_admin': false,
-    'is_topic_manager': false,
-    'can_create_collections': false,
-    'preferred_site_language_code': 'en',
-    'username': 'user',
-    'email': 'user@example.com',
-    'user_is_logged_in': true
+    roles: ['USER_ROLE'],
+    is_moderator: false,
+    is_curriculum_admin: false,
+    is_super_admin: false,
+    is_topic_manager: false,
+    can_create_collections: false,
+    preferred_site_language_code: 'en',
+    username: 'user',
+    email: 'user@example.com',
+    user_is_logged_in: true
   };
   let userInfo: UserInfo;
   let sampleSkillOpportunitiesResponse: SkillOpportunity[];

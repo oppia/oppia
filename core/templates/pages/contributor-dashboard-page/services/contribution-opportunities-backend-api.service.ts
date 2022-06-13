@@ -259,7 +259,7 @@ export class ContributionOpportunitiesBackendApiService {
   ): Promise<void> {
     return this.userService.getUserInfoAsync().then(
       (userInfo) => {
-        if(userInfo?.isLoggedIn()){
+        if (userInfo?.isLoggedIn()) {
           return this.http.post<void>(
             '/preferredtranslationlanguage',
             {language_code: languageCode}
