@@ -1481,3 +1481,85 @@ class ExplorationUserData:
             'most_recently_reached_checkpoint_state_name': (
                 self.most_recently_reached_checkpoint_state_name)
         }
+
+
+class LearnerGroupUserDict(TypedDict):
+    """Dictionary for LearnerGroupUser domain object."""
+    
+    user_id: str
+    invited_to_learner_groups: List[str]
+    member_of_learner_groups: List[str]
+    progress_sharing_permissions: List[ProgressSharingPermissionsDict]
+
+class ProgressSharingPermissionsDict(TypedDict):
+    """Dictionary for Progress Sharing Permissions of learner groups."""
+
+    group_id: str
+    sharing_is_turned_on: bool
+
+class LearnerGroupUser:
+    """Domain object for learner group user."""
+
+    def __init__(
+        self,
+        user_id: str,
+        invited_to_learner_groups: List[str],
+        member_of_learner_groups: List[str],
+        progress_sharing_permissions: List[ProgressSharingPermissionsDict]
+    ) -> None:
+        """Constructs a LearnerGroupUser domain object.
+
+        Attributes:
+            user_id: str. The user id.
+            invited_to_learner_groups: list(str). List of learner group ids
+                that the user has been invited to.
+            member_of_learner_groups: list(str). List of learner group ids
+                that the user is a member of.
+            progress_sharing_permissions: list(ProgressSharingPermissionsDict).
+                List of Progress Sharing Permissions of learner groups.
+        """
+        self.user_id = user_id
+        self.invited_to_learner_groups = invited_to_learner_groups
+        self.member_of_learner_groups = member_of_learner_groups
+        self.progress_sharing_permissions = progress_sharing_permissions
+        
+    def to_dict(self) -> LearnerGroupUserDict:
+        """Convert the LearnerGroupUser domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the LearnerGroupUser class
+            information in a dictionary form.
+        """
+
+        return {
+            'user_id': self.user_id,
+            'invited_to_learner_groups': self.invited_to_learner_groups,
+            'member_of_learner_groups': self.member_of_learner_groups,
+            'progress_sharing_permissions': self.progress_sharing_permissions
+        }
+
+    def validate(self) -> None:
+        """Validates the LearnerGroupUser domain object.
+
+        Raises:
+            ValidationError: One or more attributes of the LearnerGroupUser
+                are invalid.
+        """
+
+        invited_to_learner_groups_set = set(
+            self.invited_to_learner_groups)
+        member_of_learner_groups_set = set(
+            self.member_of_learner_groups)
+        if len(invited_to_learner_groups_set.intersection(
+            member_of_learner_groups_set)) > 0:
+            raise utils.ValidationError(
+                'Learner group user cannot be a member and be invited '
+                'at the same time in the same learner group.')
+
+        for progress_sharing_permission in self.progress_sharing_permissions:
+            if progress_sharing_permission.group_id not in (
+                self.member_of_learner_groups):
+                raise utils.ValidationError(
+                    'Learner cannot have progress sharing permissions of groups '
+                    'that they are not a member of.')

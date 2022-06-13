@@ -1501,3 +1501,127 @@ class ExplorationUserDataTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_user_data.to_dict(),
             expected_exploration_user_data_dict)
+
+
+class LearnerGroupUserTest(test_utils.GenericTestBase):
+    """Tests for LearnerGroupUser domain object."""
+
+    def test_initialization(self) -> None:
+        learner_group_user = user_domain.LearnerGroupUser(
+            'user1',
+            ['123', '432'],
+            ['654', '234'],
+            [
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ])
+
+        expected_learner_group_user_dict = {
+            'user_id': 'user1',
+            'invited_to_learner_groups': ['123', '432'],
+            'member_of_learner_groups': ['654', '234'],
+            'progress_sharing_permissions': [
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]
+        }
+
+        self.assertEqual(learner_group_user.user_id, 'user1')
+        self.assertEqual(learner_group_user.invited_to_learner_groups,
+            ['123', '432'])
+        self.assertEqual(learner_group_user.member_of_learner_groups,
+            ['654', '234'])
+        self.assertEqual(learner_group_user.progress_sharing_permissions,
+            [
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ])
+        self.assertEqual(
+            learner_group_user.to_dict(),
+            expected_learner_group_user_dict)
+
+    def test_to_dict(self) -> None:
+        learner_group_user = user_domain.LearnerGroupUser(
+            'user1',
+            ['123', '432'],
+            ['654', '234'],
+            [
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ])
+        expected_learner_group_user_dict = {
+            'user_id': 'user1',
+            'invited_to_learner_groups': ['123', '432'],
+            'member_of_learner_groups': ['654', '234'],
+            'progress_sharing_permissions': [
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]
+        }
+
+        self.assertEqual(learner_group_user.user_id, 'user1')
+        self.assertEqual(learner_group_user.invited_to_learner_groups,
+            ['123', '432'])
+        self.assertEqual(learner_group_user.member_of_learner_groups,
+            ['654', '234'])
+        self.assertEqual(learner_group_user.progress_sharing_permissions,
+            [
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ])
+        self.assertEqual(
+            learner_group_user.to_dict(),
+            expected_learner_group_user_dict)
+
+    def test_validation(self) -> None:
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Learner group user cannot be a member and be invited at the '
+            'same time in the same learner group.'):
+            user_domain.LearnerGroupUser(
+                'user1', ['123'], ['123'],
+                [{'group_id': '123', 'sharing_is_turned_on': True}])
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Learner cannot have progress sharing permissions of groups '
+            'that they are not a member of.'):
+            user_domain.LearnerGroupUser(
+                'user1', ['123'], ['367'],
+                [{'group_id': '345', 'sharing_is_turned_on': True}])
