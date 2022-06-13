@@ -86,14 +86,17 @@ export class QuestionUpdateService {
     state.interaction.answerGroups.forEach((answerGroup) => {
       allContentIdsSet.add(answerGroup.outcome.feedback.contentId);
       answerGroup.rules.forEach(rule => {
-        Object.keys(rule.inputs).forEach(inputName => {
-          let ruleInput: any = rule.inputs[inputName];
-          // All rules input types which are translatable are subclasses of
-          // BaseTranslatableObject having dict structure with contentId
-          // as a key.
-          if (ruleInput && 'contentId' in ruleInput) {
-            allContentIdsSet.add(ruleInput.contentId);
-          }
+        Object.keys(rule.inputs).forEach((inputName) => {
+          // Never Used Code @ashutoshc8101 @srijanreddy98 PTAL.
+
+          // let ruleInput = rule.inputs[inputName];
+          // // All rules input types which are translatable are subclasses of
+          // // BaseTranslatableObject having dict structure with contentId
+          // // as a key.
+
+          // if (ruleInput && 'contentId' in ruleInput) {
+          //   allContentIdsSet.add(ruleInput.contentId);
+          // }
         });
       });
     });

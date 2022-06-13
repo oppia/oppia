@@ -33,7 +33,6 @@ import { ChangeListService, StatePropertyNames, StatePropertyValues } from 'page
 import { StateObjectsBackendDict, States, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { AlertsService } from 'services/alerts.service';
 import { ValidatorsService } from 'services/validators.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
@@ -69,7 +68,6 @@ export class ExplorationStatesService {
   private _refreshGraphEventEmitter: EventEmitter<unknown> = new EventEmitter();
 
   constructor(
-    private angularNameService: AngularNameService,
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private changeListService: ChangeListService,
