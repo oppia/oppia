@@ -25,7 +25,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { CustomSchema } from 'services/schema-default-value.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { UtilsService } from 'services/utils.service';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
 
@@ -87,8 +89,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     private contextService: ContextService,
     private changeDetectorDef: ChangeDetectorRef,
     private el: ElementRef,
+    private imageLocalStorageService: ImageLocalStorageService,
     private utilsService: UtilsService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   // Calculates the dimensions of the image, assuming that the width
@@ -344,17 +348,23 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   getPreviewUrl(imageUrl: string): string {
     const entityType: string = this.contextService.getEntityType() as string;
     if (
-      entityType !== (AppConstants.ENTITY_TYPE.EXPLORATION)
-    ) {
+      this.contextService.getImageSaveDestination() ===
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
+        this.imageLocalStorageService.isInStorage(imageUrl))) {
+      // TODO(#15579): SVG sanitization cannot be run here because sanitization
+      // returns a SafeURL, which needs to be bound to the href attribute
+      // in an image tag within an SVG element -- this is currently not
+      // supported.
+      // See https://github.com/angular/angular/issues/38854
+      const base64Url = this.imageLocalStorageService.getRawImageData(
+        imageUrl);
+      return base64Url;
+    } else {
       return this.assetsBackendApiService.getImageUrlForPreview(
         entityType,
         this.contextService.getEntityId(),
         encodeURIComponent(imageUrl));
     }
-    return this.assetsBackendApiService.getImageUrlForPreview(
-      AppConstants.ENTITY_TYPE.EXPLORATION,
-      this.contextService.getExplorationId(),
-      encodeURIComponent(imageUrl));
   }
 
   regionLabelSetter(label: string): void {
@@ -659,7 +669,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       img.onload = function() {
         setHeightAndWidth(this as HTMLCanvasElement);
       };
-      img.src = this.getPreviewUrl(newVal);
+      img.src = this.getPreviewUrl(newVal) as string;
     }
     this.valueChanged.emit(this.value);
   }
