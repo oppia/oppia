@@ -17,6 +17,7 @@
 """Models related to Oppia improvement tasks."""
 
 from __future__ import annotations
+import datetime
 
 from core import feconf
 from core.constants import constants
@@ -264,7 +265,7 @@ class TaskEntryModel(base_models.BaseModel):
             issue_description: Optional[str] = None,
             status: str = constants.TASK_STATUS_OBSOLETE,
             resolver_id: Optional[str] = None,
-            resolved_on: Optional[str] = None
+            resolved_on: Optional[datetime.datetime] = None
     ) -> str:
         """Creates a new task entry and puts it in storage.
 
@@ -280,8 +281,8 @@ class TaskEntryModel(base_models.BaseModel):
                 the task was created.
             status: str. Tracks the state/progress of a task entry.
             resolver_id: str. ID of the user who closed the task, if any.
-            resolved_on: str. The date and time at which a task was closed or
-                deprecated.
+            resolved_on: datetime. The date and time at which a task was closed
+                or deprecated.
 
         Returns:
             str. The ID of the new task.

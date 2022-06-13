@@ -26,9 +26,12 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from extensions.interactions import base
 
 from typing import Dict, List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from extensions.interactions import base
 
 
 class Registry:
