@@ -133,8 +133,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
 
-        question_model: Optional[question_models.QuestionModel] = 
-        question_models.QuestionModel(
+        question_model: Optional[
+            question_models.QuestionModel] = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
                 self._create_valid_question_data('ABC').to_dict()), # type: ignore[no-untyped-call]
