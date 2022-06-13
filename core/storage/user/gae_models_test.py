@@ -3314,3 +3314,143 @@ class DeletedUsernameModelTests(test_utils.GenericTestBase):
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
+
+
+class LearnerGroupUserModelTests(test_utils.GenericTestBase):
+    """Tests for LearnerGroupUserModel."""
+
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    NONEXISTENT_USER_ID = 'id_3'
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            user_models.LearnerGroupUserModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self) -> None:
+        self.assertFalse(
+            user_models.LearnerGroupUserModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertFalse(
+            user_models.LearnerGroupUserModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.LearnerGroupUserModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+        user_models.LearnerGroupUserModel(
+            id=self.USER_ID_1,
+            invited_to_learner_groups=['123', '432'],
+            member_of_learner_groups=['654', '234'],
+            progress_sharing_permissions=[
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]).put()
+        user_models.LearnerGroupUserModel(
+            id=self.USER_ID_1,
+            invited_to_learner_groups=['129', '431'],
+            member_of_learner_groups=['754', '234'],
+            progress_sharing_permissions=[
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]).put()
+
+        self.assertTrue(
+            user_models.LearnerGroupUserModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertTrue(
+            user_models.LearnerGroupUserModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.LearnerGroupUserModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_export_data_trivial(self) -> None:
+        user_data = user_models.LearnerGroupUserModel.export_data(
+            self.USER_ID_1)
+        expected_data: Dict[str, Union[str, List[str]]] = {}
+        self.assertEqual(user_data, expected_data)
+
+        user_models.LearnerGroupUserModel(
+            id=self.USER_ID_1,
+            invited_to_learner_groups=['129', '431'],
+            member_of_learner_groups=['754', '234'],
+            progress_sharing_permissions=[
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]).put()
+
+        user_data = user_models.LearnerGroupUserModel.export_data(
+            self.USER_ID_1)
+        expected_data = {
+            'invited_to_learner_groups': ['129', '431'],
+            'member_of_learner_groups': ['754', '234'],
+            'progress_sharing_permissions': [
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            user_models.LearnerGroupUserModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            user_models.LearnerGroupUserModel.get_export_policy(), {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'invited_to_learner_groups':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'member_of_learner_groups':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'progress_sharing_permissions':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
+    def test_apply_deletion_policy(self) -> None:
+        user_models.LearnerGroupUserModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertFalse(
+            user_models.LearnerGroupUserModel.has_reference_to_user_id(
+                self.USER_ID_1)
+        )
+        # Check if passing a non-existent user_id does not fail.
+        user_models.LearnerGroupUserModel.apply_deletion_policy(
+            'fake_user_id')
