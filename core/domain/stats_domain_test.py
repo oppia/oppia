@@ -1607,9 +1607,12 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             'rule_spec_str': None
         })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'answer' key is in the submitted answer dict.
     def test_requires_answer_to_be_created_from_dict(self) -> None:
         with self.assertRaisesRegex(KeyError, 'answer'):  # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
                 'rule_spec_index': 1,
@@ -1622,9 +1625,12 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'answer_str': None
             })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'interaction_id' key is in the submitted answer dict.
     def test_requires_interaction_id_to_be_created_from_dict(self) -> None:
         with self.assertRaisesRegex(KeyError, 'interaction_id'):  # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'answer_group_index': 0,
                 'rule_spec_index': 1,
@@ -1637,9 +1643,12 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'answer_str': None
             })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'answer_group_index' key is in the submitted answer dict.
     def test_requires_answer_group_index_to_be_created_from_dict(self) -> None:
         with self.assertRaisesRegex(KeyError, 'answer_group_index'):  # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
                 'rule_spec_index': 1,
@@ -1652,9 +1661,12 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'answer_str': None
             })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'rule_spec_index' key is in the submitted answer dict.
     def test_requires_rule_spec_index_to_be_created_from_dict(self) -> None:
         with self.assertRaisesRegex(KeyError, 'rule_spec_index'): # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
@@ -1667,11 +1679,15 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'answer_str': None
             })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'classification_categorization' key is in the submitted answer
+    # dict.
     def test_requires_classification_categ_to_be_created_from_dict(
         self
     ) -> None:
         with self.assertRaisesRegex(KeyError, 'classification_categorization'):  # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
@@ -1683,9 +1699,12 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'answer_str': None
             })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'params' key is in the submitted answer dict.
     def test_requires_params_to_be_created_from_dict(self) -> None:
         with self.assertRaisesRegex(KeyError, 'params'):  # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
@@ -1698,9 +1717,12 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'answer_str': None
             })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'session_id' key is in the submitted answer dict.
     def test_requires_session_id_to_be_created_from_dict(self) -> None:
         with self.assertRaisesRegex(KeyError, 'session_id'):  # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
@@ -1713,9 +1735,12 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
                 'answer_str': None
             })
 
+    # TODO(#13528): Remove this test after the backend is fully
+    # type-annotated. Here ignore[typeddict-item] is used to test
+    # that the 'time_spent_in_sec' key is in the submitted answer dict.
     def test_requires_time_spent_in_sec_to_be_created_from_dict(self) -> None:
         with self.assertRaisesRegex(KeyError, 'time_spent_in_sec'):  # type: ignore[no-untyped-call]
-            stats_domain.SubmittedAnswer.from_dict({
+            stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
