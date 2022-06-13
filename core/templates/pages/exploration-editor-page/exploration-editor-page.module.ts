@@ -58,6 +58,10 @@ import { TranslationTabBusyModalComponent } from './translation-tab/modal-templa
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
+import { TrainingPanelComponent } from './editor-tab/training-panel/training-panel.component';
+import { TrainingModalComponent } from './editor-tab/training-panel/training-modal.component';
+import { TrainingDataEditorPanelServiceModalComponent } from './editor-tab/training-panel/training-data-editor-panel-modal.component';
+import { TestInteractionPanel } from './editor-tab/test-interaction-panel/test-interaction-panel.component';
 
 @NgModule({
   imports: [
@@ -98,6 +102,10 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelServiceModalComponent,
+    TestInteractionPanel
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -128,6 +136,10 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelServiceModalComponent,
+    TestInteractionPanel
   ],
   providers: [
     {

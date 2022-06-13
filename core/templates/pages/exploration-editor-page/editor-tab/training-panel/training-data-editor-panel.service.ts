@@ -21,6 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { ExternalSaveService } from 'services/external-save.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TrainingDataEditorPanelServiceModalComponent } from './training-data-editor-panel-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +30,8 @@ import { ExternalSaveService } from 'services/external-save.service';
 export class TrainingDataEditorPanelService {
   constructor(
     private alertsService: AlertsService,
-    private externalSaveService: ExternalSaveService
+    private externalSaveService: ExternalSaveService,
+    private ngbModal: NgbModal
   ) {}
 
   /**
@@ -36,13 +39,10 @@ export class TrainingDataEditorPanelService {
    */
   openTrainingDataEditor(): void {
     this.alertsService.clearWarnings();
-    $uibModal.open({
-      template: require(
-        'pages/exploration-editor-page/editor-tab/templates/' +
-        'training-data-editor.template.html'),
+
+    this.ngbModal.open(TrainingDataEditorPanelServiceModalComponent, {
       backdrop: 'static',
-      controller: 'TrainingDataEditorPanelServiceModalController'
-    });
+    }).result.then(() => {}, () => {});
 
     // Save the modified training data externally in state content.
     this.externalSaveService.onExternalSave.emit();

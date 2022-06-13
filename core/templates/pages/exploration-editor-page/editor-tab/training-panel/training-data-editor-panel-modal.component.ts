@@ -19,9 +19,6 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -49,46 +46,58 @@ import { State } from 'domain/state/StateObjectFactory';
 import { ResponsesService } from '../services/responses.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { TrainingDataService } from './training-data.service';
+import { TrainingModalService } from './training-modal.service';
+import { TruncateInputBasedOnInteractionAnswerType } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 
-const RULES_SERVICE_MAPPING = {
-  AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService, 
-  CodeReplRulesService: CodeReplRulesService, 
-  ContinueRulesService: ContinueRulesService, 
-  FractionInputRulesService: FractionInputRulesService, 
-  ImageClickInputRulesService: ImageClickInputRulesService, 
-  InteractiveMapRulesService: InteractiveMapRulesService, 
-  MathEquationInputRulesService: MathEquationInputRulesService, 
-  NumericExpressionInputRulesService: NumericExpressionInputRulesService, 
-  NumericInputRulesService: NumericInputRulesService, 
-  PencilCodeEditorRulesService: PencilCodeEditorRulesService, 
-  GraphInputRulesService: GraphInputRulesService, 
-  SetInputRulesService: SetInputRulesService, 
+export const RULES_SERVICE_MAPPING = {
+  AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
+  CodeReplRulesService: CodeReplRulesService,
+  ContinueRulesService: ContinueRulesService,
+  FractionInputRulesService: FractionInputRulesService,
+  ImageClickInputRulesService: ImageClickInputRulesService,
+  InteractiveMapRulesService: InteractiveMapRulesService,
+  MathEquationInputRulesService: MathEquationInputRulesService,
+  NumericExpressionInputRulesService: NumericExpressionInputRulesService,
+  NumericInputRulesService: NumericInputRulesService,
+  PencilCodeEditorRulesService: PencilCodeEditorRulesService,
+  GraphInputRulesService: GraphInputRulesService,
+  SetInputRulesService: SetInputRulesService,
   TextInputRulesService: TextInputRulesService,
 };
+
+interface TrainingData {
+  answer: InteractionAnswer;
+  answerTemplate: string;
+}
 
 @Component({
   selector: 'training-data-editor-panel-service-modal',
   templateUrl: './training-data-editor.component.html'
 })
 
-export class TrainingDataEditorPanelServiceModalController
+export class TrainingDataEditorPanelServiceModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   _stateName: string | null;
   stateName: string | null;
   _state: State;
   answerGroupIndex: number;
   FOCUS_LABEL_TEST_INTERACTION_INPUT: string;
-  trainingData: any;
-  stateContent: any;
-  answerGroupHasNonEmptyRules: any;
-  inputTemplate: any;
+  trainingData: TrainingData[];
+  stateContent: string;
+  answerGroupHasNonEmptyRules: boolean;
+  inputTemplate: string;
+  newAnswerIsAlreadyResolved: boolean;
+  answerSuccessfullyAdded: boolean;
+  newAnswerTemplate: string;
+  newAnswerFeedback: SubtitledHtml;
+  newAnswerOutcomeDest: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private urlInterpolationService: UrlInterpolationService,
-    private contextService: ContextService,
-    private windowRef: WindowRef,
     private injector: Injector,
     private alertsService: AlertsService,
     private trainingModalService: TrainingModalService,
@@ -103,6 +112,8 @@ export class TrainingDataEditorPanelServiceModalController
     private responsesService: ResponsesService,
     private stateEditorService: StateEditorService,
     private currentInteractionService: CurrentInteractionService,
+    private truncateInputBasedOnInteractionAnswerType:
+      TruncateInputBasedOnInteractionAnswerType,
   ) {
     super(ngbActiveModal);
   }
@@ -113,20 +124,21 @@ export class TrainingDataEditorPanelServiceModalController
     this._state = this.explorationStatesService.getState(this._stateName);
     this.answerGroupIndex = (
       this.responsesService.getActiveAnswerGroupIndex());
-    this.FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput'
+    this.FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput';
 
     this.stateContent = this._state.content.html;
     this.trainingData = [];
-      this.answerGroupHasNonEmptyRules = (
-        this.responsesService.getAnswerGroup(
-          this.answerGroupIndex).rules.length > 0);
+    this.answerGroupHasNonEmptyRules = (
+      this.responsesService.getAnswerGroup(
+        this.answerGroupIndex).rules.length > 0);
     this.inputTemplate = (
       this.explorationHtmlFormatterService.getInteractionHtml(
         this.stateInteractionIdService.savedMemento,
         this.stateCustomizationArgsService.savedMemento,
         false, this.FOCUS_LABEL_TEST_INTERACTION_INPUT, null));
 
-    this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
+    // Shivam PTAL.
+    // this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
     this.init();
   }
 
@@ -134,21 +146,22 @@ export class TrainingDataEditorPanelServiceModalController
     this.ngbActiveModal.dismiss();
   }
 
-  openTrainUnresolvedAnswerModal(answerIndex: any): any {
+  openTrainUnresolvedAnswerModal(answerIndex: number): void {
     // An answer group must have either a rule or at least one
     // answer in training data. Don't allow modification of training
     // data answers if there are no rules and only one training data
     // answer is present.
+
+    // Shivam PTAL.
     if ((this.answerGroupHasNonEmptyRules &&
-        this.trainingData.length > 0) 
-        this.trainingData.length > 1) {
+        this.trainingData.length > 0) && this.trainingData.length > 1) {
       let answer = this.trainingData[answerIndex].answer;
       let interactionId = this.stateInteractionIdService.savedMemento;
       return this.trainingModalService.openTrainUnresolvedAnswerModal(
-        answer, function() {
-          let truncatedAnswer = $filter(
-            'truncateInputBasedOnInteractionAnswerType')(
-            answer, interactionId, 12);
+        answer, () => {
+          let truncatedAnswer = (
+            this.truncateInputBasedOnInteractionAnswerType.transform(
+              answer, interactionId, 12));
           let successToast = (
             'The answer ' + truncatedAnswer +
             ' has been successfully trained.');
@@ -183,10 +196,10 @@ export class TrainingDataEditorPanelServiceModalController
       this.FOCUS_LABEL_TEST_INTERACTION_INPUT);
   }
 
-  removeAnswerFromTrainingData(answerIndex: any): void {
+  removeAnswerFromTrainingData(answerIndex: number): void {
     let answer = this.trainingData[answerIndex].answer;
     this.trainingDataService.removeAnswerFromAnswerGroupTrainingData(
-      answer, answerGroupIndex);
+      answer, this.answerGroupIndex);
     this.trainingData.splice(answerIndex, 1);
   }
 
@@ -194,7 +207,7 @@ export class TrainingDataEditorPanelServiceModalController
     this.ngbActiveModal.close();
   }
 
-  submitAnswe(newAnswer: any): void {
+  submitAnswe(newAnswer: InteractionAnswer): void {
     this.newAnswerIsAlreadyResolved = false;
 
     let interactionId = this.stateInteractionIdService.savedMemento;
@@ -204,7 +217,8 @@ export class TrainingDataEditorPanelServiceModalController
         interactionId);
 
     // Inject RulesService dynamically.
-    let rulesService = this.injector.get(RULES_SERVICE_MAPPING[rulesServiceName]);
+    let rulesService = (
+      this.injector.get(RULES_SERVICE_MAPPING[rulesServiceName]));
 
     let newAnswerTemplate = (
       this.explorationHtmlFormatterService.getAnswerHtml(
@@ -213,10 +227,10 @@ export class TrainingDataEditorPanelServiceModalController
 
     let classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
-        _stateName, _state.interaction, newAnswer, rulesService));
+        this._stateName, this._state.interaction, newAnswer, rulesService));
     let newAnswerOutcomeDest = classificationResult.outcome.dest;
     let newAnswerFeedback = classificationResult.outcome.feedback;
-    if (newAnswerOutcomeDest === _stateName) {
+    if (newAnswerOutcomeDest === this._stateName) {
       newAnswerOutcomeDest = '(try again)';
     }
 
@@ -229,15 +243,19 @@ export class TrainingDataEditorPanelServiceModalController
 
     // If answer is explicitly classified then show the
     // classification results to the creator.
-    if (classificationType === EXPLICIT_CLASSIFICATION 
-        classificationType === TRAINING_DATA_CLASSIFICATION) {
+    // Shivam PTAL.
+    if ((
+      classificationType ===
+        ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION) ||
+      (classificationType ===
+         ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION)) {
       this.newAnswerIsAlreadyResolved = true;
     } else {
-      TrainingDataService.associateWithAnswerGroup(
-        answerGroupIndex, newAnswer);
-      let truncatedAnswer = $filter(
-        'truncateInputBasedOnInteractionAnswerType')(
-        newAnswer, interactionId, 12);
+      this.trainingDataService.associateWithAnswerGroup(
+        this.answerGroupIndex, newAnswer);
+      let truncatedAnswer = (
+        this.truncateInputBasedOnInteractionAnswerType.transform(
+          newAnswer, interactionId, 12));
       let successToast = (
         'The answer ' + truncatedAnswer +
         ' has been successfully trained.');
@@ -245,10 +263,10 @@ export class TrainingDataEditorPanelServiceModalController
         successToast, 1000);
       this._rebuildTrainingData();
     }
-  };
+  }
 }
 
-angular.module('oppia').factory('trainingDataEditorPanelServiceModalController',
+angular.module('oppia').factory('trainingDataEditorPanelServiceModalComponent',
   downgradeComponent({
-    component: TrainingDataEditorPanelServiceModalController
+    component: TrainingDataEditorPanelServiceModalComponent
   }) as angular.IDirectiveFactory);

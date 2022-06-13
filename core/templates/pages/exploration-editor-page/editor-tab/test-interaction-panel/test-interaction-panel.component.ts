@@ -16,55 +16,60 @@
  * @fileoverview Directive for the test interaction panel in the state editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { Subscription } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { AppConstants } from 'app.constants';
 
-angular.module('oppia').component('testInteractionPanel', {
-  bindings: {
-    getStateName: '&stateName',
-    getInputTemplate: '&inputTemplate',
-  },
-  template: require('./test-interaction-panel.component.html'),
-  controller: [
-    '$rootScope', '$scope', 'CurrentInteractionService',
-    'ExplorationStatesService', 'INTERACTION_DISPLAY_MODE_INLINE',
-    'INTERACTION_SPECS',
-    function(
-        $rootScope, $scope, CurrentInteractionService,
-        ExplorationStatesService, INTERACTION_DISPLAY_MODE_INLINE,
-        INTERACTION_SPECS) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      $scope.onSubmitAnswerFromButton = function() {
-        CurrentInteractionService.submitAnswer();
-      };
+@Component({
+  selector: 'oppia-test-interaction-panel',
+  templateUrl: './test-interaction-panel.component.html'
+})
 
-      $scope.isSubmitButtonDisabled = (
-        CurrentInteractionService.isSubmitButtonDisabled);
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          // TODO(#11996): Remove when migrating to Angular2+.
-          CurrentInteractionService.onAnswerChanged$.subscribe(() => {
-            $rootScope.$applyAsync();
-          })
-        );
-        var _stateName = ctrl.getStateName();
-        var _state = ExplorationStatesService.getState(_stateName);
-        $scope.interactionIsInline = (
-          INTERACTION_SPECS[_state.interaction.id].display_mode ===
-          INTERACTION_DISPLAY_MODE_INLINE);
-      };
+export class TestInteractionPanel implements OnInit, OnDestroy {
+  @Input() inputTemplate: string;
+  @Input() stateName: string;
 
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
-    }
-  ]
-});
+  directiveSubscriptions = new Subscription();
+  interactionIsInline: boolean;
+
+  constructor(
+    private currentInteractionService: CurrentInteractionService,
+    private explorationStatesService: ExplorationStatesService,
+
+  ) {}
+
+  isSubmitButtonDisabled = (
+    this.currentInteractionService.isSubmitButtonDisabled);
+
+  onSubmitAnswerFromButton(): void {
+    this.currentInteractionService.submitAnswer();
+  }
+
+  ngOnInit(): void {
+    // Shivam PTAL.
+    this.directiveSubscriptions.add(
+      // TODO(#11996): Remove when migrating to Angular2+.
+      // this.currentInteractionService.onAnswerChanged$.subscribe(() => {
+      // })
+    );
+
+    let _stateName = this.stateName;
+    let _state = this.explorationStatesService.getState(_stateName);
+    this.interactionIsInline = (
+      INTERACTION_SPECS[_state.interaction.id].display_mode ===
+      AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').factory('oppiaTestInteractionPanel',
+downgradeComponent({
+  component: TestInteractionPanel
+}) as angular.IDirectiveFactory);

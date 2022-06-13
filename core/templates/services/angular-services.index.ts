@@ -413,6 +413,8 @@ import { TranslationStatusService } from 'pages/exploration-editor-page/translat
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data.service';
+import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
+import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -829,6 +831,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['TranslationTopicService', TranslationTopicService],
   ['TranslationStatusService', TranslationStatusService],
   ['TrainingDataService', TrainingDataService],
+  ['TrainingDataEditorPanelService', TrainingDataEditorPanelService],
+  ['TrainingModalService', TrainingModalService],
   ['TruncatePipe', TruncatePipe],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],

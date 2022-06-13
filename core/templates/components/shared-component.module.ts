@@ -124,7 +124,10 @@ import { SolutionEditor } from './state-directives/solution-editor/solution-edit
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
-
+import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
+import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
+import { TrainingDataEditorPanelServiceModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
+import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component';
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
@@ -264,7 +267,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelServiceModalComponent,
+    TestInteractionPanel
   ],
 
   entryComponents: [
@@ -358,7 +365,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelServiceModalComponent,
+    TestInteractionPanel
   ],
 
   exports: [
@@ -462,6 +473,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelServiceModalComponent,
+    TestInteractionPanel
   ],
 })
 
