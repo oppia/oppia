@@ -99,10 +99,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
-    TrainingPanelComponent,
-    TrainingModalComponent,
-    TrainingDataEditorPanelComponent,
-    TestInteractionPanel
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -133,10 +129,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
-    TrainingPanelComponent,
-    TrainingModalComponent,
-    TrainingDataEditorPanelComponent,
-    TestInteractionPanel
   ],
   providers: [
     {
