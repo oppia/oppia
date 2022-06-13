@@ -122,12 +122,8 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             user_id, strict=False)
 
         if learner_goals_model:
-            # The expected return type from this function is List[str] but
-            # here we are returning 'topic_ids_to_learn' which is an instance of
-            # datastore_services.StringProperty. Due to this MyPy throws an
-            # incompatible return type error. Thus to silent the error, we
-            # used cast here.
-            return cast(List[str], learner_goals_model.topic_ids_to_learn)
+            topic_ids: List[str] = learner_goals_model.topic_ids_to_learn
+            return topic_ids
         else:
             return []
 
