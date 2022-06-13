@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import pkgutil
 import re
 
 from typing import Any, Dict
@@ -78,10 +79,13 @@ def get_package_file_contents(package: str, filepath: str) -> str:
     Returns:
         str. The contents of the file.
     """
-    with io.open(
-        os.path.join(package, filepath), 'r', encoding='utf-8'
-    ) as file:
-        return file.read()
+    try:
+        with io.open(
+            os.path.join(package, filepath), 'r', encoding='utf-8'
+        ) as file:
+            return file.read()
+    except FileNotFoundError:
+        return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
 class Constants(dict):  # type: ignore[type-arg]
