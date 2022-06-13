@@ -27,6 +27,8 @@ import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WorkedExampleObjectFactory, WorkedExampleBackendDict } from 'domain/skill/WorkedExampleObjectFactory';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EventEmitter } from '@angular/core';
 
 describe('Skill update service', () => {
@@ -35,6 +37,7 @@ describe('Skill update service', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory = null;
   let workedExampleObjectFactory: WorkedExampleObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
+  let localStorageService: LocalStorageService = null;
 
   let skillDict = null;
   let skillContentsDict: ConceptCardBackendDict = null;
@@ -52,12 +55,13 @@ describe('Skill update service', () => {
       ],
     });
 
-    skillUpdateService = TestBed.get(SkillUpdateService);
-    undoRedoService = TestBed.get(UndoRedoService);
+    skillUpdateService = TestBed.inject(SkillUpdateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    localStorageService = TestBed.inject(LocalStorageService);
 
-    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
     const misconceptionDict1 = {
       id: 2,
@@ -563,5 +567,27 @@ describe('Skill update service', () => {
       workedExampleObjectFactory.createFromBackendDict(example1),
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
+  });
+
+  it('should update skill editor browser tabs unsaved changes status', () => {
+    let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'skill', 'skill_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(skillEditorBrowserTabsInfo);
+    spyOn(
+      localStorageService, 'updateEntityEditorBrowserTabsInfo'
+    ).and.callFake(() => {});
+
+    expect(
+      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+
+    const skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skillUpdateService.setSkillDescription(skill, 'new description');
+
+    expect(
+      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
   });
 });
