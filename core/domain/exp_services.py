@@ -2144,55 +2144,55 @@ def can_exploration_be_curated(exploration):
     Returns:
         bool. Returns true if the exploration can be curated.
     """
-    result = True
-    errorMessage = ''
+    exp_is_curated = True
+    error_message = ''
 
     if any(
       state.classifier_model_id is not None
       for state in exploration.states.values()
     ):
-        result = False
-        errorMessage = (
+        exp_is_curated = False
+        error_message = (
             'The exploration should not have classifier model for any state.')
-    if result and len(exploration.param_changes) > 0:
-        result = False
-        errorMessage = 'The exploration should not have any parameter changes.'
-    if result and len(exploration.param_specs) > 0:
-        result = False
-        errorMessage = 'The exploration should not have any parameter specs.'
-    if result:
+    if exp_is_curated and len(exploration.param_changes) > 0:
+        exp_is_curated = False
+        error_message = 'The exploration should not have any parameter changes.'
+    if exp_is_curated and len(exploration.param_specs) > 0:
+        exp_is_curated = False
+        error_message = 'The exploration should not have any parameter specs.'
+    if exp_is_curated:
         for state in exploration.states.values():
             for answer_group in state.interaction.answer_groups:
                 if len(answer_group.training_data) > 0:
-                    result = False
-                    errorMessage = (
+                    exp_is_curated = False
+                    error_message = (
                         'The exploration should not have training data ' +
                         'for any answer group in any state.')
                     break
-            if not result:
+            if not exp_is_curated:
                 break
-    if result:
+    if exp_is_curated:
         for state in exploration.states.values():
             default_outcome = state.interaction.default_outcome
             if (
                 default_outcome is not None and
                 len(default_outcome.param_changes) > 0
             ):
-                result = False
-                errorMessage = (
+                exp_is_curated = False
+                error_message = (
                     'The exploration should not have any parameter changes ' +
-                    'in the default outcome of any state.')
+                    'in the default outcome of any state interaction.')
                 break
-    if result:
+    if exp_is_curated:
         html_list = exploration.get_all_html_content_strings()
         video_tag = 'oppia-noninteractive-video'
         link_tag = 'oppia-noninteractive-link'
         for html_string in html_list:
             if video_tag in html_string or link_tag in html_string:
-                result = False
-                errorMessage = (
+                exp_is_curated = False
+                error_message = (
                     'The exploration should not have any video or link ' +
                     'in any of its states.')
                 break
 
-    return (result, errorMessage)
+    return (exp_is_curated, error_message)
