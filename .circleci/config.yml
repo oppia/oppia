@@ -11,7 +11,7 @@ workflows:
               only:
                 - develop
 
-var_for_docker_image: &docker_image circleci/python:3.7.10-browsers
+var_for_docker_image: &docker_image circleci/python:3.8.12-browsers
 
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
