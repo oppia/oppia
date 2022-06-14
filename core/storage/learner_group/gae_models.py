@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class LearnerGroupDataModel(base_models.BaseModel):
+class LearnerGroupModel(base_models.BaseModel):
     """Class for storing learner group data.
 
     Instances of this class are keyed by the group_id.
@@ -130,14 +130,14 @@ class LearnerGroupDataModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, List[str]]]:
-        """Takeout: Export LearnerGroupDataModel user-based properties.
+        """Takeout: Export LearnerGroupModel user-based properties.
 
         Args:
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
             dict. A dict containing the user-relevant properties of
-            LearnerGroupDataModel.
+            LearnerGroupModel.
         """
         found_models = cls.get_all().filter(
             user_id in cls.members or
@@ -185,7 +185,7 @@ class LearnerGroupDataModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether LearnerGroupDataModel contains data of a given user.
+        """Check whether LearnerGroupModel contains data of a given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -202,7 +202,7 @@ class LearnerGroupDataModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete all LearnerGroupDataModel instances associated with the
+        """Delete all LearnerGroupModel instances associated with the
         user.
 
         Args:

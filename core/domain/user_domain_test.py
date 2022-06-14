@@ -1592,38 +1592,19 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             ]
         }
 
-        self.assertEqual(learner_group_user.user_id, 'user1')
-        self.assertEqual(
-            learner_group_user.invited_to_learner_groups,
-            ['123', '432'])
-        self.assertEqual(
-            learner_group_user.member_of_learner_groups,
-            ['654', '234'])
-        self.assertEqual(
-            learner_group_user.progress_sharing_permissions,
-            [
-                {
-                    'group_id': '754',
-                    'sharing_is_turned_on': False
-                },
-                {
-                    'group_id': '234',
-                    'sharing_is_turned_on': True
-                }
-            ])
         self.assertEqual(
             learner_group_user.to_dict(),
             expected_learner_group_user_dict)
 
     def test_validation(self) -> None:
-        self._assert_validation_error(
+        self._assert_validation_error( # type: ignore[no-untyped-call]
             user_domain.LearnerGroupUser(
                 'user1', ['123'], ['123'],
                 [{'group_id': '123', 'sharing_is_turned_on': True}]),
             'Learner group user cannot be a member and be invited at the '
             'same time in the same learner group.')
 
-        self._assert_validation_error(
+        self._assert_validation_error( # type: ignore[no-untyped-call]
             user_domain.LearnerGroupUser(
                 'user1', ['123'], ['367'],
                 [{'group_id': '345', 'sharing_is_turned_on': True}]),
