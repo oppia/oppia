@@ -39,7 +39,7 @@ class ExpStateValidationJobTests(
     EXPLORATION_ID_3 = '3'
 
     EXP_1_STATE_1 = state_domain.State.create_default_state(
-        "EXP_1_STATE_2", is_initial_state=True).to_dict()
+        "EXP_1_STATE_1", is_initial_state=True).to_dict()
 
     EXP_1_STATE_1['interaction'] = {
       "id": "NumericInput",
@@ -147,11 +147,45 @@ class ExpStateValidationJobTests(
       "solution": None
     }
 
-    state_interaction = {
-      "id": "NumericInput",
+    # Interaction Validation
+    EXP_2_STATE_1 = state_domain.State.create_default_state(
+        "EXP_2_STATE_1", is_initial_state=True).to_dict()
+
+    EXP_2_STATE_1['interaction'] = {
+      "id": "Continue",
       "customization_args": {
-        "requireNonnegativeInput": {
-          "value": False
+        "buttonText": {
+          "value": {
+            "content_id": "ca_buttonText_0",
+            "unicode_str": "Continueeeeeeeeeeeeeeeeeeeeeeeeee"
+          }
+        }
+      },
+      "answer_groups": [],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_1",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": ""
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
+
+    EXP_2_STATE_2 = state_domain.State.create_default_state(
+        "EXP_2_STATE_2", is_initial_state=False).to_dict()
+
+    EXP_2_STATE_2['interaction'] = {
+      "id": "EndExploration",
+      "customization_args": {
+        "recommendedExplorationIds": {
+          "value": ["EXP_1", "EXP_2", "EXP_3", "EXP_4"]
         }
       },
       "answer_groups": [
@@ -165,7 +199,7 @@ class ExpStateValidationJobTests(
             }
           ],
           "outcome": {
-            "dest": "EXP_1_STATE_2",
+            "dest": "EXP_2_STATE_2",
             "feedback": {
               "content_id": "feedback_4",
               "html": "<p>good</p>"
@@ -180,10 +214,10 @@ class ExpStateValidationJobTests(
         }
       ],
       "default_outcome": {
-        "dest": "EXP_1_STATE_2",
+        "dest": "EXP_2_STATE_2",
         "feedback": {
           "content_id": "default_outcome",
-          "html": "<p>try</p>"
+          "html": ""
         },
         "labelled_as_correct": False,
         "param_changes": [],
@@ -191,72 +225,36 @@ class ExpStateValidationJobTests(
         "missing_prerequisite_skill_id": None
       },
       "confirmed_unclassified_answers": [],
-      "hints": [
-        {
-          "hint_content": {
-            "content_id": "hint_1",
-            "html": "<p>c</p>"
-          }
-        }
-      ],
+      "hints": [],
       "solution": None
     }
 
-    # Interaction Validation
-    EXP_2_STATE_1 = state_domain.State.create_default_state(
-        "EXP_2_STATE_1", is_initial_state=True).to_dict()
-
-    EXP_2_STATE_1['interaction'] = state_interaction
-    EXP_2_STATE_1['interaction']['id'] = 'Continue'
-    EXP_2_STATE_1['interaction']['default_outcome']['dest'] = "EXP_2_STATE_2"
-    EXP_2_STATE_1['interaction']['customization_args'] = {
-        "buttonText": {
-          "value": {
-            "content_id": "ca_buttonText_5",
-            "unicode_str": "Continueeeeeeeeeeeeeeee"
-          }
-        }
-      }
-
-    EXP_2_STATE_2 = state_domain.State.create_default_state(
-        "EXP_2_STATE_2", is_initial_state=False).to_dict()
-
-    EXP_2_STATE_2['interaction'] = state_interaction
-    EXP_2_STATE_2['interaction']['id'] = 'EndExploration'
-    EXP_2_STATE_2['interaction']['default_outcome']['dest'] = "EXP_2_STATE_2"
-    EXP_2_STATE_2['interaction']['customization_args'] = {
-        "recommendedExplorationIds": {
-          "value": ["EXP_1", "EXP_2", "EXP_3"]
-        }
-      }
-
     EXP_2_STATE_3 = state_domain.State.create_default_state(
         "EXP_2_STATE_3", is_initial_state=False).to_dict()
-
-    EXP_2_STATE_3['interaction'] = state_interaction
-    EXP_2_STATE_3['interaction']['id'] = 'TextInput'
-    EXP_2_STATE_3['interaction']['customization_args'] = {
+    EXP_2_STATE_3['interaction'] = {
+      "id": "TextInput",
+      "customization_args": {
         "placeholder": {
           "value": {
-            "content_id": "ca_placeholder_8",
+            "content_id": "ca_placeholder_0",
             "unicode_str": ""
           }
         },
         "rows": {
-          "value": 11
+          "value": 1
         }
-      }
-    EXP_2_STATE_3['interaction']['answer_groups'] = [
+      },
+      "answer_groups": [
         {
           "rule_specs": [
             {
               "rule_type": "FuzzyEquals",
               "inputs": {
                 "x": {
-                  "contentId": "rule_input_10",
+                  "contentId": "rule_input_2",
                   "normalizedStrSet": [
-                    "ab",
-                    "cd"
+                    "a",
+                    "b"
                   ]
                 }
               }
@@ -265,10 +263,10 @@ class ExpStateValidationJobTests(
           "outcome": {
             "dest": "EXP_2_STATE_3",
             "feedback": {
-              "content_id": "feedback_9",
-              "html": "<p>good</p>"
+              "content_id": "feedback_1",
+              "html": "<p>sdvds</p>"
             },
-            "labelled_as_correct": True,
+            "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
             "missing_prerequisite_skill_id": None
@@ -276,14 +274,28 @@ class ExpStateValidationJobTests(
           "training_data": [],
           "tagged_skill_misconception_id": None
         }
-      ]
+      ],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_3",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": "<p>sd</p>"
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
 
     EXP_2_STATE_4 = state_domain.State.create_default_state(
         "EXP_2_STATE_4", is_initial_state=False).to_dict()
-    EXP_2_STATE_4['interaction'] = state_interaction
-    EXP_2_STATE_4['interaction']['id'] = 'MultipleChoiceInput'
-    EXP_2_STATE_4['interaction']['default_outcome']['dest'] = "EXP_2_STATE_4"
-    EXP_2_STATE_4['interaction']['customization_args'] = {
+    EXP_2_STATE_4['interaction'] = {
+      "id": "MultipleChoiceInput",
+      "customization_args": {
         "choices": {
           "value": [
             {
@@ -303,31 +315,8 @@ class ExpStateValidationJobTests(
         "showChoicesInShuffledOrder": {
           "value": True
         }
-      }
-    EXP_2_STATE_4['interaction']['answer_groups'] = [
-        {
-          "rule_specs": [
-            {
-              "rule_type": "Equals",
-              "inputs": {
-                "x": 1
-              }
-            }
-          ],
-          "outcome": {
-            "dest": "EXP_2_STATE_4",
-            "feedback": {
-              "content_id": "feedback_18",
-              "html": "<p>good</p>"
-            },
-            "labelled_as_correct": True,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
-          },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
-        },
+      },
+      "answer_groups": [
         {
           "rule_specs": [
             {
@@ -397,19 +386,33 @@ class ExpStateValidationJobTests(
           "training_data": [],
           "tagged_skill_misconception_id": None
         }
-      ]
+      ],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_3",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": "<p>sd</p>"
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
 
     EXP_2_STATE_5 = state_domain.State.create_default_state(
         "EXP_2_STATE_5", is_initial_state=False).to_dict()
-    EXP_2_STATE_5['interaction'] = state_interaction
-    EXP_2_STATE_5['interaction']['id'] = 'NumericInput'
-    EXP_2_STATE_5['interaction']['default_outcome']['dest'] = "EXP_2_STATE_5"
-    EXP_2_STATE_5['interaction']['customization_args'] = {
+    EXP_2_STATE_5['interaction'] = {
+      "id": "NumericInput",
+      "customization_args": {
         "requireNonnegativeInput": {
           "value": False
         }
-      }
-    EXP_2_STATE_5['interaction']['answer_groups'] = [
+      },
+      "answer_groups": [
         {
           "rule_specs": [
             {
@@ -423,8 +426,8 @@ class ExpStateValidationJobTests(
           "outcome": {
             "dest": "EXP_2_STATE_5",
             "feedback": {
-              "content_id": "feedback_50",
-              "html": "<p>sdc</p>"
+              "content_id": "feedback_0",
+              "html": "<p>dvfdf</p>"
             },
             "labelled_as_correct": False,
             "param_changes": [],
@@ -447,8 +450,8 @@ class ExpStateValidationJobTests(
           "outcome": {
             "dest": "EXP_2_STATE_5",
             "feedback": {
-              "content_id": "feedback_51",
-              "html": "<p>sdvsdv</p>"
+              "content_id": "feedback_1",
+              "html": "<p>dfb</p>"
             },
             "labelled_as_correct": False,
             "param_changes": [],
@@ -458,14 +461,29 @@ class ExpStateValidationJobTests(
           "training_data": [],
           "tagged_skill_misconception_id": None
         }
-      ]
+      ],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_5",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": "<p>fre</p>"
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
 
     EXP_2_STATE_6 = state_domain.State.create_default_state(
         "EXP_2_STATE_6", is_initial_state=False).to_dict()
-    EXP_2_STATE_6['interaction'] = state_interaction
-    EXP_2_STATE_6['interaction']['id'] = 'NumberWithUnits'
-    EXP_2_STATE_6['interaction']['default_outcome']['dest'] = "EXP_2_STATE_6"
-    EXP_2_STATE_6['interaction']['answer_groups'] = [
+    EXP_2_STATE_6['interaction'] = {
+      "id": "NumberWithUnits",
+      "customization_args": {},
+      "answer_groups": [
         {
           "rule_specs": [
             {
@@ -492,7 +510,24 @@ class ExpStateValidationJobTests(
                   ]
                 }
               }
+            }
+          ],
+          "outcome": {
+            "dest": "EXP_2_STATE_6",
+            "feedback": {
+              "content_id": "feedback_0",
+              "html": "<p>dfv</p>"
             },
+            "labelled_as_correct": False,
+            "param_changes": [],
+            "refresher_exploration_id": None,
+            "missing_prerequisite_skill_id": None
+          },
+          "training_data": [],
+          "tagged_skill_misconception_id": None
+        },
+        {
+          "rule_specs": [
             {
               "rule_type": "IsEqualTo",
               "inputs": {
@@ -522,8 +557,8 @@ class ExpStateValidationJobTests(
           "outcome": {
             "dest": "EXP_2_STATE_6",
             "feedback": {
-              "content_id": "feedback_52",
-              "html": "<p>sd</p>"
+              "content_id": "feedback_1",
+              "html": "<p>sdv</p>"
             },
             "labelled_as_correct": False,
             "param_changes": [],
@@ -533,19 +568,33 @@ class ExpStateValidationJobTests(
           "training_data": [],
           "tagged_skill_misconception_id": None
         }
-      ]
+      ],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_6",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": "<p>fds</p>"
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
     
     EXP_2_STATE_7 = state_domain.State.create_default_state(
         "EXP_2_STATE_7", is_initial_state=False).to_dict()
-    EXP_2_STATE_7['interaction'] = state_interaction
-    EXP_2_STATE_7['interaction']['id'] = 'ItemSelectionInput'
-    EXP_2_STATE_7['interaction']['default_outcome']['dest'] = "EXP_2_STATE_7"
-    EXP_2_STATE_7['interaction']['customization_args'] = {
+    EXP_2_STATE_7['interaction'] = {
+      "id": "ItemSelectionInput",
+      "customization_args": {
         "minAllowableSelectionCount": {
-          "value": 2
+          "value": 6
         },
         "maxAllowableSelectionCount": {
-          "value": 2
+          "value": 5
         },
         "choices": {
           "value": [
@@ -563,12 +612,12 @@ class ExpStateValidationJobTests(
             },
             {
               "content_id": "ca_choices_62",
-              "html": "<p>4</p>"
+              "html": "<p></p>"
             }
           ]
         }
-      }
-    EXP_2_STATE_7['interaction']['answer_groups'] = [
+      },
+      "answer_groups": [
         {
           "rule_specs": [
             {
@@ -619,14 +668,28 @@ class ExpStateValidationJobTests(
           "training_data": [],
           "tagged_skill_misconception_id": None
         }
-      ]
+      ],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_7",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": "<p>sd</p>"
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
 
     EXP_2_STATE_8 = state_domain.State.create_default_state(
         "EXP_2_STATE_8", is_initial_state=False).to_dict()
-    EXP_2_STATE_8['interaction'] = state_interaction
-    EXP_2_STATE_8['interaction']['id'] = 'DragAndDropSortInput'
-    EXP_2_STATE_8['interaction']['default_outcome']['dest'] = "EXP_2_STATE_8"
-    EXP_2_STATE_8['interaction']['customization_args'] = {
+    EXP_2_STATE_8['interaction'] = {
+      "id": "DragAndDropSortInput",
+      "customization_args": {
       "choices": {
         "value": [
           {
@@ -638,8 +701,8 @@ class ExpStateValidationJobTests(
       "allowMultipleItemsInSamePosition": {
         "value": False
       }
-    }
-    EXP_2_STATE_8['interaction']['answer_groups'] = [
+    },
+      "answer_groups": [
       {
         "rule_specs": [
           {
@@ -697,14 +760,28 @@ class ExpStateValidationJobTests(
         "training_data": [],
         "tagged_skill_misconception_id": None
       }
-    ]
+    ],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_8",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": "<p>sd</p>"
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
 
     EXP_2_STATE_9 = state_domain.State.create_default_state(
         "EXP_2_STATE_9", is_initial_state=False).to_dict()
-    EXP_2_STATE_9['interaction'] = state_interaction
-    EXP_2_STATE_9['interaction']['id'] = 'FractionInput'
-    EXP_2_STATE_9['interaction']['default_outcome']['dest'] = "EXP_2_STATE_9"
-    EXP_2_STATE_9['interaction']['customization_args'] = {
+    EXP_2_STATE_9['interaction'] = {
+      "id": "FractionInput",
+      "customization_args": {
         "requireSimplestForm": {
           "value": True
         },
@@ -720,8 +797,8 @@ class ExpStateValidationJobTests(
             "unicode_str": ""
           }
         }
-      }
-    EXP_2_STATE_9['interaction']['answer_groups'] = [
+      },
+      "answer_groups": [
       {
         "rule_specs": [
           {
@@ -757,7 +834,7 @@ class ExpStateValidationJobTests(
             "inputs": {
               "f": {
                 "isNegative": False,
-                "wholeNumber": 3,
+                "wholeNumber": 0,
                 "numerator": 6,
                 "denominator": 4
               }
@@ -777,8 +854,46 @@ class ExpStateValidationJobTests(
         },
         "training_data": [],
         "tagged_skill_misconception_id": None
+      },
+      {
+        "rule_specs": [
+          {
+            "rule_type": "HasIntegerPartEqualTo",
+            "inputs": {
+              "x": 5
+            }
+          }
+        ],
+        "outcome": {
+          "dest": "EXP_2_STATE_9",
+          "feedback": {
+            "content_id": "feedback_74",
+            "html": "<p>dfb</p>"
+          },
+          "labelled_as_correct": False,
+          "param_changes": [],
+          "refresher_exploration_id": None,
+          "missing_prerequisite_skill_id": None
+        },
+        "training_data": [],
+        "tagged_skill_misconception_id": None
       }
-    ]
+    ],
+      "default_outcome": {
+        "dest": "EXP_2_STATE_9",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": "<p>sd</p>"
+        },
+        "labelled_as_correct": False,
+        "param_changes": [],
+        "refresher_exploration_id": None,
+        "missing_prerequisite_skill_id": None
+      },
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": None
+    }
 
     # RTE Validation
     EXP_3_STATE_1 = state_domain.State.create_default_state(
@@ -853,7 +968,8 @@ class ExpStateValidationJobTests(
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
-            states={"EXP_2_STATE_1": self.EXP_2_STATE_1,
+            states={
+            "EXP_2_STATE_1": self.EXP_2_STATE_1,
             "EXP_2_STATE_2": self.EXP_2_STATE_2,
             "EXP_2_STATE_3": self.EXP_2_STATE_3,
             "EXP_2_STATE_4": self.EXP_2_STATE_4,
@@ -861,7 +977,8 @@ class ExpStateValidationJobTests(
             "EXP_2_STATE_6": self.EXP_2_STATE_6,
             "EXP_2_STATE_7": self.EXP_2_STATE_7,
             "EXP_2_STATE_8": self.EXP_2_STATE_8,
-            "EXP_2_STATE_9": self.EXP_2_STATE_9,}
+            "EXP_2_STATE_9": self.EXP_2_STATE_9,
+            }
         )
 
         # This is an invalid model with state RTE
@@ -899,11 +1016,7 @@ class ExpStateValidationJobTests(
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 1, and the state interaction erroneous data " +
               "are [{'state_name': 'EXP_1_STATE_1'}, {'state_name': " +
-              "'EXP_1_STATE_2'}, {'state_name': 'EXP_1_STATE_3'}, " +
-              "{'state_name': 'EXP_1_STATE_4'}, {'state_name': " +
-              "'EXP_1_STATE_5'}, {'state_name': 'EXP_1_STATE_6'}, " +
-              "{'state_name': 'EXP_1_STATE_7'}, {'state_name': " +
-              "'EXP_1_STATE_8'}, {'state_name': 'EXP_1_STATE_9'}]"),
+              "'EXP_1_STATE_2'}]"),
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 1, and the state erroneous data are " +
               "[{'state_name': 'EXP_1_STATE_1', " +
@@ -922,11 +1035,80 @@ class ExpStateValidationJobTests(
             )
         ])
 
-    # def test_run_with_state_interaction_validaton(self) -> None:
-    #     self.put_multi([self.exp_2])
-    #     self.assert_job_output_is([
-    #         job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1')
-    #     ])
+    def test_run_with_state_interaction_validaton(self) -> None:
+        self.put_multi([self.exp_2])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 2, and the state RTE erroneous data are " +
+              "[{'state_name': 'EXP_2_STATE_1'}, {'state_name': " +
+              "'EXP_2_STATE_2'}, {'state_name': 'EXP_2_STATE_3'}, " +
+              "{'state_name': 'EXP_2_STATE_4'}, {'state_name': " +
+              "'EXP_2_STATE_5'}, {'state_name': 'EXP_2_STATE_6'}, " +
+              "{'state_name': 'EXP_2_STATE_7'}, {'state_name': " +
+              "'EXP_2_STATE_8'}, {'state_name': 'EXP_2_STATE_9'}]"
+            ),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 2, and the state interaction erroneous data" +
+              " are [{'state_name': 'EXP_2_STATE_1', " +
+              "'continue_interaction_invalid_values': ['The text value is" +
+              " invalid, either it is empty or the character length is more " +
+              "than 20, the value is Continueeeeeeeeeeeeeeeeeeeeeeeeee']}, " +
+              "{'state_name': 'EXP_2_STATE_2', 'end_interaction_invalid_" +
+              "values': ['There should be no default value present in the " +
+              "end exploration interaction.', 'There should be no answer " +
+              "groups present in the end exploration interaction.', " +
+              "'Total number of recommended explorations should not be more " +
+              "than 3, found 4.']}, {'state_name': 'EXP_2_STATE_3'}, " +
+              "{'state_name': 'EXP_2_STATE_4', 'mc_interaction_invalid_" +
+              "values': ['rule - 0, answer group - 2 is already present.', " +
+              "'There should be atleast 4 choices found 3', 'There should " +
+              "not be any empty choices - 2', 'All choices have feedback and "+
+              "still has default outcome']}, {'state_name': 'EXP_2_STATE_5',"+
+              " 'numeric_input_interaction_values': ['The rule 0 of answer " +
+              "group 0 having rule type IsWithinTolerance have tol value " +
+              "less than zero.', 'The rule 0 of answer group 1 having rule " +
+              "type IsInclusivelyBetween have a value greater than b " +
+              "value']}, {'state_name': 'EXP_2_STATE_6', 'number_with_units_" +
+              "errors': ['The rule 0 of answer group 1 has rule type equal " +
+              "is coming after rule type equivalent having same value']}, " +
+              "{'state_name': 'EXP_2_STATE_7', 'item_selec_interaction_" +
+              "values': ['Selected choices of rule 0 of answer group 0 " +
+              "either less than min_selection_value or greter than max_" +
+              "selection_value.', 'Selected choices of rule 0 of answer " +
+              "group 1 either less than min_selection_value or greter than " +
+              "max_selection_value.', 'Min value which is 6 is greater than " +
+              "max value which is 5', 'Number of choices which is 4 is " +
+              "lesser than the max value selection which is 5', 'There " +
+              "should not be any empty choices - 3']}, {'state_name': " +
+              "'EXP_2_STATE_8', 'drag_drop_interaction_values': ['The rule " +
+              "0 of answer group 0 have multiple items at same place when " +
+              "multiple items in same position settings is turned off.', " +
+              "'The rule 0 of answer group 0 having rule type - " +
+              "IsEqualToOrderingWithOneItemAtIncorrectPosition should not " +
+              "be there when the multiple items in same position setting is " +
+              "turned off.', 'The rule 0 of answer group 1 The value 1 and " +
+              "value 2 cannot be same when rule type is HasElementXBefore" +
+              "ElementY', 'Atleast 2 choices should be there', 'There " +
+              "should not be any empty choices, present on the index - " +
+              "0']}, {'state_name': 'EXP_2_STATE_9', 'fraction_interaction" +
+              "_invalid_values': ['The rule 0 of answer group 0 has " +
+              "denominator equals to zero.', 'The rule 0 of answer group 0 " +
+              "do not have value in proper fraction', 'The rule 0 of answer" +
+              " group 1 do not have value in simple form', 'The rule 0 of " +
+              "answer group 1 do not have value in proper fraction', " +
+              "'The rule 0 of answer group 2 has non zero integer part.']}]"
+            ),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 2, and the state erroneous data are " +
+              "[{'state_name': 'EXP_2_STATE_1'}, {'state_name': " +
+              "'EXP_2_STATE_2'}, {'state_name': 'EXP_2_STATE_3'}, " +
+              "{'state_name': 'EXP_2_STATE_4'}, {'state_name': " +
+              "'EXP_2_STATE_5'}, {'state_name': 'EXP_2_STATE_6'}, " +
+              "{'state_name': 'EXP_2_STATE_7'}, {'state_name': " +
+              "'EXP_2_STATE_8'}, {'state_name': 'EXP_2_STATE_9'}]"
+            )
+        ])
 
     def test_run_with_state_rte_validation(self) -> None:
         self.put_multi([self.exp_3])
@@ -943,13 +1125,8 @@ class ExpStateValidationJobTests(
               "review tag text value is empty.', 'State - EXP_3_STATE_1 " +
               "Video tag start value is greater than end value.']}]"),
             job_run_result.JobRunResult.as_stderr(
-              "The id of exp is 1, and the state interaction erroneous data " +
-              "are [{'state_name': 'EXP_1_STATE_1'}, {'state_name': " +
-              "'EXP_1_STATE_2'}, {'state_name': 'EXP_1_STATE_3'}, " +
-              "{'state_name': 'EXP_1_STATE_4'}, {'state_name': " +
-              "'EXP_1_STATE_5'}, {'state_name': 'EXP_1_STATE_6'}, " +
-              "{'state_name': 'EXP_1_STATE_7'}, {'state_name': " +
-              "'EXP_1_STATE_8'}, {'state_name': 'EXP_1_STATE_9'}]"),
+              "The id of exp is 3, and the state interaction erroneous data " +
+              "are [{'state_name': 'EXP_3_STATE_1'}]"),
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 3, and the state erroneous data " +
               "are [{'state_name': 'EXP_3_STATE_1'}]")

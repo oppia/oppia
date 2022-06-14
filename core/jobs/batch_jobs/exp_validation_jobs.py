@@ -160,8 +160,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
             containing the errored values.
         """
         states_with_values = []
-        rte_components_errors = []
         for key, value in states_dict.items():
+            rte_components_errors = []
             rte_components = get_rte_components(value.content.html)
             if len(rte_components) > 0:
                 for rte_component in rte_components:
@@ -250,18 +250,21 @@ class ExpStateValidationJob(base_jobs.JobBase):
             states_with_values: list[dict]. The list of dictionaries
             containing the errored values.
         """
-        answer_groups_list = []
         states_with_values = []
-        end_interaction_invalid_values = []
-        continue_interaction_invalid_values = []
-        numeric_input_interaction_values = []
-        fraction_interaction_invalid_values = []
-        number_with_units_errors = []
-        mc_interaction_invalid_values = []
-        item_selec_interaction_values = []
-        drag_drop_interaction_values = []
 
         for key, value in states_dict.items():
+            selected_equals_choices = []
+            choice_prev_selected = False
+            number_with_units_rules = []
+            end_interaction_invalid_values = []
+            continue_interaction_invalid_values = []
+            numeric_input_interaction_values = []
+            fraction_interaction_invalid_values = []
+            number_with_units_errors = []
+            mc_interaction_invalid_values = []
+            item_selec_interaction_values = []
+            drag_drop_interaction_values = []
+
             answer_groups = value.interaction.answer_groups
             for answer_group in answer_groups:
                 if value.interaction.id == "FractionInput":
@@ -330,6 +333,18 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     answer_group)) + " has denominator " +
                                     "equals to zero.")
 
+                        if rule_spec.rule_type == "HasIntegerPartEqualTo":
+                            if ((value.interaction.customization_args
+                            ['allowNonzeroIntegerPart'].value) == False and
+                            rule_spec.inputs['x'] != 0):
+                                fraction_interaction_invalid_values.append(
+                                    "The rule " +
+                                    str(answer_group.rule_specs.index(
+                                    rule_spec)) + " of answer group " +
+                                    str(answer_groups.index(
+                                    answer_group)) + " has non zero " +
+                                    "integer part.")
+
                 if value.interaction.id == "NumericInput":
                     for rule_spec in answer_group.rule_specs:
                         if rule_spec.rule_type == 'IsWithinTolerance':
@@ -354,31 +369,29 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     " have a value greater than b value")
 
                 if value.interaction.id == "NumberWithUnits":
-                    number_with_units_rules = []
                     for rule_spec in answer_group.rule_specs:
                         if rule_spec.rule_type == "IsEquivalentTo":
                             number_with_units_rules.append(
-                                rule_spec.inputs)
+                                rule_spec.inputs['f'])
                         if rule_spec.rule_type == "IsEqualTo":
-                            if rule_spec.inputs in number_with_units_rules:
+                            if (rule_spec.inputs['f'] in
+                                number_with_units_rules):
                                 number_with_units_errors.append(
                                     "The rule " +
                                     str(answer_group.rule_specs.index(
                                     rule_spec))+ " of answer group " + str(
                                     answer_groups.index(answer_group))
-                                    + " equal to coming after equivalent to "
-                                    + "for the same value")
+                                    + " has rule type equal is coming after "
+                                    + "rule type equivalent having same value")
 
                 if value.interaction.id == "MultipleChoiceInput":
-                    selected_equals_choices = []
-                    choice_prev_selected = False
                     for rule_spec in answer_group.rule_specs:
                         if rule_spec.rule_type == "Equals":
-                            if rule_spec.inputs.x in selected_equals_choices:
+                            if rule_spec.inputs['x'] in selected_equals_choices:
                                 choice_prev_selected = True
                             if not choice_prev_selected:
                                 selected_equals_choices.append(
-                                    rule_spec.inputs.x)
+                                    rule_spec.inputs['x'])
                             else:
                                 mc_interaction_invalid_values.append(
                                     "rule - " + str(
@@ -388,25 +401,24 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     " is already present.")
 
                 if value.interaction.id == "ItemSelectionInput":
+                    choices = (
+                    value.interaction.customization_args['choices'].value)
                     min_value = (
                         value.interaction.customization_args
                         ['minAllowableSelectionCount'].value)
                     max_value = (
                         value.interaction.customization_args
                         ['maxAllowableSelectionCount'].value)
-                    if answer_group not in answer_groups_list:
-                        answer_groups_list.append(answer_group)
-                    else:
-                        item_selec_interaction_values.append(
-                            ("The " + str(answer_groups.index(
-                                answer_group)) + " anser group is duplicate"))
                     for rule_spec in answer_group.rule_specs:
                         if rule_spec.rule_type == "Equals":
-                            if (len(rule_spec.inputs.x) < min_value and
-                                len(rule_spec.inputs.x) > max_value):
+                            if (len(rule_spec.inputs['x']) < min_value or
+                                len(rule_spec.inputs['x']) > max_value):
                                 item_selec_interaction_values.append(
-                                    "Selected choices are " +
-                                    "either less than min_selection_value or" +
+                                    "Selected choices of rule " +
+                                    str(answer_group.rule_specs.index(
+                                    rule_spec)) + " of answer group " +
+                                    str(answer_groups.index(answer_group)) +
+                                    " either less than min_selection_value or" +
                                     " greter than max_selection_value.")
 
                 if value.interaction.id == "DragAndDropSortInput":
@@ -418,20 +430,24 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             for ele in rule_spec.inputs['x']:
                                 if len(ele) > 1:
                                     drag_drop_interaction_values.append(
-                                        "The rule " +
+                                        "The rule "
                                         + str(answer_group.rule_specs.index(
                                         rule_spec)) + " of answer group " +
                                         str(answer_groups.index(answer_group))+
-                                        " have multiple items at same place.")
+                                        " have multiple items at same place " +
+                                        "when multiple items in same " +
+                                        "position settings is turned off.")
 
                             if (rule_spec.rule_type ==
                             "IsEqualToOrderingWithOneItemAtIncorrectPosition"):
                                 drag_drop_interaction_values.append(
-                                    "The rule " +
+                                    "The rule "
                                     + str(answer_group.rule_specs.index(
                                     rule_spec)) + " of answer group " +
                                     str(answer_groups.index(answer_group))+
-                                    " should not be there when the " +
+                                    " having rule type - IsEqualToOrderingWith"
+                                    +"OneItemAtIncorrectPosition should not " +
+                                    "be there when the " +
                                     "multiple items in same position" +
                                     " setting is turned off.")
 
@@ -440,7 +456,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                 if (rule_spec.inputs['x'] ==
                                 rule_spec.inputs['y']):
                                     drag_drop_interaction_values.append(
-                                        "The rule " +
+                                        "The rule "
                                         + str(answer_group.rule_specs.index(
                                         rule_spec)) + " of answer group " +
                                         str(answer_groups.index(answer_group))+
@@ -500,17 +516,19 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 choice_empty = False
                 choice_duplicate = False
                 for choice in choices:
-                    if choice.html == "<p><p>":
+                    if choice.html == "<p></p>":
                         choice_empty = True
                     if choice.html in seen_choices:
                         choice_duplicate = True
                     seen_choices.append(choice.html)
                 if choice_empty:
                     mc_interaction_invalid_values.append(
-                        {"choice_empty": True})
+                        "There should not be any empty" +
+                        " choices - " + str(choices.index(choice)))
                 if choice_duplicate:
                     mc_interaction_invalid_values.append(
-                        {"choice_duplicate": True})
+                        "There should not be any duplicate" +
+                        " choices - " + str(choices.index(choice)))
                 if (len(choices) == len(value.interaction.answer_groups)
                     and value.interaction.default_outcome is not None):
                     mc_interaction_invalid_values.append(
@@ -540,7 +558,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 choice_empty = False
                 choice_duplicate = False
                 for choice in choices:
-                    if choice.html == "<p><p>":
+                    if choice.html == "<p></p>":
                         choice_empty = True
                     if choice.html in seen_choices:
                         choice_duplicate = True
@@ -564,7 +582,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 choice_empty = False
                 choice_duplicate = False
                 for choice in choices:
-                    if choice.html == "<p><p>":
+                    if choice.html == "<p></p>":
                         choice_empty = True
                     if choice.html in seen_choices:
                         choice_duplicate = True
@@ -572,11 +590,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 if choice_empty:
                     drag_drop_interaction_values.append(
                         "There should not be any empty" +
-                        " choices - " + str(choices.index(choice)))
+                        " choices, present on the index - " +
+                        str(choices.index(choice)))
                 if choice_duplicate:
                     drag_drop_interaction_values.append(
                         "There should not be any duplicate" +
-                        " choices - " + str(choices.index(choice)))
+                        " choices, present on the index - " +
+                        str(choices.index(choice)))
 
             states_with_values.append(
                 {"state_name": key,
@@ -590,6 +610,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 fraction_interaction_invalid_values,
                 "mc_interaction_invalid_values": mc_interaction_invalid_values,
                 "item_selec_interaction_values": item_selec_interaction_values,
+                "number_with_units_errors": number_with_units_errors,
+                "drag_drop_interaction_values": drag_drop_interaction_values
                 }
             )
         return states_with_values
@@ -608,17 +630,17 @@ class ExpStateValidationJob(base_jobs.JobBase):
         """
         states_with_values = []
         states_list = []
-        tagged_skill_misconception_ids = []
-        wrong_labelled_as_correct_values = []
-        not_single_rule_spec = []
-        invalid_refresher_exploration_id = []
-        invalid_destinations = []
-        invalid_default_outcome_dest = []
 
         for key, value in states_dict.items():
             states_list.append(key)
 
         for key, value in states_dict.items():
+            tagged_skill_misconception_ids = []
+            wrong_labelled_as_correct_values = []
+            not_single_rule_spec = []
+            invalid_refresher_exploration_id = []
+            invalid_destinations = []
+            invalid_default_outcome_dest = []
             answer_groups = value.interaction.answer_groups
             for answer_group in answer_groups:
 
@@ -684,4 +706,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             for key, value in list(ele.items()):
                 if len(value) == 0:
                     ele.pop(key)
+        # for ele in errored_values:
+        #     if len(ele) == 1:
+        #         del errored_values[errored_values.index(ele)]
         return errored_values
