@@ -21,7 +21,6 @@ from __future__ import annotations
 import random
 import string
 
-from core import feconf
 from core.platform import models
 
 from typing import Dict, List
@@ -49,21 +48,17 @@ class LearnerGroupModel(base_models.BaseModel):
     # The list of user_ids of the users who are facilitators of
     # the learner group.
     facilitators = datastore_services.StringProperty(
-        repeated=True, indexed=True, required=True)
+        repeated=True, indexed=True)
     # The list of user_ids of the users who are part of the learner group.
-    members = datastore_services.StringProperty(
-        repeated=True, indexed=True, required=True)
+    members = datastore_services.StringProperty(repeated=True)
     # The list of user_ids of the users who are invited to join the
     # learner group.
-    invitations = datastore_services.StringProperty(
-        repeated=True, indexed=True, required=True)
+    invitations = datastore_services.StringProperty(repeated=True)
     # The list of subtopic ids that are part of the group syllabus.
     # Each subtopic id is stored ad topicid_subtopicid a string.
-    subtopic_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, required=True)
+    subtopic_ids = datastore_services.StringProperty(repeated=True)
     # The list of story ids that are part of the group syllabus.
-    story_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, required=True)
+    story_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -110,11 +105,11 @@ class LearnerGroupModel(base_models.BaseModel):
                 of attempts.
         """
         for _ in range(base_models.MAX_RETRIES):
-            new_id = 'uid_%s' % ''.join(
+            group_id = ''.join(
                 random.choice(string.ascii_lowercase + string.ascii_uppercase)
-                for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
-            if not cls.get_by_id(new_id):
-                return new_id
+                for _ in range(base_models.ID_LENGTH))
+            if not cls.get_by_id(group_id):
+                return group_id
 
         raise Exception('New id generator is producing too many collisions.')
 
