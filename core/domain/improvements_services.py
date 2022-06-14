@@ -163,8 +163,8 @@ def fetch_exploration_task_history_page(
         datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
         if urlsafe_start_cursor else None
     )
-    # Here we used cast because we need to narrow the return type of
-    # .fetch_page() method from Tuple[Sequence[...], Cursor, bool]
+    # Here we used cast because we need to narrow down the return type
+    # of .fetch_page() method from Tuple[Sequence[...], Cursor, bool]
     # to Tuple[List[...], Cursor, bool] for more strict typing.
     results, cursor, more = cast(
         Tuple[

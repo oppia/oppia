@@ -31,7 +31,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Tuple, cast
+from typing import List
 from typing_extensions import Final
 
 MYPY = False
@@ -70,7 +70,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.owner = user_services.get_user_actions_info(self.owner_id)  # type: ignore[no-untyped-call]
 
-    def _get_thread_ids_subscribed_to(self, user_id: str) -> Tuple[str, ...]:
+    def _get_thread_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns the feedback thread ids to which the user corresponding to
         the given user id is subscribed to.
 
@@ -78,27 +78,20 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the feedback thread ids to
+            List(str). The list containing all the feedback thread ids to
             which the user is subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         if subscriptions_model:
-            # The expected return type from this function is Tuple[str] but
-            # here we are returning 'general_feedback_thread_ids' which is
-            # an instance of datastore_services.StringProperty. Due to this
-            # MyPy throws an incompatible return type error. Thus to silent
-            # the error, we used cast here.
-            return cast(
-                Tuple[str, ...],
-                subscriptions_model.general_feedback_thread_ids
-            )
+            feedback_thread_ids: (
+                List[str]
+            ) = subscriptions_model.general_feedback_thread_ids
+            return feedback_thread_ids
         else:
-            return tuple()
+            return []
 
-    def _get_exploration_ids_subscribed_to(
-        self, user_id: str
-    ) -> Tuple[str, ...]:
+    def _get_exploration_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns all the exploration ids of the explorations to which the user
         has subscribed to.
 
@@ -106,24 +99,18 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the exploration ids of the
+            List(str). The list containing all the exploration ids of the
             explorations to which the user has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         if subscriptions_model:
-            # The expected return type from this function is Tuple[str] but
-            # here we are returning 'exploration_ids' which is an instance of
-            # datastore_services.StringProperty. Due to this MyPy throws an
-            # incompatible return type error. Thus to silent the error, we
-            # used cast here.
-            return cast(Tuple[str, ...], subscriptions_model.exploration_ids)
+            exploration_ids: List[str] = subscriptions_model.exploration_ids
+            return exploration_ids
         else:
-            return tuple()
+            return []
 
-    def _get_collection_ids_subscribed_to(
-        self, user_id: str
-    ) -> Tuple[str, ...]:
+    def _get_collection_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns all the collection ids of the collections to which the user
         has subscribed to.
 
@@ -131,20 +118,16 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the collection ids of the
+            List(str). The list containing all the collection ids of the
             collections to which the user has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         if subscriptions_model:
-            # The expected return type from this function is Tuple[str] but
-            # here we are returning 'collection_ids' which is an instance of
-            # datastore_services.StringProperty. Due to this MyPy throws an
-            # incompatible return type error. Thus to silent the error, we
-            # used cast here.
-            return cast(Tuple[str, ...], subscriptions_model.collection_ids)
+            collection_ids: List[str] = subscriptions_model.collection_ids
+            return collection_ids
         else:
-            return tuple()
+            return []
 
     def test_subscribe_to_feedback_thread(self) -> None:
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
@@ -434,7 +417,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)  # type: ignore[no-untyped-call]
 
-    def _get_all_subscribers_of_creator(self, user_id: str) -> Tuple[str, ...]:
+    def _get_all_subscribers_of_creator(self, user_id: str) -> List[str]:
         """Returns all the ids of the subscribers that have subscribed to the
         creator.
 
@@ -442,42 +425,34 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the ids of the subscribers that
+            List(str). The list containing all the ids of the subscribers that
             have subscribed to the creator.
         """
         subscribers_model = user_models.UserSubscribersModel.get(
             user_id, strict=False)
         if subscribers_model:
-            # The expected return type from this function is Tuple[str] but
-            # here we are returning 'subscriber_ids' which is an instance of
-            # datastore_services.StringProperty. Due to this MyPy throws an
-            # incompatible return type error. Thus to silent the error, we
-            # used cast here.
-            return cast(Tuple[str, ...], subscribers_model.subscriber_ids)
+            subscriber_ids: List[str] = subscribers_model.subscriber_ids
+            return subscriber_ids
         else:
-            return tuple()
+            return []
 
-    def _get_all_creators_subscribed_to(self, user_id: str) -> Tuple[str, ...]:
+    def _get_all_creators_subscribed_to(self, user_id: str) -> List[str]:
         """Returns the ids of the creators the given user has subscribed to.
 
         Args:
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the creator ids the given user
+            List(str). The list containing all the creator ids the given user
             has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         if subscriptions_model:
-            # The expected return type from this function is Tuple[str] but
-            # here we are returning 'creator_ids' which is an instance of
-            # datastore_services.StringProperty. Due to this MyPy throws an
-            # incompatible return type error. Thus to silent the error, we
-            # used cast here.
-            return cast(Tuple[str, ...], subscriptions_model.creator_ids)
+            creator_ids: List[str] = subscriptions_model.creator_ids
+            return creator_ids
         else:
-            return tuple()
+            return []
 
     def test_exception_is_raised_when_user_self_subscribes(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]

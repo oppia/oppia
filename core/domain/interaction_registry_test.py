@@ -185,10 +185,11 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         """
         all_specs = interaction_registry.Registry.get_all_specs()
 
-        # Here we used Any because argument value can accept values of type
+        # Here we used Any because argument 'value' can accept default_value
+        # of CustomizationArgSpecsDict and here default_value can be of type
         # List[str], str, int, and other types too.
         def traverse_schema_to_find_and_validate_subtitled_content(
-            value: Any, schema: Dict[str,Any]
+            value: Any, schema: Dict[str, Any]
         ) -> None:
             """Recursively traverse the schema to find SubtitledHtml or
             SubtitledUnicode contained or nested in value.

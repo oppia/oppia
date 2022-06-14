@@ -148,7 +148,6 @@ def save_topic_similarities(
 
     # Ruling out the possibility of None for mypy type checking.
     assert topic_similarities_entity is not None
-
     return topic_similarities_entity
 
 
@@ -391,15 +390,10 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
     if recommendations_model is None:
         return []
     else:
-        # The expected return type from this function is List[str] but
-        # here we are returning 'recommended_exploration_ids' which is
-        # an instance of datastore_services.StringProperty. Due to this
-        # MyPy throws an incompatible return type error. Thus to silent
-        # the error, we used cast here.
-        return cast(
-            List[str],
-            recommendations_model.recommended_exploration_ids
-        )
+        recommended_exploration_ids: (
+            List[str]
+        ) = recommendations_model.recommended_exploration_ids
+        return recommended_exploration_ids
 
 
 def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
@@ -425,6 +419,8 @@ def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
     # objects.
     all_recommending_models = {}
     for exp_id in exp_ids:
+        # Here we used cast because we need to narrow down the return type of
+        # .fetch() method from Sequence to List for more strict typing.
         recommending_models: (
             Sequence[recommendations_models.ExplorationRecommendationsModel]
         ) = recs_model_class.query(

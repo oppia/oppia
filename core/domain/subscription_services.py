@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform import models
 
-from typing import List, cast
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -172,12 +172,10 @@ def get_all_threads_subscribed_to(user_id: str) -> List[str]:
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if subscriptions_model:
-        # The expected return type from this function is List[str] but here we
-        # are returning 'general_feedback_thread_ids' which is an instance of
-        # datastore_services.StringProperty. Due to this MyPy throws an
-        # incompatible return type error. Thus to silent the error, we used
-        # cast here.
-        return cast(List[str], subscriptions_model.general_feedback_thread_ids)
+        feedback_thread_ids: (
+            List[str]
+        ) = subscriptions_model.general_feedback_thread_ids
+        return feedback_thread_ids
     else:
         return []
 
@@ -198,12 +196,8 @@ def get_all_creators_subscribed_to(user_id: str) -> List[str]:
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if subscriptions_model:
-        # The expected return type from this function is List[str] but
-        # here we are returning 'creator_ids' which is an instance of
-        # datastore_services.StringProperty. Due to this MyPy throws an
-        # incompatible return type error. Thus to silent the error, we
-        # used cast here.
-        return cast(List[str], subscriptions_model.creator_ids)
+        creator_ids: List[str] = subscriptions_model.creator_ids
+        return creator_ids
     else:
         return []
 
@@ -223,12 +217,8 @@ def get_all_subscribers_of_creator(user_id: str) -> List[str]:
     subscribers_model = user_models.UserSubscribersModel.get(
         user_id, strict=False)
     if subscribers_model:
-        # The expected return type from this function is List[str] but
-        # here we are returning 'subscriber_ids' which is an instance of
-        # datastore_services.StringProperty. Due to this MyPy throws an
-        # incompatible return type error. Thus to silent the error, we
-        # used cast here.
-        return cast(List[str], subscribers_model.subscriber_ids)
+        subscriber_ids: List[str] = subscribers_model.subscriber_ids
+        return subscriber_ids
     else:
         return []
 
@@ -249,12 +239,8 @@ def get_exploration_ids_subscribed_to(user_id: str) -> List[str]:
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if subscriptions_model:
-        # The expected return type from this function is List[str] but
-        # here we are returning 'exploration_ids' which is an instance of
-        # datastore_services.StringProperty. Due to this MyPy throws an
-        # incompatible return type error. Thus to silent the error, we
-        # used cast here.
-        return cast(List[str], subscriptions_model.exploration_ids)
+        exploration_ids: List[str] = subscriptions_model.exploration_ids
+        return exploration_ids
     else:
         return []
 
@@ -296,11 +282,7 @@ def get_collection_ids_subscribed_to(user_id: str) -> List[str]:
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if subscriptions_model:
-        # The expected return type from this function is List[str] but
-        # here we are returning 'collection_ids' which is an instance of
-        # datastore_services.StringProperty. Due to this MyPy throws an
-        # incompatible return type error. Thus to silent the error, we
-        # used cast here.
-        return cast(List[str], subscriptions_model.collection_ids)
+        collection_ids: List[str] = subscriptions_model.collection_ids
+        return collection_ids
     else:
         return []
