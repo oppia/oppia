@@ -226,13 +226,19 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_update_stats_returns_if_aggregated_stats_type_is_invalid(self):
         """Tests that the update_stats returns if a state name is undefined."""
@@ -254,13 +260,19 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_update_stats_throws_if_model_is_using_unicode_state_name(self):
         """Test the update_stats method."""
@@ -713,7 +725,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_get_playthrough_from_model(self):
         """Test the get_playthrough_from_model method."""
@@ -737,7 +752,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_create_stats_model(self):
         """Test the create_stats_model method."""
@@ -755,7 +773,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         # Test create method with different state_stats_mapping.
         exploration_stats.state_stats_mapping = {
