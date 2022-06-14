@@ -102,6 +102,8 @@ export class ExplorationPropertyService {
       throw new Error('Exploration property name cannot be null.');
     }
 
+    this.displayed = this._normalize(this.displayed);
+
     if (!this._isValid(this.displayed) || !this.hasChanged()) {
       this.restoreFromMemento();
       return;
