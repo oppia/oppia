@@ -60,7 +60,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'Missing cmd key in change dict',
-            callable=question_domain.QuestionChange,
+            callableObj=question_domain.QuestionChange,
             change_dict={}
         )
 
@@ -71,7 +71,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'Command wrong is not allowed',
-            callable=question_domain.QuestionChange,
+            callableObj=question_domain.QuestionChange,
             change_dict={'cmd': 'wrong', }
         )
 
@@ -82,7 +82,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'The following required attributes are present: new_value',
-            callable=question_domain.QuestionChange,
+            callableObj=question_domain.QuestionChange,
             change_dict={
                 'cmd': 'update_question_property',
                 'property_name': 'question_state_data',
@@ -97,7 +97,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: invalid',
-            callable=question_domain.QuestionChange,
+            callableObj=question_domain.QuestionChange,
             change_dict={'cmd': 'create_new', 'invalid': 'invalid'}
         )
 
@@ -109,7 +109,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for property_name in cmd update_question_property: '
                 'wrong is not allowed'),
-            callable=question_domain.QuestionChange,
+            callableObj=question_domain.QuestionChange,
             change_dict={
                 'cmd': 'update_question_property',
                 'property_name': 'wrong',
@@ -218,7 +218,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'Missing cmd key in change dict',
-            callable=question_domain.QuestionSuggestionChange,
+            callableObj=question_domain.QuestionSuggestionChange,
             change_dict={}
         )
 
@@ -229,7 +229,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'Command wrong is not allowed',
-            callable=question_domain.QuestionSuggestionChange,
+            callableObj=question_domain.QuestionSuggestionChange,
             change_dict={'cmd': 'wrong', }
         )
 
@@ -240,7 +240,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'The following required attributes are present: new_value',
-            callable=question_domain.QuestionSuggestionChange,
+            callableObj=question_domain.QuestionSuggestionChange,
             change_dict={
                 'cmd': 'create_new_fully_specified_question',
                 'question_dict': 'question_dict',
@@ -254,7 +254,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: invalid',
-            callable=question_domain.QuestionSuggestionChange,
+            callableObj=question_domain.QuestionSuggestionChange,
             change_dict={
                 'cmd': 'create_new_fully_specified_question',
                 'question_dict': 'question_dict',
