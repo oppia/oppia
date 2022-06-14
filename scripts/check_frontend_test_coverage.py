@@ -45,6 +45,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
+    'curated-exploration-validation-backend-api.service',
+    'curated-exploration-validation.service',
     'exploration-states.service.ts',
     'expression-interpolation.service.ts',
     'google-analytics.initializer.ts',
