@@ -35,16 +35,26 @@ import urllib.parse
 import urllib.request
 import zlib
 
-from core import feconf
 from core.constants import constants
 
-from typing import (
+# The third party library path is defined in common.py,
+# which is required to import typing_extensions.
+from scripts import common # isort:skip pylint: disable=unused-import
+# Since feconf imports typing_extensions, it should be
+# imported after common is imported.
+from core import feconf # isort:skip  # pylint: disable=wrong-import-position
+
+from typing import ( # isort:skip
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
-from typing_extensions import Literal
+from typing_extensions import Literal # isort:skip
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
+
+_CERTIFI_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
+sys.path.insert(0, _CERTIFI_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -62,7 +72,6 @@ TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
-# because python_utils is untyped and will be removed in python3.
 # These will be removed after python3 migration and adding stubs for new python3
 # libraries.
 
