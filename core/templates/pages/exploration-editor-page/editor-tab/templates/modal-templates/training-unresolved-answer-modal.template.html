@@ -6,8 +6,8 @@
   <form name="teachOppiaForm" class="form-inline">
     <div class="oppia-rule-details-header">
       <div>
-        <training-panel answer="trainingDataAnswer"  classification="classification" on-finish-training="finishTraining()" adding-new-response="addingNewResponse">
-        </training-panel>
+        <oppia-training-panel [answer]="trainingDataAnswer"  [classification]="classification" [on-finish-training]="finishTraining()" [adding-new-response]="addingNewResponse">
+        </oppia-training-panel>
       </div>
     </div>
   </form>
