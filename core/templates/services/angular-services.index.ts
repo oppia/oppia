@@ -408,6 +408,8 @@ import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data.service';
+import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
+import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -846,5 +848,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
-  ['NumberConversionService', NumberConversionService]
+  ['NumberConversionService', NumberConversionService],
+  ['ParameterMetadataService', ParameterMetadataService],
+  ['ExplorationWarningsService', ExplorationWarningsService],
 ];
