@@ -101,7 +101,7 @@ class VerifyExplorationMigrationJob(base_jobs.JobBase):
         if (hasAttributes):
             return result.Ok((exp_id, hasAttributes))
         else:
-            return result.Err((exp_id, e))s
+            return result.Err((exp_id, e))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration
