@@ -98,7 +98,7 @@ class VerifyExplorationMigrationJob(base_jobs.JobBase):
             logging.exception(e)
             return result.Err((exp_id, e))
 
-        if (hasAttributes):
+        if hasAttributes:
             return result.Ok((exp_id, hasAttributes))
         else:
             return result.Err((exp_id, e))
@@ -172,7 +172,7 @@ class VerifyExplorationMigrationJob(base_jobs.JobBase):
                 'exploration_boolean_list': exploration_boolean_list
             }
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
-                    'exploration_boolean_list': objects['exploration_boolean_list'][0],
+                    'exploration_boolean_list': objects['exploration_boolean_list'][0], # pylint: disable=line-too-long
                 })
         )
 
@@ -185,7 +185,7 @@ class VerifyExplorationMigrationJob(base_jobs.JobBase):
 
         return (
             (
-            
+
                 exploration_job_run_results,
                 exploration_objects_list_job_run_results
             )
