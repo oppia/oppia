@@ -51,10 +51,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _migrate_exploration(
-            exp_id: str,
-            exp_model: exp_models.ExplorationModel
+        exp_id: str,
+        exp_model: exp_models.ExplorationModel
     ) -> result.Result[Tuple[str, exp_domain.Exploration],
-                       Tuple[str, Exception]]:
+                       Tuple[str, Exception]
+        ]:
         """Migrates exploration and transform exploration model into
         exploration object.
 
@@ -79,8 +80,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_exploration_changes(
-            exp_id: str,
-            exp_model: exp_models.ExplorationModel
+        exp_id: str,
+        exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. ExplorationChange object is
         generated schema version for some field is lower than the latest

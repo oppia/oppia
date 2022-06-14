@@ -118,7 +118,6 @@ def get_exploration_titles_and_categories(exp_ids):
         dicts with the keys 'title' and 'category'. Any invalid exploration
         ids are excluded.
     """
-
     explorations = [
         (exp_fetchers.get_exploration_from_model(e) if e else None)
         for e in exp_models.ExplorationModel.get_multi(
