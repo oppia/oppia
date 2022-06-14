@@ -20,46 +20,46 @@
 
 <style>
   .confetti {
-    position: fixed;
-    width: 10px;
+    background: #00f;
     height: 34px;
-    top: 40px;
     left: 53%;
     opacity: 0;
-    background: #00f;
+    position: fixed;
+    top: 40px;
+    width: 10px;
     z-index: 2;
   }
   .coiled-confetti {
-    position: fixed;
     height: 40px;
-    top: 40px;
     opacity: 0;
+    position: fixed;
+    top: 40px;
     width: 50px;
     z-index: 2;
   }
   .confetti:nth-child(2n) {
-    left: 47%;
-    background: #00AA00;
-    width: 14px;
+    background: #0a0;
     height: 40px;
+    left: 47%;
+    width: 14px;
   }
   .confetti:nth-child(3n) {
-    background: #FF0000;
-    width: 8px;
-    height: 30px;
     animation-delay: 200ms;
+    background: #f00;
+    height: 30px;
+    width: 8px;
   }
   .confetti:nth-child(4n) {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
     animation-delay: 200ms;
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
   }
   .confetti:nth-child(7n) {
-    background: yellow;
-    width: 10px;
-    height: 30px;
     animation-delay: 400ms;
+    background: #ff0;
+    height: 30px;
+    width: 10px;
   }
   @keyframes confetti-anim-1 {
     0% { opacity: 1; }
@@ -89,7 +89,7 @@
   @keyframes confetti-anim-6 {
     0% { opacity: 1; }
     50% { opacity: 0.7; }
-    100% { transform: translate(0px, 240px) rotate(-50deg); }
+    100% { transform: translate(0, 240px) rotate(-50deg); }
   }
   @keyframes confetti-anim-7 {
     0% { opacity: 1; }
