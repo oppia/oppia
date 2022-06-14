@@ -18,13 +18,85 @@
 
 var waitFor = require('./waitFor.js');
 
-var click = async(elementName, clickableElement) => {
+// Waits for the invisibility of the autosave message.
+var waitForAutosave = async function() {
+  var autoSaveIndicatorElement = await $('.protractor-test-autosave-indicator');
+  await waitFor.invisibilityOf(
+    autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+};
+
+var clear = async function(inputName, inputElement) {
+  await click(inputName, inputElement);
+  await inputElement.clearValue();
+};
+
+var click = async function(elementName, clickableElement, elementIsMasked) {
   await waitFor.visibilityOf(
     clickableElement, `${elementName} is not visible.`);
   await waitFor.elementToBeClickable(
     clickableElement, `${elementName} is not clickable.`);
-
-  await clickableElement.click();
+  // In some cases, we expect the element to be masked by a dummy element. In
+  // these cases, the regular click will throw an error of the form
+  // Failed: element click intercepted: Element A is not clickable at point
+  // (x, y). Other element would receive the click: B.
+  // It is expected that the masked element receives the click. Therefore, a
+  // Javascript click action is used here to avoid the error.
+  if (elementIsMasked) {
+    await browser.execute(
+      'arguments[0].click()',
+      await browser.findElement('css selector', clickableElement));
+  } else {
+    await clickableElement.click();
+  }
 };
 
+var getText = async function(elementName, element) {
+  await waitFor.visibilityOf(
+    element, `${elementName} is not visible for getText()`);
+  return await element.getText();
+};
+
+var getAttribute = async function(elementName, element, attribute) {
+  await waitFor.presenceOf(
+    element, `${elementName} is not present for getAttribute(${attribute})`);
+  return await element.getAttribute(attribute);
+};
+
+var select = async function(selectorName, selectorElement, optionToSelect) {
+  await click(selectorName, selectorElement);
+  var optionElement = await selectorElement.$(`option=${optionToSelect}`);
+  await click(`${optionToSelect} in ${selectorName}`, optionElement);
+};
+
+var matSelect = async function(selectorName, selectorElement, optionToSelect) {
+  await click(selectorName, selectorElement);
+  var optionElement = await $(`.mat-option-text=${optionToSelect}`);
+  await click(`${optionToSelect} in ${selectorName}`, optionElement);
+};
+
+var select2 = async function(selectorName, selectorElement, optionToSelect) {
+  await click(selectorName, selectorElement);
+  var select2Results = await $('.select2-results');
+  await waitFor.visibilityOf(
+    select2Results, `${selectorName} options are not visible.`);
+  var option = await $(`li=${optionToSelect}`);
+  await click(`${optionToSelect} in ${selectorName}`, option);
+};
+
+var keys = async function(
+    inputName, inputElement, keys, clickInputElement = true) {
+  if (clickInputElement) {
+    await click(inputName, inputElement);
+  }
+  await inputElement.keys(keys);
+};
+
+exports.clear = clear;
 exports.click = click;
+exports.getText = getText;
+exports.getAttribute = getAttribute;
+exports.select = select;
+exports.select2 = select2;
+exports.matSelect = matSelect;
+exports.keys = keys;
+exports.waitForAutosave = waitForAutosave;

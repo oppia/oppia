@@ -1,5 +1,6 @@
 require('dotenv').config();
 const video = require('wdio-video-reporter');
+var FirebaseAdmin = require('firebase-admin');
 var path = require('path');
 var fs = require('fs');
 var Constants = require('./protractor_utils/ProtractorConstants');
@@ -32,6 +33,11 @@ var suites = {
   full: [
     './core/tests/webdriverio/**/*.js',
   ],
+
+  collections: [
+    './core/tests/webdriverio/collections.js'
+  ],
+
   navigation: [
     './core/tests/webdriverio/navigation.js'
   ],
@@ -241,9 +247,16 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    //  onPrepare: function(config, capabilities) {
-      
-    // },
+     onPrepare: function(config, capabilities) {
+      browser.isMobile = false;
+
+      // Configure the Firebase Admin SDK to communicate with the emulator.
+      process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+      FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+    
+      // Navigate to the splash page so that tests can begin on an Angular page.
+      browser.url('http://localhost:9001');
+    },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.

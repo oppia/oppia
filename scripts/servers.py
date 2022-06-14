@@ -449,39 +449,41 @@ def managed_webpack_compiler(
 
 
 def get_chrome_verison():
-     # Although there are spaces between Google and Chrome in the path, we
-        # don't need to escape them for Popen (as opposed to on the terminal, in
-        # which case we would need to escape them for the command to run).
-        chrome_command = (
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-            if common.is_mac_os() else 'google-chrome')
-        try:
-            output = subprocess.check_output([chrome_command, '--version'])
-        except OSError as e:
-            # For the error message on macOS, we need to add the backslashes in.
-            # This is because it is likely that a user will try to run the
-            # command on their terminal and, as mentioned above, the macOS
-            # chrome version command has spaces in the path which need to be
-            # escaped for successful terminal use.
-            raise Exception(
-                'Failed to execute "%s --version" command. This is used to '
-                'determine the chromedriver version to use. Please set the '
-                'chromedriver version manually using the '
-                '--chrome_driver_version flag. To determine the '
-                'chromedriver version to be used, please follow the '
-                'instructions mentioned in the following URL:\n'
-                'https://chromedriver.chromium.org/downloads/version-selection'
-                % chrome_command.replace(' ', r'\ ')) from e
+    """Download and install node to Oppia tools directory."""
 
-        installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
-        installed_version = '.'.join(
-            installed_version_parts.decode('utf-8').split('.')[:-1])
-        response = utils.url_open(
-            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
-                installed_version))
-        chrome_version = response.read().decode('utf-8')
+    # Although there are spaces between Google and Chrome in the path, we
+    # don't need to escape them for Popen (as opposed to on the terminal, in
+    # which case we would need to escape them for the command to run).
+    chrome_command = (
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        if common.is_mac_os() else 'google-chrome')
+    try:
+        output = subprocess.check_output([chrome_command, '--version'])
+    except OSError as e:
+        # For the error message on macOS, we need to add the backslashes in.
+        # This is because it is likely that a user will try to run the
+        # command on their terminal and, as mentioned above, the macOS
+        # chrome version command has spaces in the path which need to be
+        # escaped for successful terminal use.
+        raise Exception(
+            'Failed to execute "%s --version" command. This is used to '
+            'determine the chromedriver version to use. Please set the '
+            'chromedriver version manually using the '
+            '--chrome_driver_version flag. To determine the '
+            'chromedriver version to be used, please follow the '
+            'instructions mentioned in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection'
+            % chrome_command.replace(' ', r'\ ')) from e
 
-        return chrome_version
+    installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
+    installed_version = '.'.join(
+        installed_version_parts.decode('utf-8').split('.')[:-1])
+    response = utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
+            installed_version))
+    chrome_version = response.read().decode('utf-8')
+
+    return chrome_version
 
 
 @contextlib.contextmanager
@@ -680,6 +682,10 @@ def managed_webdriverIO_server(
         suite_name: str. The suite name whose tests should be run. If the value
             is `full`, all tests will run.
         dev_mode: bool. Whether the test is running on dev_mode.
+        debug_mode: bool. Whether to run the webdriverio tests in debugging mode.
+            Read the following instructions to learn how to run e2e tests in
+            debugging mode:
+            https://webdriver.io/docs/debugging/#the-debug-command.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
 
     Yields:
