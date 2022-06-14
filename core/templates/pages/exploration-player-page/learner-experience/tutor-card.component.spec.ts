@@ -236,7 +236,7 @@ describe('Tutor card component', () => {
       spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
       spyOn(componentInstance, 'triggerCelebratoryAnimation');
       componentInstance.animationHasPlayedOnce = false;
-      componentInstance.inStoryMode = false;
+      componentInstance.inStoryMode = true;
       const changes: SimpleChanges = {
         displayedCard: {
           previousValue: false,

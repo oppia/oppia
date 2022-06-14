@@ -181,7 +181,7 @@ export class TutorCardComponent {
     if (
       this.isOnTerminalCard() &&
       !this.animationHasPlayedOnce &&
-      this.inStoryMode
+      !this.inStoryMode
     ) {
       this.triggerCelebratoryAnimation();
     }
