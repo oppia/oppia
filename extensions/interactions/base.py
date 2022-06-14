@@ -65,9 +65,12 @@ class CustomizationArgSpecsDict(TypedDict):
     name: str
     description: str
     # Here we used Any because values in schema dictionary can be of type str,
-    # int, List, Dict and other types too.
+    # List, Dict and other types too.
     schema: Dict[str, Any]
-    default_value: str
+    # Here, default_value can accept values of type List[str], str, bool and
+    # other types too. So to make it generalize for every default_value, we
+    # used Any type here.
+    default_value: Any
 
 
 class BaseInteractionDict(TypedDict):
