@@ -27,7 +27,7 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, cast
+from typing import List
 from typing_extensions import Final
 
 MYPY = False
