@@ -253,9 +253,9 @@ describe('Tutor card component', () => {
 
   it('should animate the check mark and the confetti ' +
       'if animations are enabled', fakeAsync(() => {
-    expect(componentInstance.hideCheckMark).toBe(true);
+    expect(componentInstance.checkMarkHidden).toBe(true);
     expect(componentInstance.animationHasPlayedOnce).toBe(false);
-    expect(componentInstance.skipCheckMark).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
 
     spyOn(windowRef.nativeWindow, 'matchMedia').and.callThrough();
     componentInstance.checkMarkComponent =
@@ -277,14 +277,14 @@ describe('Tutor card component', () => {
       .toHaveBeenCalled();
 
     tick(4000);
-    expect(componentInstance.hideCheckMark).toBe(true);
+    expect(componentInstance.checkMarkHidden).toBe(true);
   }));
 
   it('should not animate the confetti if animations ' +
       'are not enabled', fakeAsync(() => {
-    expect(componentInstance.hideCheckMark).toBe(true);
+    expect(componentInstance.checkMarkHidden).toBe(true);
     expect(componentInstance.animationHasPlayedOnce).toBe(false);
-    expect(componentInstance.skipCheckMark).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
 
     spyOn(windowRef.nativeWindow, 'matchMedia').and.returnValue({
       matches: true,
@@ -315,27 +315,27 @@ describe('Tutor card component', () => {
       .not.toHaveBeenCalled();
 
     tick(500);
-    expect(componentInstance.hideCheckMark).toBe(true);
+    expect(componentInstance.checkMarkHidden).toBe(true);
   }));
 
   it('should skip animation when a click is made onscreen', fakeAsync(() => {
-    expect(componentInstance.skipCheckMark).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
 
-    componentInstance.hideCheckMark = false;
+    componentInstance.checkMarkHidden = false;
     let fakeClickEvent = new MouseEvent('click');
     componentInstance.onDocumentClick(fakeClickEvent);
 
-    expect(componentInstance.skipCheckMark).toBe(true);
+    expect(componentInstance.checkMarkSkipped).toBe(true);
     tick(501);
-    expect(componentInstance.hideCheckMark).toBe(true);
+    expect(componentInstance.checkMarkHidden).toBe(true);
   }));
 
   it('should not skip animation if it hasn\'t started yet', fakeAsync(() => {
-    componentInstance.hideCheckMark = true;
+    componentInstance.checkMarkHidden = true;
     let fakeClickEvent = new MouseEvent('click');
     componentInstance.onDocumentClick(fakeClickEvent);
 
-    expect(componentInstance.skipCheckMark).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
   }));
 
   it('should update displayed card', fakeAsync(() => {

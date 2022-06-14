@@ -100,9 +100,9 @@ export class TutorCardComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   OPPIA_AVATAR_LINK_URL: string;
   profilePicture: string;
-  hideCheckMark: boolean = true;
+  checkMarkHidden: boolean = true;
   animationHasPlayedOnce: boolean = false;
-  skipCheckMark: boolean = false;
+  checkMarkSkipped: boolean = false;
   confettiAnimationTimeout: NodeJS.Timeout | null = null;
 
   constructor(
@@ -188,16 +188,16 @@ export class TutorCardComponent {
   }
 
   triggerCelebratoryAnimation(): void {
-    this.hideCheckMark = false;
+    this.checkMarkHidden = false;
     this.checkMarkComponent.animateCheckMark();
     this.animationHasPlayedOnce = true;
     let mediaQuery =
       this.windowRef.nativeWindow.matchMedia('(prefers-reduced-motion)');
     if (mediaQuery.matches) {
       setTimeout(() => {
-        this.skipCheckMark = true;
+        this.checkMarkSkipped = true;
         setTimeout(() => {
-          this.hideCheckMark = true;
+          this.checkMarkHidden = true;
         }, 500);
       }, 2000);
     } else {
@@ -205,7 +205,7 @@ export class TutorCardComponent {
         this.confettiComponent.animateConfetti();
       }, 2000);
       setTimeout(() => {
-        this.hideCheckMark = true;
+        this.checkMarkHidden = true;
       }, 4000);
     }
   }
@@ -321,10 +321,10 @@ export class TutorCardComponent {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     clearTimeout(this.confettiAnimationTimeout);
-    if (!this.hideCheckMark) {
-      this.skipCheckMark = true;
+    if (!this.checkMarkHidden) {
+      this.checkMarkSkipped = true;
       setTimeout(() => {
-        this.hideCheckMark = true;
+        this.checkMarkHidden = true;
       }, 500);
     }
   }
