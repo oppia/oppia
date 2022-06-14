@@ -195,7 +195,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
         )
 
     def filter_invalid_state_rte_values(
-            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]
+    ) -> list[dict]:
         """Returns the errored state RTE values.
 
         Args:
@@ -286,7 +287,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_interaction_values_part_1(
-            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]
+    ) -> list[dict]:
         """Returns the errored state interaction values for
             - FractionInput
             - NumericInput
@@ -439,7 +441,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_interaction_values_part_2(
-            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]
+    ) -> list[dict]:
         """Returns the errored state interaction values for
             - MultipleChoiceInput
             - ItemSelectionInput
@@ -576,8 +579,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_interaction_values_part_3(
-            self, states_dict: dict[str, state_domain.State],
-            exp_ids: list[str]) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State],
+        exp_ids: list[str]
+    ) -> list[dict]:
         """Returns the errored state interaction values for
             - DragAndDropSortInput
             - EndExploration
@@ -725,7 +729,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_values(
-            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]
+    ) -> list[dict]:
         """Returns the errored state values.
 
         Args:
