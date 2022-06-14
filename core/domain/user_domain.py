@@ -1561,9 +1561,9 @@ class LearnerGroupUser:
                 'at the same time in the same learner group.')
 
         for progress_sharing_permission in self.progress_sharing_permissions:
-            if progress_sharing_permission.group_id not in (
+            if progress_sharing_permission['group_id'] not in (
                     self.member_of_learner_groups):
                 raise utils.ValidationError(
                     'Learner cannot have progress sharing permissions of '
                     'group %s since they are not it\'s member.' % (
-                        progress_sharing_permission.group_id))
+                        progress_sharing_permission['group_id']))

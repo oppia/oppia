@@ -184,7 +184,7 @@ class LearnerGroupDataModel(base_models.BaseModel):
         return user_data
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id) -> bool:
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether LearnerGroupDataModel contains data of a given user.
 
         Args:

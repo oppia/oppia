@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import types
+from typing import Dict
 
 from core.platform import models
 from core.tests import test_utils
@@ -162,7 +163,7 @@ class LearnerGroupDataModelUnitTest(test_utils.GenericTestBase):
         """
         uninvolved_user_data = (
             learner_group_models.LearnerGroupDataModel.export_data('user_31'))
-        expected_uninvolved_user_data = {}
+        expected_uninvolved_user_data: Dict = {}
 
         self.assertEqual(
             expected_uninvolved_user_data,
