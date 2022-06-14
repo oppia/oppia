@@ -3387,7 +3387,8 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
     def test_export_data_trivial(self) -> None:
         user_data = user_models.LearnerGroupUserModel.export_data(
             self.USER_ID_1)
-        expected_data: Dict[str, Union[str, List[str]]] = {}
+        expected_data: Dict[
+            str, Union[List[str], List[Dict[str, object]], None]] = {}
         self.assertEqual(user_data, expected_data)
 
         user_models.LearnerGroupUserModel(

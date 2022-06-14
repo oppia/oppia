@@ -20,12 +20,13 @@ from __future__ import annotations
 
 from core import utils
 
-from typing import List, TypedDict
+from typing import List
+from typing_extensions import TypedDict
 
 
 class LearnerGroupDict(TypedDict):
     """Dictionary for LearnerGroup domain object."""
-    
+
     group_id: str
     title: str
     description: str
@@ -34,6 +35,7 @@ class LearnerGroupDict(TypedDict):
     invitations: List[str]
     subtopic_ids: List[str]
     story_ids: List[str]
+
 
 class LearnerGroup:
     """Domain object for learner group."""
