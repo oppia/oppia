@@ -195,16 +195,16 @@ class ExpStateValidationJob(base_jobs.JobBase):
         )
 
     def filter_invalid_state_rte_values(
-        self, states_dict: dict[str, state_domain.State]) -> list[dict]:
+            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
         """Returns the errored state RTE values.
 
         Args:
             states_dict: dict[str, State]. The dictionary containing
-            state name as key and State object as value.
+                state name as key and State object as value.
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-            containing the errored values.
+                containing the errored values.
         """
         states_with_values = []
         for key, value in states_dict.items():
@@ -264,14 +264,16 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                 ' end value.')
 
                     elif rte_component['id'] == 'oppia-noninteractive-link':
+                        url_value = (
+                            rte_component['customization_args']
+                            ['url-with-value'][:5])
                         if (rte_component['customization_args']
                         ['text-with-value']) == '':
                             rte_components_errors.append(
                                 'State - ' + str(key) +
                                 ' Link tag text value' + ' is empty.')
 
-                        elif (['customization_args']['url-with-value'][:5]
-                        != 'https'):
+                        if url_value != 'https':
                             rte_components_errors.append(
                                 'State - ' + str(key) +
                                 ' Link tag url value' + ' does not start '
@@ -292,13 +294,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Args:
             states_dict: dict[str, State]. The dictionary containing
-            state name as key and State object as value.
-
-            exp_ids: list[str]. The list of exploration ids.
+                state name as key and State object as value.
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-            containing the errored values.
+                containing the errored values.
         """
         states_with_values = []
 
@@ -329,7 +329,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     ' has denominator equals to zero.')
 
                             if (value.interaction.customization_args
-                            ['requireSimplestForm'].value) == True:
+                            ['requireSimplestForm'].value) is True:
                                 if whole == 0:
                                     d = math.gcd(num, den)
                                     val_num = num // d
@@ -340,11 +340,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                         str(answer_group.rule_specs.index(
                                         rule_spec)) + ' of answer group ' +
                                         str(answer_groups.index(
-                                        answer_group)) + ' do not have value '+
-                                        'in simple form')
+                                        answer_group)) + ' do not have value '
+                                        + 'in simple form')
 
                             if (value.interaction.customization_args
-                            ['allowImproperFraction'].value) == False:
+                            ['allowImproperFraction'].value) is False:
                                 if den <= num:
                                     fraction_interaction_invalid_values.append(
                                         'The rule ' +
@@ -356,7 +356,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     )
 
                             if (value.interaction.customization_args
-                            ['allowNonzeroIntegerPart'].value) == False:
+                            ['allowNonzeroIntegerPart'].value) is False:
                                 if whole != 0:
                                     fraction_interaction_invalid_values.append(
                                         'The rule ' +
@@ -378,7 +378,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                         if rule_spec.rule_type == 'HasIntegerPartEqualTo':
                             if ((value.interaction.customization_args
-                            ['allowNonzeroIntegerPart'].value) == False and
+                            ['allowNonzeroIntegerPart'].value) is False and
                             rule_spec.inputs['x'] != 0):
                                 fraction_interaction_invalid_values.append(
                                     'The rule ' +
@@ -395,7 +395,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                 numeric_input_interaction_values.append(
                                     'The rule ' +
                                     str(answer_group.rule_specs.index(
-                                    rule_spec))+ ' of answer group ' + str(
+                                    rule_spec)) + ' of answer group ' + str(
                                     answer_groups.index(answer_group))
                                     + ' having rule type IsWithinTolerance' +
                                     ' have tol value less than zero.')
@@ -405,7 +405,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                 numeric_input_interaction_values.append(
                                     'The rule ' +
                                     str(answer_group.rule_specs.index(
-                                    rule_spec))+ ' of answer group ' + str(
+                                    rule_spec)) + ' of answer group ' + str(
                                     answer_groups.index(answer_group))
                                     + ' having rule type' +
                                     ' IsInclusivelyBetween' +
@@ -422,7 +422,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                 number_with_units_errors.append(
                                     'The rule ' +
                                     str(answer_group.rule_specs.index(
-                                    rule_spec))+ ' of answer group ' + str(
+                                    rule_spec)) + ' of answer group ' + str(
                                     answer_groups.index(answer_group))
                                     + ' has rule type equal is coming after '
                                     + 'rule type equivalent having same value')
@@ -446,12 +446,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Args:
             states_dict: dict[str, State]. The dictionary containing
-            state name as key and State object as value.
-            exp_ids: list[str]. The list of exploration ids.
+                state name as key and State object as value.
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-            containing the errored values.
+                containing the errored values.
         """
         states_with_values = []
 
@@ -475,7 +474,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                 mc_interaction_invalid_values.append(
                                     'rule - ' + str(
                                     answer_group.rule_specs.index(rule_spec)) +
-                                    ', answer group - ' +str(
+                                    ', answer group - ' + str(
                                     answer_groups.index(answer_group)) +
                                     ' is already present.')
 
@@ -508,6 +507,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         'There should be atleast 4 choices'
                         + ' found ' + str(len(choices)))
                 seen_choices = []
+                choice = None
                 choice_empty = False
                 choice_duplicate = False
                 for choice in choices:
@@ -516,11 +516,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     if choice.html in seen_choices:
                         choice_duplicate = True
                     seen_choices.append(choice.html)
-                if choice_empty:
+                if choice_empty and choice is not None:
                     mc_interaction_invalid_values.append(
                         'There should not be any empty' +
                         ' choices - ' + str(choices.index(choice)))
-                if choice_duplicate:
+                if choice_duplicate and choice is not None:
                     mc_interaction_invalid_values.append(
                         'There should not be any duplicate' +
                         ' choices - ' + str(choices.index(choice)))
@@ -585,12 +585,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Args:
             states_dict: dict[str, State]. The dictionary containing
-            state name as key and State object as value.
+                state name as key and State object as value.
+
             exp_ids: list[str]. The list of exploration ids.
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-            containing the errored values.
+                containing the errored values.
         """
         states_with_values = []
 
@@ -613,9 +614,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                         'The rule '
                                         + str(answer_group.rule_specs.index(
                                         rule_spec)) + ' of answer group ' +
-                                        str(answer_groups.index(answer_group))+
-                                        ' have multiple items at same place ' +
-                                        'when multiple items in same ' +
+                                        str(answer_groups.index(answer_group))
+                                        + ' have multiple items at same place '
+                                        + 'when multiple items in same ' +
                                         'position settings is turned off.')
 
                             if (rule_spec.rule_type ==
@@ -624,10 +625,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     'The rule '
                                     + str(answer_group.rule_specs.index(
                                     rule_spec)) + ' of answer group ' +
-                                    str(answer_groups.index(answer_group))+
+                                    str(answer_groups.index(answer_group)) +
                                     ' having rule type - IsEqualToOrderingWith'
-                                    +'OneItemAtIncorrectPosition should not ' +
-                                    'be there when the ' +
+                                    + 'OneItemAtIncorrectPosition should not '
+                                    + 'be there when the ' +
                                     'multiple items in same position' +
                                     ' setting is turned off.')
 
@@ -639,13 +640,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                         'The rule '
                                         + str(answer_group.rule_specs.index(
                                         rule_spec)) + ' of answer group ' +
-                                        str(answer_groups.index(answer_group))+
-                                        ' the value 1 and value 2 cannot be '
+                                        str(answer_groups.index(answer_group))
+                                        + ' the value 1 and value 2 cannot be '
                                         + 'same when rule type is ' +
                                         'HasElementXBeforeElementY')
 
             if value.interaction.id == 'EndExploration':
-                if value.interaction.default_outcome != None:
+                if value.interaction.default_outcome is not None:
                     end_interaction_invalid_values.append(
                         'There should be no default' +
                         ' value present in the end exploration interaction.'
@@ -654,7 +655,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 if len(value.interaction.answer_groups) > 0:
                     end_interaction_invalid_values.append(
                         'There should be no answer'
-                        +' groups present in the end exploration interaction.'
+                        + ' groups present in the end exploration interaction.'
                     )
 
                 recc_exp_ids = (
@@ -692,6 +693,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     drag_drop_interaction_values.append(
                         'Atleast 2 choices should be there')
                 seen_choices = []
+                choice = None
                 choice_empty = False
                 choice_duplicate = False
                 for choice in choices:
@@ -700,12 +702,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     if choice.html in seen_choices:
                         choice_duplicate = True
                     seen_choices.append(choice.html)
-                if choice_empty:
+                if choice_empty and choice is not None:
                     drag_drop_interaction_values.append(
                         'There should not be any empty' +
                         ' choices, present on the index - ' +
                         str(choices.index(choice)))
-                if choice_duplicate:
+                if choice_duplicate and choice is not None:
                     drag_drop_interaction_values.append(
                         'There should not be any duplicate' +
                         ' choices, present on the index - ' +
@@ -728,11 +730,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Args:
             states_dict: dict[str, State]. The dictionary containing
-            state name as key and State object as value.
+                state name as key and State object as value.
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-            containing the errored values.
+                containing the errored values.
         """
         states_with_values = []
         states_list = []
@@ -750,7 +752,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             answer_groups = value.interaction.answer_groups
             for answer_group in answer_groups:
 
-                if answer_group.tagged_skill_misconception_id != None:
+                if answer_group.tagged_skill_misconception_id is not None:
                     tagged_skill_misconception_ids.append(
                         'The tagged_skill_misconception_id'
                         + ' of answer group ' +
@@ -758,7 +760,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         ' is not None.')
 
                 if (answer_group.outcome.dest == key
-                and answer_group.outcome.labelled_as_correct == True):
+                and answer_group.outcome.labelled_as_correct is True):
                     wrong_labelled_as_correct_values.append(
                         'The value of labelled_as_correct'
                         + ' of answer group ' + str(answer_groups.index(
@@ -771,7 +773,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         + ' in answer group ' + str(answer_groups.index(
                         answer_group)) + ', atleast one is required.')
 
-                if answer_group.outcome.refresher_exploration_id != None:
+                if answer_group.outcome.refresher_exploration_id is not None:
                     invalid_refresher_exploration_id.append(
                         'The refresher_exploration_id'
                         + 'of answer group ' + str(answer_groups.index(
@@ -801,7 +803,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 'invalid_refresher_exploration_id':
                 invalid_refresher_exploration_id,
                 'invalid_destinations': invalid_destinations,
-                'invalid_default_outcome_dest': invalid_default_outcome_dest,}
+                'invalid_default_outcome_dest': invalid_default_outcome_dest,
+                }
             )
         return states_with_values
 
@@ -810,11 +813,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Args:
             errored_values: list[dict]. The list of dictionaries
-            containing the errored values
+                containing the errored values.
 
         Returns:
             errored_values: list[dict]. The list of dictionaries
-            containing the errored values with removed empty
+                containing the errored values with removed empty.
         """
         for ele in errored_values:
             for key, value in list(ele.items()):

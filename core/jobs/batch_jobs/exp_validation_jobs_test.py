@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''Unit tests for jobs.batch_jobs.exp_validation_jobs.'''
+"""Unit tests for jobs.batch_jobs.exp_validation_jobs."""
 
 from __future__ import annotations
 
@@ -1145,7 +1145,9 @@ class ExpStateValidationJobTests(
               + ' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
               + 'than 160.\', \'State - EXP_3_STATE_1 Image tag alt value is '
               + 'less than 5.\', \'State - EXP_3_STATE_1 Link tag text value '
-              + 'is empty.\', \'State - EXP_3_STATE_1 Math tag svg_filename' +
+              + 'is empty.\', \'State - EXP_3_STATE_1 Link tag url value ' +
+              'does not start with https.\', ' +
+              '\'State - EXP_3_STATE_1 Math tag svg_filename' +
               ' value has a non svg extension.\', \'State - EXP_3_STATE_1 ' +
               'Skill review tag text value is empty.\', \'State - ' +
               'EXP_3_STATE_1 Video tag start value is greater ' +
