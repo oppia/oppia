@@ -15,6 +15,11 @@
     <div ng-class="{'oppia-translate-y': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
       <div class="oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
+
+
+
+
+          
           <div class="oppia-profile-details-container">
             <span ng-if="$ctrl.profilePictureDataUrl">
               <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="rounded-circle" alt="User Avatar">
@@ -55,6 +60,12 @@
                                         (set-active-topic-name)="$ctrl.onChangeTopic($event)">
             </translation-topic-selector>
           </div>
+
+
+
+
+
+
         </div>
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName !== 'myContributionTab'">
           <div class="outer-container">
@@ -76,20 +87,16 @@
             </div>
             <div class="dropdown-container">
               <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
-                <span class="oppia-dashboard-language-container-label">Translate to</span>
-                <div>
-                  <translation-language-selector class="oppia-language-selector" [active-language-code]="$ctrl.languageCode"
-                                                 (set-active-language-code)="$ctrl.onChangeLanguage($event)">
-                  </translation-language-selector>
-                </div>
+                <div class="oppia-dashboard-language-container-label">Translate to</div>
+                <translation-language-selector class="oppia-language-selector" [active-language-code]="$ctrl.languageCode"
+                                               (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+                </translation-language-selector>
               </div>
               <div class="oppia-dashboard-topic-container" ng-if="$ctrl.showTopicSelector()">
-                <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
-                <div>
-                  <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
-                                              (set-active-topic-name)="$ctrl.onChangeTopic($event)">
-                  </translation-topic-selector>
-                </div>
+                <div class="oppia-dashboard-topic-container-label">Subject</div>
+                <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
+                                            (set-active-topic-name)="$ctrl.onChangeTopic($event)">
+                </translation-topic-selector>
               </div>
             </div>
           </div>
@@ -171,17 +178,22 @@
   </div>
 </div>
 <style>
+  .explanation-container {
+    width: 100%;
+  }
   .outer-container {
     display: flex;
     margin-top: 20px;
-    width: 100vw;
+    width: 100%;
   }
   .mascot-container {
     display: flex;
+    margin-top: 10px;
   }
   .dropdown-container {
     display: flex;
     margin-bottom: 20px;
+    width: 100%;
   }
   button.oppia-autofocus:focus {
     outline: 0;
@@ -200,8 +212,9 @@
   .oppia-dashboard-language-container {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     margin-left: 10%;
-    width: 220px;
+    width: 100%;
   }
   .oppia-opportunity-language-selector {
     background: white;
@@ -254,7 +267,7 @@
     margin-right: 5px;
     max-width: 75px;
     padding: 2% 1%;
-    width: 18%;
+    width: 100px;
   }
   .oppia-profile-picture-icon {
     color: #009688;
@@ -403,12 +416,17 @@
   }
   .oppia-topic-selector {
     padding-bottom: 10px;
+    width: 100%;
+  }
+  .oppia-language-selector {
+    padding-bottom: 10px;
+    width: 100%;
   }
   .oppia-dashboard-topic-container {
     display: flex;
     flex-direction: column;
     margin-left: 10px;
-    width: 200px;
+    width: 100%;
   }
   .oppia-collapsed-language-selector {
     padding-bottom: 15px;
@@ -432,30 +450,37 @@
     }
     .outer-container {
       flex-direction: column;
-      width: 100vw;
+      width: 100%;
     }
     .mascot-container {
       border-bottom: 1px solid #4a4a4a;
-      padding-left: 10%;
-      padding-right: 10%;
       padding-bottom: 10px;
       width: 100%;
     }
+    .oppia-mascot-avatar-container {
+      margin-left: 20px;
+    }
+    .explanation-container {
+      margin-left: 20px;
+      width: 60%;
+    }
     .dropdown-container {
       flex-direction: column;
-      margin-top: 10px;      
+      margin-top: 10px;
+      padding: 0 20px;
       width: 100%;
     }
     .oppia-dashboard-language-container, .oppia-dashboard-topic-container {
       flex-direction: row;
-      justify-content: center;
+      justify-content: flex-start;
       margin: 0;
       margin-top: 10px;
       width: 100%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
       padding-top: 10px;
-      width: 150px;
+      width: 175px;
+      margin-right: 10px;
     }
     .oppia-opportunities-tabs-list {
       width: 100%;
@@ -491,20 +516,34 @@
     }
   }
   @media only screen and (max-width: 420px) {
+    .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+      font-size: 18px;
+      width: 150px;
+      margin-right: 2vw;
+    }
     .mascot-container {
       border-bottom: 1px solid #4a4a4a;
-      padding-left: 10px;
+      padding-left: 5px;
       padding-right: 10px;
       padding-bottom: 10px;
       width: 100%;
     }
+    .oppia-mascot-avatar-container {
+      margin-left: 5px;
+    }
+    .explanation-container {
+      margin-left: 10px;
+      width: 100%;
+    }
     .dropdown-container {
       flex-direction: column;
+      align-items: flex-start;
       margin-top: 10px;
       margin-bottom: 20px;
-      margin-left: 10px;
-      margin-right: 10px;
-      width: 100%;
+      margin-left: 1vw;
+      margin-right: 1vw;
+      padding: auto 2vw;
+      width: fit-content;
     }
   }
 </style>
