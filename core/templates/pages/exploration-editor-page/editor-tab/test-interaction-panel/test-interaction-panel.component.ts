@@ -69,7 +69,7 @@ export class TestInteractionPanel implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').factory('oppiaTestInteractionPanel',
-downgradeComponent({
-  component: TestInteractionPanel
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive('oppiaTestInteractionPanel',
+  downgradeComponent({
+    component: TestInteractionPanel
+  }) as angular.IDirectiveFactory);

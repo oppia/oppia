@@ -157,7 +157,7 @@ export class TrainingDataEditorPanelComponent
         this.trainingData.length > 0) && this.trainingData.length > 1) {
       let answer = this.trainingData[answerIndex].answer;
       let interactionId = this.stateInteractionIdService.savedMemento;
-      return this.trainingModalService.openTrainUnresolvedAnswerModal(
+      this.trainingModalService.openTrainUnresolvedAnswerModal(
         answer, () => {
           let truncatedAnswer = (
             this.truncateInputBasedOnInteractionAnswerType.transform(
@@ -170,7 +170,6 @@ export class TrainingDataEditorPanelComponent
           this._rebuildTrainingData();
         });
     }
-    return;
   }
 
   _rebuildTrainingData(): void {
@@ -266,7 +265,7 @@ export class TrainingDataEditorPanelComponent
   }
 }
 
-angular.module('oppia').factory('trainingDataEditorPanel',
+angular.module('oppia').directive('trainingDataEditorPanel',
   downgradeComponent({
     component: TrainingDataEditorPanelComponent
   }) as angular.IDirectiveFactory);
