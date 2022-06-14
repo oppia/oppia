@@ -37,7 +37,7 @@ export class SkillEditorRoutingService {
     this._changeTab(currentHash.substring(1, currentHash.length));
   }
 
-  private _changeTab(newPath: string) {
+  _changeTab(newPath: string): void {
     if (newPath === '') {
       this._changeTab('/');
       return;
