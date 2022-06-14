@@ -408,6 +408,7 @@ import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -846,5 +847,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
-  ['NumberConversionService', NumberConversionService]
+  ['NumberConversionService', NumberConversionService],
+  ['QuestionUndoRedoService', QuestionUndoRedoService],
 ];

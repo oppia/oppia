@@ -17,6 +17,7 @@
  * @fileoverview Service for creating a new question.
  */
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { QuestionEditorModalComponent } from 'components/question-directives/modal-templates/question-editor-modal.component';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
 
@@ -55,19 +56,19 @@ require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').factory('QuestionCreationService', [
-  '$location', '$rootScope', '$uibModal', 'AlertsService',
+  '$location', '$rootScope', 'AlertsService',
   'EditableQuestionBackendApiService', 'ImageLocalStorageService',
   'NgbModal', 'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
-  'SkillEditorStateService', 'UrlInterpolationService',
+  'SkillEditorStateService',
   'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $location, $rootScope, $uibModal, AlertsService,
+      $location, $rootScope, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
       NgbModal, QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
-      SkillEditorStateService, UrlInterpolationService,
+      SkillEditorStateService,
       DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
       SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     var newQuestionSkillDifficulties = [];
@@ -220,28 +221,27 @@ angular.module('oppia').factory('QuestionCreationService', [
         rubric => skillDifficultyMapping[rubric.getDifficulty()] === parseFloat(
           questionDifficulty));
 
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/components/question-directives/modal-templates/' +
-            'question-editor-modal.directive.html'),
-        backdrop: 'static',
-        keyboard: false,
-        resolve: {
-          associatedSkillSummaries: () => [],
-          untriagedSkillSummaries: () => [],
-          canEditQuestion: () => canEditQuestion,
-          categorizedSkills: () => [],
-          groupedSkillSummaries: () => groupedSkillSummaries,
-          misconceptionsBySkill: () => misconceptionsBySkill,
-          newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
-          question: () => question,
-          questionId: () => questionId,
-          questionStateData: () => questionStateData,
-          rubric: () => rubric,
-          skillName: () => skillName
-        },
-        controller: 'QuestionEditorModalController',
-      }).result.then(function() {
+      let modalRef: NgbModalRef = NgbModal.open(
+        QuestionEditorModalComponent, {
+          backdrop: 'static',
+          keyboard: false,
+        });
+
+      modalRef.componentInstance.associatedSkillSummaries = [];
+      modalRef.componentInstance.untriagedSkillSummaries = [];
+      modalRef.componentInstance.canEditQuestion = canEditQuestion;
+      modalRef.componentInstance.categorizedSkills = [];
+      modalRef.componentInstance.groupedSkillSummaries = groupedSkillSummaries;
+      modalRef.componentInstance.misconceptionsBySkill = misconceptionsBySkill;
+      modalRef.componentInstance.newQuestionIsBeingCreated =
+        newQuestionIsBeingCreated;
+      modalRef.componentInstance.question = question;
+      modalRef.componentInstance.questionId = questionId;
+      modalRef.componentInstance.questionStateData = questionStateData;
+      modalRef.componentInstance.rubric = rubric;
+      modalRef.componentInstance.skillName = skillName;
+
+      modalRef.result.then(() => {
         $location.hash(null);
         saveAndPublishQuestion();
       }, () => {

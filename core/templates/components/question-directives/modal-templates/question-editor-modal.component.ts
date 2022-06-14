@@ -20,17 +20,24 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitModalComponent } from './confirm-question-exit-modal.component';
 import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AlertsService } from 'services/alerts.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { QuestionValidationService } from 'services/question-validation.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 
+interface SkillLinkageModificationsArray {
+  id: string;
+  task: string;
+}
+interface ReturnModalObject {
+  skillLinkageModificationsArray: SkillLinkageModificationsArray[];
+  commitMessage: string;
+}
 @Component({
   selector: 'question-editor-modal',
   templateUrl: './question-editor-modal.component.html'
@@ -51,7 +58,7 @@ export class QuestionEditorModalComponent
   @Input() misconceptionsBySkill;
   @Input() newQuestionIsBeingCreated;
 
-  returnModalObject = {
+  returnModalObject: ReturnModalObject = {
     skillLinkageModificationsArray: [],
     commitMessage: ''
   };
@@ -72,7 +79,7 @@ export class QuestionEditorModalComponent
     return '/skill_editor/' + skillId;
   }
 
-  removeSkill(skillId: string): any {
+  removeSkill(skillId: string): void {
     if (this.associatedSkillSummaries.length === 1) {
       this.alertsService.addInfoMessage(
         'A question should be linked to at least one skill.');
@@ -86,11 +93,11 @@ export class QuestionEditorModalComponent
 
     this.associatedSkillSummaries =
       this.associatedSkillSummaries.filter((summary) => {
-        return summary.getId() !== skillId;
+        return (summary.getId() !== skillId);
       });
   }
 
-  getSkillLinkageModificationsArray(): any {
+  getSkillLinkageModificationsArray(): SkillLinkageModificationsArray[] {
     return this.returnModalObject.skillLinkageModificationsArray;
   }
 
@@ -149,7 +156,7 @@ export class QuestionEditorModalComponent
   // modified then no commit message is required from the user
   // as there is already a default commit message present in the
   // backend for modification of skill linkages.
-  saveAndCommit(): any {
+  saveAndCommit(): boolean | null {
     if (!this.isQuestionValid()) {
       return;
     }
@@ -215,7 +222,7 @@ export class QuestionEditorModalComponent
   }
 }
 
-angular.module('oppia').factory('questionEditorModal',
+angular.module('oppia').directive('questionEditorModal',
   downgradeComponent({
     component: QuestionEditorModalComponent
   }) as angular.IDirectiveFactory);

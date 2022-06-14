@@ -125,7 +125,7 @@ import { SolutionEditor } from './state-directives/solution-editor/solution-edit
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
-
+import { QuestionEditorModalComponent } from './question-directives/modal-templates/question-editor-modal.component';
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
@@ -266,7 +266,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    QuestionEditorModalComponent
   ],
 
   entryComponents: [
@@ -361,7 +362,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    QuestionEditorModalComponent
   ],
 
   exports: [
@@ -466,6 +468,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
+    QuestionEditorModalComponent
   ],
 })
 
