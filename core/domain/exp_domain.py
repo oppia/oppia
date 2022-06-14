@@ -2003,6 +2003,38 @@ class Exploration:
                 })
 
         return states_dict
+    
+    @classmethod
+    def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
+        """Converts from version 49 to 50. Version 50 adds a new
+        customization arg to TextInput interaction which allows
+        creators to fill a catch misspellings checkbox. Also adds
+        a new dest_if_really_stuck field to the Outcome class to redirect
+        the learners to a state for strengthening concepts.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'TextInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'catchMisspellings': {
+                        'value': False
+                    }
+                })
+
+        answer_groups = state_dict['interaction']['answer_groups']
+        answer_groups['outcome']['dest_if_really_stuck'] = None
+
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -2223,6 +2255,30 @@ class Exploration:
         exploration_dict['states_schema_version'] = 49
 
         return exploration_dict
+    
+    @classmethod
+    def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
+        """Converts a v53 exploration dict into a v54 exploration dict.
+        Version 50 adds a new customization arg to TextInput interaction
+        which allows creators to fill a catch misspellings checkbox. Also adds
+        a new dest_if_really_stuck field to the Outcome class to redirect
+        the learners to a state for strengthening concepts.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v54.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
+        """
+        exploration_dict['schema_version'] = 55
+
+        exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 40
+
+        return exploration_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
@@ -2299,6 +2355,11 @@ class Exploration:
             exploration_dict = cls._convert_v53_dict_to_v54_dict(
                 exploration_dict)
             exploration_schema_version = 54
+        
+        if exploration_schema_version == 54:
+            exploration_dict = cls._convert_v54_dict_to_v55_dict(
+                exploration_dict)
+            exploration_schema_version = 55
 
         return exploration_dict
 

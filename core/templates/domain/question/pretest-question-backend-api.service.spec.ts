@@ -58,6 +58,7 @@ describe('Pretest question backend API service', function() {
           answer_groups: [{
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: '<p>Try Again.</p>'
@@ -77,6 +78,7 @@ describe('Pretest question backend API service', function() {
           {
             outcome: {
               dest: 'State 2',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: '<p>Try Again.</p>'
@@ -95,6 +97,7 @@ describe('Pretest question backend API service', function() {
           }],
           default_outcome: {
             dest: null,
+            dest_if_really_stuck: null,
             labelled_as_correct: true,
             missing_prerequisite_skill_id: null,
             refresher_exploration_id: null,

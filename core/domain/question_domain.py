@@ -1172,6 +1172,36 @@ class Question:
                 }
             })
         return question_state_dict
+    
+    @classmethod
+    def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
+        """Converts from version 49 to 50. Version 50 adds a new
+        customization arg to TextInput interaction which allows
+        creators to fill a catch misspellings checkbox. Also adds
+        a new dest_if_really_stuck field to the Outcome class to redirect
+        the learners to a state for strengthening concepts.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'TextInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'catchMisspellings': {
+                    'value': False
+                }
+            })
+        
+        answer_groups = question_state_dict['interaction']['answer_groups']
+        answer_groups['outcome']['dest_if_really_stuck'] = None
+
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(

@@ -152,6 +152,7 @@ describe('Question Creation Service', function() {
             answer_groups: [{
               outcome: {
                 dest: 'outcome 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'content_5',
                   html: ''
@@ -180,6 +181,7 @@ describe('Question Creation Service', function() {
             },
             default_outcome: {
               dest: null,
+              dest_if_really_stuck: null,
               feedback: {
                 html: 'Correct Answer',
                 content_id: 'content_2'
@@ -375,6 +377,7 @@ describe('Question Creation Service', function() {
             answer_groups: [{
               outcome: {
                 dest: 'outcome 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'content_5',
                   html: ''
@@ -389,6 +392,7 @@ describe('Question Creation Service', function() {
             customization_args: {},
             default_outcome: {
               dest: null,
+              dest_if_really_stuck: null,
               feedback: {
                 html: 'Correct Answer',
                 content_id: 'content_2'
@@ -537,6 +541,7 @@ describe('Question Creation Service', function() {
             answer_groups: [{
               outcome: {
                 dest: 'outcome 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'content_5',
                   html: ''
@@ -565,6 +570,7 @@ describe('Question Creation Service', function() {
             },
             default_outcome: {
               dest: null,
+              dest_if_really_stuck: null,
               feedback: {
                 html: 'Correct Answer',
                 content_id: 'content_2'

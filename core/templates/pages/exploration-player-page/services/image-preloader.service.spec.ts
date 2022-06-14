@@ -78,6 +78,7 @@ describe('Image preloader service', () => {
               html: ''
             },
             dest: 'State 3',
+            dest_if_really_stuck: null,
             param_changes: [],
             labelled_as_correct: null,
             refresher_exploration_id: null,
@@ -162,6 +163,7 @@ describe('Image preloader service', () => {
           id: 'MultipleChoiceInput',
           default_outcome: {
             dest: initStateName,
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: 'Try Again!'
@@ -194,6 +196,7 @@ describe('Image preloader service', () => {
             {
               outcome: {
                 dest: 'State 6',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: '<p>We are going to ItemSelection' +
@@ -216,6 +219,7 @@ describe('Image preloader service', () => {
             {
               outcome: {
                 dest: 'State 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_2',
                   html: "Let's go to state 1 ImageAndRegion"
@@ -268,6 +272,7 @@ describe('Image preloader service', () => {
           id: 'TextInput',
           default_outcome: {
             dest: 'State 6',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -299,6 +304,7 @@ describe('Image preloader service', () => {
             }],
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: "<p>Let's go to State 1</p>"
@@ -320,6 +326,7 @@ describe('Image preloader service', () => {
             }],
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: "<p>Let's go to State 1</p>"

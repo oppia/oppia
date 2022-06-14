@@ -781,6 +781,7 @@ class InteractionInstance:
         """
         default_outcome = Outcome(
             default_dest_state_name,
+            None,
             SubtitledHtml.create_default_subtitled_html(
                 feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None, None)
 

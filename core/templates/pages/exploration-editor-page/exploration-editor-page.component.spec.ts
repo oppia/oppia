@@ -133,6 +133,7 @@ describe('Exploration editor page component', function() {
           default_outcome: {
             param_changes: [],
             dest: 'Final',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'content_1',
               html: ''
@@ -162,6 +163,7 @@ describe('Exploration editor page component', function() {
           default_outcome: {
             param_changes: [],
             dest: 'Final',
+            dest_if_really_stuck: null,
             feedback: {
               html: '',
               audio_translations: {}

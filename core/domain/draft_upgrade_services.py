@@ -207,6 +207,24 @@ class DraftUpgradeUtil:
                 })
         return draft_change_list
 
+    # Chk!
+    @classmethod
+    def _convert_states_v49_dict_to_v50_dict(cls, draft_change_list):
+        """Converts draft change list from state version 49 to 50. Version 50
+        adds a new customization arg to TextInput interaction which allows
+        creators to fill a catch misspellings checkbox. Also adds
+        a new dest_if_really_stuck field to the Outcome class to redirect
+        the learners to a state for strengthening concepts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
     @classmethod
     def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list):
         """Converts draft change list from state version 48 to 49. State

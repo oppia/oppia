@@ -89,6 +89,7 @@ describe('Training Modal Controller', function() {
                 rule_specs: [],
                 outcome: {
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: '',
                     html: '',
@@ -99,6 +100,7 @@ describe('Training Modal Controller', function() {
                 rule_specs: [],
                 outcome: {
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: '',
                     html: '',
@@ -117,6 +119,7 @@ describe('Training Modal Controller', function() {
               },
               default_outcome: {
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: '',
@@ -136,6 +139,7 @@ describe('Training Modal Controller', function() {
           answer_groups: [{
             outcome: {
               dest: 'Init',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: '',
                 html: ''
@@ -155,6 +159,7 @@ describe('Training Modal Controller', function() {
           },
           default_outcome: {
             dest: 'Init',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: '',
@@ -244,6 +249,7 @@ describe('Training Modal Controller', function() {
             answer_groups: [{
               outcome: {
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: '',
@@ -254,6 +260,7 @@ describe('Training Modal Controller', function() {
             }, {
               outcome: {
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: '',
@@ -264,6 +271,7 @@ describe('Training Modal Controller', function() {
             }, {
               outcome: {
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: '',
@@ -283,6 +291,7 @@ describe('Training Modal Controller', function() {
             },
             default_outcome: {
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: '',
                 html: '',
@@ -303,6 +312,7 @@ describe('Training Modal Controller', function() {
         answer_groups: [{
           outcome: {
             dest: 'Init',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: ''
@@ -322,6 +332,7 @@ describe('Training Modal Controller', function() {
         },
         default_outcome: {
           dest: 'Init',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: '',
             html: '',
@@ -390,6 +401,7 @@ describe('Training Modal Controller', function() {
                 rule_specs: [],
                 outcome: {
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: '',
                     html: '',
@@ -408,6 +420,7 @@ describe('Training Modal Controller', function() {
               },
               default_outcome: {
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: '',
@@ -428,6 +441,7 @@ describe('Training Modal Controller', function() {
           answer_groups: [{
             outcome: {
               dest: 'Init',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: '',
                 html: ''
@@ -438,6 +452,7 @@ describe('Training Modal Controller', function() {
           }, {
             outcome: {
               dest: 'Hola',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: '',
                 html: ''
@@ -448,6 +463,7 @@ describe('Training Modal Controller', function() {
           }],
           default_outcome: {
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: '',

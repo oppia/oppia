@@ -56,6 +56,7 @@ describe('MultipleChoiceInputValidationService', () => {
 
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -68,6 +69,7 @@ describe('MultipleChoiceInputValidationService', () => {
 
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''

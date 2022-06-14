@@ -97,6 +97,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           {
             outcome: {
               dest: 'State',
+              dest_if_really_stuck: null,
               feedback: {
                 html: '',
                 content_id: 'This is a new feedback text',
@@ -113,6 +114,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         ],
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: '',
             html: '',

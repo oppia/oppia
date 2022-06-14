@@ -91,6 +91,7 @@ describe('Compare versions service', function() {
             answer_groups: [],
             default_outcome: {
               dest: 'default',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: ''
@@ -115,6 +116,7 @@ describe('Compare versions service', function() {
             return {
               outcome: {
                 dest: ruleDestName,
+                dest_if_really_stuck: null,
                 feedback: [],
                 labelled_as_correct: false,
                 param_changes: [],

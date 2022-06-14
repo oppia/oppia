@@ -1770,6 +1770,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null,
         feedback:
           content_id: default_outcome
           html: ''
@@ -1804,6 +1805,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null,
         feedback:
           content_id: default_outcome
           html: ''

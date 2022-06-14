@@ -115,6 +115,7 @@ describe('TrainingDataService', function() {
             }],
             outcome: {
               dest: 'State',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: 'Feedback'
@@ -138,6 +139,7 @@ describe('TrainingDataService', function() {
           },
           default_outcome: {
             dest: 'State',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: 'Default'

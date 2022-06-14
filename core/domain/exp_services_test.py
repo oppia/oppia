@@ -1275,6 +1275,7 @@ states:
       answer_groups:
       - outcome:
           dest: New state
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -1301,6 +1302,7 @@ states:
           value: 1
       default_outcome:
         dest: Introduction
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1378,6 +1380,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1521,6 +1524,7 @@ title: Title
               answer_groups:
               - outcome:
                   dest: New state
+                  dest_if_really_stuck: null
                   feedback:
                     audio_translations:
                         en:
@@ -1540,6 +1544,7 @@ title: Title
               customization_args: {}
               default_outcome:
                 dest: Introduction
+                dest_if_really_stuck: null
                 feedback:
                   audio_translations:
                     en:
@@ -1582,6 +1587,7 @@ title: Title
               customization_args: {}
               default_outcome:
                 dest: New state
+                dest_if_really_stuck: null
                 feedback:
                   audio_translations: {}
                   html: ''
@@ -1721,7 +1727,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_interaction_customization_args(customization_args_dict3)
 
         default_outcome1 = state_domain.Outcome(
-            'state2', state_domain.SubtitledHtml(
+            'state2', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], None, None
         )
@@ -1749,7 +1755,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', (
                         '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
@@ -1763,7 +1769,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     ], [], None
         ), state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state3', state_domain.SubtitledHtml(
+                'state3', None, state_domain.SubtitledHtml(
                     'feedback_2', '<p>Outcome2 for state2</p>'),
                 False, [], None, None),
             [
@@ -1774,7 +1780,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         )]
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Outcome for state3</p>'),
                 False, [], None, None),
             [
@@ -1860,6 +1866,7 @@ states:
           value: 1
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1902,6 +1909,7 @@ states:
           value: 1
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1968,6 +1976,7 @@ states:
           value: 1
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2010,6 +2019,7 @@ states:
           value: 1
       default_outcome:
         dest: Renamed state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2350,6 +2360,7 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2396,6 +2407,7 @@ interaction:
       value: 1
   default_outcome:
     dest: New state
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2443,6 +2455,7 @@ interaction:
       value: 1
   default_outcome:
     dest: Renamed state
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -5263,6 +5276,7 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''

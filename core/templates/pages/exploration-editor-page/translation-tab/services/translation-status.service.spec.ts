@@ -163,7 +163,8 @@ describe('Translation status service', function() {
                   content_id: 'feedback_1'
                 },
                 missing_prerequisite_skill_id: null,
-                dest: 'Second'
+                dest: 'Second',
+                dest_if_really_stuck: null,
               },
               rule_specs: [{
                 rule_type: 'Equals',
@@ -182,6 +183,7 @@ describe('Translation status service', function() {
                   content_id: 'feedback_2'
                 },
                 missing_prerequisite_skill_id: null,
+                dest_if_really_stuck: null,
                 dest: 'First'
               },
               rule_specs: [{
@@ -208,6 +210,7 @@ describe('Translation status service', function() {
                 content_id: 'default_outcome'
               },
               missing_prerequisite_skill_id: null,
+              dest_if_really_stuck: null,
               dest: 'First'
             },
             confirmed_unclassified_answers: []
@@ -248,6 +251,7 @@ describe('Translation status service', function() {
                   content_id: 'feedback_1'
                 },
                 missing_prerequisite_skill_id: null,
+                dest_if_really_stuck: null,
                 dest: 'Third'
               },
               rule_specs: [{
@@ -274,6 +278,7 @@ describe('Translation status service', function() {
                 content_id: 'default_outcome'
               },
               missing_prerequisite_skill_id: null,
+              dest_if_really_stuck: null,
               dest: 'Second'
             },
             confirmed_unclassified_answers: []

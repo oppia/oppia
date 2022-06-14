@@ -104,6 +104,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               rule_specs: [],
               outcome: {
                 dest: 'Hola',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
@@ -122,6 +123,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
             default_outcome: {
               dest: 'Hola',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
@@ -144,6 +146,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         answer_groups: [{
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_2',
               html: ''
@@ -162,6 +165,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         }],
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: '',
@@ -307,6 +311,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               rule_specs: [],
               outcome: {
                 dest: 'Hola',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
@@ -325,6 +330,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
             default_outcome: {
               dest: 'Hola',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
@@ -347,6 +353,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         answer_groups: [{
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_2',
               html: ''
@@ -357,6 +364,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         }],
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: '',
@@ -436,6 +444,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               rule_specs: [],
               outcome: {
                 dest: 'Hola',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
@@ -454,6 +463,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
             default_outcome: {
               dest: 'Hola',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: '',
@@ -476,6 +486,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         answer_groups: [{
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_2',
               html: ''
@@ -486,6 +497,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         }],
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: '',

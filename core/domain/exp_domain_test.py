@@ -567,7 +567,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         init_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'Second', state_domain.SubtitledHtml(
+                    'Second', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -585,7 +585,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'Third', state_domain.SubtitledHtml(
+                    'Third', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -608,7 +608,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         third_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End', state_domain.SubtitledHtml(
+                    'End', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -660,7 +660,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         second_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End', state_domain.SubtitledHtml(
+                    'End', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -738,7 +738,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         init_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'A', state_domain.SubtitledHtml(
+                    'A', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -756,7 +756,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'B', state_domain.SubtitledHtml(
+                    'B', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -774,7 +774,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'C', state_domain.SubtitledHtml(
+                    'C', None, state_domain.SubtitledHtml(
                         'feedback_2', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -797,7 +797,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         a_and_b_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'D', state_domain.SubtitledHtml(
+                    'D', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -820,7 +820,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_and_d_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End', state_domain.SubtitledHtml(
+                    'End', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -884,7 +884,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'D', state_domain.SubtitledHtml(
+                    'D', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -946,7 +946,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'D', state_domain.SubtitledHtml(
+                    'D', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -964,7 +964,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End 2', state_domain.SubtitledHtml(
+                    'End 2', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -1359,7 +1359,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Validate AnswerGroup.
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, [], None, None),
             [
@@ -1383,7 +1383,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected tagged skill misconception id to be a str, received 1')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, [], None, None),
             [
@@ -1687,7 +1687,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1723,7 +1723,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         new_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None)
         new_state.update_interaction_default_outcome(default_outcome)
@@ -1764,7 +1764,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1805,7 +1805,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1857,7 +1857,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, [], None, None),
             [
@@ -2202,7 +2202,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['DEF'])
 
         default_outcome = state_domain.Outcome(
-            'DEF', state_domain.SubtitledHtml(
+            'DEF', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], 'refresher_exploration_id', None,
         )
@@ -2229,7 +2229,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )]
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, param_changes, None, None),
             [
@@ -2645,6 +2645,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -2671,6 +2672,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2739,6 +2741,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2884,6 +2887,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -2910,6 +2914,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2978,6 +2983,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3028,6 +3034,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3054,6 +3061,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3122,6 +3130,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3172,6 +3181,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3198,6 +3208,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3266,6 +3277,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3317,6 +3329,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3343,6 +3356,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3412,6 +3426,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3463,6 +3478,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3489,6 +3505,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3560,6 +3577,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3612,6 +3630,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3638,6 +3657,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3709,6 +3729,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3761,6 +3782,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3787,6 +3809,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3858,6 +3881,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3910,6 +3934,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3936,6 +3961,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4007,6 +4033,7 @@ states:
           value: 1
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4059,6 +4086,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4078,6 +4106,7 @@ states:
           value: False
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4145,6 +4174,7 @@ states:
           value: False
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4200,6 +4230,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4230,6 +4261,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4317,6 +4349,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4347,6 +4380,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4441,6 +4475,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4480,6 +4515,7 @@ states:
             html: <p>Choice 2</p>
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4570,6 +4606,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4609,6 +4646,7 @@ states:
             html: <p>Choice 2</p>
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4710,6 +4748,7 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4801,6 +4840,7 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -5065,7 +5105,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_interaction_customization_args(customization_args_dict4)
 
         default_outcome = state_domain.Outcome(
-            'state2', state_domain.SubtitledHtml(
+            'state2', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], None, None
         )
@@ -5101,7 +5141,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state_answer_group_list2 = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'state1', state_domain.SubtitledHtml(
+                    'state1', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Outcome2 for state2</p>'),
                     False, [], None, None),
                 [
@@ -5120,7 +5160,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 None),
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'state3', state_domain.SubtitledHtml(
+                    'state3', None, state_domain.SubtitledHtml(
                         'feedback_2', '<p>Outcome1 for state2</p>'),
                     False, [], None, None),
                 [
@@ -5135,7 +5175,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             )]
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Outcome for state3</p>'),
                 False, [], None, None),
             [

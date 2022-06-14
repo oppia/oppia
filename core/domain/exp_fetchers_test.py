@@ -316,6 +316,7 @@ states:
           value: 1
       default_outcome:
         dest: End
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''

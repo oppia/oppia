@@ -80,6 +80,7 @@ describe('Audio preloader service', () => {
               html: ''
             },
             dest: 'State 3',
+            dest_if_really_stuck: null,
             param_changes: [],
             labelled_as_correct: false,
             refresher_exploration_id: null,
@@ -176,6 +177,7 @@ describe('Audio preloader service', () => {
               html: ''
             },
             dest: 'State 3',
+            dest_if_really_stuck: null,
             param_changes: [],
             labelled_as_correct: false,
             refresher_exploration_id: null,
@@ -227,6 +229,7 @@ describe('Audio preloader service', () => {
           id: 'TextInput',
           default_outcome: {
             dest: 'Introduction',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: '<p>Try again.</p>'
@@ -256,6 +259,7 @@ describe('Audio preloader service', () => {
             }],
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: "<p>Let's go to State 1</p>"
@@ -277,6 +281,7 @@ describe('Audio preloader service', () => {
             }],
             outcome: {
               dest: 'State 2',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: "<p>Let's go to State 2</p>"
