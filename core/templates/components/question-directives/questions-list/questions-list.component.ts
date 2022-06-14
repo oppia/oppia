@@ -269,7 +269,7 @@ angular.module('oppia').component('questionsList', {
         ctrl.question =
           QuestionObjectFactory.createDefaultQuestion(skillIds);
         ctrl.questionId = ctrl.question.getId();
-        ctrl.questionStateData = ctrl.question.getStateData();
+        ctrl.questionStateData = ctrl.question?.getStateData();
         ctrl.questionIsBeingUpdated = false;
         ctrl.newQuestionIsBeingCreated = true;
       };
@@ -411,7 +411,7 @@ angular.module('oppia').component('questionsList', {
             }
             ctrl.question = angular.copy(response.questionObject);
             ctrl.questionId = ctrl.question.getId();
-            ctrl.questionStateData = ctrl.question.getStateData();
+            ctrl.questionStateData = ctrl.question?.getStateData();
             ctrl.questionIsBeingUpdated = true;
             ctrl.newQuestionIsBeingCreated = false;
             ctrl.openQuestionEditor();
@@ -510,7 +510,7 @@ angular.module('oppia').component('questionsList', {
       };
 
       ctrl.showSolutionCheckpoint = function() {
-        const interactionId = ctrl.question.getStateData().interaction.id;
+        const interactionId = ctrl.question?.getStateData().interaction.id;
         return (
           interactionId && INTERACTION_SPECS[
             interactionId].can_have_solution);
