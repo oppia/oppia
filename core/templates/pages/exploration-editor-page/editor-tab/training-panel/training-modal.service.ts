@@ -17,6 +17,8 @@
  * the training modal used for unresolved answers.
  */
 
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TrainingModalComponent } from './training-modal.component';
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-panel.component.ts');
@@ -47,11 +49,12 @@ require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-modal.controller');
 require('services/external-save.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
-  '$uibModal', 'AlertsService', 'ExternalSaveService',
+  'NgbModal', 'AlertsService', 'ExternalSaveService',
   function(
-      $uibModal, AlertsService, ExternalSaveService) {
+      NgbModal, AlertsService, ExternalSaveService) {
     return {
       /**
       * Opens unresolved answer trainer modal for given answer.
@@ -62,21 +65,21 @@ angular.module('oppia').factory('TrainingModalService', [
       openTrainUnresolvedAnswerModal: function(
           unhandledAnswer, finishTrainingCallback) {
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/training-unresolved-answer-modal.template.html'),
+
+        let modalRef: NgbModalRef = NgbModal.open(TrainingModalComponent, {
           backdrop: 'static',
-          resolve: {
-            unhandledAnswer: function() {
-              return unhandledAnswer;
-            },
-            finishTrainingCallback: function() {
-              return finishTrainingCallback;
-            }
-          },
-          controller: 'TrainingModalController'
+          windowClass: 'skill-select-modal',
+          size: 'xl'
         });
+
+        modalRef.componentInstance.unhandledAnswer = unhandledAnswer;
+        modalRef.componentInstance.finishTrainingCallback.subscribe(
+          () => {
+            finishTrainingCallback();
+          });
+
+        modalRef.result.then(() => {}, () => {});
+
         // Save the modified training data externally in state content.
         ExternalSaveService.onExternalSave.emit();
       }

@@ -17,7 +17,7 @@
  */
 
 
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -76,7 +76,8 @@ interface classification {
 export class TrainingModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() unhandledAnswer: InteractionAnswer;
-  @Input() finishTrainingCallback: Function;
+  @Output() finishTrainingCallback: EventEmitter<void> =
+    new EventEmitter();
 
   trainingDataAnswer: InteractionAnswer | string = '';
 
@@ -153,7 +154,7 @@ export class TrainingModalComponent
         index, this.unhandledAnswer);
     }
 
-    this.finishTrainingCallback();
+    this.finishTrainingCallback.emit();
     this.ngbActiveModal.close();
   }
 
