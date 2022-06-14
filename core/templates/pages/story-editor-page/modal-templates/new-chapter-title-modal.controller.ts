@@ -130,56 +130,57 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         $scope.editableThumbnailFilename);
     };
 
-    $scope.save = function() {
+    $scope.save = async function() {
       if ($scope.nodeTitles.indexOf($scope.title) !== -1) {
         $scope.errorMsg = 'A chapter with this title already exists';
         return;
       }
-      CuratedExplorationValidationService.canExplorationBeCurated(
-        $scope.explorationId
-      ).then((result) => {
-        console.log(result);
-        if (!result.canBeCurated) {
-          $scope.invalidExpErrorString = result.errorMessage;
-          $scope.invalidExpId = true;
-          $scope.$applyAsync();
-          return;
-        }
-      });
-      ExplorationIdValidationService.isExpPublishedAsync($scope.explorationId)
-        .then((expIsPublished) => {
-          if (!expIsPublished) {
-            $scope.invalidExpErrorString = 'This exploration does not exist ' +
-              'or is not published yet.';
-            $scope.invalidExpId = true;
-            $scope.$applyAsync();
-            return;
-          }
-          $scope.invalidExpId = false;
-          ExplorationIdValidationService.isCorrectnessFeedbackEnabled(
-            $scope.explorationId).then(
-            (correctnessFeedbackIsEnabled) => {
-              if (!correctnessFeedbackIsEnabled) {
-                $scope.correctnessFeedbackDisabled = true;
-                $scope.$applyAsync();
-                return;
-              }
-              $scope.correctnessFeedbackDisabled = false;
-              ExplorationIdValidationService.isDefaultCategoryAsync(
-                $scope.explorationId).then(
-                (categoryIsDefault) => {
-                  if (!categoryIsDefault) {
-                    $scope.categoryIsDefault = false;
-                    $scope.$applyAsync();
-                    return;
-                  }
-                  $scope.categoryIsDefault = true;
-                  $scope.updateTitle();
-                  $scope.updateExplorationId();
-                  $scope.$applyAsync();
-                });
-            });
-        });
+
+      const curatedExpValidationResult = (
+        await CuratedExplorationValidationService.canExplorationBeCurated(
+          $scope.explorationId));
+      if (!curatedExpValidationResult.canBeCurated) {
+        $scope.invalidExpErrorString = curatedExpValidationResult.errorMessage;
+        $scope.invalidExpId = true;
+        $scope.$applyAsync();
+        return;
+      }
+
+      const expIsPublished = (
+        await ExplorationIdValidationService.isExpPublishedAsync(
+          $scope.explorationId));
+      if (!expIsPublished) {
+        $scope.invalidExpErrorString = 'This exploration does not exist ' +
+          'or is not published yet.';
+        $scope.invalidExpId = true;
+        $scope.$applyAsync();
+        return;
+      }
+
+      $scope.invalidExpId = false;
+      const correctnessFeedbackIsEnabled = (
+        await ExplorationIdValidationService.isCorrectnessFeedbackEnabled(
+          $scope.explorationId));
+      if (!correctnessFeedbackIsEnabled) {
+        $scope.correctnessFeedbackDisabled = true;
+        $scope.$applyAsync();
+        return;
+      }
+      $scope.correctnessFeedbackDisabled = false;
+
+      const categoryIsDefault = (
+        await ExplorationIdValidationService.isDefaultCategoryAsync(
+          $scope.explorationId));
+      if (!categoryIsDefault) {
+        $scope.categoryIsDefault = false;
+        $scope.$applyAsync();
+        return;
+      }
+
+      $scope.categoryIsDefault = true;
+      $scope.updateTitle();
+      $scope.updateExplorationId();
+      $scope.$applyAsync();
     };
   }
 ]);

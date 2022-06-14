@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { CuratedExplorationValidationBackendApiService } from './curated-exploration-validation-backend-api.service';
 
-interface CuratedExplorationValidationResponse {
+export interface CuratedExplorationValidationResponse {
   canBeCurated: boolean;
   errorMessage: string;
 }
