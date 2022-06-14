@@ -160,7 +160,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         const base64Url = this.imageLocalStorageService.getRawImageData(
           this.filepath);
         const mimeType = base64Url.split(';')[0];
-        if (mimeType === 'data:image/svg+xml') {
+        if (mimeType === AppConstants.SVG_MIME_TYPE) {
           this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
             base64Url) as string;
         } else {

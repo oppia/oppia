@@ -358,6 +358,13 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       // See https://github.com/angular/angular/issues/38854
       const base64Url = this.imageLocalStorageService.getRawImageData(
         imageUrl);
+      // This throws "TS2322: Type 'string | null' is not assignable to type
+      // 'string'" We need to suppress this error because the method
+      // 'getRawImageData' will return null only when an
+      // image is not in local storage. This scenario is explicitly checked
+      // above, before accessing the image data. So, the typescript check can
+      // be ignored here.
+      // @ts-ignore
       return base64Url;
     } else {
       return this.assetsBackendApiService.getImageUrlForPreview(
