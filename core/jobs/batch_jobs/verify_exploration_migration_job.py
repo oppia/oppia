@@ -89,16 +89,13 @@ class VerifyExplorationMigrationJob(base_jobs.JobBase):
         Tuple[str, boolean], Tuple[str, Exception]
     ]:
         try:
-            hasAttributes = False
             if hasattr(exp_model, 'android_proto_size_in_bytes'):
-                hasAttributes = True
+                return result.Ok((exp_id, True))
             else:
-                hasAttributes = False
+                return result.Err((exp_id, e))
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_id, e))
-
-        return result.Ok((exp_id, hasAttributes))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration
