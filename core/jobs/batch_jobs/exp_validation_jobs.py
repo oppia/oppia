@@ -17,11 +17,10 @@
 """Validation Jobs for exploration models"""
 
 from __future__ import annotations
-from math import gcd
 
 from core.domain import exp_fetchers
-from core.domain.html_cleaner import get_rte_components
-from core.domain.state_domain import State
+from core.domain import html_cleaner
+from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -29,6 +28,7 @@ from core.platform import models
 from core.jobs.transforms import job_result_transforms
 
 import apache_beam as beam
+import math
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,14 +60,14 @@ class ExpStateValidationJob(base_jobs.JobBase):
         total_explorations_list = beam.pvalue.AsIter(
             total_explorations_with_ids)
 
-        combne_exp_ids_and_states = (
+        combine_exp_ids_and_states = (
             total_explorations
             | 'Combine exp id and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states))
         )
 
         invalid_exps_with_errored_state_rte_values = (
-            combne_exp_ids_and_states
+            combine_exp_ids_and_states
             | 'Get invalid state rte values' >> beam.Map(
                 lambda objects: (
                     objects[0],
@@ -94,30 +94,74 @@ class ExpStateValidationJob(base_jobs.JobBase):
             )
         )
 
-        invalid_exps_with_errored_state_interaction_values = (
-            combne_exp_ids_and_states
-            | 'Get invalid state interaction values' >> beam.Map(
+        invalid_exps_with_errored_state_interaction_values_part_1 = (
+            combine_exp_ids_and_states
+            | 'Get invalid state interaction values part 1' >> beam.Map(
                 lambda objects: (
                     objects[0],
-                    self.filter_invalid_state_interaction_values(
-                        objects[1], total_explorations_list)))
-            | 'Remove empty values for state interaction' >> beam.Map(
+                    self.filter_invalid_state_interaction_values_part_1(
+                        objects[1])))
+            | 'Remove empty values for state interaction part 1' >> beam.Map(
                 lambda objects: (
                     objects[0], self.remove_empty_values(objects[1])))
         )
 
-        report_invalid_state_interaction_values = (
-            invalid_exps_with_errored_state_interaction_values
-            | 'Show info for state interaction' >> beam.Map(
+        report_invalid_state_interaction_values_part_1 = (
+            invalid_exps_with_errored_state_interaction_values_part_1
+            | 'Show info for state interaction part 1' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
                    f'The id of exp is {objects[0]}, and the state interaction'
-                   + f' erroneous data are {objects[1]}'
+                   + f' part 1 erroneous data are {objects[1]}'
+                )
+            )
+        )
+
+        invalid_exps_with_errored_state_interaction_values_part_2 = (
+            combine_exp_ids_and_states
+            | 'Get invalid state interaction values part 2' >> beam.Map(
+                lambda objects: (
+                    objects[0],
+                    self.filter_invalid_state_interaction_values_part_2(
+                        objects[1])))
+            | 'Remove empty values for state interaction part 2' >> beam.Map(
+                lambda objects: (
+                    objects[0], self.remove_empty_values(objects[1])))
+        )
+
+        report_invalid_state_interaction_values_part_2 = (
+            invalid_exps_with_errored_state_interaction_values_part_2
+            | 'Show info for state interaction part 2' >> beam.Map(
+                lambda objects: job_run_result.JobRunResult.as_stderr(
+                   f'The id of exp is {objects[0]}, and the state interaction'
+                   + f' part 2 erroneous data are {objects[1]}'
+                )
+            )
+        )
+
+        invalid_exps_with_errored_state_interaction_values_part_3 = (
+            combine_exp_ids_and_states
+            | 'Get invalid state interaction values part 3' >> beam.Map(
+                lambda objects: (
+                    objects[0],
+                    self.filter_invalid_state_interaction_values_part_3(
+                        objects[1], total_explorations_list)))
+            | 'Remove empty values for state interaction part 3' >> beam.Map(
+                lambda objects: (
+                    objects[0], self.remove_empty_values(objects[1])))
+        )
+
+        report_invalid_state_interaction_values_part_3 = (
+            invalid_exps_with_errored_state_interaction_values_part_3
+            | 'Show info for state interaction part 3' >> beam.Map(
+                lambda objects: job_run_result.JobRunResult.as_stderr(
+                   f'The id of exp is {objects[0]}, and the state interaction'
+                   + f' part 3 erroneous data are {objects[1]}'
                 )
             )
         )
 
         invalid_exps_with_errored_states_values = (
-            combne_exp_ids_and_states
+            combine_exp_ids_and_states
             | 'Get invalid state values' >> beam.Map(
                 lambda objects: (
                     objects[0],
@@ -141,14 +185,16 @@ class ExpStateValidationJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_invalid_state_rte_values,
-                report_invalid_state_interaction_values,
+                report_invalid_state_interaction_values_part_1,
+                report_invalid_state_interaction_values_part_2,
+                report_invalid_state_interaction_values_part_3,
                 report_invalid_state_values
             )
             | 'Combine results' >> beam.Flatten()
         )
 
     def filter_invalid_state_rte_values(
-        self, states_dict: dict[str, State]) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]) -> list[dict]:
         """Returns the errored state RTE values.
 
         Args:
@@ -162,7 +208,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         states_with_values = []
         for key, value in states_dict.items():
             rte_components_errors = []
-            rte_components = get_rte_components(value.content.html)
+            rte_components = (html_cleaner.get_rte_components(value.content.html))
             if len(rte_components) > 0:
                 for rte_component in rte_components:
                     if rte_component['id'] == 'oppia-noninteractive-image':
@@ -235,10 +281,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
             )
         return states_with_values
 
-    def filter_invalid_state_interaction_values(
-            self, states_dict: dict[str, State],
-            exp_ids: list[str]) -> list[dict]:
-        """Returns the errored state interaction values.
+    def filter_invalid_state_interaction_values_part_1(
+            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
+        """Returns the errored state interaction values for
+            - FractionInput
+            - NumericInput
+            - NumberWithUnits
 
         Args:
             states_dict: dict[str, State]. The dictionary containing
@@ -253,17 +301,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
         states_with_values = []
 
         for key, value in states_dict.items():
-            selected_equals_choices = []
-            choice_prev_selected = False
             number_with_units_rules = []
-            end_interaction_invalid_values = []
-            continue_interaction_invalid_values = []
             numeric_input_interaction_values = []
             fraction_interaction_invalid_values = []
             number_with_units_errors = []
-            mc_interaction_invalid_values = []
-            item_selec_interaction_values = []
-            drag_drop_interaction_values = []
 
             answer_groups = value.interaction.answer_groups
             for answer_group in answer_groups:
@@ -288,7 +329,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             if (value.interaction.customization_args
                             ['requireSimplestForm'].value) == True:
                                 if whole == 0:
-                                    d = gcd(num, den)
+                                    d = math.gcd(num, den)
                                     val_num = num // d
                                     val_den = den // d
                                 if val_num != num and val_den != den:
@@ -384,6 +425,42 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     + " has rule type equal is coming after "
                                     + "rule type equivalent having same value")
 
+            states_with_values.append(
+                {"state_name": key,
+                "numeric_input_interaction_values":
+                numeric_input_interaction_values,
+                "fraction_interaction_invalid_values":
+                fraction_interaction_invalid_values,
+                "number_with_units_errors": number_with_units_errors,
+                }
+            )
+        return states_with_values
+
+    def filter_invalid_state_interaction_values_part_2(
+            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
+        """Returns the errored state interaction values for
+            - MultipleChoiceInput
+            - ItemSelectionInput
+
+        Args:
+            states_dict: dict[str, State]. The dictionary containing
+            state name as key and State object as value.
+            exp_ids: list[str]. The list of exploration ids.
+
+        Returns:
+            states_with_values: list[dict]. The list of dictionaries
+            containing the errored values.
+        """
+        states_with_values = []
+
+        for key, value in states_dict.items():
+            selected_equals_choices = []
+            choice_prev_selected = False
+            mc_interaction_invalid_values = []
+            item_selec_interaction_values = []
+
+            answer_groups = value.interaction.answer_groups
+            for answer_group in answer_groups:
                 if value.interaction.id == "MultipleChoiceInput":
                     for rule_spec in answer_group.rule_specs:
                         if rule_spec.rule_type == "Equals":
@@ -421,6 +498,107 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     " either less than min_selection_value or" +
                                     " greter than max_selection_value.")
 
+            if value.interaction.id == "MultipleChoiceInput":
+                choices = (
+                    value.interaction.customization_args['choices'].value)
+                if len(choices) < 4:
+                    mc_interaction_invalid_values.append(
+                        "There should be atleast 4 choices"
+                        + " found " + str(len(choices)))
+                seen_choices = []
+                choice_empty = False
+                choice_duplicate = False
+                for choice in choices:
+                    if choice.html == "<p></p>":
+                        choice_empty = True
+                    if choice.html in seen_choices:
+                        choice_duplicate = True
+                    seen_choices.append(choice.html)
+                if choice_empty:
+                    mc_interaction_invalid_values.append(
+                        "There should not be any empty" +
+                        " choices - " + str(choices.index(choice)))
+                if choice_duplicate:
+                    mc_interaction_invalid_values.append(
+                        "There should not be any duplicate" +
+                        " choices - " + str(choices.index(choice)))
+                if (len(choices) == len(value.interaction.answer_groups)
+                    and value.interaction.default_outcome is not None):
+                    mc_interaction_invalid_values.append(
+                        "All choices have feedback"
+                        + " and still has default outcome")
+
+            if value.interaction.id == "ItemSelectionInput":
+                choices = (
+                    value.interaction.customization_args['choices'].value)
+                min_value = (
+                    value.interaction.customization_args
+                    ['minAllowableSelectionCount'].value)
+                max_value = (
+                    value.interaction.customization_args
+                    ['maxAllowableSelectionCount'].value)
+                if min_value > max_value:
+                    item_selec_interaction_values.append(
+                        "Min value which is " +
+                        str(min_value) + " is greater than max value "
+                        + "which is " + str(max_value))
+                if len(choices) < max_value:
+                    item_selec_interaction_values.append(
+                        "Number of choices which is "
+                        + str(len(choices)) + " is lesser than the" +
+                        " max value selection which is " + str(max_value))
+                seen_choices = []
+                choice_empty = False
+                choice_duplicate = False
+                for choice in choices:
+                    if choice.html == "<p></p>":
+                        choice_empty = True
+                    if choice.html in seen_choices:
+                        choice_duplicate = True
+                    seen_choices.append(choice.html)
+                if choice_empty:
+                    item_selec_interaction_values.append(
+                        "There should not be any empty" +
+                        " choices - " + str(choices.index(choice)))
+                if choice_duplicate:
+                    item_selec_interaction_values.append(
+                        "There should not be any duplicate" +
+                        " choices - " + str(choices.index(choice)))
+
+            states_with_values.append(
+                {"state_name": key,
+                "mc_interaction_invalid_values": mc_interaction_invalid_values,
+                "item_selec_interaction_values": item_selec_interaction_values
+                }
+            )
+        return states_with_values
+
+    def filter_invalid_state_interaction_values_part_3(
+            self, states_dict: dict[str, state_domain.State],
+            exp_ids: list[str]) -> list[dict]:
+        """Returns the errored state interaction values for
+            - DragAndDropSortInput
+            - EndExploration
+            - Continue
+
+        Args:
+            states_dict: dict[str, State]. The dictionary containing
+            state name as key and State object as value.
+            exp_ids: list[str]. The list of exploration ids.
+
+        Returns:
+            states_with_values: list[dict]. The list of dictionaries
+            containing the errored values.
+        """
+        states_with_values = []
+
+        for key, value in states_dict.items():
+            end_interaction_invalid_values = []
+            continue_interaction_invalid_values = []
+            drag_drop_interaction_values = []
+
+            answer_groups = value.interaction.answer_groups
+            for answer_group in answer_groups:
                 if value.interaction.id == "DragAndDropSortInput":
                     multi_item_value = (
                         value.interaction.customization_args
@@ -505,73 +683,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         + " it is empty or the character length is more"
                         + " than 20, the value is " + str(text_value))
 
-            if value.interaction.id == "MultipleChoiceInput":
-                choices = (
-                    value.interaction.customization_args['choices'].value)
-                if len(choices) < 4:
-                    mc_interaction_invalid_values.append(
-                        "There should be atleast 4 choices"
-                        + " found " + str(len(choices)))
-                seen_choices = []
-                choice_empty = False
-                choice_duplicate = False
-                for choice in choices:
-                    if choice.html == "<p></p>":
-                        choice_empty = True
-                    if choice.html in seen_choices:
-                        choice_duplicate = True
-                    seen_choices.append(choice.html)
-                if choice_empty:
-                    mc_interaction_invalid_values.append(
-                        "There should not be any empty" +
-                        " choices - " + str(choices.index(choice)))
-                if choice_duplicate:
-                    mc_interaction_invalid_values.append(
-                        "There should not be any duplicate" +
-                        " choices - " + str(choices.index(choice)))
-                if (len(choices) == len(value.interaction.answer_groups)
-                    and value.interaction.default_outcome is not None):
-                    mc_interaction_invalid_values.append(
-                        "All choices have feedback"
-                        + " and still has default outcome")
-
-            if value.interaction.id == "ItemSelectionInput":
-                choices = (
-                    value.interaction.customization_args['choices'].value)
-                min_value = (
-                    value.interaction.customization_args
-                    ['minAllowableSelectionCount'].value)
-                max_value = (
-                    value.interaction.customization_args
-                    ['maxAllowableSelectionCount'].value)
-                if min_value > max_value:
-                    item_selec_interaction_values.append(
-                        "Min value which is " +
-                        str(min_value) + " is greater than max value "
-                        + "which is " + str(max_value))
-                if len(choices) < max_value:
-                    item_selec_interaction_values.append(
-                        "Number of choices which is "
-                        + str(len(choices)) + " is lesser than the" +
-                        " max value selection which is " + str(max_value))
-                seen_choices = []
-                choice_empty = False
-                choice_duplicate = False
-                for choice in choices:
-                    if choice.html == "<p></p>":
-                        choice_empty = True
-                    if choice.html in seen_choices:
-                        choice_duplicate = True
-                    seen_choices.append(choice.html)
-                if choice_empty:
-                    item_selec_interaction_values.append(
-                        "There should not be any empty" +
-                        " choices - " + str(choices.index(choice)))
-                if choice_duplicate:
-                    item_selec_interaction_values.append(
-                        "There should not be any duplicate" +
-                        " choices - " + str(choices.index(choice)))
-
             if value.interaction.id == "DragAndDropSortInput":
                 choices = (
                     value.interaction.customization_args['choices'].value)
@@ -604,20 +715,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 end_interaction_invalid_values,
                 "continue_interaction_invalid_values":
                 continue_interaction_invalid_values,
-                "numeric_input_interaction_values":
-                numeric_input_interaction_values,
-                "fraction_interaction_invalid_values":
-                fraction_interaction_invalid_values,
-                "mc_interaction_invalid_values": mc_interaction_invalid_values,
-                "item_selec_interaction_values": item_selec_interaction_values,
-                "number_with_units_errors": number_with_units_errors,
                 "drag_drop_interaction_values": drag_drop_interaction_values
                 }
             )
         return states_with_values
 
     def filter_invalid_state_values(
-            self, states_dict: dict[str, State]) -> list[dict]:
+            self, states_dict: dict[str, state_domain.State]) -> list[dict]:
         """Returns the errored state values.
 
         Args:
@@ -700,13 +804,18 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def remove_empty_values(self, errored_values):
-        """
+        """Remove the empty arrays
+
+        Args:
+            errored_values: list[dict]. The list of dictionaries
+            containing the errored values
+
+        Returns:
+            errored_values: list[dict]. The list of dictionaries
+            containing the errored values with removed empty
         """
         for ele in errored_values:
             for key, value in list(ele.items()):
                 if len(value) == 0:
                     ele.pop(key)
-        # for ele in errored_values:
-        #     if len(ele) == 1:
-        #         del errored_values[errored_values.index(ele)]
         return errored_values

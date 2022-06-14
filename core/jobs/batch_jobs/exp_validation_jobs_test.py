@@ -1014,9 +1014,17 @@ class ExpStateValidationJobTests(
               "'EXP_1_STATE_2'}]"
             ),
             job_run_result.JobRunResult.as_stderr(
-              "The id of exp is 1, and the state interaction erroneous data " +
-              "are [{'state_name': 'EXP_1_STATE_1'}, {'state_name': " +
-              "'EXP_1_STATE_2'}]"),
+              "The id of exp is 1, and the state interaction part 1 " +
+              "erroneous data are [{'state_name': 'EXP_1_STATE_1'}, " +
+              "{'state_name': 'EXP_1_STATE_2'}]"),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 1, and the state interaction part 2 " +
+              "erroneous data are [{'state_name': 'EXP_1_STATE_1'}, " +
+              "{'state_name': 'EXP_1_STATE_2'}]"),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 1, and the state interaction part 3 " +
+              "erroneous data are [{'state_name': 'EXP_1_STATE_1'}, " +
+              "{'state_name': 'EXP_1_STATE_2'}]"),
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 1, and the state erroneous data are " +
               "[{'state_name': 'EXP_1_STATE_1', " +
@@ -1049,57 +1057,6 @@ class ExpStateValidationJobTests(
               "'EXP_2_STATE_8'}, {'state_name': 'EXP_2_STATE_9'}]"
             ),
             job_run_result.JobRunResult.as_stderr(
-              "The id of exp is 2, and the state interaction erroneous data" +
-              " are [{'state_name': 'EXP_2_STATE_1', " +
-              "'continue_interaction_invalid_values': ['The text value is" +
-              " invalid, either it is empty or the character length is more " +
-              "than 20, the value is Continueeeeeeeeeeeeeeeeeeeeeeeeee']}, " +
-              "{'state_name': 'EXP_2_STATE_2', 'end_interaction_invalid_" +
-              "values': ['There should be no default value present in the " +
-              "end exploration interaction.', 'There should be no answer " +
-              "groups present in the end exploration interaction.', " +
-              "'Total number of recommended explorations should not be more " +
-              "than 3, found 4.']}, {'state_name': 'EXP_2_STATE_3'}, " +
-              "{'state_name': 'EXP_2_STATE_4', 'mc_interaction_invalid_" +
-              "values': ['rule - 0, answer group - 2 is already present.', " +
-              "'There should be atleast 4 choices found 3', 'There should " +
-              "not be any empty choices - 2', 'All choices have feedback and "+
-              "still has default outcome']}, {'state_name': 'EXP_2_STATE_5',"+
-              " 'numeric_input_interaction_values': ['The rule 0 of answer " +
-              "group 0 having rule type IsWithinTolerance have tol value " +
-              "less than zero.', 'The rule 0 of answer group 1 having rule " +
-              "type IsInclusivelyBetween have a value greater than b " +
-              "value']}, {'state_name': 'EXP_2_STATE_6', 'number_with_units_" +
-              "errors': ['The rule 0 of answer group 1 has rule type equal " +
-              "is coming after rule type equivalent having same value']}, " +
-              "{'state_name': 'EXP_2_STATE_7', 'item_selec_interaction_" +
-              "values': ['Selected choices of rule 0 of answer group 0 " +
-              "either less than min_selection_value or greter than max_" +
-              "selection_value.', 'Selected choices of rule 0 of answer " +
-              "group 1 either less than min_selection_value or greter than " +
-              "max_selection_value.', 'Min value which is 6 is greater than " +
-              "max value which is 5', 'Number of choices which is 4 is " +
-              "lesser than the max value selection which is 5', 'There " +
-              "should not be any empty choices - 3']}, {'state_name': " +
-              "'EXP_2_STATE_8', 'drag_drop_interaction_values': ['The rule " +
-              "0 of answer group 0 have multiple items at same place when " +
-              "multiple items in same position settings is turned off.', " +
-              "'The rule 0 of answer group 0 having rule type - " +
-              "IsEqualToOrderingWithOneItemAtIncorrectPosition should not " +
-              "be there when the multiple items in same position setting is " +
-              "turned off.', 'The rule 0 of answer group 1 The value 1 and " +
-              "value 2 cannot be same when rule type is HasElementXBefore" +
-              "ElementY', 'Atleast 2 choices should be there', 'There " +
-              "should not be any empty choices, present on the index - " +
-              "0']}, {'state_name': 'EXP_2_STATE_9', 'fraction_interaction" +
-              "_invalid_values': ['The rule 0 of answer group 0 has " +
-              "denominator equals to zero.', 'The rule 0 of answer group 0 " +
-              "do not have value in proper fraction', 'The rule 0 of answer" +
-              " group 1 do not have value in simple form', 'The rule 0 of " +
-              "answer group 1 do not have value in proper fraction', " +
-              "'The rule 0 of answer group 2 has non zero integer part.']}]"
-            ),
-            job_run_result.JobRunResult.as_stderr(
               "The id of exp is 2, and the state erroneous data are " +
               "[{'state_name': 'EXP_2_STATE_1'}, {'state_name': " +
               "'EXP_2_STATE_2'}, {'state_name': 'EXP_2_STATE_3'}, " +
@@ -1107,6 +1064,78 @@ class ExpStateValidationJobTests(
               "'EXP_2_STATE_5'}, {'state_name': 'EXP_2_STATE_6'}, " +
               "{'state_name': 'EXP_2_STATE_7'}, {'state_name': " +
               "'EXP_2_STATE_8'}, {'state_name': 'EXP_2_STATE_9'}]"
+            ),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 2, and the state interaction part 2 " +
+              "erroneous data are [{'state_name': 'EXP_2_STATE_1'}, " +
+              "{'state_name': 'EXP_2_STATE_2'}, {'state_name': " +
+              "'EXP_2_STATE_3'}, {'state_name': 'EXP_2_STATE_4', " +
+              "'mc_interaction_invalid_values': ['rule - 0, answer " +
+              "group - 2 is already present.', 'There should be atleast " +
+              "4 choices found 3', 'There should not be any empty choices " +
+              "- 2', 'All choices have feedback and still has default " +
+              "outcome']}, {'state_name': 'EXP_2_STATE_5'}, {'state_name': " +
+              "'EXP_2_STATE_6'}, {'state_name': 'EXP_2_STATE_7', " +
+              "'item_selec_interaction_values': ['Selected choices of rule 0 "+
+              "of answer group 0 either less than min_selection_value or " +
+              "greter than max_selection_value.', 'Selected choices of rule " +
+              "0 of answer group 1 either less than min_selection_value or " +
+              "greter than max_selection_value.', 'Min value which is 6 is " +
+              "greater than max value which is 5', 'Number of choices which " +
+              "is 4 is lesser than the max value selection which is 5', " +
+              "'There should not be any empty choices - 3']}, " +
+              "{'state_name': 'EXP_2_STATE_8'}, {'state_name': " +
+              "'EXP_2_STATE_9'}]"),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 2, and the state interaction part 1 " +
+              "erroneous data are [{'state_name': 'EXP_2_STATE_1'}, " +
+              "{'state_name': 'EXP_2_STATE_2'}, {'state_name': " +
+              "'EXP_2_STATE_3'}, {'state_name': 'EXP_2_STATE_4'}, " +
+              "{'state_name': 'EXP_2_STATE_5', " +
+              "'numeric_input_interaction_values': ['The rule 0 of answer " +
+              "group 0 having rule type IsWithinTolerance have tol value " +
+              "less than zero.', 'The rule 0 of answer group 1 having rule " +
+              "type IsInclusivelyBetween have a value greater than b " +
+              "value']}, {'state_name': 'EXP_2_STATE_6', " +
+              "'number_with_units_errors': ['The rule 0 of answer group 1 " +
+              "has rule type equal is coming after rule type equivalent " +
+              "having same value']}, {'state_name': 'EXP_2_STATE_7'}, " +
+              "{'state_name': 'EXP_2_STATE_8'}, {'state_name': " +
+              "'EXP_2_STATE_9', 'fraction_interaction_invalid_values': " +
+              "['The rule 0 of answer group 0 has denominator equals to " +
+              "zero.', 'The rule 0 of answer group 0 do not have value in " +
+              "proper fraction', 'The rule 0 of answer group 1 do not have " +
+              "value in simple form', 'The rule 0 of answer group 1 do not " +
+              "have value in proper fraction', 'The rule 0 of answer group " +
+              "2 has non zero integer part.']}]"
+            ),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 2, and the state interaction part 3 " +
+              "erroneous data are [{'state_name': 'EXP_2_STATE_1', " +
+              "'continue_interaction_invalid_values': ['The text value " +
+              "is invalid, either it is empty or the character length is " +
+              "more than 20, the value is Continueeeeeeeeeeeeee" +
+              "eeeeeeeeeeee']}, {'state_name': 'EXP_2_STATE_2', " +
+              "'end_interaction_invalid_values': ['There should be no " +
+              "default value present in the end exploration interaction.', " +
+              "'There should be no answer groups present in the end " +
+              "exploration interaction.', 'Total number of recommended " +
+              "explorations should not be more than 3, found 4.']}, " +
+              "{'state_name': 'EXP_2_STATE_3'}, {'state_name': " +
+              "'EXP_2_STATE_4'}, {'state_name': 'EXP_2_STATE_5'}, " +
+              "{'state_name': 'EXP_2_STATE_6'}, {'state_name': " +
+              "'EXP_2_STATE_7'}, {'state_name': 'EXP_2_STATE_8', " +
+              "'drag_drop_interaction_values': ['The rule 0 of answer " +
+              "group 0 have multiple items at same place when multiple " +
+              "items in same position settings is turned off.', 'The " +
+              "rule 0 of answer group 0 having rule type - " +
+              "IsEqualToOrderingWithOneItemAtIncorrectPosition should " +
+              "not be there when the multiple items in same position " +
+              "setting is turned off.', 'The rule 0 of answer group 1 " +
+              "The value 1 and value 2 cannot be same when rule type is " +
+              "HasElementXBeforeElementY', 'Atleast 2 choices should be " +
+              "there', 'There should not be any empty choices, present on " +
+              "the index - 0']}, {'state_name': 'EXP_2_STATE_9'}]"
             )
         ])
 
@@ -1125,8 +1154,14 @@ class ExpStateValidationJobTests(
               "review tag text value is empty.', 'State - EXP_3_STATE_1 " +
               "Video tag start value is greater than end value.']}]"),
             job_run_result.JobRunResult.as_stderr(
-              "The id of exp is 3, and the state interaction erroneous data " +
-              "are [{'state_name': 'EXP_3_STATE_1'}]"),
+              "The id of exp is 3, and the state interaction part 1 " +
+              "erroneous data are [{'state_name': 'EXP_3_STATE_1'}]"),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 3, and the state interaction part 2 " +
+              "erroneous data are [{'state_name': 'EXP_3_STATE_1'}]"),
+            job_run_result.JobRunResult.as_stderr(
+              "The id of exp is 3, and the state interaction part 3 " +
+              "erroneous data are [{'state_name': 'EXP_3_STATE_1'}]"),
             job_run_result.JobRunResult.as_stderr(
               "The id of exp is 3, and the state erroneous data " +
               "are [{'state_name': 'EXP_3_STATE_1'}]")
