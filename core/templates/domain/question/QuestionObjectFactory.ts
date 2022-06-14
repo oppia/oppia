@@ -107,6 +107,14 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
+  getNextContentIdIndex(): number {
+    return this._nextContentIdIndex;
+  }
+
+  setNextContentIdIndex(nextContentIdIndex: number): void {
+    this._nextContentIdIndex = nextContentIdIndex;
+  }
+
   // Returns 'null' when the message is valid.
   getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;

@@ -81,8 +81,8 @@ angular.module('oppia').component('explorationEditorTab', {
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationNextContentIdIndexService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
-    'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
-    'LoaderService', 'NgbModal',
+    'ExplorationWarningsService', 'FocusManagerService',
+    'GenerateContentIdService', 'GraphDataService', 'LoaderService', 'NgbModal',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
@@ -92,8 +92,8 @@ angular.module('oppia').component('explorationEditorTab', {
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationNextContentIdIndexService,
         ExplorationInitStateNameService, ExplorationStatesService,
-        ExplorationWarningsService, FocusManagerService, GraphDataService,
-        LoaderService, NgbModal,
+        ExplorationWarningsService, FocusManagerService,
+        GenerateContentIdService, GraphDataService, LoaderService, NgbModal,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -265,6 +265,7 @@ angular.module('oppia').component('explorationEditorTab', {
 
         StateEditorService.setInteractionSolution(
           angular.copy(displayedValue));
+        ExplorationNextContentIdIndexService.saveDisplayedValue();
       };
 
       ctrl.saveHints = function(displayedValue) {
@@ -355,6 +356,14 @@ angular.module('oppia').component('explorationEditorTab', {
           }
         });
         ctrl.interactionIsShown = false;
+
+        GenerateContentIdService.init(() => {
+          let indexToUse = ExplorationNextContentIdIndexService.displayed;
+          ExplorationNextContentIdIndexService.displayed += 1;
+          return indexToUse;
+        }, () => {
+          ExplorationNextContentIdIndexService.restoreFromMemento();
+        });
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

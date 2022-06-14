@@ -30,12 +30,14 @@ angular.module('oppia').factory('QuestionUpdateService', [
   'QuestionUndoRedoService',
   'CMD_UPDATE_QUESTION_PROPERTY',
   'QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS',
-  'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_QUESTION_STATE_DATA',
+  'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX',
+  'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   function(
       QuestionUndoRedoService,
       CMD_UPDATE_QUESTION_PROPERTY,
       QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
-      QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_QUESTION_STATE_DATA) {
+      QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
+      QUESTION_PROPERTY_QUESTION_STATE_DATA) {
     var _applyChange = function(question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
@@ -111,6 +113,18 @@ angular.module('oppia').factory('QuestionUpdateService', [
               oldInapplicableSkillMisconceptionIds);
           });
       },
+      setQuestionNextContentIdIndex: function(question, newValue) {
+      var oldValue = question.getNextContentIdIndex();
+      _applyPropertyChange(
+        question, QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
+        newValue, oldValue,
+        function(changeDict, question) {
+          var newValue = _getNewPropertyValueFromChangeDict(changeDict);
+          question.setNextContentIdIndex(newValue);
+        }, function(changeDict, question) {
+          question.setNextContentIdIndex(changeDict['old_value']);
+        });
+    },
       setQuestionStateData: function(question, updateFunction) {
         var oldStateData = angular.copy(question.getStateData());
         // We update the question here before making the change,

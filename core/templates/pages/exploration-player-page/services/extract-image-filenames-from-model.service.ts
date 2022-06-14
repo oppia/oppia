@@ -271,7 +271,6 @@ export class ExtractImageFilenamesFromModelService {
       filenamesInState.push(filename);
     }
     let allHtmlOfState = state.getAllHTMLs();
-    console.log(state.getAllContentIds());
     return [
       ...filenamesInState,
       ...this._extractFilenamesFromHtmlList(allHtmlOfState)

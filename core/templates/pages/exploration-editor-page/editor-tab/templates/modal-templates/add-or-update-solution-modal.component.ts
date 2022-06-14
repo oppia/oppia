@@ -30,6 +30,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -84,6 +85,7 @@ export class AddOrUpdateSolutionModalComponent
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private generateContentIdService: GenerateContentIdService,
     private ngbActiveModal: NgbActiveModal,
     private solutionObjectFactory: SolutionObjectFactory,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -151,21 +153,25 @@ export class AddOrUpdateSolutionModalComponent
         this.savedMemento ? 'savedMemento()' : null)
     );
     this.answerIsValid = false;
-    this.EMPTY_SOLUTION_DATA = {
-      answerIsExclusive: false,
-      correctAnswer: undefined,
-      explanationHtml: '',
-      explanationContentId: this.COMPONENT_NAME_SOLUTION
-    };
-    this.data = this.solutionType ? {
-      answerIsExclusive: (
-        this.stateSolutionService.savedMemento.answerIsExclusive),
-      correctAnswer: undefined,
-      explanationHtml: (
-        this.stateSolutionService.savedMemento.explanation.html),
-      explanationContentId: (
-        this.stateSolutionService.savedMemento.explanation.contentId)
-    } : cloneDeep(this.EMPTY_SOLUTION_DATA);
+    if (this.solutionType) {
+      this.data = {
+        answerIsExclusive: (
+          this.stateSolutionService.savedMemento.answerIsExclusive),
+        correctAnswer: undefined,
+        explanationHtml: (
+          this.stateSolutionService.savedMemento.explanation.html),
+        explanationContentId: (
+          this.stateSolutionService.savedMemento.explanation.contentId)
+      }
+    } else {
+      this.data = {
+        answerIsExclusive: false,
+        correctAnswer: undefined,
+        explanationHtml: '',
+        explanationContentId: this.generateContentIdService.getNextStateId(
+          this.COMPONENT_NAME_SOLUTION)
+      };
+    }
     this.currentInteractionService.setOnSubmitFn(
       (answer: InteractionAnswer) => {
         this.data.correctAnswer = answer;

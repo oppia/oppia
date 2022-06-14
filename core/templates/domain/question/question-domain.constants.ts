@@ -41,6 +41,7 @@ export const QuestionDomainConstants = {
   QUESTION_PROPERTY_QUESTION_STATE_DATA: 'question_state_data',
   QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: (
     'inapplicable_skill_misconception_ids'),
+  QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX: 'next_content_id_index',
 
   CMD_UPDATE_QUESTION_PROPERTY: 'update_question_property',
 } as const;

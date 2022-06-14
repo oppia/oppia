@@ -28,9 +28,7 @@ export class BaseTranslatableObject {
       if (entityTranslations.hasWrittenTranslation(translatableField.contentId)) {
         let writtenTranslation = entityTranslations.getWrittenTranslation(
           translatableField.contentId);
-        console.log(translatableField.contentId, "swapinggg")
         if (this._isValidStringTranslation(writtenTranslation)) {
-          console.log(translatableField.contentId, "valid swapinggg")
           translatableField.html = writtenTranslation.translation;
         }
       }
@@ -39,8 +37,6 @@ export class BaseTranslatableObject {
     this._translatableObjects.forEach((translatableObject) => {
       translatableObject.swapContentsWithTranslation(entityTranslations);
     });
-    console.log(this.getAllHTMLs());
-
   }
 
   getAllContents() {

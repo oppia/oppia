@@ -34,6 +34,7 @@ require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/ngb-modal.service.ts');
+require('services/generate-content-id.service');
 
 import { Subscription } from 'rxjs';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
@@ -50,17 +51,23 @@ angular.module('oppia').component('questionEditor', {
   template: require('./question-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$rootScope', 'EditabilityService', 'LoaderService', 'NgbModal',
+    '$rootScope', 'EditabilityService',
+    'GenerateContentIdService', 'LoaderService', 'NgbModal',
     'QuestionUpdateService', 'SolutionValidityService',
     'StateEditorService', 'StateInteractionIdService',
     'UrlInterpolationService',
     function(
-        $rootScope, EditabilityService, LoaderService, NgbModal,
+        $rootScope, EditabilityService,
+        GenerateContentIdService, LoaderService, NgbModal,
         QuestionUpdateService, SolutionValidityService,
         StateEditorService, StateInteractionIdService,
         UrlInterpolationService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+
+      ctrl.nextContentIdIndexMemento = null;
+      ctrl.nextContentIdIndexDisplayedValue = null;
+
       ctrl.getStateContentPlaceholder = function() {
         return 'Type your question here.';
       };
@@ -92,6 +99,15 @@ angular.module('oppia').component('questionEditor', {
         StateEditorService.setInapplicableSkillMisconceptionIds(
           ctrl.question.getInapplicableSkillMisconceptionIds());
         SolutionValidityService.init(['question']);
+        GenerateContentIdService.init(() => {
+          let indexToUse = ctrl.nextContentIdIndexDisplayedValue;
+          ctrl.nextContentIdIndexDisplayedValue += 1;
+          return indexToUse;
+        }, () => {
+          ctrl.nextContentIdIndexDisplayedValue = (
+            ctrl.nextContentIdIndexMemento);
+        });
+
         var stateData = ctrl.questionStateData;
         stateData.interaction.defaultOutcome.setDestination(null);
         if (stateData) {
@@ -151,11 +167,10 @@ angular.module('oppia').component('questionEditor', {
         });
       };
 
-      ctrl.saveNextContentIdIndex = function(displayedValue) {
-        _updateQuestion(function() {
-          var stateData = ctrl.question.getStateData();
-          stateData.nextContentIdIndex = angular.copy(displayedValue);
-        });
+      ctrl.saveNextContentIdIndex = function() {
+        QuestionUpdateService.setQuestionNextContentIdIndex(
+          ctrl.question, ctrl.nextContentIdIndexDisplayedValue);
+        ctrl.nextContentIdIndexMemento = ctrl.nextContentIdIndexDisplayedValue;
       };
 
       ctrl.saveSolution = function(displayedValue) {
@@ -163,14 +178,15 @@ angular.module('oppia').component('questionEditor', {
           StateEditorService.setInteractionSolution(
             angular.copy(displayedValue));
         });
+        ctrl.saveNextContentIdIndex();
       };
 
       ctrl.saveHints = function(displayedValue) {
         _updateQuestion(function() {
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
-          $rootScope.$applyAsync();
-        });
+            $rootScope.$applyAsync();
+          });
       };
 
       ctrl.saveInapplicableSkillMisconceptionIds = function(
@@ -185,7 +201,6 @@ angular.module('oppia').component('questionEditor', {
           contentIds) {
         var state = ctrl.question.getStateData();
         var recordedVoiceovers = state.recordedVoiceovers;
-        var writtenTranslations = state.writtenTranslations;
         var updateQuestion = _updateQuestion;
 
         const shouldPrompt = contentIds.some(
@@ -200,13 +215,6 @@ angular.module('oppia').component('questionEditor', {
               contentIds.forEach(contentId => {
                 if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
                   recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                    contentId);
-                }
-                if (
-                  writtenTranslations.hasUnflaggedWrittenTranslations(
-                    contentId)
-                ) {
-                  writtenTranslations.markAllTranslationsAsNeedingUpdate(
                     contentId);
                 }
               });
@@ -243,6 +251,11 @@ angular.module('oppia').component('questionEditor', {
         StateEditorService.setActiveStateName('question');
         StateEditorService.setMisconceptionsBySkill(
           ctrl.getMisconceptionsBySkill());
+
+        ctrl.nextContentIdIndexMemento = ctrl.question.getNextContentIdIndex();
+        ctrl.nextContentIdIndexDisplayedValue = (
+          ctrl.question.getNextContentIdIndex());
+
         ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/avatar/oppia_avatar_100px.svg');
 

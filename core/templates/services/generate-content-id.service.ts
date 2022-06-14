@@ -29,9 +29,14 @@ import { ExplorationNextContentIdIndexService } from
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-  constructor(
-      private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService
-  ) {}
+
+  getNextIndex: () => number;
+  revertUnusedIndexes: () => void;
+
+  init(getNextIndex: () => number, revertUnusedIndexes): void {
+    this.getNextIndex = getNextIndex;
+    this.revertUnusedIndexes = revertUnusedIndexes;
+  }
 
   generateIdForComponent(
       existingComponentIds: string[],
@@ -67,10 +72,7 @@ export class GenerateContentIdService {
   }
 
   _getNextStateId(prefix: string): string {
-    // This function is used to generate content_ids for content that live in
-    // the State domain. This includes hints, feedback, and customization args.
-    const contentIdIndex = this.explorationNextContentIdIndexService.displayed;
-    this.explorationNextContentIdIndexService.displayed += 1;
+    const contentIdIndex = this.getNextIndex();
     return `${prefix}_${contentIdIndex}`;
   }
 
@@ -85,7 +87,7 @@ export class GenerateContentIdService {
   }
 
   revertUnusedConetentIdIndex(): void {
-    this.explorationNextContentIdIndexService.restoreFromMemento();
+    this.revertUnusedIndexes();
   }
 }
 

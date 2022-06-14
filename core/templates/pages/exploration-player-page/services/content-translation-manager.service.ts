@@ -66,7 +66,6 @@ export class ContentTranslationManagerService {
 
     return this.httpClient.get<EntityTranslationBackendDict>(url).toPromise()
       .then((response) => {
-        console.log(response)
         this.fetchingTranslations = false;
         const entityTranslations = EntityTranslation.createFromBackendDict(
           response);
@@ -126,7 +125,6 @@ export class ContentTranslationManagerService {
         element, card.getInteractionCustomizationArgs());
       card.setInteractionHtml(element.outerHTML);
     }
-    console.log(card.getContentHtml());
   }
 
   init(entityType: string, entityId: string, version: number) {

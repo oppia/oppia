@@ -51,6 +51,7 @@ QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 QUESTION_PROPERTY_LINKED_SKILL_IDS = 'linked_skill_ids'
 QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS = (
     'inapplicable_skill_misconception_ids')
+QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -86,7 +87,8 @@ class QuestionChange(change_domain.BaseChange):
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
         QUESTION_PROPERTY_LINKED_SKILL_IDS,
-        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
+        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+        QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -207,7 +209,8 @@ class Question(translation_domain.BaseTranslatableObject):
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
             'inapplicable_skill_misconception_ids': (
-                self.inapplicable_skill_misconception_ids)
+                self.inapplicable_skill_misconception_ids),
+            'next_content_id_index': self.next_content_id_index,
         }
 
     @classmethod
@@ -1434,7 +1437,8 @@ class Question(translation_domain.BaseTranslatableObject):
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
             question_dict['linked_skill_ids'],
-            question_dict['inapplicable_skill_misconception_ids'])
+            question_dict['inapplicable_skill_misconception_ids'],
+            question_dict['next_content_id_index'])
 
         return question
 
@@ -1488,6 +1492,10 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))
+
+    def update_next_content_id_index(self, next_content_id_index):
+        """Updates the next content id index for the question."""
+        self.next_content_id_index = next_content_id_index
 
     def update_question_state_data(self, question_state_data):
         """Updates the question data of the question.

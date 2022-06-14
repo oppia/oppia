@@ -185,12 +185,12 @@ export class ExplorationStatesService {
     hints: (hints) => {
       let contents = [];
       hints.forEach(hint => {
-        contents = contents.concat(hint.getAllContentIds())
+        contents = contents.concat(hint.getAllContents())
       });
       return contents;
     },
     solution: (solution) => {
-      return solution ? solution.getAllContentIds() : [];
+      return solution ? solution.getAllContents() : [];
     },
     widget_customization_args: (customizationArgs) => {
       return customizationArgs ? Interaction.getCustomizationArgContents(
