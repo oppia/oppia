@@ -32,9 +32,37 @@ import { GraphDataService } from 'pages/exploration-editor-page/services/graph-d
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { TrainingDataService } from './training-data.service';
 import cloneDeep from 'lodash/cloneDeep';
-import { RULES_SERVICE_MAPPING } from './training-data-editor-panel-modal.component';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { CodeReplRulesService } from 'interactions/CodeRepl/directives/code-repl-rules.service';
+import { ContinueRulesService } from 'interactions/Continue/directives/continue-rules.service';
+import { FractionInputRulesService } from 'interactions/FractionInput/directives/fraction-input-rules.service';
+import { GraphInputRulesService } from 'interactions/GraphInput/directives/graph-input-rules.service';
+import { ImageClickInputRulesService } from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
+import { InteractiveMapRulesService } from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
+import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericInputRulesService } from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+
+export const RULES_SERVICE_MAPPING = {
+  AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
+  CodeReplRulesService: CodeReplRulesService,
+  ContinueRulesService: ContinueRulesService,
+  FractionInputRulesService: FractionInputRulesService,
+  ImageClickInputRulesService: ImageClickInputRulesService,
+  InteractiveMapRulesService: InteractiveMapRulesService,
+  MathEquationInputRulesService: MathEquationInputRulesService,
+  NumericExpressionInputRulesService: NumericExpressionInputRulesService,
+  NumericInputRulesService: NumericInputRulesService,
+  PencilCodeEditorRulesService: PencilCodeEditorRulesService,
+  GraphInputRulesService: GraphInputRulesService,
+  SetInputRulesService: SetInputRulesService,
+  TextInputRulesService: TextInputRulesService,
+};
 
 interface classification {
   answerGroupIndex: number;
