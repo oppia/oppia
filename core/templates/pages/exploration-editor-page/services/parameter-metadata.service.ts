@@ -19,11 +19,18 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ParamMetadata } from 'domain/exploration/param-metadata.model';
+import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
 import { ExplorationParamChangesService } from './exploration-param-changes.service';
 import { ExplorationStatesService } from './exploration-states.service';
 import { GraphDataService } from './graph-data.service';
+
+interface ParamInfo {
+  paramName: string;
+  stateName: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +48,7 @@ export class ParameterMetadataService {
   PARAM_SOURCE_FEEDBACK = 'feedback';
   PARAM_SOURCE_PARAM_CHANGES = 'param_changes';
 
-  getMetadataFromParamChanges(paramChanges) {
+  getMetadataFromParamChanges(paramChanges: ParamChange[]): ParamMetadata[] {
     let result = [];
     for (let i = 0; i < paramChanges.length; i++) {
       let pc = paramChanges[i];
@@ -75,7 +82,7 @@ export class ParameterMetadataService {
   // the order that they occur.
   // TODO(sll): Add trace data (so that it's easy to figure out in which rule
   // an issue occurred, say).
-  getStateParamMetadata(state) {
+  getStateParamMetadata(state: State): ParamMetadata[] {
     // First, the state param changes are applied: we get their values
     // and set the params.
     let result = this.getMetadataFromParamChanges(state.paramChanges);
@@ -108,7 +115,9 @@ export class ParameterMetadataService {
   // Returns one of null, PARAM_ACTION_SET, PARAM_ACTION_GET depending on
   // whether this parameter is not used at all in this state, or
   // whether its first occurrence is a 'set' or 'get'.
-  getParamStatus(stateParamMetadata, paramName) {
+  getParamStatus(
+      stateParamMetadata: ParamMetadata[],
+      paramName: string): string | null {
     for (let i = 0; i < stateParamMetadata.length; i++) {
       if (stateParamMetadata[i].paramName === paramName) {
         return stateParamMetadata[i].action;
@@ -126,7 +135,7 @@ export class ParameterMetadataService {
   //     parameter is required is in the initial list of parameter changes
   //     (e.g. one parameter may be set based on the value assigned to
   //     another parameter).
-  getUnsetParametersInfo(initNodeIds) {
+  getUnsetParametersInfo(initNodeIds: string[]): ParamInfo[] {
     let graphData = this.graphDataService.getGraphData();
 
     let states = this.explorationStatesService.getStates();
@@ -134,7 +143,7 @@ export class ParameterMetadataService {
     // Determine all parameter names that are used within this exploration.
     let allParamNames = [];
     let expParamChangesMetadata = this.getMetadataFromParamChanges(
-      this.explorationParamChangesService.savedMemento);
+      this.explorationParamChangesService.savedMemento as ParamChange[]);
     let stateParamMetadatas = {};
 
     expParamChangesMetadata.forEach((expParamMetadataItem) => {

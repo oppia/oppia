@@ -36,6 +36,7 @@ describe('Exploration Warnings Service', function() {
   let ExplorationStatesService;
   let StateTopAnswersStatsService;
   let StateTopAnswersStatsBackendApiService;
+  let ExplorationParamChangesService;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
@@ -49,31 +50,6 @@ describe('Exploration Warnings Service', function() {
 
   importAllAngularServices();
   describe('when exploration param changes has jinja values', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('ExplorationParamChangesService', {
-        savedMemento: [{
-          customizationArgs: {
-            parse_with_jinja: false,
-            value: '5'
-          },
-          generatorId: 'Copier',
-          name: 'ParamChange1'
-        }, {
-          customizationArgs: {
-            parse_with_jinja: true,
-            value: '{{ParamChange2}}'
-          },
-          generatorId: 'Copier',
-        }, {
-          customizationArgs: {
-            parse_with_jinja: true,
-            value: '5'
-          },
-          generatorId: 'RandomSelector',
-          name: 'ParamChange3'
-        }]
-      });
-    }));
     beforeEach(angular.mock.inject(function($injector) {
       ExplorationInitStateNameService = $injector.get(
         'ExplorationInitStateNameService');
@@ -81,9 +57,32 @@ describe('Exploration Warnings Service', function() {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       StateTopAnswersStatsBackendApiService = $injector.get(
         'StateTopAnswersStatsBackendApiService');
+      ExplorationParamChangesService = $injector.get(
+        'ExplorationParamChangesService');
       StateTopAnswersStatsService = $injector.get(
         'StateTopAnswersStatsService');
       ExplorationInitStateNameService.init('Hola');
+      ExplorationParamChangesService.savedMemento = [{
+        customizationArgs: {
+          parse_with_jinja: false,
+          value: '5'
+        },
+        generatorId: 'Copier',
+        name: 'ParamChange1'
+      }, {
+        customizationArgs: {
+          parse_with_jinja: true,
+          value: '{{ParamChange2}}'
+        },
+        generatorId: 'Copier',
+      }, {
+        customizationArgs: {
+          parse_with_jinja: true,
+          value: '5'
+        },
+        generatorId: 'RandomSelector',
+        name: 'ParamChange3'
+      }];
     }));
 
     it('should update warnings with TextInput as interaction id', function() {
