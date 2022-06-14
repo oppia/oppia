@@ -51,6 +51,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             self.exp_id, self.exp_version, [])
         self.playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id1', 1, 'EarlyQuit', {}, [])
+        self.save_new_valid_exploration(
+            self.exp_id, 'admin', title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
 
     def test_get_exploration_stats_with_new_exp_id(self):
         exploration_stats = stats_services.get_exploration_stats(
@@ -158,13 +161,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         }
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
-            'nullid', 1)
+            'exp_id1', 2)
         self.assertEqual(exploration_stats, None)
 
-        stats_services.update_stats('nullid', 1, aggregated_stats)
+        stats_services.update_stats('exp_id1', 2, aggregated_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
-            'nullid', 1)
+            'exp_id1', 2)
         self.assertEqual(exploration_stats, None)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
