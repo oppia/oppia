@@ -44,6 +44,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -79,6 +80,7 @@ import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component
 })
 export class TutorCardComponent {
   @ViewChild('checkMark') checkMarkComponent: EndChapterCheckMarkComponent;
+  @ViewChild('confetti') confettiComponent: EndChapterConfettiComponent;
   @Input() displayedCard: StateCard;
   @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
@@ -101,6 +103,7 @@ export class TutorCardComponent {
   hideCheckMark: boolean = true;
   animationHasPlayedOnce: boolean = false;
   skipCheckMark: boolean = false;
+  confettiAnimationTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -180,11 +183,11 @@ export class TutorCardComponent {
       !this.animationHasPlayedOnce &&
       this.inStoryMode
     ) {
-      this.triggerCheckMarkAnimation();
+      this.triggerCelebratoryAnimation();
     }
   }
 
-  triggerCheckMarkAnimation(): void {
+  triggerCelebratoryAnimation(): void {
     this.hideCheckMark = false;
     this.checkMarkComponent.animateCheckMark();
     this.animationHasPlayedOnce = true;
@@ -198,6 +201,9 @@ export class TutorCardComponent {
         }, 500);
       }, 2000);
     } else {
+      this.confettiAnimationTimeout = setTimeout(() => {
+        this.confettiComponent.animateConfetti();
+      }, 2000);
       setTimeout(() => {
         this.hideCheckMark = true;
       }, 4000);
@@ -314,6 +320,7 @@ export class TutorCardComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    clearTimeout(this.confettiAnimationTimeout);
     if (!this.hideCheckMark) {
       this.skipCheckMark = true;
       setTimeout(() => {

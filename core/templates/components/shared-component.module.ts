@@ -104,6 +104,7 @@ import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { EndChapterCheckMarkComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-confetti.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
 import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
@@ -187,6 +188,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -283,6 +285,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -396,6 +399,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,

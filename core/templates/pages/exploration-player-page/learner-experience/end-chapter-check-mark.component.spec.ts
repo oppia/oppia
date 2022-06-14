@@ -35,10 +35,6 @@ describe('End chapter check mark component', function() {
     component = fixture.componentInstance;
   });
 
-  it('should check if component is initialized', () => {
-    expect(component).toBeDefined();
-  });
-
   it('should animate the check mark', fakeAsync(() => {
     expect(component.circleIsShown).toBe(false);
     expect(component.innerTickIsShown).toBe(false);

@@ -275,6 +275,14 @@ describe('URL Interpolation Service', () => {
       '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
         '.png');
 
+    expect(uis.getStaticAudioUrl('/test.flac')).toBe(
+      '/build/assets/audio/test.flac');
+    expect(uis.getStaticAudioUrl('/test_url/test.flac')).toBe(
+      '/build/assets/audio/test_url/test.flac');
+    expect(uis.getStaticAudioUrl('/hash_test.flac')).toBe(
+      '/build/assets/audio/hash_test.' + hashes['/audio/hash_test.flac'] +
+        '.flac');
+
     expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
       '/build/assets/videos/test.mp4');
     expect(uis.getStaticVideoUrl('/test_url/test.mp4')).toBe(
@@ -326,6 +334,9 @@ describe('URL Interpolation Service', () => {
     expect(uis.getStaticImageUrl.bind(uis, '')).toThrowError(
       'Empty path passed in method.');
 
+    expect(uis.getStaticAudioUrl.bind(uis, '')).toThrowError(
+      'Empty path passed in method.');
+
     expect(uis.getStaticVideoUrl.bind(uis, '')).toThrowError(
       'Empty path passed in method.');
 
@@ -348,6 +359,12 @@ describe('URL Interpolation Service', () => {
         'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.');
       expect(uis.getStaticImageUrl.bind(uis, 'test_url/fail.png')).toThrowError(
         'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.');
+
+      expect(uis.getStaticAudioUrl.bind(uis, 'test_fail.flac')).toThrowError(
+        'Path must start with \'\/\': \'' + 'test_fail.flac' + '\'.');
+      expect(uis.getStaticAudioUrl.bind(uis, 'test_url/fail.flac'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_url/fail.flac' + '\'.');
 
       expect(uis.getStaticVideoUrl.bind(uis, 'test_fail.png'))
         .toThrowError(

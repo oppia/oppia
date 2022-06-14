@@ -197,7 +197,7 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a audio path relative to /assets/audio folder,
+   * Given an audio path relative to /assets/audio folder,
    * returns the complete url path to that audio.
    */
   getStaticAudioUrl(audioPath: string): string {
