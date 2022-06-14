@@ -126,6 +126,7 @@ import { OutcomeDestinationEditorComponent } from './state-directives/outcome-ed
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
+import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -268,7 +269,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
     UnsavedChangesStatusInfoModalComponent,
-    TrainingPanelComponent
+    TrainingPanelComponent,
+    TrainingModalComponent
   ],
 
   entryComponents: [
@@ -364,7 +366,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
     UnsavedChangesStatusInfoModalComponent,
-    TrainingPanelComponent
+    TrainingPanelComponent,
+    TrainingModalComponent
   ],
 
   exports: [
@@ -469,7 +472,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
-    TrainingPanelComponent
+    TrainingPanelComponent,
+    TrainingModalComponent
   ],
 })
 
