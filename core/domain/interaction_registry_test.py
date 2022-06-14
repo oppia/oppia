@@ -29,7 +29,7 @@ from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
 
-from typing import Any
+from typing import Any, Dict
 from typing_extensions import Final
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT: Final = 1
@@ -148,11 +148,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         all_specs = interaction_registry.Registry.get_all_specs()
         ca_names_in_schema = []
 
-        # Here MyPy is not able to fetch the type of incoming values, because
-        # those values belongs to BaseInteraction class and that class is
-        # not annotated yet. So to silent the error for temporary time period,
-        # we used Any here.
-        def traverse_schema_to_find_names(schema: Any) -> None:
+        # Here we used Any because values in schema dictionary can be of type
+        # str, int, List, Dict and other types too.
+        def traverse_schema_to_find_names(schema: Dict[str, Any]) -> None:
             """Recursively traverses the schema to find all name fields.
             Recursion is required because names can be nested within
             'type: dict' inside a schema.
@@ -173,12 +171,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         for interaction_id in all_specs:
             for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
-                # Here, Mypy consider ca_spec is of type str but from the
-                # implementation we know it is of type CustomizationArgSpecsDict
-                # This is because currently BaseInteraction class is not type
-                # annotated yet.
-                ca_names_in_schema.append(ca_spec['name'])  # type: ignore[index]
-                traverse_schema_to_find_names(ca_spec['schema'])  # type: ignore[index]
+                ca_names_in_schema.append(ca_spec['name'])
+                traverse_schema_to_find_names(ca_spec['schema'])
         for name in ca_names_in_schema:
             self.assertTrue(name.isalpha())
             self.assertTrue(name[0].islower())
@@ -191,12 +185,10 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         """
         all_specs = interaction_registry.Registry.get_all_specs()
 
-        # Here MyPy is not able fetch the type of incoming values, because
-        # those values belongs to BaseInteraction class and that class is
-        # not annotated yet. So to silent the error for temporary time period,
-        # we used Any here.
+        # Here we used Any because argument value can accept values of type
+        # List[str], str, int, and other types too.
         def traverse_schema_to_find_and_validate_subtitled_content(
-            value: Any, schema: Any
+            value: Any, schema: Dict[str,Any]
         ) -> None:
             """Recursively traverse the schema to find SubtitledHtml or
             SubtitledUnicode contained or nested in value.
@@ -230,11 +222,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         for interaction_id in all_specs:
             for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
                 traverse_schema_to_find_and_validate_subtitled_content(
-                    # Here, Mypy consider ca_spec is of type str but
-                    # from the implementation we know it is of type
-                    # CustomizationArgSpecsDict. This is because currently
-                    # BaseInteraction class is not type annotated yet.
-                    ca_spec['default_value'], ca_spec['schema'])  # type: ignore[index]
+                    ca_spec['default_value'], ca_spec['schema'])
 
     def test_get_all_specs_for_state_schema_version_for_unsaved_version(
         self

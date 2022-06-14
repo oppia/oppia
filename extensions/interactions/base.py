@@ -64,6 +64,8 @@ class CustomizationArgSpecsDict(TypedDict):
 
     name: str
     description: str
+    # Here we used Any because values in schema dictionary can be of type str,
+    # int, List, Dict and other types too.
     schema: Dict[str, Any]
     default_value: str
 
@@ -80,7 +82,7 @@ class BaseInteractionDict(TypedDict):
     is_trainable: bool
     is_linear: bool
     needs_summary: bool
-    customization_arg_specs: CustomizationArgSpecsDict
+    customization_arg_specs: List[CustomizationArgSpecsDict]
     instructions: Optional[str]
     narrow_instructions: Optional[str]
     default_outcome_heading: Optional[str]
@@ -130,7 +132,7 @@ class BaseInteraction:
     answer_type: Optional[str] = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
-    _customization_arg_specs: CustomizationArgSpecsDict = []
+    _customization_arg_specs: List[CustomizationArgSpecsDict] = []
     # Specs for desired visualizations of recorded state answers. Overridden
     # in subclasses.
     _answer_visualization_specs = []
