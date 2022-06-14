@@ -45,11 +45,11 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-modal.controller');
 require('services/external-save.service.ts');
 require('services/ngb-modal.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-modal.component.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
   'NgbModal', 'AlertsService', 'ExternalSaveService',

@@ -8,8 +8,7 @@
             <div>
                 <oppia-training-panel [answer]="trainingDataAnswer"
                                       [classification]="classification"
-                                      [on-finish-training]="finishTraining()"
-                                      [adding-new-response]="addingNewResponse">
+                                      [addingNewResponse]="addingNewResponse">
                 </oppia-training-panel>
             </div>
         </div>
@@ -19,6 +18,6 @@
 <div class="modal-footer">
     <button class="btn btn-secondary" (click)="exitTrainer()">Cancel</button>
     <button class="btn btn-secondary btn-success"
-            *ngIf="(classification.answerGroupIndex >= 0 && !addingNewResponse)"
+            *ngIf="classification.answerGroupIndex >= 0 && !addingNewResponse"
             (click)="onConfirm()">Confirm Response</button>
 </div>
