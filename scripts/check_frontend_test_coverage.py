@@ -52,6 +52,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'google-analytics.initializer.ts',
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
+    'new-chapter-title-modal.controller.ts',
     'object-editor.directive.ts',
     'oppia-interactive-music-notes-input.component.ts',
     'oppia-interactive-pencil-code-editor.component.ts',
