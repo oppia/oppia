@@ -129,7 +129,7 @@ export class TrainingPanelComponent
   }
 }
 
-angular.module('oppia').factory('oppiaTrainingPanel',
+angular.module('oppia').directive('oppiaTrainingPanel',
   downgradeComponent({
     component: TrainingPanelComponent
   }) as angular.IDirectiveFactory);
