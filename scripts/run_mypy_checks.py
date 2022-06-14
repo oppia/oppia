@@ -45,8 +45,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/classifier_services_test.py',
     'core/domain/collection_services.py',
     'core/domain/collection_services_test.py',
-    'core/domain/customization_args_util.py',
-    'core/domain/customization_args_util_test.py',
     'core/domain/draft_upgrade_services.py',
     'core/domain/draft_upgrade_services_test.py',
     'core/domain/email_manager.py',
