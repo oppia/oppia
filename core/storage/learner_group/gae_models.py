@@ -23,13 +23,15 @@ import string
 
 from core import feconf
 from core.platform import models
-import core.storage.base_model.gae_models as base_models
 
 from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services  # pylint: disable=unused-import
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 

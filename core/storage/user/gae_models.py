@@ -27,7 +27,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
-from typing_extensions import Literal, TypedDict
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -3011,14 +3011,6 @@ class DeletedUsernameModel(base_models.BaseModel):
         """
         empty_dict: Dict[str, base_models.EXPORT_POLICY] = {}
         return dict(super(cls, cls).get_export_policy(), **empty_dict)
-
-
-class LearnerGroupUserDataDict(TypedDict):
-    """Dictionary object for expoting LearnerGroupUser data."""
-
-    invited_to_learner_groups: List[str]
-    member_of_learner_groups: List[str]
-    progress_sharing_permissions: List[Dict[str, Union[bool, str]]]
 
 
 class LearnerGroupUserModel(base_models.BaseModel):

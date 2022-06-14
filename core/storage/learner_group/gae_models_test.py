@@ -38,7 +38,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
     """Test the LearnerGroupModel class."""
 
     def setUp(self) -> None:
-        """Set up blog post models in datastore for use in testing."""
+        """Set up learner group model in datastore for use in testing."""
         super(LearnerGroupModelUnitTest, self).setUp()
 
         self.learner_group_model = learner_group_models.LearnerGroupModel(

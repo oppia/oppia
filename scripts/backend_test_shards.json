@@ -171,6 +171,8 @@
         "scripts.extend_index_yaml_test"
     ],
     "4": [
+        "core.storage.learner_group.gae_models_test",
+        "core.domain.learner_group_domain_test",
         "core.domain.question_fetchers_test",
         "core.domain.exp_domain_test",
         "core.domain.customization_args_util_test",
@@ -309,9 +311,5 @@
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
         "core.jobs.io.job_io_test"
-    ],
-    "5": [
-        "core.domain.learner_group_domian_test",
-        "core.storage.learner_group.gae_models_test"
     ]
 }
