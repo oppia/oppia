@@ -59,7 +59,7 @@ if ((process.env.GITHUB_ACTIONS &&
 
   repoterArray.push(videoReporter);
   console.log('Videos of the failed tests can be viewed ' +
-  'in ../webdriverio-videos');
+  'in ../webdriverio-video');
 } else {
   console.log(
     'Videos will not be recorded for this suite either because videos' +
