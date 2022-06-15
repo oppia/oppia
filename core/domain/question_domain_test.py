@@ -99,9 +99,9 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """
         change_dict = {'cmd': 'create_new', 'invalid': 'invalid'}
 
-        self.assertRaisesRegex(
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'The following extra attributes are present: invalid',
+            'The following extra attributes are present: invalid'
         ):
             question_domain.QuestionChange(change_dict)
 
