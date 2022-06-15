@@ -63,7 +63,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             learner_group_models.LearnerGroupModel.
                 get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.
-                ONE_INSTANCE_SHARED_ACROSS_USERS
+                MULTIPLE_INSTANCES_PER_USER
         )
 
     def test_get_export_policy(self) -> None:
@@ -86,9 +86,9 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_field_names_for_takeout(self) -> None:
         expected_results = {
-            'facilitator': 'facilitators',
-            'member': 'members',
-            'invitation': 'invitations'
+            'facilitators': 'facilitator',
+            'members': 'member',
+            'invitations': 'invitation'
         }
         self.assertEqual(
             learner_group_models.LearnerGroupModel
@@ -148,7 +148,9 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             '3232': {
                 'title': 'title',
                 'description': 'description',
+                'facilitator': '',
                 'member': 'user_2',
+                'invitation': '',
                 'subtopic_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
             }
@@ -165,6 +167,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             '3232': {
                 'title': 'title',
                 'description': 'description',
+                'facilitator': '',
+                'member': '',
                 'invitation': 'user_6',
                 'subtopic_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
@@ -183,6 +187,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
                 'title': 'title',
                 'description': 'description',
                 'facilitator': 'user_1',
+                'member': '',
+                'invitation': '',
                 'subtopic_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
             }

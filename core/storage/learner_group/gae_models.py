@@ -24,6 +24,7 @@ import string
 from core.platform import models
 
 from typing import Dict, List
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -40,6 +41,9 @@ class LearnerGroupModel(base_models.BaseModel):
 
     Instances of this class are keyed by the group_id.
     """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     # The title of the learner group.
     title = datastore_services.StringProperty(required=True, indexed=True)
@@ -70,12 +74,12 @@ class LearnerGroupModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model is exported as one instance shared across users since
-        multiple users are part of learner groups.
+        """Model is exported as multiple instances per user as a
+        user can be part of multiple learner groups.
         """
         return (
             base_models.MODEL_ASSOCIATION_TO_USER
-            .ONE_INSTANCE_SHARED_ACROSS_USERS
+            .MULTIPLE_INSTANCES_PER_USER
         )
 
     @classmethod
@@ -153,9 +157,9 @@ class LearnerGroupModel(base_models.BaseModel):
         the current user's id.
         """
         return {
-            'facilitator': 'facilitators',
-            'member': 'members',
-            'invitation': 'invitations'
+            'facilitators': 'facilitator',
+            'members': 'member',
+            'invitations': 'invitation'
         }
 
     @classmethod
@@ -184,7 +188,9 @@ class LearnerGroupModel(base_models.BaseModel):
                 user_data[learner_group_model.id] = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
+                    'facilitator': '',
                     'member': user_id,
+                    'invitation': '',
                     'subtopic_ids': learner_group_model.subtopic_ids,
                     'story_ids': learner_group_model.story_ids
                 }
@@ -197,6 +203,8 @@ class LearnerGroupModel(base_models.BaseModel):
                 user_data[learner_group_model.id] = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
+                    'facilitator': '',
+                    'member': '',
                     'invitation': user_id,
                     'subtopic_ids': learner_group_model.subtopic_ids,
                     'story_ids': learner_group_model.story_ids
@@ -210,6 +218,8 @@ class LearnerGroupModel(base_models.BaseModel):
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
                     'facilitator': user_id,
+                    'member': '',
+                    'invitation': '',
                     'subtopic_ids': learner_group_model.subtopic_ids,
                     'story_ids': learner_group_model.story_ids
                 }
