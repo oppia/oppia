@@ -952,6 +952,21 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'time_spent_in_exp_in_msecs': {'value': 0}
             }, [], 1, True)
 
+    def test_equality_with_different_class(self) -> None:
+        class DifferentIssue:
+            """A different class."""
+
+            pass
+
+        exploration_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit', {
+                'state_name': {'value': ''},
+                'time_spent_in_exp_in_msecs': {'value': 0}
+            }, [], 1, True)
+        different_issue = DifferentIssue()
+
+        self.assertFalse(exploration_issue == different_issue)
+
     def _dummy_convert_issue_v1_dict_to_v2_dict(
         self, issue_dict: Dict[str, Any]
     ) -> Dict[str, Any]:
