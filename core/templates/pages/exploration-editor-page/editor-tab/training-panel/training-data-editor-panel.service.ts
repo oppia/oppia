@@ -48,9 +48,6 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-data-editor-panel-modal.controller.ts');
 require('services/external-save.service.ts');
 require('services/ngb-modal.service.ts');
 
