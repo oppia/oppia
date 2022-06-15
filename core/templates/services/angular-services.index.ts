@@ -411,6 +411,7 @@ import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/tr
 import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
+import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -824,6 +825,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TruncatePipe', TruncatePipe],
   ['TrainingDataService', TrainingDataService],
   ['TrainingModalService', TrainingModalService],
+  ['TrainingDataEditorPanelService', TrainingDataEditorPanelService],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],
