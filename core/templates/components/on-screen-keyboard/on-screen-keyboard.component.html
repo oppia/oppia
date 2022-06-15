@@ -82,7 +82,7 @@
   .oppia-osk-main-tab {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 5em);
   }
 
   .oppia-osk-custom-letters-div {
@@ -105,12 +105,11 @@
   .oppia-osk-functions-tab {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 5em);
   }
 
   .oppia-osk-main-tab img,
   .oppia-osk-functions-tab img {
-    height: -webkit-fill-available;
     min-height: 64px;
     width: -webkit-fill-available;
   }
@@ -166,6 +165,7 @@
   }
 
   .oppia-osk-btn-operator {
+    align-items: center;
     background-color: #ffffcb;
     border: 1px #d3d3d3 solid;
     color: #000;
