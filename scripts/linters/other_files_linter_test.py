@@ -253,6 +253,46 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
+    def test_check_valid_strict_tsconfig(self):
+        strict_ts_config_path_swap = self.swap(
+            other_files_linter,
+            'STRICT_TS_CONFIG_FILEPATH',
+            os.path.join(LINTER_TESTS_DIR, 'valid_strict_ts_config.json'))
+        expected_error_messages = (
+            'SUCCESS  Correct folder names inside include property check ' +
+            'passed')
+        with strict_ts_config_path_swap, self.print_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_include_property_in_tsconfig_strict()
+            self.assertEqual(
+                error_messages.get_report()[0], expected_error_messages)
+            self.assertEqual(
+                'Correct folder names inside include property',
+                error_messages.name)
+            self.assertFalse(error_messages.failed)
+
+    def test_check_invalid_strict_tsconfig(self):
+        strict_ts_config_path_swap = self.swap(
+            other_files_linter,
+            'STRICT_TS_CONFIG_FILEPATH',
+            os.path.join(LINTER_TESTS_DIR, 'invalid_strict_ts_config.json'))
+        expected_error_messages = (
+            'FAILED  Correct folder names inside include property check ' +
+            'failed')
+        with strict_ts_config_path_swap, self.print_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_include_property_in_tsconfig_strict()
+            self.assertEqual(
+                error_messages.get_report()[1], expected_error_messages)
+            self.assert_same_list_elements(
+                ['Include property of tsconfig-strict.json must be equal to ' +
+                '["core", "extensions", "typings"].'],
+                error_messages.get_report())
+            self.assertEqual(
+                'Correct folder names inside include property',
+                error_messages.name)
+            self.assertTrue(error_messages.failed)
+
     def test_check_github_workflows_use_merge_action_checks(self):
         def mock_listdir(unused_path):
             return ['pass.yml', 'fail.yml', 'README']

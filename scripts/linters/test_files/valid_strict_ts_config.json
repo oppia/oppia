@@ -1,6 +1,7 @@
 {
-  "files": [
-    "some-file.ts",
-    "some-file.spec.ts"
+  "include": [
+    "core",
+    "extensions",
+    "typings"
   ]
 }
