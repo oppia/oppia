@@ -96,6 +96,10 @@
   padding: 17px 20px 17px 20px;
 }
 
+.oppia-learner-dashboard-menu:focus {
+  background-color: rgba(0, 100, 92, 0.1);
+}
+
 .oppia-learner-dashboard-section-active {
   background-color: rgba(0, 100, 92, 0.1);
   color: #00645c;
