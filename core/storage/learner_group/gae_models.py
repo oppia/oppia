@@ -24,7 +24,6 @@ import string
 from core.platform import models
 
 from typing import Dict, List
-from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -34,19 +33,6 @@ if MYPY: # pragma: no cover
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
-
-
-class LearnerGroupDict(TypedDict):
-    """Dictionary for LearnerGroup object."""
-
-    id: str
-    title: str
-    description: str
-    facilitators: List[str]
-    members: List[str]
-    invitations: List[str]
-    subtopic_ids: List[str]
-    story_ids: List[str]
 
 
 class LearnerGroupModel(base_models.BaseModel):
