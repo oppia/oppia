@@ -812,6 +812,68 @@ describe('Conversation skin component', () => {
     expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
   }));
 
+  it('should navigate to the first card on page load if exploration was ' +
+  'completed before user is logged in', fakeAsync(() => {
+    let alertMessageElement = document.createElement('div');
+    alertMessageElement.className =
+      'oppia-exploration-checkpoints-message';
+    const expResponse = explorationResponse;
+    expResponse.most_recently_reached_checkpoint_state_name = '';
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
+    spyOn(playerPositionService, 'init').and.callFake((callb) => {
+      callb();
+    });
+    componentInstance.questionPlayerConfig = {};
+    spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValues('en', 'en', 'en', 'pq');
+    spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')
+      .and.callFake((config, callb, questionAreAvailable) => {
+        callb(displayedCard, 'label');
+      });
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValue(false);
+    spyOn(componentInstance, 'adjustPageHeight');
+    spyOn(playerPositionService.onNewCardOpened, 'emit');
+    componentInstance.isIframed = true;
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValues('Start', 'Mid', 'End');
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(expResponse));
+    spyOn(explorationEngineService, 'getShortestPathToState')
+      .and.returnValue([]);
+
+    spyOn(playerPositionService, 'getDisplayedCardIndex')
+      .and.returnValue(0);
+    spyOn(explorationEngineService, 'getState')
+      .and.returnValue(stateObjectFactory.createFromBackendDict(
+        'Start', expResponse.exploration.states.Start
+      ));
+    spyOn(document, 'querySelector').withArgs(
+      '.oppia-exploration-checkpoints-message')
+      .and.returnValue(alertMessageElement);
+
+    componentInstance.explorationId = expResponse.exploration_id;
+    componentInstance.displayedCard = displayedCard;
+    componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+    componentInstance.alertMessageTimeout = 5;
+
+    componentInstance.initializePage();
+    tick(100);
+
+    expect(componentInstance.prevSessionStatesProgress).toEqual(
+      []);
+    expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('');
+  }));
 
   it('should unsubscribe on destroy', () => {
     spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');
