@@ -24,11 +24,12 @@ var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
   this.get = async function() {
-    await browser.get(CREATOR_DASHBOARD_URL);
+    await browser.url(CREATOR_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateActivityButton = async function() {
+    var createActivityButton = await $('.protractor-test-create-activity');
     await action.click('Create Activity Button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };

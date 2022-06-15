@@ -219,7 +219,7 @@ exports.config = {
     // see also: https://webdriver.io/docs/dot-reporter
     reporters: repoterArray,
 
-
+    isMobile: false,
     //
     // Options to be passed to Jasmine.
     jasmineOpts: {
@@ -292,7 +292,6 @@ exports.config = {
       // display fully.
       browser.setWindowSize(1285, 1000);
 
-      browser.isMobile = false;
 
       // Configure the Firebase Admin SDK to communicate with the emulator.
       process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';

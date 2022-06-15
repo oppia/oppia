@@ -14,11 +14,12 @@
 
 /**
  * @fileoverview Page object for the exploration editor's main tab, for use in
- * Protractor tests.
+ * WebdriverIO tests.
  */
 
 var forms = require('./forms.js');
 var general = require('./general.js');
+var interactions = require('../../../extensions/interactions/webdriverio.js');
 var action = require('./action.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
@@ -64,14 +65,14 @@ var ExplorationEditorMainTab = function() {
       await waitFor.fadeInToComplete(
         fadeIn, 'Editor taking long to fade in');
     }
-    var stateEditButton = (
-      await $('.protractor-test-edit-content-pencil-button'));
+    var stateEditButton = await $(
+      '.protractor-test-edit-content-pencil-button');
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = await $('.protractor-test-state-content-editor');
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
     var stateContentEditorLocator = ('.protractor-test-state-content-editor');
-    var stateContentEditor = stateEditorTag.$(stateContentEditorLocator);
+    var stateContentEditor = await stateEditorTag.$(stateContentEditorLocator);
     await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
@@ -82,6 +83,94 @@ var ExplorationEditorMainTab = function() {
     await waitFor.invisibilityOf(
       saveStateContentButton,
       'State content editor takes too long to disappear');
+  };
+
+  // This function should not usually be invoked directly; please consider
+  // using setInteraction instead.
+  var customizeInteraction = async function(interactionId) {
+    if (arguments.length > 1) {
+      var interactionEditor = await $('.protractor-test-interaction-editor');
+      var customizationArgs = [interactionEditor];
+      for (var i = 1; i < arguments.length; i++) {
+        customizationArgs.push(arguments[i]);
+      }
+      await interactions
+        .getInteraction(interactionId).customizeInteraction
+        .apply(null, customizationArgs);
+    }
+
+    // The save interaction button doesn't appear for interactions having no
+    // options to customize.
+    var result = await saveInteractionButton.isPresent();
+    if (result) {
+      await action.click('Save Interaction Button', saveInteractionButton);
+    }
+    await waitFor.invisibilityOf(
+      saveInteractionButton,
+      'Customize Interaction modal taking too long to close');
+  };
+
+  // This function should be used as the standard way to specify interactions
+  // for most purposes. Additional arguments may be sent to this function,
+  // and they will be passed on to the relevant interaction editor.
+  this.setInteraction = async function(interactionId) {
+    await action.waitForAutosave();
+    await createNewInteraction(interactionId);
+    await customizeInteraction.apply(null, arguments);
+    await closeAddResponseModal();
+    await waitFor.invisibilityOf(
+      addResponseHeader, 'Add Response modal takes too long to close');
+    await waitFor.visibilityOf(
+      interaction, 'interaction takes too long to appear');
+  };
+
+  // This function should not usually be invoked directly; please consider
+  // using setInteraction instead.
+  var createNewInteraction = async function(interactionId) {
+    var deleteInteractionButton = await $(
+      '.protractor-test-delete-interaction');
+    await waitFor.invisibilityOf(
+      deleteInteractionButton,
+      'Please delete interaction before creating a new one');
+
+    var addInteractionButton = await $(
+      '.protractor-test-open-add-interaction-modal');
+    await action.click('Add Interaction button', addInteractionButton);
+
+    var INTERACTION_ID_TO_TAB_NAME = {
+      Continue: 'commonly-used',
+      EndExploration: 'commonly-used',
+      ImageClickInput: 'commonly-used',
+      ItemSelectionInput: 'commonly-used',
+      MultipleChoiceInput: 'commonly-used',
+      NumericInput: 'commonly-used',
+      TextInput: 'commonly-used',
+      FractionInput: 'math',
+      GraphInput: 'math',
+      SetInput: 'math',
+      AlgebraicExpressionInput: 'math',
+      MathEquationInput: 'math',
+      NumericExpressionInput: 'math',
+      NumberWithUnits: 'math',
+      RatioExpressionInput: 'math',
+      CodeRepl: 'programming',
+      PencilCodeEditor: 'programming',
+      MusicNotesInput: 'music',
+      InteractiveMap: 'geography'
+    };
+
+    var tabId = INTERACTION_ID_TO_TAB_NAME[interactionId];
+    var interactionTabButton = await $(
+      `.protractor-test-interaction-tab-${tabId}`);
+    await action.click('Interaction Tab', interactionTabButton);
+
+    var targetTile = await $(
+      `.protractor-test-interaction-tile-${interactionId}`);
+    await waitFor.visibilityOf(
+      targetTile,
+      'Interaction tile ' + interactionId + ' takes too long to be visible'
+    );
+    await action.click('Interaction tile ' + interactionId, targetTile);
   };
 };
 

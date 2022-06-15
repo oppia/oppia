@@ -49,6 +49,10 @@ describe('Oppia landing pages tour', () => {
     await users.logout();
   });
 
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+  });
+
   // it('should visit the Nonprofits landing page', async() => {
   //   await browser.url('/nonprofits');
   // });
