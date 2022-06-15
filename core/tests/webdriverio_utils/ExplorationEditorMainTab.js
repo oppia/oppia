@@ -20,7 +20,6 @@
 var forms = require('./forms.js');
 var general = require('./general.js');
 var action = require('./action.js');
-const { default: $ } = require('webdriverio/build/commands/browser/$.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';

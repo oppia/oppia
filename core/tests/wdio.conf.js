@@ -24,7 +24,7 @@ var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
 
 var suites = {
   // The tests on Travis are run individually to parallelize
@@ -247,16 +247,9 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-     onPrepare: function(config, capabilities) {
-      browser.isMobile = false;
-
-      // Configure the Firebase Admin SDK to communicate with the emulator.
-      process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
-      FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
-    
-      // Navigate to the splash page so that tests can begin on an Angular page.
-      browser.url('http://localhost:9001');
-    },
+    //  onPrepare: function(config, capabilities) {
+      
+    // },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -295,9 +288,18 @@ exports.config = {
      * @param {Object}         browser      instance of created browser/device session
      */
     before: function() {
-        // Set a wide enough window size for the navbar in the library pages to
-        // display fully.
-        browser.setWindowSize(1285, 1000);
+      // Set a wide enough window size for the navbar in the library pages to
+      // display fully.
+      browser.setWindowSize(1285, 1000);
+
+      browser.isMobile = false;
+
+      // Configure the Firebase Admin SDK to communicate with the emulator.
+      process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+      FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+    
+      // Navigate to the splash page so that tests can begin on an Angular page.
+      browser.url('http://localhost:9001');
     },
     /**
      * Runs before a WebdriverIO command gets executed.

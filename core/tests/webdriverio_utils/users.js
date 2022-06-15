@@ -24,7 +24,7 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
-var splashPage = $('.protractor-test-splash-page');
+var splashPage = '.protractor-test-splash-page';
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -92,7 +92,7 @@ var logout = async function() {
     return !(/logout/.test(url));
   }, async() => {
     await waitFor.visibilityOf(
-      splashPage, 'Splash page takes too long to appear');
+      await $(splashPage), 'Splash page takes too long to appear');
     await waitFor.pageToFullyLoad();
   });
 };
@@ -103,7 +103,7 @@ var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
   let cookieBannerAcceptButton = (
     await $('.protractor-test-oppia-cookie-banner-accept-button'));
-  let cookie = await browser.getCookie(['OPPIA_COOKIES_ACKNOWLEDGED']);
+  let cookie = await browser.getCookies(['OPPIA_COOKIES_ACKNOWLEDGED']);
   if (!cookie) {
     await action.click('Cookie Banner Accept button', cookieBannerAcceptButton);
   }

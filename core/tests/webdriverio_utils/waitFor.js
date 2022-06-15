@@ -20,7 +20,6 @@
 var until = require('wdio-wait-for');
 var fs = require('fs');
 var Constants = require('./WebdriverioConstants');
-const { default: $ } = require('webdriverio/build/commands/browser/$');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
 // server since the mobile tests are run on a real
@@ -28,9 +27,9 @@ const { default: $ } = require('webdriverio/build/commands/browser/$');
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
-var toastInfoElement = $('.toast-info');
-var toastSuccessElement = $('.toast-success');
-var loadingMessage = $('.protractor-test-loading-message');
+var toastInfoElement = '.toast-info';
+var toastSuccessElement = '.toast-success';
+var loadingMessage = '.protractor-test-loading-message';
 
 var alertToBePresent = async() => {
   await browser.waitUntil(
@@ -54,14 +53,17 @@ var elementToBeClickable = async function(element, errorMessage) {
 };
 
 /**
- * @param {Object} element - Clickable element such as button, link or tab.
- * @param {string} errorMessage - Error message when element is not clickable.
+ * @param {Object} element - Element expected to disappear from DOM and does not
+ *                           have height or width.
+ * @param {string} errorMessage - Error message when element is still visible.
  */
-var elementToBeClickable = async function(element, errorMessage) {
-  await element.waitForClickable({
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage,
-  });
+var invisibilityOf = async function(element, errorMessage) {
+  await browser.waitUntil(
+    await until.invisibilityOf(element),
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: errorMessage
+    });
 };
 
 /**
@@ -147,7 +149,27 @@ var fadeInToComplete = async function(element, errorMessage) {
 
 var modalPopupToAppear = async function() {
   await visibilityOf(
-    $('.modal-body'), 'Modal taking too long to appear.');
+    await $('.modal-body'), 'Modal taking too long to appear.');
+};
+
+var clientSideRedirection = async function(
+    action, check, waitForCallerSpecifiedConditions) {
+  // Action triggering redirection.
+  await action();
+
+  // The action only triggers the redirection but does not wait for it to
+  // complete. Manually waiting for redirection here.
+  await browser.waitUntil(async() => {
+    var url = await browser.getUrl();
+    // Condition to wait on.
+    return check(decodeURIComponent(url));
+  },
+  {
+    timeout: 30000
+  });
+
+  // Waiting for caller specified conditions.
+  await waitForCallerSpecifiedConditions();
 };
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
@@ -159,13 +181,6 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
-exports.newTabToBeCreated = newTabToBeCreated;
-exports.urlRedirection = urlRedirection;
-exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
-exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
-exports.visibilityOfInfoToast = visibilityOfInfoToast;
-exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
-exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.clientSideRedirection = clientSideRedirection;
