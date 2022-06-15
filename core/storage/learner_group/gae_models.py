@@ -24,6 +24,7 @@ import string
 from core.platform import models
 
 from typing import Dict, List
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -33,6 +34,19 @@ if MYPY: # pragma: no cover
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class LearnerGroupDict(TypedDict):
+    """Dictionary for LearnerGroup object."""
+
+    id: str
+    title: str
+    description: str
+    facilitators: List[str]
+    members: List[str]
+    invitations: List[str]
+    subtopic_ids: List[str]
+    story_ids: List[str]
 
 
 class LearnerGroupModel(base_models.BaseModel):
@@ -136,10 +150,11 @@ class LearnerGroupModel(base_models.BaseModel):
             dict. A dict containing the user-relevant properties of
             LearnerGroupModel.
         """
-        found_models = cls.query(datastore_services.any_of(
-            cls.members == user_id,
-            cls.invitations == user_id,
-            cls.facilitators == user_id
+        found_models: List[LearnerGroupDict] = cls.query(
+            datastore_services.any_of(
+                cls.members == user_id,
+                cls.invitations == user_id,
+                cls.facilitators == user_id
         )).fetch()
         user_data = {}
         for learner_group_model in found_models:
@@ -207,10 +222,11 @@ class LearnerGroupModel(base_models.BaseModel):
         Args:
             user_id: str. The user_id denotes which user's data to delete.
         """
-        found_models = cls.query(datastore_services.any_of(
-            cls.members == user_id,
-            cls.invitations == user_id,
-            cls.facilitators == user_id
+        found_models: List[LearnerGroupDict] = cls.query(
+            datastore_services.any_of(
+                cls.members == user_id,
+                cls.invitations == user_id,
+                cls.facilitators == user_id
         )).fetch()
 
         for learner_group_model in found_models:
