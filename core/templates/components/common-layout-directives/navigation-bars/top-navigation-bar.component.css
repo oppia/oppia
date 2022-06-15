@@ -3,6 +3,10 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+.oppia-navbar-tab:focus {
+  background-color: #fff;
+  color: #00645c;
+}
 
 .arrow-forward {
   color: #00645c;
