@@ -277,13 +277,13 @@ export class ContributionOpportunitiesBackendApiService {
       preferred_translation_language_code: ''
     };
     return this.userService.getUserInfoAsync().then(
-      async (userInfo) => {
+      async(userInfo) => {
         if (userInfo?.isLoggedIn()) {
           const res = await this.http
             .get<PreferredTranslationLanguageBackendDict>(
               '/preferredtranslationlanguage').toPromise().catch(
               () => emptyResponse);
-            return res.preferred_translation_language_code;
+          return res.preferred_translation_language_code;
         } else {
           return '';
         }

@@ -66,19 +66,33 @@ describe('Contribution Opportunities backend API service', function() {
     next_cursor: '6',
     more: true
   };
-  const userInfoDict = {
-    roles: ['USER_ROLE'],
-    is_moderator: false,
-    is_curriculum_admin: false,
-    is_super_admin: false,
-    is_topic_manager: false,
-    can_create_collections: false,
-    preferred_site_language_code: 'en',
-    username: 'user',
-    email: 'user@example.com',
-    user_is_logged_in: true
-  };
-  let userInfo: UserInfo;
+  const userInfoDict = [
+    {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: false,
+      preferred_site_language_code: 'en',
+      username: 'user',
+      email: 'user@example.com',
+      user_is_logged_in: true
+    },
+    {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: false,
+      preferred_site_language_code: '',
+      username: 'guest',
+      email: '',
+      user_is_logged_in: false
+    }
+  ];
+  let userInfo: UserInfo[];
   let sampleSkillOpportunitiesResponse: SkillOpportunity[];
   let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
   let sampleVoiceoverOpportunitiesResponse: ExplorationOpportunitySummary[];
@@ -92,7 +106,10 @@ describe('Contribution Opportunities backend API service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     userService = TestBed.get(UserService);
-    userInfo = UserInfo.createFromBackendDict(userInfoDict);
+    userInfo = [
+      UserInfo.createFromBackendDict(userInfoDict[0]),
+      UserInfo.createFromBackendDict(userInfoDict[1])      
+    ]
     sampleSkillOpportunitiesResponse = [
       SkillOpportunity.createFromBackendDict(
         skillOpportunityResponse.opportunities[0])
@@ -455,7 +472,7 @@ describe('Contribution Opportunities backend API service', function() {
       const params = 'en';
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(userInfo));
+        Promise.resolve(userInfo[0]));
 
       contributionOpportunitiesBackendApiService
         .savePreferredTranslationLanguageAsync(params)
@@ -481,7 +498,7 @@ describe('Contribution Opportunities backend API service', function() {
     const params = 'en';
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(userInfo));
+      Promise.resolve(userInfo[0]));
 
     contributionOpportunitiesBackendApiService
       .savePreferredTranslationLanguageAsync(params)
@@ -515,7 +532,7 @@ describe('Contribution Opportunities backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(userInfo));
+        Promise.resolve(userInfo[0]));
 
       contributionOpportunitiesBackendApiService
         .getPreferredTranslationLanguageAsync()
@@ -542,7 +559,7 @@ describe('Contribution Opportunities backend API service', function() {
     const emptyString: string = '';
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(userInfo));
+      Promise.resolve(userInfo[0]));
 
     contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
@@ -559,6 +576,27 @@ describe('Contribution Opportunities backend API service', function() {
     }, {
       status: 500, statusText: 'Internal Server Error'
     });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(emptyString);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should return empty string when calling ' +
+    '\'getPreferredTranslationLanguageAsync\' with guest ' +
+    'user.', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const emptyString: string = '';
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo[1]));
+
+    contributionOpportunitiesBackendApiService
+      .getPreferredTranslationLanguageAsync()
+      .then(successHandler, failHandler);
+    tick();
 
     flushMicrotasks();
 
