@@ -78,14 +78,20 @@ def get_package_file_contents(package: str, filepath: str) -> str:
 
     Returns:
         str. The contents of the file.
+
+    Raises:
+        FileNotFoundError. The file does not exist.
     """
     try:
         with io.open(
             os.path.join(package, filepath), 'r', encoding='utf-8'
         ) as file:
             return file.read()
-    except FileNotFoundError:
-        return pkgutil.get_data(package, filepath).decode('utf-8')
+    except FileNotFoundError as e:
+        file_data = pkgutil.get_data(package, filepath)
+        if file_data is None:
+            raise e
+        return file_data.decode('utf-8')
 
 
 class Constants(dict):  # type: ignore[type-arg]
