@@ -61,12 +61,12 @@ def _yield_all_tasks_ordered_by_status(
     cursor, more = (None, True)
     while more:
         # Here we used cast because we need to narrow the return type of
-        # .fetch_page() method from Tuple[Sequence[...], Cursor, bool]
-        # to Tuple[List[...], Cursor, bool] for more strict typing.
+        # .fetch_page() method from Tuple[Sequence[...], Optional[Cursor], bool]
+        # to Tuple[List[...], Optional[Cursor], bool] for more strict typing.
         results, cursor, more = cast(
             Tuple[
                 List[improvements_models.TaskEntryModel],
-                datastore_services.Cursor,
+                Optional[datastore_services.Cursor],
                 bool
             ],
             query.fetch_page(
@@ -164,12 +164,12 @@ def fetch_exploration_task_history_page(
         if urlsafe_start_cursor else None
     )
     # Here we used cast because we need to narrow down the return type
-    # of .fetch_page() method from Tuple[Sequence[...], Cursor, bool]
-    # to Tuple[List[...], Cursor, bool] for more strict typing.
+    # of .fetch_page() method from Tuple[Sequence[...], Optional[Cursor], bool]
+    # to Tuple[List[...], Optional[Cursor], bool] for more strict typing.
     results, cursor, more = cast(
         Tuple[
             List[improvements_models.TaskEntryModel],
-            datastore_services.Cursor,
+            Optional[datastore_services.Cursor],
             bool
         ],
         (

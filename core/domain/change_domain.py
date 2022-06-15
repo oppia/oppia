@@ -196,8 +196,8 @@ class BaseChange:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
 
         # Here we are deleting the 'name' key which cause MyPy to throw error,
-        # because MyPy does not allow key deletion from TypedDict, thus we
-        # added an ignore here.
+        # because MyPy does not allow key deletion from TypedDict. So to silent
+        # the error, we added an ignore here.
         valid_cmd_attribute_specs.pop('name', None)  # type: ignore[misc]
 
         actual_cmd_attributes = copy.deepcopy(change_dict)

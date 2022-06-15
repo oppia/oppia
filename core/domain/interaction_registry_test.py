@@ -149,7 +149,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         ca_names_in_schema = []
 
         # Here we used Any because values in schema dictionary can be of type
-        # str, int, List, Dict and other types too.
+        # str, int, List, Dict and other types too. So to make it generalized
+        # for every type of value we used Any here.
         def traverse_schema_to_find_names(schema: Dict[str, Any]) -> None:
             """Recursively traverses the schema to find all name fields.
             Recursion is required because names can be nested within
