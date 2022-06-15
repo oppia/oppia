@@ -81,7 +81,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_exploration_changes(
-            exp_id: str, exp_model: exp_models.ExplorationModel
+        exp_id: str,
+        exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. ExplorationChange object is
         generated schema version for some field is lower than the latest
