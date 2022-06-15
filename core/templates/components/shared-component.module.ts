@@ -62,6 +62,7 @@ import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { OutcomeEditorComponent } from './state-directives/outcome-editor/outcome-editor.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
@@ -124,6 +125,10 @@ import { SolutionEditor } from './state-directives/solution-editor/solution-edit
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
+import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
+import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
+import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
+import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component'; 
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -212,6 +217,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -264,7 +270,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 
   entryComponents: [
@@ -311,6 +321,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -358,7 +369,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 
   exports: [
@@ -421,6 +436,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     RubricsEditorComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     StateContentEditorComponent,
@@ -462,6 +478,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 })
 

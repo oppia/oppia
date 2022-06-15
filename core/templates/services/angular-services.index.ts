@@ -412,6 +412,9 @@ import { ExplorationWarningsService } from 'pages/exploration-editor-page/servic
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
+import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data.service';
+import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
+import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -828,6 +831,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['TranslationTopicService', TranslationTopicService],
   ['TranslationStatusService', TranslationStatusService],
   ['TruncatePipe', TruncatePipe],
+  ['TrainingDataService', TrainingDataService],
+  ['TrainingModalService', TrainingModalService],
+  ['TrainingDataEditorPanelService', TrainingDataEditorPanelService],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],
@@ -854,5 +860,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
-  ['NumberConversionService', NumberConversionService]
+  ['NumberConversionService', NumberConversionService],
+  ['ParameterMetadataService', ParameterMetadataService],
+  ['ExplorationWarningsService', ExplorationWarningsService],
 ];
