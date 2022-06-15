@@ -96,8 +96,9 @@ class UserSettings:
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
-        preferred_translation_language_code: str or None. Translation
-            language preference that pertains to the contributor dashboard.
+        preferred_translation_language_code: str or None. Text Translation
+            language preference of the translator that persists on the
+            contributor dashboard.
         pin: str or None. The PIN of the user's profile for android.
         display_alias: str or None. Display name of a user who is logged
             into the Android app. None when the request is coming from web
@@ -177,8 +178,8 @@ class UserSettings:
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
-            preferred_translation_language_code: str or None. Default language
-                used for text translations preference that pertains to the
+            preferred_translation_language_code: str or None. Text Translation
+                language preference of the translator that persists on the
                 contributor dashboard.
             pin: str or None. The PIN of the user's profile for android.
             display_alias: str or None. Display name of a user who is logged
@@ -1269,8 +1270,8 @@ class ModifiableUserData:
                 preference.
             preferred_audio_language_code: str or None. Audio language
                 preference.
-            preferred_translation_language_code: str or None. Text
-                translation language preference that pertains to the
+            preferred_translation_language_code: str or None. Text Translation
+                language preference of the translator that persists on the
                 contributor dashboard.
             user_id: str or None. User ID of the user whose data is being
                 updated. None if request did not have a user_id for the user

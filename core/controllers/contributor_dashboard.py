@@ -636,14 +636,10 @@ class TranslationPreferenceHandler(base.BaseHandler):
         }
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
-        if user_settings is None:
-            return self.render_json({
-                'preferred_translation_language_code': ''
-            })
         return self.render_json({
             'preferred_translation_language_code': (
                 user_settings.preferred_translation_language_code)

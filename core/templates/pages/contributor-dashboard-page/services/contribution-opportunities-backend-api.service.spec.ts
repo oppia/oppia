@@ -514,9 +514,13 @@ describe('Contribution Opportunities backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo));
+
       contributionOpportunitiesBackendApiService
         .getPreferredTranslationLanguageAsync()
         .then(successHandler, failHandler);
+      tick();
 
       const req = httpTestingController.expectOne(
         '/preferredtranslationlanguage'
@@ -537,9 +541,13 @@ describe('Contribution Opportunities backend API service', function() {
     const failHandler = jasmine.createSpy('fail');
     const emptyString: string = '';
 
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo));
+
     contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
       .then(successHandler, failHandler);
+    tick();
 
     const req = httpTestingController.expectOne(
       '/preferredtranslationlanguage'

@@ -276,11 +276,19 @@ export class ContributionOpportunitiesBackendApiService {
     const emptyResponse = {
       preferred_translation_language_code: ''
     };
-    const response = await this.http
-      .get<PreferredTranslationLanguageBackendDict>(
-        '/preferredtranslationlanguage').toPromise().catch(
-        () => emptyResponse);
-    return response.preferred_translation_language_code;
+    return this.userService.getUserInfoAsync().then(
+      async (userInfo) => {
+        if (userInfo?.isLoggedIn()) {
+          const res = await this.http
+            .get<PreferredTranslationLanguageBackendDict>(
+              '/preferredtranslationlanguage').toPromise().catch(
+              () => emptyResponse);
+            return res.preferred_translation_language_code;
+        } else {
+          return '';
+        }
+      }
+    );
   }
 }
 

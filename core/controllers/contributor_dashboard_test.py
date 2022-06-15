@@ -1434,6 +1434,9 @@ class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['preferred_translation_language_code'], 'en')
         self.logout()
 
-    def test_get_preferred_translation_language_with_guest_user(self):
-        response = self.get_json('/preferredtranslationlanguage')
-        self.assertEqual(response['preferred_translation_language_code'], '')
+    def test_handler_with_guest_user_raises_exception(self):
+        response = self.get_json(
+            '/preferredtranslationlanguage', expected_status_int=401)
+
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
