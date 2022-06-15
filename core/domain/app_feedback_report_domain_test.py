@@ -816,17 +816,19 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validation_name_is_none_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type None to
-        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
             'No entry point name supplied.')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type int to
-        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
@@ -860,6 +862,9 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             'Exploration with id invalid_exploration is not part of story '
             'with id')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validation_exploration_id_not_a_stringfails(self) -> None:
         self.entry_point.topic_id = 'valid_topic1'
         self.entry_point.story_id = 'valid_story1'
@@ -867,6 +872,16 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Exploration id should be a string')
+
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_story_id_fails_on_none_value(self) -> None:
+        self.entry_point.topic_id = 'valid_topic1'
+        self.entry_point.story_id = None
+        self._assert_validation_error(
+            self.entry_point,
+            'The story_id must be a string value, received None')
 
     def _assert_validation_error(
             self,

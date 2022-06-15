@@ -471,10 +471,12 @@ class Collection:
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        # Here, to_dict() method return TypeDict which is defined to match the
-        # current version of domain object but collection_dict expecting a
-        # TypeDict which contain full version of domain object. Thus to avoid
-        # MyPy error we added an ignore here.
+        # Here, to_dict() method returns a general dictionary representation
+        # of domain object which do not contain properties like created_on and
+        # last_updated but MyPy expecting collection_dict a dictionary which
+        # contain all the properties of domain object. That's why we explicitly
+        # changing the type of collection_dict here which causes MyPy to throw
+        # error, thus to silent the error we added an ignore here.
         collection_dict: SerializableCollectionDict = self.to_dict() # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version

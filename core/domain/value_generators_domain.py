@@ -26,7 +26,7 @@ import os
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, Type
 
 
 class BaseValueGenerator:
@@ -69,8 +69,8 @@ class BaseValueGenerator:
     # are set to 'Any'.
     def generate_value(
         self,
-        *args: Tuple[Any],
-        **kwargs: Dict[str, Any]
+        *args: Any,
+        **kwargs: Any
     ) -> Any:
         """Generates a new value, using the given customization args.
 
