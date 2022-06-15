@@ -17,7 +17,7 @@
  */
 
 import { PlatformLocation } from '@angular/common';
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, NgZone } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -61,7 +61,8 @@ export class RouterService {
     private explorationImprovementsService: ExplorationImprovementsService,
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
-    private location: PlatformLocation
+    private location: PlatformLocation,
+    private ngZone: NgZone
   ) {
     this._changeTab(this.windowRef.nativeWindow.location.hash.split('#')[1]);
 
@@ -86,16 +87,20 @@ export class RouterService {
 
     if (newPath.indexOf(this.TABS.TRANSLATION.path) === 0) {
       this._activeTabName = this.TABS.TRANSLATION.name;
-      let waitForStatesToLoad = setInterval(() => {
-        if (this.explorationStatesService.isInitialized()) {
-          clearInterval(waitForStatesToLoad);
-          if (!this.stateEditorService.getActiveStateName()) {
-            this.stateEditorService.setActiveStateName(
-              this.explorationInitStateNameService.savedMemento);
-          }
-          this.refreshTranslationTabEventEmitter.emit();
-        }
-      }, 300);
+      this.ngZone.runOutsideAngular(() => {
+        let waitForStatesToLoad = setInterval(() => {
+          this.ngZone.run(() => {
+            if (this.explorationStatesService.isInitialized()) {
+              clearInterval(waitForStatesToLoad);
+              if (!this.stateEditorService.getActiveStateName()) {
+                this.stateEditorService.setActiveStateName(
+                  this.explorationInitStateNameService.savedMemento);
+              }
+              this.refreshTranslationTabEventEmitter.emit();
+            }
+          });
+        }, 300);
+      });
     } else if (newPath.indexOf(this.TABS.PREVIEW.path) === 0) {
       this._activeTabName = this.TABS.PREVIEW.name;
       this._doNavigationWithState(newPath, this.SLUG_PREVIEW);
