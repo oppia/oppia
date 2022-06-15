@@ -26,8 +26,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Optional
-
 MYPY = False
 if MYPY:
     from mypy_imports import question_models
@@ -71,8 +69,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 2, ['skill_1'], 0))
 
         self.assertEqual(len(questions), 1)
-        # Ruling out the possibility of None for mypy type checking.
-        assert isinstance(questions[0], question_domain.Question)
+        assert questions[0] is not None
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict()) # type: ignore[no-untyped-call]
 
@@ -99,7 +96,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(questions), 1)
         # Ruling out the possibility of None for mypy type checking.
-        assert isinstance(questions[0], question_domain.Question)
+        assert questions[0] is not None
         self.assertEqual(
             questions[0].to_dict(), question_1.to_dict()) # type: ignore[no-untyped-call]
 
@@ -112,11 +109,11 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)
         # Ruling out the possibility of None for mypy type checking.
-        assert isinstance(questions[0], question_domain.Question)
+        assert questions[0] is not None
         self.assertEqual(questions[0].id, self.question_id)
         self.assertIsNone(questions[1])
         # Ruling out the possibility of None for mypy type checking.
-        assert isinstance(questions[2], question_domain.Question)
+        assert questions[2] is not None
         self.assertEqual(questions[2].id, question_id_2)
 
     def test_cannot_get_question_from_model_with_invalid_schema_version(
@@ -133,32 +130,30 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
 
-        question_model: Optional[
-            question_models.QuestionModel] = question_models.QuestionModel(
+        question_model: question_models.QuestionModel = (
+        question_models.QuestionModel(
             id=question_id,
             question_state_data=(
                 self._create_valid_question_data('ABC').to_dict()), # type: ignore[no-untyped-call]
             language_code='en',
             version=0,
-            question_state_data_schema_version=0)
+            question_state_data_schema_version=0))
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert isinstance(question_model, question_models.QuestionModel)
         question_model.commit(
             self.editor_id, 'question model created',
             [{'cmd': question_domain.CMD_CREATE_NEW}])
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
-        question_model = all_question_models.get()
+        new_question_model = all_question_models.get()
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION):
             # Ruling out the possibility of None for mypy type checking.
-            assert isinstance(question_model, question_models.QuestionModel)
-            question_fetchers.get_question_from_model(question_model)
+            assert new_question_model is not None
+            question_fetchers.get_question_from_model(new_question_model)
 
     def test_get_question_from_model_with_current_valid_schema_version(
         self
@@ -188,11 +183,11 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
+        new_question_model = all_question_models.get()
         # Ruling out the possibility of None for mypy type checking.
-        assert isinstance(all_question_models, question_models.QuestionModel)
-        question_model = all_question_models.get()
+        assert new_question_model is not None
         updated_question_model = question_fetchers.get_question_from_model(
-            question_model)
+            new_question_model)
         self.assertEqual(
             updated_question_model.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
