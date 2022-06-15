@@ -663,7 +663,7 @@ class SessionStateStats:
                             state_stats[state_stats_property]
                         )
                     )
-        # The aggregated_stats parameter do not represents any domain class,
+        # The aggregated_stats parameter does not represent any domain class,
         # hence dict form of the data is returned from here.
         return aggregated_stats
 

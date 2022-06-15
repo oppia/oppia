@@ -1880,7 +1880,8 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
-            self):
+        self
+    ):
         self.aggregated_stats['num_starts'] = 'invalid'
 
         response = self.post_json('/explorehandler/stats_events/%s' % (
