@@ -20,12 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import {
-  CapitalizePipe
-} from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { Fraction } from 'domain/objects/fraction.model';
@@ -45,6 +41,7 @@ import {
 } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { InteractionCustomizationArgs, DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 export interface ExplanationBackendDict {
   // A null 'content_id' indicates that the 'Solution' has been created
@@ -92,7 +89,9 @@ export class Solution extends BaseTranslatableObject {
     };
   }
 
-  getSummary(interactionId: string): string {
+  getSummary(
+      interactionId: string, customizationArgs: InteractionCustomizationArgs
+  ): string {
     const solutionType = this.answerIsExclusive ? 'The only' : 'One';
     let correctAnswer = null;
     if (interactionId === 'GraphInput') {
@@ -110,12 +109,17 @@ export class Solution extends BaseTranslatableObject {
         new UnitsObjectFactory())).fromDict(
           this.correctAnswer as NumberWithUnitsAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
-      const formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
       correctAnswer = [];
+      const subtitledHtmlChoices = (
+        customizationArgs as DragAndDropSortInputCustomizationArgs)
+        .choices.value;
+      const subtitledHtmlChoicesContentIds = subtitledHtmlChoices.map(
+        choice => choice.contentId);
       for (const arr of this.correctAnswer as DragAndDropAnswer) {
         const transformedArray = [];
         for (const elem of arr) {
-          transformedArray.push(formatRtePreview.transform(elem));
+          const choiceIndex = subtitledHtmlChoicesContentIds.indexOf(elem);
+          transformedArray.push(subtitledHtmlChoices[choiceIndex].html);
         }
         correctAnswer.push(transformedArray);
       }
