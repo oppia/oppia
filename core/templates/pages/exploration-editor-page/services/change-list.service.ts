@@ -37,7 +37,6 @@ import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGr
 import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { StringNullableChain } from 'lodash';
 
 export type StatePropertyValues = (
   AnswerGroup[] |

@@ -319,7 +319,7 @@ export class CustomizeInteractionModalComponent
       if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
         if ((value as SubtitledHtml|SubtitledUnicode).contentId === null) {
           (value as SubtitledHtml|SubtitledUnicode).contentId = (
-            this.generateContentIdService.getNextStateId(contentIdPrefix);
+            this.generateContentIdService.getNextStateId(contentIdPrefix));
         }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (
