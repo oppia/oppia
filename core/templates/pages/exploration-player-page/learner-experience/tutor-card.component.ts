@@ -45,6 +45,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -122,7 +123,8 @@ export class TutorCardComponent {
     private urlService: UrlService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -179,6 +181,7 @@ export class TutorCardComponent {
       this.updateDisplayedCard();
     }
     if (
+      this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
       this.isOnTerminalCard() &&
       !this.animationHasPlayedOnce &&
       this.inStoryMode

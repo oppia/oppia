@@ -45,6 +45,7 @@ import { TutorCardComponent } from './tutor-card.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -58,6 +59,16 @@ class MockWindowRef {
       };
     }
   };
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EndChapterCelebration: {
+        isEnabled: true
+      }
+    };
+  }
 }
 
 describe('Tutor card component', () => {
@@ -80,6 +91,7 @@ describe('Tutor card component', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
+  let platformFeatureService: PlatformFeatureService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', new Interaction([], [], null, null, [], null, null)
@@ -113,6 +125,11 @@ describe('Tutor card component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -141,6 +158,7 @@ describe('Tutor card component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowRef = TestBed.inject(WindowRef);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -225,10 +243,42 @@ describe('Tutor card component', () => {
           isFirstChange: () => false
         }
       };
+
       componentInstance.ngOnChanges(changes);
+
       expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
       expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalled();
     }));
+
+  it('should not trigger celebratory animation if the feature is not enabled',
+    () => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+        {
+          EndChapterCelebration: {
+            isEnabled: false
+          }
+        }
+      );
+      spyOn(componentInstance, 'triggerCelebratoryAnimation');
+      componentInstance.animationHasPlayedOnce = false;
+      componentInstance.inStoryMode = true;
+      const changes: SimpleChanges = {
+        displayedCard: {
+          previousValue: false,
+          currentValue: true,
+          firstChange: false,
+          isFirstChange: () => false
+        }
+      };
+
+      componentInstance.ngOnChanges(changes);
+
+      expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+      expect(
+        componentInstance.triggerCelebratoryAnimation).not.toHaveBeenCalled();
+    });
 
   it('should not trigger celebratory animation if not in story mode',
     fakeAsync(() => {
@@ -245,7 +295,9 @@ describe('Tutor card component', () => {
           isFirstChange: () => false
         }
       };
+
       componentInstance.ngOnChanges(changes);
+
       expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
       expect(
         componentInstance.triggerCelebratoryAnimation).not.toHaveBeenCalled();
