@@ -17,6 +17,7 @@
  * the training data editor of an answer group.
  */
 
+import { TrainingDataEditorPanelComponent } from './training-data-editor-panel-modal.component';
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
@@ -51,24 +52,23 @@ require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-data-editor-panel-modal.controller.ts');
 require('services/external-save.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').factory('TrainingDataEditorPanelService', [
-  '$uibModal', 'AlertsService', 'ExternalSaveService',
+  'AlertsService', 'NgbModal', 'ExternalSaveService',
   function(
-      $uibModal, AlertsService, ExternalSaveService) {
+      AlertsService, NgbModal, ExternalSaveService) {
     return {
       /**
       * Opens training data editor for currently selected answer group.
       */
       openTrainingDataEditor: function() {
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'training-data-editor.template.html'),
-          backdrop: 'static',
-          controller: 'TrainingDataEditorPanelServiceModalController'
-        });
+
+        NgbModal.open(TrainingDataEditorPanelComponent, {
+          backdrop: 'static'
+        }).result.then(() => {}, () => {});
+
         // Save the modified training data externally in state content.
         ExternalSaveService.onExternalSave.emit();
       }

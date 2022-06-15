@@ -127,10 +127,13 @@ import { StateSolutionEditorComponent } from './state-editor/state-solution-edit
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
 import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
+import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
+import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component'; 
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
+import { TruncateInputBasedOnInteractionAnswerType } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 
 
 // Services.
@@ -270,7 +273,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StaleTabInfoModalComponent,
     UnsavedChangesStatusInfoModalComponent,
     TrainingPanelComponent,
-    TrainingModalComponent
+    TrainingModalComponent,
+    TruncateInputBasedOnInteractionAnswerType,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 
   entryComponents: [
@@ -367,7 +373,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StaleTabInfoModalComponent,
     UnsavedChangesStatusInfoModalComponent,
     TrainingPanelComponent,
-    TrainingModalComponent
+    TrainingModalComponent,
+    TruncateInputBasedOnInteractionAnswerType,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 
   exports: [
@@ -473,7 +482,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     TrainingPanelComponent,
-    TrainingModalComponent
+    TrainingModalComponent,
+    TruncateInputBasedOnInteractionAnswerType,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 })
 
