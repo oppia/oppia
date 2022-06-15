@@ -51,10 +51,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _migrate_exploration(
-            exp_id: str,
-            exp_model: exp_models.ExplorationModel
-    ) -> result.Result[Tuple[str, exp_domain.Exploration],
-                       Tuple[str, Exception]]:
+        exp_id: str,
+        exp_model: exp_models.ExplorationModel
+    ) -> result.Result[
+        Tuple[str, exp_domain.Exploration],
+        Tuple[str, Exception]
+    ]:
         """Migrates exploration and transform exploration model into
         exploration object.
 
@@ -79,8 +81,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_exploration_changes(
-            exp_id: str,
-            exp_model: exp_models.ExplorationModel
+            exp_id: str, exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. ExplorationChange object is
         generated schema version for some field is lower than the latest
@@ -218,7 +219,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
-            lambda exp_model: exp_model.id)
+                lambda exp_model: exp_model.id)
         )
 
         exp_rights_models = (
@@ -230,11 +231,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         exp_summary_models = (
-                self.pipeline
-                | 'Get all non-deleted exploration summary models' >> (
-                    ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
-                | 'Add exploration summary ID' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
-            lambda exp_summary_model: exp_summary_model.id)
+            self.pipeline
+            | 'Get all non-deleted exploration summary models' >> (
+                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+            | 'Add exploration summary ID' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
+                lambda exp_summary_model: exp_summary_model.id)
         )
 
         migrated_exp_results = (
