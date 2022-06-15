@@ -150,12 +150,12 @@ class LearnerGroupModel(base_models.BaseModel):
             dict. A dict containing the user-relevant properties of
             LearnerGroupModel.
         """
-        found_models: List[LearnerGroupDict] = cls.query(
+        found_models = cls.get_all().filter(
             datastore_services.any_of(
                 cls.members == user_id,
                 cls.invitations == user_id,
                 cls.facilitators == user_id
-        )).fetch()
+        ))
         user_data = {}
         for learner_group_model in found_models:
             # If the user is a member, we export all fields except
@@ -222,12 +222,12 @@ class LearnerGroupModel(base_models.BaseModel):
         Args:
             user_id: str. The user_id denotes which user's data to delete.
         """
-        found_models: List[LearnerGroupDict] = cls.query(
+        found_models = cls.get_all().filter(
             datastore_services.any_of(
                 cls.members == user_id,
                 cls.invitations == user_id,
                 cls.facilitators == user_id
-        )).fetch()
+        ))
 
         for learner_group_model in found_models:
             # If the user is a member, delete the user from the members list.
