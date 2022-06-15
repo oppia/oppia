@@ -86,33 +86,6 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             self.assertFalse(
                 os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
-    def test_compiled_js_dir_is_deleted_after_compilation(self) -> None:
-        """Test that compiled_js_dir is deleted before a fresh compilation."""
-        def mock_validate_compiled_js_dir() -> None:
-            pass
-        process = subprocess.Popen(
-            ['test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_deletion(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
-            os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
-            return process
-
-        compiled_js_dir_swap = self.swap(
-            typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
-        validate_swap = self.swap(
-            typescript_checks, 'validate_compiled_js_dir',
-            mock_validate_compiled_js_dir)
-        popen_swap = self.swap(
-            subprocess, 'Popen', mock_popen_for_deletion)
-        with popen_swap, compiled_js_dir_swap, validate_swap:
-            if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
-                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
-            typescript_checks.compile_and_check_typescript(
-                typescript_checks.STRICT_TSCONFIG_FILEPATH)
-            self.assertFalse(
-                os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
-
     def test_no_error_for_valid_compilation_of_tsconfig(self) -> None:
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:

@@ -865,9 +865,6 @@ def compile_strict_tsconfig(
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, encoding='utf-8')
 
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
-
     # The value of `process.stdout` should not be None since we passed
     # the `stdout=subprocess.PIPE` argument to `Popen`.
     assert process.stdout is not None
@@ -921,9 +918,6 @@ def compile_and_check_typescript(config_path: str) -> None:
     print('Compiling and testing typescript...')
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
-
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
 
     # The value of `process.stdout` should not be None since we passed
     # the `stdout=subprocess.PIPE` argument to `Popen`.
