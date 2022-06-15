@@ -113,6 +113,39 @@ class LearnerGroupModel(base_models.BaseModel):
 
         raise Exception('New id generator is producing too many collisions.')
 
+    @classmethod
+    def create(
+        cls,
+        group_id: str,
+        title: str,
+        description: str
+    ) -> LearnerGroupModel:
+        """Creates a new LearnerGroupModel instance and returns it.
+
+        Note that the client is responsible for actually saving this entity to
+        the datastore.
+
+        Args:
+            group_id: str. The ID of the learner group.
+            title: str. The title of the learner group.
+            description: str. The description of the learner group.
+
+        Returns:
+            LearnerGroupModel. The newly created LearnerGroupModel instance.
+
+        Raises:
+            Exception. A learner group with the given group ID exists already.
+        """
+        if cls.get_by_id(group_id):
+            raise Exception(
+                'A learner group with the given group ID exists already.')
+
+        entity = cls(id=group_id, title=title, description=description)
+
+        entity.update_timestamps()
+        entity.put()
+        return entity
+
     @staticmethod
     def get_field_names_for_takeout() -> Dict[str, str]:
         """We do not want to export all user ids in the facilitators, members

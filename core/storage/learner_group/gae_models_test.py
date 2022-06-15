@@ -101,6 +101,19 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         learner_group_data_model_cls = (
             learner_group_models.LearnerGroupModel)
 
+        # Test create method.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'A learner group with the given group ID exists already.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                learner_group_data_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    learner_group_data_model_cls)):
+                learner_group_data_model_cls.create(
+                    'Abcd', 'title', 'description')
+
         # Test get_new_id method.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
@@ -112,6 +125,19 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
                     lambda x, y: True,
                     learner_group_data_model_cls)):
                 learner_group_data_model_cls.get_new_id()
+
+    def test_creating_new_learner_group_model_instance(self) -> None:
+        learner_group_data_model_id = (
+            learner_group_models.LearnerGroupModel.get_new_id())
+        learner_group_data_model_instance = (
+            learner_group_models.LearnerGroupModel.create(
+                learner_group_data_model_id, 'title', 'description'))
+        self.assertEqual(
+            learner_group_data_model_instance.id, learner_group_data_model_id)
+        self.assertEqual(
+            learner_group_data_model_instance.title, 'title')
+        self.assertEqual(
+            learner_group_data_model_instance.description, 'description')
 
     def test_export_data_on_members(self) -> None:
         """Test export data on users that are members of the learner group."""
