@@ -87,7 +87,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
                 skill_descriptions.append(skill.description)
             else:
                 skill_descriptions.append(None)
-    grouped_skill_descriptions.append(skill_descriptions)
+        grouped_skill_descriptions.append(skill_descriptions)
 
     questions = get_questions_by_ids(question_ids)
     return questions, grouped_skill_descriptions
