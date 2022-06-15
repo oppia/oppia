@@ -16,26 +16,18 @@
  * @fileoverview Unit tests for TrainingModalService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AlertsService } from 'services/alerts.service';
 import { TrainingModalService } from './training-modal.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
 
-
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Training Modal Service', () => {
+describe('Training Modal Service', () => {
   let trainingModalService: TrainingModalService;
   let alertsService: AlertsService;
   let ngbModal: NgbModal;
-
-  class MockNgbModalRef {
-    unhandledAnswer: string;
-    finishTrainingCallback: Observable<void>;
-  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -54,21 +46,32 @@ fdescribe('Training Modal Service', () => {
     ngbModal = TestBed.inject(NgbModal);
   });
 
+  it('should open NgbModal', fakeAsync(() => {
+    let emitter = new EventEmitter<void>();
+    let MockComponentInstance = {
+      unhandledAnswer: 'shivam',
+      finishTrainingCallback: emitter
+    };
 
-  it('should open NgbModal', () => {
+    spyOn(trainingModalService.onFinishTrainingCallback, 'emit');
     spyOn(alertsService, 'clearWarnings')
       .and.stub();
     spyOn(ngbModal, 'open').and.callFake(() => {
       return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject()
+        componentInstance: MockComponentInstance,
+        result: Promise.resolve()
       } as NgbModalRef);
     });
 
     trainingModalService.openTrainUnresolvedAnswerModal(
       'Test', 'textInput', 2);
 
+    emitter.emit();
+    tick();
+
     expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(
+      trainingModalService.onFinishTrainingCallback.emit).toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
-  });
+  }));
 });
