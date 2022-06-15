@@ -597,6 +597,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
+                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -641,6 +642,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': True,
+                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -653,6 +655,51 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
         run_e2e_tests.main(args=['--debug_mode'])
+
+    def test_start_tests_in_mobile_mode(self):
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'install_third_party_libraries', lambda _: None,
+            expected_args=[(False,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            expected_args=[(True,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_dev_appserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webdriver_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_protractor_server', mock_managed_process,
+            expected_kwargs=[
+                {
+                    'dev_mode': True,
+                    'suite_name': 'full',
+                    'sharding_instances': 3,
+                    'debug_mode': True,
+                    'mobile': True,
+                    'stdout': subprocess.PIPE,
+                },
+            ]))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            flake_checker, 'report_pass', lambda _: None,
+            expected_args=[('full',)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(0,)]))
+
+        run_e2e_tests.main(args=['--mobile'])
 
     def test_start_tests_in_with_chromedriver_flag(self):
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -686,6 +733,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
+                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
