@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from "rxjs";
-
 /**
  * @fileoverview Controller for teach oppia modal.
  */
 
+import { Subscription } from 'rxjs';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
