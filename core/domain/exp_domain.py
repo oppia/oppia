@@ -2031,8 +2031,13 @@ class Exploration:
                     }
                 })
 
-        answer_groups = state_dict['interaction']['answer_groups']
-        answer_groups['outcome']['dest_if_really_stuck'] = None
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['outcome']['dest_if_really_stuck'] = None
+
+            # state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None
+            if state_dict['interaction']['default_outcome'] is not None:
+                state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None
 
         return states_dict
 
@@ -2258,7 +2263,7 @@ class Exploration:
     
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
-        """Converts a v53 exploration dict into a v54 exploration dict.
+        """Converts a v54 exploration dict into a v55 exploration dict.
         Version 50 adds a new customization arg to TextInput interaction
         which allows creators to fill a catch misspellings checkbox. Also adds
         a new dest_if_really_stuck field to the Outcome class to redirect
@@ -2276,7 +2281,7 @@ class Exploration:
 
         exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
             exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 40
+        exploration_dict['states_schema_version'] = 50
 
         return exploration_dict
 

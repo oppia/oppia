@@ -1068,6 +1068,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         old_answer_groups.append({
             'outcome': {
                 'dest': exploration.init_state_name,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2645,7 +2646,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -2670,11 +2670,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2741,11 +2738,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2891,7 +2885,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -2916,11 +2909,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-            value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2987,11 +2977,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3042,7 +3029,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3067,11 +3053,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3138,11 +3121,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3193,7 +3173,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3218,11 +3197,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3289,11 +3265,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3345,7 +3318,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3370,11 +3342,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3442,11 +3411,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3498,7 +3464,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3523,11 +3488,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3597,11 +3559,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3654,7 +3613,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3679,11 +3637,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3753,11 +3708,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3810,7 +3762,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3835,11 +3786,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3909,11 +3857,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3966,7 +3911,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -3991,11 +3935,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4122,6 +4063,144 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 49
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V55 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 55
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
           dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
@@ -4206,8 +4285,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        requireNonnegativeInput:
-          value: False
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -4219,7 +4304,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: NumericInput
+      id: TextInput
       solution: null
     linked_skill_id: null
     next_content_id_index: 1
@@ -4235,12 +4320,12 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V54
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V55
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -4511,7 +4596,6 @@ states:
       answer_groups:
       - outcome:
           dest: END
-          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4551,7 +4635,6 @@ states:
             html: <p>Choice 2</p>
       default_outcome:
         dest: (untitled state)
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4630,7 +4713,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4746,7 +4829,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
@@ -4784,7 +4867,6 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4858,7 +4940,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4935,7 +5017,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
@@ -4985,6 +5067,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'customization_args': {},
                     'default_outcome': {
                         'dest': dest_name,
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
                             'html': ''
@@ -5088,7 +5171,10 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                     'unicode_str': 'Enter here.'
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
         }
         customization_args_dict2 = {
             'choices': {'value': [
@@ -5618,6 +5704,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'labelled_as_correct': False,
                 'param_changes': [],
                 'feedback': {
@@ -5641,6 +5728,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'feedback': {
@@ -5695,6 +5783,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -5750,6 +5841,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -5893,6 +5987,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -5909,6 +6006,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property'
@@ -5933,6 +6033,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6003,6 +6106,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'param_changes': [],
                         'refresher_exploration_id': None,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False
                     }
@@ -6095,6 +6199,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'refresher_exploration_id': None,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'html': '',
@@ -6123,6 +6228,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     {
                         'refresher_exploration_id': None,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback':
                         {
@@ -6183,6 +6289,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6199,6 +6308,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property'
@@ -6223,6 +6335,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6293,6 +6408,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'param_changes': [],
                         'refresher_exploration_id': None,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False
                     }
@@ -6319,6 +6435,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6381,6 +6500,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -6495,6 +6615,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -6510,6 +6631,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         })]
@@ -6529,6 +6651,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -6558,6 +6681,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -6610,6 +6734,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -6633,6 +6758,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -6659,6 +6785,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -6791,6 +6918,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'refresher_exploration_id': None,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'html': '',
@@ -6816,6 +6944,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'refresher_exploration_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'html': '<p>Good</p>',
@@ -6874,6 +7003,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -6927,6 +7057,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -6956,6 +7087,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7008,6 +7140,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7031,6 +7164,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7057,6 +7191,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7110,6 +7245,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7139,6 +7275,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7200,6 +7337,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -7320,6 +7458,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7346,6 +7485,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7398,6 +7538,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7421,6 +7562,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7447,6 +7589,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7541,6 +7684,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None,
             'new_value': {
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -7564,6 +7708,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
@@ -7681,6 +7826,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -7734,6 +7880,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7760,6 +7907,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7812,6 +7960,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7835,6 +7984,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7861,6 +8011,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -8024,6 +8175,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'new_value': {}
@@ -8089,6 +8243,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'html': '',
                         'content_id': 'feedback_2'
@@ -8456,6 +8611,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': '',
                         'content_id': 'ca_placeholder_0'
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -8501,6 +8659,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'param_changes': []
                     },
                     'training_data': [],
@@ -8531,6 +8690,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'param_changes': []
             },
             'cmd': 'edit_state_property',
@@ -8544,6 +8704,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'param_changes': [
 
                 ]
@@ -8559,6 +8720,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'param_changes': [
 
                 ]
@@ -8574,6 +8736,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'param_changes': [
 
                 ]
@@ -8868,6 +9031,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -8881,6 +9047,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -8896,6 +9065,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -8911,6 +9081,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -8991,6 +9162,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -9116,6 +9288,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': 'Placeholder',
                         'content_id': 'ca_placeholder_0'
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9130,6 +9305,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': 'Placeholder Changed.',
                         'content_id': 'ca_placeholder_0'
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9145,6 +9323,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -9160,6 +9339,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         })]
@@ -9206,6 +9386,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -9234,6 +9415,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9247,6 +9431,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9262,6 +9449,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -9277,6 +9465,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -9505,6 +9694,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9518,6 +9710,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9533,6 +9728,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -9548,6 +9744,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -9844,6 +10041,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9857,6 +10057,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9872,6 +10075,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -9887,6 +10091,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -10080,6 +10285,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -10134,6 +10342,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'training_data': [],
                     'outcome': {
                         'param_changes': [],
+                        'dest_if_really_stuck': None,
                         'dest': 'End',
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
@@ -10243,6 +10452,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'param_changes': [],
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'feedback_1',
@@ -10266,6 +10476,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'param_changes': [],
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'feedback_1',
@@ -10280,6 +10491,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': {
                 'param_changes': [],
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
@@ -10293,6 +10505,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'param_changes': [],
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
@@ -10334,6 +10547,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': {
                 'param_changes': [],
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
@@ -10383,6 +10597,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -10420,6 +10637,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'outcome': {
                         'param_changes': [],
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'feedback_1',
@@ -10505,6 +10723,9 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'rows': {
                         'value': 1
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'cmd': 'edit_state_property',
@@ -10560,6 +10781,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'outcome': {
                             'param_changes': [],
                             'dest': 'End',
+                            'dest_if_really_stuck': None,
                             'missing_prerequisite_skill_id': None,
                             'feedback': {
                                 'content_id': 'feedback_1',
@@ -10645,6 +10867,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'outcome': {
                         'param_changes': [],
                         'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'feedback_1',
@@ -10668,6 +10891,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'outcome': {
                         'param_changes': [],
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'feedback_1',
@@ -10682,6 +10906,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'old_value': {
                     'param_changes': [],
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'default_outcome',
@@ -10695,6 +10920,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'new_value': {
                     'param_changes': [],
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'default_outcome',
@@ -10736,6 +10962,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'old_value': {
                     'param_changes': [],
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'default_outcome',

@@ -1199,7 +1199,10 @@ class Question:
             })
         
         answer_groups = question_state_dict['interaction']['answer_groups']
-        answer_groups['outcome']['dest_if_really_stuck'] = None
+        for answer_group in answer_groups:
+            answer_group['outcome']['dest_if_really_stuck'] = None
+
+        question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None
 
         return question_state_dict
 

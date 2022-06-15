@@ -3397,6 +3397,9 @@ title: Title
                 },
             },
             'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
         })
         state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
