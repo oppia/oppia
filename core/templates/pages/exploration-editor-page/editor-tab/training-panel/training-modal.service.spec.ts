@@ -16,53 +16,59 @@
  * @fileoverview Unit tests for TrainingModalService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AlertsService } from 'services/alerts.service';
+import { TrainingModalService } from './training-modal.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import { Subscription } from 'rxjs';
 
-describe('Training Modal Service', function() {
-  var TrainingModalService = null;
-  var AlertsService = null;
-  var ExternalSaveService = null;
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Training Modal Service', () => {
+  let trainingModalService: TrainingModalService;
+  let alertsService: AlertsService;
+  let ngbModal: NgbModal;
 
-  var testSubscriptions = null;
-  var externalSaveSpy = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    TrainingModalService = $injector.get(
-      'TrainingModalService');
-    AlertsService = $injector.get('AlertsService');
-    ExternalSaveService = $injector.get('ExternalSaveService');
-  }));
+  class MockNgbModalRef {
+    unhandledAnswer: string;
+    finishTrainingCallback: Observable<void>;
+  }
 
   beforeEach(() => {
-    externalSaveSpy = jasmine.createSpy('externalSave');
-    testSubscriptions = new Subscription();
-    testSubscriptions.add(ExternalSaveService.onExternalSave.subscribe(
-      externalSaveSpy));
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        TrainingModalService,
+        AlertsService,
+        ExternalSaveService,
+        NgbModal
+      ]
+    });
+
+    trainingModalService = TestBed.inject(
+      TrainingModalService);
+    alertsService = TestBed.inject(AlertsService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
-  afterEach(() => {
-    testSubscriptions.unsubscribe();
-  });
 
-  it('should open $uibModal', function() {
-    var clearWarningsSpy = spyOn(AlertsService, 'clearWarnings')
-      .and.callThrough();
-    TrainingModalService.openTrainUnresolvedAnswerModal();
+  it('should open NgbModal', () => {
+    spyOn(alertsService, 'clearWarnings')
+      .and.stub();
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject()
+      } as NgbModalRef);
+    });
 
-    expect(clearWarningsSpy).toHaveBeenCalled();
-    expect(externalSaveSpy).toHaveBeenCalled();
+    trainingModalService.openTrainUnresolvedAnswerModal(
+      'Test', 'textInput', 2);
+
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 });

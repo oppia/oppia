@@ -20,6 +20,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
+interface inputAnswerType {
+  code: string;
+}
+
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe'
 })
@@ -29,13 +33,13 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     private truncatePipe: TruncatePipe,
   ) { }
 
-  // Shivam PTAL.
-  transform(input: any, interactionId: string, length: number): string {
+  transform(
+      input: inputAnswerType, interactionId: string, length: number): string {
     let answerType = INTERACTION_SPECS[interactionId].answer_type;
     let actualInputToTruncate = '';
 
     if (answerType === 'NormalizedString') {
-      actualInputToTruncate = input;
+      actualInputToTruncate = input as unknown as string;
     } else if (answerType === 'CodeEvaluation') {
       actualInputToTruncate = input.code;
     } else {

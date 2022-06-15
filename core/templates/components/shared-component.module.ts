@@ -128,12 +128,11 @@ import { StateInteractionEditorComponent } from './state-editor/state-interactio
 import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
 import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
 import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
-import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component'; 
+import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
-
 
 // Services.
 import { AuthService } from 'services/auth.service';
@@ -217,7 +216,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
-    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -252,14 +250,9 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
-    AddHintModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
-    DeleteInteractionModalComponent,
-    DeleteHintModalComponent,
-    DeleteLastHintModalComponent,
-    DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
     ReviewMaterialEditorComponent,
@@ -271,10 +264,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
     UnsavedChangesStatusInfoModalComponent,
-    TrainingPanelComponent,
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
-    TestInteractionPanel
+    TestInteractionPanel,
+    OutcomeEditorComponent,
+    TrainingPanelComponent,
   ],
 
   entryComponents: [
@@ -351,7 +345,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
-    AddHintModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
