@@ -126,6 +126,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -394,6 +397,9 @@ describe('Exploration Warnings Service', function() {
                 },
                 placeholder: {
                   value: 1
+                },
+                catchMisspellings: {
+                  value: false
                 }
               },
               hints: [],
@@ -489,6 +495,9 @@ describe('Exploration Warnings Service', function() {
                 },
                 placeholder: {
                   value: 1
+                },
+                catchMisspellings: {
+                  value: false
                 }
               },
               hints: [],
@@ -594,6 +603,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -685,6 +697,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -741,6 +756,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -832,6 +850,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -900,6 +921,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1028,6 +1052,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1070,6 +1097,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1112,6 +1142,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1154,6 +1187,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1196,6 +1232,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1238,6 +1277,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1280,6 +1322,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1322,6 +1367,9 @@ describe('Exploration Warnings Service', function() {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -1502,6 +1550,9 @@ describe('Exploration Warnings Service', function() {
                   unicode_str: 'placeholder value',
                   content_id: ''
                 }
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],

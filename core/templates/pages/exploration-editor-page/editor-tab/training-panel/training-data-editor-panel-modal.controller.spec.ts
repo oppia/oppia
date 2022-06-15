@@ -119,7 +119,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: 'Hola',
@@ -179,7 +182,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         hints: [],
       }));
@@ -326,7 +332,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: 'Hola',
@@ -380,6 +389,9 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               content_id: 'ca_placeholder_0',
               unicode_str: ''
             }
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         hints: [],
@@ -459,7 +471,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: 'Hola',
@@ -511,7 +526,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         hints: [],
       }));

@@ -130,7 +130,10 @@ describe('Solution Verification Service', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           default_outcome: {
             dest: 'First State',
@@ -202,7 +205,10 @@ describe('Solution Verification Service', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           default_outcome: {
             dest: 'default',

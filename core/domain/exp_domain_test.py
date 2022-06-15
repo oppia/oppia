@@ -2670,6 +2670,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -2739,6 +2741,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -2912,6 +2916,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+            value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -2981,6 +2987,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -3059,6 +3067,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -3128,6 +3138,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -3206,6 +3218,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -3275,6 +3289,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -3354,6 +3370,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -3424,6 +3442,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -3503,6 +3523,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -3575,6 +3597,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -3655,6 +3679,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -3727,6 +3753,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -3807,6 +3835,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -3879,6 +3909,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
@@ -3959,6 +3991,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -4031,6 +4065,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null

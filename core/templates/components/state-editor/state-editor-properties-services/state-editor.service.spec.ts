@@ -113,6 +113,9 @@ describe('Editor state service', () => {
         },
         rows: {
           value: 1
+        },
+        catchMisspellings: {
+          value: false
         }
       },
       hints: [],
@@ -465,6 +468,9 @@ describe('Editor state service', () => {
       placeholder: {
         value: suof.createDefault('2', ''),
       },
+      catchMisspellings: {
+        value: false
+      }
     };
     ecs.setInteraction(mockInteraction);
     expect(ecs.interaction.customizationArgs).toEqual({
@@ -473,6 +479,9 @@ describe('Editor state service', () => {
       },
       rows: {
         value: 1
+      },
+      catchMisspellings: {
+        value: false
       }
     });
     ecs.setInteractionCustomizationArgs(newCustomizationArgs);

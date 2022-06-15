@@ -115,7 +115,10 @@ describe('Training Modal Controller', function() {
                     unicode_str: ''
                   }
                 },
-                rows: { value: 1 }
+                rows: { value: 1 },
+                catchMisspellings: {
+                  value: false
+                }
               },
               default_outcome: {
                 dest: '',
@@ -155,7 +158,10 @@ describe('Training Modal Controller', function() {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           default_outcome: {
             dest: 'Init',
@@ -287,7 +293,10 @@ describe('Training Modal Controller', function() {
                   unicode_str: 'Type your answer here.'
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: '',
@@ -328,7 +337,10 @@ describe('Training Modal Controller', function() {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'Init',
@@ -416,7 +428,10 @@ describe('Training Modal Controller', function() {
                     unicode_str: ''
                   }
                 },
-                rows: { value: 1 }
+                rows: { value: 1 },
+                catchMisspellings: {
+                  value: false
+                }
               },
               default_outcome: {
                 dest: '',
@@ -479,6 +494,9 @@ describe('Training Modal Controller', function() {
                 content_id: 'ca_placeholder_0',
                 unicode_str: ''
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],

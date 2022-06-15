@@ -177,7 +177,10 @@ describe('Question Creation Service', function() {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: null,
@@ -566,7 +569,10 @@ describe('Question Creation Service', function() {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: null,

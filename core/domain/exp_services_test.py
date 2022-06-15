@@ -1300,6 +1300,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         dest_if_really_stuck: null
@@ -1864,6 +1866,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: %s
         dest_if_really_stuck: null
@@ -1907,6 +1911,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: New state
         dest_if_really_stuck: null
@@ -1974,6 +1980,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: %s
         dest_if_really_stuck: null
@@ -2017,6 +2025,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Renamed state
         dest_if_really_stuck: null
@@ -2358,6 +2368,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+        value: false
   default_outcome:
     dest: %s
     dest_if_really_stuck: null
@@ -2405,6 +2417,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+        value: false
   default_outcome:
     dest: New state
     dest_if_really_stuck: null
@@ -2453,6 +2467,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+        value: false
   default_outcome:
     dest: Renamed state
     dest_if_really_stuck: null

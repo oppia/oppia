@@ -69,7 +69,10 @@ describe('Editable question backend API service', function() {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: null,

@@ -108,6 +108,9 @@ describe('Exploration engine service ', () => {
                   unicode_str: '',
                   content_id: 'ca_placeholder_0'
                 }
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             answer_groups: [
@@ -233,6 +236,9 @@ describe('Exploration engine service ', () => {
                   unicode_str: '',
                   content_id: 'ca_placeholder_0'
                 }
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             answer_groups: [

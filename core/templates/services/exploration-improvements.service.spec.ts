@@ -99,6 +99,9 @@ describe('ExplorationImprovementsService', function() {
           },
         },
         rows: { value: 1 },
+        catchMisspellings: {
+          value: false
+        }
       },
       default_outcome: {
         dest: 'new state',

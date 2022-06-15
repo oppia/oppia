@@ -447,7 +447,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
         }
 
         state.update_next_content_id_index(3)
@@ -933,6 +936,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': 'New state',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'default_outcome',
                         'html': ''
@@ -1368,7 +1372,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_interaction_cust_args)
 
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1870,6 +1874,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1913,6 +1918,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1978,6 +1984,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2060,6 +2067,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2160,6 +2168,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_old_math_schema
@@ -2197,6 +2206,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_new_math_schema
@@ -2248,6 +2258,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2319,6 +2330,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2377,6 +2389,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_old_math_schema
@@ -2398,6 +2411,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_new_math_schema
@@ -2444,6 +2458,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2504,6 +2519,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_new_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2558,6 +2574,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_old_math_schema
@@ -2579,6 +2596,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_new_math_schema
@@ -2625,6 +2643,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2675,6 +2694,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_new_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2772,6 +2792,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2793,6 +2814,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2836,6 +2858,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2918,6 +2941,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3004,6 +3028,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_old_math_schema
@@ -3043,6 +3068,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3113,6 +3139,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_old_math_schema
@@ -3152,6 +3179,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3239,6 +3267,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3325,6 +3354,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3368,6 +3398,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_new_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False

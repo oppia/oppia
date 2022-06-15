@@ -128,6 +128,9 @@ describe('Responses Service', () => {
         placeholder: {
           value: 1,
         },
+        catchMisspellings: {
+          value: false
+        }
       },
       hints: [],
       solution: {
@@ -189,6 +192,9 @@ describe('Responses Service', () => {
         placeholder: {
           value: 1,
         },
+        catchMisspellings: {
+          value: false
+        }
       },
       hints: [],
       solution: {

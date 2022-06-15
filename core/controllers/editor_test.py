@@ -294,6 +294,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: false
   default_outcome:
     dest: State A
     dest_if_really_stuck: null
@@ -338,6 +340,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: false
   default_outcome:
     dest: State B
     dest_if_really_stuck: null
@@ -382,6 +386,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: false
   default_outcome:
     dest: %s
     dest_if_really_stuck: null
@@ -428,6 +434,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: false
   default_outcome:
     dest: State A
     dest_if_really_stuck: null

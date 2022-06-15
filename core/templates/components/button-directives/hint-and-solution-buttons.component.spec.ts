@@ -132,6 +132,9 @@ describe('HintAndSolutionButtonsComponent', () => {
           placeholder: {
             value: 1,
           },
+          catchMisspellings: {
+            value: false
+          }
         },
         hints: [],
         solution: {

@@ -1600,6 +1600,7 @@ class GenericTestBase(AppEngineTestBase):
                     'html': '',
                 },
                 'dest': None,
+                'dest_if_really_stuck': None,
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': True,
@@ -1607,6 +1608,9 @@ class GenericTestBase(AppEngineTestBase):
             'customization_args': {
                 'rows': {'value': 1},
                 'placeholder': {'value': 'Enter text here'},
+                'catchMisspellings': {
+                    'value': False
+                }
             },
             'confirmed_unclassified_answers': [],
             'id': 'TextInput',
