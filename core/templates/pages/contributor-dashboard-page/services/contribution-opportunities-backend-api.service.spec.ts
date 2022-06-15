@@ -108,8 +108,8 @@ describe('Contribution Opportunities backend API service', function() {
     userService = TestBed.get(UserService);
     userInfo = [
       UserInfo.createFromBackendDict(userInfoDict[0]),
-      UserInfo.createFromBackendDict(userInfoDict[1])      
-    ]
+      UserInfo.createFromBackendDict(userInfoDict[1])
+    ];
     sampleSkillOpportunitiesResponse = [
       SkillOpportunity.createFromBackendDict(
         skillOpportunityResponse.opportunities[0])
