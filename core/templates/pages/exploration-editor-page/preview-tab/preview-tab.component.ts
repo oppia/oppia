@@ -179,7 +179,7 @@ angular.module('oppia').component('previewTab', {
             ExplorationParamChangesService.init(
               ParamChangesObjectFactory.createFromBackendList(
                 explorationData.param_changes));
-            ExplorationStatesService.init(explorationData.states);
+            ExplorationStatesService.init(explorationData.states, false);
             ExplorationInitStateNameService.init(
               explorationData.init_state_name);
             GraphDataService.recompute();

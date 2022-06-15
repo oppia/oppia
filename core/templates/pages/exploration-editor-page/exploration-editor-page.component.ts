@@ -270,7 +270,8 @@ angular.module('oppia').component('explorationEditorPage', {
           StateClassifierMappingService.init(
             ContextService.getExplorationId(), explorationData.version);
           ExplorationStatesService.init(
-            explorationData.states, explorationData.exploration_is_linked_to_story);
+            explorationData.states,
+            explorationData.exploration_is_linked_to_story);
           EntityTranslationsService.init(
             'exploration', ctrl.explorationId, explorationData.version);
 

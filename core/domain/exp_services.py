@@ -1173,12 +1173,21 @@ def update_exploration(
     # changes will be performed in the task queue.
     changes_related_to_translation = []
     translation_related_cmds = [
-        exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE,
-        exp_domain.CMD_REMOVE_TRANSLATION
+        exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+        exp_domain.CMD_REMOVE_TRANSLATIONS
     ]
+    content_ids_corresponding_translations_to_remove = []
+    content_ids_corresponding_translations_to_mark_needs_update = []
+
     for change in change_list:
-        if change.cmd in translation_related_cmds:
-            changes_related_to_translation.append(change)
+        if change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
+            content_ids_corresponding_translations_to_remove.append(
+                change.content_id)
+            continue
+
+        if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
+            content_ids_corresponding_translations_to_mark_needs_update.append(
+                change.content_id)
 
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
@@ -1189,7 +1198,9 @@ def update_exploration(
     taskqueue_services.defer(
         taskqueue_services.FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
-        updated_exploration.version, changes_related_to_translation,
+        updated_exploration.version,
+        content_ids_corresponding_translations_to_remove,
+        content_ids_corresponding_translations_to_mark_needs_update,
         translation_services.get_content_count(updated_exploration)
         )
 

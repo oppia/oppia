@@ -235,6 +235,7 @@ export class ExplorationStatesService {
           backdropClass: 'forced-modal-stack',
           windowClass: 'forced-modal-stack'
         });
+      modalRef.componentInstance.contentId = content.contentId;
     }
   }
 

@@ -17,19 +17,38 @@
  *  needing update.
  */
 
- import { Component } from '@angular/core';
- import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
- import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { Component, Input } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 
- @Component({
-   selector: 'oppia-mark-translations-as-needing-update-modal',
-   templateUrl: './mark-translations-as-needing-update-modal.component.html'
- })
- export class MarkTranslationsAsNeedingUpdateModalComponent
-   extends ConfirmOrCancelModal {
-   constructor(
-     private ngbActiveModal: NgbActiveModal,
-   ) {
-     super(ngbActiveModal);
-   }
- }
+@Component({
+  selector: 'oppia-mark-translations-as-needing-update-modal',
+  templateUrl: './mark-translations-as-needing-update-modal.component.html'
+})
+export class MarkTranslationsAsNeedingUpdateModalComponent
+  extends ConfirmOrCancelModal {
+
+  @Input() contentId: string;
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+    private changeListService: ChangeListService
+  ) {
+    super(ngbActiveModal);
+  }
+
+  markNeedsUpdate(): void {
+    this.changeListService.markTranslationsAsNeedingUpdate(this.contentId);
+    this.ngbActiveModal.close();
+  }
+
+  removeTranslations(): void {
+    this.changeListService.removeTranslations(this.contentId);
+    this.ngbActiveModal.close();
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss();
+  }
+}

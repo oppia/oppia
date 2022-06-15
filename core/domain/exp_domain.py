@@ -110,9 +110,9 @@ DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
 # This takes additional 'content_id' and 'state_name' parameters.
 DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
     'mark_written_translations_as_needing_update')
-CMD_MARK_TRANSLATION_NEEDS_UPDATE = 'mark_translations_as_needing_update'
-# This takes additional 'content_id' and 'state_name' parameters.
-CMD_REMOVE_TRANSLATION = 'mark_to_remove_translation'
+CMD_MARK_TRANSLATIONS_NEEDS_UPDATE = 'mark_translations_as_needing_update'
+# This takes additional 'content_id' parameters.
+CMD_REMOVE_TRANSLATIONS = 'remove_translations'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -338,6 +338,16 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
         'required_attribute_names': ['content_id', 'state_name'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+        'required_attribute_names': ['content_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_REMOVE_TRANSLATIONS,
+        'required_attribute_names': ['content_id'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {

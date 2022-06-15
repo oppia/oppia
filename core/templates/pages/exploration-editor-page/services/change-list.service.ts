@@ -381,13 +381,24 @@ export class ChangeListService {
    * update in all languages.
    *
    * @param {string} contentId - The content id of the translated content.
-   * @param {string} stateName - The current state name.
    */
-  markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {
+  markTranslationsAsNeedingUpdate(contentId: string): void {
     this.addChange({
-      cmd: 'mark_written_translations_as_needing_update',
-      content_id: contentId,
-      state_name: stateName
+      cmd: 'mark_translations_as_needing_update',
+      content_id: contentId
+    });
+  }
+
+  /**
+   * Saves a change dict that represents removing translations in all languages
+   * for the given content id.
+   *
+   * @param {string} contentId - The content id of the translated content.
+   */
+   removeTranslations(contentId: string): void {
+    this.addChange({
+      cmd: 'remove_translations',
+      content_id: contentId
     });
   }
 

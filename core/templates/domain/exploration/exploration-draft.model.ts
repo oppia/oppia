@@ -29,7 +29,8 @@ export type ExplorationChange = (
   ExplorationChangeAddState |
   ExplorationChangeAddWrittenTranslation |
   ExplorationChangeMarkWrittenTranslationAsNeedingUpdate |
-  ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate |
+  ExplorationChangeMarkTranslationsAsNeedingUpdate |
+  ExplorationChangeRemoveTranslations |
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
   ExplorationChangeEditStateProperty |
@@ -121,10 +122,14 @@ export interface ExplorationChangeMarkWrittenTranslationAsNeedingUpdate {
   'state_name': string;
 }
 
-export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
-  'cmd': 'mark_written_translations_as_needing_update';
+export interface ExplorationChangeMarkTranslationsAsNeedingUpdate {
+  'cmd': 'mark_translations_as_needing_update';
   'content_id': string;
-  'state_name': string;
+}
+
+export interface ExplorationChangeRemoveTranslations {
+  'cmd': 'remove_translations';
+  'content_id': string;
 }
 
 export interface ExplorationDraftDict {

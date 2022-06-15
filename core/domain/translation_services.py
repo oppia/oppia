@@ -95,7 +95,8 @@ def get_and_cache_machine_translation(
 def update_translation_related_change(
     exploration_id,
     exploration_version,
-    changes_related_to_translation,
+    content_ids_corresponding_translations_to_remove,
+    content_ids_corresponding_translations_to_mark_needs_update,
     content_count
 ):
     old_translation_models = (
@@ -119,17 +120,18 @@ def update_translation_related_change(
         )
         translation_counts[new_translation_model.language_code] = (
             len(new_translation_model.translation))
-        for change in changes_related_to_translation:
-            if change.content_id not in new_translation_model.translation:
-                continue
+        for content_id in content_ids_corresponding_translations_to_remove:
+            if content_id in new_translation_model.translation:
+                del new_translation_model.translations[change.content_id]
+                translation_counts[new_translation_model.language_code] -= 1
 
-            if change.cmd == exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE:
+        for content_id in (
+                content_ids_corresponding_translations_to_mark_needs_update):
+            if content_id in new_translation_model.translation:
                 new_translation_model.translations[
                     change.content_id].needs_update = True
-            else:
-                # CMD_REMOVE_TRANSLATION:
-                del new_translation_model.translations[change.content_id]
-            translation_counts[new_translation_model.language_code] -= 1
+                translation_counts[new_translation_model.language_code] -= 1
+
 
         new_translation_models.append(new_translation_model)
 
