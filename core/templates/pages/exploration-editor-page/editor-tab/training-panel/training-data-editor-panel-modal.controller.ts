@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for TrainingDataEditorPanelService modal.
  */
+import { Subscription } from 'rxjs';
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -43,6 +44,8 @@ angular.module('oppia').controller(
         StateCustomizationArgsService, StateEditorService,
         StateInteractionIdService, TrainingDataService, TrainingModalService,
         EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION) {
+      var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var _stateName = StateEditorService.getActiveStateName();
       $scope.stateName = _stateName;
       var _state = ExplorationStatesService.getState(_stateName);
@@ -161,20 +164,31 @@ angular.module('oppia').controller(
           var answer = $scope.trainingData[answerIndex].answer;
           var interactionId = StateInteractionIdService.savedMemento;
           return TrainingModalService.openTrainUnresolvedAnswerModal(
-            answer, function() {
+            answer, interactionId, answerIndex);
+        }
+        return;
+      };
+
+      $scope.init();
+
+      ctrl.$onInit = function() {
+        ctrl.directiveSubscriptions.add(
+          TrainingModalService.onFinishTrainingCallback.subscribe(
+            (finishTrainingResult) => {
               var truncatedAnswer = $filter(
                 'truncateInputBasedOnInteractionAnswerType')(
-                answer, interactionId, 12);
+                finishTrainingResult.answer,
+                finishTrainingResult.interactionId, 12);
               var successToast = (
                 'The answer ' + truncatedAnswer +
                 ' has been successfully trained.');
               AlertsService.addSuccessMessage(
                 successToast, 1000);
               _rebuildTrainingData();
-            });
-        }
-        return;
+            }));
       };
 
-      $scope.init();
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
+      };
     }]);

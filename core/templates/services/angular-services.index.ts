@@ -410,6 +410,7 @@ import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/se
 import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data.service';
 import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -822,6 +823,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TranslationTopicService', TranslationTopicService],
   ['TruncatePipe', TruncatePipe],
   ['TrainingDataService', TrainingDataService],
+  ['TrainingModalService', TrainingModalService],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],

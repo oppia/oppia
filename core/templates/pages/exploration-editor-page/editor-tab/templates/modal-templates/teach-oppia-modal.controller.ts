@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Subscription } from "rxjs";
+
 /**
  * @fileoverview Controller for teach oppia modal.
  */
@@ -68,6 +70,8 @@ angular.module('oppia').controller('TeachOppiaModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    var ctrl = this;
+    ctrl.directiveSubscriptions = new Subscription();
     var _explorationId = (
       ContextService.getExplorationId());
     var _stateName = StateEditorService.getActiveStateName();
@@ -174,20 +178,31 @@ angular.module('oppia').controller('TeachOppiaModalController', [
         $scope.unresolvedAnswers[answerIndex]);
       var answer = unresolvedAnswer.answer;
       return TrainingModalService.openTrainUnresolvedAnswerModal(
-        answer, function() {
-          $scope.unresolvedAnswers.splice(answerIndex, 1);
-          var truncatedAnswer = $filter(
-            'truncateInputBasedOnInteractionAnswerType')(
-            answer, interactionId, 12);
-          var successToast = (
-            'The response for ' + truncatedAnswer +
-            ' has been fixed.');
-          AlertsService.addSuccessMessage(
-            successToast, TOAST_TIMEOUT);
-        });
+        answer, null, answerIndex);
     };
 
     $scope.loadingDotsAreShown = true;
     fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
+
+    ctrl.$onInit = function() {
+      ctrl.directiveSubscriptions.add(
+        TrainingModalService.onFinishTrainingCallback.subscribe(
+          (finishTrainingResult) => {
+            $scope.unresolvedAnswers.splice(
+              finishTrainingResult.answerIndex, 1);
+            var truncatedAnswer = $filter(
+              'truncateInputBasedOnInteractionAnswerType')(
+              finishTrainingResult.answer, interactionId, 12);
+            var successToast = (
+              'The response for ' + truncatedAnswer +
+              ' has been fixed.');
+            AlertsService.addSuccessMessage(
+              successToast, TOAST_TIMEOUT);
+          }));
+    };
+
+    ctrl.$onDestroy = function() {
+      ctrl.directiveSubscriptions.unsubscribe();
+    };
   }
 ]);
