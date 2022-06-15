@@ -42,12 +42,14 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         super(LearnerGroupModelUnitTest, self).setUp()
 
         self.learner_group_model = learner_group_models.LearnerGroupModel(
-            '3232', 'title', 'description',
-            ['user_1'],
-            ['user_2', 'user_3', 'user_4'],
-            ['user_5', 'user_6'],
-            ['subtopic_1', 'subtopic_2'],
-            ['story_1', 'story_2'])
+            id='3232',
+            title='title',
+            description='description',
+            facilitators=['user_1', 'user_11'],
+            members=['user_2', 'user_3', 'user_4'],
+            invitations=['user_5', 'user_6'],
+            subtopic_ids=['subtopic_1', 'subtopic_2'],
+            story_ids=['story_1', 'story_2'])
         self.learner_group_model.update_timestamps()
         self.learner_group_model.put()
 
@@ -117,11 +119,13 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         member_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_2'))
         expected_member_user_data = {
-            'title': 'title',
-            'description': 'description',
-            'member': 'user_2',
-            'subtopic_ids': ['subtopic_1', 'subtopic_2'],
-            'story_ids': ['story_1', 'story_2']
+            '3232': {
+                'title': 'title',
+                'description': 'description',
+                'member': 'user_2',
+                'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+                'story_ids': ['story_1', 'story_2']
+            }
         }
         self.assertEqual(expected_member_user_data, member_user_data)
 
@@ -132,11 +136,13 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         invited_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_6'))
         expected_invited_user_data = {
-            'title': 'title',
-            'description': 'description',
-            'invited': 'user_6',
-            'subtopic_ids': ['subtopic_1', 'subtopic_2'],
-            'story_ids': ['story_1', 'story_2']
+            '3232': {
+                'title': 'title',
+                'description': 'description',
+                'invitation': 'user_6',
+                'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+                'story_ids': ['story_1', 'story_2']
+            }
         }
         self.assertEqual(expected_invited_user_data, invited_user_data)
 
@@ -147,11 +153,13 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         facilitator_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_1'))
         expected_facilitator_user_data = {
-            'title': 'title',
-            'description': 'description',
-            'facilitator': 'user_1',
-            'subtopic_ids': ['subtopic_1', 'subtopic_2'],
-            'story_ids': ['story_1', 'story_2']
+            '3232': {
+                'title': 'title',
+                'description': 'description',
+                'facilitator': 'user_1',
+                'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+                'story_ids': ['story_1', 'story_2']
+            }
         }
 
         self.assertEqual(
@@ -211,7 +219,11 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_1'))
+        self.assertTrue(
+            learner_group_models.LearnerGroupModel
+            .has_reference_to_user_id('user_11'))
 
+        # Deleting facilitator when more than 1 facilitators are present.
         (
             learner_group_models.LearnerGroupModel
             .apply_deletion_policy('user_1')
@@ -220,3 +232,13 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_1'))
+
+        # Deleting facilitator when only 1 facilitator is present.
+        (
+            learner_group_models.LearnerGroupModel
+            .apply_deletion_policy('user_11')
+        )
+
+        self.assertFalse(
+            learner_group_models.LearnerGroupModel
+            .has_reference_to_user_id('user_11'))

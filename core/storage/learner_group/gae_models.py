@@ -136,10 +136,11 @@ class LearnerGroupModel(base_models.BaseModel):
             dict. A dict containing the user-relevant properties of
             LearnerGroupModel.
         """
-        found_models = cls.get_all().filter(
-            user_id in cls.members or
-            user_id in cls.invitations or
-            user_id in cls.facilitators)
+        found_models = cls.query(datastore_services.any_of(
+            cls.members == user_id,
+            cls.invitations == user_id,
+            cls.facilitators == user_id
+        )).fetch()
         user_data = {}
         for learner_group_model in found_models:
             # If the user is a member, we export all fields except
@@ -191,10 +192,11 @@ class LearnerGroupModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            cls.query().filter(
-            user_id in cls.members or
-            user_id in cls.invitations or
-            user_id in cls.facilitators).count() > 0
+            cls.query(datastore_services.any_of(
+                cls.members == user_id,
+                cls.invitations == user_id,
+                cls.facilitators == user_id
+            )).get(keys_only=True) is not None
         )
 
     @classmethod
@@ -205,21 +207,24 @@ class LearnerGroupModel(base_models.BaseModel):
         Args:
             user_id: str. The user_id denotes which user's data to delete.
         """
-        found_models = cls.query().filter(
-            user_id in cls.members or
-            user_id in cls.invitations or
-            user_id in cls.facilitators)
+        found_models = cls.query(datastore_services.any_of(
+            cls.members == user_id,
+            cls.invitations == user_id,
+            cls.facilitators == user_id
+        )).fetch()
 
         for learner_group_model in found_models:
             # If the user is a member, delete the user from the members list.
             if user_id in learner_group_model.members:
                 learner_group_model.members.remove(user_id)
+                learner_group_model.update_timestamps()
                 learner_group_model.put()
 
             # If the user has been invited to join the group, delete the
             # user from the invitations list.
             elif user_id in learner_group_model.invitations:
                 learner_group_model.invitations.remove(user_id)
+                learner_group_model.update_timestamps()
                 learner_group_model.put()
 
             # If the user is the facilitator of the group and there are
@@ -228,6 +233,7 @@ class LearnerGroupModel(base_models.BaseModel):
             elif user_id in learner_group_model.facilitators and (
                     len(learner_group_model.facilitators) > 1):
                 learner_group_model.facilitators.remove(user_id)
+                learner_group_model.update_timestamps()
                 learner_group_model.put()
 
             # If the user is the facilitator of the group and there is

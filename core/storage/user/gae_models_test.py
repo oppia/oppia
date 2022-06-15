@@ -3357,7 +3357,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
                 }
             ]).put()
         user_models.LearnerGroupUserModel(
-            id=self.USER_ID_1,
+            id=self.USER_ID_2,
             invited_to_learner_groups=['129', '431'],
             member_of_learner_groups=['754', '234'],
             progress_sharing_permissions=[

@@ -3024,7 +3024,7 @@ class LearnerGroupUserModel(base_models.BaseModel):
     member_of_learner_groups = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     progress_sharing_permissions = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
+        datastore_services.JsonProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
