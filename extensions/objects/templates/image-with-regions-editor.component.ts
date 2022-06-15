@@ -351,11 +351,6 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
         this.imageLocalStorageService.isInStorage(imageUrl))) {
-      // TODO(#15579): SVG sanitization cannot be run here because sanitization
-      // returns a SafeURL, which needs to be bound to the href attribute
-      // in an image tag within an SVG element -- this is currently not
-      // supported.
-      // See https://github.com/angular/angular/issues/38854
       const base64Url = this.imageLocalStorageService.getRawImageData(
         imageUrl);
       // This throws "TS2322: Type 'string | null' is not assignable to type
@@ -365,7 +360,27 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       // above, before accessing the image data. So, the typescript check can
       // be ignored here.
       // @ts-ignore
-      return base64Url;
+      const mimeType = base64Url.split(';')[0];
+      if (mimeType === AppConstants.SVG_MIME_TYPE) {
+        return this.svgSanitizerService.removeAllInvalidTagsAndAttributes(
+          // This throws "TS2322: Type 'string | null' is not assignable to type
+          // 'string'" We need to suppress this error because the method
+          // 'getRawImageData' will return null only when an
+          // image is not in local storage. This scenario is explicitly checked
+          // above, before accessing the image data. So, the typescript check
+          // can be ignored here.
+          // @ts-ignore
+          base64Url);
+      } else {
+        // This throws "TS2322: Type 'string | null' is not assignable to type
+        // 'string'" We need to suppress this error because the method
+        // 'getRawImageData' will return null only when an
+        // image is not in local storage. This scenario is explicitly checked
+        // above, before accessing the image data. So, the typescript check can
+        // be ignored here.
+        // @ts-ignore
+        return base64Url;
+      }
     } else {
       return this.assetsBackendApiService.getImageUrlForPreview(
         entityType,
