@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TruncateInputBasedOnInteractionAnswerType filter for Oppia.
+ * @fileoverview TruncateInputBasedOnInteractionAnswerType Pipe for Oppia.
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
@@ -23,7 +23,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe'
 })
-export class TruncateInputBasedOnInteractionAnswerType
+export class TruncateInputBasedOnInteractionAnswerTypePipe
     implements PipeTransform {
   constructor(
     private truncatePipe: TruncatePipe,

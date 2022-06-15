@@ -48,7 +48,7 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { TrainingDataService } from './training-data.service';
 import { TrainingModalService } from './training-modal.service';
-import { TruncateInputBasedOnInteractionAnswerType } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
+import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
@@ -113,8 +113,8 @@ export class TrainingDataEditorPanelComponent
     private responsesService: ResponsesService,
     private stateEditorService: StateEditorService,
     private currentInteractionService: CurrentInteractionService,
-    private truncateInputBasedOnInteractionAnswerType:
-      TruncateInputBasedOnInteractionAnswerType,
+    private truncateInputBasedOnInteractionAnswerTypePipe:
+      TruncateInputBasedOnInteractionAnswerTypePipe,
   ) {
     super(ngbActiveModal);
   }
@@ -142,7 +142,7 @@ export class TrainingDataEditorPanelComponent
       this.trainingModalService.onFinishTrainingCallback.subscribe(
         (finishTrainingResult) => {
           let truncatedAnswer = (
-            this.truncateInputBasedOnInteractionAnswerType.transform(
+            this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
               finishTrainingResult.interactionId, 12));
           let successToast = (
@@ -262,7 +262,7 @@ export class TrainingDataEditorPanelComponent
       this.trainingDataService.associateWithAnswerGroup(
         this.answerGroupIndex, newAnswer);
       let truncatedAnswer = (
-        this.truncateInputBasedOnInteractionAnswerType.transform(
+        this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
           newAnswer, interactionId, 12));
       let successToast = (
         'The answer ' + truncatedAnswer +
