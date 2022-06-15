@@ -133,7 +133,6 @@ import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/t
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
-import { TruncateInputBasedOnInteractionAnswerType } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 
 
 // Services.
@@ -274,7 +273,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     UnsavedChangesStatusInfoModalComponent,
     TrainingPanelComponent,
     TrainingModalComponent,
-    TruncateInputBasedOnInteractionAnswerType,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel
   ],
@@ -374,7 +372,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     UnsavedChangesStatusInfoModalComponent,
     TrainingPanelComponent,
     TrainingModalComponent,
-    TruncateInputBasedOnInteractionAnswerType,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel
   ],
@@ -483,7 +480,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateInteractionEditorComponent,
     TrainingPanelComponent,
     TrainingModalComponent,
-    TruncateInputBasedOnInteractionAnswerType,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel
   ],

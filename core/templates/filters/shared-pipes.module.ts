@@ -24,6 +24,7 @@ import { FormsModule } from '@angular/forms';
 
 import { LimitToPipe } from './limit-to.pipe';
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
+import { TruncateInputBasedOnInteractionAnswerType } from './truncate-input-based-on-interaction-answer-type.pipe';
 
 @NgModule({
   imports: [
@@ -32,11 +33,13 @@ import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-
     StringUtilityPipesModule
   ],
   declarations: [
-    LimitToPipe
+    LimitToPipe,
+    TruncateInputBasedOnInteractionAnswerType
   ],
   exports: [
     LimitToPipe,
-    StringUtilityPipesModule
+    StringUtilityPipesModule,
+    TruncateInputBasedOnInteractionAnswerType
   ],
 })
 
