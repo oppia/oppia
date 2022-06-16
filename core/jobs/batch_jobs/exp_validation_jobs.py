@@ -52,19 +52,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 exp_fetchers.get_exploration_from_model)
         )
 
-        total_explorations_with_ids = (
-            total_explorations
-            | 'Map with id' >> beam.Map(
-                lambda exp: exp.id)
-        )
-
-        total_explorations_list = beam.pvalue.AsIter(
-            total_explorations_with_ids)
-
         combine_exp_ids_and_states = (
             total_explorations
             | 'Combine exp id and states' >> beam.Map(
-                lambda exp: (exp.id, exp.states))
+                lambda exp: (exp.id, exp.states, exp.created_on))
         )
 
         invalid_exps_with_errored_state_rte_values = (
@@ -72,10 +63,17 @@ class ExpStateValidationJob(base_jobs.JobBase):
             | 'Get invalid state rte values' >> beam.Map(
                 lambda objects: (
                     objects[0],
-                    self.filter_invalid_state_rte_values(objects[1])))
+                    self.filter_invalid_state_rte_values(objects[1]),
+                    objects[2]))
             | 'Remove empty values for rte' >> beam.Map(
                 lambda objects: (
-                    objects[0], self.remove_empty_values(objects[1])))
+                    objects[0], self.remove_empty_values(objects[1]),
+                    objects[2]))
+            | 'Split date and time' >> beam.Map(
+                lambda objects: (
+                    objects[0], objects[1], objects[2].date()
+                )
+            )
         )
 
         report_number_of_exps_queried = (
@@ -89,8 +87,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
             invalid_exps_with_errored_state_rte_values
             | 'Show info for rte' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {objects[0]}, and the state RTE ' +
-                   f'erroneous data are {objects[1]}'
+                   f'The id of exp is {objects[0]}, ' +
+                   f'created on {objects[2]}, and the state' +
+                   f' RTE erroneous data are {objects[1]}'
                 )
             )
         )
@@ -101,17 +100,19 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 lambda objects: (
                     objects[0],
                     self.filter_invalid_state_interaction_values_part_1(
-                        objects[1])))
+                        objects[1]), objects[2]))
             | 'Remove empty values for state interaction part 1' >> beam.Map(
                 lambda objects: (
-                    objects[0], self.remove_empty_values(objects[1])))
+                    objects[0], self.remove_empty_values(objects[1]),
+                    objects[2].date()))
         )
 
         report_invalid_state_interaction_values_part_1 = (
             invalid_exps_with_errored_state_interaction_values_part_1
             | 'Show info for state interaction part 1' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {objects[0]}, and the state interaction'
+                   f'The id of exp is {objects[0]}, ' +
+                   f'created on {objects[2]}, and the state interaction'
                    + f' part 1 erroneous data are {objects[1]}'
                 )
             )
@@ -123,17 +124,19 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 lambda objects: (
                     objects[0],
                     self.filter_invalid_state_interaction_values_part_2(
-                        objects[1])))
+                        objects[1]), objects[2]))
             | 'Remove empty values for state interaction part 2' >> beam.Map(
                 lambda objects: (
-                    objects[0], self.remove_empty_values(objects[1])))
+                    objects[0], self.remove_empty_values(objects[1]),
+                    objects[2].date()))
         )
 
         report_invalid_state_interaction_values_part_2 = (
             invalid_exps_with_errored_state_interaction_values_part_2
             | 'Show info for state interaction part 2' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {objects[0]}, and the state interaction'
+                   f'The id of exp is {objects[0]}, ' +
+                   f'created on {objects[2]}, and the state interaction'
                    + f' part 2 erroneous data are {objects[1]}'
                 )
             )
@@ -145,17 +148,19 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 lambda objects: (
                     objects[0],
                     self.filter_invalid_state_interaction_values_part_3(
-                        objects[1], total_explorations_list)))
+                        objects[1]), objects[2]))
             | 'Remove empty values for state interaction part 3' >> beam.Map(
                 lambda objects: (
-                    objects[0], self.remove_empty_values(objects[1])))
+                    objects[0], self.remove_empty_values(objects[1]),
+                    objects[2].date()))
         )
 
         report_invalid_state_interaction_values_part_3 = (
             invalid_exps_with_errored_state_interaction_values_part_3
             | 'Show info for state interaction part 3' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {objects[0]}, and the state interaction'
+                   f'The id of exp is {objects[0]}, ' +
+                   f'created on {objects[2]}, and the state interaction'
                    + f' part 3 erroneous data are {objects[1]}'
                 )
             )
@@ -166,18 +171,20 @@ class ExpStateValidationJob(base_jobs.JobBase):
             | 'Get invalid state values' >> beam.Map(
                 lambda objects: (
                     objects[0],
-                    self.filter_invalid_state_values(objects[1])))
+                    self.filter_invalid_state_values(objects[1]), objects[2]))
             | 'Remove empty values for state values' >> beam.Map(
                 lambda objects: (
-                    objects[0], self.remove_empty_values(objects[1])))
+                    objects[0], self.remove_empty_values(objects[1]),
+                    objects[2].date()))
         )
 
         report_invalid_state_values = (
             invalid_exps_with_errored_states_values
             | 'Show info for state values' >> beam.Map(
                 lambda objects: job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {objects[0]}, and the state'
-                   + f' erroneous data are {objects[1]}'
+                   f'The id of exp is {objects[0]}, ' +
+                   f'created on {objects[2]}, and the state' +
+                   f' erroneous data are {objects[1]}'
                 )
             )
         )
@@ -195,8 +202,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         )
 
     def filter_invalid_state_rte_values(
-        self, states_dict: dict[str, state_domain.State]
-    ) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]) -> list[dict]:
         """Returns the errored state RTE values.
 
         Args:
@@ -205,7 +211,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-                containing the errored values.
+            containing the errored values.
         """
         states_with_values = []
         for key, value in states_dict.items():
@@ -231,7 +237,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             rte_components_errors.append(
                                 'State - ' + str(key) +
                                 ' Image tag filepath value' +
-                                ' does not have svg extension')
+                                ' does not have svg extension.')
 
                     elif rte_component['id'] == 'oppia-noninteractive-math':
                         svg_filename = (rte_component['customization_args'][
@@ -287,8 +293,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_interaction_values_part_1(
-        self, states_dict: dict[str, state_domain.State]
-    ) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]) -> list[dict]:
         """Returns the errored state interaction values for
             - FractionInput
             - NumericInput
@@ -300,7 +305,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-                containing the errored values.
+            containing the errored values.
         """
         states_with_values = []
 
@@ -376,7 +381,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     rule_spec)) + ' of answer group ' +
                                     str(answer_groups.index(
                                     answer_group)) + ' has denominator ' +
-                                    'equals to zero.')
+                                    'equals to zero having rule type ' +
+                                    'HasDenominatorEqualTo.')
 
                         if rule_spec.rule_type == 'HasIntegerPartEqualTo':
                             if ((value.interaction.customization_args
@@ -388,7 +394,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     rule_spec)) + ' of answer group ' +
                                     str(answer_groups.index(
                                     answer_group)) + ' has non zero ' +
-                                    'integer part.')
+                                    'integer part having rule type ' +
+                                    'HasIntegerPartEqualTo.')
 
                 if value.interaction.id == 'NumericInput':
                     for rule_spec in answer_group.rule_specs:
@@ -441,8 +448,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_interaction_values_part_2(
-        self, states_dict: dict[str, state_domain.State]
-    ) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]) -> list[dict]:
         """Returns the errored state interaction values for
             - MultipleChoiceInput
             - ItemSelectionInput
@@ -453,7 +459,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-                containing the errored values.
+            containing the errored values.
         """
         states_with_values = []
 
@@ -522,11 +528,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 if choice_empty and choice is not None:
                     mc_interaction_invalid_values.append(
                         'There should not be any empty' +
-                        ' choices - ' + str(choices.index(choice)))
+                        ' choices')
                 if choice_duplicate and choice is not None:
                     mc_interaction_invalid_values.append(
                         'There should not be any duplicate' +
-                        ' choices - ' + str(choices.index(choice)))
+                        ' choices')
                 if (len(choices) == len(value.interaction.answer_groups)
                     and value.interaction.default_outcome is not None):
                     mc_interaction_invalid_values.append(
@@ -564,11 +570,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 if choice_empty:
                     item_selec_interaction_values.append(
                         'There should not be any empty' +
-                        ' choices - ' + str(choices.index(choice)))
+                        ' choices')
                 if choice_duplicate:
                     item_selec_interaction_values.append(
                         'There should not be any duplicate' +
-                        ' choices - ' + str(choices.index(choice)))
+                        ' choices')
 
             states_with_values.append(
                 {'state_name': key,
@@ -579,9 +585,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_interaction_values_part_3(
-        self, states_dict: dict[str, state_domain.State],
-        exp_ids: list[str]
-    ) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State],) -> list[dict]:
         """Returns the errored state interaction values for
             - DragAndDropSortInput
             - EndExploration
@@ -595,7 +599,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-                containing the errored values.
+            containing the errored values.
         """
         states_with_values = []
 
@@ -670,15 +674,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         'Total number of recommended '
                         + 'explorations should not be more than 3, found '
                         + str(len(recc_exp_ids)) + '.')
-                else:
-                    errored_exps = []
-                    for ele in recc_exp_ids:
-                        if ele not in exp_ids:
-                            errored_exps.append(ele)
-                    if len(errored_exps) > 0:
-                        end_interaction_invalid_values.append(
-                            'These explorations are not'
-                            + ' valid ' + str(errored_exps))
 
             if value.interaction.id == 'Continue':
                 text_value = (
@@ -709,13 +704,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 if choice_empty and choice is not None:
                     drag_drop_interaction_values.append(
                         'There should not be any empty' +
-                        ' choices, present on the index - ' +
-                        str(choices.index(choice)))
+                        ' choices')
                 if choice_duplicate and choice is not None:
                     drag_drop_interaction_values.append(
                         'There should not be any duplicate' +
-                        ' choices, present on the index - ' +
-                        str(choices.index(choice)))
+                        ' choices')
 
             states_with_values.append(
                 {'state_name': key,
@@ -729,8 +722,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         return states_with_values
 
     def filter_invalid_state_values(
-        self, states_dict: dict[str, state_domain.State]
-    ) -> list[dict]:
+        self, states_dict: dict[str, state_domain.State]) -> list[dict]:
         """Returns the errored state values.
 
         Args:
@@ -739,7 +731,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Returns:
             states_with_values: list[dict]. The list of dictionaries
-                containing the errored values.
+            containing the errored values.
         """
         states_with_values = []
         states_list = []
@@ -780,7 +772,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                 if answer_group.outcome.refresher_exploration_id is not None:
                     invalid_refresher_exploration_id.append(
-                        'The refresher_exploration_id'
+                        'The refresher_exploration_id '
                         + 'of answer group ' + str(answer_groups.index(
                         answer_group)) + ' is not None.')
 
@@ -797,6 +789,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         'The destination of default outcome'
                         + ' is not valid, the value is ' + str(
                             value.interaction.default_outcome.dest))
+
+                if (
+                    value.interaction.default_outcome.refresher_exploration_id
+                    is not None):
+                    invalid_refresher_exploration_id.append(
+                        'The refresher_exploration_id '
+                        + 'of default outcome is not None.')
 
             states_with_values.append(
                 {'state_name': key,
@@ -822,7 +821,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         Returns:
             errored_values: list[dict]. The list of dictionaries
-                containing the errored values with removed empty.
+            containing the errored values with removed empty.
         """
         for ele in errored_values:
             for key, value in list(ele.items()):

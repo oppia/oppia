@@ -26,6 +26,8 @@ from core.jobs.batch_jobs import exp_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from datetime import date
+
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -60,7 +62,7 @@ class ExpStateValidationJobTests(
             },
             'labelled_as_correct': True,
             'param_changes': [],
-            'refresher_exploration_id': None,
+            'refresher_exploration_id': 'Not None',
             'missing_prerequisite_skill_id': None
           },
           'training_data': [],
@@ -185,7 +187,7 @@ class ExpStateValidationJobTests(
       'id': 'EndExploration',
       'customization_args': {
         'recommendedExplorationIds': {
-          'value': ['EXP_1', 'EXP_2', 'EXP_3', 'EXP_4']
+          'value': ['EXP_1', 'EXP_2', 'EXP_5', 'EXP_4']
         }
       },
       'answer_groups': [
@@ -304,7 +306,7 @@ class ExpStateValidationJobTests(
             },
             {
               'content_id': 'ca_choices_15',
-              'html': '<p>2</p>'
+              'html': '<p>1</p>'
             },
             {
               'content_id': 'ca_choices_16',
@@ -604,7 +606,7 @@ class ExpStateValidationJobTests(
             },
             {
               'content_id': 'ca_choices_60',
-              'html': '<p>2</p>'
+              'html': '<p>1</p>'
             },
             {
               'content_id': 'ca_choices_61',
@@ -877,10 +879,100 @@ class ExpStateValidationJobTests(
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
+      },
+      {
+        'rule_specs': [
+          {
+            'rule_type': 'HasFractionalPartExactlyEqualTo',
+            'inputs': {
+              'f': {
+                'isNegative': False,
+                'wholeNumber': 3,
+                'numerator': 1,
+                'denominator': 2
+              }
+            }
+          }
+        ],
+        'outcome': {
+          'dest': 'EXP_2_STATE_9',
+          'feedback': {
+            'content_id': 'feedback_74',
+            'html': '<p>dfb</p>'
+          },
+          'labelled_as_correct': False,
+          'param_changes': [],
+          'refresher_exploration_id': None,
+          'missing_prerequisite_skill_id': None
+        },
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+      },
+      {
+        'rule_specs': [
+          {
+            'rule_type': 'HasDenominatorEqualTo',
+            'inputs': {
+              'x': 0
+            }
+          }
+        ],
+        'outcome': {
+          'dest': 'EXP_2_STATE_9',
+          'feedback': {
+            'content_id': 'feedback_74',
+            'html': '<p>dfb</p>'
+          },
+          'labelled_as_correct': False,
+          'param_changes': [],
+          'refresher_exploration_id': None,
+          'missing_prerequisite_skill_id': None
+        },
+        'training_data': [],
+        'tagged_skill_misconception_id': None
       }
     ],
       'default_outcome': {
         'dest': 'EXP_2_STATE_9',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    EXP_2_STATE_10 = state_domain.State.create_default_state(
+        'EXP_2_STATE_10', is_initial_state=False).to_dict()
+    EXP_2_STATE_10['interaction'] = {
+      'id': 'DragAndDropSortInput',
+      'customization_args': {
+      'choices': {
+        'value': [
+          {
+            'content_id': 'ca_choices_68',
+            'html': '<p>1</p>'
+          },
+          {
+            'content_id': 'ca_choices_69',
+            'html': '<p>1</p>'
+          }
+        ]
+      },
+      'allowMultipleItemsInSamePosition': {
+        'value': False
+      }
+    },
+      'answer_groups': [
+    ],
+      'default_outcome': {
+        'dest': 'EXP_2_STATE_10',
         'feedback': {
           'content_id': 'default_outcome',
           'html': '<p>sd</p>'
@@ -915,7 +1007,7 @@ class ExpStateValidationJobTests(
     + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     + '&amp;quot;\" ' +
     'filepath-with-value=\"&amp;quot;img_20220606_174455_f8yf0gg4rz_height_350'
-    + '_width_450.svg&amp;quot;\"></oppia-noninteractive-image>' +
+    + '_width_450.svgg&amp;quot;\"></oppia-noninteractive-image>' +
     '<oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
     'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value=' +
     '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;' +
@@ -978,6 +1070,7 @@ class ExpStateValidationJobTests(
             'EXP_2_STATE_7': self.EXP_2_STATE_7,
             'EXP_2_STATE_8': self.EXP_2_STATE_8,
             'EXP_2_STATE_9': self.EXP_2_STATE_9,
+            'EXP_2_STATE_10': self.EXP_2_STATE_10
             }
         )
 
@@ -1027,19 +1120,24 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, and the state RTE erroneous data are ' +
+              'The id of exp is 4, created on 2021-06-17' +
+              ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, and the state interaction part 1 ' +
+              'The id of exp is 4, created on 2021-06-17' +
+              ', and the state interaction part 1 ' +
               'erroneous data are [{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, and the state interaction part 2 ' +
+              'The id of exp is 4, created on 2021-06-17' +
+              ', and the state interaction part 2 ' +
               'erroneous data are [{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, and the state interaction part 3 ' +
+              'The id of exp is 4, created on 2021-06-17' +
+              ', and the state interaction part 3 ' +
               'erroneous data are [{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, and the state erroneous data are ' +
+              'The id of exp is 4, created on 2021-06-17' +
+              ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_4_STATE_1\'}]')
         ])
 
@@ -1048,30 +1146,39 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state RTE erroneous data are ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_1_STATE_2\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state interaction part 1 ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state interaction part 1 ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state interaction part 2 ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state interaction part 2 ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state interaction part 3 ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state interaction part 3 ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state erroneous data are ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\', ' +
               '\'tagged_skill_misconception_ids\': [\'The ' +
               'tagged_skill_misconception_id of answer group 0 is not None.\']'
               + ', \'not_single_rule_spec\': ' +
               '[\'There is no rule present in answer group 0, atleast one ' +
-              'is required.\'], \'invalid_destinations\': [\'The destination '
+              'is required.\'], \'invalid_refresher_exploration_id\': ' +
+              '[\'The refresher_exploration_id of answer group 0 is not ' +
+              'None.\', \'The refresher_exploration_id of default ' +
+              'outcome is not None.\'], '
+              '\'invalid_destinations\': [\'The destination '
               + 'Not valid state of answer group 0 is not valid.\'], ' +
               '\'invalid_default_outcome_dest\': [\'The destination of default'
               + ' outcome is not valid, the value is Not valid state\']}, ' +
@@ -1087,32 +1194,38 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state RTE erroneous data are ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}]'
+              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
+              '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state erroneous data are ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}]'
+              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
+              '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state interaction part 2 ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state interaction part 2 ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\', ' +
               '\'mc_interaction_invalid_values\': [\'rule - 0, answer ' +
               'group - 2 is already present.\', \'There should be atleast ' +
-              '4 choices found 3\', \'There should not be any empty choices ' +
-              '- 2\', \'All choices have feedback and still has default ' +
+              '4 choices found 3\', \'There should not be any empty choices' +
+              '\', \'There should not be any duplicate choices\', ' +
+              '\'All choices have feedback and still has default ' +
               'outcome\']}, {\'state_name\': \'EXP_2_STATE_5\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_6\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_7\', \'item_selec_interaction_values\': ' +
@@ -1123,11 +1236,13 @@ class ExpStateValidationJobTests(
               'max_selection_value.\', \'Min value which is 6 is greater ' +
               'than max value which is 5\', \'Number of choices which is 4 ' +
               'is lesser than the max value selection which is 5\', ' +
-              '\'There should not be any empty choices - 3\']}, ' +
+              '\'There should not be any empty choices\', ' +
+              '\'There should not be any duplicate choices\']}, ' +
               '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_9\'}]'),
+              '\'EXP_2_STATE_9\'}, {\'state_name\': \'EXP_2_STATE_10\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state interaction part 1 ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state interaction part 1 ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\'}, ' +
@@ -1147,10 +1262,16 @@ class ExpStateValidationJobTests(
               'proper fraction\', \'The rule 0 of answer group 1 do not have ' +
               'value in simple form\', \'The rule 0 of answer group 1 do not ' +
               'have value in proper fraction\', \'The rule 0 of answer group ' +
-              '2 has non zero integer part.\']}]'
+              '2 has non zero integer part having rule type ' +
+              'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has ' +
+              'non zero integer part.\', \'The rule 0 of answer group 4 has ' +
+              'denominator equals to zero having rule type ' +
+              'HasDenominatorEqualTo.\']}, {\'state_name\': ' +
+              '\'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state interaction part 3 ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state interaction part 3 ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\', ' +
               '\'continue_interaction_invalid_values\': [\'The text value ' +
               'is invalid, either it is empty or the character length is ' +
@@ -1174,8 +1295,10 @@ class ExpStateValidationJobTests(
               'setting is turned off.\', \'The rule 0 of answer group 1 ' +
               'the value 1 and value 2 cannot be same when rule type is ' +
               'HasElementXBeforeElementY\', \'Atleast 2 choices should be ' +
-              'there\', \'There should not be any empty choices, present on ' +
-              'the index - 0\']}, {\'state_name\': \'EXP_2_STATE_9\'}]'
+              'there\', \'There should not be any empty choices\']}' +
+              ', {\'state_name\': \'EXP_2_STATE_9\'}, {\'state_name\': ' +
+              '\'EXP_2_STATE_10\', \'drag_drop_interaction_values\': ' +
+              '[\'There should not be any duplicate choices\']}]'
             )
         ])
 
@@ -1184,11 +1307,15 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state RTE erroneous data are ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_3_STATE_1\', \'rte_components_errors\':'
               + ' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
               + 'than 160.\', \'State - EXP_3_STATE_1 Image tag alt value is '
-              + 'less than 5.\', \'State - EXP_3_STATE_1 Link tag text value '
+              + 'less than 5.\', ' +
+              '\'State - EXP_3_STATE_1 Image tag filepath value does ' +
+              'not have svg extension.\', '
+              '\'State - EXP_3_STATE_1 Link tag text value '
               + 'is empty.\', \'State - EXP_3_STATE_1 Link tag url value ' +
               'does not start with https.\', ' +
               '\'State - EXP_3_STATE_1 Math tag svg_filename' +
@@ -1197,16 +1324,20 @@ class ExpStateValidationJobTests(
               'EXP_3_STATE_1 Video tag start value is greater ' +
               'than end value.\']}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state interaction part 1 ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state interaction part 1 ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state interaction part 2 ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state interaction part 2 ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state interaction part 3 ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state interaction part 3 ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state erroneous data ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state erroneous data ' +
               'are [{\'state_name\': \'EXP_3_STATE_1\'}]')
         ])
 
@@ -1215,30 +1346,39 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state RTE erroneous data are ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_1_STATE_2\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state interaction part 1 ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state interaction part 1 ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state interaction part 2 ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state interaction part 2 ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state interaction part 3 ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state interaction part 3 ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, and the state erroneous data are ' +
+              'The id of exp is 1, created on 2021-06-17' +
+              ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\', ' +
               '\'tagged_skill_misconception_ids\': [\'The ' +
               'tagged_skill_misconception_id of answer group 0 is not None.\']'
               + ', \'not_single_rule_spec\': ' +
               '[\'There is no rule present in answer group 0, atleast one ' +
-              'is required.\'], \'invalid_destinations\': [\'The destination '
+              'is required.\'], \'invalid_refresher_exploration_id\': ' +
+              '[\'The refresher_exploration_id of answer group 0 is not ' +
+              'None.\', \'The refresher_exploration_id of default ' +
+              'outcome is not None.\'], '
+              '\'invalid_destinations\': [\'The destination '
               + 'Not valid state of answer group 0 is not valid.\'], ' +
               '\'invalid_default_outcome_dest\': [\'The destination of default'
               + ' outcome is not valid, the value is Not valid state\']}, ' +
@@ -1248,32 +1388,38 @@ class ExpStateValidationJobTests(
               'destination is the state itself.\']}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state RTE erroneous data are ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}]'
+              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
+              '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state erroneous data are ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}]'
+              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
+              '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state interaction part 2 ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state interaction part 2 ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\', ' +
               '\'mc_interaction_invalid_values\': [\'rule - 0, answer ' +
               'group - 2 is already present.\', \'There should be atleast ' +
-              '4 choices found 3\', \'There should not be any empty choices ' +
-              '- 2\', \'All choices have feedback and still has default ' +
+              '4 choices found 3\', \'There should not be any empty choices' +
+              '\', \'There should not be any duplicate choices\', ' +
+              '\'All choices have feedback and still has default ' +
               'outcome\']}, {\'state_name\': \'EXP_2_STATE_5\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_6\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_7\', \'item_selec_interaction_values\': ' +
@@ -1284,11 +1430,13 @@ class ExpStateValidationJobTests(
               'max_selection_value.\', \'Min value which is 6 is greater ' +
               'than max value which is 5\', \'Number of choices which is 4 ' +
               'is lesser than the max value selection which is 5\', ' +
-              '\'There should not be any empty choices - 3\']}, ' +
+              '\'There should not be any empty choices\', ' +
+              '\'There should not be any duplicate choices\']}, ' +
               '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_9\'}]'),
+              '\'EXP_2_STATE_9\'}, {\'state_name\': \'EXP_2_STATE_10\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state interaction part 1 ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state interaction part 1 ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\'}, ' +
@@ -1308,10 +1456,16 @@ class ExpStateValidationJobTests(
               'proper fraction\', \'The rule 0 of answer group 1 do not have ' +
               'value in simple form\', \'The rule 0 of answer group 1 do not ' +
               'have value in proper fraction\', \'The rule 0 of answer group ' +
-              '2 has non zero integer part.\']}]'
+              '2 has non zero integer part having rule type ' +
+              'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has ' +
+              'non zero integer part.\', \'The rule 0 of answer group 4 has ' +
+              'denominator equals to zero having rule type ' +
+              'HasDenominatorEqualTo.\']}, {\'state_name\': ' +
+              '\'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, and the state interaction part 3 ' +
+              'The id of exp is 2, created on 2021-06-17' +
+              ', and the state interaction part 3 ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\', ' +
               '\'continue_interaction_invalid_values\': [\'The text value ' +
               'is invalid, either it is empty or the character length is ' +
@@ -1335,15 +1489,21 @@ class ExpStateValidationJobTests(
               'setting is turned off.\', \'The rule 0 of answer group 1 ' +
               'the value 1 and value 2 cannot be same when rule type is ' +
               'HasElementXBeforeElementY\', \'Atleast 2 choices should be ' +
-              'there\', \'There should not be any empty choices, present on ' +
-              'the index - 0\']}, {\'state_name\': \'EXP_2_STATE_9\'}]'
+              'there\', \'There should not be any empty choices\']}' +
+              ', {\'state_name\': \'EXP_2_STATE_9\'}, {\'state_name\': ' +
+              '\'EXP_2_STATE_10\', \'drag_drop_interaction_values\': ' +
+              '[\'There should not be any duplicate choices\']}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state RTE erroneous data are ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_3_STATE_1\', \'rte_components_errors\':'
               + ' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
               + 'than 160.\', \'State - EXP_3_STATE_1 Image tag alt value is '
-              + 'less than 5.\', \'State - EXP_3_STATE_1 Link tag text value '
+              + 'less than 5.\', ' +
+              '\'State - EXP_3_STATE_1 Image tag filepath value does ' +
+              'not have svg extension.\', '
+              '\'State - EXP_3_STATE_1 Link tag text value '
               + 'is empty.\', \'State - EXP_3_STATE_1 Link tag url value ' +
               'does not start with https.\', ' +
               '\'State - EXP_3_STATE_1 Math tag svg_filename' +
@@ -1352,15 +1512,19 @@ class ExpStateValidationJobTests(
               'EXP_3_STATE_1 Video tag start value is greater ' +
               'than end value.\']}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state interaction part 1 ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state interaction part 1 ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state interaction part 2 ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state interaction part 2 ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state interaction part 3 ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state interaction part 3 ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, and the state erroneous data ' +
+              'The id of exp is 3, created on 2021-06-17' +
+              ', and the state erroneous data ' +
               'are [{\'state_name\': \'EXP_3_STATE_1\'}]')
         ])
