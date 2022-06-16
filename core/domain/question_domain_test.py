@@ -89,7 +89,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The following required attributes are present: new_value',
+            'The following required attributes are missing: new_value',
         ):
             question_domain.QuestionChange(change_dict)
 
@@ -249,8 +249,9 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'question_dict': 'question_dict',
         }
         with self.assertRaisesRegex(
-            utils.ValidationError,
-            'The following required attributes are present: new_value',
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'skill_difficulty, skill_id'),
         ):
             question_domain.QuestionSuggestionChange(change_dict)
 
