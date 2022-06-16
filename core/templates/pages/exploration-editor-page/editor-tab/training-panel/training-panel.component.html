@@ -16,29 +16,29 @@
     <div class="trained-feedback-selection-form-container">
       <form>
         <div class="trained-feedback-selection-container" *ngFor="let outcome of allOutcomes; let index = index">
-          <button class="trained-feedback-selection"
-                  (click)="selectAnswerGroupIndex(index)"
-                  [ngClass]="{'trained-feedback-selected': index == selectedAnswerGroupIndex}">
-            <span *ngIf="!outcome.feedback.isEmpty()">
-              <angular-html-bind-wrapper [htmlData]="outcome.feedback.html">
-              </angular-html-bind-wrapper>
-            </span>
-            <span *ngIf="outcome.feedback.isEmpty()">
-              <em>(No feedback)</em>
-            </span>
+        <button class="trained-feedback-selection"
+                (click)="selectAnswerGroupIndex(index)"
+                [ngClass]="{'trained-feedback-selected': index == selectedAnswerGroupIndex}">
+          <span *ngIf="!outcome.feedback.isEmpty()">
+            <angular-html-bind-wrapper [htmlData]="outcome.feedback.html">
+            </angular-html-bind-wrapper>
+          </span>
+          <span *ngIf="outcome.feedback.isEmpty()">
+            <em>(No feedback)</em>
+          </span>
 
-            <br>
+          <br>
 
-            <span class="oppia-float-right" *ngIf="outcome.dest != getCurrentStateName()">
-              → {{outcome.dest}}
-            </span>
-            <span class="oppia-float-right" *ngIf="outcome.dest == getCurrentStateName()">
-              <em>→ (try again)</em>
-            </span>
-          </button>
+          <span class="oppia-float-right" *ngIf="outcome.dest != getCurrentStateName()">
+            → {{outcome.dest}}
+          </span>
+          <span class="oppia-float-right" *ngIf="outcome.dest == getCurrentStateName()">
+            <em>→ (try again)</em>
+          </span>
+        </button>
         </div>
       </form>
-      <button class="btn btn-secondary" 
+      <button class="btn btn-secondary"
               *ngIf="!addingNewResponse"
               (click)="beginAddingNewResponse()">Add New Response
       </button>
