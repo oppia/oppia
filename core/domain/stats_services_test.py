@@ -142,7 +142,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 '🙂'].num_times_solution_viewed_v2, 1)
 
-    def test_update_stats_throws_if_model_is_missing_entirely(self):
+    def test_update_stats_throws_if_exp_version_is_not_latest(self):
         """Test the update_stats method."""
         aggregated_stats = {
             'num_starts': 1,
@@ -169,6 +169,34 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 2)
         self.assertEqual(exploration_stats, None)
+
+    def test_update_stats_throws_if_stats_model_is_missing_entirely(self):
+        """Test the update_stats method."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+        stats_models.ExplorationStatsModel.get_model('exp_id1', 1).delete()
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats, None)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'ExplorationStatsModel id="exp_id1.1" does not exist'
+        ):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
         """Test the update_stats method."""
