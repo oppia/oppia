@@ -28,7 +28,7 @@ describe('End chapter confetti component', function() {
 
   class MockUrlInterpolationService {
     getStaticAudioUrl(audioPath: string): string {
-      return 'audio_url.flac';
+      return 'audio_url.mp3';
     }
   }
 
@@ -48,21 +48,21 @@ describe('End chapter confetti component', function() {
   });
 
   it('should obtain the audio URL upon initialization', () => {
-    expect(component.celebratoryTadaa.src).toBe('');
+    expect(component.endChapterCelebratoryAudio.src).toBe('');
 
     component.ngOnInit();
 
-    expect(component.audioUrl).toBe('audio_url.flac');
+    expect(component.audioUrl).toBe('audio_url.mp3');
   });
 
   it('should animate the confetti and play audio', () => {
     expect(component.confettiIsShown).toBe(false);
 
-    spyOn(component.celebratoryTadaa, 'play');
+    spyOn(component.endChapterCelebratoryAudio, 'play');
 
     component.animateConfetti();
 
     expect(component.confettiIsShown).toBe(true);
-    expect(component.celebratoryTadaa.play).toHaveBeenCalled();
+    expect(component.endChapterCelebratoryAudio.play).toHaveBeenCalled();
   });
 });

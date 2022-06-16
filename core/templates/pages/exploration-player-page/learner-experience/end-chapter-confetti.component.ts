@@ -26,19 +26,19 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 export class EndChapterConfettiComponent implements OnInit {
   confettiIsShown: boolean = false;
   audioUrl: string;
-  celebratoryTadaa = new Audio();
+  endChapterCelebratoryAudio = new Audio();
 
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 
   ngOnInit(): void {
     this.audioUrl = this.urlInterpolationService.getStaticAudioUrl(
-      '/end_chapter_celebratory_tadaa.flac');
-    this.celebratoryTadaa.src = this.audioUrl;
-    this.celebratoryTadaa.load();
+      '/end_chapter_celebratory_tadaa.mp3');
+    this.endChapterCelebratoryAudio.src = this.audioUrl;
+    this.endChapterCelebratoryAudio.load();
   }
 
   animateConfetti(): void {
     this.confettiIsShown = true;
-    this.celebratoryTadaa.play();
+    this.endChapterCelebratoryAudio.play();
   }
 }

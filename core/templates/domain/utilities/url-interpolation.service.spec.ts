@@ -275,13 +275,13 @@ describe('URL Interpolation Service', () => {
       '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
         '.png');
 
-    expect(uis.getStaticAudioUrl('/test.flac')).toBe(
-      '/build/assets/audio/test.flac');
-    expect(uis.getStaticAudioUrl('/test_url/test.flac')).toBe(
-      '/build/assets/audio/test_url/test.flac');
-    expect(uis.getStaticAudioUrl('/hash_test.flac')).toBe(
-      '/build/assets/audio/hash_test.' + hashes['/audio/hash_test.flac'] +
-        '.flac');
+    expect(uis.getStaticAudioUrl('/test.mp3')).toBe(
+      '/build/assets/audio/test.mp3');
+    expect(uis.getStaticAudioUrl('/test_url/test.mp3')).toBe(
+      '/build/assets/audio/test_url/test.mp3');
+    expect(uis.getStaticAudioUrl('/hash_test.mp3')).toBe(
+      '/build/assets/audio/hash_test.' + hashes['/audio/hash_test.mp3'] +
+        '.mp3');
 
     expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
       '/build/assets/videos/test.mp4');
@@ -360,11 +360,11 @@ describe('URL Interpolation Service', () => {
       expect(uis.getStaticImageUrl.bind(uis, 'test_url/fail.png')).toThrowError(
         'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.');
 
-      expect(uis.getStaticAudioUrl.bind(uis, 'test_fail.flac')).toThrowError(
-        'Path must start with \'\/\': \'' + 'test_fail.flac' + '\'.');
-      expect(uis.getStaticAudioUrl.bind(uis, 'test_url/fail.flac'))
+      expect(uis.getStaticAudioUrl.bind(uis, 'test_fail.mp3')).toThrowError(
+        'Path must start with \'\/\': \'' + 'test_fail.mp3' + '\'.');
+      expect(uis.getStaticAudioUrl.bind(uis, 'test_url/fail.mp3'))
         .toThrowError(
-          'Path must start with \'\/\': \'' + 'test_url/fail.flac' + '\'.');
+          'Path must start with \'\/\': \'' + 'test_url/fail.mp3' + '\'.');
 
       expect(uis.getStaticVideoUrl.bind(uis, 'test_fail.png'))
         .toThrowError(
