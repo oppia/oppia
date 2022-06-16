@@ -654,6 +654,7 @@ def managed_protractor_server(
         common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH,
         '--params.devMode=%s' % dev_mode,
         '--suite', suite_name,
+        '--params.mobile=%s' % mobile
         ]
 
     if debug_mode:
