@@ -18,7 +18,7 @@
   margin-right: 4px;
 }
 .launch {
-  font-size: 15px;
+  font-size: 12px;
   margin-right: 90px;
 }
 
@@ -71,15 +71,19 @@
 }
 .get-involved-dropdown .language {
   color: #f2994a;
+  font-size: 18px;
 }
 .get-involved-dropdown .volunteer {
   color: #2d9cdb;
+  font-size: 18px;
 }
 .get-involved-dropdown .contact {
   color: #b4bbc3;
+  font-size: 18px;
 }
 .get-involved-dropdown .fav {
   color: #eb5757;
+  font-size: 18px;
 }
 .get-involved-dropdown .des {
   color: #767676;
@@ -115,7 +119,7 @@
 }
 
 .bottom-section .heading-text {
-  margin-right: 7px;
+  margin-right: 9px;
 }
 
 .item {
@@ -261,7 +265,8 @@
 }
 
 .language-icon {
-  margin-top: -3px;
+  font-size: 20px;
+  vertical-align: text-bottom;
 }
 
 .language-padding-left {
@@ -365,8 +370,13 @@
 }
 .oppia-navbar-close-icon {
   color: #fff;
+  font-size: 22px;
   margin-left: 4px;
-  margin-top: -10px;
+  margin-top: -5px;
+}
+.oppia-launch-icon {
+  color: #009688;
+  font-size: 22px;
 }
 .oppia-user-avatar-icon {
   margin-top: -1px;
@@ -413,6 +423,7 @@
 }
 .oppia-navbar-menu-icon {
   color: #fff;
+  font-size: 22px;
   margin-top: -5px;
 }
 .nav-mobile-header-text-container {
@@ -476,7 +487,16 @@
 .oppia-navbar-nav.oppia-navbar-profile .profile-dropdown:hover {
   background-color: #fff;
 }
-
+.oppia-navbar-arrow-right {
+  font-size: 12px;
+  padding-right: 8px;
+  padding-top: 1.5px;
+}
+.oppia-tick-mark {
+  font-size: 15px;
+  margin-left: 5px;
+  padding-right: 5px;
+}
 @media screen and (max-width: 880px) {
   .oppia-logo-wide {
     margin-right: 0;

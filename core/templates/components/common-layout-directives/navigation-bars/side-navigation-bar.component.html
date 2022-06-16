@@ -1,4 +1,14 @@
 <style>
+  .oppia-sidebar-expand-icon {
+    float: right;
+    font-size: 22px;
+    height: 22px;
+    margin: 0 35px 3px 6px;
+    padding-left: 5px;
+    transition-duration: 0.5s;
+    vertical-align: middle;
+    width: 22px;
+  }
   .oppia-sidebar-menu {
     background: #fff;
     height: 100%;
@@ -30,7 +40,7 @@
   .oppia-sidebar-menu-icon {
     float: right;
     height: 22px;
-    margin: 0 35px 3px 6px;
+    margin: 7px 35px 3px 6px;
     transition-duration: 0.5s;
     vertical-align: middle;
     width: 22px;
@@ -116,7 +126,7 @@
   }
   .oppia-sidebar-submenu-icon {
     height: 22px;
-    margin: 0 6px 3px -3px;
+    margin: 4px 6px 3px -3px;
     transition-duration: 0.5s;
     vertical-align: middle;
     width: 22px;
@@ -184,15 +194,19 @@
   }
   i.partnerships-icon {
     color: #f2994a;
+    font-size: 18px;
   }
   i.volunteer-icon {
     color: #2d9cdb;
+    font-size: 16px;
   }
   i.donate-icon {
     color: #eb5757;
+    font-size: 18px;
   }
   i.contact-icon {
     color: #b4bbc4;
+    font-size: 18px;
   }
 </style>
 
@@ -213,8 +227,8 @@
 
     <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
       <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button protractor-mobile-test-learn" >
-        <i class="material-icons oppia-sidebar-menu-icon expand-icon oppia-sidebar-menu-icon-transition"
-          [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">expand_more
+        <i class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon oppia-sidebar-menu-icon-transition"
+          [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">
         </i>
         <span class="oppia-sidebar-submenu-toggle text-uppercase" [ngClass]="{'oppia-sidebar-submenu-toggle': learnSubmenuIsShown}">
               {{ 'I18N_SIDEBAR_LEARN' | translate }}
@@ -253,7 +267,7 @@
         <div class="submenu-notop-margin">
           <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
             <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
-            <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
+            <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
           </a>
         </div>
       </div>
@@ -261,7 +275,7 @@
         <a href="/community-library" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" class="protractor-mobile-test-library-link">
           <p class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</p>
           <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY' | translate }}</span>
-          <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
+          <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
         </a>
       </div>
     </li>
@@ -277,35 +291,34 @@
     <li class="oppia-sidebar-rows">
       <div (click)="togglegetinvolvedSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button">
         <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
-        <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="material-icons oppia-sidebar-menu-icon expand-icon">
-          expand_more
+        <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon">
         </i>
       </div>
       <div [hidden]="!getinvolvedSubmenuIsShown">
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/partnerships" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon partnerships-icon">language</i>
+            <i class="fas fa-globe oppia-sidebar-submenu-icon partnerships-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/volunteer" routerLink="/volunteer">
-            <i class="material-icons oppia-sidebar-submenu-icon volunteer-icon">people</i>
+            <i class="fas fa-user-friends oppia-sidebar-submenu-icon volunteer-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon donate-icon">favorite</i>
+            <i class="fas fa-heart oppia-sidebar-submenu-icon donate-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon contact-icon">email</i>
+            <i class="fas fa-envelope oppia-sidebar-submenu-icon contact-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
           </a>
