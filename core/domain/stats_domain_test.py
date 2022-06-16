@@ -666,6 +666,31 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             stats_domain.SessionStateStats.validate_aggregated_stats_dict(
                 sessions_state_stats)
 
+    def test_aggregated_stats_validation_when_fully_valid(
+        self
+    ):
+        sessions_state_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        self.assertEqual(
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats
+            ),
+            sessions_state_stats
+        )
+
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
