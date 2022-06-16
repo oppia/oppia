@@ -5338,16 +5338,16 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
 class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_state_version_history_gets_created(self):
-        state_version_history_dict_1 = {
+        expected_dict = {
             'previously_edited_in_version': 1,
             'state_name_in_previous_version': 'state 1',
             'committer_id': 'user_1'
         }
-        state_version_history_dict_2 = state_domain.StateVersionHistory(
+        actual_dict = state_domain.StateVersionHistory(
             1, 'state 1', 'user_1').to_dict()
 
         self.assertEqual(
-            state_version_history_dict_1, state_version_history_dict_2)
+            expected_dict, actual_dict)
 
     def test_state_version_history_gets_created_from_dict(self):
         state_version_history_dict = {
