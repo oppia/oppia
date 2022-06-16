@@ -32,8 +32,8 @@ var CreatorDashboardPage = function() {
     var activityCreationModal = await $('.protractor-test-creation-modal');
     await waitFor.visibilityOf(
       activityCreationModal, 'Activity Creation modal is not visible');
-    await action.click('Create Collection Button', createCollectionButton);
     var createCollectionButton = await $('.protractor-test-create-collection');
+    await action.click('Create Collection Button', createCollectionButton);
     await waitFor.pageToFullyLoad();
     var collectionEditorContainer = await $(
       '.protractor-test-collection-editor-cards-container');

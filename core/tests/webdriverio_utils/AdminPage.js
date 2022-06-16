@@ -64,7 +64,7 @@ var AdminPage = function() {
     var roleSelector = await $('.protractor-test-new-role-selector');
     await action.matSelect('New role selector', roleSelector, newRole);
 
-    var progressSpinner = $('.protractor-test-progress-spinner');
+    var progressSpinner = await $('.protractor-test-progress-spinner');
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
     var removeButtonElement = await $(

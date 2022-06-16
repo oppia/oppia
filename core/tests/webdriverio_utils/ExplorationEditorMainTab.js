@@ -20,6 +20,9 @@
 var forms = require('./forms.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
+// var ruleTemplates = require(
+//   '../../../extensions/interactions/rule_templates.json');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 var action = require('./action.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
@@ -33,11 +36,12 @@ var ExplorationEditorMainTab = function() {
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
-    var dismissWelcomeModalButton = (
-      await $('.protractor-test-dismiss-welcome-modal'));
+    var dismissWelcomeModalButton = await $(
+      '.protractor-test-dismiss-welcome-modal');
     // Exit the welcome modal.
     await action.click(
       'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
+    var editorWelcomeModal = await $('.protractor-test-welcome-modal');
     await waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
@@ -58,10 +62,12 @@ var ExplorationEditorMainTab = function() {
   // .appendBoldText(...).
   this.setContent = async function(richTextInstructions, expectFadeIn = false) {
     // Wait for browser to time out the popover, which is 4000 ms.
+    var postTutorialPopover = await $('.ng-joyride .popover-content');
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
+      var fadeIn = await $('.protractor-test-editor-cards-container');
       await waitFor.fadeInToComplete(
         fadeIn, 'Editor taking long to fade in');
     }
@@ -79,6 +85,8 @@ var ExplorationEditorMainTab = function() {
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
+    var saveStateContentButton = await $(
+      '.protractor-test-save-state-content');
     await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
       saveStateContentButton,
@@ -101,7 +109,9 @@ var ExplorationEditorMainTab = function() {
 
     // The save interaction button doesn't appear for interactions having no
     // options to customize.
-    var result = await saveInteractionButton.isPresent();
+    var saveInteractionButton = await $(
+      '.protractor-test-save-interaction');
+    var result = await saveInteractionButton.isExisting();
     if (result) {
       await action.click('Save Interaction Button', saveInteractionButton);
     }
@@ -118,8 +128,11 @@ var ExplorationEditorMainTab = function() {
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
     await closeAddResponseModal();
+    var addResponseHeader = await $(
+      '.protractor-test-add-response-modal-header');
     await waitFor.invisibilityOf(
       addResponseHeader, 'Add Response modal takes too long to close');
+    var interaction = await $('.protractor-test-interaction');
     await waitFor.visibilityOf(
       interaction, 'interaction takes too long to appear');
   };

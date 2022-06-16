@@ -41,13 +41,17 @@ var createExplorationAndStartTutorial = async function(isCollectionEditor) {
 
   await creatorDashboardPage.clickCreateActivityButton();
   if (isCollectionEditor) {
+    var activityCreationModal = await $('.protractor-test-creation-modal');
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
+    var createExplorationButton = await $(
+      '.protractor-test-create-exploration');
     await action.click('Create Exploration Button', createExplorationButton);
   }
 
   await waitFor.pageToFullyLoad();
+  var stateNameText = await $('.protractor-test-state-name-text');
   await waitFor.visibilityOf(
     stateNameText, 'State name text takes too long to appear.');
 };

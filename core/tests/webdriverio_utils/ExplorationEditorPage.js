@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the exploration editor, for use in Protractor
+ * @fileoverview Page object for the exploration editor, for use in WebdriverIO
  * tests.
  */
 

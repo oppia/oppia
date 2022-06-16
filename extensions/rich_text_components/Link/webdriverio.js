@@ -17,7 +17,7 @@
  * end-to-end testing with Webdriverio.js
  */
 
-var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 
 var customizeComponent = async function(modal, url) {
   await objects.SanitizedUrlEditor(

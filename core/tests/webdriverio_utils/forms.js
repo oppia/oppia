@@ -182,7 +182,7 @@ var RichTextEditor = async function(elem) {
   };
   var _clearContent = async function() {
     await expect(
-      await (await rteElements[0]).isPresent()
+      await (await rteElements[0]).isExisting()
     ).toBe(true);
     await (await rteElements[0]).clearValue();
   };
@@ -308,11 +308,7 @@ var toRichText = async function(text) {
 var FORM_EDITORS = {
   CodeString: CodeStringEditor,
   Dictionary: DictionaryEditor,
-  Graph: GraphEditor,
-  List: ListEditor,
-  Real: RealEditor,
   RichText: RichTextEditor,
-  SetOfTranslatableHtmlContentIds: SetOfTranslatableHtmlContentIdsEditor,
   Unicode: UnicodeEditor
 };
 
@@ -330,6 +326,7 @@ exports.CodeStringEditor = CodeStringEditor;
 exports.RichTextEditor = RichTextEditor;
 exports.toRichText = toRichText;
 exports.UnicodeEditor = UnicodeEditor;
+exports.DictionaryEditor = DictionaryEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 
 exports.getEditor = getEditor;
