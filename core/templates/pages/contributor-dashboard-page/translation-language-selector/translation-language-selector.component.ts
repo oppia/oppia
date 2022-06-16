@@ -67,7 +67,6 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   ngOnInit(): void {
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
       () => {
-        this.
         this.languageSelection = this.languageIdToDescription[
           this.translationLanguageService.getActiveLanguageCode()];
       });

@@ -17,7 +17,7 @@
  * playing an exploration.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -44,6 +44,7 @@ import { ContentTranslationManagerService } from '../services/content-translatio
 })
 export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
@@ -94,7 +95,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
       this.imagePreloaderService.restartImagePreloader(
         this.playerTranscriptService.getCard(0).getStateName());
     }
-
+    this.changeDetectorRef.detectChanges();
     return this.selectedLanguageCode;
   }
 

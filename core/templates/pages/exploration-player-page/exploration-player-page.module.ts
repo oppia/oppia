@@ -28,9 +28,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
@@ -60,6 +59,7 @@ import { ToastrModule } from 'ngx-toastr';
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
+    TranslationsFetchingMessageModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
@@ -71,6 +71,7 @@ import { ToastrModule } from 'ngx-toastr';
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
+    TranslationsFetchingMessageModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,

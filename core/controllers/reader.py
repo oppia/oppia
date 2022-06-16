@@ -37,6 +37,7 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import opportunity_services
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -283,12 +284,14 @@ class ExplorationHandler(base.BaseHandler):
         preferred_language_codes = None
         has_viewed_lesson_info_modal_once = None
 
-        displayable_language_codes = (
-            translation_services.get_displayable_translation_languages(
-                feconf.TranslatableEntityType.EXPLORATION,
-                exploration
+        if opportunity_services.is_exploration_available_for_contribution(
+                exploration_id):
+            displayable_language_codes = (
+                translation_services.get_displayable_translation_languages(
+                    feconf.TranslatableEntityType.EXPLORATION,
+                    exploration
+                )
             )
-        )
 
         if user_settings is not None:
             preferred_audio_language_code = (
@@ -411,7 +414,7 @@ class EntityTranslationhandler(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.can_play_exploration
+    @acl_decorators.open_access
     def get(self, entity_type, entity_id, entity_version, language_code):
         entity_translations = translation_fetchers.get_entity_translation(
             entity_type, entity_id, entity_version, language_code)
