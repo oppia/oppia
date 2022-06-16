@@ -16,9 +16,9 @@
     <div class="trained-feedback-selection-form-container">
       <form>
         <div class="trained-feedback-selection-container" *ngFor="let outcome of allOutcomes; let index = index">
-            <button class="trained-feedback-selection"
-                    (click)="selectAnswerGroupIndex(index)"
-                    [ngClass]="{'trained-feedback-selected': index == selectedAnswerGroupIndex}">
+          <button class="trained-feedback-selection"
+                  (click)="selectAnswerGroupIndex(index)"
+                  [ngClass]="{'trained-feedback-selected': index == selectedAnswerGroupIndex}">
             <span *ngIf="!outcome.feedback.isEmpty()">
               <angular-html-bind-wrapper [htmlData]="outcome.feedback.html">
               </angular-html-bind-wrapper>
@@ -35,7 +35,7 @@
             <span class="oppia-float-right" *ngIf="outcome.dest == getCurrentStateName()">
               <em>→ (try again)</em>
             </span>
-            </button>
+          </button>
         </div>
       </form>
       <button class="btn btn-secondary"
