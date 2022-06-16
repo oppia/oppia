@@ -29,7 +29,9 @@ from core.tests import test_utils
 class RulesRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the rules registry."""
 
-    def test_get_html_field_types_to_rule_specs_for_current_state_schema_version(self): # pylint: disable=line-too-long
+    def test_get_html_field_types_to_rule_specs_for_current_state_schema_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         html_field_types_to_rule_specs = (
             rules_registry.Registry.get_html_field_types_to_rule_specs())
 
@@ -42,7 +44,9 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             html_field_types_to_rule_specs,
             specs_from_json)
 
-    def test_get_html_field_types_to_rule_specs_for_previous_state_schema_version(self): # pylint: disable=line-too-long
+    def test_get_html_field_types_to_rule_specs_for_previous_state_schema_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         html_field_types_to_rule_specs_v41 = (
             rules_registry.Registry.get_html_field_types_to_rule_specs(
                 state_schema_version=41))
@@ -58,8 +62,10 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             html_field_types_to_rule_specs_v41,
             specs_from_json_v41)
 
-    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(self): # pylint: disable=line-too-long
-        with self.assertRaisesRegex(
+    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'No specs json file found for state schema'
         ):
