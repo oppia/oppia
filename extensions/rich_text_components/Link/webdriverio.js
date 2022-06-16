@@ -26,8 +26,8 @@ var customizeComponent = async function(modal, url) {
 };
 
 var expectComponentDetailsToMatch = async function(elem, url) {
-  await expect(await elem.$('<a>')).getAttribute('href').toBe(url);
-  await expect(
+  expect(await elem.$('<a>')).getAttribute('href').toBe(url);
+  expect(
     await elem.$('<a>')).getAttribute('target').toBe('_blank');
 };
 

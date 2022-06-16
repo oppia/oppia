@@ -32,7 +32,7 @@ var expectComponentDetailsToMatch = async function(
     elem, heading, contentInstructions) {
   var headerElement = await elem.$(
     '.protractor-test-collapsible-heading');
-  await expect(await headerElement.getText()).toMatch(heading);
+  expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   await headerElement.click();
   const collapsibleElem = await elem.$(

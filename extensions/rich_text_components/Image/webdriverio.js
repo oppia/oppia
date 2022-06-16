@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -178,10 +178,9 @@ var expectComponentDetailsToMatch = async function(
       'SVG Diagram input element takes too long to load.');
     var src = await svgDiagramInputElement.getAttribute('src');
     var alt = await svgDiagramInputElement.getAttribute('alt');
-    await expect(alt).toEqual(altText);
+    aexpect(alt).toEqual(altText);
     await request(src, function(error, response, body) {
-      await expect(
-        body.replace(/(\r\n|\n|\r|\t)/gm, '')).toBe(SVGTAGS[svgName]);
+      expect(body.replace(/(\r\n|\n|\r|\t)/gm, '')).toBe(SVGTAGS[svgName]);
     });
   }
 };
