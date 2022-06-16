@@ -54,8 +54,7 @@ class MockTrainingDataService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Training Panel Component', () => {
+describe('Training Panel Component', () => {
   let component: TrainingPanelComponent;
   let fixture: ComponentFixture<TrainingPanelComponent>;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
