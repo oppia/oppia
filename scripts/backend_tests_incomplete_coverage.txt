@@ -1,6 +1,5 @@
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
-core.controllers.tasks_test
 core.controllers.voice_artist_test
 core.domain.suggestion_registry_test
 core.controllers.feedback_test

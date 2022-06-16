@@ -129,6 +129,21 @@ class TasksTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 2)
             self.assertEqual(messages[1].body, expected_message)
 
+            # Create another message.
+            feedback_services.create_message(
+                thread_id, self.user_id_b, None, None, 'user b another message')
+
+            # Pops feedback message references.
+            feedback_services.pop_feedback_message_references_transactional(
+                self.editor_id, 0)
+
+            # Send task and subsequent email to Editor.
+            self.process_and_flush_pending_tasks()
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+
+            # Check that there are three messages.
+            self.assertEqual(len(messages), 3)
+
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
 
