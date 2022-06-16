@@ -16,7 +16,7 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, HostListener, Input, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, SimpleChanges, ViewChild, Renderer2 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
@@ -105,6 +105,7 @@ export class TutorCardComponent {
   animationHasPlayedOnce: boolean = false;
   checkMarkSkipped: boolean = false;
   confettiAnimationTimeout: NodeJS.Timeout | null = null;
+  skipClickListener: Function | null = null;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -124,7 +125,8 @@ export class TutorCardComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
@@ -193,6 +195,14 @@ export class TutorCardComponent {
   triggerCelebratoryAnimation(): void {
     this.checkMarkHidden = false;
     this.checkMarkComponent.animateCheckMark();
+    this.skipClickListener = this.renderer.listen(
+      'document', 'click', () => {
+        clearTimeout(this.confettiAnimationTimeout);
+        this.checkMarkSkipped = true;
+        setTimeout(() => {
+          this.checkMarkHidden = true;
+        }, 500);
+      });
     this.animationHasPlayedOnce = true;
     let mediaQuery =
       this.windowRef.nativeWindow.matchMedia('(prefers-reduced-motion)');
@@ -201,6 +211,8 @@ export class TutorCardComponent {
         this.checkMarkSkipped = true;
         setTimeout(() => {
           this.checkMarkHidden = true;
+          this.skipClickListener();
+          this.skipClickListener = null;
         }, 500);
       }, 2000);
     } else {
@@ -209,6 +221,8 @@ export class TutorCardComponent {
       }, 2000);
       setTimeout(() => {
         this.checkMarkHidden = true;
+        this.skipClickListener();
+        this.skipClickListener = null;
       }, 4000);
     }
   }
@@ -319,17 +333,6 @@ export class TutorCardComponent {
 
   getInputResponsePairId(index: number): string {
     return 'input-response-pair-' + index;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    clearTimeout(this.confettiAnimationTimeout);
-    if (!this.checkMarkHidden) {
-      this.checkMarkSkipped = true;
-      setTimeout(() => {
-        this.checkMarkHidden = true;
-      }, 500);
-    }
   }
 }
 

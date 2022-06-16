@@ -19,7 +19,7 @@
 import { SimpleChanges } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync, flush } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -373,22 +373,33 @@ describe('Tutor card component', () => {
   it('should skip animation when a click is made onscreen', fakeAsync(() => {
     expect(componentInstance.checkMarkSkipped).toBe(false);
 
-    componentInstance.checkMarkHidden = false;
+    spyOn(window, 'clearTimeout');
+    componentInstance.checkMarkComponent =
+      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
+        'EndChapterCheckMarkComponent', ['animateCheckMark']);
+    componentInstance.confettiComponent =
+      jasmine.createSpyObj<EndChapterConfettiComponent>(
+        'EndChapterConfettiComponent', ['animateConfetti']);
+    componentInstance.triggerCelebratoryAnimation();
     let fakeClickEvent = new MouseEvent('click');
-    componentInstance.onDocumentClick(fakeClickEvent);
+    document.dispatchEvent(fakeClickEvent);
 
+    tick(1);
+    expect(clearTimeout).toHaveBeenCalled();
     expect(componentInstance.checkMarkSkipped).toBe(true);
-    tick(501);
+    tick(500);
     expect(componentInstance.checkMarkHidden).toBe(true);
+
+    flush();
   }));
 
-  it('should not skip animation if it hasn\'t started yet', fakeAsync(() => {
-    componentInstance.checkMarkHidden = true;
-    let fakeClickEvent = new MouseEvent('click');
-    componentInstance.onDocumentClick(fakeClickEvent);
+  it('should not skip animation if it hasn\'t been triggered yet',
+    fakeAsync(() => {
+      let fakeClickEvent = new MouseEvent('click');
+      document.dispatchEvent(fakeClickEvent);
 
-    expect(componentInstance.checkMarkSkipped).toBe(false);
-  }));
+      expect(componentInstance.checkMarkSkipped).toBe(false);
+    }));
 
   it('should update displayed card', fakeAsync(() => {
     mockDisplayedCard.markAsCompleted();
