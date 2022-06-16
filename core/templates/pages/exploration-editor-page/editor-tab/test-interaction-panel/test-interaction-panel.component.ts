@@ -40,8 +40,9 @@ export class TestInteractionPanel implements OnInit {
 
   ) { }
 
-  isSubmitButtonDisabled = (
-    this.currentInteractionService.isSubmitButtonDisabled);
+  isSubmitButtonDisabled(): boolean {
+    return this.currentInteractionService.isSubmitButtonDisabled();
+  }
 
   onSubmitAnswerFromButton(): void {
     this.currentInteractionService.submitAnswer();

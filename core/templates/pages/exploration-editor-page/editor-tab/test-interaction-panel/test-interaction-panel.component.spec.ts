@@ -81,15 +81,18 @@ fdescribe('Test Interaction Panel Component', () => {
 
       component.stateName = 'TextInput';
       component.ngOnInit();
+      let isSubmitButtonDisabled = component.isSubmitButtonDisabled();
 
       expect(component.interactionIsInline).toEqual(true);
-      expect(component.isSubmitButtonDisabled).toEqual(false);
+      expect(isSubmitButtonDisabled).toEqual(false);
     });
 
   it('should submit answer when clicking on button', () => {
     spyOn(currentInteractionService, 'submitAnswer')
       .and.stub();
 
+    component.stateName = 'TextInput';
+    component.ngOnInit();
     component.onSubmitAnswerFromButton();
 
     expect(component.interactionIsInline).toEqual(true);
