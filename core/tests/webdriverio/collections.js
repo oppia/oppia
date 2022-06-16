@@ -136,34 +136,34 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  // it('should visit the collection editor', async function() {
-  //   await users.login('alice@collections.com');
-  //   await creatorDashboardPage.get();
-  //   await creatorDashboardPage.clickCreateActivityButton();
-  //   await creatorDashboardPage.clickCreateCollectionButton();
-  //   // Add existing explorations.
-  //   await collectionEditorPage.addExistingExploration(firstExplorationId);
-  //   await collectionEditorPage.addExistingExploration(secondExplorationId);
-  //   await collectionEditorPage.addExistingExploration(thirdExplorationId);
-  //   // Search and add existing explorations.
-  //   await collectionEditorPage.addExistingExploration(lazyExplorationId);
-  //   await collectionEditorPage.addExistingExploration(linearExplorationId);
-  //   await collectionEditorPage.addExistingExploration(testExplorationId);
-  //   // Shifting nodes in the node graph.
-  //   await collectionEditorPage.shiftNodeLeft(1);
-  //   await collectionEditorPage.shiftNodeRight(1);
-  //   // Delete node in the node graph.
-  //   await collectionEditorPage.deleteNode(1);
-  //   // Publish the collection.
-  //   await collectionEditorPage.saveDraft();
-  //   await collectionEditorPage.closeSaveModal();
-  //   await collectionEditorPage.publishCollection();
-  //   await collectionEditorPage.setTitle('Test Collection');
-  //   await collectionEditorPage.setObjective('This is a test collection.');
-  //   await collectionEditorPage.setCategory('Algebra');
-  //   await collectionEditorPage.saveChanges();
-  //   await users.logout();
-  // });
+  it('should visit the collection editor', async function() {
+    await users.login('alice@collections.com');
+    await creatorDashboardPage.get();
+    // await creatorDashboardPage.clickCreateActivityButton();
+    // await creatorDashboardPage.clickCreateCollectionButton();
+    // // Add existing explorations.
+    // await collectionEditorPage.addExistingExploration(firstExplorationId);
+    // await collectionEditorPage.addExistingExploration(secondExplorationId);
+    // await collectionEditorPage.addExistingExploration(thirdExplorationId);
+    // // Search and add existing explorations.
+    // await collectionEditorPage.addExistingExploration(lazyExplorationId);
+    // await collectionEditorPage.addExistingExploration(linearExplorationId);
+    // await collectionEditorPage.addExistingExploration(testExplorationId);
+    // // Shifting nodes in the node graph.
+    // await collectionEditorPage.shiftNodeLeft(1);
+    // await collectionEditorPage.shiftNodeRight(1);
+    // // Delete node in the node graph.
+    // await collectionEditorPage.deleteNode(1);
+    // // Publish the collection.
+    // await collectionEditorPage.saveDraft();
+    // await collectionEditorPage.closeSaveModal();
+    // await collectionEditorPage.publishCollection();
+    // await collectionEditorPage.setTitle('Test Collection');
+    // await collectionEditorPage.setObjective('This is a test collection.');
+    // await collectionEditorPage.setCategory('Algebra');
+    // await collectionEditorPage.saveChanges();
+    // await users.logout();
+  });
 
   // it('should visit the collection player', async function() {
   //   await users.login('alice@collections.com');

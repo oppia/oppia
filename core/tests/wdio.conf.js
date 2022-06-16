@@ -24,7 +24,7 @@ var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
 
 var suites = {
   // The tests on Travis are run individually to parallelize
@@ -59,7 +59,7 @@ if ((process.env.GITHUB_ACTIONS &&
   videoReporter = [video, {
     outputDir: '../webdriverio-video',
     // Enable saveAllVideos if you want success videos to be saved.
-    saveAllVideos: true,
+    saveAllVideos: false,
     videoSlowdownMultiplier: 3,
   }];
 
