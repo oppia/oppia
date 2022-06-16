@@ -80,8 +80,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/learner_playlist_services_test.py',
     'core/domain/learner_progress_services.py',
     'core/domain/learner_progress_services_test.py',
-    'core/domain/moderator_services.py',
-    'core/domain/moderator_services_test.py',
     'core/domain/object_registry.py',
     'core/domain/object_registry_test.py',
     'core/domain/opportunity_services.py',
