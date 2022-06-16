@@ -24,7 +24,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('TrainingDataEditorPanelServiceModalController', function() {
+describe('TrainingDataEditorPanelComponent', function() {
   importAllAngularServices();
 
   var $scope = null;

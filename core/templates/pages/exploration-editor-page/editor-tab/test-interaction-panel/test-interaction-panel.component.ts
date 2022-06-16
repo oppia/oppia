@@ -18,8 +18,7 @@
 
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { Subscription } from 'rxjs';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
@@ -29,11 +28,10 @@ import { AppConstants } from 'app.constants';
   templateUrl: './test-interaction-panel.component.html'
 })
 
-export class TestInteractionPanel implements OnInit, OnDestroy {
+export class TestInteractionPanel implements OnInit {
   @Input() inputTemplate: string;
   @Input() stateName: string;
 
-  directiveSubscriptions = new Subscription();
   interactionIsInline: boolean;
 
   constructor(
@@ -50,22 +48,11 @@ export class TestInteractionPanel implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Shivam PTAL.
-    this.directiveSubscriptions.add(
-      // TODO(#11996): Remove when migrating to Angular2+.
-      // this.currentInteractionService.onAnswerChanged$.subscribe(() => {
-      // })
-    );
-
     let _stateName = this.stateName;
     let _state = this.explorationStatesService.getState(_stateName);
     this.interactionIsInline = (
       INTERACTION_SPECS[_state.interaction.id].display_mode ===
       AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
   }
 }
 
