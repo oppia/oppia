@@ -26,8 +26,6 @@ from core.jobs.batch_jobs import exp_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from datetime import date
-
 (exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
 
 

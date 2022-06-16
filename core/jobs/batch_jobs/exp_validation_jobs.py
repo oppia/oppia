@@ -595,8 +595,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
             states_dict: dict[str, State]. The dictionary containing
                 state name as key and State object as value.
 
-            exp_ids: list[str]. The list of exploration ids.
-
         Returns:
             states_with_values: list[dict]. The list of dictionaries
             containing the errored values.
