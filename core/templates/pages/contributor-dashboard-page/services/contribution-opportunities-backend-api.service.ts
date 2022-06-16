@@ -54,6 +54,10 @@ interface VoiceoverContributionOpportunitiesBackendDict {
   'more': boolean;
 }
 
+interface ReviewableTranslationOpportunitiesBackendDict {
+  'opportunities': ExplorationOpportunitySummaryBackendDict[];
+}
+
 interface SkillContributionOpportunities {
   opportunities: SkillOpportunity[];
   nextCursor: string;
@@ -70,6 +74,10 @@ interface VoiceoverContributionOpportunities {
   opportunities: ExplorationOpportunitySummary[];
   nextCursor: string;
   more: boolean;
+}
+
+interface FetchedReviewableTranslationOpportunitiesResponse {
+  opportunities: ExplorationOpportunitySummary[];
 }
 
 interface FeaturedTranslationLanguagesBackendDict {
@@ -135,7 +143,8 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchTranslationOpportunitiesAsync(
       languageCode: string, topicName: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
-    topicName = (topicName === 'All') ? '' : topicName;
+    topicName = (
+      topicName === constants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName);
 
     const params = {
       language_code: languageCode,
@@ -182,6 +191,29 @@ export class ContributionOpportunitiesBackendApiService {
         opportunities: opportunities,
         nextCursor: data.next_cursor,
         more: data.more
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  async fetchReviewableTranslationOpportunitiesAsync(
+      topicName: string
+  ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
+    const params: {
+      topic_name?: string;
+    } = {};
+    if (topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
+      params.topic_name = topicName;
+    }
+    return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
+      '/getreviewableopportunitieshandler', {
+        params
+      }).toPromise().then(data => {
+      const opportunities = data.opportunities.map(
+        dict => this._getExplorationOpportunityFromDict(dict));
+      return {
+        opportunities: opportunities
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
