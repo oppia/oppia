@@ -53,130 +53,130 @@ describe('Oppia landing pages tour', () => {
     await general.checkForConsoleErrors([]);
   });
 
-  // it('should visit the Nonprofits landing page', async() => {
-  //   await browser.url('/nonprofits');
-  // });
+  it('should visit the Nonprofits landing page', async() => {
+    await browser.url('/nonprofits');
+  });
 
-  // it('should visit the Parents landing page', async() => {
-  //   await browser.url('/parents');
-  // });
+  it('should visit the Parents landing page', async() => {
+    await browser.url('/parents');
+  });
 
-  // it('should visit the Teachers landing page', async() => {
-  //   await browser.url('/teachers');
-  // });
+  it('should visit the Teachers landing page', async() => {
+    await browser.url('/teachers');
+  });
 });
 
-// describe('Donation flow', () => {
-//   it('should be able to donate via PayPal', async() => {
-//     await browser.url('/donate');
-//     var payPalButton = await $('.protractor-test-paypal-donate-button');
-//     await action.click('PayPal button', payPalButton);
-//     await expect(await browser.getUrl()).toContain('www.paypal.com');
-//   });
+describe('Donation flow', () => {
+  it('should be able to donate via PayPal', async() => {
+    await browser.url('/donate');
+    var payPalButton = await $('.protractor-test-paypal-donate-button');
+    await action.click('PayPal button', payPalButton);
+    await expect(await browser.getUrl()).toContain('www.paypal.com');
+  });
 
-//   it('should be able to donate via credit card', async() => {
-//     await browser.url('/donate');
-//     var creditCardButton = await $(
-//       '.protractor-test-credit-card-donate-button');
-//     await action.click('Credit Card button', creditCardButton);
-//     await expect(await browser.getUrl()).toContain('www.paypal.com');
-//   });
-// });
+  it('should be able to donate via credit card', async() => {
+    await browser.url('/donate');
+    var creditCardButton = await $(
+      '.protractor-test-credit-card-donate-button');
+    await action.click('Credit Card button', creditCardButton);
+    await expect(await browser.getUrl()).toContain('www.paypal.com');
+  });
+});
 
-// describe('Static Pages Tour', () => {
-//   var getStartedPage = new GetStartedPage.GetStartedPage();
+describe('Static Pages Tour', () => {
+  var getStartedPage = new GetStartedPage.GetStartedPage();
 
-//   it('should visit the Get started page', async() => {
-//     await getStartedPage.get();
-//     await expect(await $(
-//       '.protractor-test-get-started-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Get started page', async() => {
+    await getStartedPage.get();
+    await expect(await $(
+      '.protractor-test-get-started-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Login page', async() => {
-//     await browser.url('/login');
-//     var loginPage = $('.protractor-test-login-page');
-//     await waitFor.presenceOf(loginPage, 'Login page did not load');
-//   });
+  it('should visit the Login page', async() => {
+    await browser.url('/login');
+    var loginPage = $('.protractor-test-login-page');
+    await waitFor.presenceOf(loginPage, 'Login page did not load');
+  });
 
-//   it('should visit the Teach page', async() => {
-//     await browser.url('/teach');
-//     await expect(await $(
-//       '.protractor-test-teach-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Teach page', async() => {
+    await browser.url('/teach');
+    await expect(await $(
+      '.protractor-test-teach-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Home page', async() => {
-//     await browser.url('/');
-//     await expect(await $(
-//       '.protractor-test-splash-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Home page', async() => {
+    await browser.url('/');
+    await expect(await $(
+      '.protractor-test-splash-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the About page', async() => {
-//     await browser.url('/about');
-//     await expect(await $(
-//       '.protractor-test-about-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the About page', async() => {
+    await browser.url('/about');
+    await expect(await $(
+      '.protractor-test-about-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Contact page', async() => {
-//     await browser.url('/contact');
-//     await expect(await $(
-//       '.protractor-test-contact-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Contact page', async() => {
+    await browser.url('/contact');
+    await expect(await $(
+      '.protractor-test-contact-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Donate page', async() => {
-//     await browser.url('/donate');
-//     await expect(await $(
-//       '.protractor-test-donate-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Donate page', async() => {
+    await browser.url('/donate');
+    await expect(await $(
+      '.protractor-test-donate-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Partnerships page', async() => {
-//     await browser.url('/partnerships');
-//     await expect(await $(
-//       '.protractor-test-partnerships-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Partnerships page', async() => {
+    await browser.url('/partnerships');
+    await expect(await $(
+      '.protractor-test-partnerships-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the About the Oppia Foundation page', async() => {
-//     await browser.url('/about-foundation');
-//     await expect(await $(
-//       '.protractor-test-about-foundation-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the About the Oppia Foundation page', async() => {
+    await browser.url('/about-foundation');
+    await expect(await $(
+      '.protractor-test-about-foundation-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Privacy page', async() => {
-//     await browser.url('/privacy-policy');
-//     await expect(await $(
-//       '.protractor-test-privacy-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Privacy page', async() => {
+    await browser.url('/privacy-policy');
+    await expect(await $(
+      '.protractor-test-privacy-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Terms page', async() => {
-//     await browser.url('/terms');
-//     await expect(await $(
-//       '.protractor-test-terms-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Terms page', async() => {
+    await browser.url('/terms');
+    await expect(await $(
+      '.protractor-test-terms-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Thanks page', async() => {
-//     await browser.url('/thanks');
-//     await expect(await $(
-//       '.protractor-test-thanks-page').isExisting()).toBeTrue();
-//   });
+  it('should visit the Thanks page', async() => {
+    await browser.url('/thanks');
+    await expect(await $(
+      '.protractor-test-thanks-page').isExisting()).toBeTrue();
+  });
 
-//   it('should visit the Volunteer page', async() => {
-//     await browser.url('/volunteer');
-//     await waitFor.visibilityOf(
-//       $('.protractor-test-volunteer'),
-//       'Volunteer page taking too long to appear');
-//   });
+  it('should visit the Volunteer page', async() => {
+    await browser.url('/volunteer');
+    await waitFor.visibilityOf(
+      $('.protractor-test-volunteer'),
+      'Volunteer page taking too long to appear');
+  });
 
-//   it('should show the error page when an incorrect url is given',
-//     async() => {
-//       await browser.url('/splashes');
+  it('should show the error page when an incorrect url is given',
+    async() => {
+      await browser.url('/splashes');
 
-//       await general.expectErrorPage(404);
-//     });
-// });
+      await general.expectErrorPage(404);
+    });
+});
 
-// describe('DEV MODE Test', () => {
-//   it('should not show Dev Mode label in prod', async() => {
-//     await browser.url('/');
-//     await expect(await $('.protractor-test-dev-mode').isExisting())
-//       .toBeFalse();
-//   });
-// });
+describe('DEV MODE Test', () => {
+  it('should not show Dev Mode label in prod', async() => {
+    await browser.url('/');
+    await expect(await $('.protractor-test-dev-mode').isExisting())
+      .toBeFalse();
+  });
+});

@@ -316,14 +316,15 @@ def run_tests(args):
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
 
-            proc =  stack.enter_context(servers.managed_webdriverIO_server(
+            proc =  stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
 
         elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
-            proc =  stack.enter_context(servers.managed_webdriverIO_server(
+            proc =  stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,

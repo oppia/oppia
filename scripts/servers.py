@@ -673,7 +673,7 @@ def managed_protractor_server(
         yield proc
 
 @contextlib.contextmanager
-def managed_webdriverIO_server(
+def managed_webdriverio_server(
         suite_name='full', debug_mode=False, sharding_instances=1,
         chrome_version=None, **kwargs):
     """Returns context manager to start/stop the WebdriverIO server gracefully.
@@ -705,22 +705,27 @@ def managed_webdriverIO_server(
         '--versions.chrome', chrome_version,
     ])
 
-    webdriverIO_args = [
+    webdriverio_args = [
         common.NODE_BIN_PATH2,
         common.NODEMODULES_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
         '--suite', suite_name, chrome_version,
     ]
+    
+    if sharding_instances > 1:
+       webdriverio_args.extend([
+           '--capabilities[0].maxInstances=%d' % sharding_instances,
+       ])
 
     if debug_mode:
         # NOTE: This is a flag for Node.js, not Protractor, so we insert it
         # immediately after NODE_BIN_PATH.
-        webdriverIO_args.insert(0, 'DEBUG=true')
+        webdriverio_args.insert(0, 'DEBUG=true')
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    managed_webdribverIO_proc = managed_process(
-        webdriverIO_args, human_readable_name='WebdriverIO Server', shell=True,
+    managed_webdribverio_proc = managed_process(
+        webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
         **kwargs)
 
-    with managed_webdribverIO_proc as proc:
+    with managed_webdribverio_proc as proc:
         yield proc

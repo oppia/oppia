@@ -88,7 +88,7 @@ var keys = async function(
   if (clickInputElement) {
     await click(inputName, inputElement);
   }
-  await inputElement.keys(keys);
+  await inputElement.setValue(keys);
 };
 
 exports.clear = clear;
