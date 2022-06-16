@@ -227,6 +227,7 @@
       justify-content: space-between;
       margin-bottom: 20px;
       padding-bottom: 30px;
+      padding-top: 5px;
     }
     contributions-and-review .oppia-contributions-show-review {
       align-items: center;
@@ -249,6 +250,19 @@
     }
     contributions-and-review .oppia-contributions-navbar-items-list::before {
       font-size: 2vw;
+    }
+  }
+
+  @media only screen and (max-width: 420px) {
+    .dropdown-label {
+      font-size: 18px;
+      width: 100px !important;
+      margin-right: 2vw;
+    }
+    .oppia-contributions-dropdown-section {
+      margin-bottom: 20px;
+      padding: auto 2vw;
+      width: 90%;
     }
   }
 </style>
