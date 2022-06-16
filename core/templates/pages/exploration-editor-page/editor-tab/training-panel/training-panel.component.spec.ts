@@ -16,32 +16,12 @@
  * @fileoverview Unit tests for trainingPanel.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { TrainingPanelComponent } from './training-panel.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { TrainingPanelComponent } from './training-panel.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { TrainingDataService } from './training-data.service';
