@@ -29,11 +29,14 @@ import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TestBed } from '@angular/core/testing';
 import { SubtopicPage } from './subtopic-page.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 
 describe('Topic update service', function() {
   let topicUpdateService: TopicUpdateService;
   let topicObjectFactory: TopicObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
+  let localStorageService: LocalStorageService = null;
   let _sampleTopic = null;
   let _firstSkillSummary = null;
   let _secondSkillSummary = null;
@@ -99,9 +102,10 @@ describe('Topic update service', function() {
   };
 
   beforeEach(() => {
-    topicUpdateService = TestBed.get(TopicUpdateService);
-    topicObjectFactory = TestBed.get(TopicObjectFactory);
-    undoRedoService = TestBed.get(UndoRedoService);
+    topicUpdateService = TestBed.inject(TopicUpdateService);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    localStorageService = TestBed.inject(LocalStorageService);
 
     _firstSkillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
@@ -1185,5 +1189,26 @@ describe('Topic update service', function() {
         }
       }
     }]);
+  });
+
+  it('should update topic editor browser tabs unsaved changes status', () => {
+    let topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+      'topic', 'topic_id', 2, 1, false);
+    spyOn(
+      localStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(topicEditorBrowserTabsInfo);
+    spyOn(
+      localStorageService, 'updateEntityEditorBrowserTabsInfo'
+    ).and.callFake(() => {});
+
+    expect(
+      topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+
+    topicUpdateService.setTopicName(_sampleTopic, 'new unique value');
+
+    expect(
+      topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
   });
 });

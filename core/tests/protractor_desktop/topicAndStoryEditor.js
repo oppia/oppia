@@ -229,6 +229,30 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.saveTopic('Rearranged skills');
     });
 
+  it(
+    'should show stale tab and unsaved changes status info modals',
+    async function() {
+      await topicsAndSkillsDashboardPage.get();
+      var handle = await browser.getWindowHandle();
+      await topicsAndSkillsDashboardPage.createTopic(
+        'Topic 2', 'topic-two', 'Description', false);
+      await browser.switchTo().window(handle);
+      await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+
+      var handles = await browser.getAllWindowHandles();
+
+      await topicEditorPage.changeTopicName('new topic name');
+      await browser.switchTo().window(handles[handles.length - 1]);
+      await topicEditorPage.expectUnsavedChangesStatusInfoModalToBeVisible();
+
+      await browser.switchTo().window(handles[handles.length - 2]);
+      await topicEditorPage.saveTopic('Changed topic name.');
+      await browser.switchTo().window(handles[handles.length - 1]);
+      await topicEditorPage.expectStaleTabInfoModalToBeVisible();
+
+      await general.closeCurrentTabAndSwitchTo(handles[handles.length - 2]);
+    });
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
     await users.logout();
