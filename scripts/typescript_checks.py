@@ -26,7 +26,7 @@ import sys
 
 from core import utils
 
-from typing import List, Optional, Sequence
+from typing import Generator, List, Optional, Sequence
 
 import yaml
 
@@ -812,7 +812,9 @@ def validate_compiled_js_dir() -> None:
 
 @contextlib.contextmanager
 def compile_strict_tsconfig(
-    config_path: str, error_messages: List[str]) -> None:
+        config_path: str,
+        error_messages: List[str]
+) -> Generator[None, None, None]:
     """Context manager in which we compiles strict TS config with files those
     are neither strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If
     there are any errors, we restores the original config.
