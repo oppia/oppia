@@ -936,14 +936,19 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [platform_parameter_id]),
             {})
 
-        default_parameter = parameter_domain.PlatformParameter.from_dict({ # type: ignore[no-untyped-call]
+        default_parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a 😍',
             'description': '😍😍😍😍',
             'data_type': 'bool',
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
+                        # The expected type of 'conditions' key is
+                        # List[Tuple[str, str]], but for testing purposes
+                        # we are providing value of type List[List[str]].
+                        # Which causes MyPy to throw error, Thus to silent
+                        # the error we used ignore here.
+                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],  # type: ignore[list-item]
                     'value_when_matched': True
                 }
             ],
@@ -967,4 +972,4 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_parameter.to_dict(),
-            platform_parameters[platform_parameter_id].to_dict()) # type: ignore[no-untyped-call]
+            platform_parameters[platform_parameter_id].to_dict())
