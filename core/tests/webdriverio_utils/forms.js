@@ -50,18 +50,20 @@ var UnicodeEditor = function(elem) {
 
 var AutocompleteDropdownEditor = function(elem) {
   var containerLocator = '.select2-container';
-  var searchInputLocator = '.select2-search input';
+  var searchInputLocator = '.select2-search';
   return {
     setValue: async function(text) {
-      var dropdownElement = await $('.select2-dropdown');
+      // var dropdownElement = await $('.select2-dropdown');
       await action.click('Container Element', await elem.$(containerLocator));
       await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
+      var dropdownElementSelector = await $(
+        '.select2-dropdown').$('<input>').$('.select2-search');
       await action.keys(
         'Dropdown Element',
-        await dropdownElement.$(searchInputLocator),
+        dropdownElementSelector,
         text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
@@ -76,7 +78,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // Re-close the dropdown.
       await action.keys(
         'Dropdown Element',
-        await dropdownElement.$(searchInputLocator),
+        await dropdownElement.$(searchInputLocator).$('<input>'),
         '\n');
     }
   };

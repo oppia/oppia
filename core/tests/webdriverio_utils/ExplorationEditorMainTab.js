@@ -139,6 +139,20 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
+  var closeAddResponseModal = async function() {
+    // If the "Add Response" modal opens, close it.
+    var addResponseHeader = await $(
+      '.protractor-test-add-response-modal-header');
+    var isVisible = await addResponseHeader.isExisting();
+    if (isVisible) {
+      var closeAddResponseButton = await $(
+        '.protractor-test-close-add-response-modal');
+      await action.click('Close Add Response Button', closeAddResponseButton);
+    }
+  };
+
+  // This function should not usually be invoked directly; please consider
+  // using setInteraction instead.
   var createNewInteraction = async function(interactionId) {
     var deleteInteractionButton = await $(
       '.protractor-test-delete-interaction');
