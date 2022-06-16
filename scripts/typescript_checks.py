@@ -813,14 +813,18 @@ def validate_compiled_js_dir() -> None:
 @contextlib.contextmanager
 def compile_strict_tsconfig(
     config_path: str, error_messages: List[str]) -> None:
-    """Compiles strict TS config with files those are neither strictly
-    typed nor present in TS_STRICT_EXCLUDE_PATHS.
+    """Context manager in which we compiles strict TS config with files those
+    are neither strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If
+    there are any errors, we restores the original config.
 
     Args:
         config_path: str. The config that should be used to run the typescript
             checks.
         error_messages: List[str]. A list of error messages produced by
             compiling the strict typescript config.
+
+    Yields:
+        None. Nothing.
     """
     # Generate file names from the error messages.
     errors = [x.strip() for x in error_messages]
