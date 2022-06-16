@@ -5339,7 +5339,7 @@ class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_state_version_history_gets_created(self):
         state_version_history_dict_1 = {
-            'previously_edited_on_version': 1,
+            'previously_edited_in_version': 1,
             'state_name_in_previous_version': 'state 1',
             'committer_id': 'user_1'
         }
@@ -5351,7 +5351,7 @@ class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_state_version_history_gets_created_from_dict(self):
         state_version_history_dict = {
-            'previously_edited_on_version': 1,
+            'previously_edited_in_version': 1,
             'state_name_in_previous_version': 'state 1',
             'committer_id': 'user_1'
         }
@@ -5359,8 +5359,8 @@ class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
             state_version_history_dict)
 
         self.assertEqual(
-            state_version_history.previously_edited_on_version,
-            state_version_history_dict['previously_edited_on_version'])
+            state_version_history.previously_edited_in_version,
+            state_version_history_dict['previously_edited_in_version'])
         self.assertEqual(
             state_version_history.state_name_in_previous_version,
             state_version_history_dict['state_name_in_previous_version'])

@@ -3794,11 +3794,11 @@ class State(translation_domain.BaseTranslatableObject):
 class StateVersionHistory:
     """Class to represent an element of the version history list of a state.
     The version history list of a state is the list of exploration versions
-    on which the state has been edited.
+    in which the state has been edited.
 
     Attributes:
-        previously_edited_on_version: int. The version number of the
-            exploration on which the state was previously edited.
+        previously_edited_in_version: int. The version number of the
+            exploration in which the state was previously edited.
         state_name_in_previous_version: str. The name of the state in the
             previously edited version. It is useful in case of state renames.
         committer_id: str. The id of the user who committed the changes in the
@@ -3806,13 +3806,13 @@ class StateVersionHistory:
     """
 
     def __init__(
-        self, previously_edited_on_version,
+        self, previously_edited_in_version,
         state_name_in_previous_version, committer_id
     ):
         """Initializes the StateVersionHistory domain object.
 
         Args:
-            previously_edited_on_version: int. The version number of the
+            previously_edited_in_version: int. The version number of the
                 exploration on which the state was previously edited.
             state_name_in_previous_version: str. The name of the state in the
                 previously edited version. It is useful in case of state
@@ -3820,7 +3820,7 @@ class StateVersionHistory:
             committer_id: str. The id of the user who committed the changes in
                 the previously edited version.
         """
-        self.previously_edited_on_version = previously_edited_on_version
+        self.previously_edited_in_version = previously_edited_in_version
         self.state_name_in_previous_version = state_name_in_previous_version
         self.committer_id = committer_id
 
@@ -3833,7 +3833,7 @@ class StateVersionHistory:
             object.
         """
         return {
-            'previously_edited_on_version': self.previously_edited_on_version,
+            'previously_edited_in_version': self.previously_edited_in_version,
             'state_name_in_previous_version': (
                 self.state_name_in_previous_version),
             'committer_id': self.committer_id
@@ -3852,7 +3852,7 @@ class StateVersionHistory:
             object.
         """
         return cls(
-            state_version_history_dict['previously_edited_on_version'],
+            state_version_history_dict['previously_edited_in_version'],
             state_version_history_dict['state_name_in_previous_version'],
             state_version_history_dict['committer_id']
         )
