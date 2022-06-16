@@ -219,6 +219,11 @@
   margin: 10px 20px;
 }
 
+.save-progress-menu .sign-in-box .sign-in-text a{
+  color: #00645c;
+  text-decoration: underline;
+}
+
 .save-progress-menu .sign-in-box .create-account-btn {
   background-color: #00645c;
   color: white;
@@ -245,10 +250,52 @@
   height: 2px;
   width: 30%;
   background-color: #B7B7B7;
-}
-.save-progress-menu .separator .bars{
-  width: 30%;
   padding: auto;
+}
+
+.save-progress-menu .uid-box {
+  height: 40%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.save-progress-menu .uid-box .guide-text{
+  width: 100%;
+  text-align: center;
+}
+
+.save-progress-menu .uid-box .copy-text{
+  width: 100%;
+  padding-left: 20px;
+  font-size: 14px;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.save-progress-menu .uid-box .uid-copy {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.save-progress-menu .uid-box .uid-copy #unique-progress-id {
+  width: 70%;
+  border: 1px solid black;
+  margin-left: 20px;
+  border-radius: 5px;
+  height: 100%;
+}
+
+.save-progress-menu .uid-box .uid-copy .uid-copy-btn {
+  margin: 0 auto;
+  width: 20%;
+  box-shadow: 1px 1px 2px 0px rgb(0 54 50 / 50%);
+  font-family: Roboto;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .save-progress-menu .save-progress-close-button {

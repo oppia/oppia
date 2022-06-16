@@ -135,7 +135,7 @@
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
 <div class="save-progress-menu"
-     *ngIf="saveProgressMenuIsShown">
+     *ngIf="saveProgressMenuIsShown && !userIsLoggedIn">
     <h3>Save Progress</h3>
     <div class="sign-in-box">
       <p>Your learning progress will be automatically saved if you have an account.</p>
@@ -143,13 +143,21 @@
               class="btn btn-secondary create-account-btn">
             Create Account
       </button>
+      <p class="sign-in-text">Already have an account? <a class="sign-in-link">Sign In</a></p>
     </div>
     <div class="separator">
       <div class="bars"></div>
       <div class="mid">or</div>
       <div class="bars"></div>
     </div>
-    <div class="unique-progress-url-id-box"></div>
+    <div class="uid-box">
+      <p class="guide-text">Use the link below to save progress for 72 hours.<br>You may lose your progress after 72 hours.</p>
+      <p class="copy-text">Write or copy the link below</p>
+      <div class="uid-copy">
+        <div id="unique-progress-id">{{ loggedOutProgressUniqueUrlId }}</div>
+        <button type="button" class="btn btn-secondary uid-copy-btn">Copy</button>
+      </div>
+    </div>
     <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
       <i class="material-icons md-24">&#xE5CD;</i>
       <span class="oppia-icon-accessibility-label">Close</span>
