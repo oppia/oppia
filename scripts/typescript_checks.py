@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import shutil
@@ -809,7 +810,7 @@ def validate_compiled_js_dir() -> None:
             'COMPILED_JS_DIR: %s does not match the output directory '
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
-
+@contextlib.contextmanager
 def compile_strict_tsconfig(
     config_path: str, error_messages: List[str]) -> None:
     """Compiles strict TS config with files those are neither strictly
@@ -841,53 +842,64 @@ def compile_strict_tsconfig(
     # Add "typings" folder to get global imports while compiling.
     files_not_type_strict.append('typings')
 
-    # Update "include" field of tsconfig-strict.json with files those are
-    # neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
-    # Example: List "files_not_type_strict".
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
-        strict_ts_config = yaml.safe_load(f)
-        strict_ts_config['include'] = files_not_type_strict
+    try:
+        # Update "include" field of tsconfig-strict.json with files those are
+        # neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
+        # Example: List "files_not_type_strict".
+        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+            strict_ts_config = yaml.safe_load(f)
+            strict_ts_config['include'] = files_not_type_strict
 
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
-        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
-        f.write('\n')
+        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
+            json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+            f.write('\n')
 
-    # Compile tsconfig-strict.json with files those are neither strictly
-    # typed nor present in TS_STRICT_EXCLUDE_PATHS. All those files
-    # present inside include property.
-    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
-    validate_compiled_js_dir()
+        # Compile tsconfig-strict.json with files those are neither strictly
+        # typed nor present in TS_STRICT_EXCLUDE_PATHS. All those files
+        # present inside include property.
+        os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+        validate_compiled_js_dir()
 
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
+        if os.path.exists(COMPILED_JS_DIR):
+            shutil.rmtree(COMPILED_JS_DIR)
 
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, encoding='utf-8')
+        cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
+        process = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, encoding='utf-8')
 
-    # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`.
-    assert process.stdout is not None
-    error_messages = list(iter(process.stdout.readline, ''))
+        # The value of `process.stdout` should not be None since we passed
+        # the `stdout=subprocess.PIPE` argument to `Popen`.
+        assert process.stdout is not None
+        error_messages = list(iter(process.stdout.readline, ''))
 
-    # Update tsconfig-strict.json and set to its intial "include" state
-    # example "include": ["core", "extensions", "typings"].
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
-        strict_ts_config = yaml.safe_load(f)
-        strict_ts_config['include'] = prefixes
+        # Update tsconfig-strict.json and set to its intial "include" state
+        # example "include": ["core", "extensions", "typings"].
+        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+            strict_ts_config = yaml.safe_load(f)
+            strict_ts_config['include'] = prefixes
 
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
-        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
-        f.write('\n')
+        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
+            json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+            f.write('\n')
 
-    if error_messages:
-        print('\n' + '\n'.join(error_messages))
-        print(
-            str(len([x for x in error_messages if x.startswith(prefixes)]))
-            + ' Errors found during compilation.\n')
-        sys.exit(1)
-    else:
-        print('Compilation successful!')
+        if error_messages:
+            print('\n' + '\n'.join(error_messages))
+            print(
+                str(len([x for x in error_messages if x.startswith(prefixes)]))
+                + ' Errors found during compilation.\n')
+            sys.exit(1)
+        else:
+            print('Compilation successful!')
+
+        yield
+    finally:
+        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+            strict_ts_config = yaml.safe_load(f)
+            strict_ts_config['include'] = prefixes
+
+        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
+            json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+            f.write('\n')
 
 
 def compile_and_check_typescript(config_path: str) -> None:
@@ -925,7 +937,8 @@ def compile_and_check_typescript(config_path: str) -> None:
     error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
-        compile_strict_tsconfig(config_path, error_messages)
+        with compile_strict_tsconfig(config_path, error_messages):
+            pass
     else:
         if error_messages:
             print('Errors found during compilation\n')
