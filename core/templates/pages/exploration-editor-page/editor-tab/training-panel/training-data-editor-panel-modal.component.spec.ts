@@ -13,33 +13,134 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TrainingDataEditorPanelServiceModalController.
+ * @fileoverview Unit tests for TrainingDataEditorPanelServiceModalcomponent.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { AlertsService } from 'services/alerts.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ResponsesService } from '../services/responses.service';
+import { TrainingDataEditorPanelComponent } from './training-data-editor-panel-modal.component';
+import { TrainingDataService } from './training-data.service';
+import { TrainingModalService } from './training-modal.service';
 
-describe('TrainingDataEditorPanelComponent', function() {
-  importAllAngularServices();
 
-  var $scope = null;
-  var $uibModalInstance = null;
-  var ExplorationStatesService = null;
-  var ResponsesService = null;
-  var InteractionObjectFactory = null;
-  var StateInteractionIdService = null;
-  var StateCustomizationArgsService = null;
-  var TrainingModalService = null;
-  var AlertsService = null;
+class MockStateEditorService {
+  getActiveStateName() {
+    return 'Hola';
+  }
+}
 
-  beforeEach(() => {
+class MockExplorationStatesService {
+  getState(item1) {
+    return {
+      content: {
+        html: 'This is Hola State'
+      }
+    };
+  }
+}
+
+class MockResponsesService {
+  getActiveAnswerGroupIndex() {
+    return 1;
+  }
+
+  getAnswerGroup() {
+    return new AnswerGroup([
+      new Rule('TextInput', null, null),
+      new Rule('TextInput', null, null)
+    ], null, ['Answer1', 'Answer2'], null);
+  }
+}
+
+class MockExplorationHtmlFormatterService {
+  getInteractionHtml() {
+    return 'MockExplorationHtmlFormattered string';
+  }
+
+  getAnswerHtml() {
+    return 'answer';
+  }
+}
+
+class MockActiveModal {
+  close(): void {
+    return;
+  }
+
+  dismiss(): void {
+    return;
+  }
+}
+
+class MockStateInteractionIdService {
+  savedMemento = 'TextInput';
+}
+
+class MockAnswerClassificationService {
+  getMatchingClassificationResult() {
+    return {
+      outcome: {
+        dest: 'dest',
+        feedback: 'feedback'
+      },
+      classificationCategorization: 'explicit Type'
+    };
+  }
+}
+
+describe('Training Data Editor Panel Component', () => {
+  let component: TrainingDataEditorPanelComponent;
+  let fixture: ComponentFixture<TrainingDataEditorPanelComponent>;
+  let focusManagerService: FocusManagerService;
+  let ngbActiveModal: NgbActiveModal;
+  let trainingModalService: TrainingModalService;
+  let trainingDataService: TrainingDataService;
+  let truncateInputBasedOnInteractionAnswerTypePipe:
+    TruncateInputBasedOnInteractionAnswerTypePipe;
+  let answerClassificationService: AnswerClassificationService;
+  let trainingModalServiceeventEmitter = new EventEmitter();
+
+  class MockTrainingModalService {
+    get onFinishTrainingCallback() {
+      return trainingModalServiceeventEmitter;
+    }
+
+    getTrainingDataOfAnswerGroup(index1) {
+      return ['name', 'class'];
+    }
+
+    openTrainUnresolvedAnswerModal(item1, item2, item3) {
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+      ],
+      declarations: [
+        TrainingDataEditorPanelComponent
+      ],
       providers: [
+        FocusManagerService,
+        AlertsService,
+        TruncateInputBasedOnInteractionAnswerTypePipe,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -48,485 +149,171 @@ describe('TrainingDataEditorPanelComponent', function() {
               return;
             }
           }
-        }
-      ]
-    });
+        },
+        {
+          provide: StateInteractionIdService,
+          useClass: MockStateInteractionIdService
+        },
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        {
+          provide: StateEditorService,
+          useClass: MockStateEditorService
+        },
+        {
+          provide: ExplorationStatesService,
+          useClass: MockExplorationStatesService
+        },
+        {
+          provide: ResponsesService,
+          useClass: MockResponsesService
+        },
+        {
+          provide: ExplorationHtmlFormatterService,
+          useClass: MockExplorationHtmlFormatterService
+        },
+        {
+          provide: TrainingModalService,
+          useClass: MockTrainingModalService
+        },
+        {
+          provide: AnswerClassificationService,
+          useClass: MockAnswerClassificationService
+        },
+        TrainingDataService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TrainingDataEditorPanelComponent);
+    component = fixture.componentInstance;
+
+    trainingDataService = TestBed.inject(TrainingDataService);
+    trainingModalService = TestBed.inject(TrainingModalService);
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    truncateInputBasedOnInteractionAnswerTypePipe =
+      TestBed.inject(TruncateInputBasedOnInteractionAnswerTypePipe);
+
+    spyOn(focusManagerService, 'setFocus').and.stub();
+    spyOn(truncateInputBasedOnInteractionAnswerTypePipe, 'transform')
+      .and.returnValue('of question');
+    spyOn(trainingDataService, 'associateWithAnswerGroup')
+      .and.stub();
+
+    fixture.detectChanges();
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.value('StateEditorService', {
-      getActiveStateName: function() {
-        return 'Hola';
-      }
-    });
-  }));
+  it('should initialize component properties after component is initialized',
+    fakeAsync(() => {
+      component.ngOnInit();
 
-  describe('when answer group has rules', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      ExplorationStatesService = $injector.get('ExplorationStatesService');
-      ResponsesService = $injector.get('ResponsesService');
-      InteractionObjectFactory = $injector.get('InteractionObjectFactory');
-      StateInteractionIdService = $injector.get('StateInteractionIdService');
-      StateCustomizationArgsService = $injector.get(
-        'StateCustomizationArgsService');
-      TrainingModalService = $injector.get('TrainingModalService');
-      AlertsService = $injector.get('AlertsService');
-
-      ExplorationStatesService.init({
-        Hola: {
-          content: {
-            content_id: '',
-            html: 'This is Hola State'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              feedback_1: {}
-            },
-          },
-          param_changes: [],
-          interaction: {
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'Hola',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '',
-                },
-              },
-              training_data: ['Answer2']
-            }],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: 'Hola',
-              feedback: {
-                content_id: 'feedback_1',
-                html: '',
-              },
-            },
-            hints: [],
-            id: 'TextInput',
-            solution: null,
-          },
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              feedback_1: {}
-            },
-          },
-        },
+      trainingModalServiceeventEmitter.emit({
+        answer: 'answer',
+        interactionId: 'interactionId',
       });
-      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
-        id: 'TextInput',
-        answer_groups: [{
-          outcome: {
-            dest: '',
-            feedback: {
-              content_id: 'feedback_2',
-              html: ''
-            },
-          },
-          rule_specs: [{
-            rule_type: 'Equals',
-            inputs: {
-              x: {
-                contentId: 'rule_input',
-                normalizedStrSet: ['c', 'd', 'e']
-              }
-            }
-          }],
-          training_data: ['Answer1', 'Answer2']
-        }],
-        default_outcome: {
-          dest: 'Hola',
-          feedback: {
-            content_id: 'feedback_1',
-            html: '',
-          },
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          placeholder: {
-            value: {
-              content_id: 'ca_placeholder_0',
-              unicode_str: ''
-            }
-          },
-          rows: { value: 1 }
-        },
-        hints: [],
-      }));
-      ResponsesService.changeActiveAnswerGroupIndex(0);
-      StateInteractionIdService.init('Hola', 'TextInput');
-      StateCustomizationArgsService.init('Hola', {});
+      tick();
 
-      var $rootScope = $injector.get('$rootScope');
+      component.ngOnDestroy();
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
-      $scope = $rootScope.$new();
-      $controller(
-        'TrainingDataEditorPanelServiceModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance
-        });
+      expect(truncateInputBasedOnInteractionAnswerTypePipe.transform)
+        .toHaveBeenCalled();
+      expect(component.stateName).toBe('Hola');
+      expect(component.stateContent).toBe('This is Hola State');
+      expect(component.answerGroupHasNonEmptyRules).toBe(true);
+      expect(component.inputTemplate).toBe(
+        'MockExplorationHtmlFormattered string');
     }));
 
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.stateName).toBe('Hola');
-        expect($scope.stateContent).toBe('This is Hola State');
-        expect($scope.answerGroupHasNonEmptyRules).toBe(true);
-        expect($scope.inputTemplate).toBe(
-          '<oppia-interactive-text-input ' +
-          'label-for-focus-target="testInteractionInput" [last-answer]="null"' +
-          '></oppia-interactive-text-input>');
-      });
-
-    it('should call init when controller is initialized', function() {
-      expect($scope.trainingData).toEqual([{
-        answer: 'Answer1',
-        answerTemplate: '<oppia-response-text-input answer="&' +
-          'amp;quot;Answer1&amp;quot;"></oppia-response-text-input>'
-      }, {
-        answer: 'Answer2',
-        answerTemplate: '<oppia-response-text-input answer="&' +
-          'amp;quot;Answer2&amp;quot;"></oppia-response-text-input>'
-      }]);
-      expect($scope.newAnswerIsAlreadyResolved).toBe(false);
-      expect($scope.answerSuccessfullyAdded).toBe(false);
-    });
-
-    it('should remove answer from training data', function() {
-      $scope.removeAnswerFromTrainingData(0);
-      expect($scope.trainingData).toEqual([{
-        answer: 'Answer2',
-        answerTemplate: '<oppia-response-text-input answer="&' +
-          'amp;quot;Answer2&amp;quot;"></oppia-response-text-input>'
-      }]);
-    });
-
-    it('should submit answer that is explicity classified', function() {
-      $scope.submitAnswer('Answer2');
-
-      expect($scope.newAnswerTemplate).toBe(
-        '<oppia-response-text-input answer="&amp;quot;Answer2&' +
-        'amp;quot;"></oppia-response-text-input>');
-      expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtml.createDefault('', 'feedback_1'));
-      expect($scope.newAnswerOutcomeDest).toBe('(try again)');
-      expect($scope.newAnswerIsAlreadyResolved).toBe(true);
-    });
-
-    it('should submit answer that is not explicity classified', function() {
-      var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
-        .and.callThrough();
-      $scope.submitAnswer('Answer1');
-
-      expect($scope.newAnswerTemplate).toBe(
-        '<oppia-response-text-input answer="&amp;quot;Answer1&' +
-        'amp;quot;"></oppia-response-text-input>');
-      expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtml.createDefault('', 'feedback_1'));
-      expect($scope.newAnswerOutcomeDest).toBe('(try again)');
-      expect($scope.newAnswerIsAlreadyResolved).toBe(false);
-      expect(addSuccessMessageSpy).toHaveBeenCalledWith(
-        'The answer Answer1 has been successfully trained.', 1000);
-    });
-
-    it('should open train unresolved answer modal', function() {
-      var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
-        .and.callThrough();
-      spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
-          callback();
-        });
-
-      $scope.openTrainUnresolvedAnswerModal(1);
-      expect(addSuccessMessageSpy).toHaveBeenCalledWith(
-        'The answer Answer2 has been successfully trained.', 1000);
-    });
-
-    it('should exit modal', function() {
-      expect(true).toBe(true);
-      $scope.exit();
-      expect($uibModalInstance.close).toHaveBeenCalled();
-    });
+  it('should call init when component is initialized', () => {
+    expect(component.trainingData).toEqual([{
+      answer: 'Answer1',
+      answerTemplate: 'answer'
+    }, {
+      answer: 'Answer2',
+      answerTemplate: 'answer'
+    }]);
+    expect(component.newAnswerIsAlreadyResolved).toBe(false);
+    expect(component.answerSuccessfullyAdded).toBe(false);
   });
 
-  describe('when answer group does not have rule and has at least 2' +
-    ' training data', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      ExplorationStatesService = $injector.get('ExplorationStatesService');
-      ResponsesService = $injector.get('ResponsesService');
-      InteractionObjectFactory = $injector.get('InteractionObjectFactory');
-      StateInteractionIdService = $injector.get('StateInteractionIdService');
-      StateCustomizationArgsService = $injector.get(
-        'StateCustomizationArgsService');
-      TrainingModalService = $injector.get('TrainingModalService');
-      AlertsService = $injector.get('AlertsService');
+  it('should remove answer from training data', () => {
+    spyOn(trainingDataService, 'removeAnswerFromAnswerGroupTrainingData')
+      .and.stub();
 
-      ExplorationStatesService.init({
-        Hola: {
-          content: {
-            content_id: '',
-            html: 'This is Hola State'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              feedback_1: {}
-            },
-          },
-          param_changes: [],
-          interaction: {
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'Hola',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '',
-                },
-              },
-              training_data: ['Answer2']
-            }],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: 'Hola',
-              feedback: {
-                content_id: 'feedback_1',
-                html: '',
-              },
-            },
-            hints: [],
-            id: 'TextInput',
-            solution: null,
-          },
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              feedback_1: {}
-            },
-          },
-        },
-      });
-      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
-        id: 'TextInput',
-        answer_groups: [{
-          outcome: {
-            dest: '',
-            feedback: {
-              content_id: 'feedback_2',
-              html: ''
-            },
-          },
-          rule_specs: [],
-          training_data: ['Answer1', 'Answer2']
-        }],
-        default_outcome: {
-          dest: 'Hola',
-          feedback: {
-            content_id: 'feedback_1',
-            html: '',
-          },
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: true
-          },
-          placeholder: {
-            value: {
-              content_id: 'ca_placeholder_0',
-              unicode_str: ''
-            }
-          }
-        },
-        hints: [],
-      }));
-      ResponsesService.changeActiveAnswerGroupIndex(0);
-      StateInteractionIdService.init('Hola', 'TextInput');
-      StateCustomizationArgsService.init('Hola', {});
-
-      var $rootScope = $injector.get('$rootScope');
-
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
-      $scope = $rootScope.$new();
-      $controller(
-        'TrainingDataEditorPanelServiceModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance
-        });
-    }));
-
-    it('should open train unresolved answer modal', function() {
-      var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
-        .and.callThrough();
-      spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
-          callback();
-        });
-
-      $scope.openTrainUnresolvedAnswerModal(1);
-      expect(addSuccessMessageSpy).toHaveBeenCalledWith(
-        'The answer Answer2 has been successfully trained.', 1000);
-    });
+    component.removeAnswerFromTrainingData(0);
+    expect(component.trainingData).toEqual([{
+      answer: 'Answer2',
+      answerTemplate: 'answer'
+    }]);
   });
 
-  describe('when answer group does not have rule and has one training' +
-    ' data', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      ExplorationStatesService = $injector.get('ExplorationStatesService');
-      ResponsesService = $injector.get('ResponsesService');
-      InteractionObjectFactory = $injector.get('InteractionObjectFactory');
-      StateInteractionIdService = $injector.get('StateInteractionIdService');
-      StateCustomizationArgsService = $injector.get(
-        'StateCustomizationArgsService');
-      TrainingModalService = $injector.get('TrainingModalService');
-      AlertsService = $injector.get('AlertsService');
+  it('should submit answer that is not explicity classified', () => {
+    component.submitAnswer('answer');
 
-      ExplorationStatesService.init({
-        Hola: {
-          content: {
-            content_id: '',
-            html: 'This is Hola State'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              feedback_1: {}
-            },
-          },
-          param_changes: [],
-          interaction: {
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'Hola',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '',
-                },
-              },
-              training_data: ['Answer2']
-            }],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: 'Hola',
-              feedback: {
-                content_id: 'feedback_1',
-                html: '',
-              },
-            },
-            hints: [],
-            id: 'TextInput',
-            solution: null,
-          },
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              feedback_1: {}
-            },
-          },
-        },
+    expect(component.newAnswerTemplate).toBe(
+      'answer');
+    expect(component.newAnswerFeedback).toEqual(
+      'feedback');
+    expect(component.newAnswerOutcomeDest).toBe('dest');
+    expect(component.newAnswerIsAlreadyResolved).toBe(false);
+  });
+
+  it('should submit answer that is explicity classified', () => {
+    spyOn(answerClassificationService, 'getMatchingClassificationResult')
+      .and.returnValue({
+        outcome: new Outcome(
+          'Hola',
+          new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+          false,
+          [],
+          null,
+          null,
+        ),
+        answerGroupIndex: null,
+        ruleIndex: null,
+        classificationCategorization: 'explicit',
       });
-      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
-        id: 'TextInput',
-        answer_groups: [{
-          outcome: {
-            dest: '',
-            feedback: {
-              content_id: 'feedback_2',
-              html: ''
-            },
-          },
-          rule_specs: [],
-          training_data: ['Answer1']
-        }],
-        default_outcome: {
-          dest: 'Hola',
-          feedback: {
-            content_id: 'feedback_1',
-            html: '',
-          },
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          placeholder: {
-            value: {
-              content_id: 'ca_placeholder_0',
-              unicode_str: ''
-            }
-          },
-          rows: { value: 1 }
-        },
-        hints: [],
-      }));
-      ResponsesService.changeActiveAnswerGroupIndex(0);
-      StateInteractionIdService.init('Hola', 'TextInput');
-      StateCustomizationArgsService.init('Hola', {});
 
-      var $rootScope = $injector.get('$rootScope');
+    component.submitAnswer('answer');
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
+    expect(component.newAnswerTemplate).toBe(
+      'answer');
+    expect(component.newAnswerFeedback).toEqual(
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'));
+    expect(component.newAnswerOutcomeDest).toBe('(try again)');
+    expect(component.newAnswerIsAlreadyResolved).toBe(true);
+  });
 
-      $scope = $rootScope.$new();
-      $controller(
-        'TrainingDataEditorPanelServiceModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance
-        });
-    }));
+  it('should open train unresolved answer modal', () => {
+    component.answerGroupHasNonEmptyRules = true;
 
-    it('should open train unresolved answer modal', function() {
-      var openTrainUnresolvedAnswerModalSpy = spyOn(
-        TrainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callThrough();
+    spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
+      .stub();
 
-      $scope.openTrainUnresolvedAnswerModal(1);
-      expect(openTrainUnresolvedAnswerModalSpy).not.toHaveBeenCalled();
-    });
+    component.openTrainUnresolvedAnswerModal(1);
+    expect(trainingModalService.openTrainUnresolvedAnswerModal)
+      .toHaveBeenCalled();
+  });
+
+  it('should exit modal', () => {
+    spyOn(ngbActiveModal, 'close').and.stub();
+
+    component.exit();
+
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  });
+
+  it('should dismiss modal', () => {
+    spyOn(ngbActiveModal, 'dismiss').and.stub();
+
+    component.cancel();
+
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 });

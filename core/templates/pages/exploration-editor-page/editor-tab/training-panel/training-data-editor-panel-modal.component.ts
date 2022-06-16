@@ -153,8 +153,7 @@ export class TrainingDataEditorPanelComponent
           this._rebuildTrainingData();
         }));
 
-    // Shivam PTAL.
-    // this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
+    this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
     this.init();
   }
 
@@ -215,7 +214,7 @@ export class TrainingDataEditorPanelComponent
     this.ngbActiveModal.close();
   }
 
-  submitAnswe(newAnswer: InteractionAnswer): void {
+  submitAnswer(newAnswer: InteractionAnswer): void {
     this.newAnswerIsAlreadyResolved = false;
 
     let interactionId = this.stateInteractionIdService.savedMemento;
