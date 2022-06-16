@@ -349,8 +349,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     const entityType: string = this.contextService.getEntityType() as string;
     if (
       this.contextService.getImageSaveDestination() ===
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
-        this.imageLocalStorageService.isInStorage(imageUrl))) {
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+      this.imageLocalStorageService.isInStorage(imageUrl)
+    ) {
       const base64Url = this.imageLocalStorageService.getRawImageData(
         imageUrl);
       // This throws "TS2322: Type 'string | null' is not assignable to type

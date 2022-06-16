@@ -25,6 +25,8 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
 import { AppConstants } from 'app.constants';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('ImageWithRegionsEditorComponent', () => {
   let component: ImageWithRegionsEditorComponent;
@@ -32,6 +34,8 @@ describe('ImageWithRegionsEditorComponent', () => {
   let fixture: ComponentFixture<ImageWithRegionsEditorComponent>;
   let contextService: ContextService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let svgSanitizerService: SvgSanitizerService;
 
   class MockImageObject {
     source = null;
@@ -64,6 +68,8 @@ describe('ImageWithRegionsEditorComponent', () => {
     ngbModal = TestBed.inject(NgbModal);
     contextService = TestBed.inject(ContextService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     fixture = TestBed.createComponent(ImageWithRegionsEditorComponent);
     component = fixture.componentInstance;
 
@@ -1447,5 +1453,48 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.yDirectionToggled = false;
 
     expect(component.getCursorStyle()).toBe('e-resize');
+  });
+
+  it('should get the preview URL when the image save destination is ' +
+  'server', () => {
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    spyOn(assetsBackendApiService, 'getImageUrlForPreview');
+
+    component.getPreviewUrl('/path/to/image.png');
+
+    expect(assetsBackendApiService.getImageUrlForPreview).toHaveBeenCalled();
+  });
+
+  it('should get the preview URL when the image save destination is ' +
+  'local storage and image is non SVG', () => {
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      'data:image/png;dummy%20image');
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes');
+
+    component.getPreviewUrl('/path/to/image.png');
+
+    expect(
+      svgSanitizerService.removeAllInvalidTagsAndAttributes
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should get the preview URL when the image save destination is ' +
+  'local storage and image is an SVG', () => {
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      'data:image/svg+xml;dummy%20image');
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes');
+
+    component.getPreviewUrl('/path/to/image.svg');
+
+    expect(
+      svgSanitizerService.removeAllInvalidTagsAndAttributes
+    ).toHaveBeenCalled();
   });
 });

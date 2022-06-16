@@ -155,8 +155,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       // we directly assign the url to the imageUrl.
       if (
         this.contextService.getImageSaveDestination() ===
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
-          this.imageLocalStorageService.isInStorage(this.filepath))) {
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+        this.imageLocalStorageService.isInStorage(this.filepath)
+      ) {
         const base64Url = this.imageLocalStorageService.getRawImageData(
           this.filepath);
         const mimeType = base64Url.split(';')[0];
