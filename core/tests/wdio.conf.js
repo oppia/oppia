@@ -59,7 +59,7 @@ if ((process.env.GITHUB_ACTIONS &&
   videoReporter = [video, {
     outputDir: '../webdriverio-video',
     // Enable saveAllVideos if you want success videos to be saved.
-    saveAllVideos: false,
+    saveAllVideos: true,
     videoSlowdownMultiplier: 3,
   }];
 

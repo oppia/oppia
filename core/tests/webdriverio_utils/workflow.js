@@ -52,6 +52,32 @@ var createExplorationAndStartTutorial = async function(isCollectionEditor) {
     stateNameText, 'State name text takes too long to appear.');
 };
 
+// This will only work if all changes have been saved and there are no
+// outstanding warnings; run from the editor.
+var publishExploration = async function() {
+  await waitFor.elementToBeClickable(await $(
+    '.protractor-test-publish-exploration'));
+  await $('.protractor-test-publish-exploration').isDisplayed();
+  var testPublishExploration = await $('.protractor-test-publish-exploration');
+  await action.click('Test Publish Exploration', testPublishExploration);
+  var prePublicationButtonElem = await $(
+    '.protractor-test-confirm-pre-publication');
+  await action.click(
+    'Pre Publication Button Element', prePublicationButtonElem);
+
+  await waitFor.invisibilityOf(
+    prePublicationButtonElem,
+    'prePublicationButtonElem taking too long to disappear while publishing');
+  var testConfirmPublish = await $('.protractor-test-confirm-publish');
+  await action.click('Test Confirm Publish', testConfirmPublish);
+
+  var sharePublishModal = await $('.protractor-test-share-publish-modal');
+  var closePublishModalButton = await $('.protractor-test-share-publish-close');
+  await waitFor.visibilityOf(
+    sharePublishModal, 'Share Publish Modal takes too long to appear');
+  await action.click('Close Publish Modal Button', closePublishModalButton);
+};
+
 // Creates and publishes a minimal exploration.
 var createAndPublishExploration = async function(
     title, category, objective, language, welcomeModalIsShown) {

@@ -23,13 +23,54 @@ var waitFor = require('./waitFor.js');
 
 var ExplorationEditorMainTab = require(
   '../webdriverio_utils/ExplorationEditorMainTab.js');
+var ExplorationEditorSettingsTab = require(
+  '../webdriverio_utils/ExplorationEditorSettingsTab.js');
 
 var ExplorationEditorPage = function() {
+  /*
+   * Workflows
+   */
+  // ---- CONTROLS ----
+
+  this.saveChanges = async function(commitMessage) {
+    await action.waitForAutosave();
+    var saveChangesButton = await $('.protractor-test-save-changes');
+    await action.click('Save changes button', saveChangesButton);
+    if (commitMessage) {
+      var commitMessageInput = await $(
+        '.protractor-test-commit-message-input');
+      await action.keys(
+        'Commit message input', commitMessageInput, commitMessage);
+    }
+    var commitChangesButton = await $(
+      '.protractor-test-save-draft-button');
+    await action.click('Save draft button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    // eslint-disable-next-line wdio/no-pause
+    await browser.pause(2500);
+    var saveDraftButtonTextContainer = await $(
+      '.protractor-test-save-draft-message');
+    await waitFor.textToBePresentInElement(
+      saveDraftButtonTextContainer, 'Save Draft',
+      'Changes could not be saved');
+  };
+
   /*
    * Components
    */
   this.getMainTab = function() {
     return new ExplorationEditorMainTab.ExplorationEditorMainTab();
+  };
+  this.getSettingsTab = function() {
+    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
+
+  // ---- NAVIGATION ----
+
+  this.navigateToSettingsTab = async function() {
+    var navigateToSettingsTabButton = await $('.protractor-test-settings-tab');
+    await action.click('Settings tab button', navigateToSettingsTabButton);
+    await waitFor.pageToFullyLoad();
   };
 };
 

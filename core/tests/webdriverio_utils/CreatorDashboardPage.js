@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the creator dashboard, for use in Protractor
+ * @fileoverview Page object for the creator dashboard, for use in WebdriverIO
  * tests.
  */
 
@@ -26,6 +26,18 @@ var CreatorDashboardPage = function() {
   this.get = async function() {
     await browser.url(CREATOR_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.clickCreateCollectionButton = async function() {
+    var activityCreationModal = await $('.protractor-test-creation-modal');
+    await waitFor.visibilityOf(
+      activityCreationModal, 'Activity Creation modal is not visible');
+    await action.click('Create Collection Button', createCollectionButton);
+    var createCollectionButton = await $('.protractor-test-create-collection');
+    await waitFor.pageToFullyLoad();
+    var collectionEditorContainer = await $(
+      '.protractor-test-collection-editor-cards-container');
+    await waitFor.visibilityOf(collectionEditorContainer);
   };
 
   this.clickCreateActivityButton = async function() {
