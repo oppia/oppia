@@ -810,6 +810,7 @@ def validate_compiled_js_dir() -> None:
             'COMPILED_JS_DIR: %s does not match the output directory '
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
+
 @contextlib.contextmanager
 def compile_strict_tsconfig(
         config_path: str,
