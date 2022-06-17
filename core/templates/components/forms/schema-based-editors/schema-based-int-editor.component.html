@@ -1,0 +1,31 @@
+<div class="input-group">
+  <span *ngIf="!expressionMode">
+    <mat-form-field class="long oppia-blue-on-focus md-default-theme m-0">
+      <input type="number"
+             matNativeControl
+             [(ngModel)]="localValue"
+             (ngModelChange)="updateValue($event)"
+             [disabled]="disabled"
+             required="!notRequired"
+             applyValidation [validators]="validators"
+             [oppiaFocusOn]="labelForFocusTarget"
+             (blur)="inputBlur.emit()"
+             (focus)="inputFocus.emit()">
+    </mat-form-field>
+  </span>
+</div>
+
+<style>
+  .oppia-blue-on-focus > input {
+    border-width: 0 0 1px 0;
+    display: block;
+    line-height: 26px;
+    padding-bottom: 1px;
+    padding-top: 2px;
+  }
+
+  .oppia-blue-on-focus > input:focus {
+    border-bottom-color: rgb(63, 81, 181);
+    border-bottom-width: 2px;
+  }
+</style>

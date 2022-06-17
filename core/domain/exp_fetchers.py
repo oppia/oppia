@@ -185,7 +185,9 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         last_updated=exploration_model.last_updated)
 
 
-def get_exploration_summary_by_id(exploration_id):
+def get_exploration_summary_by_id(
+    exploration_id: str
+) -> exp_domain.ExplorationSummary:
     """Returns a domain object representing an exploration summary.
 
     Args:

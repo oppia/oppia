@@ -1079,6 +1079,11 @@ class Topic:
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
                 'Topic thumbnail image is not provided.')
+        if self.canonical_story_references:
+            for reference in self.canonical_story_references:
+                if not isinstance(reference.story_is_published, bool):
+                    raise utils.ValidationError(
+                        'story_is_published value should be boolean type')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
@@ -1153,7 +1158,8 @@ class Topic:
 
     @classmethod
     def create_default_topic(
-        cls, topic_id: str, name: str, url_fragment: str, description: str
+        cls, topic_id: str, name: str, url_fragment: str, description: str,
+        page_title_frag: str
     ) -> Topic:
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
@@ -1164,6 +1170,7 @@ class Topic:
             name: str. The initial name for the topic.
             url_fragment: str. The url fragment for the topic.
             description: str. The description for the topic.
+            page_title_frag: str. The page title fragment for web.
 
         Returns:
             Topic. The Topic domain object with the default values.
@@ -1173,7 +1180,8 @@ class Topic:
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
+            False, page_title_frag)
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
@@ -1191,11 +1199,11 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
         subtopic_dict['thumbnail_size_in_bytes'] = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
         return subtopic_dict
 

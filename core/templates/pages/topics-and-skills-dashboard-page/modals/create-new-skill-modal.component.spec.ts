@@ -17,12 +17,11 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
@@ -47,13 +46,13 @@ describe('Create new skill modal', () => {
         FormsModule
       ],
       declarations: [
-        CreateNewSkillModalComponent,
-        SchemaBasedEditorDirective
+        CreateNewSkillModalComponent
       ],
       providers: [
         NgbActiveModal,
         ChangeDetectorRef,
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
