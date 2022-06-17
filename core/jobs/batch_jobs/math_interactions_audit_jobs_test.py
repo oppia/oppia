@@ -194,7 +194,10 @@ class FindMathExplorationsWithNonTrivialFunctionsJobTests(
                 'trivial_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state', is_initial_state=True
                 ).to_dict(),
-                'non_trivial_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'non_trivial_state_1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state', is_initial_state=True
+                ).to_dict(),
+                'non_trivial_state_2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state', is_initial_state=True
                 ).to_dict(),
                 'end_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
@@ -219,9 +222,9 @@ class FindMathExplorationsWithNonTrivialFunctionsJobTests(
                 }]
             }
         ]
-        exp_model_1.states['non_trivial_state']['interaction']['id'] = (
+        exp_model_1.states['non_trivial_state_1']['interaction']['id'] = (
             'AlgebraicExpressionInput')
-        exp_model_1.states['non_trivial_state']['interaction'][
+        exp_model_1.states['non_trivial_state_1']['interaction'][
                 'answer_groups'] = [
             {
                 'rule_specs': [{
@@ -237,6 +240,21 @@ class FindMathExplorationsWithNonTrivialFunctionsJobTests(
                 }]
             }
         ]
+        exp_model_1.states['non_trivial_state_2']['interaction']['id'] = (
+            'MathEquationInput')
+        exp_model_1.states['non_trivial_state_2']['interaction'][
+                'answer_groups'] = [
+            {
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'log(x) = 3 * tan(y)',
+                        'y': 'both'
+                    },
+                    'rule_type': 'MatchesExactlyWith'
+                }]
+            }
+        ]
+
         exp_model_1.update_timestamps()
 
         datastore_services.put_multi([exp_model_1, ])
@@ -244,8 +262,13 @@ class FindMathExplorationsWithNonTrivialFunctionsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=(
-                    '(\'exp_1_id\', \'non_trivial_state\', '
+                    '(\'exp_1_id\', \'non_trivial_state_1\', '
                     '[\'log(x) - sin(y)\', \'x - y\'])'
+                )
+            ), job_run_result.JobRunResult(
+                stdout=(
+                    '(\'exp_1_id\', \'non_trivial_state_2\', '
+                    '[\'log(x) = 3 * tan(y)\'])'
                 )
             )
         ])

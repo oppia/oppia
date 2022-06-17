@@ -137,7 +137,14 @@ class Utils:
         """
         rule_inputs = tup[2]
         for rule_input in rule_inputs:
-            tokens = expression_parser.tokenize(rule_input)
+            tokens = []
+            if '=' in rule_input:
+                lhs, rhs = rule_input.split('=')
+                lhs_tokens = expression_parser.tokenize(lhs)
+                rhs_tokens = expression_parser.tokenize(rhs)
+                tokens = lhs_tokens + rhs_tokens
+            else:
+                tokens = expression_parser.tokenize(rule_input)
             for token in tokens:
                 if token.is_function(token.text) and (
                         token.text not in TRIVIAL_FUNCTIONS):
