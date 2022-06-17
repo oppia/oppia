@@ -27,7 +27,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Callable, Dict, List, Optional, Pattern, Tuple, Type, Union
+from typing import Callable, Dict, List, Optional, Pattern, Tuple, Union
 from typing_extensions import Final, TypedDict
 
 
@@ -39,7 +39,7 @@ class ServerModes(enum.Enum):
     PROD = 'prod'
 
 
-FeatureStages: Type[ServerModes] = ServerModes
+FeatureStages = ServerModes
 
 
 class DataTypes(enum.Enum):
@@ -569,7 +569,7 @@ class PlatformParameterRuleDict(TypedDict):
     """Dictionary representing the PlatformParameterRule object."""
 
     filters: List[PlatformParameterFilterDict]
-    value_when_matched: Union[str, bool]
+    value_when_matched: Union[str, bool, int]
 
 
 class PlatformParameterRule:
@@ -578,7 +578,7 @@ class PlatformParameterRule:
     def __init__(
         self,
         filters: List[PlatformParameterFilter],
-        value_when_matched: Union[str, bool]
+        value_when_matched: Union[str, bool, int]
     ) -> None:
         self._filters = filters
         self._value_when_matched = value_when_matched
@@ -593,7 +593,7 @@ class PlatformParameterRule:
         return self._filters
 
     @property
-    def value_when_matched(self) -> Union[str, bool]:
+    def value_when_matched(self) -> Union[str, bool, int]:
         """Returns the value outcome if this rule is matched.
 
         Returns:
@@ -674,7 +674,7 @@ class PlatformParameterDict(TypedDict):
     data_type: str
     rules: List[PlatformParameterRuleDict]
     rule_schema_version: int
-    default_value: Union[str, bool]
+    default_value: Union[str, bool, int]
     is_feature: bool
     feature_stage: Optional[str]
 
@@ -683,7 +683,7 @@ class PlatformParameter:
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT: (
-        Dict[str, Callable[[Union[str, int, bool, float]], bool]]
+        Dict[str, Callable[[Union[str, int, bool]], bool]]
     ) = {
         DataTypes.BOOL.value: lambda x: isinstance(x, bool),
         DataTypes.STRING.value: lambda x: isinstance(x, str),
@@ -699,7 +699,7 @@ class PlatformParameter:
         data_type: str,
         rules: List[PlatformParameterRule],
         rule_schema_version: int,
-        default_value: Union[str, bool],
+        default_value: Union[str, bool, int],
         is_feature: bool,
         feature_stage: Optional[str]
     ) -> None:
@@ -767,7 +767,7 @@ class PlatformParameter:
         return self._rule_schema_version
 
     @property
-    def default_value(self) -> Union[str, bool]:
+    def default_value(self) -> Union[str, bool, int]:
         """Returns the default value of the platform parameter.
 
         Returns:
@@ -825,7 +825,7 @@ class PlatformParameter:
 
     def evaluate(
         self, context: EvaluationContext
-    ) -> Union[str, bool]:
+    ) -> Union[str, bool, int]:
         """Evaluates the value of the platform parameter in the given context.
         The value of first matched rule is returned as the result.
 

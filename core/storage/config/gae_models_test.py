@@ -22,8 +22,11 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List
+
 MYPY = False
 if MYPY: # pragma: no cover
+    from core.domain import platform_parameter_domain
     from mypy_imports import base_models
     from mypy_imports import config_models
 
@@ -126,7 +129,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: (
+            List[platform_parameter_domain.PlatformParameterRuleDict]
+        ) = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -144,10 +149,14 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
-        new_rules = [
+        new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    {'type': 'app_version', 'value': '>1.2.3'}
+                    # Here, we are providing 'value' key but there is no key
+                    # defined in PlatformParameterRuleDict as 'value'. Due
+                    # to this MyPy throws an 'Extra key 'value' for TypedDict'
+                    # error. So, to silent the error, we used ignore here.
+                    {'type': 'app_version', 'value': '>1.2.3'}  # type: ignore[typeddict-item]
                 ],
                 'value_when_matched': True
             },
@@ -166,7 +175,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit_is_persistent_in_storage(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: (
+            List[platform_parameter_domain.PlatformParameterRuleDict]
+        ) = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -185,7 +196,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit_with_updated_rules(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: (
+            List[platform_parameter_domain.PlatformParameterRuleDict]
+        ) = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -195,10 +208,14 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         )
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
-        new_rules = [
+        new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    {'type': 'app_version', 'value': '>1.2.3'}
+                    # Here, we are providing 'value' key but there is no key
+                    # defined in PlatformParameterRuleDict as 'value'. Due
+                    # to this MyPy throws an 'Extra key 'value' for TypedDict'
+                    # error. So, to silent the error, we used ignore here.
+                    {'type': 'app_version', 'value': '>1.2.3'}  # type: ignore[typeddict-item]
                 ],
                 'value_when_matched': True
             },

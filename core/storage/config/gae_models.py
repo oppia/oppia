@@ -25,6 +25,8 @@ from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'platform_parameter_domain' only for type checking.
+    from core.domain import platform_parameter_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
@@ -139,13 +141,11 @@ class PlatformParameterModel(base_models.VersionedModel):
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'rule_dicts' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
     def create(
         cls,
         param_name: str,
-        rule_dicts: List[Dict[str, Any]],
+        rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
         rule_schema_version: int
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
