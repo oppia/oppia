@@ -492,6 +492,17 @@ class Subtopic:
                 'Expected subtopic title to be less than %d characters, '
                 'received %s' % (title_limit, self.title))
 
+        url_fragment_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT  # pylint: disable=line-too-long
+        if len(self.url_fragment) > url_fragment_limit:
+            raise utils.ValidationError(
+                'Expected subtopic url fragment to be less '
+                'than or equal to %d characters, received %s'
+                % (url_fragment_limit, self.url_fragment))
+
+        if not bool(re.match('^[a-z]+(-[a-z]+)*$', self.url_fragment)):
+            raise utils.ValidationError(
+                'Invalid url fragment: %s' % self.url_fragment)
+
         if len(self.skill_ids) > len(set(self.skill_ids)):
             raise utils.ValidationError(
                 'Expected all skill ids to be distinct.')

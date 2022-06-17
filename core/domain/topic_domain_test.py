@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -490,6 +491,17 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'ijklmnopqrstuvwxyz')
         self._assert_validation_error(
             'Expected subtopic title to be less than 64 characters')
+
+    def test_subtopic_url_fragment_validation(self) -> None:
+        self.topic.subtopics[0].url_fragment = 'a' * 26
+        self._assert_validation_error(
+            'Expected subtopic url fragment to be less '
+            'than or equal to %d characters' %
+            (android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT))
+
+        self.topic.subtopics[0].url_fragment = 'invalidFragment'
+        self._assert_validation_error(
+            'Invalid url fragment: %s' % self.topic.subtopics[0].url_fragment)
 
     def test_thumbnail_filename_validation_for_subtopic(self) -> None:
         self._assert_valid_thumbnail_filename_for_subtopic(
