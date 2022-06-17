@@ -259,7 +259,7 @@ export class ContributionOpportunitiesBackendApiService {
   ): Promise<void> {
     return this.userService.getUserInfoAsync().then(
       (userInfo) => {
-        if (userInfo?.isLoggedIn()) {
+        if (userInfo.isLoggedIn()) {
           return this.http.post<void>(
             '/preferredtranslationlanguage',
             {language_code: languageCode}
@@ -279,10 +279,11 @@ export class ContributionOpportunitiesBackendApiService {
     return this.userService.getUserInfoAsync().then(
       async(userInfo) => {
         if (userInfo?.isLoggedIn()) {
-          const res = await this.http
-            .get<PreferredTranslationLanguageBackendDict>(
-              '/preferredtranslationlanguage').toPromise().catch(
-              () => emptyResponse);
+          const res = (
+            await this.http.get<PreferredTranslationLanguageBackendDict>(
+              '/preferredtranslationlanguage'
+            ).toPromise().catch(() => emptyResponse)
+          );
           return res.preferred_translation_language_code;
         } else {
           return '';
