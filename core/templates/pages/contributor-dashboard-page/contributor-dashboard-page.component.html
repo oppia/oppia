@@ -52,8 +52,8 @@
                 </div>
               </div>
             </div>
-            <div class="dropdown-container">
-              <div class="oppia-dashboard-topic-container" ng-if="$ctrl.showTopicSelector()">
+            <div class="dropdown-container" ng-if="$ctrl.showTopicSelector()">
+              <div class="oppia-dashboard-topic-container">
                 <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
                 <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
                                             (set-active-topic-name)="$ctrl.onChangeTopic($event)">
@@ -426,8 +426,9 @@
   .collapsed-oppia-contributor-username-container {
     color: #00645d;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 15px;
+    font-size: 20px;
     height: 30%;
+    left: -20px;
     position: relative;
     width: 10%;
   }
@@ -439,7 +440,7 @@
   .collapsed-oppia-opportunities-tabs-explanation {
     color: #00615a;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 15px;
+    font-size: 20px;
     position: relative;
   }
   .collapsed-oppia-opportunities-tab-customization-container {
@@ -507,6 +508,8 @@
     }
     .user-and-rights {
       border-bottom: 1px solid rgba(151, 151, 151, 0.5);
+      margin-bottom: 10px;
+      padding-bottom: 10px;
     }
     .oppia-opportunities-tab-header {
       justify-content: center;
@@ -578,7 +581,14 @@
       padding-top: 1%;
     }
   }
-  @media only screen and (max-width: 480px) {
+  @media only screen and (max-width: 510px) {    
+    .collapsed-user-info {
+      right: 133px;
+      position: relative;
+    }
+    .oppia-mascot-avatar-container {
+      margin-left: 10px;
+    }
     .oppia-opportunities-tabs-text {
       font-size: 3.5vw;
     }
@@ -599,6 +609,7 @@
       width: 50px;
     }
     .collapsed-oppia-opportunities-tabs-explanation {
+      font-size: 16px;
       margin: auto 0;
       text-align: center;
     }
@@ -614,6 +625,7 @@
     }
     .collapsed-oppia-contributor-username-container {
       left: -20px;
+      font-size: 16px;
       position: relative;
     }
     .collapsed-oppia-review-right-details-container {
@@ -623,6 +635,12 @@
     }
   }
   @media only screen and (max-width: 420px) {
+    .mascot-container {
+      width: 80%;
+    }
+    .oppia-mascot-avatar-container {
+      margin-left: 5px;
+    }
     .oppia-topic-selector {
       width: 90%;
     }
