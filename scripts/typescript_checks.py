@@ -798,6 +798,7 @@ _PARSER.add_argument(
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
 STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
+PREFIXES = ('core', 'extensions', 'typings')
 
 
 def validate_compiled_js_dir() -> None:
@@ -812,7 +813,8 @@ def validate_compiled_js_dir() -> None:
 
 
 def compile_strict_tsconfig(
-        config_path: str, error_messages: List[str]) -> None:
+    config_path: str, error_messages: List[str]
+) -> None:
     """Compiles strict TS config with files those are neither strictly typed
     nor present in TS_STRICT_EXCLUDE_PATHS. If there are any errors, we
     restores the original config.
@@ -826,8 +828,7 @@ def compile_strict_tsconfig(
     # Generate file names from the error messages.
     errors = [x.strip() for x in error_messages]
     # Remove the empty lines and error explanation lines.
-    prefixes = ('core', 'extensions', 'typings')
-    errors = [x for x in errors if x.startswith(prefixes)]
+    errors = [x for x in errors if x.startswith(PREFIXES)]
     # Remove error explanation lines.
     errors = [x.split('(', 1)[0] for x in errors]
     # Remove the duplicate occurrences of the file names.
@@ -876,8 +877,9 @@ def compile_strict_tsconfig(
         if error_messages:
             print('\n' + '\n'.join(error_messages))
             print(
-                str(len([x for x in error_messages if x.startswith(prefixes)]))
-                + ' Errors found during compilation.\n')
+                 '%s Errors found during compilation.\n' % (
+                     len([x for x in error_messages if x.startswith(PREFIXES)]))
+             )
             sys.exit(1)
         else:
             print('Compilation successful!')
@@ -886,7 +888,7 @@ def compile_strict_tsconfig(
         # example "include": ["core", "extensions", "typings"].
         with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
             strict_ts_config = yaml.safe_load(f)
-            strict_ts_config['include'] = prefixes
+            strict_ts_config['include'] = PREFIXES
 
         with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
             json.dump(strict_ts_config, f, indent=2, sort_keys=True)
@@ -905,8 +907,7 @@ def compile_and_check_typescript(config_path: str) -> None:
     # checks get aborted mid-way.
     with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
         strict_ts_config = yaml.safe_load(f)
-        strict_ts_config['include'] = (
-            ['core', 'extensions', 'typings'])
+        strict_ts_config['include'] = PREFIXES
 
     with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
         json.dump(strict_ts_config, f, indent=2, sort_keys=True)

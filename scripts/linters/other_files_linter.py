@@ -261,6 +261,7 @@ class CustomLintChecksManager:
 
         failed = False
         error_messages = []
+        prefixes = ['core', 'extensions', 'typings']
 
         with utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
             strict_ts_config = yaml.safe_load(f)
@@ -269,7 +270,7 @@ class CustomLintChecksManager:
         # spec files are always below the main files.
         files = strict_ts_config['include']
 
-        if files != ['core', 'extensions', 'typings']:
+        if files != prefixes:
             failed = True
             error_message = (
                 'Include property of tsconfig-strict.json must be equal to ' +
