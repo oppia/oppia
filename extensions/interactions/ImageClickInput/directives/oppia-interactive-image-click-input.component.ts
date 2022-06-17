@@ -33,7 +33,9 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { Subscription } from 'rxjs';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ServicesConstants } from 'services/services.constants';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { ImageClickInputRulesService } from './image-click-input-rules.service';
 
 interface RectangleRegion extends ImagePoint {
@@ -81,7 +83,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
     private playerPositionService: PlayerPositionService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   private _getAttrs() {
@@ -149,9 +153,26 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       // preview mode. We don't have loading indicator or try again for
       // showing images in the exploration editor or in preview mode. So
       // we directly assign the url to the imageUrl.
-      this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-        this.contextService.getEntityType(), this.contextService.getEntityId(),
-        this.filepath);
+      if (
+        this.contextService.getImageSaveDestination() ===
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+        this.imageLocalStorageService.isInStorage(this.filepath)
+      ) {
+        const base64Url = this.imageLocalStorageService.getRawImageData(
+          this.filepath);
+        const mimeType = base64Url.split(';')[0];
+        if (mimeType === AppConstants.SVG_MIME_TYPE) {
+          this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+            base64Url) as string;
+        } else {
+          this.imageUrl = base64Url;
+        }
+      } else {
+        this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+          this.contextService.getEntityType(),
+          this.contextService.getEntityId(),
+          encodeURIComponent(this.filepath));
+      }
     }
 
     this.mouseX = 0;

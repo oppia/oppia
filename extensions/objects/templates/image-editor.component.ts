@@ -717,7 +717,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         null, x1, y1, width, height);
       this.processGIFImage(
         imageDataURI, width, height, processFrameCb, successCb);
-    } else if (mimeType === 'data:image/svg+xml') {
+    } else if (mimeType === AppConstants.SVG_MIME_TYPE) {
       // Check point 2 in the note before imports and after fileoverview.
       const imageData = this.imgData || (
         this.data.metadata.uploadedImageData as string);
@@ -815,7 +815,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     const imageDataURI = (
       this.imgData || this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
-    const maxImageRatio = (mimeType === 'data:image/svg+xml') ? 2 : 1;
+    const maxImageRatio = (mimeType === AppConstants.SVG_MIME_TYPE) ? 2 : 1;
     // Do not allow the user to increase size beyond 100% for non-SVG images
     // and 200% for SVG images. Users may downsize the image if required.
     // SVG images can be resized to 200% because certain SVGs may not contain a
@@ -982,7 +982,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       let gifWidth = dimensions.width;
       let gifHeight = dimensions.height;
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
-    } else if (mimeType === 'data:image/svg+xml') {
+    } else if (mimeType === AppConstants.SVG_MIME_TYPE) {
       resampledFile = (
         this.imageUploadHelperService.convertImageDataToImageFile(
           imageDataURI));

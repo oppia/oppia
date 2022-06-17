@@ -187,5 +187,6 @@ export const AppConstants = {
 
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
   IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
-    'imageSaveDestinationLocalStorage'
+    'imageSaveDestinationLocalStorage',
+  SVG_MIME_TYPE: 'data:image/svg+xml'
 } as const;
