@@ -18,32 +18,32 @@
  */
 
 export interface StateVersionHistoryBackendDict {
-  'previously_edited_on_version': number;
+  'previously_edited_in_version': number;
   'state_name_in_previous_version': string;
   'committer_username': string;
 }
 
 export class StateVersionHistory {
-  _previouslyEditedOnVersion: number;
+  _previouslyEditedInVersion: number;
   _stateNameInPreviousVersion: string;
   _committerUsername: string;
 
   constructor(
-      previouslyEditedOnVersion: number,
+      previouslyEditedInVersion: number,
       stateNameInPreviousVersion: string,
       committerUsername: string
   ) {
-    this._previouslyEditedOnVersion = previouslyEditedOnVersion;
+    this._previouslyEditedInVersion = previouslyEditedInVersion;
     this._stateNameInPreviousVersion = stateNameInPreviousVersion;
     this._committerUsername = committerUsername;
   }
 
   getPreviouslyEditedVersionNumber(): number {
-    return this._previouslyEditedOnVersion;
+    return this._previouslyEditedInVersion;
   }
 
-  setPreviouslyEditedVersionNumber(previouslyEditedOnVersion: number): void {
-    this._previouslyEditedOnVersion = previouslyEditedOnVersion;
+  setPreviouslyEditedVersionNumber(previouslyEditedInVersion: number): void {
+    this._previouslyEditedInVersion = previouslyEditedInVersion;
   }
 
   getStateNameInPreviousVersion(): string {
@@ -64,7 +64,7 @@ export class StateVersionHistory {
 
   toBackendDict(): StateVersionHistoryBackendDict {
     return {
-      previously_edited_on_version: this._previouslyEditedOnVersion,
+      previously_edited_in_version: this._previouslyEditedInVersion,
       state_name_in_previous_version: this._stateNameInPreviousVersion,
       committer_username: this._committerUsername
     };
@@ -74,7 +74,7 @@ export class StateVersionHistory {
       stateVersionHistoryBackendDict: StateVersionHistoryBackendDict
   ): StateVersionHistory {
     return new StateVersionHistory(
-      stateVersionHistoryBackendDict.previously_edited_on_version,
+      stateVersionHistoryBackendDict.previously_edited_in_version,
       stateVersionHistoryBackendDict.state_name_in_previous_version,
       stateVersionHistoryBackendDict.committer_username);
   }

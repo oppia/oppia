@@ -65,7 +65,7 @@ describe('State version history model', () => {
 
   it('should convert into backend dict', () => {
     const stateVersionHistoryBackendDict = {
-      previously_edited_on_version: 1,
+      previously_edited_in_version: 1,
       state_name_in_previous_version: 'state_1',
       committer_username: 'user_1'
     };
@@ -77,7 +77,7 @@ describe('State version history model', () => {
 
   it('should correctly be created from backend dict', () => {
     const stateVersionHistoryBackendDict = {
-      previously_edited_on_version: 1,
+      previously_edited_in_version: 1,
       state_name_in_previous_version: 'state_1',
       committer_username: 'user_1'
     };
