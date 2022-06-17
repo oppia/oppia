@@ -28,17 +28,7 @@ export class EndChapterCheckMarkComponent {
   innerTickIsShown: boolean = false;
 
   animateCheckMark(): void {
-    setTimeout(() => {
-      this.circleIsShown = true;
-    }, 500);
-    setTimeout(() => {
-      this.innerTickIsShown = true;
-    }, 750);
-    setTimeout(() => {
-      this.circleIsShown = false;
-    }, 2300);
-    setTimeout(() => {
-      this.innerTickIsShown = false;
-    }, 2550);
+    this.circleIsShown = true;
+    this.innerTickIsShown = true;
   }
 }

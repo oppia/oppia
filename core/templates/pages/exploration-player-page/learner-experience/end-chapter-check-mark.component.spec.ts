@@ -17,7 +17,7 @@
  * check mark component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 
 describe('End chapter check mark component', function() {
@@ -35,22 +35,13 @@ describe('End chapter check mark component', function() {
     component = fixture.componentInstance;
   });
 
-  it('should animate the check mark', fakeAsync(() => {
+  it('should animate the check mark', () => {
     expect(component.circleIsShown).toBe(false);
     expect(component.innerTickIsShown).toBe(false);
 
     component.animateCheckMark();
 
-    tick(501);
     expect(component.circleIsShown).toBe(true);
-
-    tick(751);
     expect(component.innerTickIsShown).toBe(true);
-
-    tick(2301);
-    expect(component.circleIsShown).toBe(false);
-
-    tick(2551);
-    expect(component.innerTickIsShown).toBe(false);
-  }));
+  });
 });

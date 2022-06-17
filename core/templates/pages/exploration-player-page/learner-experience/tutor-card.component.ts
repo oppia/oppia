@@ -47,6 +47,11 @@ import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 
+const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
+const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;
+const CONFETTI_ANIMATION_DELAY_IN_MSECS = 2000;
+const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
+
 @Component({
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',
@@ -183,10 +188,10 @@ export class TutorCardComponent {
       this.updateDisplayedCard();
     }
     if (
-      this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
+      !this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
       this.isOnTerminalCard() &&
       !this.animationHasPlayedOnce &&
-      this.inStoryMode
+      !this.inStoryMode
     ) {
       this.triggerCelebratoryAnimation();
     }
@@ -201,7 +206,7 @@ export class TutorCardComponent {
         this.checkMarkSkipped = true;
         setTimeout(() => {
           this.checkMarkHidden = true;
-        }, 500);
+        }, CHECK_MARK_HIDE_DELAY_IN_MSECS);
       });
     this.animationHasPlayedOnce = true;
     let mediaQuery =
@@ -213,17 +218,17 @@ export class TutorCardComponent {
           this.checkMarkHidden = true;
           this.skipClickListener();
           this.skipClickListener = null;
-        }, 500);
-      }, 2000);
+        }, CHECK_MARK_HIDE_DELAY_IN_MSECS);
+      }, REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS);
     } else {
       this.confettiAnimationTimeout = setTimeout(() => {
         this.confettiComponent.animateConfetti();
-      }, 2000);
+      }, CONFETTI_ANIMATION_DELAY_IN_MSECS);
       setTimeout(() => {
         this.checkMarkHidden = true;
         this.skipClickListener();
         this.skipClickListener = null;
-      }, 4000);
+      }, STANDARD_ANIMATION_DURATION_IN_MSECS);
     }
   }
 
