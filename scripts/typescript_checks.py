@@ -811,23 +811,17 @@ def validate_compiled_js_dir() -> None:
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
-@contextlib.contextmanager
 def compile_strict_tsconfig(
-        config_path: str,
-        error_messages: List[str]
-) -> Generator[None, None, None]:
-    """Context manager in which we compiles strict TS config with files those
-    are neither strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If
-    there are any errors, we restores the original config.
+        config_path: str, error_messages: List[str]) -> None:
+    """Compiles strict TS config with files those are neither strictly typed
+    nor present in TS_STRICT_EXCLUDE_PATHS. If there are any errors, we
+    restores the original config.
 
     Args:
         config_path: str. The config that should be used to run the typescript
             checks.
         error_messages: List[str]. A list of error messages produced by
             compiling the strict typescript config.
-
-    Yields:
-        None. Nothing.
     """
     # Generate file names from the error messages.
     errors = [x.strip() for x in error_messages]
@@ -897,9 +891,7 @@ def compile_strict_tsconfig(
             sys.exit(1)
         else:
             print('Compilation successful!')
-
-        yield
-    finally:
+    except:
         with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
             strict_ts_config = yaml.safe_load(f)
             strict_ts_config['include'] = prefixes
@@ -944,8 +936,7 @@ def compile_and_check_typescript(config_path: str) -> None:
     error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
-        with compile_strict_tsconfig(config_path, error_messages):
-            pass
+        compile_strict_tsconfig(config_path, error_messages)
     else:
         if error_messages:
             print('Errors found during compilation\n')
