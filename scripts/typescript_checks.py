@@ -779,7 +779,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.spec.ts',
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.ts',
     'extensions/visualizations/oppia-visualization-sorted-tiles.directive.spec.ts',
-    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
+    # 'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
@@ -848,7 +848,7 @@ def compile_mock_strict_tsconfig(
     # Update "include" field of mock-tsconfig-strict.json with files those
     # are neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
     # Example: List "files_not_type_strict".
-    with utils.open_file(MOCK_STRICT_TSCONFIG_FILEPATH, 'r') as f:
+    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
         strict_ts_config = yaml.safe_load(f)
         strict_ts_config['include'] = files_not_type_strict
 
@@ -873,6 +873,9 @@ def compile_mock_strict_tsconfig(
     # the `stdout=subprocess.PIPE` argument to `Popen`.
     assert process.stdout is not None
     error_messages = list(iter(process.stdout.readline, ''))
+
+    if os.path.exists(MOCK_STRICT_TSCONFIG_FILEPATH):
+        os.remove(MOCK_STRICT_TSCONFIG_FILEPATH)
 
     if error_messages:
         print('\n' + '\n'.join(error_messages))
