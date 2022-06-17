@@ -798,7 +798,7 @@ _PARSER.add_argument(
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
 STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
-MOCK_STRICT_TSCONFIG_FILEPATH = 'mock-tsconfig-strict.json'
+TEMP_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-strict.json'
 PREFIXES = ('core', 'extensions', 'typings')
 
 
@@ -813,12 +813,12 @@ def validate_compiled_js_dir() -> None:
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
-def compile_mock_strict_tsconfig(
+def compile_temp_strict_tsconfig(
     config_path: str, error_messages: List[str]
 ) -> None:
-    """Compiles mock strict TS config with files those are neither strictly
-    typed nor present in TS_STRICT_EXCLUDE_PATHS. If there are any errors, we
-    restores the original config.
+    """Compiles temporary strict TS config with files those are neither
+    strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If there are any
+    errors, we restores the original config.
 
     Args:
         config_path: str. The config that should be used to run the typescript
@@ -845,18 +845,18 @@ def compile_mock_strict_tsconfig(
     # Add "typings" folder to get global imports while compiling.
     files_not_type_strict.append('typings')
 
-    # Update "include" field of mock-tsconfig-strict.json with files those
+    # Update "include" field of temp-tsconfig-strict.json with files those
     # are neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
     # Example: List "files_not_type_strict".
     with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
         strict_ts_config = yaml.safe_load(f)
         strict_ts_config['include'] = files_not_type_strict
 
-    with utils.open_file(MOCK_STRICT_TSCONFIG_FILEPATH, 'w') as f:
+    with utils.open_file(TEMP_STRICT_TSCONFIG_FILEPATH, 'w') as f:
         json.dump(strict_ts_config, f, indent=2, sort_keys=True)
         f.write('\n')
 
-    # Compile mock-tsconfig-strict.json with files those are neither strictly
+    # Compile temp-tsconfig-strict.json with files those are neither strictly
     # typed nor present in TS_STRICT_EXCLUDE_PATHS. All those files
     # present inside include property.
     os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
@@ -874,8 +874,9 @@ def compile_mock_strict_tsconfig(
     assert process.stdout is not None
     error_messages = list(iter(process.stdout.readline, ''))
 
-    if os.path.exists(MOCK_STRICT_TSCONFIG_FILEPATH):
-        os.remove(MOCK_STRICT_TSCONFIG_FILEPATH)
+    # Remove temporary strict TS config.
+    if os.path.exists(TEMP_STRICT_TSCONFIG_FILEPATH):
+        os.remove(TEMP_STRICT_TSCONFIG_FILEPATH)
 
     if error_messages:
         print('\n' + '\n'.join(error_messages))
@@ -922,8 +923,8 @@ def compile_and_check_typescript(config_path: str) -> None:
     error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
-        compile_mock_strict_tsconfig(
-            MOCK_STRICT_TSCONFIG_FILEPATH, error_messages)
+        compile_temp_strict_tsconfig(
+            TEMP_STRICT_TSCONFIG_FILEPATH, error_messages)
     else:
         if error_messages:
             print('Errors found during compilation\n')
