@@ -38,7 +38,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
@@ -55,7 +55,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_topic(self) -> None:
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         expected_topic_dict: topic_domain.TopicDict = {
             'id': self.topic_id,
             'name': 'Name',
@@ -77,7 +77,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'version': 0,
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
-            'page_title_fragment_for_web': ''
+            'page_title_fragment_for_web': 'fragm'
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -562,6 +562,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
+
+    def test_validation_fails_with_story_is_published_set_to_non_bool_value(
+        self
+    ) -> None:
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id')
+        ]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        # Here, a bool value is expected but for test purpose we're assigning it
+        # a string type. Thus to avoid MyPy error, we added an ignore here.
+        self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore[assignment]
+        self._assert_validation_error(
+            'story_is_published value should be boolean type')
 
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.topic.url_fragment = ''

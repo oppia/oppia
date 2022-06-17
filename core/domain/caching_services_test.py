@@ -863,7 +863,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_topic = (
             topic_domain.Topic.create_default_topic(
                 topic_id, 'Name 😍', 'abbrev 😍',
-                'description 😍'))
+                'description 😍', 'fragm 😍'))
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_TOPIC,
@@ -899,7 +899,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_story = (
-            story_domain.Story.create_default_story( # type: ignore[no-untyped-call]
+            story_domain.Story.create_default_story(
                 story_id, 'Title 😍',
                 'Description 😍', topic_id,
                 'title 😍'))
@@ -917,7 +917,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_story.to_dict(),
-            stories[story_id].to_dict()) # type: ignore[no-untyped-call]
+            stories[story_id].to_dict())
 
     def test_platform_parameters_with_unicode_are_set_and_get_correctly(
         self

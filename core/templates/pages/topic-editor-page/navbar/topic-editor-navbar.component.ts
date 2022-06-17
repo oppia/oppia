@@ -31,6 +31,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 require('services/ngb-modal.service.ts');
+require('services/local-storage.service.ts');
 
 import { Subscription } from 'rxjs';
 import { TopicEditorSendMailComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
@@ -46,10 +47,10 @@ angular.module('oppia').component('topicEditorNavbar', {
     'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
     function(
         $rootScope, $scope, $window, AlertsService,
-        NgbModal, TopicEditorRoutingService, TopicEditorStateService,
-        TopicRightsBackendApiService, UndoRedoService,
-        UrlInterpolationService, UrlService,
-        TOPIC_VIEWER_URL_TEMPLATE) {
+        NgbModal, TopicEditorRoutingService,
+        TopicEditorStateService, TopicRightsBackendApiService,
+        UndoRedoService, UrlInterpolationService,
+        UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       $scope.isSaveInProgress = function() {

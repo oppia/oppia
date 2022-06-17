@@ -137,6 +137,12 @@
   width: 100vw;
 }
 
+.splash-page .oppia-splash-testimonial-arrow {
+  color: #6d6d6d;
+  font-size: 3.0em;
+  margin-left: 20px;
+  margin-top: 50px;
+}
 .splash-page .splash-arrows-container {
   position: absolute;
 }
@@ -173,12 +179,14 @@
   width: 100%;
 }
 
-.splash-page .splash-books-image img {
+.splash-page .splash-books-image {
+  height: auto;
   max-width: 500px;
   width: 100%;
 }
 
 .splash-page .splash-student-image img {
+  height: auto;
   max-width: 350px;
   width: 100%;
 }
@@ -261,6 +269,7 @@
 }
 
 .splash-page .splash-student-desk-image img {
+  height: auto;
   max-width: 500px;
   width: 100%;
 }
@@ -323,7 +332,8 @@
   margin-top: 25px;
 }
 
-.splash-page .splash-matthew-image img {
+.splash-page .splash-matthew-image {
+  height: auto;
   max-width: 600px;
   width: 100%;
 }
@@ -346,6 +356,10 @@
   justify-content: space-between;
   margin-left: 25px;
   width: 40px;
+}
+
+.splash-page .splash-benefit-bullets-column img {
+  height: auto;
 }
 
 .splash-page .splash-benefit-text-items-column {
@@ -380,8 +394,8 @@
   font-weight: bold;
 }
 
-.splash-page .oppia-splash-main-image img,
-.splash-page .oppia-splash-main-image source {
+.splash-page .oppia-splash-main-image img {
+  height: auto;
   max-width: 800px;
   width: 100%;
 }
@@ -457,6 +471,7 @@
   }
 
   .splash-page .splash-vol-image img {
+    height: auto;
     max-width: fit-content;
   }
 
@@ -527,6 +542,7 @@
   }
 
   .splash-page .splash-student-image img {
+    height: auto;
     max-width: 150px;
   }
 
