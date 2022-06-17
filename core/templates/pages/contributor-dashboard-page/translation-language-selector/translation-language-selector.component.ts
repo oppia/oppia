@@ -92,7 +92,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
 
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
-      .then((preferredLanguageCode: string) => {
+      .then((preferredLanguageCode: string|null) => {
         if (preferredLanguageCode) {
           this.populateLanguageSelection(
             preferredLanguageCode);

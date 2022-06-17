@@ -552,11 +552,10 @@ describe('Contribution Opportunities backend API service', function() {
     })
   );
 
-  it('should return empty string if \'preferredtranslationlanguage\' ' +
+  it('should return null if \'preferredtranslationlanguage\' ' +
     'call fails', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    const emptyString: string = '';
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo[0]));
@@ -579,16 +578,15 @@ describe('Contribution Opportunities backend API service', function() {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(emptyString);
+    expect(successHandler).toHaveBeenCalledWith(null);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should return empty string when calling ' +
+  it('should return null when calling ' +
     '\'getPreferredTranslationLanguageAsync\' with guest ' +
     'user.', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    const emptyString: string = '';
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo[1]));
@@ -600,7 +598,7 @@ describe('Contribution Opportunities backend API service', function() {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(emptyString);
+    expect(successHandler).toHaveBeenCalledWith(null);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 });

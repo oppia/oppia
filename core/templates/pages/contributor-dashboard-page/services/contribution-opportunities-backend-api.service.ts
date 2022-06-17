@@ -90,7 +90,7 @@ interface TopicNamesBackendDict {
 }
 
 interface PreferredTranslationLanguageBackendDict {
-  'preferred_translation_language_code': string;
+  'preferred_translation_language_code': string|null;
 }
 
 @Injectable({
@@ -272,9 +272,9 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async getPreferredTranslationLanguageAsync(
-  ): Promise<string> {
+  ): Promise<string|null> {
     const emptyResponse = {
-      preferred_translation_language_code: ''
+      preferred_translation_language_code: null
     };
     return this.userService.getUserInfoAsync().then(
       async(userInfo) => {
@@ -286,7 +286,7 @@ export class ContributionOpportunitiesBackendApiService {
           );
           return res.preferred_translation_language_code;
         } else {
-          return '';
+          return null;
         }
       }
     );
