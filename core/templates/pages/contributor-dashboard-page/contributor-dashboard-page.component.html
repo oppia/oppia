@@ -15,7 +15,6 @@
     <div ng-class="{'oppia-translate-y': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
       <div class="oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
-
           <div class="outer-container">
             <div class="user-and-rights">
               <div class="oppia-profile-details-container">
@@ -62,7 +61,6 @@
               </div>
             </div>
           </div>
-
         </div>
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName !== 'myContributionTab'">
           <div class="outer-container">
@@ -100,12 +98,9 @@
         </div>
       </div>
     </div>
-    
     <div ng-class="{'oppia-translate-y': !$ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': $ctrl.defaultHeaderVisible}">
       <div class="collapsed-oppia-opportunities-tab-customization-container">
         <div class="oppia-collapsed-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
-
-
           <div class="collapsed-user-info">
             <div class="oppia-profile-details-container">
               <span ng-if="$ctrl.profilePictureDataUrl">
@@ -122,29 +117,25 @@
               </span>
             </div>
           </div>
-          
           <div class="collapsed-oppia-review-right-details-container protractor-test-review-rights" ng-if="$ctrl.userIsReviewer">
-              <strong>Review rights:</strong>
-              <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
-                Translations in languages:
-                <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
-                  <span class="oppia-review-item-detail-container protractor-test-translation-<[languageDescription]>-reviewer"><[languageDescription]></span>
-                </span>
-              </div>
-              <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
-                Voiceovers in languages:
-                <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
-                  <span class="oppia-review-item-detail-container protractor-test-voiceover-<[languageDescription]>-reviewer"><[languageDescription]></span>
-                </span>
-              </div>
-              <div ng-if="$ctrl.userCanReviewQuestions" class="protractor-test-question-reviewer">
-                Questions
-              </div>
+            <strong>Review rights:</strong>
+            <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
+              Translations in languages:
+              <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
+                <span class="oppia-review-item-detail-container protractor-test-translation-<[languageDescription]>-reviewer"><[languageDescription]></span>
+              </span>
+            </div>
+            <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
+              Voiceovers in languages:
+              <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
+                <span class="oppia-review-item-detail-container protractor-test-voiceover-<[languageDescription]>-reviewer"><[languageDescription]></span>
+              </span>
+            </div>
+            <div ng-if="$ctrl.userCanReviewQuestions" class="protractor-test-question-reviewer">
+              Questions
+            </div>
           </div>
         </div>
-
-
-
         <div class="oppia-collapsed-opportunities-tab-header" ng-if="$ctrl.activeTabName !== 'myContributionTab'">
           <div class="tab-info">
             <div class="oppia-collapsed-mascot-avatar-container">
@@ -163,7 +154,6 @@
               Translate Text
             </div>
           </div>
-          
           <div class="collapsed-language-selector" ng-if="$ctrl.showLanguageSelector()">
             <div class="oppia-collapsed-dashboard-language-container-label">Translate to</div>
             <button focus-on="selectLangDropDown" class="oppia-autofocus oppia-collapsed-language-selector-button border-0 p-0">
@@ -173,10 +163,6 @@
             </button>
           </div>
         </div>
-
-
-
-
       </div>
     </div>
   </div>
@@ -199,8 +185,8 @@
     margin: 0 20px;
   }
   .tab-info {
-    display: flex;
     align-items: center;
+    display: flex;
     width: 45vw;
   }
   .oppia-collapsed-opportunities-tab-header {
@@ -210,22 +196,15 @@
     justify-content: space-between;
     margin: auto;
     max-width: 1200px;
-    width: 80%;
-    padding-top: 20px;
     padding-bottom: 10px;
+    padding-top: 20px;
+    width: 80%;
   }
   .collapsed-language-selector {
-    font-size: 20px;
     display: flex;
     flex-direction: row;
-  }
-  .collapsed-language-selector {
+    font-size: 20px;
     margin-right: 10px;
-  }
-  .collapsed-oppia-review-right-details-container {
-    display: flex;
-    margin: auto 0;
-    width: 500px;
   }
   .opportunities {
     margin-top: 20px;
@@ -234,9 +213,9 @@
     display: flex;
     flex-direction: row;
     padding: auto 20px;
-    width: 100%;
-    padding-left: 20px;
     padding-bottom: 20px;
+    padding-left: 20px;
+    width: 100%;
   }
   .explanation-container {
     width: 100%;
@@ -269,9 +248,9 @@
     margin-right: 20px;
   }
   .oppia-dashboard-language-container {
+    align-items: flex-start;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     margin-left: 10%;
     width: 100%;
   }
@@ -303,17 +282,18 @@
     width: 100px;
   }
   .oppia-review-right-details-container {
-    max-width: 300px;
+    font-size: 18px;
+    margin-left: 20px;
+    max-width: 400px;
     position: relative;
     width: 100%;
-    margin-left: 20px;
-    font-size: 18px;
   }
   .collapsed-oppia-review-right-details-container {
+    align-self: flex-end;
     display: flex;
     flex-direction: column;
     font-size: 16px;
-    align-self: flex-end;
+    margin: auto 0;
     max-width: 300px;
     position: relative;
     width: 40%;
@@ -518,9 +498,9 @@
       width: 500px !important;
     }
     .oppia-collapsed-opportunities-tab-header {
+      justify-content: space-between;
       margin: auto 10px;
       width: 100%;
-      justify-content: space-between;
     }
     .collapsed-oppia-opportunities-tab-customization-container {
       margin-bottom: 0;
@@ -529,6 +509,7 @@
       border-bottom: 1px solid rgba(151, 151, 151, 0.5);
     }
     .oppia-opportunities-tab-header {
+      justify-content: center;
       margin: 0;
       width: 100vw;
     }
@@ -550,8 +531,8 @@
     }
     .dropdown-container {
       flex-direction: column;
-      margin-top: 10px;
       margin-bottom: 15px;
+      margin-top: 10px;
       padding: 0 20px;
       width: 100%;
     }
@@ -563,18 +544,15 @@
       width: 100%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+      margin-right: 10px;
       padding-top: 10px;
       width: 175px;
-      margin-right: 10px;
     }
     .oppia-opportunities-tabs-list {
       width: 100%;
     }
     .oppia-opportunities-tabs-text {
       font-size: 18px;
-    }
-    .oppia-opportunities-tab-header {
-      justify-content: center;
     }
     .oppia-contributor-username-and-review-rights-container {
       align-items: initial;
@@ -588,15 +566,12 @@
       width: 100px;
     }
     .oppia-contributor-username-container {
-      width: 100%;
       margin-bottom: 10px;
+      width: 100%;
     }
     .oppia-review-right-details-container {
-      width: 100%;
       margin-left: 0;
-    }
-    .collapsed-oppia-review-right-details-container {
-      margin: auto 0;
+      width: 100%;
     }
     .oppia-opportunities-tab-customization-container {
       margin-bottom: 0;
@@ -611,10 +586,10 @@
       margin-bottom: 20px;
     }
     .oppia-collapsed-opportunities-tab-header {
+      align-items: center;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
       margin: auto 10px;
       max-width: 1200px;
       width: 100%;
@@ -624,8 +599,8 @@
       width: 50px;
     }
     .collapsed-oppia-opportunities-tabs-explanation {
-      text-align: center;
       margin: auto 0;
+      text-align: center;
     }
     .collapsed-language-selector {
       margin: auto;
@@ -638,8 +613,8 @@
       margin-bottom: 20px;
     }
     .collapsed-oppia-contributor-username-container {
-      position: relative;
       left: -20px;
+      position: relative;
     }
     .collapsed-oppia-review-right-details-container {
       display: flex;
@@ -647,14 +622,14 @@
       width: 500px;
     }
   }
-  @media only screen and (max-width: 420px) {    
+  @media only screen and (max-width: 420px) {
     .oppia-topic-selector {
       width: 90%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
       font-size: 18px;
-      width: 90px !important;
       margin-right: 2vw;
+      width: 90px !important;
     }
     .mascot-container {
       border-bottom: 1px solid #4a4a4a;
@@ -667,8 +642,8 @@
       width: 100%;
     }
     .dropdown-container {
-      flex-direction: column;
       align-items: flex-start;
+      flex-direction: column;
       padding: auto 2vw;
       width: 100%;
     }
