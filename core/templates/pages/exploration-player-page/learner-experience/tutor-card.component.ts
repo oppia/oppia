@@ -188,10 +188,10 @@ export class TutorCardComponent {
       this.updateDisplayedCard();
     }
     if (
-      !this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
+      this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
       this.isOnTerminalCard() &&
       !this.animationHasPlayedOnce &&
-      !this.inStoryMode
+      this.inStoryMode
     ) {
       this.triggerCelebratoryAnimation();
     }
