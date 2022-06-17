@@ -423,7 +423,8 @@ class Subtopic:
         return subtopic
 
     @classmethod
-    def create_default_subtopic(cls, subtopic_id: int, title: str) -> Subtopic:
+    def create_default_subtopic(
+        cls, subtopic_id: int, title: str, url_frag = 'url-frag') -> Subtopic:
         """Creates a Subtopic object with default values.
 
         Args:
@@ -434,7 +435,7 @@ class Subtopic:
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None, None, '')
+        return cls(subtopic_id, title, [], None, None, None, url_frag)
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename: str) -> None:
