@@ -16,6 +16,7 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
@@ -25,6 +26,7 @@ describe('Story Creation Service', () => {
   let StoryCreationService = null;
   let TopicEditorStateService = null;
   let ImageLocalStorageService = null;
+  let LocalStorageService = null;
   let CsrfTokenService: CsrfTokenService;
   let $uibModal = null;
   let $httpBackend = null;
@@ -50,6 +52,7 @@ describe('Story Creation Service', () => {
     $scope = $rootScope.$new();
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
+    LocalStorageService = $injector.get('LocalStorageService');
     CsrfTokenService = $injector.get('CsrfTokenService');
 
     imageBlob = new Blob(['image data'], {type: 'imagetype'});
@@ -125,5 +128,35 @@ describe('Story Creation Service', () => {
     } catch (e) {
       expect(e).toBe(new Error('Story fields cannot be empty'));
     }
+  });
+
+  it('should increment topic version in local storage when a new story ' +
+  'successfully created', () => {
+    const topicEditorBrowserTabsInfo = (
+      EntityEditorBrowserTabsInfo.create('topic', 'id', 2, 2, false));
+    spyOn(
+      LocalStorageService, 'getEntityEditorBrowserTabsInfo'
+    ).and.returnValue(topicEditorBrowserTabsInfo);
+    spyOn(
+      LocalStorageService, 'updateEntityEditorBrowserTabsInfo'
+    ).and.callFake(() => {});
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve({
+        isValid: () => true,
+        title: 'Title',
+        description: 'Description',
+        urlFragment: 'url'
+      })
+    });
+
+    $httpBackend.expectPOST('/topic_editor_story_handler/id')
+      .respond(200, {storyId: 'id'});
+    expect(topicEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
+
+    StoryCreationService.createNewCanonicalStory();
+    $scope.$apply();
+    $httpBackend.flush();
+
+    expect(topicEditorBrowserTabsInfo.getLatestVersion()).toEqual(3);
   });
 });
