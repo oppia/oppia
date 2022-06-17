@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import argparse
-import contextlib
 import json
 import os
 import shutil
@@ -26,7 +25,7 @@ import sys
 
 from core import utils
 
-from typing import Generator, List, Optional, Sequence
+from typing import List, Optional, Sequence
 
 import yaml
 
@@ -873,16 +872,6 @@ def compile_strict_tsconfig(
         assert process.stdout is not None
         error_messages = list(iter(process.stdout.readline, ''))
 
-        # Update tsconfig-strict.json and set to its intial "include" state
-        # example "include": ["core", "extensions", "typings"].
-        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
-            strict_ts_config = yaml.safe_load(f)
-            strict_ts_config['include'] = prefixes
-
-        with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
-            json.dump(strict_ts_config, f, indent=2, sort_keys=True)
-            f.write('\n')
-
         if error_messages:
             print('\n' + '\n'.join(error_messages))
             print(
@@ -891,7 +880,9 @@ def compile_strict_tsconfig(
             sys.exit(1)
         else:
             print('Compilation successful!')
-    except:
+    finally:
+        # Update tsconfig-strict.json and set to its intial "include" state
+        # example "include": ["core", "extensions", "typings"].
         with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
             strict_ts_config = yaml.safe_load(f)
             strict_ts_config['include'] = prefixes
