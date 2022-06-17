@@ -250,36 +250,6 @@ class CustomLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_include_property_in_tsconfig_strict(self):
-        """Checks if the files in strict TS config are correct.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Correct folder names inside include property'
-
-        failed = False
-        error_messages = []
-        prefixes = ['core', 'extensions', 'typings']
-
-        with utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
-            strict_ts_config = yaml.safe_load(f)
-
-        # Remove .ts extension from filepath for sorting to ensure that
-        # spec files are always below the main files.
-        files = strict_ts_config['include']
-
-        if files != prefixes:
-            failed = True
-            error_message = (
-                'Include property of tsconfig-strict.json must be equal to ' +
-                '["core", "extensions", "typings"].')
-            error_messages.append(error_message)
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def check_github_workflows_use_merge_action(self):
         """Checks that all github actions workflows use the merge action.
 
@@ -341,7 +311,6 @@ class CustomLintChecksManager:
         linter_stdout.append(self.check_skip_files_in_app_dev_yaml())
         linter_stdout.append(self.check_third_party_libs_type_defs())
         linter_stdout.append(self.check_webpack_config_file())
-        linter_stdout.append(self.check_include_property_in_tsconfig_strict())
         linter_stdout.append(self.check_github_workflows_use_merge_action())
 
         return linter_stdout

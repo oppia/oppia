@@ -1,7 +1,0 @@
-{
-  "include": [
-    "core",
-    "extensions",
-    "typings"
-  ]
-}
