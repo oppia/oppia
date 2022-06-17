@@ -23,48 +23,16 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
-require('services/local-storage.service.ts');
-
-import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 
 angular.module('oppia').factory('StoryCreationService', [
   '$http', '$uibModal', '$window', 'AlertsService', 'ImageLocalStorageService',
-  'LoaderService', 'LocalStorageService',
-  'TopicEditorStateService', 'UrlInterpolationService',
+  'LoaderService', 'TopicEditorStateService', 'UrlInterpolationService',
   function(
       $http, $uibModal, $window, AlertsService, ImageLocalStorageService,
-      LoaderService, LocalStorageService,
-      TopicEditorStateService, UrlInterpolationService) {
+      LoaderService, TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
-
-    /**
-     * Increments the topic version stored in the local storage.
-     * This function is required because when a new story is created, the page
-     * navigates to the editor page for the newly created story. However, untill
-     * the user goes back to the topic editor page, the updated topic is not
-     * fetched from the backend. This makes the other opened topic editor pages
-     * stale but it cannot be detected. By increasing the version of the topic
-     * here, the other tabs can be marked stale as soon as the story is created.
-    */
-    const updateTopicEditorBrowserTabsInfo = function() {
-      const topic = TopicEditorStateService.getTopic();
-      const topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
-        LocalStorageService.getEntityEditorBrowserTabsInfo(
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_TOPIC_EDITOR_BROWSER_TABS, topic.getId()));
-
-      if (topicEditorBrowserTabsInfo) {
-        topicEditorBrowserTabsInfo.setLatestVersion(
-          topicEditorBrowserTabsInfo.getLatestVersion() + 1);
-        LocalStorageService.updateEntityEditorBrowserTabsInfo(
-          topicEditorBrowserTabsInfo,
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_TOPIC_EDITOR_BROWSER_TABS);
-      }
-    };
 
     return {
       createNewCanonicalStory: function() {
@@ -120,7 +88,6 @@ angular.module('oppia').factory('StoryCreationService', [
             }
           })
             .then(function(response) {
-              updateTopicEditorBrowserTabsInfo();
               $window.location = UrlInterpolationService.interpolateUrl(
                 STORY_EDITOR_URL_TEMPLATE, {
                   story_id: response.data.storyId

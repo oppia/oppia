@@ -30,15 +30,12 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Change, TopicChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { Topic } from './TopicObjectFactory';
+import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
 import { ShortSkillSummary } from 'core/templates/domain/skill/short-skill-summary.model';
 import { SubtitledHtml } from 'core/templates/domain/exploration/subtitled-html.model';
-import { SubtopicPage } from './subtopic-page.model';
+import { SubtopicPage } from 'core/templates/domain/topic/subtopic-page.model';
 import { RecordedVoiceovers } from 'core/templates/domain/exploration/recorded-voiceovers.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { LocalStorageService } from 'services/local-storage.service';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
 type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;
@@ -51,17 +48,13 @@ type SubtopicUpdateReverse = (
   providedIn: 'root'
 })
 export class TopicUpdateService {
-  constructor(
-    private undoRedoService: UndoRedoService,
-    private localStorageService: LocalStorageService
-  ) {}
-
+  constructor(private undoRedoService: UndoRedoService) {}
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // topic.
   // entity can be a topic object or a subtopic page object.
   private _applyChange(
-      entity: Topic | SubtopicPage,
+      entity,
       command: string, params,
       apply: TopicUpdateApply | SubtopicUpdateApply,
       reverse: TopicUpdateReverse | SubtopicUpdateReverse) {
@@ -69,34 +62,6 @@ export class TopicUpdateService {
     changeDict.cmd = command;
     let changeObj = new Change(changeDict, apply, reverse);
     this.undoRedoService.applyChange(changeObj, entity);
-    this._updateTopicEditorBrowserTabUnsavedChangesStatus(entity);
-  }
-
-  private _updateTopicEditorBrowserTabUnsavedChangesStatus(
-      entity: Topic | SubtopicPage
-  ) {
-    let topicId: string = null;
-    if (entity instanceof Topic) {
-      topicId = entity.getId();
-    } else if (entity instanceof SubtopicPage) {
-      topicId = entity.getTopicId();
-    }
-    const topicEditorBrowserTabsInfo:
-      EntityEditorBrowserTabsInfo = (
-        this.localStorageService.getEntityEditorBrowserTabsInfo(
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_TOPIC_EDITOR_BROWSER_TABS, topicId));
-    if (
-      this.undoRedoService.getChangeCount() > 0 &&
-      topicEditorBrowserTabsInfo &&
-      !topicEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ) {
-      topicEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
-      this.localStorageService.updateEntityEditorBrowserTabsInfo(
-        topicEditorBrowserTabsInfo,
-        EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_TOPIC_EDITOR_BROWSER_TABS);
-    }
   }
 
   private _getParameterFromChangeDict(changeDict, paramName: string) {
