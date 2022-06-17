@@ -636,6 +636,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/services/topic-editor-routing.service.ts',
     'core/templates/pages/topic-editor-page/services/topic-editor-state.service.spec.ts',
     'core/templates/pages/topic-editor-page/services/topic-editor-state.service.ts',
+    'core/templates/pages/topic-editor-page/services/topic-editor-staleness-detection.service.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.spec.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.spec.ts',
