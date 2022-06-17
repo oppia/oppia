@@ -2031,7 +2031,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/answer_submitted_event/%s' % exp_id,
             {
                 'old_state_name': state_name_1,
-                'answer': [],
+                'answer': 1.1,
                 'version': version,
                 'client_time_spent_in_secs': 0,
                 'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
@@ -2044,7 +2044,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'Schema validation for \'answer\' failed: ' +
-            'Type of [] is not present in options'
+            'Type of 1.1 is not present in options'
         )
 
 
