@@ -51,6 +51,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             self.exp_id, self.exp_version, [])
         self.playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id1', 1, 'EarlyQuit', {}, [])
+        self.save_new_valid_exploration(
+            self.exp_id, 'admin', title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
 
     def test_get_exploration_stats_with_new_exp_id(self):
         exploration_stats = stats_services.get_exploration_stats(
@@ -139,7 +142,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 '🙂'].num_times_solution_viewed_v2, 1)
 
-    def test_update_stats_throws_if_model_is_missing_entirely(self):
+    def test_update_stats_throws_if_exp_version_is_not_latest(self):
         """Test the update_stats method."""
         aggregated_stats = {
             'num_starts': 1,
@@ -157,8 +160,43 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegex(Exception, 'id="nullid.1" does not exist'):
-            stats_services.update_stats('nullid', 1, aggregated_stats)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 2)
+        self.assertEqual(exploration_stats, None)
+
+        stats_services.update_stats('exp_id1', 2, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 2)
+        self.assertEqual(exploration_stats, None)
+
+    def test_update_stats_throws_if_stats_model_is_missing_entirely(self):
+        """Test the update_stats method."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+        stats_models.ExplorationStatsModel.get_model('exp_id1', 1).delete()
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats, None)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'ExplorationStatsModel id="exp_id1.1" does not exist'
+        ):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
         """Test the update_stats method."""
@@ -216,13 +254,53 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
+
+    def test_update_stats_returns_if_aggregated_stats_type_is_invalid(self):
+        """Tests that the update_stats returns if a state name is undefined."""
+        aggregated_stats = {
+            'num_starts': '1',
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'undefined': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
+
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_update_stats_throws_if_model_is_using_unicode_state_name(self):
         """Test the update_stats method."""
@@ -675,7 +753,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_get_playthrough_from_model(self):
         """Test the get_playthrough_from_model method."""
@@ -699,7 +780,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_create_stats_model(self):
         """Test the create_stats_model method."""
@@ -717,7 +801,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         # Test create method with different state_stats_mapping.
         exploration_stats.state_stats_mapping = {

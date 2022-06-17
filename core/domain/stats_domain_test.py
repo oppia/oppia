@@ -567,6 +567,130 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
                 'num_completions': 6
             })
 
+    def test_aggregated_stats_validation_when_session_property_is_missing(
+        self
+    ):
+        sessions_state_stats = {
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'num_starts not in aggregated stats dict.'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_session_property_type_is_invalid(
+        self
+    ):
+        sessions_state_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 'invalid_type',
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected num_actual_starts to be an int, received invalid_type'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_state_property_type_is_missing(
+        self
+    ):
+        sessions_state_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'total_answers_count not in state stats mapping of Home in '
+            'aggregated stats dict.'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_state_property_type_is_invalid(
+        self
+    ):
+        sessions_state_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 'invalid_count',
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected first_hit_count to be an int, received invalid_count'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_fully_valid(
+        self
+    ):
+        sessions_state_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        self.assertEqual(
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats
+            ),
+            sessions_state_stats
+        )
+
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
