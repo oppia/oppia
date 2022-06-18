@@ -50,12 +50,12 @@ class DataTypes(enum.Enum):
     NUMBER = 'number'
 
 
-ALLOWED_SERVER_MODES: List[str] = [
+ALLOWED_SERVER_MODES: Final = [
     ServerModes.DEV.value,
     ServerModes.TEST.value,
     ServerModes.PROD.value
 ]
-ALLOWED_FEATURE_STAGES: List[str] = [
+ALLOWED_FEATURE_STAGES: Final = [
     FeatureStages.DEV.value,
     FeatureStages.TEST.value,
     FeatureStages.PROD.value
@@ -249,12 +249,12 @@ class PlatformParameterFilterDict(TypedDict):
 class PlatformParameterFilter:
     """Domain object for filters in platform parameters."""
 
-    SUPPORTED_FILTER_TYPES: List[str] = [
+    SUPPORTED_FILTER_TYPES: Final = [
         'server_mode', 'platform_type', 'browser_type', 'app_version',
         'app_version_flavor',
     ]
 
-    SUPPORTED_OP_FOR_FILTERS: Dict[str, List[str]] = {
+    SUPPORTED_OP_FOR_FILTERS: Final = {
         'server_mode': ['='],
         'platform_type': ['='],
         'browser_type': ['='],

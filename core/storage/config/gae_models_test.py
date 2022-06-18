@@ -129,9 +129,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts: (
-            List[platform_parameter_domain.PlatformParameterRuleDict]
-        ) = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[
+            platform_parameter_domain.PlatformParameterRuleDict
+        ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -175,9 +175,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit_is_persistent_in_storage(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts: (
-            List[platform_parameter_domain.PlatformParameterRuleDict]
-        ) = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[
+            platform_parameter_domain.PlatformParameterRuleDict
+        ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -196,9 +196,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit_with_updated_rules(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts: (
-            List[platform_parameter_domain.PlatformParameterRuleDict]
-        ) = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[
+            platform_parameter_domain.PlatformParameterRuleDict
+        ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,

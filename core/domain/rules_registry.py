@@ -78,11 +78,11 @@ class Registry:
                 )
             )
             cls._state_schema_version_to_html_field_types_to_rule_specs[
-                state_schema_version] = specs_from_json
+                state_schema_version
+            ] = specs_from_json
         elif not cached:
             # Ruling out the possibility of None for mypy type checking.
             assert state_schema_version is not None
-
             file_name = 'html_field_types_to_rule_specs_state_v%i.json' % (
                 state_schema_version
             )

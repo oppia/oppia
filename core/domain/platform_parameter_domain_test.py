@@ -26,6 +26,7 @@ from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
 from typing import List, Optional
+from typing_extensions import Final
 
 ServerModes = parameter_domain.ServerModes
 
@@ -33,7 +34,7 @@ ServerModes = parameter_domain.ServerModes
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterChange class."""
 
-    CMD_EDIT_RULES = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+    CMD_EDIT_RULES: Final = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
 
     def test_param_change_object_with_missing_cmd_raises_exception(
         self
