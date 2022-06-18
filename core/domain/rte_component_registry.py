@@ -25,10 +25,13 @@ import pkgutil
 from core import constants
 from core import feconf
 from core import utils
-from extensions.rich_text_components import components
 
 from typing import Any, Dict, List, Type
 from typing_extensions import TypedDict
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from extensions.rich_text_components import components
 
 
 class CustomizationArgSpecDict(TypedDict):
