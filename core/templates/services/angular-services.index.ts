@@ -407,6 +407,14 @@ import { ExplorationImprovementsService } from './exploration-improvements.servi
 import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
+import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
+import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { QuestionUpdateService } from 'domain/question/question-update.service';
+import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data.service';
+import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
+import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -552,6 +560,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationTagsService', ExplorationTagsService],
   ['ExplorationTitleService', ExplorationTitleService],
+  ['ExplorationWarningsService', ExplorationWarningsService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],
@@ -664,6 +673,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ParamSpecObjectFactory', ParamSpecObjectFactory],
   ['ParamSpecsObjectFactory', ParamSpecsObjectFactory],
   ['ParamTypeObjectFactory', ParamTypeObjectFactory],
+  ['ParameterMetadataService', ParameterMetadataService],
   ['PencilCodeEditorRulesService', PencilCodeEditorRulesService],
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
   ['PlatformFeatureAdminBackendApiService',
@@ -697,6 +707,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionSuggestionBackendApiService', QuestionSuggestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],
+  ['QuestionUndoRedoService', QuestionUndoRedoService],
+  ['QuestionUpdateService', QuestionUpdateService],
   ['RatingComputationService', RatingComputationService],
   ['RatioExpressionInputRulesService', RatioExpressionInputRulesService],
   ['RatioExpressionInputValidationService',
@@ -817,7 +829,11 @@ export const angularServices: [string, Type<{}>][] = [
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TranslationTopicService', TranslationTopicService],
+  ['TranslationStatusService', TranslationStatusService],
   ['TruncatePipe', TruncatePipe],
+  ['TrainingDataService', TrainingDataService],
+  ['TrainingModalService', TrainingModalService],
+  ['TrainingDataEditorPanelService', TrainingDataEditorPanelService],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],
@@ -844,5 +860,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
-  ['NumberConversionService', NumberConversionService]
+  ['NumberConversionService', NumberConversionService],
+  ['ParameterMetadataService', ParameterMetadataService],
+  ['ExplorationWarningsService', ExplorationWarningsService],
 ];
