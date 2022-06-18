@@ -4458,7 +4458,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4564,7 +4564,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)

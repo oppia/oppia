@@ -2003,7 +2003,7 @@ class Exploration:
                 })
 
         return states_dict
-    
+
     @classmethod
     def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
         """Converts from version 49 to 50. Version 50 adds a new
@@ -2035,9 +2035,8 @@ class Exploration:
             for answer_group in answer_groups:
                 answer_group['outcome']['dest_if_really_stuck'] = None
 
-            # state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None
             if state_dict['interaction']['default_outcome'] is not None:
-                state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None
+                state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
 
         return states_dict
 
@@ -2260,7 +2259,7 @@ class Exploration:
         exploration_dict['states_schema_version'] = 49
 
         return exploration_dict
-    
+
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
         """Converts a v54 exploration dict into a v55 exploration dict.
@@ -2360,7 +2359,7 @@ class Exploration:
             exploration_dict = cls._convert_v53_dict_to_v54_dict(
                 exploration_dict)
             exploration_schema_version = 54
-        
+
         if exploration_schema_version == 54:
             exploration_dict = cls._convert_v54_dict_to_v55_dict(
                 exploration_dict)
