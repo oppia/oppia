@@ -207,7 +207,7 @@ class DraftUpgradeUtil:
                 })
         return draft_change_list
 
-    # Chk!
+    # Chk.
     @classmethod
     def _convert_states_v49_dict_to_v50_dict(cls, draft_change_list):
         """Converts draft change list from state version 49 to 50. Version 50

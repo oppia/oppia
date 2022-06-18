@@ -29,7 +29,7 @@ import { ParamChangeBackendDict } from
 
 export interface OutcomeBackendDict {
   'dest': string;
-  'dest_if_really_stuck': string | null,
+  'dest_if_really_stuck': string | null;
   'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
   'param_changes': readonly ParamChangeBackendDict[];
@@ -39,19 +39,20 @@ export interface OutcomeBackendDict {
 
 export class Outcome {
   dest: string;
-  dest_if_really_stuck: string | null;
+  destIfReallyStuck: string | null;
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
   paramChanges: readonly ParamChangeBackendDict[];
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   constructor(
-      dest: string, dest_if_really_stuck: string | null, feedback: SubtitledHtml,
-      labelledAsCorrect: boolean, paramChanges: readonly ParamChangeBackendDict[],
+      dest: string, destIfReallyStuck: string | null, feedback: SubtitledHtml,
+      labelledAsCorrect: boolean,
+      paramChanges: readonly ParamChangeBackendDict[],
       refresherExplorationId: string | null,
       missingPrerequisiteSkillId: string | null) {
     this.dest = dest;
-    this.dest_if_really_stuck = dest_if_really_stuck;
+    this.destIfReallyStuck = destIfReallyStuck;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
     this.paramChanges = paramChanges;
@@ -66,7 +67,7 @@ export class Outcome {
   toBackendDict(): OutcomeBackendDict {
     return {
       dest: this.dest,
-      dest_if_really_stuck: this.dest_if_really_stuck,
+      dest_if_really_stuck: this.destIfReallyStuck,
       feedback: this.feedback.toBackendDict(),
       labelled_as_correct: this.labelledAsCorrect,
       param_changes: this.paramChanges,

@@ -3928,7 +3928,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         default_outcome = state_domain.Outcome(
-            'Introduction', None, state_domain.SubtitledHtml('default_outcome', ''),
+            'Introduction', None,
+            state_domain.SubtitledHtml('default_outcome', ''),
             False, [], None, None
         )
         exploration.init_state.update_interaction_default_outcome(

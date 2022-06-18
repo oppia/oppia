@@ -1306,7 +1306,7 @@ class Outcome:
         Args:
             dest: str. The name of the destination state.
             dest_if_really_stuck: str or None. The name of the optional state
-            to redirect the learner to strengthen their concepts. 
+                to redirect the learner to strengthen their concepts.
             feedback: SubtitledHtml. Feedback to give to the user if this rule
                 is triggered.
             labelled_as_correct: bool. Whether this outcome has been labelled

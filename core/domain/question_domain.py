@@ -1172,7 +1172,7 @@ class Question:
                 }
             })
         return question_state_dict
-    
+
     @classmethod
     def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
         """Converts from version 49 to 50. Version 50 adds a new
@@ -1197,12 +1197,12 @@ class Question:
                     'value': False
                 }
             })
-        
+
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:
             answer_group['outcome']['dest_if_really_stuck'] = None
 
-        question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None
+        question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
 
         return question_state_dict
 

@@ -1753,12 +1753,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-        default_outcome_dict = test_value['state']['interaction']['default_outcome']
-        outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome']
+        default_outcome_dict = test_value['state']['interaction']['default_outcome'] # pylint: disable=line-too-long
+        outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome'] # pylint: disable=line-too-long
 
         self.assertIn('dest_if_really_stuck', default_outcome_dict)
         self.assertEqual(default_outcome_dict['dest_if_really_stuck'], None)
-        
+
         self.assertIn('dest_if_really_stuck', outcome_dict)
         self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
 
