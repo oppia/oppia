@@ -233,8 +233,8 @@ class EvaluationContext:
         """
         return cls(
             client_context_dict['platform_type'],
-            client_context_dict['browser_type'],
-            client_context_dict['app_version'],
+            client_context_dict.get('browser_type'),
+            client_context_dict.get('app_version'),
             server_context_dict['server_mode'],
         )
 
