@@ -23,25 +23,33 @@ from core import utils
 from core.domain import image_validation_services
 from core.tests import test_utils
 
+from typing import Optional, Union
+
 
 class ImageValidationServiceTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(ImageValidationServiceTests, self).setUp()
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None) as f:
             self.raw_image = f.read()
 
-    def _assert_validation_error(
-            self, image, filename, expected_error_substring):
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with TestBase._assert_validation_error().
+    def _assert_validation_error(  # type: ignore[override]
+        self,
+        image: Optional[Union[str, bytes]],
+        filename: Optional[str],
+        expected_error_substring: str
+    ) -> None:
         """Checks that the image passes validation."""
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             image_validation_services.validate_image_and_filename(
                 image, filename)
 
-    def test_image_validation_checks(self):
+    def test_image_validation_checks(self) -> None:
         self._assert_validation_error(None, 'image.png', 'No image supplied')
         self._assert_validation_error(
             self.raw_image, None, 'No filename supplied')
