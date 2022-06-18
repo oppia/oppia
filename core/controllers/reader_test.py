@@ -2910,3 +2910,24 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             exploration_dict['most_recently_reached_checkpoint_state_name'])
 
         self.logout()
+
+
+class CuratedExplorationValidationHandlerTests(test_utils.GenericTestBase):
+    """Tests for curated exploration validation handler."""
+
+    def setUp(self):
+        super(CuratedExplorationValidationHandlerTests, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+
+    def test_curated_exp_validation_with_invalid_exp_id(self):
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.get_json(
+            '/explorehandler/curated_exploration_validation/exploration_1',
+            expected_status_int=400)
+
+        self.assertIn(
+            'Schema validation for \'exploration_id\' failed: ' +
+            'Validation failed: is_regex_matched',
+            response['error']
+        )
