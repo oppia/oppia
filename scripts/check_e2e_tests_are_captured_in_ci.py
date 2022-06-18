@@ -21,9 +21,14 @@ from __future__ import annotations
 import os
 import re
 
-from core import utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import List
+from core import utils  # isort:skip
+
+from typing import List  # isort:skip
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.

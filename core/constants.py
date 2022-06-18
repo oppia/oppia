@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import pkgutil
 import re
 
 from typing import Any, Dict
@@ -77,11 +78,20 @@ def get_package_file_contents(package: str, filepath: str) -> str:
 
     Returns:
         str. The contents of the file.
+
+    Raises:
+        FileNotFoundError. The file does not exist.
     """
-    with io.open(
-        os.path.join(package, filepath), 'r', encoding='utf-8'
-    ) as file:
-        return file.read()
+    try:
+        with io.open(
+            os.path.join(package, filepath), 'r', encoding='utf-8'
+        ) as file:
+            return file.read()
+    except FileNotFoundError as e:
+        file_data = pkgutil.get_data(package, filepath)
+        if file_data is None:
+            raise e
+        return file_data.decode('utf-8')
 
 
 class Constants(dict):  # type: ignore[type-arg]
