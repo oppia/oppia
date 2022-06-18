@@ -568,7 +568,10 @@ describe('Interaction object factory', () => {
       placeholder: {
         value: new SubtitledUnicode('Enter text', 'ca_placeholder_0')
       },
-      rows: { value: 1 }
+      rows: { value: 1 },
+      catchMisspellings: {
+        value: false
+      }
     });
     testInteraction.setCustomizationArgs(newCustomizationArgs);
     expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
