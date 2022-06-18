@@ -23,11 +23,11 @@ import shutil
 import subprocess
 import sys
 
+import yaml
+
 from core import utils
 
 from typing import List, Optional, Sequence
-
-import yaml
 
 from . import common
 
