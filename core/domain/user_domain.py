@@ -1507,7 +1507,7 @@ class ProgressSharingPermission:
         group_id: str,
         sharing_is_turned_on: bool
     ) -> None:
-        """Constructs a ProgressSharingPermissions domain object.
+        """Constructs a ProgressSharingPermission domain object.
 
         Attributes:
             group_id: str. The id of the learner group.
@@ -1518,11 +1518,11 @@ class ProgressSharingPermission:
         self.sharing_is_turned_on = sharing_is_turned_on
 
     def to_dict(self) -> ProgressSharingPermissionDict:
-        """Convert the ProgressSharingPermissions domain instance into a
+        """Convert the ProgressSharingPermission domain instance into a
         dictionary form with its keys as the attributes of this class.
 
         Returns:
-            dict. A dictionary containing the ProgressSharingPermissions class
+            dict. A dictionary containing the ProgressSharingPermission class
             information in a dictionary form.
         """
 
@@ -1551,7 +1551,7 @@ class LearnerGroupUser:
             member_of_learner_groups_ids: list(str). List of learner group ids
                 that the user is a member of.
             progress_sharing_permissions_list:
-                list(ProgressSharingPermissions). List of Progress Sharing
+                list(ProgressSharingPermission). List of Progress Sharing
                 Permissions of learner groups.
         """
         self.user_id = user_id
