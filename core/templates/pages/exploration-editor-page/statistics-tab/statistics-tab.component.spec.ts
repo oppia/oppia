@@ -40,8 +40,7 @@ class MockRouterService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Statistics Tab Component', function() {
+describe('Statistics Tab Component', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
