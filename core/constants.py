@@ -19,6 +19,8 @@
 from __future__ import annotations
 
 import json
+import os
+import pkgutil
 import re
 
 from core import python_utils
@@ -57,6 +59,40 @@ def remove_comments(text: str) -> str:
         str. Text with all its comments removed.
     """
     return re.sub(r'  //.*\n', r'', text)
+
+
+# This function could be in utils but a race conditions happens because of
+# the chronology of our files execution. utils imports constants and constants
+# need utils.get_package_file_contents but it does not have it loaded to memory
+# yet. If called from utils we get error as `module has no attribute`.
+def get_package_file_contents(package: str, filepath: str) -> str:
+    """Open file and return its contents. This needs to be used for files that
+    are loaded by the Python code directly, like constants.ts or
+    rich_text_components.json. This function is needed to make loading these
+    files work even when Oppia is packaged.
+
+    Args:
+        package: str. The package where the file is located.
+            For Oppia the package is usually the folder in the root folder,
+            like 'core' or 'extensions'.
+        filepath: str. The path to the file in the package.
+
+    Returns:
+        str. The contents of the file.
+
+    Raises:
+        FileNotFoundError. The file does not exist.
+    """
+    try:
+        with io.open(
+            os.path.join(package, filepath), 'r', encoding='utf-8'
+        ) as file:
+            return file.read()
+    except FileNotFoundError as e:
+        file_data = pkgutil.get_data(package, filepath)
+        if file_data is None:
+            raise e
+        return file_data.decode('utf-8')
 
 
 class Constants(dict):  # type: ignore[type-arg]
