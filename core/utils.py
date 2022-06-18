@@ -35,14 +35,8 @@ import urllib.parse
 import urllib.request
 import zlib
 
+from core import feconf
 from core.constants import constants
-
-# The third party library path is defined in common.py,
-# which is required to import typing_extensions.
-from scripts import common # isort:skip pylint: disable=unused-import
-# Since feconf imports typing_extensions, it should be
-# imported after common is imported.
-from core import feconf # isort:skip  # pylint: disable=wrong-import-position
 
 from typing import ( # isort:skip
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
