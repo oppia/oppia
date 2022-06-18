@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import os
+import pkgutil
 
 from core import constants
 from core import feconf
@@ -42,11 +43,35 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_non_existing_file_throws_error(self) -> None:
         """Test get_package_file_contents with imaginary file."""
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            IOError,
-            'No such file or directory: \'assets/non_exist_file.xy\''
+        with self.swap_to_always_raise(
+            pkgutil,
+            'get_data',
+            FileNotFoundError(
+                'No such file or directory: \'assets/non_exist.xy\''
+            )
         ):
-            constants.get_package_file_contents('assets', 'non_exist_file.xy')
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+                FileNotFoundError,
+                'No such file or directory: \'assets/non_exist.xy\''
+            ):
+                constants.get_package_file_contents('assets', 'non_exist.xy')
+
+    def test_loading_file_in_package_returns_the_content(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.swap_to_always_return(pkgutil, 'get_data', b'File data'):
+            self.assertEqual(
+                constants.get_package_file_contents('assets', 'non_exist.xy'),
+                'File data'
+            )
+
+    def test_loading_file_in_non_existent_package_throws_error(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.swap_to_always_return(pkgutil, 'get_data', None):
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+                FileNotFoundError,
+                'No such file or directory: \'assets/non_exist.xy\''
+            ):
+                constants.get_package_file_contents('assets', 'non_exist.xy')
 
     def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the

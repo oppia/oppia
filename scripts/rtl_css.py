@@ -26,7 +26,12 @@ import argparse
 import os
 import subprocess
 
-from core import utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core import utils  # isort:skip
 
 _PARSER = argparse.ArgumentParser(
     description="""

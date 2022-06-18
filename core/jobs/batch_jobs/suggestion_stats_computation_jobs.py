@@ -66,8 +66,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Get all non-deleted suggestion models' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
                     include_deleted=False))
-            # We need to window the models so that CoGroupByKey below
-            # works properly.
             | 'Filter translate suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
@@ -82,8 +80,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(
                 opportunity_models.ExplorationOpportunitySummaryModel.get_all(
                     include_deleted=False))
-            # We need to window the models so that CoGroupByKey below
-            # works properly.
             | 'Transform to opportunity domain object' >> beam.Map(
                 opportunity_services.
                 get_exploration_opportunity_summary_from_model)
