@@ -156,6 +156,14 @@ describe('State Translation Editor Component', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
+    $provide.value('ExplorationStatesService', {
+      getState: () => {
+        return stateObjectFactory.createFromBackendDict(stateName, state);
+      },
+      saveWrittenTranslation: () => {},
+      saveRecordedVoiceovers: () => {},
+      markWrittenTranslationAsNeedingUpdate: () => {}
+    });
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateRecordedVoiceoversService', TestBed.get(

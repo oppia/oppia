@@ -32,6 +32,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let $uibModalInstance = null;
   let $q = null;
   let $scope = null;
+  let $rootScope = null;
   let $flushPendingTasks = null;
   let AlertsService = null;
   let ContributionAndReviewService = null;
@@ -90,7 +91,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $uibModal = $injector.get('$uibModal');
       ngbModal = $injector.get('NgbModal');
       $q = $injector.get('$q');
-      const $rootScope = $injector.get('$rootScope');
+      $rootScope = $injector.get('$rootScope');
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       AlertsService = $injector.get('AlertsService');
       CsrfTokenService = $injector.get('CsrfTokenService');
@@ -304,12 +305,12 @@ describe('Question Suggestion Editor Modal Controller', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
-        result: $q.resolve()
+        result: Promise.resolve()
       } as NgbModalRef);
 
       $scope.cancel();
+      $rootScope.$apply();
       tick();
-      $scope.$apply();
 
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     }));
@@ -318,19 +319,21 @@ describe('Question Suggestion Editor Modal Controller', function() {
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+        result: Promise.reject()
       });
       $scope.cancel();
-      $scope.$apply();
+      $rootScope.$apply();
 
       expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
     });
 
     it('should open skill difficulty selection modal on clicking' +
         ' change difficulty icon', fakeAsync(() => {
-      var uibSpy = spyOn(ngbModal, 'open').and.returnValue({
+      spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
-        result: $q.resolve()
+        result: $q.resolve({
+          skillDifficulty: 0.6
+        })
       } as NgbModalRef);
 
       $scope.onClickChangeDifficulty();
@@ -338,7 +341,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $scope.$apply();
       $flushPendingTasks();
 
-      expect(uibSpy).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     }));
 
     it('should change skill difficulty when skill difficulty' +
@@ -386,7 +389,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
-      const $rootScope = $injector.get('$rootScope');
+      $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionBackendApiService =
       $injector.get('QuestionSuggestionBackendApiService');

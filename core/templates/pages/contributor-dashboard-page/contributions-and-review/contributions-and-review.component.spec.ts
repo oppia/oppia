@@ -1002,21 +1002,21 @@ describe('Contributions and review component', function() {
         .toHaveBeenCalled();
     });
 
-    // it('should open show view question modal when clicking on' +
-    //   ' question suggestion', fakeAsync(() => {
-    //   spyOn($uibModal, 'open').and.returnValue({
-    //     result: Promise.reject()
-    //   });
+    it('should open show view question modal when clicking on' +
+      ' question suggestion', fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: Promise.reject()
+      });
 
-    //   ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-    //   ctrl.loadContributions().then(() => {
-    //     ctrl.onClickViewSuggestion('suggestion_1');
-    //     $scope.$applyAsync();
-    //     tick();
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
+      ctrl.loadContributions().then(() => {
+        ctrl.onClickViewSuggestion('suggestion_1');
+        $scope.$applyAsync();
+        tick();
 
-    //     expect($uibModal.open).toHaveBeenCalled();
-    //   });
-    // }));
+        expect($uibModal.open).toHaveBeenCalled();
+      });
+    }));
 
     it('should resolve suggestion to skill when closing show question' +
       ' suggestion modal', function() {
