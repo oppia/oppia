@@ -419,8 +419,6 @@ def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
     # objects.
     all_recommending_models = {}
     for exp_id in exp_ids:
-        # Here we used cast because we need to narrow down the return type of
-        # .fetch() method from Sequence to List for more strict typing.
         recommending_models: Sequence[
             recommendations_models.ExplorationRecommendationsModel
         ] = recs_model_class.query(
