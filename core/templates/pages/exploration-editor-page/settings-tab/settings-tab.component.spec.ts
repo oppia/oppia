@@ -61,6 +61,7 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
+
 describe('Settings Tab Component', () => {
   let ctrl = null;
   let $q = null;
@@ -224,7 +225,12 @@ describe('Settings Tab Component', () => {
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        getUsername: () => 'username1'
+        getUsername() {
+          return 'username1';
+        },
+        isSuperAdmin() {
+          return false;
+        }
       }));
 
       explorationCategoryService.init('Astrology');
@@ -740,7 +746,7 @@ describe('Settings Tab Component', () => {
         expect(alertsService.clearWarnings).toHaveBeenCalled();
       }));
 
-    it('should toggle notifications', () => {
+    it('should toggle notifications', fakeAsync(() => {
       let feedbackNotificationsSpy = spyOn(
         userEmailPreferencesService, 'setFeedbackNotificationPreferences')
         .and.callFake((mute: boolean, callb: () => void) => {
@@ -751,22 +757,27 @@ describe('Settings Tab Component', () => {
         .and.callFake((mute: boolean, callb: () => void) => {
           callb();
         });
+
       ctrl.muteFeedbackNotifications();
+      tick();
       expect(feedbackNotificationsSpy)
         .toHaveBeenCalledWith(true, ctrl._successCallback);
 
       ctrl.unmuteFeedbackNotifications();
+      tick();
       expect(feedbackNotificationsSpy)
         .toHaveBeenCalledWith(false, ctrl._successCallback);
 
       ctrl.muteSuggestionNotifications();
+      tick();
       expect(suggestionNotificationsSpy)
         .toHaveBeenCalledWith(true, ctrl._successCallback);
 
       ctrl.unmuteSuggestionNotifications();
+      tick();
       expect(suggestionNotificationsSpy)
         .toHaveBeenCalledWith(false, ctrl._successCallback);
-    });
+    }));
 
     it('should open edit roles form and edit username and role', () => {
       ctrl.openEditRolesForm();

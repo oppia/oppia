@@ -219,46 +219,49 @@ describe('Audio translation bar directive', function() {
     expect($scope.cannotRecord).toBe(true);
   });
 
-  it('should stop recording when reaching recording time limit', function() {
-    spyOn(voiceoverRecordingService, 'status').and.returnValue({
-      isAvailable: true
-    });
-    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
-      $q.resolve());
-    spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
-      $q.resolve([]));
-    var waveSurferObjSpy = {
-      load: () => {},
-      on: () => {},
-      pause: () => {},
-      play: () => {},
-    };
-    // This throws "Argument of type '{ load: () => void; ... }'
-    // is not assignable to parameter of type 'WaveSurfer'."
-    // This is because the actual 'WaveSurfer.create` function returns a
-    // object with around 50 more properties than `waveSurferObjSpy`.
-    // We need to suppress this error because we have defined the properties
-    // we need for this test in 'waveSurferObjSpy' object.
-    // @ts-expect-error
-    spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
+  it('should stop recording when reaching recording time limit',
+    fakeAsync(() => {
+      spyOn(voiceoverRecordingService, 'status').and.returnValue({
+        isAvailable: true
+      });
+      spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
+        Promise.resolve());
+      spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
+        Promise.resolve([]));
+      var waveSurferObjSpy = {
+        load: () => {},
+        on: () => {},
+        pause: () => {},
+        play: () => {},
+      };
+      // This throws "Argument of type '{ load: () => void; ... }'
+      // is not assignable to parameter of type 'WaveSurfer'."
+      // This is because the actual 'WaveSurfer.create` function returns a
+      // object with around 50 more properties than `waveSurferObjSpy`.
+      // We need to suppress this error because we have defined the properties
+      // we need for this test in 'waveSurferObjSpy' object.
+      // @ts-expect-error
+      spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
-    $scope.checkAndStartRecording();
-    $scope.$apply();
+      $scope.checkAndStartRecording();
+      $scope.$apply();
+      tick();
 
-    $scope.elapsedTime = 298;
-    $interval.flush(1000);
+      $scope.elapsedTime = 298;
+      $interval.flush(1000);
+      tick(1010);
 
-    expect($scope.recordingComplete).toBe(true);
-    expect($scope.unsupportedBrowser).toBe(false);
-    expect($scope.showRecorderWarning).toBe(true);
-    expect($scope.recordingPermissionDenied).toBe(false);
-    expect($scope.cannotRecord).toBe(false);
-    expect($scope.selectedRecording).toBe(true);
+      expect($scope.recordingComplete).toBe(true);
+      expect($scope.unsupportedBrowser).toBe(false);
+      expect($scope.showRecorderWarning).toBe(true);
+      expect($scope.recordingPermissionDenied).toBe(false);
+      expect($scope.cannotRecord).toBe(false);
+      expect($scope.selectedRecording).toBe(true);
 
-    expect($scope.getTranslationTabBusyMessage()).toBe(
-      'You haven\'t saved your recording. Please save or ' +
-      'cancel the recording.');
-  });
+      expect($scope.getTranslationTabBusyMessage()).toBe(
+        'You haven\'t saved your recording. Please save or ' +
+        'cancel the recording.');
+    }));
 
   it('should stop record when content id changes', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
@@ -351,7 +354,7 @@ describe('Audio translation bar directive', function() {
   it('should play and pause unsaved audio when wave surfer calls on method' +
     ' callback', fakeAsync(() => {
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
-      $q.resolve([]));
+      Promise.resolve([]));
     var waveSurferObjSpy = {
       load: () => {},
       on: (evt, callback) => {
@@ -379,9 +382,9 @@ describe('Audio translation bar directive', function() {
   }));
 
   it('should play and pause unsaved audio when wave surfer on method does' +
-    ' not call the callbacl', function() {
+    ' not call the callback', function() {
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
-      $q.resolve([]));
+      Promise.resolve([]));
     var waveSurferObjSpy = {
       load: () => {},
       on: () => {},
@@ -710,20 +713,22 @@ describe('Audio translation bar directive', function() {
       scope = compiledElement[0].getControllerScope();
     }));
 
-    it('should trigger dragover event in translation tab element', function() {
-      translationTabDivMock.triggerHandler('dragover');
+    it('should trigger dragover event in translation tab element',
+      fakeAsync(()=> {
+        translationTabDivMock.triggerHandler('dragover');
+        tick();
 
-      expect(scope.dropAreaIsAccessible).toBe(true);
-      expect(scope.userIsGuest).toBe(false);
-    });
+        expect($scope.dropAreaIsAccessible).toBe(true);
+        expect($scope.userIsGuest).toBe(false);
+      }));
 
     it('should trigger drop event in translation tab element and open add' +
       ' audio translation modal', function() {
       translationTabDivMock.triggerHandler('dragover');
 
       spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+        result: Promise.reject()
+      });
       translationTabDivMock.triggerHandler({
         originalEvent: {
           dataTransfer: {
@@ -742,17 +747,20 @@ describe('Audio translation bar directive', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should trigger dragleave event in main body element', function() {
-      mainBodyDivMock.triggerHandler({
+    it('should trigger dragleave event in main body element', fakeAsync(() => {
+      $scope.mainBodyDivMock.triggerHandler({
         pageX: 0,
         pageY: 0,
         preventDefault: () => {},
         type: 'dragleave'
       });
+      tick();
 
-      expect(compiledElement[0].getControllerScope().dropAreaIsAccessible)
+      expect(
+        $scope.compiledElement[0].getControllerScope().dropAreaIsAccessible)
         .toBe(false);
-      expect(compiledElement[0].getControllerScope().userIsGuest).toBe(false);
-    });
+      expect(
+        $scope.compiledElement[0].getControllerScope().userIsGuest).toBe(false);
+    }));
   });
 });

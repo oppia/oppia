@@ -16,6 +16,7 @@
  * @fileoverview Unit test for Suggestion Modal For Exploration Editor.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Suggestion Modal For Exploration Editor', () => {
@@ -197,7 +198,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
     };
   }));
 
-  it('should open suggestion modal', () => {
+  it('should open suggestion modal', fakeAsync(() => {
     spyOn($uibModal, 'open').and.callFake((options) => {
       options.resolve.currentContent();
       options.resolve.newContent();
@@ -207,21 +208,22 @@ describe('Suggestion Modal For Exploration Editor', () => {
       options.resolve.threadUibModalInstance();
       options.resolve.unsavedChangesExist();
       return {
-        result: $q.resolve({
+        result: Promise.resolve({
           action: 'accept',
           audioUpdateRequired: true
         })
       };
     });
     spyOn(ThreadDataBackendApiService, 'resolveSuggestionAsync')
-      .and.returnValue($q.resolve());
+      .and.returnValue(Promise.resolve());
 
     smfees.showSuggestionModal('edit_exploration_state_content', extraParams);
     $scope.$apply();
+    tick();
 
     expect(ExplorationDataService.data.version).toBe(11);
     expect(ExplorationStatesService.setState).toHaveBeenCalled();
-  });
+  }));
 
   it('should error if there is problem while resolving suggestion', () => {
     spyOn(ThreadDataBackendApiService, 'resolveSuggestionAsync')

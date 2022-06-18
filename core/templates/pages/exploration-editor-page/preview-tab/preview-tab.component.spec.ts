@@ -360,15 +360,6 @@ describe('Preview Tab Component', function() {
       ctrl.$onInit();
     }));
 
-    it('should initialize controller properties after its initialization',
-      function() {
-        // Get data from exploration data service.
-        $scope.$apply();
-
-        expect(ctrl.isExplorationPopulated).toBe(false);
-        expect(ctrl.previewWarning).toBe('');
-      });
-
     it('should load preview state when closing set params modal', function() {
       spyOn($uibModal, 'open');
       spyOn(explorationEngineService, 'initSettingsFromEditor');
@@ -386,7 +377,7 @@ describe('Preview Tab Component', function() {
 
     it('should reset preview settings', function() {
       spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+        result: Promise.reject()
       });
       spyOn(numberAttemptsService, 'reset').and.callThrough();
       spyOn(explorationEngineService, 'initSettingsFromEditor');

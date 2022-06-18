@@ -45,7 +45,6 @@ describe('State Translation Editor Component', function() {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
-  let $q = null;
   var ngbModal: NgbModal;
   var editabilityService = null;
   var explorationStatesService = null;
@@ -171,7 +170,6 @@ describe('State Translation Editor Component', function() {
   describe('when has written translation', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
-      $q = $injector.get('$q');
       ngbModal = $injector.get('NgbModal');
       editabilityService = $injector.get('EditabilityService');
       explorationStatesService = $injector.get('ExplorationStatesService');
@@ -263,6 +261,7 @@ describe('State Translation Editor Component', function() {
     it('should update state\'s recorded voiceovers after broadcasting' +
       ' externalSave event when closing modal', fakeAsync(() => {
       $scope.openTranslationEditor();
+      $rootScope.$apply();
       tick();
 
       expect($scope.translationEditorIsOpen).toBe(true);
@@ -281,15 +280,16 @@ describe('State Translation Editor Component', function() {
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('en');
       spyOn(ngbModal, 'open').and.returnValue({
-        result: $q.resolve()
+        result: Promise.resolve()
       } as NgbModalRef);
+
       expect(
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
           .en.needsUpdate).toBe(false);
 
       mockExternalSaveEventEmitter.emit();
+      $rootScope.$apply();
       tick();
-      $scope.$apply();
 
       expect(
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')

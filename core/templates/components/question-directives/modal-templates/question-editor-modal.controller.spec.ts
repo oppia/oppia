@@ -19,7 +19,7 @@
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -304,7 +304,7 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should save and commit after modifying skills', function() {
+    it('should save and commit after modifying skills', fakeAsync(() => {
       const commitMessage = 'Commiting skills';
       const openModalSpy = spyOn(ngbModal, 'open');
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
@@ -312,18 +312,19 @@ describe('Question Editor Modal Controller', function() {
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
 
       openModalSpy.and.returnValue({
-        result: $q.resolve(commitMessage)
+        result: Promise.resolve(commitMessage)
       } as NgbModalRef);
 
       $scope.saveAndCommit();
       $scope.$apply();
+      tick();
 
       expect($uibModalInstance.close).toHaveBeenCalledWith({
         skillLinkageModificationsArray: (
           $scope.getSkillLinkageModificationsArray()),
         commitMessage: commitMessage
       });
-    });
+    }));
 
     it('should not save and commit when dismissing the add skill modal',
       function() {
@@ -349,17 +350,18 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should dismiss modal when there are pending changes which won\'t be' +
-      ' saved', function() {
+      ' saved', fakeAsync(() => {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn(ngbModal, 'open').and.returnValue({
-        result: $q.resolve()
+        result: Promise.resolve()
       } as NgbModalRef);
 
       $scope.cancel();
       $scope.$apply();
+      tick();
 
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
+    }));
 
     it('should not dismiss modal when there are pending changes which will be' +
       ' saved', function() {

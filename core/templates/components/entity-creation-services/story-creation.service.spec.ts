@@ -94,23 +94,19 @@ describe('Story Creation Service', () => {
   it('should post story data to server and change window location' +
     ' on success', fakeAsync(() => {
     spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
+      result: Promise.resolve({
         isValid: () => true,
         title: 'Title',
         description: 'Description',
         urlFragment: 'url'
       })
     });
-
     $httpBackend.expectPOST('/topic_editor_story_handler/id')
       .respond(200, {storyId: 'id'});
 
-    tick();
-    expect(mockWindow.location).toBe('');
-
-
     StoryCreationService.createNewCanonicalStory();
-    $scope.$apply();
+    $rootScope.$apply();
+    tick();
 
     $httpBackend.flush();
 

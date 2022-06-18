@@ -159,7 +159,7 @@ describe('Feedback Tab Component', function() {
       }).toThrowError('Trying to display a non-existent thread');
     });
 
-  it('should set active thread when it exists', function() {
+  it('should set active thread when it exists', fakeAsync(() => {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'review',
       subject: '',
@@ -184,14 +184,15 @@ describe('Feedback Tab Component', function() {
     });
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve());
 
     ctrl.setActiveThread('1');
-    $scope.$apply();
+    $rootScope.$applyAsync();
+    tick();
 
     expect(ctrl.activeThread).toEqual(thread);
     expect(ctrl.tmpMessage.status).toBe('review');
-  });
+  }));
 
   it('should add warning when trying to add a message in a thread with id' +
     ' null', function() {
@@ -219,7 +220,7 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should add new message to a thread and then go back to feedback' +
-    ' threads list', function() {
+    ' threads list', fakeAsync(() => {
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
       suggestionThreadObjectFactory.createFromBackendDicts({
         status: 'Open',
@@ -244,17 +245,19 @@ describe('Feedback Tab Component', function() {
         last_updated_msecs: 0
       }));
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve());
 
     ctrl.setActiveThread('1');
     $scope.$apply();
+    tick();
 
     spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve());
     ctrl.addNewMessage('1', 'Text', 'Open');
 
     expect(ctrl.messageSendingInProgress).toBe(true);
     $scope.$apply();
+    tick();
 
     expect(ctrl.messageSendingInProgress).toBe(false);
     expect(ctrl.tmpMessage.status).toBe('Open');
@@ -262,12 +265,13 @@ describe('Feedback Tab Component', function() {
 
     ctrl.onBackButtonClicked();
     $scope.$apply();
+    tick();
 
     expect(threadDataBackendApiService.getThread).toHaveBeenCalledWith('1');
-  });
+  }));
 
   it('should use reject handler when trying to add a message in a thread fails',
-    function() {
+    fakeAsync(() => {
       spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
         suggestionThreadObjectFactory.createFromBackendDicts({
           status: 'Open',
@@ -292,19 +296,21 @@ describe('Feedback Tab Component', function() {
           last_updated_msecs: 0
         }));
       spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-        $q.resolve());
+        Promise.resolve());
       ctrl.setActiveThread('1');
-      $scope.$apply();
+      $rootScope.$applyAsync();
+      tick();
 
       spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
-        $q.reject());
+        Promise.reject());
       ctrl.addNewMessage('1', 'Text', 'Open');
 
       expect(ctrl.messageSendingInProgress).toBe(true);
-      $scope.$apply();
+      $rootScope.$applyAsync();
+      tick();
 
       expect(ctrl.messageSendingInProgress).toBe(false);
-    });
+    }));
 
   it('should evaluate suggestion button type to be default when a feedback' +
     ' thread is selected', function() {
@@ -332,7 +338,7 @@ describe('Feedback Tab Component', function() {
     });
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve());
 
     ctrl.setActiveThread('1');
     $scope.$apply();
@@ -341,7 +347,7 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should evaluate suggestion button type to be primary when a feedback' +
-    ' thread is selected', function() {
+    ' thread is selected', fakeAsync(() => {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'review',
       subject: '',
@@ -366,95 +372,100 @@ describe('Feedback Tab Component', function() {
     });
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
+      Promise.resolve());
 
     ctrl.setActiveThread('1');
     $scope.$apply();
+    $rootScope.$applyAsync();
+    tick();
 
     spyOn(explorationStatesService, 'hasState').and.returnValue(true);
     spyOn(changeListService, 'getChangeList').and.returnValue([]);
 
     expect(ctrl.getSuggestionButtonType()).toBe('primary');
-  });
+  }));
 
   it('should not open show suggestion modal when active thread is null',
     function() {
-      expect(function() {
+      expect(() => {
         ctrl.showSuggestionModal();
       }).toThrowError('Trying to show suggestion of a non-existent thread');
     });
 
-  it('should open show suggestion modal when active thread exists', function() {
-    var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
-    getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
-        status: 'Open',
-        subject: '',
-        summary: '',
-        original_author_username: 'Username1',
-        last_updated_msecs: 0,
-        message_count: 1,
-        thread_id: '1',
-        last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
-      }, {
-        suggestion_type: 'edit_exploration_state_content',
-        suggestion_id: '1',
-        target_type: '',
-        target_id: '',
-        status: '',
-        author_name: '',
-        change: {
-          state_name: '',
-          new_value: '',
-          old_value: '',
-        },
-        last_updated_msecs: 0
-      }));
-    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      $q.resolve());
-    ctrl.setActiveThread('1');
-    $scope.$apply();
+  it('should open show suggestion modal when active thread exists',
+    fakeAsync(() => {
+      var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
+      getThreadSpy.and.returnValue(
+        suggestionThreadObjectFactory.createFromBackendDicts({
+          status: 'Open',
+          subject: '',
+          summary: '',
+          original_author_username: 'Username1',
+          last_updated_msecs: 0,
+          message_count: 1,
+          thread_id: '1',
+          last_nonempty_message_author: 'Message 1',
+          last_nonempty_message_text: 'Message 2'
+        }, {
+          suggestion_type: 'edit_exploration_state_content',
+          suggestion_id: '1',
+          target_type: '',
+          target_id: '',
+          status: '',
+          author_name: '',
+          change: {
+            state_name: '',
+            new_value: '',
+            old_value: '',
+          },
+          last_updated_msecs: 0
+        }));
+      spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+        Promise.resolve());
+      ctrl.setActiveThread('1');
+      $rootScope.$apply();
+      tick();
 
-    spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
-      .and.callFake(function(suggestionType, obj) {
-        obj.setActiveThread('0');
-      });
+      spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
+        .and.callFake((suggestionType, obj) => {
+          obj.setActiveThread('0');
+        });
 
-    getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
-        status: 'Review',
-        subject: '',
-        summary: '',
-        original_author_username: 'Username1',
-        last_updated_msecs: 0,
-        message_count: 1,
-        thread_id: '2',
-        last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
-      }, {
-        suggestion_type: 'edit_exploration_state_content',
-        suggestion_id: '2',
-        target_type: '',
-        target_id: '',
-        status: '',
-        author_name: '',
-        change: {
-          state_name: '',
-          new_value: '',
-          old_value: '',
-        },
-        last_updated_msecs: 0
-      }));
-    ctrl.showSuggestionModal();
-    $scope.$apply();
+      getThreadSpy.and.returnValue(
+        suggestionThreadObjectFactory.createFromBackendDicts({
+          status: 'Review',
+          subject: '',
+          summary: '',
+          original_author_username: 'Username1',
+          last_updated_msecs: 0,
+          message_count: 1,
+          thread_id: '2',
+          last_nonempty_message_author: 'Message 1',
+          last_nonempty_message_text: 'Message 2'
+        }, {
+          suggestion_type: 'edit_exploration_state_content',
+          suggestion_id: '2',
+          target_type: '',
+          target_id: '',
+          status: '',
+          author_name: '',
+          change: {
+            state_name: '',
+            new_value: '',
+            old_value: '',
+          },
+          last_updated_msecs: 0
+        }));
+      ctrl.showSuggestionModal();
+      $rootScope.$apply();
+      tick();
 
-    expect(
-      suggestionModalForExplorationEditorService.showSuggestionModal)
-      .toHaveBeenCalled();
-    expect(ctrl.tmpMessage.status).toBe('Review');
-    expect(ctrl.tmpMessage.text).toBe('');
-  });
+      expect(
+        suggestionModalForExplorationEditorService.showSuggestionModal)
+        .toHaveBeenCalled();
+      expect(ctrl.tmpMessage.status).toBe('Review');
+      expect(ctrl.tmpMessage.text).toBe('');
+    }));
 
   it('should create a new thread when closing create new thread modal',
     fakeAsync(() => {
