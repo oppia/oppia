@@ -26,41 +26,40 @@ describe('State version history model', () => {
   });
 
   it('should get the various properties', () => {
-    expect(stateVersionHistory.getPreviouslyEditedVersionNumber()).toEqual(1);
-    expect(stateVersionHistory.getStateNameInPreviousVersion()).toEqual(
-      'state_1');
-    expect(stateVersionHistory.getCommitterUsername()).toEqual('user_1');
+    expect(stateVersionHistory.previouslyEditedInVersion).toEqual(1);
+    expect(stateVersionHistory.stateNameInPreviousVersion).toEqual('state_1');
+    expect(stateVersionHistory.committerUsername).toEqual('user_1');
   });
 
   it('should correctly set the value of previously edited version number',
     () => {
-      expect(stateVersionHistory.getPreviouslyEditedVersionNumber()).toEqual(1);
+      expect(stateVersionHistory.previouslyEditedInVersion).toEqual(1);
 
-      stateVersionHistory.setPreviouslyEditedVersionNumber(2);
+      stateVersionHistory.previouslyEditedInVersion = 2;
 
-      expect(stateVersionHistory.getPreviouslyEditedVersionNumber()).toEqual(2);
+      expect(stateVersionHistory.previouslyEditedInVersion).toEqual(2);
     });
 
   it('should correctly set the value of state name in previous version',
     () => {
       expect(
-        stateVersionHistory.getStateNameInPreviousVersion()
+        stateVersionHistory.stateNameInPreviousVersion
       ).toEqual('state_1');
 
-      stateVersionHistory.setStateNameInPreviousVersion('state_2');
+      stateVersionHistory.stateNameInPreviousVersion = 'state_2';
 
       expect(
-        stateVersionHistory.getStateNameInPreviousVersion()
+        stateVersionHistory.stateNameInPreviousVersion
       ).toEqual('state_2');
     });
 
   it('should correctly set the value of committer username',
     () => {
-      expect(stateVersionHistory.getCommitterUsername()).toEqual('user_1');
+      expect(stateVersionHistory.committerUsername).toEqual('user_1');
 
-      stateVersionHistory.setCommitterUsername('user_2');
+      stateVersionHistory.committerUsername = 'user_2';
 
-      expect(stateVersionHistory.getCommitterUsername()).toEqual('user_2');
+      expect(stateVersionHistory.committerUsername).toEqual('user_2');
     });
 
   it('should convert into backend dict', () => {
@@ -85,13 +84,13 @@ describe('State version history model', () => {
       stateVersionHistoryBackendDict);
 
     expect(
-      anotherStateVersionHistory.getPreviouslyEditedVersionNumber()
-    ).toEqual(stateVersionHistory.getPreviouslyEditedVersionNumber());
+      anotherStateVersionHistory.previouslyEditedInVersion
+    ).toEqual(stateVersionHistory.previouslyEditedInVersion);
     expect(
-      anotherStateVersionHistory.getStateNameInPreviousVersion()
-    ).toEqual(stateVersionHistory.getStateNameInPreviousVersion());
+      anotherStateVersionHistory.stateNameInPreviousVersion
+    ).toEqual(stateVersionHistory.stateNameInPreviousVersion);
     expect(
-      anotherStateVersionHistory.getCommitterUsername()
-    ).toEqual(stateVersionHistory.getCommitterUsername());
+      anotherStateVersionHistory.committerUsername
+    ).toEqual(stateVersionHistory.committerUsername);
   });
 });

@@ -38,27 +38,27 @@ export class StateVersionHistory {
     this._committerUsername = committerUsername;
   }
 
-  getPreviouslyEditedVersionNumber(): number {
+  get previouslyEditedInVersion(): number {
     return this._previouslyEditedInVersion;
   }
 
-  setPreviouslyEditedVersionNumber(previouslyEditedInVersion: number): void {
+  set previouslyEditedInVersion(previouslyEditedInVersion: number) {
     this._previouslyEditedInVersion = previouslyEditedInVersion;
   }
 
-  getStateNameInPreviousVersion(): string {
+  get stateNameInPreviousVersion(): string {
     return this._stateNameInPreviousVersion;
   }
 
-  setStateNameInPreviousVersion(stateNameInPreviousVersion: string): void {
+  set stateNameInPreviousVersion(stateNameInPreviousVersion: string) {
     this._stateNameInPreviousVersion = stateNameInPreviousVersion;
   }
 
-  getCommitterUsername(): string {
+  get committerUsername(): string {
     return this._committerUsername;
   }
 
-  setCommitterUsername(committerUsername: string): void {
+  set committerUsername(committerUsername: string) {
     this._committerUsername = committerUsername;
   }
 
