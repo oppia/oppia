@@ -3019,12 +3019,17 @@ class LearnerGroupUserModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    invited_to_learner_groups = (
+    # List of learner group ids which the user has been invited to join.
+    invited_to_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    member_of_learner_groups = (
+    # List of learner group ids which the user is part joined.
+    member_of_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    progress_sharing_permissions = (
-        datastore_services.JsonProperty(repeated=True, indexed=True))
+    # List of ProgressSharingPermission dicts, which is defined in
+    # user_domain.py, each dict corresponds to a learner group and
+    # has stores progress sharing permission status for that group.
+    progress_sharing_permissions_list = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -3072,12 +3077,12 @@ class LearnerGroupUserModel(base_models.BaseModel):
             return {}
 
         return {
-            'invited_to_learner_groups': (
-                learner_group_user_model.invited_to_learner_groups),
-            'member_of_learner_groups': (
-                learner_group_user_model.member_of_learner_groups),
-            'progress_sharing_permissions': (
-                learner_group_user_model.progress_sharing_permissions)
+            'invited_to_learner_groups_ids': (
+                learner_group_user_model.invited_to_learner_groups_ids),
+            'member_of_learner_groups_ids': (
+                learner_group_user_model.member_of_learner_groups_ids),
+            'progress_sharing_permissions_list': (
+                learner_group_user_model.progress_sharing_permissions_list)
         }
 
     @staticmethod
@@ -3090,10 +3095,10 @@ class LearnerGroupUserModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'invited_to_learner_groups':
+            'invited_to_learner_groups_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'member_of_learner_groups':
+            'member_of_learner_groups_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'progress_sharing_permissions':
+            'progress_sharing_permissions_list':
                 base_models.EXPORT_POLICY.EXPORTED
         })

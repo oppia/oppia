@@ -869,10 +869,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.LEARNER_GROUP_ID,
             title='sample title',
             description='sample description',
-            facilitators=[self.USER_ID_1],
-            members=['user_id_2'],
-            invitations=['user_id_3'],
-            subtopic_ids=['subtopic_id_1', 'subtopic_id_2'],
+            facilitators_user_ids=[self.USER_ID_1],
+            members_user_ids=['user_id_2'],
+            invited_user_ids=['user_id_3'],
+            subtopics_page_ids=['subtopic_id_1', 'subtopic_id_2'],
             story_ids=['skill_id_1', 'skill_id_2']
         )
         learner_group_model.update_timestamps()
@@ -880,9 +880,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         learner_group_user_model = user_models.LearnerGroupUserModel(
             id=self.USER_ID_1,
-            invited_to_learner_groups=['123'],
-            member_of_learner_groups=['654'],
-            progress_sharing_permissions=[
+            invited_to_learner_groups_ids=['123'],
+            member_of_learner_groups_ids=['654'],
+            progress_sharing_permissions_list=[
                 {
                     'group_id': '654',
                     'sharing_is_turned_on': False
@@ -1651,14 +1651,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_learner_group_data = {
             'title': 'sample title',
             'description': 'sample description',
-            'facilitator': self.USER_ID_1,
-            'subtopic_ids': ['subtopic_id_1', 'subtopic_id_2'],
+            'facilitator_user_id': self.USER_ID_1,
+            'subtopics_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['skill_id_1', 'skill_id_2']
         }
         expected_learner_group_user_data = {
-            'invited_to_learner_groups': ['123'],
-            'member_of_learner_groups': ['654'],
-            'progress_sharing_permissions': [
+            'invited_to_learner_groups_ids': ['123'],
+            'member_of_learner_groups_ids': ['654'],
+            'progress_sharing_permissions_list': [
                 {
                     'group_id': '654',
                     'sharing_is_turned_on': False

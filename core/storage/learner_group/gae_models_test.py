@@ -45,10 +45,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             id='3232',
             title='title',
             description='description',
-            facilitators=['user_1', 'user_11'],
-            members=['user_2', 'user_3', 'user_4'],
-            invitations=['user_5', 'user_6'],
-            subtopic_ids=['subtopic_1', 'subtopic_2'],
+            facilitators_user_ids=['user_1', 'user_11'],
+            members_user_ids=['user_2', 'user_3', 'user_4'],
+            invited_user_ids=['user_5', 'user_6'],
+            subtopics_page_ids=['subtopic_1', 'subtopic_2'],
             story_ids=['story_1', 'story_2'])
         self.learner_group_model.update_timestamps()
         self.learner_group_model.put()
@@ -73,10 +73,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'description': base_models.EXPORT_POLICY.EXPORTED,
-            'facilitators': base_models.EXPORT_POLICY.EXPORTED,
-            'members': base_models.EXPORT_POLICY.EXPORTED,
-            'invitations': base_models.EXPORT_POLICY.EXPORTED,
-            'subtopic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'facilitators_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'members_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'invited_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'subtopics_page_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
         }
         self.assertEqual(
@@ -86,9 +86,9 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_field_names_for_takeout(self) -> None:
         expected_results = {
-            'facilitators': 'facilitator',
-            'members': 'member',
-            'invitations': 'invitation'
+            'facilitators_user_ids': 'facilitator_user_id',
+            'members_user_ids': 'member_user_id',
+            'invited_user_ids': 'invited_user_id'
         }
         self.assertEqual(
             learner_group_models.LearnerGroupModel
@@ -148,10 +148,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             '3232': {
                 'title': 'title',
                 'description': 'description',
-                'facilitator': '',
-                'member': 'user_2',
-                'invitation': '',
-                'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+                'facilitator_user_id': '',
+                'member_user_id': 'user_2',
+                'invited_user_id': '',
+                'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
             }
         }
@@ -167,10 +167,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             '3232': {
                 'title': 'title',
                 'description': 'description',
-                'facilitator': '',
-                'member': '',
-                'invitation': 'user_6',
-                'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+                'facilitator_user_id': '',
+                'member_user_id': '',
+                'invited_user_id': 'user_6',
+                'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
             }
         }
@@ -186,10 +186,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             '3232': {
                 'title': 'title',
                 'description': 'description',
-                'facilitator': 'user_1',
-                'member': '',
-                'invitation': '',
-                'subtopic_ids': ['subtopic_1', 'subtopic_2'],
+                'facilitator_user_id': 'user_1',
+                'member_user_id': '',
+                'invited_user_id': '',
+                'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
             }
         }
@@ -255,7 +255,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_11'))
 
-        # Deleting facilitator when more than 1 facilitators are present.
+        # Deleting a facilitator when more than 1 facilitators are present.
         (
             learner_group_models.LearnerGroupModel
             .apply_deletion_policy('user_1')
@@ -265,7 +265,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_1'))
 
-        # Deleting facilitator when only 1 facilitator is present.
+        # Deleting a facilitator when only 1 facilitator is present.
         (
             learner_group_models.LearnerGroupModel
             .apply_deletion_policy('user_11')
