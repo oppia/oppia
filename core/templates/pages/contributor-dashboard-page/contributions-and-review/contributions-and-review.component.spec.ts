@@ -36,8 +36,7 @@ class MockNgbModalRef {
   };
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Contributions and review component', function() {
+describe('Contributions and review component', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
