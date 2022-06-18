@@ -68,8 +68,6 @@ def install_prerequisite(package: Tuple[str]) -> None:
 for prerequisite in PREREQUISITES:
     install_prerequisite(prerequisite)
 
-from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -77,6 +75,8 @@ from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-positi
 from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
