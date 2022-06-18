@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core.constants import constants
 from core.domain import state_domain
@@ -1019,6 +1021,9 @@ class ExpStateValidationJobTests(
     EXP_4_STATE_1 = state_domain.State.create_default_state(
         'EXP_4_STATE_1', is_initial_state=True).to_dict()
 
+    TODAY_DATE = datetime.datetime.utcnow()
+    YEAR_AGO_DATE = (TODAY_DATE - datetime.timedelta(weeks=52)).date()
+
     def setUp(self):
         super().setUp()
 
@@ -1118,23 +1123,31 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, created on 2021-06-17' +
+              'The id of exp is 4, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, created on 2021-06-17' +
-              ', and the state interaction part 1 ' +
+              'The id of exp is 4, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
               'erroneous data are [{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, created on 2021-06-17' +
-              ', and the state interaction part 2 ' +
+              'The id of exp is 4, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, created on 2021-06-17' +
-              ', and the state interaction part 3 ' +
+              'The id of exp is 4, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_4_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 4, created on 2021-06-17' +
+              'The id of exp is 4, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_4_STATE_1\'}]')
         ])
@@ -1144,28 +1157,36 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_1_STATE_2\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
-              ', and the state interaction part 1 ' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
-              ', and the state interaction part 2 ' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
-              ', and the state interaction part 3 ' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\', ' +
               '\'tagged_skill_misconception_ids\': [\'The ' +
@@ -1192,7 +1213,8 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
@@ -1203,7 +1225,8 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
@@ -1214,8 +1237,10 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
-              ', and the state interaction part 2 ' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\', ' +
@@ -1239,8 +1264,10 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_9\'}, {\'state_name\': \'EXP_2_STATE_10\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
-              ', and the state interaction part 1 ' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\'}, ' +
@@ -1268,8 +1295,10 @@ class ExpStateValidationJobTests(
               '\'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
-              ', and the state interaction part 3 ' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\', ' +
               '\'continue_interaction_invalid_values\': [\'The text value ' +
               'is invalid, either it is empty or the character length is ' +
@@ -1305,7 +1334,8 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_3_STATE_1\', \'rte_components_errors\':'
               + ' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
@@ -1322,19 +1352,26 @@ class ExpStateValidationJobTests(
               'EXP_3_STATE_1 Video tag start value is greater ' +
               'than end value.\']}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
-              ', and the state interaction part 1 ' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
-              ', and the state interaction part 2 ' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
-              ', and the state interaction part 3 ' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data ' +
               'are [{\'state_name\': \'EXP_3_STATE_1\'}]')
         ])
@@ -1344,28 +1381,36 @@ class ExpStateValidationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_1_STATE_2\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
-              ', and the state interaction part 1 ' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
-              ', and the state interaction part 2 ' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
-              ', and the state interaction part 3 ' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_1_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_1_STATE_2\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 1, created on 2021-06-17' +
+              'The id of exp is 1, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_1_STATE_1\', ' +
               '\'tagged_skill_misconception_ids\': [\'The ' +
@@ -1386,7 +1431,8 @@ class ExpStateValidationJobTests(
               'destination is the state itself.\']}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
@@ -1397,7 +1443,8 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data are ' +
               '[{\'state_name\': \'EXP_2_STATE_1\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
@@ -1408,8 +1455,10 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
-              ', and the state interaction part 2 ' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\', ' +
@@ -1433,8 +1482,10 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_9\'}, {\'state_name\': \'EXP_2_STATE_10\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
-              ', and the state interaction part 1 ' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_2\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_3\'}, {\'state_name\': \'EXP_2_STATE_4\'}, ' +
@@ -1462,8 +1513,10 @@ class ExpStateValidationJobTests(
               '\'EXP_2_STATE_10\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 2, created on 2021-06-17' +
-              ', and the state interaction part 3 ' +
+              'The id of exp is 2, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_2_STATE_1\', ' +
               '\'continue_interaction_invalid_values\': [\'The text value ' +
               'is invalid, either it is empty or the character length is ' +
@@ -1493,7 +1546,8 @@ class ExpStateValidationJobTests(
               '[\'There should not be any duplicate choices\']}]'
             ),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_3_STATE_1\', \'rte_components_errors\':'
               + ' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
@@ -1510,19 +1564,26 @@ class ExpStateValidationJobTests(
               'EXP_3_STATE_1 Video tag start value is greater ' +
               'than end value.\']}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
-              ', and the state interaction part 1 ' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
-              ', and the state interaction part 2 ' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
-              ', and the state interaction part 3 ' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
               'erroneous data are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
             job_run_result.JobRunResult.as_stderr(
-              'The id of exp is 3, created on 2021-06-17' +
+              'The id of exp is 3, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data ' +
               'are [{\'state_name\': \'EXP_3_STATE_1\'}]')
         ])
