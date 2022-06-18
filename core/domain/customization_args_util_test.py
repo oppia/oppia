@@ -278,13 +278,6 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'extraArg': {'value': ''}
         }
 
-        expected_customization_args_after_validation = {
-            'requireSimplestForm': {'value': False},
-            'allowImproperFraction': {'value': True},
-            'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''}
-        }
-
         # The next four checks are for cases where customization args dict
         # does not contain some of the required specs.
 
