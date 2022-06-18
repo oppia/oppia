@@ -72,7 +72,7 @@ DEFAULT_TOPIC_SIMILARITIES_STRING: Final = (
 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
 # pylint: enable=line-too-long, single-line-pragma
 
-RECOMMENDATION_CATEGORIES: List[str] = [
+RECOMMENDATION_CATEGORIES: Final = [
     'Architecture',
     'Art',
     'Biology',
@@ -390,9 +390,9 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
     if recommendations_model is None:
         return []
     else:
-        recommended_exploration_ids: (
-            List[str]
-        ) = recommendations_model.recommended_exploration_ids
+        recommended_exploration_ids: List[str] = (
+            recommendations_model.recommended_exploration_ids
+        )
         return recommended_exploration_ids
 
 
@@ -421,9 +421,9 @@ def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
     for exp_id in exp_ids:
         # Here we used cast because we need to narrow down the return type of
         # .fetch() method from Sequence to List for more strict typing.
-        recommending_models: (
-            Sequence[recommendations_models.ExplorationRecommendationsModel]
-        ) = recs_model_class.query(
+        recommending_models: Sequence[
+            recommendations_models.ExplorationRecommendationsModel
+        ] = recs_model_class.query(
             recs_model_class.recommended_exploration_ids == exp_id
         ).fetch()
         for recommending_model in recommending_models:

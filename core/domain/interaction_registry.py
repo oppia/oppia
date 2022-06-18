@@ -149,9 +149,9 @@ class Registry:
 
             if os.path.isfile(spec_file):
                 with utils.open_file(spec_file, 'r') as f:
-                    specs_from_json: (
-                        Dict[str, base.BaseInteractionDict]
-                    ) = json.loads(f.read())
+                    specs_from_json: Dict[str, base.BaseInteractionDict] = (
+                        json.loads(f.read())
+                    )
                 cls._state_schema_version_to_interaction_specs[
                     state_schema_version] = specs_from_json
                 return cls._state_schema_version_to_interaction_specs[

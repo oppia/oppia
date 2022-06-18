@@ -172,9 +172,9 @@ def get_all_threads_subscribed_to(user_id: str) -> List[str]:
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if subscriptions_model:
-        feedback_thread_ids: (
-            List[str]
-        ) = subscriptions_model.general_feedback_thread_ids
+        feedback_thread_ids: List[str] = (
+            subscriptions_model.general_feedback_thread_ids
+        )
         return feedback_thread_ids
     else:
         return []

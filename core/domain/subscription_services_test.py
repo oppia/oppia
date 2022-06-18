@@ -84,9 +84,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
         if subscriptions_model:
-            feedback_thread_ids: (
-                List[str]
-            ) = subscriptions_model.general_feedback_thread_ids
+            feedback_thread_ids: List[str] = (
+                subscriptions_model.general_feedback_thread_ids
+            )
             return feedback_thread_ids
         else:
             return []

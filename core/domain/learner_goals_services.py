@@ -68,13 +68,10 @@ def save_learner_goals(learner_goals: user_domain.LearnerGoals) -> None:
         learner_goals_model.update_timestamps()
         learner_goals_model.put()
     else:
-        # Here, learner_goals_dict is of type LearnerGoalsDict, and in type
-        # LearnerGoalsDict there is no key which is defined as 'id' but here
-        # we are adding a new 'id' key, which violates the rule of strict
-        # dictionary and causes MyPy to throw error. Thus to silent the error
-        # we used ignore statement here.
-        learner_goals_dict['id'] = learner_goals.id  # type: ignore[misc]
-        user_models.LearnerGoalsModel(**learner_goals_dict).put()
+        user_models.LearnerGoalsModel(
+            id = learner_goals.id,
+            **learner_goals_dict
+        ).put()
 
 
 def mark_topic_to_learn(user_id: str, topic_id: str) -> bool:
