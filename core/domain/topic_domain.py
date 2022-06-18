@@ -424,12 +424,14 @@ class Subtopic:
 
     @classmethod
     def create_default_subtopic(
-        cls, subtopic_id: int, title: str, url_frag = 'url-frag') -> Subtopic:
+        cls, subtopic_id: int, title: str,
+        url_frag: str = 'url-frag') -> Subtopic:
         """Creates a Subtopic object with default values.
 
         Args:
             subtopic_id: int. ID of the new subtopic.
             title: str. The title for the new subtopic.
+            url_frag: str. The url fragment for the new subtopic.
 
         Returns:
             Subtopic. A subtopic object with given id, title and empty skill ids
