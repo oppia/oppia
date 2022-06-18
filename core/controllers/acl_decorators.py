@@ -2200,6 +2200,43 @@ def can_access_learner_dashboard(handler):
 
     return test_can_access
 
+def can_access_teacher_dashboard(handler):
+    """Decorator to check access to teacher dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        one can access the teacher dashboard.
+    """
+
+    def test_can_access(self, **kwargs):
+        """Checks if the user can access the teacher dashboard.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_TEACHER_DASHBOARD in self.user.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
 
 def can_manage_question_skill_status(handler):
     """Decorator to check whether the user can publish a question and link it

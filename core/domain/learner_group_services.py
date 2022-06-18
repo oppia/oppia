@@ -1,0 +1,256 @@
+# coding: utf-8
+#
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Services for the learner groups."""
+
+from __future__ import annotations
+from typing import List
+
+from core import feconf
+from core.domain import user_domain
+from core.platform import datastore, models
+
+(user_models, learner_group_models) = models.Registry.import_models(
+    [models.NAMES.user], [models.NAMES.learner_group])
+
+
+def create_learner_group(
+    facilitator_id, title, description, members,
+    invitations, subtopic_ids, story_ids):
+    """Creates a new learner group.
+
+    Args:
+        facilitator_id: str. The id of the user who is creating the learner
+            group.
+        title: str. The title of the learner group.
+        description: str. The description of the learner group.
+        members: list(str). List of user_ids of the members of the
+            learner group.
+        invitations: list(str). List of user_ids of the users who have
+            been invited to the learner group.
+        subtopic_ids: list(str). The ids of the subtopics that are part of the
+            learner group syllabus.
+        story_ids: list(str). The ids of the stories that are part of the
+            learner group syllabus.
+
+    Returns:
+        learner_group_id: str. The id of the learner group created.
+    """
+
+    learner_group_id = learner_group_models.LearnerGroupModel.get_new_id()
+
+    learner_group_model = learner_group_models.LearnerGroupModel(
+        id=learner_group_id,
+        facilitator_id=facilitator_id,
+        title=title,
+        description=description,
+        members=members,
+        invitations=invitations,
+        subtopic_ids=subtopic_ids,
+        story_ids=story_ids)
+
+    learner_group_model.update_timestamps()
+    learner_group_model.put()
+
+    return learner_group_id
+
+
+def update_learner_group(
+        group_id, title, description, facilitators, members,
+        invitations, subtopic_ids, story_ids):
+    """Updates a learner group.
+
+    Args:
+        group_id: str. The id of the learner group to be updated.
+        title: str. The title of the learner group.
+        description: str. The description of the learner group.
+        facilitators: str. List of user_ids of the facilitators of the
+            learner group.
+        members: list(str). List of user_ids of the members of the
+            learner group.
+        invitations: list(str). List of user_ids of the users who have
+            been invited to the learner group.
+        subtopic_ids: list(str). The ids of the subtopics that are part of the
+            learner group syllabus.
+        story_ids: list(str). The ids of the stories that are part of the
+            learner group syllabus.
+
+    Returns:
+        learner_group: LearnerGroup. The domain object of the updated
+            learner group.
+
+    Raises:
+        Exception. The learner group does not exist.
+    """
+    
+    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
+        group_id)
+
+    if not learner_group_model:
+        raise Exception('The learner group does not exist.')
+
+    learner_group_model.title = title
+    learner_group_model.description = description
+    learner_group_model.facilitators = facilitators
+    learner_group_model.members = members
+    learner_group_model.invitations = invitations
+    learner_group_model.subtopic_ids = subtopic_ids
+    learner_group_model.story_ids = story_ids
+
+    learner_group_model.update_timestamps()
+    learner_group_model.put()
+
+    return learner_group_model
+
+
+def is_user_a_facilitator(user_id, group_id):
+    """Checks if the user is a facilitator of the leaner group.
+
+    Args:
+        user_id: str. The id of the user.
+        group_id: str. The id of the learner group.
+
+    Returns:
+        bool. Whether the user is a facilitator of the learner group.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
+        group_id)
+    return user_id in learner_group_model.facilitators
+
+
+def get_learner_goals_from_model(learner_goals_model):
+    """Returns the learner goals domain object given the learner goals
+    model loaded from the datastore.
+
+    Args:
+        learner_goals_model: LearnerGoalsModel. The
+            learner goals model from the datastore.
+
+    Returns:
+        LearnerGoals. The learner goals domain object corresponding to the
+        given model.
+    """
+    return user_domain.LearnerGoals(
+        learner_goals_model.id,
+        learner_goals_model.topic_ids_to_learn,
+        learner_goals_model.topic_ids_to_master)
+
+
+def save_learner_goals(learner_goals):
+    """Save a learner goals domain object as an LearnerGoalsModel entity
+    in the datastore.
+
+    Args:
+        learner_goals: LearnerGoals. The learner goals domain object to
+            be saved in the datastore.
+    """
+    learner_goals_dict = learner_goals.to_dict()
+
+    learner_goals_model = user_models.LearnerGoalsModel.get(
+        learner_goals.id, strict=False)
+    if learner_goals_model is not None:
+        learner_goals_model.populate(**learner_goals_dict)
+        learner_goals_model.update_timestamps()
+        learner_goals_model.put()
+    else:
+        learner_goals_dict['id'] = learner_goals.id
+        user_models.LearnerGoalsModel(**learner_goals_dict).put()
+
+
+def mark_topic_to_learn(user_id, topic_id):
+    """Adds the topic id to the learner goals of the user. If the count exceeds
+    feconf.MAX_CURRENT_GOALS_COUNT, the topic is not added.
+
+    Args:
+        user_id: str. The id of the user.
+        topic_id: str. The id of the topic to be added to the
+            learner goals.
+
+    Returns:
+        bool. The boolean indicates whether the learner goals limit
+        of the user has been exceeded.
+
+    Raises:
+        Exception. Given topic is already present.
+    """
+    learner_goals_model = user_models.LearnerGoalsModel.get(
+        user_id, strict=False)
+    if not learner_goals_model:
+        learner_goals_model = user_models.LearnerGoalsModel(id=user_id)
+
+    learner_goals = get_learner_goals_from_model(learner_goals_model)
+
+    goals_limit_exceeded = False
+    topic_ids_count = len(learner_goals.topic_ids_to_learn)
+    if topic_id not in learner_goals.topic_ids_to_learn:
+        if topic_ids_count < feconf.MAX_CURRENT_GOALS_COUNT:
+            learner_goals.add_topic_id_to_learn(topic_id)
+        else:
+            goals_limit_exceeded = True
+        save_learner_goals(learner_goals)
+        return goals_limit_exceeded
+    else:
+        raise Exception(
+            'The topic id %s is already present in the learner goals' % (
+                topic_id))
+
+
+def remove_topics_from_learn_goal(user_id, topic_ids_to_remove):
+    """Removes topics from the learner goals of the user (if present).
+
+    Args:
+        user_id: str. The id of the user.
+        topic_ids_to_remove: list(str). The ids of the topics to be removed.
+
+    Raises:
+        Exception. Given topic does not exist.
+    """
+    learner_goals_model = user_models.LearnerGoalsModel.get(
+        user_id, strict=False)
+
+    if learner_goals_model:
+        learner_goals = get_learner_goals_from_model(
+            learner_goals_model)
+        for topic_id in topic_ids_to_remove:
+            if topic_id in learner_goals.topic_ids_to_learn:
+                learner_goals.remove_topic_id_from_learn(topic_id)
+            else:
+                raise Exception(
+                    'The topic id %s is not present in LearnerGoalsModel' % (
+                        topic_id))
+        save_learner_goals(learner_goals)
+
+
+def get_all_topic_ids_to_learn(user_id):
+    """Returns a list with the ids of all the topics that are in the
+    goals of the user.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(str). A list of the ids of the topics that are in the
+        learner goals of the user.
+    """
+    learner_goals_model = user_models.LearnerGoalsModel.get(
+        user_id, strict=False)
+
+    if learner_goals_model:
+        learner_goals = get_learner_goals_from_model(
+            learner_goals_model)
+
+        return learner_goals.topic_ids_to_learn
+    return []

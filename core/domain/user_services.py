@@ -23,6 +23,7 @@ import hashlib
 import imghdr
 import logging
 import re
+from typing import List
 import urllib
 
 from core import feconf
@@ -101,6 +102,29 @@ def get_user_id_from_username(username):
         return None
     else:
         return user_model.id
+
+
+def get_multi_user_ids_from_usernames(usernames):
+    """Gets the user_ids for a given list of usernames.
+
+    Args:
+        usernames: list(str). Identifiable usernames to display in the UI.
+            
+        Returns:
+            list(str) or None. If the users with given usernames do not
+            exist, return None. Otherwise return the list of user_ids
+            corresponding to given usernames.
+        """
+    user_ids: List[str] = []
+    for username in usernames:
+        user_id = get_user_id_from_username(username)
+        if user_id is not None:
+            user_ids.append(user_id)
+
+    if len(user_ids) == 0:
+        return None
+
+    return user_ids
 
 
 def get_user_settings_from_username(username):

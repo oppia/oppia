@@ -48,6 +48,7 @@ from core.controllers import improvements
 from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
 from core.controllers import learner_goals
+from core.controllers import learner_group
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -912,7 +913,26 @@ URLS = [
     get_redirect_route(
         r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
         topics_and_skills_dashboard
-            .CategorizedAndUntriagedSkillsDataHandler)
+            .CategorizedAndUntriagedSkillsDataHandler),
+
+    get_redirect_route(
+        r'/create_learner_group_handler/',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'/update_learner_group_handler/',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'/delete_learner_group_handler/',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'/learner_group_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSyllabusHandler),
+    get_redirect_route(
+        r'/learner_group_user_progress_handler/<learner_group_id>',
+        learner_group.LearnerGroupUserProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.
