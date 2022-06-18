@@ -30,10 +30,10 @@ class LearnerGroupDict(TypedDict):
     group_id: str
     title: str
     description: str
-    facilitators: List[str]
-    members: List[str]
-    invitations: List[str]
-    subtopic_ids: List[str]
+    facilitators_user_ids: List[str]
+    members_user_ids: List[str]
+    invited_user_ids: List[str]
+    subtopics_page_ids: List[str]
     story_ids: List[str]
 
 
@@ -45,10 +45,10 @@ class LearnerGroup:
         group_id: str,
         title: str,
         description: str,
-        facilitators: List[str],
-        members: List[str],
-        invitations: List[str],
-        subtopic_ids: List[str],
+        facilitators_user_ids: List[str],
+        members_user_ids: List[str],
+        invited_user_ids: List[str],
+        subtopics_page_ids: List[str],
         story_ids: List[str],
 
     ) -> None:
@@ -58,22 +58,24 @@ class LearnerGroup:
             group_id: str. The unique ID of the learner group.
             title: str. The title of the learner group.
             description: str. The description of the learner group.
-            facilitators: List[str]. The list of facilitators of the learner
-                group.
-            members: List[str]. The list of members of the learner group.
-            invitations: List[str]. The list of invited users to the learner
-                group.
-            subtopic_ids: List[str]. The list of subtopic ids of the learner
-                group. A subtopic id is depicted as topicId:subtopicId string.
+            facilitators_user_ids: List[str]. The list of user ids of
+                facilitators of the learner group.
+            members_user_ids: List[str]. The list of user ids of members
+                of the learner group.
+            invited_user_ids: List[str]. The list of user ids of the users
+                invited to join the learner group.
+            subtopics_page_ids: List[str]. The list of subtopic ids of the
+                learner group. A subtopic id is depicted as topicId:subtopicId
+                string.
             story_ids: List[str]. The list of story ids of the learner group.
         """
         self.group_id = group_id
         self.title = title
         self.description = description
-        self.facilitators = facilitators
-        self.members = members
-        self.invitations = invitations
-        self.subtopic_ids = subtopic_ids
+        self.facilitators_user_ids = facilitators_user_ids
+        self.members_user_ids = members_user_ids
+        self.invited_user_ids = invited_user_ids
+        self.subtopics_page_ids = subtopics_page_ids
         self.story_ids = story_ids
 
     def to_dict(self) -> LearnerGroupDict:
@@ -89,10 +91,10 @@ class LearnerGroup:
             'group_id': self.group_id,
             'title': self.title,
             'description': self.description,
-            'facilitators': self.facilitators,
-            'members': self.members,
-            'invitations': self.invitations,
-            'subtopic_ids': self.subtopic_ids,
+            'facilitators_user_ids': self.facilitators_user_ids,
+            'members_user_ids': self.members_user_ids,
+            'invited_user_ids': self.invited_user_ids,
+            'subtopics_page_ids': self.subtopics_page_ids,
             'story_ids': self.story_ids
         }
 
@@ -104,24 +106,24 @@ class LearnerGroup:
                 are invalid.
         """
 
-        if len(self.facilitators) < 1:
+        if len(self.facilitators_user_ids) < 1:
             raise utils.ValidationError(
                 'Expected learner group to have at least one facilitator.')
 
-        invitations_set = set(self.invitations)
-        members_set = set(self.members)
+        invited_user_ids_set = set(self.invited_user_ids)
+        members_set = set(self.members_user_ids)
 
-        if len(invitations_set.intersection(members_set)) > 0:
+        if len(invited_user_ids_set.intersection(members_set)) > 0:
             raise utils.ValidationError(
-                'Learner group member and be invited to join the group.')
+                'Learner group member cannot be invited to join the group.')
 
-        facilitator_set = set(self.facilitators)
+        facilitator_set = set(self.facilitators_user_ids)
 
         if len(facilitator_set.intersection(members_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be a member of the group.')
 
-        if len(facilitator_set.intersection(invitations_set)) > 0:
+        if len(facilitator_set.intersection(invited_user_ids_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be invited to '
                 'join the group.')

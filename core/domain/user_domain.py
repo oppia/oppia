@@ -1487,16 +1487,49 @@ class LearnerGroupUserDict(TypedDict):
     """Dictionary for LearnerGroupUser domain object."""
 
     user_id: str
-    invited_to_learner_groups: List[str]
-    member_of_learner_groups: List[str]
-    progress_sharing_permissions: List[ProgressSharingPermissionsDict]
+    invited_to_learner_groups_ids: List[str]
+    member_of_learner_groups_ids: List[str]
+    progress_sharing_permissions_list: List[ProgressSharingPermissionDict]
 
 
-class ProgressSharingPermissionsDict(TypedDict):
+class ProgressSharingPermissionDict(TypedDict):
     """Dictionary for Progress Sharing Permissions of learner groups."""
 
     group_id: str
     sharing_is_turned_on: bool
+
+
+class ProgressSharingPermission:
+    """Domain object for Progress Sharing Permissions of learner groups."""
+
+    def __init__(
+        self,
+        group_id: str,
+        sharing_is_turned_on: bool
+    ) -> None:
+        """Constructs a ProgressSharingPermissions domain object.
+
+        Attributes:
+            group_id: str. The id of the learner group.
+            sharing_is_turned_on: bool. Whether progress sharing is turned on
+                for the learner group.
+        """
+        self.group_id = group_id
+        self.sharing_is_turned_on = sharing_is_turned_on
+
+    def to_dict(self) -> ProgressSharingPermissionDict:
+        """Convert the ProgressSharingPermissions domain instance into a
+        dictionary form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the ProgressSharingPermissions class
+            information in a dictionary form.
+        """
+
+        return {
+            'group_id': self.group_id,
+            'sharing_is_turned_on': self.sharing_is_turned_on
+        }
 
 
 class LearnerGroupUser:
@@ -1505,25 +1538,27 @@ class LearnerGroupUser:
     def __init__(
         self,
         user_id: str,
-        invited_to_learner_groups: List[str],
-        member_of_learner_groups: List[str],
-        progress_sharing_permissions: List[ProgressSharingPermissionsDict]
+        invited_to_learner_groups_ids: List[str],
+        member_of_learner_groups_ids: List[str],
+        progress_sharing_permissions_list: List[ProgressSharingPermission]
     ) -> None:
         """Constructs a LearnerGroupUser domain object.
 
         Attributes:
             user_id: str. The user id.
-            invited_to_learner_groups: list(str). List of learner group ids
+            invited_to_learner_groups_ids: list(str). List of learner group ids
                 that the user has been invited to.
-            member_of_learner_groups: list(str). List of learner group ids
+            member_of_learner_groups_ids: list(str). List of learner group ids
                 that the user is a member of.
-            progress_sharing_permissions: list(ProgressSharingPermissionsDict).
-                List of Progress Sharing Permissions of learner groups.
+            progress_sharing_permissions_list:
+                list(ProgressSharingPermissions). List of Progress Sharing
+                Permissions of learner groups.
         """
         self.user_id = user_id
-        self.invited_to_learner_groups = invited_to_learner_groups
-        self.member_of_learner_groups = member_of_learner_groups
-        self.progress_sharing_permissions = progress_sharing_permissions
+        self.invited_to_learner_groups_ids = invited_to_learner_groups_ids
+        self.member_of_learner_groups_ids = member_of_learner_groups_ids
+        self.progress_sharing_permissions_list = (
+            progress_sharing_permissions_list)
 
     def to_dict(self) -> LearnerGroupUserDict:
         """Convert the LearnerGroupUser domain instance into a dictionary
@@ -1534,11 +1569,20 @@ class LearnerGroupUser:
             information in a dictionary form.
         """
 
+        progress_sharing_permissions_list_dict = [
+            progress_sharing_permission.to_dict()
+            for progress_sharing_permission in (
+                self.progress_sharing_permissions_list)
+        ]
+
         return {
             'user_id': self.user_id,
-            'invited_to_learner_groups': self.invited_to_learner_groups,
-            'member_of_learner_groups': self.member_of_learner_groups,
-            'progress_sharing_permissions': self.progress_sharing_permissions
+            'invited_to_learner_groups_ids':
+                self.invited_to_learner_groups_ids,
+            'member_of_learner_groups_ids':
+                self.member_of_learner_groups_ids,
+            'progress_sharing_permissions_list':
+                progress_sharing_permissions_list_dict
         }
 
     def validate(self) -> None:
@@ -1549,21 +1593,21 @@ class LearnerGroupUser:
                 are invalid.
         """
 
-        invited_to_learner_groups_set = set(
-            self.invited_to_learner_groups)
-        member_of_learner_groups_set = set(
-            self.member_of_learner_groups)
+        invited_to_learner_groups_ids_set = set(
+            self.invited_to_learner_groups_ids)
+        member_of_learner_groups_ids_set = set(
+            self.member_of_learner_groups_ids)
 
-        if len(invited_to_learner_groups_set.intersection(
-                member_of_learner_groups_set)) > 0:
+        if len(invited_to_learner_groups_ids_set.intersection(
+                member_of_learner_groups_ids_set)) > 0:
             raise utils.ValidationError(
                 'Learner group user cannot be a member and be invited '
                 'at the same time in the same learner group.')
 
-        for progress_sharing_permission in self.progress_sharing_permissions:
-            if progress_sharing_permission['group_id'] not in (
-                    self.member_of_learner_groups):
+        for prog_sharing_permission in self.progress_sharing_permissions_list:
+            if prog_sharing_permission.group_id not in (
+                    self.member_of_learner_groups_ids):
                 raise utils.ValidationError(
                     'Learner cannot have progress sharing permissions of '
                     'group %s since they are not it\'s member.' % (
-                        progress_sharing_permission['group_id']))
+                        prog_sharing_permission.group_id))

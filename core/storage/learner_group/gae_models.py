@@ -51,23 +51,24 @@ class LearnerGroupModel(base_models.BaseModel):
     description = datastore_services.StringProperty(required=True, indexed=True)
     # The list of user_ids of the users who are facilitators of
     # the learner group.
-    facilitators = datastore_services.StringProperty(
+    facilitators_user_ids = datastore_services.StringProperty(
         repeated=True, indexed=True)
     # The list of user_ids of the users who are part of the learner group.
-    members = datastore_services.StringProperty(repeated=True)
+    members_user_ids = datastore_services.StringProperty(repeated=True)
     # The list of user_ids of the users who are invited to join the
     # learner group.
-    invitations = datastore_services.StringProperty(repeated=True)
+    invited_user_ids = datastore_services.StringProperty(repeated=True)
     # The list of subtopic ids that are part of the group syllabus.
-    # Each subtopic id is stored ad topicid_subtopicid a string.
-    subtopic_ids = datastore_services.StringProperty(repeated=True)
+    # Each subtopic id is stored as topicid:subtopicid a string.
+    subtopics_page_ids = datastore_services.StringProperty(repeated=True)
     # The list of story ids that are part of the group syllabus.
     story_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to delete corresponding
-        to a user: members, invitations and facilitators fields.
+        to a user: members_user_ids, invited_user_ids and
+        facilitators_user_ids fields.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -88,10 +89,10 @@ class LearnerGroupModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'description': base_models.EXPORT_POLICY.EXPORTED,
-            'facilitators': base_models.EXPORT_POLICY.EXPORTED,
-            'members': base_models.EXPORT_POLICY.EXPORTED,
-            'invitations': base_models.EXPORT_POLICY.EXPORTED,
-            'subtopic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'facilitators_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'members_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'invited_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'subtopics_page_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -126,9 +127,6 @@ class LearnerGroupModel(base_models.BaseModel):
     ) -> LearnerGroupModel:
         """Creates a new LearnerGroupModel instance and returns it.
 
-        Note that the client is responsible for actually saving this entity to
-        the datastore.
-
         Args:
             group_id: str. The ID of the learner group.
             title: str. The title of the learner group.
@@ -152,14 +150,14 @@ class LearnerGroupModel(base_models.BaseModel):
 
     @staticmethod
     def get_field_names_for_takeout() -> Dict[str, str]:
-        """We do not want to export all user ids in the facilitators, members
-        and invitations fields, so we export them as fields only containing
-        the current user's id.
+        """We do not want to export all user ids in the facilitators_user_ids,
+        members_user_ids and invited_user_ids fields, so we export them as
+        fields only containing the current user's id.
         """
         return {
-            'facilitators': 'facilitator',
-            'members': 'member',
-            'invitations': 'invitation'
+            'facilitators_user_ids': 'facilitator_user_id',
+            'members_user_ids': 'member_user_id',
+            'invited_user_ids': 'invited_user_id'
         }
 
     @classmethod
@@ -175,52 +173,56 @@ class LearnerGroupModel(base_models.BaseModel):
         """
         found_models = cls.get_all().filter(
             datastore_services.any_of(
-                cls.members == user_id,
-                cls.invitations == user_id,
-                cls.facilitators == user_id
+                cls.members_user_ids == user_id,
+                cls.invited_user_ids == user_id,
+                cls.facilitators_user_ids == user_id
         ))
         user_data = {}
         for learner_group_model in found_models:
             # If the user is a member, we export all fields except
-            # facilitators, invitations and the member field is
-            # exported only containing the current user's id.
-            if user_id in learner_group_model.members:
+            # facilitators_user_ids, invited_user_ids and the member_user_id
+            # field is exported only containing the current user's id.
+            if user_id in learner_group_model.members_user_ids:
                 user_data[learner_group_model.id] = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
-                    'facilitator': '',
-                    'member': user_id,
-                    'invitation': '',
-                    'subtopic_ids': learner_group_model.subtopic_ids,
+                    'facilitator_user_id': '',
+                    'member_user_id': user_id,
+                    'invited_user_id': '',
+                    'subtopics_page_ids':
+                        learner_group_model.subtopics_page_ids,
                     'story_ids': learner_group_model.story_ids
                 }
 
             # If the user has been invited to join the group,
-            # we export all fields except facilitators, members and
-            # the invitation field is exported only containing the
-            # current user's id.
-            elif user_id in learner_group_model.invitations:
+            # we export all fields except facilitators_user_ids,
+            # members_user_ids and the invited_user_id field is exported
+            # only containing the current user's id.
+            elif user_id in learner_group_model.invited_user_ids:
                 user_data[learner_group_model.id] = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
-                    'facilitator': '',
-                    'member': '',
-                    'invitation': user_id,
-                    'subtopic_ids': learner_group_model.subtopic_ids,
+                    'facilitator_user_id': '',
+                    'member_user_id': '',
+                    'invited_user_id': user_id,
+                    'subtopics_page_ids':
+                        learner_group_model.subtopics_page_ids,
                     'story_ids': learner_group_model.story_ids
                 }
 
             # If the user is the facilitator of the group, we export all
-            # fields except members, invitations and the facilitator field is
-            # exported only containing the current user's id.
-            elif user_id in learner_group_model.facilitators:
+            # fields except members_user_ids, invited_user_ids and the
+            # facilitator_user_id field is exported only containing the
+            # current user's id.
+            elif user_id in learner_group_model.facilitators_user_ids:
                 user_data[learner_group_model.id] = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
-                    'facilitator': user_id,
-                    'member': '',
-                    'invitation': '',
-                    'subtopic_ids': learner_group_model.subtopic_ids,
+                    'facilitator_user_id': user_id,
+                    'member_user_id': '',
+                    'invited_user_id': '',
+                    'subtopics_page_ids':
+                        learner_group_model.subtopics_page_ids,
                     'story_ids': learner_group_model.story_ids
                 }
         return user_data
@@ -237,9 +239,9 @@ class LearnerGroupModel(base_models.BaseModel):
         """
         return (
             cls.query(datastore_services.any_of(
-                cls.members == user_id,
-                cls.invitations == user_id,
-                cls.facilitators == user_id
+                cls.members_user_ids == user_id,
+                cls.invited_user_ids == user_id,
+                cls.facilitators_user_ids == user_id
             )).get(keys_only=True) is not None
         )
 
@@ -253,36 +255,37 @@ class LearnerGroupModel(base_models.BaseModel):
         """
         found_models = cls.get_all().filter(
             datastore_services.any_of(
-                cls.members == user_id,
-                cls.invitations == user_id,
-                cls.facilitators == user_id
+                cls.members_user_ids == user_id,
+                cls.invited_user_ids == user_id,
+                cls.facilitators_user_ids == user_id
         ))
 
         for learner_group_model in found_models:
-            # If the user is a member, delete the user from the members list.
-            if user_id in learner_group_model.members:
-                learner_group_model.members.remove(user_id)
+            # If the user is a member, delete the user from the
+            # members_user_ids list.
+            if user_id in learner_group_model.members_user_ids:
+                learner_group_model.members_user_ids.remove(user_id)
                 learner_group_model.update_timestamps()
                 learner_group_model.put()
 
             # If the user has been invited to join the group, delete the
-            # user from the invitations list.
-            elif user_id in learner_group_model.invitations:
-                learner_group_model.invitations.remove(user_id)
+            # user from the invited_user_ids list.
+            elif user_id in learner_group_model.invited_user_ids:
+                learner_group_model.invited_user_ids.remove(user_id)
                 learner_group_model.update_timestamps()
                 learner_group_model.put()
 
             # If the user is the facilitator of the group and there are
-            # more then one facilitators, delete the user from the
-            # facilitators list.
-            elif user_id in learner_group_model.facilitators and (
-                    len(learner_group_model.facilitators) > 1):
-                learner_group_model.facilitators.remove(user_id)
+            # more then one facilitators_user_ids, delete the user from the
+            # facilitators_user_ids list.
+            elif user_id in learner_group_model.facilitators_user_ids and (
+                    len(learner_group_model.facilitators_user_ids) > 1):
+                learner_group_model.facilitators_user_ids.remove(user_id)
                 learner_group_model.update_timestamps()
                 learner_group_model.put()
 
             # If the user is the facilitator of the group and there is
-            # only one facilitator, delete the group.
-            elif user_id in learner_group_model.facilitators and (
-                    len(learner_group_model.facilitators) == 1):
+            # only one facilitator_user_id, delete the group.
+            elif user_id in learner_group_model.facilitators_user_ids and (
+                    len(learner_group_model.facilitators_user_ids) == 1):
                 learner_group_model.delete()
