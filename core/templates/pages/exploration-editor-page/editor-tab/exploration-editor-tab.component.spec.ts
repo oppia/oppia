@@ -555,7 +555,10 @@ describe('Exploration editor tab component', function() {
 
     expect(stateEditorService.interaction.customizationArgs).toEqual({
       rows: { value: 1 },
-      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') }
+      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') },
+      catchMisspellings: {
+        value: false
+      }
     });
 
     var displayedValue = {
@@ -564,6 +567,9 @@ describe('Exploration editor tab component', function() {
       },
       rows: {
         value: 2
+      },
+      catchMisspellings: {
+        value: false
       }
     };
     ctrl.saveInteractionCustomizationArgs(displayedValue);

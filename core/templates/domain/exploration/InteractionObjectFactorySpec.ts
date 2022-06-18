@@ -119,7 +119,10 @@ describe('Interaction object factory', () => {
             unicode_str: 'Enter text'
           }
         },
-        rows: { value: 1 }
+        rows: { value: 1 },
+        catchMisspellings: {
+          value: false
+        }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -138,6 +141,9 @@ describe('Interaction object factory', () => {
       },
       rows: {
         value: 1
+      },
+      catchMisspellings: {
+        value: false
       }
     });
   });
@@ -553,7 +559,10 @@ describe('Interaction object factory', () => {
       placeholder: {
         value: new SubtitledUnicode('New', 'ca_placeholder_1')
       },
-      rows: { value: 2 }
+      rows: { value: 2 },
+      catchMisspellings: {
+        value: false
+      }
     };
     expect(testInteraction.customizationArgs).toEqual({
       placeholder: {
