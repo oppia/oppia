@@ -214,7 +214,10 @@ describe('Question opportunities component', function() {
   });
 
   it('should open create question modal when creating a question', function() {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+
     ctrl.createQuestion(
       skillObjectFactory.createFromBackendDict({
         id: '1',

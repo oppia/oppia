@@ -721,7 +721,9 @@ describe('Audio translation bar directive', function() {
       ' audio translation modal', function() {
       translationTabDivMock.triggerHandler('dragover');
 
-      spyOn($uibModal, 'open').and.callThrough();
+      spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
       translationTabDivMock.triggerHandler({
         originalEvent: {
           dataTransfer: {

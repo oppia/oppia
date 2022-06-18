@@ -308,7 +308,9 @@ describe('Rte Helper Service', function() {
   });
 
   it('should open customization modal', function() {
-    var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
+    var uibModalSpy = spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(

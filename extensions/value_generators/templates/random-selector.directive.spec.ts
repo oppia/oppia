@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for random selector value generator.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
+
 describe('randomSelector', () => {
   let ctrl = null;
   let $rootScope = null;
@@ -39,12 +41,13 @@ describe('randomSelector', () => {
     $rootScope.$digest();
   }));
 
-  it('should initialise component', () => {
+  it('should initialise component', fakeAsync(() => {
     ctrl.customizationArgs = {
       list_of_values: ['test']
     };
 
     ctrl.$onInit();
+    tick();
 
     expect(ctrl.SCHEMA).toEqual({
       type: 'list',
@@ -57,7 +60,7 @@ describe('randomSelector', () => {
     });
     expect(ctrl.generatorId).toBe('generatorId');
     expect(ctrl.customizationArgs.list_of_values).toEqual(['test']);
-  });
+  }));
 
   it('should initialise list_of_values as an empty array when list_of_values' +
   ' is not defined', () => {

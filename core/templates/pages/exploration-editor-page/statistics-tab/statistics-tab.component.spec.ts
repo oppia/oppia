@@ -231,7 +231,9 @@ describe('Statistics Tab Component', function() {
     // Resolve promise.
     $scope.$apply();
 
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
     $scope.onClickStateInStatsGraph('State1');
     expect(ctrl.stateStatsModalIsOpen).toBe(true);
 

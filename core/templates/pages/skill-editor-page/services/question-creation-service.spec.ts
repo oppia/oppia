@@ -437,12 +437,14 @@ describe('Question Creation Service', function() {
       $rootScope = $injector.get('$rootScope');
     }));
 
-    it('should Alerts Service if populating misconceptions fails', function() {
-      var alertsSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
-      qcs.populateMisconceptions();
-      $rootScope.$apply();
-      expect(alertsSpy).toHaveBeenCalled();
-    });
+    it('should Alerts Service if populating misconceptions fails',
+      fakeAsync(() => {
+        spyOn(AlertsService, 'addWarning').and.callThrough();
+        qcs.populateMisconceptions();
+        $rootScope.$apply();
+        tick();
+        expect(AlertsService.addWarning).toHaveBeenCalled();
+      }));
 
     it('should not call question backend api service to create the question',
       function() {
@@ -616,15 +618,22 @@ describe('Question Creation Service', function() {
     }));
 
     it('should not call question backend api service to create the question',
-      function() {
+      fakeAsync(() => {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: Promise.resolve()});
+
         qcs.createQuestion();
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
-        $rootScope.$apply();
+        $rootScope.$applyAsync();
+        tick();
+
         var questionSpy = (
           spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
-        expect(questionSpy).not.toHaveBeenCalled();
-      });
+
+        tick();
+        expect(questionSpy).toHaveBeenCalled();
+      }));
   });
 });

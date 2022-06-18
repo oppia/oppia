@@ -42,7 +42,6 @@ describe('QuestionsListComponent', () => {
   let $rootScope = null;
   let $scope = null;
   let $q = null;
-  let $timeout = null;
 
   let ngbModal: NgbModal;
   let WindowDimensionsService = null;
@@ -82,7 +81,6 @@ describe('QuestionsListComponent', () => {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $q = $injector.get('$q');
-    $timeout = $injector.get('$timeout');
 
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     QuestionsListService = $injector.get('QuestionsListService');
@@ -294,20 +292,21 @@ describe('QuestionsListComponent', () => {
   });
 
   it('should fetch misconception ids for selected skill on' +
-    ' initialization', () => {
-    spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue($q.resolve(
-      {
-        skill: skill
-      }
-    ));
+    ' initialization', fakeAsync(() => {
+    spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.resolve(
+        {
+          skill: skill
+        }
+      ));
 
     expect(ctrl.misconceptionIdsForSelectedSkill).toEqual(undefined);
 
     ctrl.$onInit();
-    $scope.$apply();
+    tick();
 
     expect(ctrl.misconceptionIdsForSelectedSkill).toEqual([2]);
-  });
+  }));
 
   it('should start creating question on navigating to question editor', () => {
     spyOn(SkillEditorRoutingService, 'navigateToQuestionEditor')
@@ -335,59 +334,61 @@ describe('QuestionsListComponent', () => {
     expect(ctrl.newQuestionSkillIds).toEqual(['skillId2']);
   });
 
-  it('should populate misconceptions when a question is created', () => {
-    const skill = skillObjectFactory.createFromBackendDict({
-      id: 'skillId1',
-      description: 'test description 1',
-      misconceptions: [{
-        id: 2,
-        name: 'test name',
-        notes: 'test notes',
-        feedback: 'test feedback',
-        must_be_addressed: true
-      }],
-      rubrics: [],
-      skill_contents: {
-        explanation: {
-          html: 'test explanation',
-          content_id: 'explanation',
-        },
-        worked_examples: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {}
-        }
-      },
-      language_code: 'en',
-      version: 3,
-      prerequisite_skill_ids: [],
-      all_questions_merged: null,
-      next_misconception_id: null,
-      superseding_skill_id: null
-    });
-    spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
-      $q.resolve([skill])
-    );
-    ctrl.linkedSkillsWithDifficulty = [
-      SkillDifficulty.create('skillId1', '', 1)
-    ];
-
-    expect(ctrl.misconceptionsBySkill).toEqual(undefined);
-
-    ctrl.initiateQuestionCreation();
-    $scope.$apply();
-
-    expect(ctrl.misconceptionsBySkill).toEqual({
-      skillId1: [
-        misconceptionObjectFactory.createFromBackendDict({
+  it('should populate misconceptions when a question is created',
+    fakeAsync(() => {
+      const skill = skillObjectFactory.createFromBackendDict({
+        id: 'skillId1',
+        description: 'test description 1',
+        misconceptions: [{
           id: 2,
           name: 'test name',
           notes: 'test notes',
           feedback: 'test feedback',
           must_be_addressed: true
-        })
-      ]
-    });
-  });
+        }],
+        rubrics: [],
+        skill_contents: {
+          explanation: {
+            html: 'test explanation',
+            content_id: 'explanation',
+          },
+          worked_examples: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          }
+        },
+        language_code: 'en',
+        version: 3,
+        prerequisite_skill_ids: [],
+        all_questions_merged: null,
+        next_misconception_id: null,
+        superseding_skill_id: null
+      });
+      spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
+        Promise.resolve([skill])
+      );
+      ctrl.linkedSkillsWithDifficulty = [
+        SkillDifficulty.create('skillId1', '', 1)
+      ];
+      tick();
+
+      expect(ctrl.misconceptionsBySkill).toEqual(undefined);
+
+      ctrl.initiateQuestionCreation();
+      tick();
+
+      expect(ctrl.misconceptionsBySkill).toEqual({
+        skillId1: [
+          misconceptionObjectFactory.createFromBackendDict({
+            id: 2,
+            name: 'test name',
+            notes: 'test notes',
+            feedback: 'test feedback',
+            must_be_addressed: true
+          })
+        ]
+      });
+    }));
 
   it('should warning message if fetching skills fails', () => {
     spyOn(AlertsService, 'addWarning');
@@ -574,12 +575,13 @@ describe('QuestionsListComponent', () => {
   it('should reset image save destination when user clicks confirm on' +
     ' \'confirm question modal exit\' modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
-      result: $q.resolve('confirm')
+      result: Promise.resolve('confirm')
     } as NgbModalRef);
     spyOn(ContextService, 'resetImageSaveDestination');
 
     ctrl.cancel();
-    $scope.$apply();
+    $rootScope.$applyAsync();
+    tick();
 
     expect(ContextService.resetImageSaveDestination).toHaveBeenCalled();
   }));
@@ -992,22 +994,23 @@ describe('QuestionsListComponent', () => {
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
-  it('should save and publish question after updating linked skill', () => {
-    spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
-      .and.returnValue($q.resolve());
-    spyOn(QuestionsListService, 'getQuestionSummariesAsync');
-    spyOn(ctrl, 'saveAndPublishQuestion');
+  it('should save and publish question after updating linked skill',
+    fakeAsync(() => {
+      spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(QuestionsListService, 'getQuestionSummariesAsync').and.stub();
+      spyOn(ctrl, 'saveAndPublishQuestion').and.stub();
 
-    ctrl.updateSkillLinkageAndQuestions('commit');
-    $scope.$apply();
-    $timeout.flush(500);
+      ctrl.updateSkillLinkageAndQuestions('commit');
+      $rootScope.$applyAsync();
+      tick(520);
 
-    expect(QuestionsListService.getQuestionSummariesAsync).toHaveBeenCalled();
-    expect(ctrl.editorIsOpen).toBe(false);
-    expect(ctrl.saveAndPublishQuestion).toHaveBeenCalledWith('commit');
-  });
+      expect(QuestionsListService.getQuestionSummariesAsync).toHaveBeenCalled();
+      expect(ctrl.editorIsOpen).toBe(false);
+      expect(ctrl.saveAndPublishQuestion).toHaveBeenCalledWith('commit');
+    }));
 
-  it('should update skill linkage correctly', () => {
+  it('should update skill linkage correctly', fakeAsync(() => {
     ctrl.skillLinkageModificationsArray = [
       {
         id: 'skillId1',
@@ -1016,20 +1019,20 @@ describe('QuestionsListComponent', () => {
       }
     ];
     spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
-      .and.returnValue($q.resolve());
+      .and.returnValue(Promise.resolve());
 
     ctrl.updateSkillLinkage();
-    $scope.$apply();
-    $timeout.flush(500);
+    $scope.$applyAsync();
+    tick();
 
     expect(ctrl.skillLinkageModificationsArray).toEqual([]);
-  });
+  }));
 
   it('should open question editor save modal if question' +
     ' is being updated when user click on \'SAVE\' button', fakeAsync(() => {
     ctrl.questionIsBeingUpdated = true;
     spyOn(ngbModal, 'open').and.returnValue({
-      result: $q.resolve('commit')
+      result: Promise.resolve('commit')
     } as NgbModalRef);
     spyOn(ctrl, 'updateSkillLinkageAndQuestions');
     spyOn(ctrl, 'saveAndPublishQuestion');
@@ -1039,7 +1042,6 @@ describe('QuestionsListComponent', () => {
 
     ctrl.saveQuestion();
     tick();
-    $scope.$apply();
 
     expect(ctrl.updateSkillLinkageAndQuestions).toHaveBeenCalledWith('commit');
 
@@ -1048,7 +1050,6 @@ describe('QuestionsListComponent', () => {
 
     ctrl.saveQuestion();
     tick();
-    $scope.$apply();
 
     expect(ctrl.saveAndPublishQuestion).toHaveBeenCalledWith('commit');
   }));

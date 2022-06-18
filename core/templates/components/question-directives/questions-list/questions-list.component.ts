@@ -81,7 +81,7 @@ angular.module('oppia').component('questionsList', {
   },
   template: require('./questions-list.component.html'),
   controller: [
-    '$location', '$rootScope', '$timeout', 'AlertsService',
+    '$location', '$rootScope', 'AlertsService',
     'ContextService', 'EditableQuestionBackendApiService',
     'FocusManagerService', 'ImageLocalStorageService',
     'MisconceptionObjectFactory', 'NgbModal',
@@ -92,7 +92,7 @@ angular.module('oppia').component('questionsList', {
     'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
     'NUM_QUESTIONS_PER_PAGE',
     function(
-        $location, $rootScope, $timeout, AlertsService,
+        $location, $rootScope, AlertsService,
         ContextService, EditableQuestionBackendApiService,
         FocusManagerService, ImageLocalStorageService,
         MisconceptionObjectFactory, NgbModal,
@@ -572,7 +572,8 @@ angular.module('oppia').component('questionsList', {
         ).then(
           data => {
             ctrl.skillLinkageModificationsArray = [];
-            $timeout(function() {
+
+            setTimeout(() => {
               QuestionsListService.resetPageNumber();
               _reInitializeSelectedSkillIds();
               QuestionsListService.getQuestionSummariesAsync(
@@ -581,6 +582,7 @@ angular.module('oppia').component('questionsList', {
               ctrl.editorIsOpen = false;
               ctrl.saveAndPublishQuestion(commitMsg);
             }, 500);
+
             $rootScope.$apply();
           });
       };

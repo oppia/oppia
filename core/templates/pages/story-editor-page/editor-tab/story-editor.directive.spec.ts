@@ -272,7 +272,9 @@ describe('Story editor Directive having two story nodes', function() {
 
   it('should call StoryUpdateService to add destination node id',
     function() {
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
       $scope.createNode();
       $rootScope.$apply();
       expect(modalSpy).toHaveBeenCalled();

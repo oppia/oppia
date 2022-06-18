@@ -435,7 +435,9 @@ describe('Contributions and review component', function() {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
           ctrl.loadContributions().then(() => {
-            spyOn($uibModal, 'open').and.callThrough();
+            spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
             ctrl.onClickViewSuggestion('suggestion_1');
 
             expect($uibModal.open).toHaveBeenCalled();
@@ -998,7 +1000,9 @@ describe('Contributions and review component', function() {
 
     it('should open show view question modal when clicking on' +
       ' question suggestion', function() {
-      spyOn($uibModal, 'open').and.callThrough();
+      spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
       ctrl.loadContributions().then(function() {
         ctrl.onClickViewSuggestion('suggestion_1');
@@ -1070,7 +1074,9 @@ describe('Contributions and review component', function() {
 
     it('should open suggestion modal when user clicks on view suggestion',
       fakeAsync(function() {
-        const modalSpy = spyOn($uibModal, 'open').and.callThrough();
+        const modalSpy = spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
 
         ctrl.onClickViewSuggestion('suggestion_1');
         $scope.$apply();

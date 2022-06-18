@@ -136,7 +136,9 @@ describe('Oppia sorted tiles visualization', function() {
     });
 
     it('should open the answer content modal when prompted for more', () => {
-      const openModalSpy = spyOn($uibModal, 'open').and.callThrough();
+      const openModalSpy = spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
 
       element.find('.more > a').click();
       expect(openModalSpy).toHaveBeenCalledWith(jasmine.objectContaining({

@@ -176,7 +176,9 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   it('should open teach oppia modal', function() {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
 
     $scope.openTeachOppiaModal();
 

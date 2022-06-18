@@ -212,7 +212,9 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     it('should open edit question modal when clicking on' +
       ' edit button', function() {
-      spyOn($uibModal, 'open').and.callThrough();
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
 
       $scope.edit();
       $scope.$apply();

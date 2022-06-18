@@ -56,7 +56,9 @@ describe('Improvement Modal Service', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
 
-    openModalSpy = spyOn($uibModal, 'open').and.callThrough();
+    openModalSpy = spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
   }));
 
   it('should open playthrough modal', function() {

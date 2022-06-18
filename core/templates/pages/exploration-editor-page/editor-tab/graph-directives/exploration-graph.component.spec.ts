@@ -87,7 +87,9 @@ describe('Exploration Graph Component', function() {
   });
 
   it('should open state graph modal', function() {
-    var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
+    var modalOpenSpy = spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
 
     ctrl.openStateGraphModal();
     $rootScope.$apply();

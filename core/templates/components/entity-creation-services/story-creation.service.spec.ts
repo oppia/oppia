@@ -16,6 +16,7 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
@@ -69,6 +70,9 @@ describe('Story Creation Service', () => {
   }));
 
   it('should not initiate new story creation if another is in process', () => {
+    $httpBackend.expectPOST('/topic_editor_story_handler/id')
+      .respond(200, {storyId: 'id'});
+
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         isValid: () => true,
@@ -81,12 +85,14 @@ describe('Story Creation Service', () => {
     StoryCreationService.createNewCanonicalStory();
     $scope.$apply();
 
+    $httpBackend.flush();
+
     // Creating a new story while previous was in creation process.
     expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
   });
 
   it('should post story data to server and change window location' +
-    ' on success', () => {
+    ' on success', fakeAsync(() => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
         isValid: () => true,
@@ -99,6 +105,7 @@ describe('Story Creation Service', () => {
     $httpBackend.expectPOST('/topic_editor_story_handler/id')
       .respond(200, {storyId: 'id'});
 
+    tick();
     expect(mockWindow.location).toBe('');
 
 
@@ -108,7 +115,7 @@ describe('Story Creation Service', () => {
     $httpBackend.flush();
 
     expect(mockWindow.location).toBe('/story_editor/id');
-  });
+  }));
 
   it('should throw error if the newly created story is not valid', () => {
     spyOn($uibModal, 'open').and.returnValue({
@@ -123,7 +130,7 @@ describe('Story Creation Service', () => {
       StoryCreationService.createNewCanonicalStory();
       $scope.$apply();
     } catch (e) {
-      expect(e).toBe(new Error('Story fields cannot be empty'));
+      expect(e).toEqual(new Error('Story fields cannot be empty'));
     }
   });
 });

@@ -732,7 +732,9 @@ describe('StateResponsesComponent', () => {
 
   it('should open add response modal when user clicks on' +
     ' \'+ ADD RESPONSE\' button', () => {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
 
     $scope.openAddAnswerGroupModal();
 
