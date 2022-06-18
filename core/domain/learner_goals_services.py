@@ -69,7 +69,7 @@ def save_learner_goals(learner_goals: user_domain.LearnerGoals) -> None:
         learner_goals_model.put()
     else:
         user_models.LearnerGoalsModel(
-            id = learner_goals.id,
+            id=learner_goals.id,
             **learner_goals_dict
         ).put()
 
