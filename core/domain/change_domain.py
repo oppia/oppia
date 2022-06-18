@@ -77,7 +77,7 @@ def validate_cmd(
     if error_msg_list:
         raise utils.ValidationError((', ').join(error_msg_list))
 
-    deprecated_values = valid_cmd_attribute_specs['deprecated_values']
+    deprecated_values = valid_cmd_attribute_specs.get('deprecated_values', {})
     for attribute_name, attribute_values in deprecated_values.items():
         actual_value = actual_cmd_attributes.get(attribute_name)
         if actual_value in attribute_values:
@@ -85,7 +85,7 @@ def validate_cmd(
                 'Value for %s in cmd %s: %s is deprecated' % (
                     attribute_name, cmd_name, actual_value))
 
-    allowed_values = valid_cmd_attribute_specs['allowed_values']
+    allowed_values = valid_cmd_attribute_specs.get('allowed_values')
     if not allowed_values:
         return
 
