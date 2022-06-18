@@ -1283,15 +1283,72 @@ class RecommendationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'include_system_recommendations': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': True
+            },
+            'stringified_author_recommended_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'story_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'current_node_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        collection_id = self.request.get('collection_id')
+        collection_id = self.normalized_request.get('collection_id')
 
-        include_system_recommendations = self.request.get(
+        include_system_recommendations = self.normalized_request.get(
             'include_system_recommendations')
         try:
-            author_recommended_exp_ids = json.loads(self.request.get(
+            author_recommended_exp_ids = json.loads(self.normalized_request.get(
                 'stringified_author_recommended_ids'))
         except Exception as e:
             raise self.PageNotFoundException from e
