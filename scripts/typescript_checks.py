@@ -23,13 +23,16 @@ import shutil
 import subprocess
 import sys
 
-from core import utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import List, Optional, Sequence
+from core import utils  # isort:skip
 
 import yaml
 
-from . import common
+from typing import List, Optional, Sequence  # isort:skip
 
 # Contains the name of all files that are not strictly typed.
 # This list must be kept up-to-date; the changes (only remove) should be done
