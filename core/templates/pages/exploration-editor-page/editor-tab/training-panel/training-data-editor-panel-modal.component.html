@@ -6,8 +6,7 @@
   <div>
     <div class="add-new-answer">
       <p class="training-data-answer-label"> Add New Answer </p>
-      <oppia-test-interaction-panel [inputTemplate]="inputTemplate"
-                                    [stateName]="stateName">
+      <oppia-test-interaction-panel [inputTemplate]="inputTemplate" [stateName]="stateName">
       </oppia-test-interaction-panel>
       <div *ngIf="newAnswerIsAlreadyResolved">
         <div>
@@ -47,7 +46,15 @@
         <br>
 
         <div>
+<<<<<<< HEAD
           <span><strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
+=======
+          <span>
+            <strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is
+              right, you should change the rule directly referring to this answer.
+            </strong>
+          </span>
+>>>>>>> gsocPR1
         </div>
       </div>
     </div>
@@ -68,7 +75,8 @@
           <div class="training-data-answer-html" (click)="openTrainUnresolvedAnswerModal(index)">
             <angular-html-bind-wrapper [htmlData]="answer.answerTemplate"></angular-html-bind-wrapper>
           </div>
-          <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response" (click)="removeAnswerFromTrainingData(index)">
+          <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
+                (click)="removeAnswerFromTrainingData(index)">
             <i class="material-icons md-24"></i>
           </span>
         </div>

@@ -40,6 +40,9 @@ import { AngularNameService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { TrainingDataService } from '../../training-panel/training-data.service';
+import { TrainingModalService } from '../../training-panel/training-modal.service';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 
 describe('Teach Oppia Modal Controller', function() {
   importAllAngularServices();
@@ -63,6 +66,7 @@ describe('Teach Oppia Modal Controller', function() {
   var mockExternalSaveEventEmitter = null;
   var explorationId = 'exp1';
   var stateName = 'Introduction';
+  let MockEmitter = new EventEmitter();
   var state = {
     classifier_model_id: null,
     content: {
@@ -134,11 +138,26 @@ describe('Teach Oppia Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
+      isConfirmedUnclassifiedAnswer: () => {
+        return true;
+      },
+      associateWithDefaultResponse: () => {},
+      associateWithAnswerGroup: () => {},
+    });
+
+    $provide.value('TrainingDataService', {
       open: () => {
         return {
           result: Promise.resolve()
         };
       }
+    });
+
+    $provide.value('TrainingModalService', {
+      openTrainUnresolvedAnswerModal: () => {
+        return true;
+      },
+      onFinishTrainingCallback: MockEmitter
     });
   }));
 
@@ -147,6 +166,8 @@ describe('Teach Oppia Modal Controller', function() {
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
+    trainingDataService = TestBed.get(TrainingDataService);
+    trainingModalService = TestBed.get(TrainingModalService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -159,8 +180,20 @@ describe('Teach Oppia Modal Controller', function() {
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value(
+      'DEFAULT_OUTCOME_CLASSIFICATION',
+      ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
+    $provide.value(
+      'EXPLICIT_CLASSIFICATION',
+      ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION);
+    $provide.value(
+      'TRAINING_DATA_CLASSIFICATION',
+      ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION);
+
+    $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
+    $provide.value('TrainingDataService', trainingDataService);
+    $provide.value('TrainingModalService', trainingModalService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
@@ -274,15 +307,13 @@ describe('Teach Oppia Modal Controller', function() {
 
     it('should open train unresolved answer modal', function() {
       spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
-          callback();
+        .callFake(function(InteractionAnswer, interactionId, answerIndex) {
         });
-      spyOn(alertsService, 'addSuccessMessage');
 
       $scope.openTrainUnresolvedAnswerModal(0);
 
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'The response for Answer Text has been fixed.', 2000);
+      expect(trainingModalService.openTrainUnresolvedAnswerModal)
+        .toHaveBeenCalled();
     });
   });
 

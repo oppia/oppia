@@ -39,70 +39,70 @@ import { TrainingDataService } from './training-data.service';
 import { TrainingModalService } from './training-modal.service';
 
 
-class MockStateEditorService {
-  getActiveStateName() {
-    return 'Hola';
-  }
-}
+ class MockStateEditorService {
+   getActiveStateName() {
+     return 'Hola';
+   }
+ }
 
-class MockExplorationStatesService {
-  getState(item1) {
-    return {
-      content: {
-        html: 'This is Hola State'
-      }
-    };
-  }
-}
+ class MockExplorationStatesService {
+   getState(item1) {
+     return {
+       content: {
+         html: 'This is Hola State'
+       }
+     };
+   }
+ }
 
-class MockResponsesService {
-  getActiveAnswerGroupIndex() {
-    return 1;
-  }
+ class MockResponsesService {
+   getActiveAnswerGroupIndex() {
+     return 1;
+   }
 
-  getAnswerGroup() {
-    return new AnswerGroup([
-      new Rule('TextInput', null, null),
-      new Rule('TextInput', null, null)
-    ], null, ['Answer1', 'Answer2'], null);
-  }
-}
+   getAnswerGroup() {
+     return new AnswerGroup([
+       new Rule('TextInput', null, null),
+       new Rule('TextInput', null, null)
+     ], null, ['Answer1', 'Answer2'], null);
+   }
+ }
 
-class MockExplorationHtmlFormatterService {
-  getInteractionHtml() {
-    return 'MockExplorationHtmlFormattered string';
-  }
+ class MockExplorationHtmlFormatterService {
+   getInteractionHtml() {
+     return 'MockExplorationHtmlFormattered string';
+   }
 
-  getAnswerHtml() {
-    return 'answer';
-  }
-}
+   getAnswerHtml() {
+     return 'answer';
+   }
+ }
 
-class MockActiveModal {
-  close(): void {
-    return;
-  }
+ class MockActiveModal {
+   close(): void {
+     return;
+   }
 
-  dismiss(): void {
-    return;
-  }
-}
+   dismiss(): void {
+     return;
+   }
+ }
 
-class MockStateInteractionIdService {
-  savedMemento = 'TextInput';
-}
+ class MockStateInteractionIdService {
+   savedMemento = 'TextInput';
+ }
 
-class MockAnswerClassificationService {
-  getMatchingClassificationResult() {
-    return {
-      outcome: {
-        dest: 'dest',
-        feedback: 'feedback'
-      },
-      classificationCategorization: 'explicit Type'
-    };
-  }
-}
+ class MockAnswerClassificationService {
+   getMatchingClassificationResult() {
+     return {
+       outcome: {
+         dest: 'dest',
+         feedback: 'feedback'
+       },
+       classificationCategorization: 'explicit Type'
+     };
+   }
+ }
 
 describe('Training Data Editor Panel Component', () => {
   let component: TrainingDataEditorPanelComponent;
@@ -112,208 +112,208 @@ describe('Training Data Editor Panel Component', () => {
   let trainingModalService: TrainingModalService;
   let trainingDataService: TrainingDataService;
   let truncateInputBasedOnInteractionAnswerTypePipe:
-    TruncateInputBasedOnInteractionAnswerTypePipe;
+     TruncateInputBasedOnInteractionAnswerTypePipe;
   let answerClassificationService: AnswerClassificationService;
   let trainingModalServiceeventEmitter = new EventEmitter();
 
-  class MockTrainingModalService {
-    get onFinishTrainingCallback() {
-      return trainingModalServiceeventEmitter;
-    }
+   class MockTrainingModalService {
+     get onFinishTrainingCallback() {
+       return trainingModalServiceeventEmitter;
+     }
 
-    getTrainingDataOfAnswerGroup(index1) {
-      return ['name', 'class'];
-    }
+     getTrainingDataOfAnswerGroup(index1) {
+       return ['name', 'class'];
+     }
 
-    openTrainUnresolvedAnswerModal(item1, item2, item3) {
-    }
-  }
+     openTrainUnresolvedAnswerModal(item1, item2, item3) {
+     }
+   }
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      declarations: [
-        TrainingDataEditorPanelComponent
-      ],
-      providers: [
-        FocusManagerService,
-        AlertsService,
-        TruncateInputBasedOnInteractionAnswerTypePipe,
-        {
-          provide: ExplorationDataService,
-          useValue: {
-            explorationId: 0,
-            autosaveChangeListAsync() {
-              return;
-            }
-          }
-        },
-        {
-          provide: StateInteractionIdService,
-          useClass: MockStateInteractionIdService
-        },
-        {
-          provide: NgbActiveModal,
-          useClass: MockActiveModal
-        },
-        {
-          provide: StateEditorService,
-          useClass: MockStateEditorService
-        },
-        {
-          provide: ExplorationStatesService,
-          useClass: MockExplorationStatesService
-        },
-        {
-          provide: ResponsesService,
-          useClass: MockResponsesService
-        },
-        {
-          provide: ExplorationHtmlFormatterService,
-          useClass: MockExplorationHtmlFormatterService
-        },
-        {
-          provide: TrainingModalService,
-          useClass: MockTrainingModalService
-        },
-        {
-          provide: AnswerClassificationService,
-          useClass: MockAnswerClassificationService
-        },
-        TrainingDataService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-  }));
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+         HttpClientTestingModule,
+       ],
+       declarations: [
+         TrainingDataEditorPanelComponent
+       ],
+       providers: [
+         FocusManagerService,
+         AlertsService,
+         TruncateInputBasedOnInteractionAnswerTypePipe,
+         {
+           provide: ExplorationDataService,
+           useValue: {
+             explorationId: 0,
+             autosaveChangeListAsync() {
+               return;
+             }
+           }
+         },
+         {
+           provide: StateInteractionIdService,
+           useClass: MockStateInteractionIdService
+         },
+         {
+           provide: NgbActiveModal,
+           useClass: MockActiveModal
+         },
+         {
+           provide: StateEditorService,
+           useClass: MockStateEditorService
+         },
+         {
+           provide: ExplorationStatesService,
+           useClass: MockExplorationStatesService
+         },
+         {
+           provide: ResponsesService,
+           useClass: MockResponsesService
+         },
+         {
+           provide: ExplorationHtmlFormatterService,
+           useClass: MockExplorationHtmlFormatterService
+         },
+         {
+           provide: TrainingModalService,
+           useClass: MockTrainingModalService
+         },
+         {
+           provide: AnswerClassificationService,
+           useClass: MockAnswerClassificationService
+         },
+         TrainingDataService
+       ],
+       schemas: [NO_ERRORS_SCHEMA]
+     }).compileComponents();
+   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(TrainingDataEditorPanelComponent);
-    component = fixture.componentInstance;
+   beforeEach(() => {
+     fixture = TestBed.createComponent(TrainingDataEditorPanelComponent);
+     component = fixture.componentInstance;
 
-    trainingDataService = TestBed.inject(TrainingDataService);
-    trainingModalService = TestBed.inject(TrainingModalService);
-    answerClassificationService = TestBed.inject(AnswerClassificationService);
-    focusManagerService = TestBed.inject(FocusManagerService);
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    truncateInputBasedOnInteractionAnswerTypePipe =
-      TestBed.inject(TruncateInputBasedOnInteractionAnswerTypePipe);
+     trainingDataService = TestBed.inject(TrainingDataService);
+     trainingModalService = TestBed.inject(TrainingModalService);
+     answerClassificationService = TestBed.inject(AnswerClassificationService);
+     focusManagerService = TestBed.inject(FocusManagerService);
+     ngbActiveModal = TestBed.inject(NgbActiveModal);
+     truncateInputBasedOnInteractionAnswerTypePipe =
+       TestBed.inject(TruncateInputBasedOnInteractionAnswerTypePipe);
 
-    spyOn(focusManagerService, 'setFocus').and.stub();
-    spyOn(truncateInputBasedOnInteractionAnswerTypePipe, 'transform')
-      .and.returnValue('of question');
-    spyOn(trainingDataService, 'associateWithAnswerGroup')
-      .and.stub();
+     spyOn(focusManagerService, 'setFocus').and.stub();
+     spyOn(truncateInputBasedOnInteractionAnswerTypePipe, 'transform')
+       .and.returnValue('of question');
+     spyOn(trainingDataService, 'associateWithAnswerGroup')
+       .and.stub();
 
-    fixture.detectChanges();
-  });
+     fixture.detectChanges();
+   });
 
-  it('should initialize component properties after component is initialized',
-    fakeAsync(() => {
-      component.ngOnInit();
+   it('should initialize component properties after component is initialized',
+     fakeAsync(() => {
+       component.ngOnInit();
 
-      trainingModalServiceeventEmitter.emit({
-        answer: 'answer',
-        interactionId: 'interactionId',
-      });
-      tick();
+       trainingModalServiceeventEmitter.emit({
+         answer: 'answer',
+         interactionId: 'interactionId',
+       });
+       tick();
 
-      component.ngOnDestroy();
+       component.ngOnDestroy();
 
-      expect(truncateInputBasedOnInteractionAnswerTypePipe.transform)
-        .toHaveBeenCalled();
-      expect(component.stateName).toBe('Hola');
-      expect(component.stateContent).toBe('This is Hola State');
-      expect(component.answerGroupHasNonEmptyRules).toBe(true);
-      expect(component.inputTemplate).toBe(
-        'MockExplorationHtmlFormattered string');
-    }));
+       expect(truncateInputBasedOnInteractionAnswerTypePipe.transform)
+         .toHaveBeenCalled();
+       expect(component.stateName).toBe('Hola');
+       expect(component.stateContent).toBe('This is Hola State');
+       expect(component.answerGroupHasNonEmptyRules).toBe(true);
+       expect(component.inputTemplate).toBe(
+         'MockExplorationHtmlFormattered string');
+     }));
 
-  it('should call init when component is initialized', () => {
-    expect(component.trainingData).toEqual([{
-      answer: 'Answer1',
-      answerTemplate: 'answer'
-    }, {
-      answer: 'Answer2',
-      answerTemplate: 'answer'
-    }]);
-    expect(component.newAnswerIsAlreadyResolved).toBe(false);
-    expect(component.answerSuccessfullyAdded).toBe(false);
-  });
+   it('should call init when component is initialized', () => {
+     expect(component.trainingData).toEqual([{
+       answer: 'Answer1',
+       answerTemplate: 'answer'
+     }, {
+       answer: 'Answer2',
+       answerTemplate: 'answer'
+     }]);
+     expect(component.newAnswerIsAlreadyResolved).toBe(false);
+     expect(component.answerSuccessfullyAdded).toBe(false);
+   });
 
-  it('should remove answer from training data', () => {
-    spyOn(trainingDataService, 'removeAnswerFromAnswerGroupTrainingData')
-      .and.stub();
+   it('should remove answer from training data', () => {
+     spyOn(trainingDataService, 'removeAnswerFromAnswerGroupTrainingData')
+       .and.stub();
 
-    component.removeAnswerFromTrainingData(0);
-    expect(component.trainingData).toEqual([{
-      answer: 'Answer2',
-      answerTemplate: 'answer'
-    }]);
-  });
+     component.removeAnswerFromTrainingData(0);
+     expect(component.trainingData).toEqual([{
+       answer: 'Answer2',
+       answerTemplate: 'answer'
+     }]);
+   });
 
-  it('should submit answer that is not explicity classified', () => {
-    component.submitAnswer('answer');
+   it('should submit answer that is not explicity classified', () => {
+     component.submitAnswer('answer');
 
-    expect(component.newAnswerTemplate).toBe(
-      'answer');
-    expect(component.newAnswerFeedback).toEqual(
-      'feedback');
-    expect(component.newAnswerOutcomeDest).toBe('dest');
-    expect(component.newAnswerIsAlreadyResolved).toBe(false);
-  });
+     expect(component.newAnswerTemplate).toBe(
+       'answer');
+     expect(component.newAnswerFeedback).toEqual(
+       'feedback');
+     expect(component.newAnswerOutcomeDest).toBe('dest');
+     expect(component.newAnswerIsAlreadyResolved).toBe(false);
+   });
 
-  it('should submit answer that is explicity classified', () => {
-    spyOn(answerClassificationService, 'getMatchingClassificationResult')
-      .and.returnValue({
-        outcome: new Outcome(
-          'Hola',
-          new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
-          false,
-          [],
-          null,
-          null,
-        ),
-        answerGroupIndex: null,
-        ruleIndex: null,
-        classificationCategorization: 'explicit',
-      });
+   it('should submit answer that is explicity classified', () => {
+     spyOn(answerClassificationService, 'getMatchingClassificationResult')
+       .and.returnValue({
+         outcome: new Outcome(
+           'Hola',
+           new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+           false,
+           [],
+           null,
+           null,
+         ),
+         answerGroupIndex: null,
+         ruleIndex: null,
+         classificationCategorization: 'explicit',
+       });
 
-    component.submitAnswer('answer');
+     component.submitAnswer('answer');
 
-    expect(component.newAnswerTemplate).toBe(
-      'answer');
-    expect(component.newAnswerFeedback).toEqual(
-      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'));
-    expect(component.newAnswerOutcomeDest).toBe('(try again)');
-    expect(component.newAnswerIsAlreadyResolved).toBe(true);
-  });
+     expect(component.newAnswerTemplate).toBe(
+       'answer');
+     expect(component.newAnswerFeedback).toEqual(
+       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'));
+     expect(component.newAnswerOutcomeDest).toBe('(try again)');
+     expect(component.newAnswerIsAlreadyResolved).toBe(true);
+   });
 
-  it('should open train unresolved answer modal', () => {
-    component.answerGroupHasNonEmptyRules = true;
+   it('should open train unresolved answer modal', () => {
+     component.answerGroupHasNonEmptyRules = true;
 
-    spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
-      .stub();
+     spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
+       .stub();
 
-    component.openTrainUnresolvedAnswerModal(1);
-    expect(trainingModalService.openTrainUnresolvedAnswerModal)
-      .toHaveBeenCalled();
-  });
+     component.openTrainUnresolvedAnswerModal(1);
+     expect(trainingModalService.openTrainUnresolvedAnswerModal)
+       .toHaveBeenCalled();
+   });
 
-  it('should exit modal', () => {
-    spyOn(ngbActiveModal, 'close').and.stub();
+   it('should exit modal', () => {
+     spyOn(ngbActiveModal, 'close').and.stub();
 
-    component.exit();
+     component.exit();
 
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
+     expect(ngbActiveModal.close).toHaveBeenCalled();
+   });
 
-  it('should dismiss modal', () => {
-    spyOn(ngbActiveModal, 'dismiss').and.stub();
+   it('should dismiss modal', () => {
+     spyOn(ngbActiveModal, 'dismiss').and.stub();
 
-    component.cancel();
+     component.cancel();
 
-    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
-  });
+     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+   });
 });

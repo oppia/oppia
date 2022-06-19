@@ -49,7 +49,7 @@ describe('Training Modal Service', () => {
   it('should open NgbModal', fakeAsync(() => {
     let emitter = new EventEmitter<void>();
     let MockComponentInstance = {
-      unhandledAnswer: 'shivam',
+      unhandledAnswer: 'unhandledAnswer',
       finishTrainingCallback: emitter
     };
 

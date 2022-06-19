@@ -67,7 +67,7 @@ class MockResponsesService {
     item3(null);
   }
 
-  updateConfirmedUnclassifiedAnswers(item1) {}
+  updateConfirmedUnclassifiedAnswers(item1) { }
   getConfirmedUnclassifiedAnswers() {
     return ['answer1', 'answer2'];
   }
@@ -78,11 +78,11 @@ class MockResponsesService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1, item2) {}
+  saveInteractionAnswerGroups(item1, item2) { }
 
-  saveInteractionDefaultOutcome(item1, item2) {}
+  saveInteractionDefaultOutcome(item1, item2) { }
 
-  saveConfirmedUnclassifiedAnswers(item1, item2) {}
+  saveConfirmedUnclassifiedAnswers(item1, item2) { }
 }
 
 class MockStateEditorService {
@@ -188,7 +188,7 @@ describe('Training Data Service', () => {
     // First the answer group's outcome is listed, then the default.
     expect(trainingDataService.getAllPotentialOutcomes(
       new State(
-        'shivam', 'id', 'some', null,
+        'State', 'id', 'some', null,
         new Interaction([
           new AnswerGroup([
             new Rule('TextInput', null, null),
@@ -231,7 +231,11 @@ describe('Training Data Service', () => {
   });
 
   it('should correctly check whether answer is in confirmed unclassified ' +
+<<<<<<< HEAD
   'answers', fakeAsync(() => {
+=======
+    'answers', fakeAsync(() => {
+>>>>>>> gsocPR1
     trainingDataService.associateWithAnswerGroup(0, 'text answer');
     trainingDataService.associateWithAnswerGroup(0, 'second answer');
     trainingDataService.associateWithDefaultResponse('second answer');

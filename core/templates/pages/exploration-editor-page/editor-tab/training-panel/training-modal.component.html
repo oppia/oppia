@@ -16,8 +16,7 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="exitTrainer()">Cancel
-  </button>
+  <button class="btn btn-secondary" (click)="exitTrainer()">Cancel</button>
   <button class="btn btn-secondary btn-success"
           *ngIf="classification.answerGroupIndex >= 0 && !addingNewResponse"
           (click)="onConfirm()">Confirm Response

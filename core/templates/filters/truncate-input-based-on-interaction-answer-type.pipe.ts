@@ -25,7 +25,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
   name: 'truncateInputBasedOnInteractionAnswerTypePipe'
 })
 export class TruncateInputBasedOnInteractionAnswerTypePipe
-    implements PipeTransform {
+  implements PipeTransform {
   constructor(
     private truncatePipe: TruncatePipe,
   ) { }
