@@ -40,6 +40,7 @@ class ExpStateValidationJobTests(
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
     EXPLORATION_ID_4 = '4'
+    EXPLORATION_ID_5 = '5'
 
     EXP_1_STATE_1 = state_domain.State.create_default_state(
         'EXP_1_STATE_1', is_initial_state=True).to_dict()
@@ -687,9 +688,43 @@ class ExpStateValidationJobTests(
       'solution': None
     }
 
-    EXP_2_STATE_8 = state_domain.State.create_default_state(
-        'EXP_2_STATE_8', is_initial_state=False).to_dict()
-    EXP_2_STATE_8['interaction'] = {
+    EXP_3_STATE_1 = state_domain.State.create_default_state(
+        'EXP_3_STATE_1', is_initial_state=True).to_dict()
+    EXP_3_STATE_1['content']['html'] = (
+    '"<p><oppia-noninteractive-link' +
+    ' text-with-value=\"&amp;quot;&amp;quot;\"' +
+    ' url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">' +
+    '</oppia-noninteractive-link></p>\n\n<p><oppia-noninteractive-math' +
+    ' math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;' +
+    '2/3&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;' +
+    'mathImg_20220606_180525_2toc4729js_height_2d731_width_3d519_vertical' +
+    '_0d833.svgas&amp;quot;}\"></oppia-noninteractive-math>' +
+    '<oppia-noninteractive-skillreview skill_id-with-value=' +
+    '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;' +
+    '&amp;quot;\"></oppia-noninteractive-skillreview>&nbsp;heading' +
+    '</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
+    'bbb&amp;quot;\" caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
+    + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    + '&amp;quot;\" ' +
+    'filepath-with-value=\"&amp;quot;img_20220606_174455_f8yf0gg4rz_height_350'
+    + '_width_450.svgg&amp;quot;\"></oppia-noninteractive-image>' +
+    '<oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
+    'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value=' +
+    '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;' +
+    'img_20220606_114604' + '_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">'
+    + '</oppia-noninteractive-image>"<oppia-noninteractive-video ' +
+    'autoplay-with-value=\"true\" end-with-value=\"11\" ' +
+    'start-with-value=\"13\"' +
+    ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;' +
+    'quot;\"></oppia-noninteractive-video>')
+
+    EXP_4_STATE_1 = state_domain.State.create_default_state(
+        'EXP_4_STATE_1', is_initial_state=True).to_dict()
+
+    EXP_5_STATE_1 = state_domain.State.create_default_state(
+        'EXP_5_STATE_1', is_initial_state=False).to_dict()
+    EXP_5_STATE_1['interaction'] = {
       'id': 'DragAndDropSortInput',
       'customization_args': {
       'choices': {
@@ -725,7 +760,7 @@ class ExpStateValidationJobTests(
           }
         ],
         'outcome': {
-          'dest': 'EXP_2_STATE_8',
+          'dest': 'EXP_5_STATE_1',
           'feedback': {
             'content_id': 'feedback_71',
             'html': '<p>df</p>'
@@ -749,7 +784,7 @@ class ExpStateValidationJobTests(
           }
         ],
         'outcome': {
-          'dest': 'EXP_2_STATE_8',
+          'dest': 'EXP_5_STATE_1',
           'feedback': {
             'content_id': 'feedback_72',
             'html': '<p>dvds</p>'
@@ -764,7 +799,7 @@ class ExpStateValidationJobTests(
       }
     ],
       'default_outcome': {
-        'dest': 'EXP_2_STATE_8',
+        'dest': 'EXP_5_STATE_1',
         'feedback': {
           'content_id': 'default_outcome',
           'html': '<p>sd</p>'
@@ -779,9 +814,9 @@ class ExpStateValidationJobTests(
       'solution': None
     }
 
-    EXP_2_STATE_9 = state_domain.State.create_default_state(
-        'EXP_2_STATE_9', is_initial_state=False).to_dict()
-    EXP_2_STATE_9['interaction'] = {
+    EXP_5_STATE_2 = state_domain.State.create_default_state(
+        'EXP_5_STATE_2', is_initial_state=False).to_dict()
+    EXP_5_STATE_2['interaction'] = {
       'id': 'FractionInput',
       'customization_args': {
         'requireSimplestForm': {
@@ -816,7 +851,7 @@ class ExpStateValidationJobTests(
           }
         ],
         'outcome': {
-          'dest': 'EXP_2_STATE_9',
+          'dest': 'EXP_5_STATE_2',
           'feedback': {
             'content_id': 'feedback_74',
             'html': '<p>dfb</p>'
@@ -844,7 +879,7 @@ class ExpStateValidationJobTests(
           }
         ],
         'outcome': {
-          'dest': 'EXP_2_STATE_9',
+          'dest': 'EXP_5_STATE_2',
           'feedback': {
             'content_id': 'feedback_74',
             'html': '<p>dfb</p>'
@@ -867,7 +902,7 @@ class ExpStateValidationJobTests(
           }
         ],
         'outcome': {
-          'dest': 'EXP_2_STATE_9',
+          'dest': 'EXP_5_STATE_2',
           'feedback': {
             'content_id': 'feedback_74',
             'html': '<p>dfb</p>'
@@ -895,7 +930,7 @@ class ExpStateValidationJobTests(
           }
         ],
         'outcome': {
-          'dest': 'EXP_2_STATE_9',
+          'dest': 'EXP_5_STATE_2',
           'feedback': {
             'content_id': 'feedback_74',
             'html': '<p>dfb</p>'
@@ -918,7 +953,7 @@ class ExpStateValidationJobTests(
           }
         ],
         'outcome': {
-          'dest': 'EXP_2_STATE_9',
+          'dest': 'EXP_5_STATE_2',
           'feedback': {
             'content_id': 'feedback_74',
             'html': '<p>dfb</p>'
@@ -933,7 +968,7 @@ class ExpStateValidationJobTests(
       }
     ],
       'default_outcome': {
-        'dest': 'EXP_2_STATE_9',
+        'dest': 'EXP_5_STATE_2',
         'feedback': {
           'content_id': 'default_outcome',
           'html': '<p>sd</p>'
@@ -948,9 +983,9 @@ class ExpStateValidationJobTests(
       'solution': None
     }
 
-    EXP_2_STATE_10 = state_domain.State.create_default_state(
-        'EXP_2_STATE_10', is_initial_state=False).to_dict()
-    EXP_2_STATE_10['interaction'] = {
+    EXP_5_STATE_3 = state_domain.State.create_default_state(
+        'EXP_5_STATE_3', is_initial_state=False).to_dict()
+    EXP_5_STATE_3['interaction'] = {
       'id': 'DragAndDropSortInput',
       'customization_args': {
       'choices': {
@@ -972,7 +1007,7 @@ class ExpStateValidationJobTests(
       'answer_groups': [
     ],
       'default_outcome': {
-        'dest': 'EXP_2_STATE_10',
+        'dest': 'EXP_5_STATE_3',
         'feedback': {
           'content_id': 'default_outcome',
           'html': '<p>sd</p>'
@@ -986,40 +1021,6 @@ class ExpStateValidationJobTests(
       'hints': [],
       'solution': None
     }
-
-    EXP_3_STATE_1 = state_domain.State.create_default_state(
-        'EXP_3_STATE_1', is_initial_state=True).to_dict()
-    EXP_3_STATE_1['content']['html'] = (
-    '"<p><oppia-noninteractive-link' +
-    ' text-with-value=\"&amp;quot;&amp;quot;\"' +
-    ' url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">' +
-    '</oppia-noninteractive-link></p>\n\n<p><oppia-noninteractive-math' +
-    ' math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;' +
-    '2/3&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;' +
-    'mathImg_20220606_180525_2toc4729js_height_2d731_width_3d519_vertical' +
-    '_0d833.svgas&amp;quot;}\"></oppia-noninteractive-math>' +
-    '<oppia-noninteractive-skillreview skill_id-with-value=' +
-    '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;' +
-    '&amp;quot;\"></oppia-noninteractive-skillreview>&nbsp;heading' +
-    '</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
-    'bbb&amp;quot;\" caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
-    + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-    + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-    + '&amp;quot;\" ' +
-    'filepath-with-value=\"&amp;quot;img_20220606_174455_f8yf0gg4rz_height_350'
-    + '_width_450.svgg&amp;quot;\"></oppia-noninteractive-image>' +
-    '<oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
-    'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value=' +
-    '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;' +
-    'img_20220606_114604' + '_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">'
-    + '</oppia-noninteractive-image>"<oppia-noninteractive-video ' +
-    'autoplay-with-value=\"true\" end-with-value=\"11\" ' +
-    'start-with-value=\"13\"' +
-    ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;' +
-    'quot;\"></oppia-noninteractive-video>')
-
-    EXP_4_STATE_1 = state_domain.State.create_default_state(
-        'EXP_4_STATE_1', is_initial_state=True).to_dict()
 
     TODAY_DATE = datetime.datetime.utcnow()
     YEAR_AGO_DATE = (TODAY_DATE - datetime.timedelta(weeks=52)).date()
@@ -1070,10 +1071,7 @@ class ExpStateValidationJobTests(
             'EXP_2_STATE_4': self.EXP_2_STATE_4,
             'EXP_2_STATE_5': self.EXP_2_STATE_5,
             'EXP_2_STATE_6': self.EXP_2_STATE_6,
-            'EXP_2_STATE_7': self.EXP_2_STATE_7,
-            'EXP_2_STATE_8': self.EXP_2_STATE_8,
-            'EXP_2_STATE_9': self.EXP_2_STATE_9,
-            'EXP_2_STATE_10': self.EXP_2_STATE_10
+            'EXP_2_STATE_7': self.EXP_2_STATE_7
             }
         )
 
@@ -1113,6 +1111,28 @@ class ExpStateValidationJobTests(
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
             states={'EXP_4_STATE_1': self.EXP_4_STATE_1}
+        )
+
+        self.exp_5 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_5,
+            title='titles',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={'EXP_5_STATE_1': self.EXP_5_STATE_1,
+            'EXP_5_STATE_2': self.EXP_5_STATE_2,
+            'EXP_5_STATE_3': self.EXP_5_STATE_3
+            }
         )
 
     def test_run_with_no_models(self) -> None:
@@ -1208,6 +1228,75 @@ class ExpStateValidationJobTests(
             )
         ])
 
+    def test_run_with_state_drag_frac_interaction_validation(self) -> None:
+        self.put_multi([self.exp_5])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+          job_run_result.JobRunResult.as_stderr(
+            'The id of exp is 5, created on {date}'.format(
+              date=str(self.YEAR_AGO_DATE)) +
+            ', and the state RTE erroneous data are ' +
+            '[{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+            '\'EXP_5_STATE_2\'}, {\'state_name\': \'EXP_5_STATE_3\'}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            'The id of exp is 5, created on {date}'.format(
+              date=str(self.YEAR_AGO_DATE)) +
+            ', and the state erroneous data are ' +
+            '[{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+            '\'EXP_5_STATE_2\'}, {\'state_name\': \'EXP_5_STATE_3\'}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            'The id of exp is 5, created on {date}'.format(
+              date=str(self.YEAR_AGO_DATE)) +
+            ', and the state multiple choice and ' +
+            'item selection interactions ' +
+            'erroneous data are [' +
+            '{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+            '\'EXP_5_STATE_2\'}, {\'state_name\': \'EXP_5_STATE_3\'}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            'The id of exp is 5, created on {date}'.format(
+              date=str(self.YEAR_AGO_DATE)) +
+            ', and the state fraction, numeric and number ' +
+            'with units interaction ' +
+            'erroneous data are [' +
+            '{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+            '\'EXP_5_STATE_2\', \'fraction_interaction_invalid_values\': ' +
+            '[\'The rule 0 of answer group 0 has denominator equals to ' +
+            'zero.\', \'The rule 0 of answer group 0 do not have value in ' +
+            'proper fraction\', \'The rule 0 of answer group 1 do not have ' +
+            'value in simple form\', \'The rule 0 of answer group 1 do not ' +
+            'have value in proper fraction\', \'The rule 0 of answer group ' +
+            '2 has non zero integer part having rule type ' +
+            'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has ' +
+            'non zero integer part.\', \'The rule 0 of answer group 4 has ' +
+            'denominator equals to zero having rule type ' +
+            'HasDenominatorEqualTo.\']}, {\'state_name\': ' +
+            '\'EXP_5_STATE_3\'}]'
+            ),
+          job_run_result.JobRunResult.as_stderr(
+            'The id of exp is 5, created on {date}'.format(
+              date=str(self.YEAR_AGO_DATE)) +
+            ', and the state continue, end and ' +
+            'drag and drop interactions ' +
+            'erroneous data are [{\'state_name\': \'EXP_5_STATE_1\', ' +
+            '\'drag_drop_interaction_values\': [\'The rule 0 of answer ' +
+            'group 0 have multiple items at same place when multiple ' +
+            'items in same position settings is turned off.\', \'The ' +
+            'rule 0 of answer group 0 having rule type - ' +
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition should ' +
+            'not be there when the multiple items in same position ' +
+            'setting is turned off.\', \'The rule 0 of answer group 1 ' +
+            'the value 1 and value 2 cannot be same when rule type is ' +
+            'HasElementXBeforeElementY\', \'Atleast 2 choices should be ' +
+            'there\', \'There should not be any empty choices\']}' +
+            ', {\'state_name\': \'EXP_5_STATE_2\'}, {\'state_name\': ' +
+            '\'EXP_5_STATE_3\', \'drag_drop_interaction_values\': ' +
+            '[\'There should not be any duplicate choices\']}]'
+          )
+        ])
+
     def test_run_with_state_interaction_validaton(self) -> None:
         self.put_multi([self.exp_2])
         self.assert_job_output_is([
@@ -1220,9 +1309,7 @@ class ExpStateValidationJobTests(
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_10\'}]'
+              '{\'state_name\': \'EXP_2_STATE_7\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
@@ -1232,9 +1319,7 @@ class ExpStateValidationJobTests(
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_10\'}]'
+              '{\'state_name\': \'EXP_2_STATE_7\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
@@ -1260,9 +1345,7 @@ class ExpStateValidationJobTests(
               'than max value which is 5\', \'Number of choices which is 4 ' +
               'is lesser than the max value selection which is 5\', ' +
               '\'There should not be any empty choices\', ' +
-              '\'There should not be any duplicate choices\']}, ' +
-              '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_9\'}, {\'state_name\': \'EXP_2_STATE_10\'}]'),
+              '\'There should not be any duplicate choices\']}]'),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
                 date=str(self.YEAR_AGO_DATE)) +
@@ -1279,20 +1362,7 @@ class ExpStateValidationJobTests(
               'value\']}, {\'state_name\': \'EXP_2_STATE_6\', ' +
               '\'number_with_units_errors\': [\'The rule 0 of answer group 1 ' +
               'has rule type equal is coming after rule type equivalent ' +
-              'having same value\']}, {\'state_name\': \'EXP_2_STATE_7\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_9\', \'fraction_interaction_invalid_values\': ' +
-              '[\'The rule 0 of answer group 0 has denominator equals to ' +
-              'zero.\', \'The rule 0 of answer group 0 do not have value in ' +
-              'proper fraction\', \'The rule 0 of answer group 1 do not have ' +
-              'value in simple form\', \'The rule 0 of answer group 1 do not ' +
-              'have value in proper fraction\', \'The rule 0 of answer group ' +
-              '2 has non zero integer part having rule type ' +
-              'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has ' +
-              'non zero integer part.\', \'The rule 0 of answer group 4 has ' +
-              'denominator equals to zero having rule type ' +
-              'HasDenominatorEqualTo.\']}, {\'state_name\': ' +
-              '\'EXP_2_STATE_10\'}]'
+              'having same value\']}, {\'state_name\': \'EXP_2_STATE_7\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
@@ -1312,20 +1382,7 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_3\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_4\'}, {\'state_name\': \'EXP_2_STATE_5\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_6\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_7\'}, {\'state_name\': \'EXP_2_STATE_8\', ' +
-              '\'drag_drop_interaction_values\': [\'The rule 0 of answer ' +
-              'group 0 have multiple items at same place when multiple ' +
-              'items in same position settings is turned off.\', \'The ' +
-              'rule 0 of answer group 0 having rule type - ' +
-              'IsEqualToOrderingWithOneItemAtIncorrectPosition should ' +
-              'not be there when the multiple items in same position ' +
-              'setting is turned off.\', \'The rule 0 of answer group 1 ' +
-              'the value 1 and value 2 cannot be same when rule type is ' +
-              'HasElementXBeforeElementY\', \'Atleast 2 choices should be ' +
-              'there\', \'There should not be any empty choices\']}' +
-              ', {\'state_name\': \'EXP_2_STATE_9\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_10\', \'drag_drop_interaction_values\': ' +
-              '[\'There should not be any duplicate choices\']}]'
+              '\'EXP_2_STATE_7\'}]'
             )
         ])
 
@@ -1377,9 +1434,9 @@ class ExpStateValidationJobTests(
         ])
 
     def test_run_with_all_models(self) -> None:
-        self.put_multi([self.exp_1, self.exp_2, self.exp_3])
+        self.put_multi([self.exp_1, self.exp_2, self.exp_3, self.exp_5])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 3'),
+            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 4'),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 1, created on {date}'.format(
                 date=str(self.YEAR_AGO_DATE)) +
@@ -1438,9 +1495,7 @@ class ExpStateValidationJobTests(
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_10\'}]'
+              '{\'state_name\': \'EXP_2_STATE_7\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
@@ -1450,9 +1505,7 @@ class ExpStateValidationJobTests(
               '\'EXP_2_STATE_2\'}, {\'state_name\': \'EXP_2_STATE_3\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_4\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_5\'}, {\'state_name\': \'EXP_2_STATE_6\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_7\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_8\'}, {\'state_name\': \'EXP_2_STATE_9\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_10\'}]'
+              '{\'state_name\': \'EXP_2_STATE_7\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
@@ -1478,9 +1531,7 @@ class ExpStateValidationJobTests(
               'than max value which is 5\', \'Number of choices which is 4 ' +
               'is lesser than the max value selection which is 5\', ' +
               '\'There should not be any empty choices\', ' +
-              '\'There should not be any duplicate choices\']}, ' +
-              '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_9\'}, {\'state_name\': \'EXP_2_STATE_10\'}]'),
+              '\'There should not be any duplicate choices\']}]'),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
                 date=str(self.YEAR_AGO_DATE)) +
@@ -1497,20 +1548,7 @@ class ExpStateValidationJobTests(
               'value\']}, {\'state_name\': \'EXP_2_STATE_6\', ' +
               '\'number_with_units_errors\': [\'The rule 0 of answer group 1 ' +
               'has rule type equal is coming after rule type equivalent ' +
-              'having same value\']}, {\'state_name\': \'EXP_2_STATE_7\'}, ' +
-              '{\'state_name\': \'EXP_2_STATE_8\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_9\', \'fraction_interaction_invalid_values\': ' +
-              '[\'The rule 0 of answer group 0 has denominator equals to ' +
-              'zero.\', \'The rule 0 of answer group 0 do not have value in ' +
-              'proper fraction\', \'The rule 0 of answer group 1 do not have ' +
-              'value in simple form\', \'The rule 0 of answer group 1 do not ' +
-              'have value in proper fraction\', \'The rule 0 of answer group ' +
-              '2 has non zero integer part having rule type ' +
-              'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has ' +
-              'non zero integer part.\', \'The rule 0 of answer group 4 has ' +
-              'denominator equals to zero having rule type ' +
-              'HasDenominatorEqualTo.\']}, {\'state_name\': ' +
-              '\'EXP_2_STATE_10\'}]'
+              'having same value\']}, {\'state_name\': \'EXP_2_STATE_7\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 2, created on {date}'.format(
@@ -1530,20 +1568,7 @@ class ExpStateValidationJobTests(
               '{\'state_name\': \'EXP_2_STATE_3\'}, {\'state_name\': ' +
               '\'EXP_2_STATE_4\'}, {\'state_name\': \'EXP_2_STATE_5\'}, ' +
               '{\'state_name\': \'EXP_2_STATE_6\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_7\'}, {\'state_name\': \'EXP_2_STATE_8\', ' +
-              '\'drag_drop_interaction_values\': [\'The rule 0 of answer ' +
-              'group 0 have multiple items at same place when multiple ' +
-              'items in same position settings is turned off.\', \'The ' +
-              'rule 0 of answer group 0 having rule type - ' +
-              'IsEqualToOrderingWithOneItemAtIncorrectPosition should ' +
-              'not be there when the multiple items in same position ' +
-              'setting is turned off.\', \'The rule 0 of answer group 1 ' +
-              'the value 1 and value 2 cannot be same when rule type is ' +
-              'HasElementXBeforeElementY\', \'Atleast 2 choices should be ' +
-              'there\', \'There should not be any empty choices\']}' +
-              ', {\'state_name\': \'EXP_2_STATE_9\'}, {\'state_name\': ' +
-              '\'EXP_2_STATE_10\', \'drag_drop_interaction_values\': ' +
-              '[\'There should not be any duplicate choices\']}]'
+              '\'EXP_2_STATE_7\'}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               'The id of exp is 3, created on {date}'.format(
@@ -1585,5 +1610,68 @@ class ExpStateValidationJobTests(
               'The id of exp is 3, created on {date}'.format(
                 date=str(self.YEAR_AGO_DATE)) +
               ', and the state erroneous data ' +
-              'are [{\'state_name\': \'EXP_3_STATE_1\'}]')
+              'are [{\'state_name\': \'EXP_3_STATE_1\'}]'),
+            job_run_result.JobRunResult.as_stderr(
+              'The id of exp is 5, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state RTE erroneous data are ' +
+              '[{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+              '\'EXP_5_STATE_2\'}, {\'state_name\': \'EXP_5_STATE_3\'}]'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+              'The id of exp is 5, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state erroneous data are ' +
+              '[{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+              '\'EXP_5_STATE_2\'}, {\'state_name\': \'EXP_5_STATE_3\'}]'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+              'The id of exp is 5, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state multiple choice and ' +
+              'item selection interactions ' +
+              'erroneous data are [' +
+              '{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+              '\'EXP_5_STATE_2\'}, {\'state_name\': \'EXP_5_STATE_3\'}]'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+              'The id of exp is 5, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state fraction, numeric and number ' +
+              'with units interaction ' +
+              'erroneous data are [' +
+              '{\'state_name\': \'EXP_5_STATE_1\'}, {\'state_name\': ' +
+              '\'EXP_5_STATE_2\', \'fraction_interaction_invalid_values\': ' +
+              '[\'The rule 0 of answer group 0 has denominator equals to ' +
+              'zero.\', \'The rule 0 of answer group 0 do not have value in ' +
+              'proper fraction\', \'The rule 0 of answer group 1 do not have ' +
+              'value in simple form\', \'The rule 0 of answer group 1 do not ' +
+              'have value in proper fraction\', \'The rule 0 of answer group ' +
+              '2 has non zero integer part having rule type ' +
+              'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has ' +
+              'non zero integer part.\', \'The rule 0 of answer group 4 has ' +
+              'denominator equals to zero having rule type ' +
+              'HasDenominatorEqualTo.\']}, {\'state_name\': ' +
+              '\'EXP_5_STATE_3\'}]'
+              ),
+            job_run_result.JobRunResult.as_stderr(
+              'The id of exp is 5, created on {date}'.format(
+                date=str(self.YEAR_AGO_DATE)) +
+              ', and the state continue, end and ' +
+              'drag and drop interactions ' +
+              'erroneous data are [{\'state_name\': \'EXP_5_STATE_1\', ' +
+              '\'drag_drop_interaction_values\': [\'The rule 0 of answer ' +
+              'group 0 have multiple items at same place when multiple ' +
+              'items in same position settings is turned off.\', \'The ' +
+              'rule 0 of answer group 0 having rule type - ' +
+              'IsEqualToOrderingWithOneItemAtIncorrectPosition should ' +
+              'not be there when the multiple items in same position ' +
+              'setting is turned off.\', \'The rule 0 of answer group 1 ' +
+              'the value 1 and value 2 cannot be same when rule type is ' +
+              'HasElementXBeforeElementY\', \'Atleast 2 choices should be ' +
+              'there\', \'There should not be any empty choices\']}' +
+              ', {\'state_name\': \'EXP_5_STATE_2\'}, {\'state_name\': ' +
+              '\'EXP_5_STATE_3\', \'drag_drop_interaction_values\': ' +
+              '[\'There should not be any duplicate choices\']}]'
+            )
         ])
