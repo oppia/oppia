@@ -188,7 +188,7 @@ describe('Training Data Service', () => {
     // First the answer group's outcome is listed, then the default.
     expect(trainingDataService.getAllPotentialOutcomes(
       new State(
-        'shivam', 'id', 'some', null,
+        'State', 'id', 'some', null,
         new Interaction([
           new AnswerGroup([
             new Rule('TextInput', null, null),
