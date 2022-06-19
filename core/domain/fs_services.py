@@ -23,7 +23,7 @@ from core import utils
 from core.domain import image_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
