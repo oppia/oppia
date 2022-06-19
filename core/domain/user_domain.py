@@ -1488,7 +1488,7 @@ class LearnerGroupUserDict(TypedDict):
 
     user_id: str
     invited_to_learner_groups_ids: List[str]
-    member_of_learner_groups_ids: List[str]
+    student_of_learner_groups_ids: List[str]
     progress_sharing_permissions_list: List[ProgressSharingPermissionDict]
 
 
@@ -1539,7 +1539,7 @@ class LearnerGroupUser:
         self,
         user_id: str,
         invited_to_learner_groups_ids: List[str],
-        member_of_learner_groups_ids: List[str],
+        student_of_learner_groups_ids: List[str],
         progress_sharing_permissions_list: List[ProgressSharingPermission]
     ) -> None:
         """Constructs a LearnerGroupUser domain object.
@@ -1548,15 +1548,15 @@ class LearnerGroupUser:
             user_id: str. The user id.
             invited_to_learner_groups_ids: list(str). List of learner group ids
                 that the user has been invited to.
-            member_of_learner_groups_ids: list(str). List of learner group ids
-                that the user is a member of.
+            student_of_learner_groups_ids: list(str). List of learner group ids
+                that the user is a student of.
             progress_sharing_permissions_list:
                 list(ProgressSharingPermission). List of Progress Sharing
                 Permissions of learner groups.
         """
         self.user_id = user_id
         self.invited_to_learner_groups_ids = invited_to_learner_groups_ids
-        self.member_of_learner_groups_ids = member_of_learner_groups_ids
+        self.student_of_learner_groups_ids = student_of_learner_groups_ids
         self.progress_sharing_permissions_list = (
             progress_sharing_permissions_list)
 
@@ -1579,8 +1579,8 @@ class LearnerGroupUser:
             'user_id': self.user_id,
             'invited_to_learner_groups_ids':
                 self.invited_to_learner_groups_ids,
-            'member_of_learner_groups_ids':
-                self.member_of_learner_groups_ids,
+            'student_of_learner_groups_ids':
+                self.student_of_learner_groups_ids,
             'progress_sharing_permissions_list':
                 progress_sharing_permissions_list_dict
         }
@@ -1595,19 +1595,19 @@ class LearnerGroupUser:
 
         invited_to_learner_groups_ids_set = set(
             self.invited_to_learner_groups_ids)
-        member_of_learner_groups_ids_set = set(
-            self.member_of_learner_groups_ids)
+        student_of_learner_groups_ids_set = set(
+            self.student_of_learner_groups_ids)
 
         if len(invited_to_learner_groups_ids_set.intersection(
-                member_of_learner_groups_ids_set)) > 0:
+                student_of_learner_groups_ids_set)) > 0:
             raise utils.ValidationError(
-                'Learner group user cannot be a member and be invited '
+                'Learner group user cannot be a student and be invited '
                 'at the same time in the same learner group.')
 
         for prog_sharing_permission in self.progress_sharing_permissions_list:
             if prog_sharing_permission.group_id not in (
-                    self.member_of_learner_groups_ids):
+                    self.student_of_learner_groups_ids):
                 raise utils.ValidationError(
                     'Learner cannot have progress sharing permissions of '
-                    'group %s since they are not it\'s member.' % (
+                    'group %s since they are not it\'s student.' % (
                         prog_sharing_permission.group_id))

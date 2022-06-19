@@ -3345,7 +3345,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
         user_models.LearnerGroupUserModel(
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['123', '432'],
-            member_of_learner_groups_ids=['754', '234'],
+            student_of_learner_groups_ids=['754', '234'],
             progress_sharing_permissions_list=[
                 {
                     'group_id': '754',
@@ -3359,7 +3359,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
         user_models.LearnerGroupUserModel(
             id=self.USER_ID_2,
             invited_to_learner_groups_ids=['129', '431'],
-            member_of_learner_groups_ids=['754', '234'],
+            student_of_learner_groups_ids=['754', '234'],
             progress_sharing_permissions_list=[
                 {
                     'group_id': '754',
@@ -3394,7 +3394,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
         user_models.LearnerGroupUserModel(
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['129', '431'],
-            member_of_learner_groups_ids=['754', '234'],
+            student_of_learner_groups_ids=['754', '234'],
             progress_sharing_permissions_list=[
                 {
                     'group_id': '754',
@@ -3410,7 +3410,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
             self.USER_ID_1)
         expected_data = {
             'invited_to_learner_groups_ids': ['129', '431'],
-            'member_of_learner_groups_ids': ['754', '234'],
+            'student_of_learner_groups_ids': ['754', '234'],
             'progress_sharing_permissions_list': [
                 {
                     'group_id': '754',
@@ -3437,7 +3437,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'invited_to_learner_groups_ids':
                     base_models.EXPORT_POLICY.EXPORTED,
-                'member_of_learner_groups_ids':
+                'student_of_learner_groups_ids':
                     base_models.EXPORT_POLICY.EXPORTED,
                 'progress_sharing_permissions_list':
                     base_models.EXPORT_POLICY.EXPORTED,

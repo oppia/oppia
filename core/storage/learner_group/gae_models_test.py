@@ -46,7 +46,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             title='title',
             description='description',
             facilitators_user_ids=['user_1', 'user_11'],
-            members_user_ids=['user_2', 'user_3', 'user_4'],
+            students_user_ids=['user_2', 'user_3', 'user_4'],
             invited_user_ids=['user_5', 'user_6'],
             subtopics_page_ids=['subtopic_1', 'subtopic_2'],
             story_ids=['story_1', 'story_2'])
@@ -74,7 +74,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'description': base_models.EXPORT_POLICY.EXPORTED,
             'facilitators_user_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'members_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'students_user_ids': base_models.EXPORT_POLICY.EXPORTED,
             'invited_user_ids': base_models.EXPORT_POLICY.EXPORTED,
             'subtopics_page_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
@@ -87,7 +87,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
     def test_get_field_names_for_takeout(self) -> None:
         expected_results = {
             'facilitators_user_ids': 'facilitator_user_id',
-            'members_user_ids': 'member_user_id',
+            'students_user_ids': 'student_user_id',
             'invited_user_ids': 'invited_user_id'
         }
         self.assertEqual(
@@ -139,8 +139,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_group_data_model_instance.description, 'description')
 
-    def test_export_data_on_members(self) -> None:
-        """Test export data on users that are members of the learner group."""
+    def test_export_data_on_students(self) -> None:
+        """Test export data on users that are students of the learner group."""
 
         member_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_2'))
@@ -149,7 +149,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
                 'title': 'title',
                 'description': 'description',
                 'facilitator_user_id': '',
-                'member_user_id': 'user_2',
+                'student_user_id': 'user_2',
                 'invited_user_id': '',
                 'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
@@ -168,7 +168,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
                 'title': 'title',
                 'description': 'description',
                 'facilitator_user_id': '',
-                'member_user_id': '',
+                'student_user_id': '',
                 'invited_user_id': 'user_6',
                 'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
@@ -187,7 +187,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
                 'title': 'title',
                 'description': 'description',
                 'facilitator_user_id': 'user_1',
-                'member_user_id': '',
+                'student_user_id': '',
                 'invited_user_id': '',
                 'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
@@ -210,8 +210,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             expected_uninvolved_user_data,
             uninvolved_user_data)
 
-    def test_apply_deletion_policy_on_members(self) -> None:
-        """Test apply_deletion_policy on users that are members of
+    def test_apply_deletion_policy_on_students(self) -> None:
+        """Test apply_deletion_policy on users that are students of
         the learner group.
         """
         self.assertTrue(

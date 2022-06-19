@@ -39,7 +39,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'title': 'title',
             'description': 'description',
             'facilitators_user_ids': ['user_1'],
-            'members_user_ids': ['user_2', 'user_3', 'user_4'],
+            'students_user_ids': ['user_2', 'user_3', 'user_4'],
             'invited_user_ids': ['user_5', 'user_6'],
             'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
@@ -50,7 +50,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
         self.assertEqual(learner_group.description, 'description')
         self.assertEqual(learner_group.facilitators_user_ids, ['user_1'])
         self.assertEqual(
-            learner_group.members_user_ids, ['user_2', 'user_3', 'user_4'])
+            learner_group.students_user_ids, ['user_2', 'user_3', 'user_4'])
         self.assertEqual(
             learner_group.invited_user_ids, ['user_5', 'user_6'])
         self.assertEqual(
@@ -76,7 +76,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'title': 'title',
             'description': 'description',
             'facilitators_user_ids': ['user_1'],
-            'members_user_ids': ['user_2', 'user_3', 'user_4'],
+            'students_user_ids': ['user_2', 'user_3', 'user_4'],
             'invited_user_ids': ['user_5', 'user_6'],
             'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
@@ -105,7 +105,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['user_5', 'user_6'],
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
-            'Learner group member cannot be invited to join the group.')
+            'Learner group student cannot be invited to join the group.')
 
         self._assert_validation_error( # type: ignore[no-untyped-call]
             learner_group_domain.LearnerGroup(
@@ -115,7 +115,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['user_5', 'user_6'],
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
-            'Learner group facilitator cannot be a member of the group.')
+            'Learner group facilitator cannot be a student of the group.')
 
         self._assert_validation_error( # type: ignore[no-untyped-call]
             learner_group_domain.LearnerGroup(

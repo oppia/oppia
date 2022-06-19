@@ -1554,7 +1554,7 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
         expected_learner_group_user_dict = {
             'user_id': 'user1',
             'invited_to_learner_groups_ids': ['123', '432'],
-            'member_of_learner_groups_ids': ['754'],
+            'student_of_learner_groups_ids': ['754'],
             'progress_sharing_permissions_list': [
                 {
                     'group_id': '754',
@@ -1568,7 +1568,7 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             learner_group_user.invited_to_learner_groups_ids,
             ['123', '432'])
         self.assertEqual(
-            learner_group_user.member_of_learner_groups_ids,
+            learner_group_user.student_of_learner_groups_ids,
             ['754'])
         self.assertEqual(
             learner_group_user.progress_sharing_permissions_list,
@@ -1590,7 +1590,7 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
         expected_learner_group_user_dict = {
             'user_id': 'user1',
             'invited_to_learner_groups_ids': ['123', '432'],
-            'member_of_learner_groups_ids': ['754'],
+            'student_of_learner_groups_ids': ['754'],
             'progress_sharing_permissions_list': [
                 {
                     'group_id': '754',
@@ -1612,7 +1612,7 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             user_domain.LearnerGroupUser(
                 'user1', ['123'], ['123'],
                 [progress_sharing_permission]),
-            'Learner group user cannot be a member and be invited at the '
+            'Learner group user cannot be a student and be invited at the '
             'same time in the same learner group.')
 
         self._assert_validation_error( # type: ignore[no-untyped-call]
@@ -1620,4 +1620,4 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
                 'user1', ['345'], ['367'],
                 [progress_sharing_permission]),
             'Learner cannot have progress sharing permissions of '
-            'group 123 since they are not it\'s member.')
+            'group 123 since they are not it\'s student.')

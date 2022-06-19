@@ -3022,8 +3022,8 @@ class LearnerGroupUserModel(base_models.BaseModel):
     # List of learner group ids which the user has been invited to join.
     invited_to_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    # List of learner group ids which the user is part joined.
-    member_of_learner_groups_ids = (
+    # List of learner group ids which the user has joined as a student.
+    student_of_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # List of ProgressSharingPermission dicts, which is defined in
     # user_domain.py, each dict corresponds to a learner group and
@@ -3079,8 +3079,8 @@ class LearnerGroupUserModel(base_models.BaseModel):
         return {
             'invited_to_learner_groups_ids': (
                 learner_group_user_model.invited_to_learner_groups_ids),
-            'member_of_learner_groups_ids': (
-                learner_group_user_model.member_of_learner_groups_ids),
+            'student_of_learner_groups_ids': (
+                learner_group_user_model.student_of_learner_groups_ids),
             'progress_sharing_permissions_list': (
                 learner_group_user_model.progress_sharing_permissions_list)
         }
@@ -3097,7 +3097,7 @@ class LearnerGroupUserModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'invited_to_learner_groups_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'member_of_learner_groups_ids':
+            'student_of_learner_groups_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
             'progress_sharing_permissions_list':
                 base_models.EXPORT_POLICY.EXPORTED
