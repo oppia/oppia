@@ -75,7 +75,7 @@ const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
     trigger('fadeInOut', [
       transition('void => *', []),
       transition('* <=> *', [
-        style({ opacity: 1 }),
+        style({ opacity: 0 }),
         animate('1s ease', keyframes([
           style({ opacity: 0 }),
           style({ opacity: 1 })
