@@ -39,7 +39,7 @@ var CollectionEditorPage = function() {
   // Shift a node left in the node graph.
   this.shiftNodeLeft = async function(number) {
     var editorShiftLeft = await $$('.protractor-test-editor-shift-left');
-    await action.click('Editor Shift Left', editorShiftLeft.get(number));
+    await action.click('Editor Shift Left', editorShiftLeft[number]);
   };
 
   this.setCommitMessage = async function(message) {
@@ -57,13 +57,13 @@ var CollectionEditorPage = function() {
   // Shift a node right in the node graph.
   this.shiftNodeRight = async function(number) {
     var editorShiftRight = await $$('.protractor-test-editor-shift-right');
-    await action.click('Editor Shift Right', editorShiftRight.get(number));
+    await action.click('Editor Shift Right', editorShiftRight[number]);
   };
 
   // Delete a node in the node graph.
   this.deleteNode = async function(number) {
     var editorDeleteNode = await $$('.protractor-test-editor-delete-node');
-    await action.click('Editor Delete Node', editorDeleteNode.get(number));
+    await action.click('Editor Delete Node', editorDeleteNode[number]);
   };
 
   // Save draft of the collection.
@@ -111,11 +111,10 @@ var CollectionEditorPage = function() {
 
   // Set collection category.
   this.setCategory = async function(category) {
-    var categoryFilterDropdown = await $(
+    var categoryFilterDropdown = $(
       '.protractor-test-collection-editor-category-dropdown');
     await action.click('Category filter', categoryFilterDropdown);
-    var dropdownOption = await $(
-      'mat-option').$(`.mat-option-text=${category}`);
+    var dropdownOption = await $(`.mat-option-text=${category}`);
     await action.click(
       'category option: ' + category, dropdownOption);
   };

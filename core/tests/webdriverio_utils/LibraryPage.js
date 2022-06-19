@@ -18,7 +18,6 @@
  */
 
 var action = require('./action.js');
-var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var LibraryPage = function() {
@@ -38,8 +37,8 @@ var LibraryPage = function() {
     // Function get is a zero-based index.
     var searchInputs = await $$('.protractor-test-search-input');
     var searchInput = (
-      browser.isMobile ? searchInputs.get(1) :
-      searchInputs.first());
+      browser.isMobile ? searchInputs[1] :
+      searchInputs[0]);
     await action.clear('Search input', searchInput);
     await action.keys('Search input', searchInput, searchQuery);
     var searchButton = await $('.protractor-test-search-button');
@@ -62,12 +61,13 @@ var LibraryPage = function() {
 
   this.playCollection = async function(collectionName) {
     await waitFor.pageToFullyLoad();
+    await browser.debug();
     var allCollectionSummaryTile = await $$(
       '.protractor-test-collection-summary-tile');
     await waitFor.visibilityOf(
-      allCollectionSummaryTile.first(),
+      allCollectionSummaryTile[0],
       'Library Page does not have any collections');
-    var collectionCard = await allCollectionsTitled(collectionName).first();
+    var collectionCard = await allCollectionsTitled(collectionName)[0];
     await waitFor.visibilityOf(
       collectionCard,
       'Unable to find collection ' + collectionName);

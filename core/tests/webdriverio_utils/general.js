@@ -95,7 +95,7 @@ var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
 var _getExplorationId = async function(currentUrlPrefix) {
   var url = await browser.getUrl();
-  await expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
+  expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
   var explorationId = url.slice(
     currentUrlPrefix.length,
     currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
@@ -160,7 +160,7 @@ var ensurePageHasNoTranslationIds = async function() {
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
 
-  let promiseValue = await oppiaBaseContainer.getHtml(false);
+  let promiseValue = await oppiaBaseContainer.getHTML(false);
 
   // First remove all the attributes translate and variables that are
   // not displayed.

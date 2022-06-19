@@ -24,7 +24,7 @@ var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
 
 var suites = {
   // The tests on Travis are run individually to parallelize
@@ -152,7 +152,7 @@ exports.config = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'warn',
+    logLevel: 'debug',
     //
     // Set specific log levels per logger
     // loggers:

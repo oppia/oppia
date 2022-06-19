@@ -34,31 +34,20 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setLanguage = async function(language) {
-    var neutralElement = await $(
-      '.protractor-test-settings-container');
-    await action.click('Neutral element', neutralElement);
-    await action.waitForAutosave();
-    var explorationLanguageInput = await $(
+    var explorationLanguageInput = $(
       '.protractor-test-exploration-language-select');
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    var languageButton = await explorationLanguageInput.$(`option=${language}`);
-    await action.click('Language button', languageButton);
-    await action.click('Neutral element', neutralElement);
+    await explorationLanguageInput.selectByVisibleText(language);
   };
 
   this.setObjective = async function(objective) {
-    var neutralElement = await $(
-      '.protractor-test-settings-container');
-    await action.click('Neutral element', neutralElement);
-    await action.waitForAutosave();
     var explorationObjectiveInput = await $(
       '.protractor-test-exploration-objective-input');
     await action.clear(
       'Exploration Objective input', explorationObjectiveInput);
     await action.keys(
       'Exploration Objective input', explorationObjectiveInput, objective);
-    await action.click('Neutral element', neutralElement);
   };
 
   this.setTitle = async function(title) {
@@ -69,9 +58,6 @@ var ExplorationEditorSettingsTab = function() {
     await action.clear('Exploration Title Input', explorationTitleInput);
     await action.keys(
       'Exploration Title Input', explorationTitleInput, title);
-    var neutralElement = await $(
-      '.protractor-test-settings-container');
-    await action.click('Neutral element', neutralElement);
   };
 };
 

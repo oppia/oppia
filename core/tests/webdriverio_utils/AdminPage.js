@@ -13,13 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the admin page, for use in Protractor
+ * @fileoverview Page object for the admin page, for use in WebdriverIO
  * tests.
  */
 
 var action = require('./action.js');
-var forms = require('./forms.js');
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {

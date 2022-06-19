@@ -148,6 +148,7 @@ RERUN_POLICIES = {
 }
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
+    'collections',
     'navigation'
 ]
 
@@ -157,7 +158,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'additionalEditorFeaturesModals',
     'additionalPlayerFeatures',
     'adminPage',
-    'collections',
     'blogDashboard',
     'classroomPage',
     'classroomPageFileUploadFeatures',

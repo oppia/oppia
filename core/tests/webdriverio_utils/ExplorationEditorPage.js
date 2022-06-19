@@ -34,21 +34,21 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     await action.waitForAutosave();
-    var saveChangesButton = await $('.protractor-test-save-changes');
+    var saveChangesButton = $('.protractor-test-save-changes');
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
-      var commitMessageInput = await $(
+      var commitMessageInput = $(
         '.protractor-test-commit-message-input');
       await action.keys(
         'Commit message input', commitMessageInput, commitMessage);
     }
-    var commitChangesButton = await $(
+    var commitChangesButton = $(
       '.protractor-test-save-draft-button');
     await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.sleep from e2e files.
     // eslint-disable-next-line wdio/no-pause
     await browser.pause(2500);
-    var saveDraftButtonTextContainer = await $(
+    var saveDraftButtonTextContainer = $(
       '.protractor-test-save-draft-message');
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
