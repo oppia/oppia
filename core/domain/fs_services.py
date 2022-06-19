@@ -22,6 +22,7 @@ from core import feconf
 from core import utils
 from core.domain import image_services
 from core.platform import models
+from proto_files import text_classifier_pb2
 
 from typing import Dict, List, Optional, Union
 
@@ -29,7 +30,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_identity_services
     from mypy_imports import storage_services
-    from proto_files import text_classifier_pb2
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
