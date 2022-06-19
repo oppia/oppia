@@ -100,6 +100,9 @@ export class ExplorationMetadata {
   }
 }
 
+// TODO(#15599): Refactor ExplorationMetadataObjectFactory to a model.ts once
+// ParamSpecsObjectFactory and ParamChangesObjectFactory are refactored
+// into model.ts files.
 @Injectable({
   providedIn: 'root'
 })
