@@ -35,7 +35,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
 
-        self.blog_post = blog_services.create_new_blog_post(self.user_id_a)  # type: ignore[no-untyped-call]
+        self.blog_post = blog_services.create_new_blog_post(self.user_id_a)
 
     def _assert_strict_validation_error(
         self, expected_error_substring: str
@@ -82,6 +82,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegex(# type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
+            # Ruling out the possibility of None for mypy type checking.
+            assert self.blog_post.thumbnail_filename is not None
             blog_domain.BlogPost.require_valid_thumbnail_filename(
                 self.blog_post.thumbnail_filename, strict=True)
 
@@ -253,10 +255,13 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Tag should not be empty.', ['abc', ''])
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_passes_validate(self) -> None:
         """Tests validation for blog post."""
         self.blog_post.validate(strict=False)
-        self.blog_post.content = 123
+        self.blog_post.content = 123  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected contents to be a string, received: 123')
 
@@ -271,9 +276,12 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.content = '<p>Hello</p>'
         self.blog_post.validate(strict=True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_thumbnail_passes_string_validation(self) -> None:
         self.blog_post.title = 'Sample Title'
-        self.blog_post.thumbnail_filename = 123
+        self.blog_post.thumbnail_filename = 123  # type: ignore[assignment]
         self.blog_post.tags = ['tag']
         self.blog_post.url_fragment = 'sample-title'
         self.blog_post.content = '<p>Hello</p>'
@@ -284,9 +292,12 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.thumbnail_filename = 'thumbnail.svg'
         self.blog_post.validate(strict=True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_thumbnail_filename_strict_validation_for_blog_post(self) -> None:
         self.blog_post.title = 'Sample Title'
-        self.blog_post.thumbnail_filename = 123
+        self.blog_post.thumbnail_filename = 123  # type: ignore[assignment]
         self.blog_post.tags = ['tag']
         self.blog_post.url_fragment = 'sample-url-fragment'
         self.blog_post.content = 'Sample content'
@@ -294,22 +305,28 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Expected thumbnail filename to be a string, received: 123'
         )
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_url_passes_strict_validation(self) -> None:
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 'sample-thumbnail.png'
         self.blog_post.tags = ['tag']
-        self.blog_post.url_fragment = 123
+        self.blog_post.url_fragment = 123  # type: ignore[assignment]
         self.blog_post.content = '<p>Hello</p>'
         self._assert_valid_url_fragment(
             'Blog Post URL Fragment field must be a string. '
             'Received 123.'
         )
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_valid_thumbnail_update(self) -> None:
         self.blog_post.title = 'Sample Title'
-        self.blog_post.thumbnail_filename = 123
+        self.blog_post.thumbnail_filename = 123  # type: ignore[assignment]
         self.blog_post.tags = ['tag']
-        self.blog_post.url_fragment = 123
+        self.blog_post.url_fragment = 123  # type: ignore[assignment]
         self.blog_post.content = '<p>Hello</p>'
         self._assert_valid_thumbnail_update(
             'Expected image filename to be a string, received 123'
@@ -326,10 +343,10 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
         self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
         self.user_id_b = self.get_user_id_from_email('b@example.com') # type: ignore[no-untyped-call]
 
-        blog_post = blog_services.create_new_blog_post(self.user_id_a) # type: ignore[no-untyped-call]
+        blog_post = blog_services.create_new_blog_post(self.user_id_a)
         self.blog_post_id = blog_post.id
         self.blog_post_rights = (
-            blog_services.get_blog_post_rights(self.blog_post_id)) # type: ignore[no-untyped-call]
+            blog_services.get_blog_post_rights(self.blog_post_id))
 
     def test_is_editor(self) -> None:
         self.assertTrue(self.blog_post_rights.is_editor(self.user_id_a))
@@ -351,10 +368,10 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         super(BlogPostSummaryUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        blog_post = blog_services.create_new_blog_post(self.user_id_a) # type: ignore[no-untyped-call]
+        blog_post = blog_services.create_new_blog_post(self.user_id_a)
         self.blog_post_id = blog_post.id
         self.blog_post_summary = (
-            blog_services.get_blog_post_summary_by_id(self.blog_post_id))  # type: ignore[no-untyped-call]
+            blog_services.get_blog_post_summary_by_id(self.blog_post_id))
 
     def _assert_valid_thumbnail_filename_for_blog_post(
         self,
@@ -373,6 +390,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         """Checks that blog post passes validation for thumbnail filename."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
+            # Ruling out the possibility of None for mypy type checking.
+            assert self.blog_post_summary.thumbnail_filename is not None
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
                 self.blog_post_summary.thumbnail_filename, strict=True)
 
@@ -500,11 +519,14 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_url_fragment_passes_strict_validation(self) -> None:
         self.blog_post_summary.title = 'Sample Title'
         self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.png'
         self.blog_post_summary.tags = ['tag']
-        self.blog_post_summary.url_fragment = 123
+        self.blog_post_summary.url_fragment = 123  # type: ignore[assignment]
         self.blog_post_summary.summary = 'Sample Summary'
         self._assert_strict_validation_error(
             'Expected url fragment to be a string, received: 123')
@@ -512,9 +534,12 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.url_fragment = 'sample-url-fragment'
         self.blog_post_summary.validate(strict=True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_thumbnail_passes_strict_validation(self) -> None:
         self.blog_post_summary.title = 'Sample Title'
-        self.blog_post_summary.thumbnail_filename = 123
+        self.blog_post_summary.thumbnail_filename = 123  # type: ignore[assignment]
         self.blog_post_summary.tags = ['tag']
         self.blog_post_summary.url_fragment = 'sample-url-fragment'
         self.blog_post_summary.summary = 'Sample Summary'
@@ -524,27 +549,39 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.png'
         self.blog_post_summary.validate(strict=True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_summary_passes_validate(self) -> None:
         """Tests validation for blog post summary."""
         self.blog_post_summary.validate(strict=False)
-        self.blog_post_summary.summary = 123
+        self.blog_post_summary.summary = 123  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected summary to be a string, received: 123')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_passes_valid_thumbnail_filename(self) -> None:
         """Tests validation for blog post thumbnail."""
-        self.blog_post_summary.thumbnail_filename = 123
+        self.blog_post_summary.thumbnail_filename = 123  # type: ignore[assignment]
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
             'Expected thumbnail filename to be a string, received: 123')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_passes_valid_url_fragment(self) -> None:
-        self.blog_post_summary.url_fragment = 123
+        self.blog_post_summary.url_fragment = 123  # type: ignore[assignment]
         self._assert_url_fragment_passes_valid_url_fragment(
             'Blog Post URL Fragment field must be a string. '
             'Received 123')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_passes_valid_title(self) -> None:
-        self.blog_post_summary.title = 123
+        self.blog_post_summary.title = 123  # type: ignore[assignment]
         self._assert_title_passes_valid_title(
             'Expected title to be a string, received: 123.')
 
@@ -583,8 +620,11 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_tags_for_blog_post(
             'Atleast one tag should be selected', [])
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_blog_post_tags_passes_validation(self) -> None:
-        self.blog_post_summary.tags = ['tag', 123]
+        self.blog_post_summary.tags = ['tag', 123]  # type: ignore[list-item]
         self._assert_valid_tag_elements(
             'Expected each tag in \'tags\' to be a string, received: '
             '\'123\'')
