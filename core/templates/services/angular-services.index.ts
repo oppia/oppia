@@ -412,6 +412,8 @@ import { ParameterMetadataService } from 'pages/exploration-editor-page/services
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
 import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { QuestionUpdateService } from 'domain/question/question-update.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -702,6 +704,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['QuestionSuggestionBackendApiService', QuestionSuggestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],
+  ['QuestionUndoRedoService', QuestionUndoRedoService],
+  ['QuestionUpdateService', QuestionUpdateService],
   ['RatingComputationService', RatingComputationService],
   ['RatioExpressionInputRulesService', RatioExpressionInputRulesService],
   ['RatioExpressionInputValidationService',
