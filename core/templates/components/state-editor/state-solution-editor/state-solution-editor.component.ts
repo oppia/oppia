@@ -118,8 +118,10 @@ export class StateSolutionEditorComponent implements OnInit {
     return this.stateEditorService.isCurrentSolutionValid();
   }
 
-  isEditableOutsideTutorialMode(): boolean {
-    return this.editabilityService.isEditableOutsideTutorialMode();
+  isEditable(): boolean {
+    return (
+      this.editabilityService.isEditable() &&
+      this.editabilityService.isEditableOutsideTutorialMode());
   }
 
   toggleInlineSolutionEditorIsActive(): void {
@@ -128,11 +130,13 @@ export class StateSolutionEditorComponent implements OnInit {
   }
 
   getSolutionSummary(): string {
-    let solution = this.stateSolutionService.savedMemento;
-    let solutionAsPlainText = (
-      solution.getSummary(this.stateInteractionIdService.savedMemento));
-    solutionAsPlainText = (
-      this.convertToPlainText.transform(solutionAsPlainText));
+    const solution = this.stateSolutionService.savedMemento;
+    const interactionId = this.stateInteractionIdService.savedMemento;
+    const solutionSummary = (
+      solution.getSummary(
+        interactionId, this.stateCustomizationArgsService.savedMemento));
+    const solutionAsPlainText = (
+      this.convertToPlainText.transform(solutionSummary));
     return solutionAsPlainText;
   }
 

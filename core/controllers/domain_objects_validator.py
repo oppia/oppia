@@ -28,6 +28,7 @@ from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import stats_domain
 
 from typing import Dict, Optional, Union
 
@@ -223,33 +224,8 @@ def validate_aggregated_stats(aggregated_stats):
     Raises:
         InvalidInputException. Property not in aggregated stats dict.
     """
-    exploration_stats_properties = [
-        'num_starts',
-        'num_actual_starts',
-        'num_completions'
-    ]
-    state_stats_properties = [
-        'total_answers_count',
-        'useful_feedback_count',
-        'total_hit_count',
-        'first_hit_count',
-        'num_times_solution_viewed',
-        'num_completions'
-    ]
-    for exp_stats_property in exploration_stats_properties:
-        if exp_stats_property not in aggregated_stats:
-            raise base.BaseHandler.InvalidInputException(
-                '%s not in aggregated stats dict.' % (exp_stats_property))
-    state_stats_mapping = aggregated_stats['state_stats_mapping']
-    for state_name in state_stats_mapping:
-        for state_stats_property in state_stats_properties:
-            if state_stats_property not in state_stats_mapping[state_name]:
-                raise base.BaseHandler.InvalidInputException(
-                    '%s not in state stats mapping of %s in aggregated '
-                    'stats dict.' % (state_stats_property, state_name))
-    # The aggregated_stats parameter do not represents any domain class, hence
-    # dict form of the data is returned from here.
-    return aggregated_stats
+    return stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+        aggregated_stats)
 
 
 def validate_suggestion_images(files):
@@ -267,22 +243,3 @@ def validate_suggestion_images(files):
     # The files argument do not represent any domain class, hence dict form
     # of the data is returned from here.
     return files
-
-
-def validate_params_dict(params):
-    """validates params data type
-
-    Args:
-        params: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the params argument in dict form.
-
-    Raises:
-        Exception. The given params is not of type dict as expected.
-    """
-    if not isinstance(params, dict):
-        raise Exception('Excepted dict, received %s' % params)
-    # The params argument do not represent any domain class, hence dict form of
-    # the data is returned from here.
-    return params

@@ -26,14 +26,14 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MaterialModule } from '../modules/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
-import { BaseModule } from '../base-components/base.module';
+import { BaseModule } from 'base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -41,7 +41,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
-import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
+import { BackgroundBannerModule } from './common-layout-directives/common-elements/background-banner.module';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
@@ -62,6 +62,7 @@ import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { OutcomeEditorComponent } from './state-directives/outcome-editor/outcome-editor.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
@@ -86,8 +87,7 @@ import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/mod
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
-import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
-import { OppiaAngularRootComponent } from './oppia-angular-root.component';
+import { SearchBarModule } from 'pages/library-page/search-bar/search-bar.module';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import { MultiSelectionFieldComponent } from './filter-fields/multi-selection-field/multi-selection-field.component';
@@ -127,12 +127,8 @@ import { StateSolutionEditorComponent } from './state-editor/state-solution-edit
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 
 // Pipes.
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/truncate-and-capitalize.pipe';
+import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
-import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 
 // Services.
@@ -140,9 +136,12 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
+import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 
 @NgModule({
   imports: [
+    BackgroundBannerModule,
     BaseModule,
     CommonModule,
     DragDropModule,
@@ -160,7 +159,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
+    SearchBarModule,
     SharedFormsModule,
+    StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
   ],
@@ -177,7 +178,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     AudioBarComponent,
     AudioFileUploaderComponent,
     AttributionGuideComponent,
-    BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
@@ -204,7 +204,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
-    FilterForMatchingSubstringPipe,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
@@ -213,8 +212,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     LazyLoadingComponent,
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
-    OppiaAngularRootComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -227,7 +226,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RubricsEditorComponent,
     ScoreRingComponent,
     SelectSkillModalComponent,
-    SearchBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -240,17 +238,13 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TakeBreakModalComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
-    WrapTextWithEllipsisPipe,
     SupplementalCardComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TruncateAndCapitalizePipe,
     TutorCardComponent,
     SummarizeNonnegativeNumberPipe,
-    TruncatePipe,
     UploadActivityModalComponent,
-    SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
@@ -270,13 +264,14 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
-    StateInteractionEditorComponent
+    StateInteractionEditorComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent
   ],
 
   entryComponents: [
     AudioBarComponent,
     AudioFileUploaderComponent,
-    BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
@@ -305,7 +300,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent,
     OnScreenKeyboardComponent,
-    OppiaAngularRootComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
@@ -319,6 +313,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -334,7 +329,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     StateContentEditorComponent,
     StateHintsEditorComponent,
     ScoreRingComponent,
-    SearchBarComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
@@ -365,14 +359,18 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
-    StateInteractionEditorComponent
+    StateInteractionEditorComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent
   ],
 
   exports: [
     // Modules.
+    BackgroundBannerModule,
     BaseModule,
     CommonElementsModule,
     CodeMirrorModule,
+    DragDropModule,
     DynamicContentModule,
     FormsModule,
     MaterialModule,
@@ -380,13 +378,13 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
+    SearchBarModule,
     SharedFormsModule,
-    DragDropModule,
+    StringUtilityPipesModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
@@ -418,20 +416,17 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     HintEditorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
-    FilterForMatchingSubstringPipe,
     ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
-    FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
-    OppiaAngularRootComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
-    SearchBarComponent,
     StateContentEditorComponent,
     StateHintsEditorComponent,
     QuestionDifficultySelectorComponent,
@@ -453,11 +448,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TutorCardComponent,
     UploadActivityModalComponent,
-    WrapTextWithEllipsisPipe,
-    TruncateAndCapitalizePipe,
-    TruncatePipe,
     SummarizeNonnegativeNumberPipe,
-    SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
     AddOrUpdateSolutionModalComponent,

@@ -19,7 +19,8 @@
          *ngIf="!interactionId">
       <button type="button"
               class="btn btn-secondary oppia-add-interaction-button protractor-test-open-add-interaction-modal"
-              (click)="openInteractionCustomizerModal()">
+              (click)="openInteractionCustomizerModal()"
+              *ngIf="editabilityService.isEditable()">
         + ADD INTERACTION
       </button>
     </div>
@@ -104,6 +105,10 @@
   .oppia-interaction-preview-container {
     padding: 5px;
     pointer-events: none;
+  }
+
+  .oppia-editor-card-section {
+    min-height: 80px;
   }
 
   @media screen and (max-width: 768px) {

@@ -19,10 +19,11 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 
 require('base-components/base-content.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.component.ts');
@@ -91,6 +92,7 @@ angular.module('oppia').component('contributionsAndReview', {
       var SUGGESTION_TYPE_TRANSLATE = 'translate_content';
       ctrl.TAB_TYPE_CONTRIBUTIONS = 'contributions';
       ctrl.TAB_TYPE_REVIEWS = 'reviews';
+      ctrl.activeExplorationId = null;
 
       var tabNameToOpportunityFetchFunction = {
         [SUGGESTION_TYPE_QUESTION]: {
@@ -118,7 +120,7 @@ angular.module('oppia').component('contributionsAndReview', {
             return ContributionAndReviewService
               .getReviewableTranslationSuggestionsAsync(
                 shouldResetOffset,
-                TranslationTopicService.getActiveTopicName());
+                ctrl.activeExplorationId);
           }
         }
       };
@@ -197,7 +199,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var _showQuestionSuggestionModal = function(
           suggestion, contributionDetails, reviewable,
-          misconceptionsBySkill) {
+          misconceptionsBySkill, question) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'question-suggestion-review.directive.html');
@@ -205,7 +207,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var suggestionId = suggestion.suggestion_id;
         var authorName = suggestion.author_name;
         var questionHeader = contributionDetails.skill_description;
-        var question = QuestionObjectFactory.createFromBackendDict(
+        var question = question || QuestionObjectFactory.createFromBackendDict(
           suggestion.change.question_dict);
         var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
@@ -245,7 +247,8 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             suggestionId: function() {
               return suggestionId;
-            }
+            },
+            editSuggestionCallback: () => openQuestionSuggestionModal
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
@@ -298,23 +301,34 @@ angular.module('oppia').component('contributionsAndReview', {
           ctrl.activeSuggestionType === suggestionType);
       };
 
+      ctrl.isReviewTranslationsTab = function() {
+        return (
+          ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS &&
+          ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE);
+      };
+
+      const openQuestionSuggestionModal = function(
+          suggestionId, suggestion, reviewable, question = undefined) {
+        var contributionDetails = ctrl.contributions[suggestionId].details;
+        var skillId = suggestion.change.skill_id;
+        ContextService.setCustomEntityContext(
+          IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
+        SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+          var misconceptionsBySkill = {};
+          var skill = skillDict.skill;
+          misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+          _showQuestionSuggestionModal(
+            suggestion, contributionDetails, reviewable,
+            misconceptionsBySkill, question);
+          $rootScope.$apply();
+        });
+      };
+
       ctrl.onClickViewSuggestion = function(suggestionId) {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
         if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
-          var contributionDetails = ctrl.contributions[suggestionId].details;
-          var skillId = suggestion.change.skill_id;
-          ContextService.setCustomEntityContext(
-            IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
-          SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
-            var misconceptionsBySkill = {};
-            var skill = skillDict.skill;
-            misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-            _showQuestionSuggestionModal(
-              suggestion, contributionDetails, reviewable,
-              misconceptionsBySkill);
-            $rootScope.$apply();
-          });
+          openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
           const suggestionIdToContribution = {};
@@ -358,11 +372,42 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.activeDropdownTabChoice = ctrl.getActiveDropdownTabChoice();
         ctrl.dropdownShown = false;
         ctrl.contributions = {};
+        ctrl.activeExplorationId = null;
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
       ctrl.toggleDropdown = function() {
         ctrl.dropdownShown = !ctrl.dropdownShown;
+      };
+
+      ctrl.loadReviewableTranslationOpportunities = function() {
+        return ContributionOpportunitiesService
+          .getReviewableTranslationOpportunitiesAsync(
+            TranslationTopicService.getActiveTopicName())
+          .then(function(response) {
+            const opportunitiesDicts = [];
+            response.opportunities.forEach(opportunity => {
+              const opportunityDict = {
+                id: opportunity.getExplorationId(),
+                heading: opportunity.getOpportunityHeading(),
+                subheading: opportunity.getOpportunitySubheading(),
+                actionButtonTitle: 'Translations'
+              };
+              opportunitiesDicts.push(opportunityDict);
+            });
+            return {
+              opportunitiesDicts: opportunitiesDicts,
+              more: response.more
+            };
+          });
+      };
+
+      ctrl.onClickReviewableTranslations = function(explorationId) {
+        ctrl.activeExplorationId = explorationId;
+      };
+
+      ctrl.onClickBackToReviewableLessons = function() {
+        ctrl.activeExplorationId = null;
       };
 
       ctrl.loadOpportunities = function() {
@@ -432,8 +477,14 @@ angular.module('oppia').component('contributionsAndReview', {
             enabled: true
           }
         ];
+        ctrl.directiveSubscriptions = new Subscription();
         TranslationTopicService.setActiveTopicName(
           DEFAULT_OPPORTUNITY_TOPIC_NAME);
+
+        // Reset active exploration when changing topics.
+        ctrl.directiveSubscriptions.add(
+          TranslationTopicService.onActiveTopicChanged.subscribe(
+            () => ctrl.activeExplorationId = null));
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
@@ -496,6 +547,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
         $(document).off('click', ctrl.closeDropdownWhenClickedOutside);
       };
     }

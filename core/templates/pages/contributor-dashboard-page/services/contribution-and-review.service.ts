@@ -67,8 +67,11 @@ interface FetchSuggestionsResponse {
   providedIn: 'root',
 })
 export class ContributionAndReviewService {
-  private activeTabType: string = null;
-  private activeSuggestionType: string = null;
+  // This property is initialized using async methods
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private activeTabType!: string;
+  private activeSuggestionType!: string;
 
   constructor(
     private contributionAndReviewBackendApiService:
@@ -114,7 +117,9 @@ export class ContributionAndReviewService {
    * @returns {Promise<FetchSuggestionsResponse>}
    */
   private async fetchSuggestionsAsync(
-      fetcher: SuggestionFetcher, shouldResetOffset: boolean, topicName: string
+      fetcher: SuggestionFetcher,
+      shouldResetOffset: boolean,
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -130,7 +135,8 @@ export class ContributionAndReviewService {
         // The first page of results is returned to the caller and the second
         // page is cached.
         (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
-        fetcher.offset, topicName
+        fetcher.offset,
+        explorationId
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
@@ -162,50 +168,49 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
-  Promise<FetchSuggestionsResponse> {
+      shouldResetOffset: boolean = true
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.userCreatedQuestionFetcher, shouldResetOffset, topicName);
+      this.userCreatedQuestionFetcher,
+      shouldResetOffset);
   }
 
   async getReviewableQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
-  Promise<FetchSuggestionsResponse> {
+      shouldResetOffset: boolean = true
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.reviewableQuestionFetcher, shouldResetOffset, topicName);
+      this.reviewableQuestionFetcher,
+      shouldResetOffset);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
-      shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
-  Promise<FetchSuggestionsResponse> {
+      shouldResetOffset: boolean = true
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.userCreatedTranslationFetcher, shouldResetOffset, topicName);
+      this.userCreatedTranslationFetcher,
+      shouldResetOffset);
   }
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      topicName: string = 'All'):
-  Promise<FetchSuggestionsResponse> {
+      explorationId: string
+  ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
-      this.reviewableTranslationFetcher, shouldResetOffset, topicName);
+      this.reviewableTranslationFetcher,
+      shouldResetOffset,
+      explorationId);
   }
 
   reviewExplorationSuggestion(
       targetId: string, suggestionId: string, action: string,
-      reviewMessage: string, commitMessage: string,
+      reviewMessage: string, commitMessage: string | null,
       onSuccess: (suggestionId: string) => void,
-      onFailure: (error) => void
+      onFailure: (error: Error) => void
   ): Promise<void> {
     const requestBody = {
       action: action,
       review_message: reviewMessage,
-      commit_message: (
-        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-        commitMessage : null
-      )
+      commit_message: commitMessage
     };
 
     return this.contributionAndReviewBackendApiService
@@ -243,7 +248,7 @@ export class ContributionAndReviewService {
   async updateTranslationSuggestionAsync(
       suggestionId: string, translationHtml: string,
       onSuccess: () => void,
-      onFailure: (error) => void
+      onFailure: (error: Error) => void
   ): Promise<void> {
     const requestBody = {
       translation_html: translationHtml

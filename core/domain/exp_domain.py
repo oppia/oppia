@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import collections
 import copy
+import datetime
 import json
 import re
 import string
@@ -37,6 +38,8 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
+
+from typing import Dict, List
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -135,6 +138,13 @@ TYPE_INVALID_EXPRESSION = 'Invalid'
 TYPE_VALID_ALGEBRAIC_EXPRESSION = 'AlgebraicExpressionInput'
 TYPE_VALID_NUMERIC_EXPRESSION = 'NumericExpressionInput'
 TYPE_VALID_MATH_EQUATION = 'MathEquationInput'
+MATH_INTERACTION_TYPES = [
+    TYPE_VALID_ALGEBRAIC_EXPRESSION,
+    TYPE_VALID_NUMERIC_EXPRESSION,
+    TYPE_VALID_MATH_EQUATION
+]
+MATH_INTERACTION_DEPRECATED_RULES = [
+    'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
 
 def clean_math_expression(math_expression):
@@ -274,7 +284,8 @@ class ExplorationChange(change_domain.BaseChange):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
+        'edits_allowed')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -559,7 +570,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             language_code, tags, blurb, author_notes,
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
-            auto_tts_enabled, correctness_feedback_enabled,
+            auto_tts_enabled, correctness_feedback_enabled, edits_allowed,
             created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
@@ -588,6 +599,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
+            edits_allowed: bool. True when edits to the exploration is allowed.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
@@ -621,6 +633,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.edits_allowed = edits_allowed
 
     def get_translatable_contents_collection(
         self
@@ -681,7 +694,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED)
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, True)
 
     @classmethod
     def from_dict(
@@ -720,6 +733,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
+        exploration.edits_allowed = exploration_dict['edits_allowed']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -949,6 +963,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
+
+        if not isinstance(self.edits_allowed, bool):
+            raise utils.ValidationError(
+                'Expected edits_allowed to be a bool, received '
+                '%s' % self.edits_allowed)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -1921,7 +1940,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_domain.InteractionInstance
                     .convert_customization_args_dict_to_customization_args(
                         state_dict['interaction']['id'],
-                        state_dict['interaction']['customization_args']))
+                        state_dict['interaction']['customization_args'],
+                        state_schema_version=45))
                 for ca_name in customisation_args:
                     list_of_subtitled_unicode_content_ids.extend(
                         state_domain.InteractionCustomizationArg
@@ -1969,7 +1989,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict,
                     html_validation_service
-                    .convert_svg_diagram_tags_to_image_tags)
+                    .convert_svg_diagram_tags_to_image_tags, 46)
         return states_dict
 
     @classmethod
@@ -2025,6 +2045,50 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
+        """Converts from version 49 to 50. Version 50 removes rules from
+        explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] in MATH_INTERACTION_TYPES:
+                filtered_answer_groups = []
+                for answer_group_dict in state_dict[
+                        'interaction']['answer_groups']:
+                    filtered_rule_specs = []
+                    for rule_spec_dict in answer_group_dict['rule_specs']:
+                        rule_type = rule_spec_dict['rule_type']
+                        if rule_type not in MATH_INTERACTION_DEPRECATED_RULES:
+                            filtered_rule_specs.append(
+                                copy.deepcopy(rule_spec_dict))
+                    answer_group_dict['rule_specs'] = filtered_rule_specs
+                    if len(filtered_rule_specs) > 0:
+                        filtered_answer_groups.append(
+                            copy.deepcopy(answer_group_dict))
+                state_dict[
+                    'interaction']['answer_groups'] = filtered_answer_groups
+
+                # Renaming cust arg.
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args['allowedVariables'] = []
+                if 'customOskLetters' in customization_args:
+                    customization_args['allowedVariables'] = copy.deepcopy(
+                        customization_args['customOskLetters'])
+                    del customization_args['customOskLetters']
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -2061,7 +2125,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 54
+    CURRENT_EXP_SCHEMA_VERSION = 55
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2245,6 +2309,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
+        """Converts a v54 exploration dict into a v55 exploration dict.
+        Removes rules from explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v54.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
+        """
+        exploration_dict['schema_version'] = 55
+
+        exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 50
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2320,6 +2407,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 exploration_dict)
             exploration_schema_version = 54
 
+        if exploration_schema_version == 54:
+            exploration_dict = cls._convert_v54_dict_to_v55_dict(
+                exploration_dict)
+            exploration_schema_version = 55
+
         return exploration_dict
 
     @classmethod
@@ -2380,6 +2472,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
@@ -2497,13 +2590,29 @@ class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
     def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids, voice_artist_ids,
-            viewer_ids, contributor_ids, contributors_summary, version,
-            exploration_model_created_on,
-            exploration_model_last_updated,
-            first_published_msec, deleted=False):
+        self,
+        exploration_id: str,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        ratings: Dict[str, int],
+        scaled_average_rating: float,
+        status: str,
+        community_owned: bool,
+        owner_ids: List[str],
+        editor_ids: List[str],
+        voice_artist_ids: List[str],
+        viewer_ids: List[str],
+        contributor_ids: List[str],
+        contributors_summary: Dict[str, int],
+        version: int,
+        exploration_model_created_on: datetime.datetime,
+        exploration_model_last_updated: datetime.datetime,
+        first_published_msec: int,
+        deleted: bool = False
+    ) -> None:
         """Initializes a ExplorationSummary domain object.
 
         Args:

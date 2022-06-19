@@ -79,6 +79,29 @@
 </mat-card>
 
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Rollback exploration to latest known safe state:</h3>
+  <em>
+    Here, a "safe state" refers to the latest version of the exploration for
+    which both snapshot content and snapshot metadata models also exist.
+  </em>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="rollbackExploration()">
+      <div class="form-group row">
+        <label>Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expIdToRollback"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Rollback Exploration">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Send a Test Mail to Admin</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="sendDummyMailToAdmin()">

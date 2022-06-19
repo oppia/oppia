@@ -189,6 +189,7 @@ describe('Exploration editor page component', function() {
     param_changes: [],
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
+    edits_allowed: true,
     state_classifier_mapping: [],
     user: {},
     version: '1',
@@ -701,6 +702,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
+      expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
       mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
@@ -709,6 +711,7 @@ describe('Exploration editor page component', function() {
       flushMicrotasks();
       $scope.$apply();
 
+      expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
       expect(successCallback).toHaveBeenCalled();
     }));
 

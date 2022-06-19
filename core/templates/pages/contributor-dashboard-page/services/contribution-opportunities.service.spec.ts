@@ -160,6 +160,36 @@ describe('Contribution Opportunities Service', () => {
     expect(successHandler).toHaveBeenCalledWith(skillOpportunitiesDict);
   }));
 
+  it('should throw error if no more skill opportunity is available ' +
+    'when calling \'getMoreSkillOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    let getSkillOpportunitiesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchSkillOpportunitiesAsync')
+      .and.returnValue(Promise.resolve(
+        {
+          opportunities: sampleSkillOpportunitiesResponse,
+          nextCursor: skillOpportunityResponse.next_cursor,
+          more: false
+        }
+      ));
+
+    contributionOpportunitiesService.getMoreSkillOpportunitiesAsync().then(
+      successHandler, failHandler);
+    tick();
+
+    expect(getSkillOpportunitiesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
+
+    contributionOpportunitiesService.getMoreSkillOpportunitiesAsync().then(
+      successHandler, failHandler);
+    tick();
+
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
   it('should return translation opportunities when calling ' +
     '\'getTranslationOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
@@ -220,23 +250,82 @@ describe('Contribution Opportunities Service', () => {
     expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
   }));
 
-  it('should return all topic names when calling \'getAllTopicNamesAsync\'',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should return reviewable translation opportunities when calling ' +
+    '\'getReviewableTranslationOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const translationOpportunitiesDict: ExplorationOpportunitiesDict = {
+      opportunities: sampleTranslationOpportunitiesResponse,
+      more: false
+    };
+    const getReviewableTranslationOpportunitiesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchReviewableTranslationOpportunitiesAsync')
+      .and.returnValue(Promise.resolve(
+        {
+          opportunities: sampleTranslationOpportunitiesResponse,
+          more: false
+        }
+      ));
 
-      let topicNamesDict = ['Topic 1', 'Topic 2'];
+    contributionOpportunitiesService
+      .getReviewableTranslationOpportunitiesAsync('Topic')
+      .then(successHandler, failHandler);
+    tick();
 
-      let getAllTopicNamesSpy = spyOn(
-        contributionOpportunitiesBackendApiService,
-        'fetchAllTopicNamesAsync')
-        .and.returnValue(Promise.resolve(topicNamesDict));
+    expect(getReviewableTranslationOpportunitiesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
+  }));
 
-      contributionOpportunitiesService.getAllTopicNamesAsync()
-        .then(successHandler, failHandler);
-      tick();
+  it('should throw error if no more translation opportunities is available ' +
+    'when calling \'getMoreTranslationOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      expect(getAllTopicNamesSpy).toHaveBeenCalled();
-      expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
-    }));
+    let getTranslationOpportunitiesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchTranslationOpportunitiesAsync')
+      .and.returnValue(Promise.resolve(
+        {
+          opportunities: sampleTranslationOpportunitiesResponse,
+          nextCursor: '6',
+          more: false
+        }
+      ));
+
+    contributionOpportunitiesService
+      .getMoreTranslationOpportunitiesAsync('en', 'Topic')
+      .then(successHandler, failHandler);
+    tick();
+
+    expect(getTranslationOpportunitiesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
+
+    contributionOpportunitiesService
+      .getMoreTranslationOpportunitiesAsync('en', 'Topic')
+      .then(successHandler, failHandler);
+    tick();
+
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should return topic names when calling ' +
+    '\'getTranslatableTopicNamesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    let topicNamesDict = ['Topic 1', 'Topic 2'];
+
+    let getTranslatableTopicNamesSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchTranslatableTopicNamesAsync')
+      .and.returnValue(Promise.resolve(topicNamesDict));
+
+    contributionOpportunitiesService.getTranslatableTopicNamesAsync()
+      .then(successHandler, failHandler);
+    tick();
+
+    expect(getTranslatableTopicNamesSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
+  }));
 });

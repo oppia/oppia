@@ -48,6 +48,8 @@ var TopicsAndSkillsDashboardPage = function() {
     '.protractor-test-new-topic-url-fragment-field'));
   var topicDescriptionField = element(by.css(
     '.protractor-test-new-topic-description-field'));
+  var topicPageTitleFragmentField = element(by.css(
+    '.protractor-test-new-page-title-fragm-field'));
   var topicFilterKeywordField = element(by.css(
     '.protractor-test-select-keyword-dropdown'));
   var topicFilterClassroomField = element(by.css(
@@ -112,6 +114,8 @@ var TopicsAndSkillsDashboardPage = function() {
   var retLocator = by.css('.protractor-test-rte');
   var skillDescriptionField = element(
     by.css('.protractor-test-skill-description-field'));
+  var openSkillEditorButtons = element.all(
+    by.css('.protractor-test-open-skill-editor'));
 
   this.get = async function() {
     await waitFor.clientSideRedirection(async() => {
@@ -176,6 +180,20 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.navigateToSkillWithDescription = async function(description) {
+    await this.navigateToSkillsTab();
+    await this.waitForSkillsToLoad();
+    for (var i = 0; i < await openSkillEditorButtons.count(); i++) {
+      var button = openSkillEditorButtons.get(i);
+      var buttonText = await action.getText('Skill editor button', button);
+      if (buttonText.includes(description)) {
+        await action.click('Skill editor', button);
+        await waitFor.pageToFullyLoad();
+        return;
+      }
+    }
+  };
+
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
@@ -209,6 +227,9 @@ var TopicsAndSkillsDashboardPage = function() {
       'Topic URL fragment field', topicUrlFragmentField, topicUrlFragment);
     await action.sendKeys(
       'Topic description field', topicDescriptionField, description);
+    await action.sendKeys(
+      'Topic page title fragment field',
+      topicPageTitleFragmentField, description);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer,
       ('../data/test_svg.svg'), false);

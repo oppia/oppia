@@ -355,7 +355,7 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
     def test_message(self) -> None:
         error = base_validation_errors.ModelRelationshipError(
-            model_property.ModelProperty(FooModel, FooModel.bar_id),  # type: ignore[no-untyped-call]
+            model_property.ModelProperty(FooModel, FooModel.bar_id),
             '123',
             'BarModel',
             '123'

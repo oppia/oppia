@@ -532,6 +532,32 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, expected_data)
 
+    def test_export_when_commit_message_contains_user_id(self) -> None:
+        version_model = TestVersionedModel(id='version_model')
+        model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-1', 'committer_id', 'create',
+            'Test uid_abcdefghijabcdefghijabcdefghijab', None)
+        model1.update_timestamps()
+        model1.put()
+        model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
+            [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
+        model2.update_timestamps()
+        model2.put()
+        user_data = (
+            version_model.SNAPSHOT_METADATA_CLASS.export_data('committer_id'))
+        expected_data = {
+            'model_id-1': {
+                'commit_type': 'create',
+                'commit_message': 'Test <user ID>',
+            },
+            'model_id-2': {
+                'commit_type': 'create',
+                'commit_message': 'Hi this is a commit.',
+            }
+        }
+        self.assertEqual(user_data, expected_data)
+
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 
@@ -766,13 +792,11 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         version_model = TestVersionedModel.get_version('model_id1', 2)
-        # Ruling out the possibility of None for mypy type checking.
-        assert version_model is not None
         self.assertEqual(version_model.version, 2)
 
-        version_model = (
+        test_version_model = (
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
-        self.assertIsNone(version_model)
+        self.assertIsNone(test_version_model)
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             base_models.BaseModel.EntityNotFoundError,
@@ -780,9 +804,9 @@ class VersionedModelTests(test_utils.GenericTestBase):
             'not found'):
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
 
-        version_model = (
+        test_version_model = (
             TestVersionedModel.get_version('model_id1', 4, strict=False))
-        self.assertIsNone(version_model)
+        self.assertIsNone(test_version_model)
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             base_models.BaseModel.EntityNotFoundError,
