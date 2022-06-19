@@ -477,6 +477,7 @@
 /core/templates/pages/topics-and-skills-dashboard-page/ @aks681 @kevintab95
 
 # Learner group project.
+/core/controllers/learner_group*.py @aks681 @paprajapati9
 /core/domain/learner_group*.py @aks681 @paprajapati9
 
 # Beam jobs

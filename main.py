@@ -917,7 +917,7 @@ URLS = [
 
     get_redirect_route(
         r'/create_learner_group_handler/',
-        learner_group.LearnerGroupHandler),
+        learner_group.CreateLearnerGroupHandler),
     get_redirect_route(
         r'/update_learner_group_handler/',
         learner_group.LearnerGroupHandler),
