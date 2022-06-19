@@ -58,8 +58,8 @@ angular.module('oppia').component('translatorOverview', {
         .getAllVoiceoverLanguageCodes();
 
       $scope.canShowTabModeSwitcher = function() {
-        return ($scope.languageCode !== (
-          ExplorationLanguageCodeService.displayed));
+        return ContextService.isExplorationLinkedToStory() && (
+          $scope.languageCode !== ExplorationLanguageCodeService.displayed);
       };
 
       var refreshDirectiveScope = function() {

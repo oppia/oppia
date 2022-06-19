@@ -16,6 +16,7 @@
  * @fileoverview Service to send changes to a entity-translation to the backend.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient, HttpSentEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { EntityTranslation, EntityTranslationBackendDict } from 'domain/translation/EntityTranslationObjectFactory';
@@ -38,7 +39,7 @@ export class EntityTranslationBackendApiService {
       AppConstants.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE, {
         'entity_id': entityId,
         'entity_type': entityType,
-        'entity_version': entityVersion,
+        'entity_version': String(entityVersion),
         'language_code': languageCode
       }
     );
@@ -51,18 +52,15 @@ export class EntityTranslationBackendApiService {
           this._getUrl(
             entityId, entityType, entityVersion, languageCode
           )).toPromise().then(response => {
-          resolve({
-            entityId: response.entity_id,
-            entityType: response.entity_type,
-            entityVersion: response.entity_version,
-            languageCode: response.language_code,
-            translationMapping: response.translations
-            // this mapping is wrong because this should convert backend dict to frontend .
-          });
+          resolve(EntityTranslation.createFromBackendDict(response))
         }, errorResponse => {
           reject(errorResponse.error.error);
         });
       });
     }
-
 }
+
+
+angular.module('oppia').factory(
+  'EntityTranslationBackendApiService',
+  downgradeInjectable(EntityTranslationBackendApiService));

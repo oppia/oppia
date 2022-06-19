@@ -29,12 +29,14 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_cleaner
+from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import translation_domain
+from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 
@@ -644,48 +646,35 @@ class SuggestionTranslateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
+
+        translated_content = translation_domain.TranslatedContent(
+            self.change.translation_html,
+            self.change.data_format,
+            needs_update=False
+        )
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.target_id,
+            self.target_version_at_submission,
+            self.language_code,
+            self.change.content_id,
+            translated_content)
+
+        (
+            opportunity_services.
+            update_translation_opportunity_with_accepted_suggestion(
+                self.target_id, self.language_code)
+        )
+
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
-        if (
-                hasattr(self.change, 'data_format') and (
-                    translation_domain.TranslatableContentFormat
-                    .is_data_format_list(self.change.data_format)
-                )
-        ):
-            translated_content_dict = translation_domain.TranslatedContent(
-                    self.change.translation_html,
-                    needs_update=False
-                ).to_dict()
-            translations = {self.change.content_id: translated_content_dict}
-
-            entity_translation_model = (
-                translation_models.EntityTranslationsModel.get_model(
-                    self.target_type,
-                    self.target_id,
-                    self.target_version_at_submission,
-                    self.language_code
-                )
-            )
-            if entity_translation_model is None:
-                model = translation_models.EntityTranslationsModel.create_new(
-                    self.target_type,
-                    self.target_id,
-                    self.target_version_at_submission,
-                    self.language_code,
-                    translations={}
-                )
-            entity_translation_model.translations = translations
-            translation_models.EntityTranslationsModel.put(
-                entity_translation_model)
-
-            opportunity_services.update_opportunity_with_accepted_suggestion(
-                self.target_id, self.language_code)
+        if (hasattr(self.change, 'data_format') and (
+                translation_domain.TranslatableContentFormat
+                .is_data_format_list(self.change.data_format))):
             return
 
         self._copy_new_images_to_target_entity_storage()
-        exp_services.update_exploration(
-            self.final_reviewer_id, self.target_id, [self.change],
-            commit_message, is_suggestion=True)
 
     def get_all_html_content_strings(self):
         """Gets all html content strings used in this suggestion.

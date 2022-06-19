@@ -311,10 +311,15 @@ def update_opportunity_with_updated_exploration(exp_id):
         [exploration_opportunity_summary])
 
 
-def update_opportunity_with_accepted_suggestion(
+def update_translation_opportunity_with_accepted_suggestion(
         exploration_id, language_code):
-    """
-    TODO
+    """Updates the translation opportunity for the accepted suggestion in the
+    ExplorationOpportunitySummaryModel.
+
+    Args:
+        exploration_id: str. The Id of the exploration.
+        language_code: str. The langauge code of the accepted translation
+            suggestion.
     """
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(
         exploration_id)
@@ -332,9 +337,6 @@ def update_opportunity_with_accepted_suggestion(
     ):
         exp_opportunity_summary.incomplete_translation_language_codes.remove(
             language_code)
-
-    # confirm with @DubeySandeep.
-    # exp_opportunity_summary.translation_in_review_counts[language_code] += 1
 
     exp_opportunity_summary.validate()
     _save_multi_exploration_opportunity_summary([exp_opportunity_summary])
@@ -955,5 +957,3 @@ def regenerate_opportunities_related_to_topic(
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
     return len(exploration_opportunity_summary_list)
-
-

@@ -26,8 +26,7 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
 import { EntityTranslation, EntityTranslationBackendDict } from 'domain/translation/EntityTranslationObjectFactory';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslationsFetchingMessageModal } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
-
+import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 export interface LanguageCodeToEntityTranslations {
   [languageCode: string]: EntityTranslation;
 }
@@ -63,18 +62,16 @@ export class ContentTranslationManagerService {
   fetchAndDisplayTranslations(languageCode: string): Promise<any> {
     const url = (
       `/entity_translations_handler/${this.entityType}/${this.entityId}/${this.version}/${languageCode}`);
-    const modalRef = this.ngbModal.open(TranslationsFetchingMessageModal, {
+    const modalRef = this.ngbModal.open(TranslationsFetchingMessageModalComponent, {
       backdrop: 'static',
     });
     return this.httpClient.get<EntityTranslationBackendDict>(url).toPromise()
       .then((response) => {
-        // modalRef.close();
+        modalRef.close();
         const entityTranslations = EntityTranslation.createFromBackendDict(
           response);
         this.languageCodeToEntityTranslations[languageCode] = entityTranslations;
         this.displayTranslations(languageCode);
-      }, () => {
-        // modalRef.close();
       });
   }
 

@@ -47,6 +47,8 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
+from core.domain import translation_domain
+from core.domain import translation_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 
@@ -284,14 +286,11 @@ class ExplorationHandler(base.BaseHandler):
         preferred_language_codes = None
         has_viewed_lesson_info_modal_once = None
 
-        if opportunity_services.is_exploration_available_for_contribution(
-                exploration_id):
+        displayable_language_codes = []
+        if exp_services.get_story_id_linked_to_exploration(exploration_id):
             displayable_language_codes = (
                 translation_services.get_displayable_translation_languages(
-                    feconf.TranslatableEntityType.EXPLORATION,
-                    exploration
-                )
-            )
+                    feconf.TranslatableEntityType.EXPLORATION, exploration))
 
         if user_settings is not None:
             preferred_audio_language_code = (
@@ -365,7 +364,7 @@ class ExplorationHandler(base.BaseHandler):
                 most_recently_reached_checkpoint_exp_version),
             'most_recently_reached_checkpoint_state_name': (
                 most_recently_reached_checkpoint_state_name),
-            'displayable_language_codes': ['hi'] or displayable_language_codes
+            'displayable_language_codes': displayable_language_codes
         })
         self.render_json(self.values)
 
@@ -416,8 +415,9 @@ class EntityTranslationhandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self, entity_type, entity_id, entity_version, language_code):
-        entity_translations = translation_fetchers.get_entity_translation(
-            entity_type, entity_id, entity_version, language_code)
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION, entity_id,
+            entity_version, language_code)
 
         self.render_json(entity_translation.to_dict())
 

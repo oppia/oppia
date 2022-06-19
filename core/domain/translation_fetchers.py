@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core.domain import translation_domain
 from core.platform import models
+from core import feconf
 
 from typing import Optional
 
@@ -94,13 +95,14 @@ def _populate_entity_translation_from_model(entity_translation_model):
         EntityTranslation. An instance of EntityTranslation object, created from
         its model.
     """
-    entity_translation = translation_domain.EntityTranslation(
-        entity_translation_model.entity_id,
-        entity_translation_model.entity_type,
-        entity_translation_model.entity_version,
-        entity_translation_model.language_code,
-        entity_translation_model.translations
-    )
+    entity_translation = translation_domain.EntityTranslation.from_dict({
+        'entity_id': entity_translation_model.entity_id,
+        'entity_type': entity_translation_model.entity_type,
+        'entity_version': entity_translation_model.entity_version,
+        'language_code': entity_translation_model.language_code,
+        'translations': entity_translation_model.translations
+
+    })
     return entity_translation
 
 
@@ -153,4 +155,6 @@ def get_entity_translation(
         domain_object = _populate_entity_translation_from_model(
             entity_translation_model)
         return domain_object
-    return None
+    return translation_domain.EntityTranslation.create_empty(
+        entity_type, entity_id, language_code, entity_version=entity_version
+    )

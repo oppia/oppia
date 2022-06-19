@@ -38,12 +38,12 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TranslationStatusService', [
-  'EntityTranslationsService', 'ExplorationStatesService',
+  'EntityTranslationsService', 'ExplorationStatesService', 'LoaderService',
   'StateRecordedVoiceoversService', 'TranslationLanguageService',
   'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
   'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
   function(
-    EntityTranslationsService, ExplorationStatesService,
+    EntityTranslationsService, ExplorationStatesService, LoaderService,
     StateRecordedVoiceoversService, TranslationLanguageService,
       TranslationTabActiveModeService, COMPONENT_NAME_HINT,
       COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
@@ -54,6 +54,7 @@ angular.module('oppia').factory('TranslationStatusService', [
     var NO_ASSETS_AVAILABLE_COLOR = '#D14836';
 
     var langCode = TranslationLanguageService.getActiveLanguageCode();
+    var entityTranslation = null;
     var stateNeedsUpdateWarnings = {};
     var stateWiseStatusColor = {};
     var explorationTranslationContentRequiredCount = 0;
@@ -77,31 +78,28 @@ angular.module('oppia').factory('TranslationStatusService', [
       return availabilityStatus;
     };
 
-    var _getTranslationStatus = function(writtenTranslations, contentId) {
+    var _getTranslationStatus = function(contentId) {
       var availabilityStatus = {
         available: false,
         needsUpdate: false,
       };
-      langCode = TranslationLanguageService.getActiveLanguageCode();
-      var availableLanguages = (
-        writtenTranslations.getLanguageCodes(contentId));
-      if (availableLanguages.indexOf(langCode) !== -1) {
-        var writtenTranslation = (
-          writtenTranslations.getWrittenTranslation(contentId, langCode));
-        if (writtenTranslation.translation !== '') {
+      if (entityTranslation && entityTranslation.hasWrittenTranslation(
+          contentId)) {
+        let translatedContent = entityTranslation.getWrittenTranslation(
+          contentId);
+        if (translatedContent.translation !== '') {
           availabilityStatus.available = true;
-          availabilityStatus.needsUpdate = writtenTranslation.needsUpdate;
+          availabilityStatus.needsUpdate = translatedContent.needsUpdate;
         }
       }
       return availabilityStatus;
     };
+
     var _getContentAvailabilityStatus = function(stateName, contentId) {
-      langCode = TranslationLanguageService.getActiveLanguageCode();
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        // var writtenTranslations = (
-          // ExplorationStatesService.getWrittenTranslationsMemento(stateName));
-        return {'available': true, 'needsUpdate':true};
+        return _getTranslationStatus(contentId);
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        langCode = TranslationLanguageService.getActiveLanguageCode();
         var recordedVoiceovers = (
           ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
         return _getVoiceOverStatus(recordedVoiceovers, contentId);
@@ -110,8 +108,7 @@ angular.module('oppia').factory('TranslationStatusService', [
 
     var _getActiveStateContentAvailabilityStatus = function(contentId) {
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        var writtenTranslations = EntityTranslationsService.entityTranslations;
-        return _getTranslationStatus(writtenTranslations, contentId);
+        return _getTranslationStatus(contentId);
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
         var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
         return _getVoiceOverStatus(recordedVoiceovers, contentId);
@@ -209,20 +206,12 @@ angular.module('oppia').factory('TranslationStatusService', [
       var contentIdList = [];
 
       if (availableContentIds.length > 0) {
-        if (componentName === 'solution' || componentName === 'content') {
-          contentIdList.push(componentName);
-        } else {
           var searchKey = componentName + '_';
           availableContentIds.forEach(function(contentId) {
             if (contentId.indexOf(searchKey) > -1) {
               contentIdList.push(contentId);
             }
           });
-
-          if (componentName === 'feedback') {
-            contentIdList.push('default_outcome');
-          }
-        }
       }
       return contentIdList;
     };
@@ -250,16 +239,8 @@ angular.module('oppia').factory('TranslationStatusService', [
     };
 
     var _getAvailableContentIds = function() {
-      var availableContentIds = [];
-      if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        var writtenTranslations = EntityTranslationsService.translations;
-        availableContentIds = writtenTranslations.getAllContentIds();
-      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-        var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
-        availableContentIds = recordedVoiceovers.getAllContentIds();
-      }
-
-      return availableContentIds;
+      var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
+      return recordedVoiceovers.getAllContentIds();
     };
 
     var _getActiveStateComponentNeedsUpdateStatus = function(componentName) {
@@ -313,7 +294,18 @@ angular.module('oppia').factory('TranslationStatusService', [
 
     return {
       refresh: function() {
-        _computeAllStatesStatus();
+        if (TranslationTabActiveModeService.isTranslationModeActive()) {
+          langCode = TranslationLanguageService.getActiveLanguageCode();
+          LoaderService.showLoadingScreen("Loading");
+          EntityTranslationsService.refreshEntityTranslationsAsync(langCode).then(
+            (entityTranslationObject) => {
+              LoaderService.hideLoadingScreen();
+              entityTranslation = entityTranslationObject;
+              _computeAllStatesStatus();
+            })
+        } else {
+          _computeAllStatesStatus();
+        }
       },
       getAllStatesNeedUpdatewarning: function() {
         return stateNeedsUpdateWarnings;

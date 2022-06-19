@@ -161,12 +161,12 @@ def _migrate_state_schema(versioned_question_state):
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
         if state_schema_version == 50:
             # State conversion function from 50 to 51 removes
-            # next_content_id_index from the state level, hence this if case
+            # next_content_id_index from the state level, hence this "if" case
             # populates the next_content_id_index from the old state, which will
             # be used for introducing next_content_id_index into
-            # exploration level.
+            # question level.
             next_content_id_index = (
-                exp_domain.Exploration.update_states_from_model(
+                question_domain.Question.update_states_from_model(
                     versioned_exploration_states,
                     states_schema_version, init_state_name)
             )

@@ -92,6 +92,33 @@ def get_and_cache_machine_translation(
     return translated_text
 
 
+def add_new_translation(
+    entity_type,
+    entity_id,
+    entity_version,
+    language_code,
+    content_id,
+    translated_content
+):
+    entity_translation = translation_fetchers.get_entity_translation(
+        entity_type, entity_id, entity_version, language_code)
+
+    entity_translation.translations[content_id] = translated_content
+
+
+    entity_translation.validate()
+
+    model = translation_models.EntityTranslationsModel.create_new(
+        entity_type,
+        entity_id,
+        entity_version,
+        language_code,
+        entity_translation.to_dict()['translations']
+    )
+
+    model.update_timestamps()
+    model.put()
+
 def update_translation_related_change(
     exploration_id,
     exploration_version,
@@ -226,8 +253,8 @@ def get_content_count(base_translatable_object):
         len(
             base_translatable_object.get_all_contents_which_need_translations(
                 translation_domain.EntityTranslation.create_empty(
-                    entity_id='',
                     entity_type=feconf.TranslatableEntityType.EXPLORATION,
+                    entity_id='',
                     language_code='')
                 )
         )
@@ -253,14 +280,6 @@ def get_translatable_text(exploration, language_code):
                 exploration.version,
                 language_code)
         )
-        if entity_translations is None:
-            entity_translations = (
-                translation_domain.EntityTranslation.create_empty(
-                    exploration.id,
-                    feconf.TranslatableEntityType.EXPLORATION,
-                    language_code
-                )
-            )
         state_names_to_content_id_mapping = {}
         for state_name, state in exploration.states.items():
             state_names_to_content_id_mapping[state_name] = (

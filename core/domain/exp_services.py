@@ -1112,7 +1112,7 @@ def validate_exploration_for_story(exp, strict):
 
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
-        is_suggestion=False, is_by_voice_artist=False):
+        is_by_voice_artist=False):
     """Update an exploration. Commits changes.
 
     Args:
@@ -1127,8 +1127,6 @@ def update_exploration(
             explorations, it should be equal to None. For suggestions that are
             being accepted, and only for such commits, it should start with
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
-        is_suggestion: bool. Whether the update is due to a suggestion being
-            accepted.
         is_by_voice_artist: bool. Whether the changes are made by a
             voice artist.
 
@@ -1154,28 +1152,10 @@ def update_exploration(
             'Exploration is public so expected a commit message but '
             'received none.')
 
-    if (is_suggestion and (
-            not commit_message or
-            not commit_message.startswith(
-                feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX))):
-        raise ValueError('Invalid commit message for suggestion.')
-    if (not is_suggestion and commit_message and commit_message.startswith(
-            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)):
-        raise ValueError(
-            'Commit messages for non-suggestions may not start with \'%s\'' %
-            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
-
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
 
-    # List which will contain exploration changes related to translation, these
-    # changes will be performed in the task queue.
-    changes_related_to_translation = []
-    translation_related_cmds = [
-        exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-        exp_domain.CMD_REMOVE_TRANSLATIONS
-    ]
     content_ids_corresponding_translations_to_remove = []
     content_ids_corresponding_translations_to_mark_needs_update = []
 
@@ -1194,7 +1174,7 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
 
-    # Update translations related changes, in the datastore.
+    # Update translations related changes in the datastore.
     taskqueue_services.defer(
         taskqueue_services.FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,

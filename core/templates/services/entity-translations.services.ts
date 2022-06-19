@@ -30,7 +30,7 @@ export class EntityTranslationsService {
   private entityId: string;
   private entityType: string;
   private entityVersion: number;
-  private entityTranslations: EntityTranslation;
+  private translationsMapping: any;
   constructor(
     private entityTranslationBackendApiService: EntityTranslationBackendApiService
   ){}
@@ -43,14 +43,19 @@ export class EntityTranslationsService {
     this.entityId = entityId;
   }
 
-  async updateEntityTranslations(languageCode: string): void {
-    this.entityTranslations = (
-      await this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
-        this.entityType,
-        this.entityId,
-        this.entityVersion,
-        languageCode
-      ));
+  async refreshEntityTranslationsAsync(languageCode: string):
+      Promise<any> {
+        return new Promise((resolve, reject) => {
+          this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
+            this.entityType,
+            this.entityId,
+            this.entityVersion,
+            languageCode
+          ).then((entityTranslation) => {
+            this.translationsMapping = entityTranslation.translationMapping;
+            resolve(entityTranslation);
+          });
+        });
   }
 }
 

@@ -33,7 +33,7 @@ class ContentType(enum.Enum):
     CONTENT = 'content'
     INTERACTION = 'interaction'
     DEFAULT_OUTCOME = 'default_outcome'
-    CUSTOMIZATION_ARG = 'cutomization_arg'
+    CUSTOMIZATION_ARG = 'customization_arg'
     RULE = 'rule'
     FEEDBACK = 'feedback'
     HINT = 'hint'
@@ -158,6 +158,7 @@ class TranslatedContent:
         needs_update: bool
     ) -> None:
         self.content_value = content_value
+        self.content_format = content_format
         self.needs_update = needs_update
 
     @classmethod
@@ -414,7 +415,7 @@ class EntityTranslation:
 
     def to_dict(entity_translation):
         translations_dict = {}
-        for content_id, translated_content in entity_translation.translations:
+        for content_id, translated_content in entity_translation.translations.items():
             translations_dict[content_id] = translated_content.to_dict()
 
         return {
@@ -427,14 +428,16 @@ class EntityTranslation:
 
     @classmethod
     def from_dict(cls, entity_translation_dict):
+        translations_dict = entity_translation_dict["translations"]
         content_id_to_translated_content = {}
-        for content_id, translations in entity_translation_dict.items():
+        for content_id, translated_content in translations_dict.items():
             content_id_to_translated_content[content_id] = (
-                translations.from_dict())
+                TranslatedContent.from_dict(translated_content))
 
         return cls(
-            entity_translation_dict['entity_type'],
             entity_translation_dict['entity_id'],
+            feconf.TranslatableEntityType(
+                entity_translation_dict['entity_type']),
             entity_translation_dict['entity_version'],
             entity_translation_dict['language_code'],
             content_id_to_translated_content
@@ -458,7 +461,7 @@ class EntityTranslation:
                 'language_code must be a string, but got %r' %
                 self.language_code)
 
-        for content_id, translated_content in self.translations:
+        for content_id, translated_content in self.translations.items():
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'content_id must be a string, but got %r' % content_id)
@@ -479,7 +482,8 @@ class EntityTranslation:
                         content_value)
 
     @classmethod
-    def create_empty(cls, entity_id, entity_type, language_code):
+    def create_empty(
+            cls, entity_type, entity_id, language_code, entity_version=0):
         return cls(
             entity_id=entity_id,
             entity_type=entity_type,

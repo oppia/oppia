@@ -56,9 +56,6 @@ export class TranslationTabActiveContentIdService {
     this.activeDataFormat = dataFormat;
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
   }
-  fetchAndUpdateEntityTranslations(languageCode) {
-
-  }
 
   get onActiveContentIdChanged(): EventEmitter<string> {
     return this._activeContentIdChangedEventEmitter;

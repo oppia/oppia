@@ -3117,27 +3117,29 @@ class State(translation_domain.BaseTranslatableObject):
 
         solution = interaction['solution']
         if solution is not None:
-            yield solution, translation_domain.ContentType.SOLUTION
+            yield (
+                solution['explanation'],
+                translation_domain.ContentType.SOLUTION)
 
-        cust_args_name_to_cust_args = (
-            InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                interaction['id'], interaction['customization_args'])
+        interaction_id = interaction['id']
+        customisation_args = interaction['customization_args']
+        ca_specs_dict = (
+            interaction_registry.Registry
+            .get_all_specs_for_state_schema_version(
+                feconf.CURRENT_STATE_SCHEMA_VERSION,
+                can_fetch_latest_specs=True
+            )[interaction_id]['customization_arg_specs']
         )
-        for cust_args in cust_args_name_to_cust_args.values():
-            subtitled_htmls = cust_args.get_subtitled_html()
-            for subtitled_html in subtitled_htmls:
-                html_string = subtitled_html.html
-                if not html_string.isnumeric():
-                    yield (
-                        subtitled_html,
-                        translation_domain.ContentType.INTERACTION)
-
-            subtitled_unicodes = cust_args.get_subtitled_unicode()
-            for subtitled_unicode in subtitled_unicodes:
-                yield (
-                    subtitled_unicode,
-                    translation_domain.ContentType.INTERACTION)
+        for spec in ca_specs_dict:
+            customisation_arg = customisation_args[spec["name"]]
+            contents = InteractionCustomizationArg.traverse_by_schema_and_get(
+                spec['schema'], customisation_arg["value"], [
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+                lambda x: x
+            )
+            for content in contents:
+                yield content, translation_domain.ContentType.CUSTOMIZATION_ARG
 
     @classmethod
     def update_old_content_id_to_new_content_id_in_v49_states(
@@ -3156,21 +3158,32 @@ class State(translation_domain.BaseTranslatableObject):
             content-ids.
         """
         content_id_generator = translation_domain.ContentIdGenerator()
-
         for state_name in sorted(states_dict.keys()):
+            state = states_dict[state_name]
+            voiceovers = []
             for content, content_type in (
-                cls.traverse_v49_state_dict_for_contents(
-                    states_dict[state_name])
+                cls.traverse_v49_state_dict_for_contents(state)
             ):
-                if content_type == translation_domain.ContentType.INTERACTION:
-                    content.content_id = content_id_generator.generate(
-                        content_type)
-                elif content_type == translation_domain.ContentType.RULE:
-                    content['contentId'] = content_id_generator.generate(
-                        content_type)
-                else:
-                    content['content_id'] = content_id_generator.generate(
-                        content_type)
+                content_id_key = 'content_id'
+                if content_type == translation_domain.ContentType.RULE:
+                    content_id_key = 'contentId'
+                old_content_id = content[content_id_key]
+                new_content_id = content_id_generator.generate(content_type)
+
+                voiceovers_mapping = (
+                    state['recorded_voiceovers'][
+                        'voiceovers_mapping'])
+
+                voiceovers.append((
+                    new_content_id,
+                    copy.deepcopy(voiceovers_mapping[old_content_id])
+                ))
+                content[content_id_key] = new_content_id
+            state['recorded_voiceovers']['voiceovers_mapping'] = {
+                content_id: voiceover
+                for content_id, voiceover in voiceovers
+            }
+
         return states_dict, content_id_generator.next_content_id_index
 
     @classmethod
