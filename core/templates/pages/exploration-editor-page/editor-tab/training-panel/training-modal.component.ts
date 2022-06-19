@@ -80,12 +80,10 @@ export class TrainingModalComponent
     new EventEmitter();
 
   trainingDataAnswer: InteractionAnswer | string = '';
-
   // See the training panel directive in ExplorationEditorTab for an
   // explanation on the structure of this object.
   classification: classification;
   addingNewResponse: boolean = false;
-  responsesServiceCallback: (value: AnswerGroup[], value2: Outcome) => void;
 
   constructor(
     private injector: Injector,
@@ -117,22 +115,21 @@ export class TrainingModalComponent
   _saveNewAnswerGroup(newAnswerGroup: AnswerGroup): void {
     let answerGroups = this.responsesService.getAnswerGroups();
     answerGroups.push(newAnswerGroup);
-    this.responsesServiceCallback = (newAnswerGroups, newDefaultOutcome) => {
-      this.explorationStatesService.saveInteractionAnswerGroups(
-        this.stateEditorService.getActiveStateName(),
-        cloneDeep(newAnswerGroups));
-
-      this.explorationStatesService.saveInteractionDefaultOutcome(
-        this.stateEditorService.getActiveStateName(),
-        cloneDeep(newDefaultOutcome));
-
-      this.graphDataService.recompute();
-      this.explorationWarningsService.updateWarnings();
-    };
 
     this.responsesService.save(
       answerGroups, this.responsesService.getDefaultOutcome(),
-      this.responsesServiceCallback);
+      (newAnswerGroups, newDefaultOutcome) => {
+        this.explorationStatesService.saveInteractionAnswerGroups(
+          this.stateEditorService.getActiveStateName(),
+          cloneDeep(newAnswerGroups));
+
+        this.explorationStatesService.saveInteractionDefaultOutcome(
+          this.stateEditorService.getActiveStateName(),
+          cloneDeep(newDefaultOutcome));
+
+        this.graphDataService.recompute();
+        this.explorationWarningsService.updateWarnings();
+      });
   }
 
   exitTrainer(): void {

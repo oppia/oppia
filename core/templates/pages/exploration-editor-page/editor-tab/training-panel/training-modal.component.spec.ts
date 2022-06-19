@@ -176,13 +176,14 @@ describe('Training Modal Component', () => {
     spyOn(responsesService, 'getAnswerGroups')
       .and.returnValue([{}] as AnswerGroup[]);
     spyOn(responsesService, 'save')
-      .and.stub();
+      .and.callFake((answerGroups, getDefaultOutcome, save) => {
+        save(null, null);
+      });
 
     component.ngOnInit();
     component.onConfirm();
 
     expect(responsesService.save).toHaveBeenCalled();
-    component.responsesServiceCallback(null, null);
     expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 

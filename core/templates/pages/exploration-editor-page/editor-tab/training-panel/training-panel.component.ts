@@ -39,7 +39,6 @@ interface ClassificationInterface {
   selector: 'oppia-training-panel',
   templateUrl: './training-panel.component.html'
 })
-
 export class TrainingPanelComponent
   implements OnInit {
   @Input() answer: InteractionAnswer;
