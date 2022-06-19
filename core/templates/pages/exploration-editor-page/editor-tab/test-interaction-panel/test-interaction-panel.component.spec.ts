@@ -39,8 +39,7 @@ class MockExplorationStatesService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Test Interaction Panel Component', () => {
+describe('Test Interaction Panel Component', () => {
   let component: TestInteractionPanel;
   let fixture: ComponentFixture<TestInteractionPanel>;
   let currentInteractionService: CurrentInteractionService;
