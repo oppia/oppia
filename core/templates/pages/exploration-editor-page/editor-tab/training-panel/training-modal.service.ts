@@ -48,11 +48,11 @@ export class TrainingModalService {
   }
 
   /**
-      * Opens unresolved answer trainer modal for given answer.
-      * @param {Object} unhandledAnswer - The answer to be trained.
-      * @param {requestCallback} finishTrainingCallback - Function to call when
-          answer has been trained.
-      */
+  * Opens unresolved answer trainer modal for given answer.
+  * @param {Object} unhandledAnswer - The answer to be trained.
+  * @param {requestCallback} finishTrainingCallback - Function to call when
+      answer has been trained.
+  */
   openTrainUnresolvedAnswerModal(
       unhandledAnswer: InteractionAnswer,
       interactionId: string | null,

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for TrainingDataEditorPanelComponent modal.
+ * @fileoverview Component for TrainingDataEditorPanelComponent modal.
  */
 import { Subscription } from 'rxjs';
 import { Component, Injector, OnDestroy, OnInit } from '@angular/core';

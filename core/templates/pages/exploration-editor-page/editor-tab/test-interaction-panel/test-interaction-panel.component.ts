@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the test interaction panel in the state editor.
+ * @fileoverview Component for the test interaction panel in the state editor.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -27,7 +27,6 @@ import { AppConstants } from 'app.constants';
   selector: 'oppia-test-interaction-panel',
   templateUrl: './test-interaction-panel.component.html'
 })
-
 export class TestInteractionPanel implements OnInit {
   @Input() inputTemplate: string;
   @Input() stateName: string;
@@ -37,7 +36,6 @@ export class TestInteractionPanel implements OnInit {
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private explorationStatesService: ExplorationStatesService,
-
   ) { }
 
   isSubmitButtonDisabled(): boolean {
