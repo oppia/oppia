@@ -344,7 +344,8 @@ describe('Exploration save service ' +
 
   it('should open publish exploration modal', fakeAsync(function() {
     let modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
+      result: Promise.reject(),
+      opened: Promise.resolve()
     });
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
@@ -694,7 +695,8 @@ describe('Exploration save service ' +
         stateIds: [],
       });
     let modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
+      result: Promise.reject(),
+      opened: Promise.resolve()
     });
 
     explorationSaveService.saveChangesAsync(
@@ -730,7 +732,8 @@ describe('Exploration save service ' +
         stateIds: [],
       });
     spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
+      result: Promise.reject(),
+      opened: Promise.resolve()
     });
     let focusSpy = spyOnProperty(focusManagerService, 'onFocus')
       .and.returnValue(mockEventEmitter);
@@ -774,10 +777,8 @@ describe('Exploration save service ' +
     spyOn(ExplorationWarningsService, 'countWarnings')
       .and.returnValue(1);
     spyOn(changeListService, 'discardAllChanges')
-      .and.returnValue(Promise.resolve(null));
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
-    });
+      .and.returnValue(Promise.resolve());
+    let modalSpy = spyOn($uibModal, 'open').and.stub();
 
     expectAsync(
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb)
@@ -807,7 +808,8 @@ describe('Exploration save service ' +
         stateIds: [],
       });
     let modalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
+      result: Promise.reject(),
+      opened: Promise.resolve()
     });
 
     // Opening modal first time.

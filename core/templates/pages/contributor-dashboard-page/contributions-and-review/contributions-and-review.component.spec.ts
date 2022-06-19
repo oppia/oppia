@@ -1005,7 +1005,7 @@ describe('Contributions and review component', function() {
     it('should open show view question modal when clicking on' +
       ' question suggestion', fakeAsync(() => {
       spyOn($uibModal, 'open').and.returnValue({
-        result: Promise.reject()
+        result: $q.reject()
       });
 
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
@@ -1055,6 +1055,22 @@ describe('Contributions and review component', function() {
 
     it('should fetch skill when user clicks on view suggestion',
       fakeAsync(() => {
+        ctrl.contributions = {
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                content_html: 'Translation',
+                translation_html: 'Tradução'
+              },
+              status: 'review'
+            },
+            details: 'skill_1'
+          }
+        };
+        ctrl.activeTabType = 'reviews';
         spyOn($uibModal, 'open').and.returnValue({
           result: Promise.resolve([])
         });
@@ -1069,30 +1085,42 @@ describe('Contributions and review component', function() {
         ctrl.onClickViewSuggestion('suggestion_1');
         // Here '$scope.$apply' is used multiple times
         // in order to traverse through nested promises.
-        $scope.$applyAsync();
+        $rootScope.$apply();
         tick();
-        $scope.$applyAsync();
+        $rootScope.$apply();
         tick();
-        $scope.$applyAsync();
-        tick();
-        $scope.$applyAsync();
-        tick();
-        $scope.$applyAsync();
 
         expect(fetchSkillSpy).toHaveBeenCalled();
       }));
 
     it('should open suggestion modal when user clicks on view suggestion',
       fakeAsync(() => {
-        const modalSpy = spyOn($uibModal, 'open').and.returnValue({
+        ctrl.contributions = {
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                content_html: 'Translation',
+                translation_html: 'Tradução'
+              },
+              status: 'review'
+            },
+            details: 'skill_1'
+          }
+        };
+        ctrl.activeTabType = 'reviews';
+        spyOn($uibModal, 'open').and.returnValue({
           result: Promise.reject()
         });
+        $rootScope.$apply();
 
         ctrl.onClickViewSuggestion('suggestion_1');
-        $rootScope.$applyAsync();
+        $rootScope.$apply();
         tick();
 
-        expect(modalSpy).toHaveBeenCalled();
+        expect($uibModal.open).toHaveBeenCalled();
       }));
 
     it('should return correctly check the active tab', function() {

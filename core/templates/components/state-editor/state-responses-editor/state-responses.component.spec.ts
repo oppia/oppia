@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for StateResponsesComponent.
+ */
+
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -21,10 +25,6 @@ import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
-/**
- * @fileoverview Unit tests for StateResponsesComponent.
- */
 
 describe('StateResponsesComponent', () => {
   let ctrl = null;
@@ -799,7 +799,7 @@ describe('StateResponsesComponent', () => {
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
-  it('should delete answer group after modal is opened', () => {
+  it('should delete answer group after modal is opened', fakeAsync(() => {
     spyOn(ResponsesService, 'deleteAnswerGroup').and.callFake(
       (number: string, callback: () => void) => {
         callback();
@@ -807,7 +807,7 @@ describe('StateResponsesComponent', () => {
     spyOn($rootScope, '$apply').and.callThrough();
     spyOn(ngbModal, 'open').and.returnValue(
       {
-        result: $q.resolve()
+        result: Promise.resolve()
       } as NgbModalRef
     );
 
@@ -817,13 +817,13 @@ describe('StateResponsesComponent', () => {
     };
 
     $scope.deleteAnswerGroup(value);
-    $scope.$apply();
+    tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
     expect($rootScope.$apply).toHaveBeenCalled();
     expect(ResponsesService.deleteAnswerGroup)
       .toHaveBeenCalled();
-  });
+  }));
 
   it('should clear warnings when delete answer group modal is closed', () => {
     spyOn(AlertsService, 'clearWarnings');

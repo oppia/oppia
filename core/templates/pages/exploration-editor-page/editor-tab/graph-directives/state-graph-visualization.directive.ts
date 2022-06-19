@@ -179,8 +179,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 // Center the graph at the node representing the current state.
                 try {
                   origTranslations[0] = (
-                    dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
-                    nodeData[$scope.currentStateId()].width / 2);
+                    dimensions.w / 2 - nodeData[$scope.currentStateId()]?.x0 -
+                    nodeData[$scope.currentStateId()]?.width / 2);
                 } catch (error) {
                   error.message += (
                     `\ncurrentStateId(): ${ $scope.currentStateId() }` +
@@ -189,8 +189,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 }
 
                 origTranslations[1] = (
-                  dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
-                  nodeData[$scope.currentStateId()].height / 2);
+                  dimensions.h / 2 - nodeData[$scope.currentStateId()]?.y0 -
+                  nodeData[$scope.currentStateId()]?.height / 2);
 
                 if (graphBounds.right - graphBounds.left < dimensions.w) {
                   origTranslations[0] = (

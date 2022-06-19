@@ -19,6 +19,7 @@
 describe('Value Generator Editor directive', function() {
   var $scope = null;
   var elem = null;
+  let $httpBackend = null;
 
   var compiledElement = null;
 
@@ -27,12 +28,14 @@ describe('Value Generator Editor directive', function() {
 
   beforeEach(angular.mock.inject(function($compile, $injector) {
     var $rootScope = $injector.get('$rootScope');
-
+    $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
     $scope.generatorId = 'Copier';
     $scope.customizationArgs = [];
     $scope.initArgs = [];
     $scope.objType = 'UnicodeString';
+    $httpBackend.whenGET('/value_generator_handler/Copier')
+      .respond(200, '');
 
     elem = angular.element(
       '<value-generator-editor generator-id="generatorId" ' +
@@ -43,7 +46,7 @@ describe('Value Generator Editor directive', function() {
     $rootScope.$digest();
   }));
 
-  it('should add new attributes in the compiled one', function() {
+  it('should add new attributes in the compiled one', () => {
     expect(compiledElement.html()).toContain(
       'get-generator-id="getGeneratorId()"');
     expect(compiledElement.html()).toContain(
@@ -51,5 +54,9 @@ describe('Value Generator Editor directive', function() {
     expect(compiledElement.html()).toContain(
       'get-generator-id="getGeneratorId()"');
     expect(compiledElement.html()).toContain('get-obj-type="getObjType()"');
+  });
+
+  afterEach(() => {
+    $httpBackend.flush();
   });
 });

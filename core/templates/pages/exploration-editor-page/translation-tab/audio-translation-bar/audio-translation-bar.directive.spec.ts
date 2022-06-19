@@ -27,6 +27,7 @@ import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
 import { AudioPlayerService } from 'services/audio-player.service';
 
+
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
 
@@ -41,7 +42,8 @@ require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
-describe('Audio translation bar directive', function() {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Audio translation bar directive', function() {
   var ctrl = null;
   var $interval = null;
   var $q = null;
@@ -178,6 +180,7 @@ describe('Audio translation bar directive', function() {
     });
     ctrl.$onInit();
     $scope.getVoiceoverRecorder();
+    $scope.isTranslationTabBusy = true;
   }));
 
   afterEach(() => {
@@ -233,6 +236,7 @@ describe('Audio translation bar directive', function() {
         on: () => {},
         pause: () => {},
         play: () => {},
+        un: () => {}
       };
       // This throws "Argument of type '{ load: () => void; ... }'
       // is not assignable to parameter of type 'WaveSurfer'."
@@ -362,6 +366,7 @@ describe('Audio translation bar directive', function() {
       },
       pause: () => {},
       play: () => {},
+      un: () => {}
     };
     spyOn(waveSurferObjSpy, 'play');
     // This throws "Argument of type '{ load: () => void; ... }'
@@ -390,6 +395,7 @@ describe('Audio translation bar directive', function() {
       on: () => {},
       pause: () => {},
       play: () => {},
+      un: () => {}
     };
     spyOn(waveSurferObjSpy, 'play');
     spyOn(waveSurferObjSpy, 'pause');
@@ -401,6 +407,7 @@ describe('Audio translation bar directive', function() {
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
+    $scope.waveSurfer = waveSurferObjSpy;
     $scope.stopRecording();
     $scope.$apply();
 
@@ -436,6 +443,7 @@ describe('Audio translation bar directive', function() {
       on: () => {},
       pause: () => {},
       play: () => {},
+      un: () => {}
     };
     // This throws "Argument of type '{ load: () => void; ... }'
     // is not assignable to parameter of type 'WaveSurfer'."
@@ -723,12 +731,12 @@ describe('Audio translation bar directive', function() {
       }));
 
     it('should trigger drop event in translation tab element and open add' +
-      ' audio translation modal', function() {
-      translationTabDivMock.triggerHandler('dragover');
-
+      ' audio translation modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: Promise.reject()
       });
+      translationTabDivMock = $(document.createElement('div'))
+      translationTabDivMock.triggerHandler('dragover');
       translationTabDivMock.triggerHandler({
         originalEvent: {
           dataTransfer: {
@@ -740,6 +748,7 @@ describe('Audio translation bar directive', function() {
         target: dropAreaMessageDivMock,
         type: 'drop',
       });
+
       expect(scope.dropAreaIsAccessible)
         .toBe(false);
       $scope.$apply();

@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { StateGraphLayoutService } from
   'components/graph-services/graph-layout.service';
 import { TextInputRulesService } from
@@ -346,7 +346,7 @@ describe('State Graph Visualization directive', function() {
   });
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
-    ' x and y axis to 0', function() {
+    ' x and y axis to 0', fakeAsync(() => {
     // Spies for element dimensions.
     spyOn($element, 'height').and.returnValue(100);
     spyOn($element, 'width').and.returnValue(100);
@@ -357,7 +357,7 @@ describe('State Graph Visualization directive', function() {
       top: 10,
       right: 20
     });
-    $flushPendingTasks();
+    tick();
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
@@ -373,12 +373,14 @@ describe('State Graph Visualization directive', function() {
     });
 
     routerService.onCenterGraph.emit();
-    $flushPendingTasks();
+    tick();
+    $scope.$apply();
+    tick();
 
     expect(d3.event.transform.x).toBe(0);
     expect(d3.event.transform.y).toBe(0);
     expect($scope.overallTransformStr).toBe('translate(35,35)');
-  });
+  }));
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
   ' x and y axis to custom value', function() {

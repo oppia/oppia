@@ -1,5 +1,5 @@
 <div ng-if="options.header">
-  <strong><[options.header]></strong>
+  <strong>{{options.header}}</strong>
 </div>
 <ol class="oppia-visualization-sorted-tiles">
   <li tabindex="-1"
@@ -7,7 +7,7 @@
       ng-class="['oppia-visualization-sorted-tile', {'selected': isSelected[$index]}]">
     <div class="oppia-visualization-sorted-tile-content"
          ng-mouseover="select($index)" ng-mouseleave="unselect($index)">
-      <div class="oppia-visualization-sorted-tile-answer answer-<[$index]>">
+      <div class="oppia-visualization-sorted-tile-answer answer-{{$index}}">
         <angular-html-bind class="oppia-visualization-sorted-tile-answer-content"
                            html-data="datum.answer">
         </angular-html-bind>
@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="oppia-visualization-sorted-tile-frequency">
-        <span ng-if="options.use_percentages"><[percentages[$index]]>%</span>
+        <span ng-if="options.use_percentages">{{percentages[$index]}}%</span>
         <span ng-if="!options.use_percentages"
               ng-pluralize count="datum.frequency" when="{'one': '1 time', 'other': '{} times'}">
         </span>

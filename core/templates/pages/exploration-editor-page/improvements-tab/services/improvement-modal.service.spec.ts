@@ -57,7 +57,7 @@ describe('Improvement Modal Service', function() {
     $rootScope = $injector.get('$rootScope');
 
     openModalSpy = spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
+      result: Promise.resolve()
     });
   }));
 

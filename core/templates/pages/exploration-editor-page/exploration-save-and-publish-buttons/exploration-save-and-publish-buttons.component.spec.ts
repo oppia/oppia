@@ -386,21 +386,6 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.saveChanges).not.toHaveBeenCalled();
   });
 
-  it('should open a confirmation modal when save is in progress', function() {
-    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    spyOn($scope, 'saveChanges');
-    $scope.saveIsInProcess = true;
-
-    $scope.getChangeListLength();
-    $scope.$apply();
-
-    expect($uibModal.open).not.toHaveBeenCalled();
-    expect($scope.saveChanges).not.toHaveBeenCalled();
-  });
-
   it('should change connnection status to ONLINE when internet is connected',
     () => {
       $scope.connectedToInternet = false;

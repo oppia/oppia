@@ -71,6 +71,7 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
   showDropArea?: boolean;
   getVoiceoverRecorder?: () => void;
   openAddAudioTranslationModal?: (files: FileList) => void;
+  isTranslationTabBusy?: boolean;
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
