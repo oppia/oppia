@@ -30,10 +30,11 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 import { State } from 'domain/state/StateObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
-interface answerGroupData {
+interface AnswerGroupData {
   answerGroupIndex: number;
   answers: InteractionAnswer[];
 }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -98,7 +99,7 @@ export class TrainingDataService {
     if (updatedAnswerGroups) {
       this.responsesService.save(
         answerGroups, this.responsesService.getDefaultOutcome(),
-        function(newAnswerGroups, newDefaultOutcome) {
+        (newAnswerGroups, newDefaultOutcome) => {
           this.explorationStatesService.saveInteractionAnswerGroups(
             this.stateEditorService.getActiveStateName(),
             cloneDeep(newAnswerGroups));
@@ -120,7 +121,7 @@ export class TrainingDataService {
     }
   }
 
-  getTrainingDataAnswers(): answerGroupData[] {
+  getTrainingDataAnswers(): AnswerGroupData[] {
     let trainingDataAnswers = [];
     let answerGroups = this.responsesService.getAnswerGroups();
 
@@ -167,6 +168,7 @@ export class TrainingDataService {
     answerGroup.trainingData = [
       ...answerGroup.trainingData,
       answer];
+
     this.responsesService.updateAnswerGroup(answerGroupIndex, {
       trainingData: answerGroup.trainingData
     } as AnswerGroup, (newAnswerGroups) => {

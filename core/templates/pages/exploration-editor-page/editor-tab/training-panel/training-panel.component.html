@@ -38,9 +38,9 @@
           </button>
         </div>
       </form>
-      <button class="btn btn-secondary" *ngIf="!addingNewResponse"
-                                        (click)="beginAddingNewResponse()">
-                                        Add New Response
+      <button class="btn btn-secondary"
+              *ngIf="!addingNewResponse"
+              (click)="beginAddingNewResponse()">Add New Response
       </button>
       <oppia-outcome-feedback-editor *ngIf="addingNewResponse"
                                      [outcome]="classification.newOutcome">

@@ -7,7 +7,7 @@
             <img class="preview-conversation-skin-row-avatar-img rounded-circle" [src]="userBlueImgUrl" >
           </td>
           <td class="preview-conversation-skin-learner-input">
-            <angular-html-bind-wrapper [htmlData]="getInputTemplate()"></angular-html-bind-wrapper>
+            <angular-html-bind-wrapper [htmlData]="inputTemplate"></angular-html-bind-wrapper>
           </td>
         </tr>
       </table>
@@ -17,7 +17,7 @@
     <div>
       <mat-card class="preview-conversation-skin-supplemental-card">
         <div>
-          <angular-html-bind-wrapper [htmlData]="getInputTemplate()">
+          <angular-html-bind-wrapper [htmlData]="inputTemplate">
           </angular-html-bind-wrapper>
         </div>
       </mat-card>
@@ -25,7 +25,7 @@
   </div>
   <br>
   <div class="submit-answer-btn">
-    <button mat-button 
+    <button mat-button
             class="oppia-learner-confirm-button protractor-test-submit-answer-button"
             [disabled]="isSubmitButtonDisabled()"
             (click)="onSubmitAnswerFromButton()"

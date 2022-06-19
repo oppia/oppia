@@ -48,7 +48,7 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { TrainingDataService } from './training-data.service';
 import { TrainingModalService } from './training-modal.service';
-import { TruncateInputBasedOnInteractionAnswerType } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
+import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
@@ -68,18 +68,18 @@ export const RULES_SERVICE_MAPPING = {
   TextInputRulesService: TextInputRulesService,
 };
 
-interface TrainingData {
-  answer: InteractionAnswer;
-  answerTemplate: string;
-}
+ interface TrainingData {
+   answer: InteractionAnswer;
+   answerTemplate: string;
+ }
 
-@Component({
-  selector: 'training-data-editor-panel',
-  templateUrl: './training-data-editor-panel-modal.component.html'
-})
+ @Component({
+   selector: 'training-data-editor-panel',
+   templateUrl: './training-data-editor-panel-modal.component.html'
+ })
 
 export class TrainingDataEditorPanelComponent
-  extends ConfirmOrCancelModal implements OnInit, OnDestroy {
+   extends ConfirmOrCancelModal implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   _stateName: string | null;
@@ -98,23 +98,23 @@ export class TrainingDataEditorPanelComponent
   newAnswerOutcomeDest: string;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
-    private injector: Injector,
-    private alertsService: AlertsService,
-    private trainingModalService: TrainingModalService,
-    private stateInteractionIdService: StateInteractionIdService,
-    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-    private stateCustomizationArgsService: StateCustomizationArgsService,
-    private focusManagerService: FocusManagerService,
-    private trainingDataService: TrainingDataService,
-    private angularNameService: AngularNameService,
-    private answerClassificationService: AnswerClassificationService,
-    private explorationStatesService: ExplorationStatesService,
-    private responsesService: ResponsesService,
-    private stateEditorService: StateEditorService,
-    private currentInteractionService: CurrentInteractionService,
-    private truncateInputBasedOnInteractionAnswerType:
-      TruncateInputBasedOnInteractionAnswerType,
+     private ngbActiveModal: NgbActiveModal,
+     private injector: Injector,
+     private alertsService: AlertsService,
+     private trainingModalService: TrainingModalService,
+     private stateInteractionIdService: StateInteractionIdService,
+     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+     private stateCustomizationArgsService: StateCustomizationArgsService,
+     private focusManagerService: FocusManagerService,
+     private trainingDataService: TrainingDataService,
+     private angularNameService: AngularNameService,
+     private answerClassificationService: AnswerClassificationService,
+     private explorationStatesService: ExplorationStatesService,
+     private responsesService: ResponsesService,
+     private stateEditorService: StateEditorService,
+     private currentInteractionService: CurrentInteractionService,
+     private truncateInputBasedOnInteractionAnswerTypePipe:
+       TruncateInputBasedOnInteractionAnswerTypePipe,
   ) {
     super(ngbActiveModal);
   }
@@ -142,19 +142,18 @@ export class TrainingDataEditorPanelComponent
       this.trainingModalService.onFinishTrainingCallback.subscribe(
         (finishTrainingResult) => {
           let truncatedAnswer = (
-            this.truncateInputBasedOnInteractionAnswerType.transform(
+            this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
               finishTrainingResult.interactionId, 12));
           let successToast = (
             'The answer ' + truncatedAnswer +
-            ' has been successfully trained.');
+             ' has been successfully trained.');
           this.alertsService.addSuccessMessage(
             successToast, 1000);
           this._rebuildTrainingData();
         }));
 
-    // Shivam PTAL.
-    // this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
+    this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
     this.init();
   }
 
@@ -173,7 +172,7 @@ export class TrainingDataEditorPanelComponent
     // answer is present.
 
     if ((this.answerGroupHasNonEmptyRules &&
-        this.trainingData.length > 0) && this.trainingData.length > 1) {
+         this.trainingData.length > 0) && this.trainingData.length > 1) {
       let answer = this.trainingData[answerIndex].answer;
       let interactionId = this.stateInteractionIdService.savedMemento;
       this.trainingModalService.openTrainUnresolvedAnswerModal(
@@ -215,14 +214,14 @@ export class TrainingDataEditorPanelComponent
     this.ngbActiveModal.close();
   }
 
-  submitAnswe(newAnswer: InteractionAnswer): void {
+  submitAnswer(newAnswer: InteractionAnswer): void {
     this.newAnswerIsAlreadyResolved = false;
 
     let interactionId = this.stateInteractionIdService.savedMemento;
 
     let rulesServiceName =
-      this.angularNameService.getNameOfInteractionRulesService(
-        interactionId);
+       this.angularNameService.getNameOfInteractionRulesService(
+         interactionId);
 
     // Inject RulesService dynamically.
     let rulesService = (
@@ -254,19 +253,19 @@ export class TrainingDataEditorPanelComponent
     // Shivam PTAL.
     if ((
       classificationType ===
-        ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION) ||
-      (classificationType ===
-         ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION)) {
+         ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION) ||
+       (classificationType ===
+          ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION)) {
       this.newAnswerIsAlreadyResolved = true;
     } else {
       this.trainingDataService.associateWithAnswerGroup(
         this.answerGroupIndex, newAnswer);
       let truncatedAnswer = (
-        this.truncateInputBasedOnInteractionAnswerType.transform(
+        this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
           newAnswer, interactionId, 12));
       let successToast = (
         'The answer ' + truncatedAnswer +
-        ' has been successfully trained.');
+         ' has been successfully trained.');
       this.alertsService.addSuccessMessage(
         successToast, 1000);
       this._rebuildTrainingData();
@@ -275,6 +274,6 @@ export class TrainingDataEditorPanelComponent
 }
 
 angular.module('oppia').directive('trainingDataEditorPanel',
-  downgradeComponent({
-    component: TrainingDataEditorPanelComponent
-  }) as angular.IDirectiveFactory);
+   downgradeComponent({
+     component: TrainingDataEditorPanelComponent
+   }) as angular.IDirectiveFactory);
