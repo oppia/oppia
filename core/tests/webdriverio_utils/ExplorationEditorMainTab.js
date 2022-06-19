@@ -20,8 +20,8 @@
 var forms = require('./forms.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
-// var ruleTemplates = require(
-//   '../../../extensions/interactions/rule_templates.json');
+var ruleTemplates = require(
+  '../../../extensions/interactions/rule_templates.json');
 var waitFor = require('../webdriverio_utils/waitFor.js');
 var action = require('./action.js');
 
@@ -29,6 +29,19 @@ var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
 
 var ExplorationEditorMainTab = function() {
+  /*
+   * Interactive elements
+   */
+  var multipleChoiceAnswerOptions = function(optionNum) {
+    return $(
+      `.protractor-test-html-multiple-select-option=${optionNum}`);
+  };
+
+  var itemSelectionAnswerOptions = function(optionNum) {
+    return $(
+      `.protractor-test-html-item-select-option=${optionNum}`);
+  };
+
   /*
    * Actions
    */
@@ -54,6 +67,70 @@ var ExplorationEditorMainTab = function() {
         'Expected to find at most one \'exit tutorial\' button');
     }
   };
+
+   // ---- RESPONSE EDITOR ----
+
+  /**
+   * This clicks the "add new response" button and then selects the rule type
+   * and enters its parameters, and closes the rule editor. Any number of rule
+   * parameters may be specified after the ruleName.
+   * Note that feedbackInstructions may be null (which means 'specify no
+   * feedback'), and only represents a single feedback element.
+   * @param {string} interactionId - Interaction type e.g. NumericInput
+   * @param {object} feedbackInstructions - A RTE object containing feedback
+   *                                        or null
+   * @param {string} destStateName - New destination state or 'try again'/null
+   * @param {boolean} createNewState - True if the rule creates a new state,
+   *                                   else false.
+   * @param {string} ruleName - The name of the rule, e.g. IsGreaterThan, must
+   *                            match with interaction type.
+   */
+  this.addResponse = async function(
+      interactionId, feedbackInstructions, destStateName,
+      createNewState, ruleName) {
+    await action.waitForAutosave();
+    // Open the "Add Response" modal if it is not already open.
+    var addResponseButton = $('.protractor-test-open-add-response-modal');
+    await action.click('Response Editor Button', addResponseButton);
+    await this.setResponse.apply(null, arguments);
+  };
+
+  this.setResponse = async function(
+      interactionId, feedbackInstructions, destStateName,
+      createNewState, ruleName) {
+    // Set the rule description.
+    var args = [addResponseDetails, interactionId, ruleName];
+    for (var i = 5; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    expect(await addResponseDetails.isDisplayed()).toBe(true);
+    await _selectRule(addResponseDetails, interactionId, ruleName);
+    await _setRuleParameters.apply(null, args);
+    // Open the feedback entry form if it is not already open.
+    var isVisible = await feedbackEditor.isPresent();
+    if (isVisible) {
+      await action.click('Feedback editor', feedbackEditor);
+    }
+
+    if (feedbackInstructions) {
+      // Set feedback contents.
+      await _setOutcomeFeedback(feedbackInstructions);
+    }
+    // If the destination is being changed, open the corresponding editor.
+    if (destStateName || destStateName !== '(try again)') {
+    // Set destination contents.
+      if (destStateName !== null) {
+        await _setOutcomeDest(
+          destStateName, createNewState, null);
+      }
+    }
+
+    // Close new response modal.
+    await action.click('New Response Button', addNewResponseButton);
+    await waitFor.invisibilityOf(
+      addNewResponseButton, 'Add New Response Modal is not closed');
+  };
+
 
   // ---- CONTENT ----
 
@@ -198,6 +275,133 @@ var ExplorationEditorMainTab = function() {
       'Interaction tile ' + interactionId + ' takes too long to be visible'
     );
     await action.click('Interaction tile ' + interactionId, targetTile);
+  };
+
+  // ---- RULES ----
+  var _getRuleDescription = function(interactionId, ruleName) {
+    if (ruleTemplates.hasOwnProperty(interactionId)) {
+      if (ruleTemplates[interactionId].hasOwnProperty(ruleName)) {
+        return ruleTemplates[interactionId][ruleName].description;
+      } else {
+        throw new Error('Unknown rule: ' + ruleName);
+      }
+    } else {
+      throw new Error('Could not find rules for interaction: ' + interactionId);
+    }
+  };
+
+  // Parses the relevant ruleDescription string, and returns an Array containing
+  // the types of the rule input parameters.
+  var _getRuleParameterTypes = function(interactionId, ruleName) {
+    var ruleDescription = _getRuleDescription(interactionId, ruleName);
+    // An example of rule description:
+    // is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}.
+    // (from NumericInput).
+    var parameterTypes = [];
+    var re = /\|(.*?)\}/ig;
+    // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}].
+    var angularSelectors = ruleDescription.match(re);
+    // Slicing first and last letter.
+    if (angularSelectors) {
+      for (var index = 0; index < angularSelectors.length; index++) {
+        parameterTypes.push(angularSelectors[index].toString().slice(1, -1));
+      }
+    }
+    // Expected sample output = Array[NonnegativeInt, NonnegativeInt].
+    return parameterTypes;
+  };
+
+  // This function sets the parameter values for the given rule.
+  // Note: The parameter values should be specified as additional arguments
+  // after the ruleName. For example, the call
+  //   _selectRuleParameters(ruleElement, 'NumericInput', 'Equals', 24)
+  // will result in a rule that checks whether the learner's answer equals 24.
+  var _setRuleParameters = async function(
+      ruleElement, interactionId, ruleName) {
+    var parameterValues = [];
+    for (var i = 3; i < arguments.length; i++) {
+      parameterValues.push(arguments[i]);
+    }
+    var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
+    expect(parameterValues.length).toEqual(parameterTypes.length);
+    for (var i = 0; i < parameterValues.length; i++) {
+      var answerDescriptionFragment = $$(
+        '.protractor-test-answer-description-fragment');
+      var parameterElement = answerDescriptionFragment[i * 2 + 1];
+      var parameterEditor = await forms.getEditor(
+        parameterTypes[i])(parameterElement);
+
+      if (interactionId === 'MultipleChoiceInput') {
+        // This is a special case as it uses a dropdown to set a NonnegativeInt.
+        var parameterElementButton = parameterElement.$('<button>');
+        await action.click('Parameter Element Button', parameterElementButton);
+        var multipleChoiceAnswerOption =
+          multipleChoiceAnswerOptions(parameterValues[i]);
+        await action.click(
+          'Multiple Choice Answer Option: ' + i,
+          multipleChoiceAnswerOption);
+      } else if (interactionId === 'ItemSelectionInput') {
+        var answerArray = Array.from(parameterValues[i]);
+        for (var j = 0; j < answerArray.length; j++) {
+          var itemSelectionAnswerOption =
+            itemSelectionAnswerOptions(answerArray[j]);
+          await action.click(
+            'Item Selection Answer Option: ' + j,
+            itemSelectionAnswerOption);
+        }
+      } else {
+        await parameterEditor.setValue(parameterValues[i]);
+      }
+    }
+  };
+
+  /**
+   * Parse for rule input placeholders in ruleDescription and replace them.
+   * @param {string} [ruleDescription] - Interaction type.
+   * @param {string[]} [providedText] - Feedback text to replace with.
+   */
+  var _replaceRuleInputPlaceholders = function(ruleDescription, providedText) {
+    // An example of rule description:
+    // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
+    // (from NumericInput).
+    var re = /{{[a-z]+[\|](.*?)}}/ig;
+    // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}].
+    var placeholders = ruleDescription.match(re);
+    var textArray = [];
+    // Return as-is if string does not contain placeholders.
+    if (placeholders) {
+      // Replacing placeholders in ruleDescription with given text.
+      for (var index = 0; index < placeholders.length; index++) {
+        var placeholderElement = placeholders[index];
+        if (providedText[0] === '...') {
+          ruleDescription = ruleDescription.replace(placeholderElement, '...');
+        } else {
+          if (providedText.length !== placeholders.length) {
+            throw new Error(
+              '# of feedback text(' + textArray.length +
+              ') is expected to match # of placeholders(' +
+              (placeholders.length) + ')');
+          }
+          ruleDescription = ruleDescription.replace(
+            placeholderElement, providedText[index].toString());
+        }
+      }
+    }
+    return ruleDescription;
+  };
+
+
+  // This function selects a rule from the dropdown,
+  // but does not set any of its input parameters.
+  var _selectRule = async function(ruleElem, interactionId, ruleName) {
+    var ruleDescription = _getRuleDescription(interactionId, ruleName);
+    // Replace selectors with "...".
+    ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
+    var ruleDescriptionInDropdown = ruleDescription;
+    await action.click('Answer Description', answerDescription);
+    var ruleDropdownElement = $$(
+      `.select2-results__option=${ruleDescriptionInDropdown}`)[0];
+    await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 };
 

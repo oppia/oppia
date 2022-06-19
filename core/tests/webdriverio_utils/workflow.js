@@ -24,7 +24,6 @@ var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 
-
 var getImageSource = async function(customImageElement) {
   await waitFor.visibilityOf(
     customImageElement,
@@ -121,10 +120,17 @@ var publishExploration = async function() {
   var testConfirmPublish = $('.protractor-test-confirm-publish');
   await action.click('Test Confirm Publish', testConfirmPublish);
 
-  var sharePublishModal = await $('.protractor-test-share-publish-modal');
+  var acceptCookieButton = $(
+    '.protractor-test-oppia-cookie-banner-accept-button');
+  var cookieButtonPresent = await acceptCookieButton.isDisplayed();
+  if (cookieButtonPresent) {
+    await action.click('Accept Cookie Button', acceptCookieButton);
+  }
+
+  var sharePublishModal = $('.protractor-test-share-publish-modal');
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  var closePublishModalButton = await $('.protractor-test-share-publish-close');
+  var closePublishModalButton = $('.protractor-test-share-publish-close');
   await action.click('Close Publish Modal Button', closePublishModalButton);
 };
 

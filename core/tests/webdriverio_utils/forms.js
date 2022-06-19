@@ -81,84 +81,83 @@ var AutocompleteDropdownEditor = function(elem) {
   };
 };
 
-// var GraphEditor = function(graphInputContainer) {
-//   if (!graphInputContainer) {
-//     throw new Error('Please provide Graph Input Container element');
-//   }
-//   var vertexElement = async function(index) {
-//     // Would throw incorrect element error if provided incorrect index number.
-//     // Node index starts at 0.
-//     return await graphInputContainer.$(
-//       `.protractor-test-graph-vertex-${index}`);
-//   };
+var GraphEditor = function(graphInputContainer) {
+  if (!graphInputContainer) {
+    throw new Error('Please provide Graph Input Container element');
+  }
+  var vertexElement = async function(index) {
+    // Would throw incorrect element error if provided incorrect index number.
+    // Node index starts at 0.
+    return graphInputContainer.$(
+      `.protractor-test-graph-vertex-${index}`);
+  };
 
-//   var createVertex = async function(xOffset, yOffset) {
-//     var addNodeButton = await graphInputContainer.$(
-//       '.protractor-test-Add-Node-button');
-//     await action.click('Add Node Button', addNodeButton);
-//     // Offsetting from the graph container.
-//     await browser.actions().mouseMove(
-//       graphInputContainer, {x: xOffset, y: yOffset}).perform();
-//     await browser.actions().click().perform();
-//   };
+  var createVertex = async function(xOffset, yOffset) {
+    var addNodeButton = await graphInputContainer.$(
+      '.protractor-test-Add-Node-button');
+    await action.click('Add Node Button', addNodeButton);
+    // Offsetting from the graph container.
+    await browser.moveToElement(graphInputContainer, xOffset, yOffset);
+    await browser.actions().click().perform();
+  };
 
-//   var createEdge = async function(vertexIndex1, vertexIndex2) {
-//     var addEdgeButton = await graphInputContainer.$(
-//       '.protractor-test-Add-Edge-button');
-//     await action.click('Add Edge Button', addEdgeButton);
-//     await browser.actions().mouseMove(
-//       vertexElement(vertexIndex1)).perform();
-//     await browser.actions().mouseDown().perform();
-//     await browser.actions().mouseMove(
-//       vertexElement(vertexIndex2)).perform();
-//     await browser.actions().mouseUp().perform();
-//   };
+  var createEdge = async function(vertexIndex1, vertexIndex2) {
+    var addEdgeButton = await graphInputContainer.$(
+      '.protractor-test-Add-Edge-button');
+    await action.click('Add Edge Button', addEdgeButton);
+    await browser.actions().mouseMove(
+      vertexElement(vertexIndex1)).perform();
+    await browser.actions().mouseDown().perform();
+    await browser.actions().mouseMove(
+      vertexElement(vertexIndex2)).perform();
+    await browser.actions().mouseUp().perform();
+  };
 
-//   return {
-//     setValue: async function(graphDict) {
-//       var nodeCoordinatesList = graphDict.vertices;
-//       var edgesList = graphDict.edges;
-//       if (nodeCoordinatesList) {
-//         expect(nodeCoordinatesList.length).toBeGreaterThan(0);
-//         // Assume x-coord is at index 0.
-//         for (coordinateElement of nodeCoordinatesList) {
-//           await createVertex(coordinateElement[0], coordinateElement[1]);
-//         }
-//       }
-//       if (edgesList) {
-//         for (edgeElement of edgesList) {
-//           await createEdge(edgeElement[0], edgeElement[1]);
-//         }
-//       }
-//     },
-//     clearDefaultGraph: async function() {
-//       var deleteButton = await graphInputContainer.$(
-//         '.protractor-test-Delete-button');
-//       await action.click('Delete Button', deleteButton);
-//       // Sample graph comes with 3 vertices.
-//       for (var i = 2; i >= 0; i--) {
-//         await action.click(`Vertex Element ${i}`, vertexElement(i));
-//       }
-//     },
-//     expectCurrentGraphToBe: async function(graphDict) {
-//       var nodeCoordinatesList = graphDict.vertices;
-//       var edgesList = graphDict.edges;
-//       if (nodeCoordinatesList) {
-//         // Expecting total no. of vertices on the graph matches with the given
-//         // dict's vertices.
-//         for (var i = 0; i < nodeCoordinatesList.length; i++) {
-//           expect(await vertexElement(i).isDisplayed()).toBe(true);
-//         }
-//       }
-//       if (edgesList) {
-//         var allEdgesElement = await $$('.protractor-test-graph-edge');
-//         // Expecting total no. of edges on the graph matches with the given
-//         // dict's edges.
-//         expect(await allEdgesElement.count()).toEqual(edgesList.length);
-//       }
-//     }
-//   };
-// };
+  return {
+    setValue: async function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        expect(nodeCoordinatesList.length).toBeGreaterThan(0);
+        // Assume x-coord is at index 0.
+        for (coordinateElement of nodeCoordinatesList) {
+          await createVertex(coordinateElement[0], coordinateElement[1]);
+        }
+      }
+      if (edgesList) {
+        for (edgeElement of edgesList) {
+          await createEdge(edgeElement[0], edgeElement[1]);
+        }
+      }
+    },
+    clearDefaultGraph: async function() {
+      var deleteButton = await graphInputContainer.$(
+        '.protractor-test-Delete-button');
+      await action.click('Delete Button', deleteButton);
+      // Sample graph comes with 3 vertices.
+      for (var i = 2; i >= 0; i--) {
+        await action.click(`Vertex Element ${i}`, vertexElement(i));
+      }
+    },
+    expectCurrentGraphToBe: async function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        // Expecting total no. of vertices on the graph matches with the given
+        // dict's vertices.
+        for (var i = 0; i < nodeCoordinatesList.length; i++) {
+          expect(await vertexElement(i).isDisplayed()).toBe(true);
+        }
+      }
+      if (edgesList) {
+        var allEdgesElement = await $$('.protractor-test-graph-edge');
+        // Expecting total no. of edges on the graph matches with the given
+        // dict's edges.
+        expect(await allEdgesElement.count()).toEqual(edgesList.length);
+      }
+    }
+  };
+};
 
 var RichTextEditor = async function(elem) {
   var rteElements = await $$('.protractor-test-rte');
@@ -327,5 +326,6 @@ exports.toRichText = toRichText;
 exports.UnicodeEditor = UnicodeEditor;
 exports.DictionaryEditor = DictionaryEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
+exports.GraphEditor = GraphEditor;
 
 exports.getEditor = getEditor;

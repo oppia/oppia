@@ -70,12 +70,13 @@ var invisibilityOf = async function(element, errorMessage) {
  * Consider adding this method after each browser.url() call.
  */
 var pageToFullyLoad = async function() {
-  var loadingMessage = await $('.protractor-test-loading-fullpage');
-  await loadingMessage.waitForExist({
-    timeout: 15000,
-    reverse: true,
-    timeoutMsg: 'Page takes more than 15 secs to load'
-  });
+  var loadingMessage = $('.protractor-test-loading-fullpage');
+  await browser.waitUntil(
+    await until.invisibilityOf(loadingMessage),
+    {
+      timeout: 15000,
+      timeoutMsg: 'Page takes more than 15 secs to load'
+    });
 };
 
 /**

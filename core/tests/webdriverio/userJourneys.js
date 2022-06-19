@@ -34,8 +34,8 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
   var languageDropdown = $('.protractor-test-language-dropdown');
-  var languageOption = $('.protractor-test-i18n-language-' + language);
   await action.click('Language Dropdown', languageDropdown);
+  var languageOption = $('.protractor-test-i18n-language-' + language);
   await action.click('Language Option', languageOption);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();

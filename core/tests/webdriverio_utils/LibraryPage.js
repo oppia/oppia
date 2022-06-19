@@ -61,11 +61,10 @@ var LibraryPage = function() {
 
   this.playCollection = async function(collectionName) {
     await waitFor.pageToFullyLoad();
-    await browser.debug();
-    var allCollectionSummaryTile = await $$(
+    var allCollectionSummaryTile = $(
       '.protractor-test-collection-summary-tile');
     await waitFor.visibilityOf(
-      allCollectionSummaryTile[0],
+      allCollectionSummaryTile,
       'Library Page does not have any collections');
     var collectionCard = await allCollectionsTitled(collectionName)[0];
     await waitFor.visibilityOf(

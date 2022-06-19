@@ -43,8 +43,7 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
   // Javascript click action is used here to avoid the error.
   if (elementIsMasked) {
     await browser.execute(
-      'arguments[0].click()',
-      await browser.findElement('css selector', clickableElement));
+      '$(arguments[0]).click()', clickableElement);
   } else {
     await clickableElement.click();
   }
