@@ -39,13 +39,6 @@ class MockExplorationStatesService {
   }
 }
 
-class MockCurrentInteractionService {
-  isSubmitButtonDisabled() {
-    return false;
-  }
-
-  submitAnswer() {}
-}
 // eslint-disable-next-line oppia/no-test-blockers
 fdescribe('Test Interaction Panel Component', () => {
   let component: TestInteractionPanel;
@@ -66,10 +59,7 @@ fdescribe('Test Interaction Panel Component', () => {
           provide: ExplorationStatesService,
           useClass: MockExplorationStatesService
         },
-        {
-          provide: CurrentInteractionService,
-          useClass: MockCurrentInteractionService
-        }
+        CurrentInteractionService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
