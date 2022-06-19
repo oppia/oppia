@@ -307,7 +307,7 @@ describe('Teach Oppia Modal Controller', function() {
 
     it('should open train unresolved answer modal', function() {
       spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback, third) {
+        .callFake(function(InteractionAnswer, interactionId, answerIndex) {
         });
 
       $scope.openTrainUnresolvedAnswerModal(0);

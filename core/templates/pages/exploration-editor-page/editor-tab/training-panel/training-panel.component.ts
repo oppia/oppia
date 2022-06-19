@@ -121,8 +121,7 @@ export class TrainingPanelComponent
     let _state = this.explorationStatesService.getState(_stateName);
     this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
       _state);
-    // Shivam PTAL.
-    // this.$watch('answer', _updateAnswerTemplate);
+
     this._updateAnswerTemplate();
     this.selectedAnswerGroupIndex = (
       this.classification.answerGroupIndex);

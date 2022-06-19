@@ -126,7 +126,6 @@ export class TrainingDataEditorPanelComponent
     this.answerGroupIndex = (
       this.responsesService.getActiveAnswerGroupIndex());
     this.FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput';
-
     this.stateContent = this._state.content.html;
     this.trainingData = [];
     this.answerGroupHasNonEmptyRules = (
@@ -248,9 +247,6 @@ export class TrainingDataEditorPanelComponent
     let classificationType = (
       classificationResult.classificationCategorization);
 
-    // If answer is explicitly classified then show the
-    // classification results to the creator.
-    // Shivam PTAL.
     if ((
       classificationType ===
          ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION) ||

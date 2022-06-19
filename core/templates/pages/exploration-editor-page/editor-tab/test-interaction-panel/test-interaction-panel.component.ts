@@ -16,10 +16,10 @@
  * @fileoverview Directive for the test interaction panel in the state editor.
  */
 
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 
