@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for TrainingModal.
+ * @fileoverview Component for Training Modal.
  */
 
 
