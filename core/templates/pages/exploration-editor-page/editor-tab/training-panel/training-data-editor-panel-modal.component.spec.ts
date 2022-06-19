@@ -317,4 +317,3 @@ describe('Training Data Editor Panel Component', () => {
      expect(ngbActiveModal.dismiss).toHaveBeenCalled();
    });
 });
-

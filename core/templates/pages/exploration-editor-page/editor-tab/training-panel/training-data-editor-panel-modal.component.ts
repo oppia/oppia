@@ -153,7 +153,7 @@ export class TrainingDataEditorPanelComponent
           this._rebuildTrainingData();
         }));
 
-    // this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
+    this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
     this.init();
   }
 
