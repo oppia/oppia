@@ -30,7 +30,7 @@ from core import utils
 from core.tests import test_utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
@@ -338,7 +338,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             expected_args=[('path/package-1.1.0',)]
         )
         pip_install_swap = self.swap_with_checks(
-            install_backend_python_libs,
+            install_python_prod_dependencies,
             'pip_install',
             lambda _, __: None,
             expected_args=[('package==1.1.0', 'path/package-1.1.0')]
@@ -356,7 +356,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             expected_args=[('path/package-1.1.0',)]
         )
         pip_install_swap = self.swap_with_checks(
-            install_backend_python_libs,
+            install_python_prod_dependencies,
             'pip_install',
             lambda _, __: None,
             expected_args=[(

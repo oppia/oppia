@@ -89,7 +89,7 @@ def normalize_python_library_name(library_name):
     # the suffix. We have also implemented the backend tests,
     # test_uniqueness_of_lib_names_in_requirements_file and
     # test_uniqueness_of_lib_names_in_compiled_requirements_file, in
-    # scripts/install_backend_python_libs_test.py to ensure that all
+    # scripts/install_python_prod_dependencies_test.py to ensure that all
     # library names in the requirements files are distinct when normalized.
     library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
     return library_name.lower()
@@ -639,7 +639,7 @@ def validate_metadata_directories():
                 'The python library %s was installed without the correct '
                 'metadata folders which may indicate that the convention for '
                 'naming the metadata folders have changed. Please go to '
-                '`scripts/install_backend_python_libs` and modify our '
+                '`scripts/install_python_prod_dependencies` and modify our '
                 'assumptions in the '
                 '_get_possible_normalized_metadata_directory_names'
                 ' function for what metadata directory names can be.' %

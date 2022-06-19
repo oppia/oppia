@@ -69,7 +69,7 @@ for prerequisite in PREREQUISITES:
     install_prerequisite(prerequisite)
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_python_prod_dependencies  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -222,10 +222,10 @@ def ensure_pip_library_is_installed(package, version, path):
     if not os.path.exists(exact_lib_path):
         print('Installing %s' % package)
         if package.startswith('git+'):
-            install_backend_python_libs.pip_install(
+            install_python_prod_dependencies.pip_install(
                 '%s@%s' % (package, version), exact_lib_path)
         else:
-            install_backend_python_libs.pip_install(
+            install_python_prod_dependencies.pip_install(
                 '%s==%s' % (package, version), exact_lib_path)
 
 
@@ -239,7 +239,7 @@ def ensure_system_python_libraries_are_installed(package, version):
         version: str. The package version.
     """
     print('Checking if %s is installed.' % (package))
-    install_backend_python_libs.pip_install_to_system(package, version)
+    install_python_prod_dependencies.pip_install_to_system(package, version)
 
 
 def main() -> None:
