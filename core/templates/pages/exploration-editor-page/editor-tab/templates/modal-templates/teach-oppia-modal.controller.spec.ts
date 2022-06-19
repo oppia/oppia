@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
@@ -50,6 +50,7 @@ describe('Teach Oppia Modal Controller', function() {
   var $httpBackend = null;
   var $log = null;
   var $scope = null;
+  let ctrl = null;
   var $uibModalInstance = null;
   var alertsService = null;
   var angularNameService = null;
@@ -66,7 +67,7 @@ describe('Teach Oppia Modal Controller', function() {
   var mockExternalSaveEventEmitter = null;
   var explorationId = 'exp1';
   var stateName = 'Introduction';
-  let MockEmitter = new EventEmitter();
+  let mockEmitter = new EventEmitter();
   var state = {
     classifier_model_id: null,
     content: {
@@ -157,7 +158,7 @@ describe('Teach Oppia Modal Controller', function() {
       openTrainUnresolvedAnswerModal: () => {
         return true;
       },
-      onFinishTrainingCallback: MockEmitter
+      onFinishTrainingCallback: mockEmitter
     });
   }));
 
@@ -253,21 +254,35 @@ describe('Teach Oppia Modal Controller', function() {
       });
 
       $scope = $rootScope.$new();
-      $controller('TeachOppiaModalController', {
+      ctrl = $controller('TeachOppiaModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance
       });
       $httpBackend.flush();
+      ctrl.$onInit();
+      $rootScope.$apply();
     }));
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should initialize unresolved answer properties after controller is' +
-      ' initialized', function() {
+      ' initialized', fakeAsync(() => {
+      let onchange = new EventEmitter();
+      spyOn(trainingModalService, 'onFinishTrainingCallback')
+        .and.returnValue(onchange);
+
+      onchange.emit('si');
+      mockEmitter.emit(null);
+      tick();
+
       var unresolvedAnswers = $scope.unresolvedAnswers[0];
 
       expect(unresolvedAnswers.answer).toBe('Answer Text');
       expect(unresolvedAnswers.answerTemplate).toBe('');
       expect(unresolvedAnswers.feedbackHtml).toBe('This is a html feedback');
-    });
+    }));
 
     it('should confirm answer assignment when its type is default_outcome',
       function() {
