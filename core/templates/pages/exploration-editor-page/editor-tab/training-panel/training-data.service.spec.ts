@@ -36,7 +36,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 
-describe('TrainingDataService', function() {
+xdescribe('TrainingDataService', function() {
   var siis, ecs, rs, tds, ess, oof;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
