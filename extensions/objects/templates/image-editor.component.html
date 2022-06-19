@@ -73,12 +73,24 @@
       </div>
     </div>
     <div *ngIf="isImageUploaded()" class="filepath-editor-save-box">
-      <button type="button"
+      <button *ngIf="!imageIsUploading; else Loading"
+              type="button"
               class="btn btn-success filepath-editor-use"
               (click)="saveUploadedFile()"
               [disabled]="isUserCropping()">
         Use This Image
       </button>
+      <ng-template #Loading>
+        <button class="btn btn-success filepath-editor-use"
+                type="button"
+                disabled>
+          <span class="spinner-border spinner-border-md"
+                role="status"
+                aria-hidden="true">
+          </span>
+          Uploading..
+        </button>
+      </ng-template>
       <button type="button"
               class="btn btn-secondary filepath-editor-discard"
               (click)="discardUploadedFile()"
