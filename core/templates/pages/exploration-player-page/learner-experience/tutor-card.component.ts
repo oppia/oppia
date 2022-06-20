@@ -43,6 +43,8 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -81,6 +83,13 @@ export class TutorCardComponent {
   @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
+  @Input() userIsLoggedIn: boolean;
+  @Input() explorationIsInPreviewMode: boolean;
+  @Input() questionPlayerConfig;
+  @Input() collectionSummary: CollectionSummary;
+  @Input() isRefresherExploration: boolean;
+  @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
+  @Input() parentExplorationIds: string[];
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;

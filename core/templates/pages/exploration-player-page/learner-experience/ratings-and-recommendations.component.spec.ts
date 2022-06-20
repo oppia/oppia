@@ -27,6 +27,8 @@ import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
 import { MockLimitToPipe } from '../templates/information-card-modal.component.spec';
 import { RatingsAndRecommendationsComponent } from './ratings-and-recommendations.component';
+import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -35,6 +37,8 @@ describe('Ratings and recommendations component', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
   let userService: UserService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let urlInterpolationService: UrlInterpolationService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -65,6 +69,8 @@ describe('Ratings and recommendations component', () => {
         LearnerViewRatingService,
         UrlService,
         UserService,
+        ExplorationPlayerStateService,
+        UrlInterpolationService,
         {
           provide: WindowRef,
           useClass: MockWindowRef
@@ -81,6 +87,9 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   it('should populate internal properties and subscribe to event' +
@@ -98,6 +107,10 @@ describe('Ratings and recommendations component', () => {
       (callb: (rating: number) => void) => {
         callb(userRating);
       });
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'dummy_story_viewer_page_url');
     spyOnProperty(learnerViewRatingService, 'onRatingUpdated').and.returnValue(
       mockOnRatingUpdated);
 
@@ -107,11 +120,33 @@ describe('Ratings and recommendations component', () => {
     mockOnRatingUpdated.emit();
     tick();
 
+    expect(explorationPlayerStateService.isInStoryChapterMode)
+      .toHaveBeenCalled();
+    expect(componentInstance.inStoryMode).toBe(true);
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
+    expect(componentInstance.storyViewerUrl).toBe(
+      'dummy_story_viewer_page_url');
     expect(componentInstance.userRating).toEqual(userRating);
     expect(alertsService.addSuccessMessage).toHaveBeenCalled();
     expect(learnerViewRatingService.getUserRating).toHaveBeenCalled();
     expect(componentInstance.collectionId).toEqual(collectionId);
   }));
+
+  it('should not generate story page url if not in story mode',
+    fakeAsync(() => {
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(false);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+        'dummy_story_viewer_page_url');
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(explorationPlayerStateService.isInStoryChapterMode)
+        .toHaveBeenCalled();
+      expect(componentInstance.inStoryMode).toBe(false);
+      expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
+    }));
 
   it('should toggle popover when user clicks on rating stars', () => {
     componentInstance.feedbackPopOver = mockNgbPopover;

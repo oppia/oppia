@@ -28,6 +28,9 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
+import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
 
 interface ResultActionButton {
   type: string;
@@ -55,12 +58,12 @@ export class RatingsAndRecommendationsComponent {
   @Input() userIsLoggedIn: boolean;
   @Input() explorationIsInPreviewMode: boolean;
   @Input() questionPlayerConfig: QuestionPlayerConfig;
-  @Input() inStoryMode: boolean;
-  @Input() storyViewerUrl!: string;
   @Input() collectionSummary: CollectionSummary;
   @Input() isRefresherExploration: boolean;
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
+  inStoryMode: boolean;
+  storyViewerUrl!: string;
   collectionId: string;
   userRating: number;
   directiveSubscriptions = new Subscription();
@@ -71,10 +74,23 @@ export class RatingsAndRecommendationsComponent {
     private learnerViewRatingService: LearnerViewRatingService,
     private urlService: UrlService,
     private userService: UserService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
+    this.inStoryMode =
+      this.explorationPlayerStateService.isInStoryChapterMode();
+    if (this.inStoryMode) {
+      this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
+        TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
+          topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
+          classroom_url_fragment:
+            this.urlService.getUrlParams().classroom_url_fragment,
+          story_url_fragment: this.urlService.getUrlParams().story_url_fragment
+        });
+    }
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 
     this.directiveSubscriptions.add(

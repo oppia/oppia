@@ -13,7 +13,14 @@
       <oppia-tutor-card [displayedCard]="displayedCard"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
-                        [startCardChangeAnimation]="startCardChangeAnimation">
+                        [startCardChangeAnimation]="startCardChangeAnimation"
+                        [userIsLoggedIn]="isLoggedIn"
+                        [collectionSummary]="collectionSummary"
+                        [questionPlayerConfig]="questionPlayerConfig"
+                        [explorationIsInPreviewMode]="isInPreviewMode"
+                        [isRefresherExploration]="isRefresherExploration"
+                        [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                        [parentExplorationIds]="parentExplorationIds">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -77,18 +84,6 @@
     <oppia-correctness-footer></oppia-correctness-footer>
   </div>
 </div>
-
-<oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
-                                   [userIsLoggedIn]="isLoggedIn"
-                                   [explorationIsInPreviewMode]="isInPreviewMode"
-                                   [questionPlayerConfig]="questionPlayerConfig"
-                                   [inStoryMode]="inStoryMode"
-                                   [storyViewerUrl]="storyViewerUrl"
-                                   [collectionSummary]="collectionSummary"
-                                   [isRefresherExploration]="isRefresherExploration"
-                                   [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                                   [parentExplorationIds]="parentExplorationIds">
-</oppia-ratings-and-recommendations>
 
 <div *ngIf="prevSessionStatesProgress.length != 0" class="oppia-exploration-checkpoints-message">
   <div id="toast-container" class="toast-top-center toast-container">
