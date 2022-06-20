@@ -36,8 +36,8 @@ import subprocess
 import sys
 
 sys.path.append(os.getcwd())
-from core import utils  # isort:skip # pylint: disable=wrong-import-position
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
+from core import utils  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
