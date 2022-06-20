@@ -920,13 +920,13 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExplorationVersionHistoryModel.get_export_policy(),
             export_policy_dict)
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             exp_models.ExplorationVersionHistoryModel.
                 get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
-    def test_get_instance_id(self):
+    def test_get_instance_id(self) -> None:
         expected_instance_id = 'exp1-2'
         actual_instance_id = (
             exp_models.ExplorationVersionHistoryModel.get_instance_id(
@@ -939,11 +939,12 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
             exploration_id='exp1',
             exploration_version=2,
             state_version_history={
-                feconf.DEFAULT_INIT_STATE_NAME: (
-                    state_domain.StateVersionHistory(
-                        1, feconf.DEFAULT_INIT_STATE_NAME, 'user_1'
-                    ).to_dict()
-                )
+                feconf.DEFAULT_INIT_STATE_NAME: {
+                    'previously_edited_in_version': 1,
+                    'state_name_in_previous_version': (
+                        feconf.DEFAULT_INIT_STATE_NAME),
+                    'committer_id': 'user_1'
+                }
             },
             metadata_version_history={
                 'previously_edited_in_version': 1,
