@@ -1533,6 +1533,32 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     'exp_id_1', [1]))
 
+    def test_creating_new_exploration_creates_version_history_model(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_0_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        version_history_id = (
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                exploration.id, exploration.version))
+        version_history_model = exp_models.ExplorationVersionHistoryModel.get(
+            version_history_id)
+        expected_state_version_history_dict = {
+            feconf.DEFAULT_INIT_STATE_NAME: state_domain.StateVersionHistory(
+                None, None, self.owner_id
+            ).to_dict()
+        }
+        expected_metadata_version_history_dict = (
+            exp_domain.ExplorationMetadataVersionHistory(None, None).to_dict())
+
+        self.assertEqual(
+            version_history_model.state_version_history,
+            expected_state_version_history_dict
+        )
+        self.assertEqual(
+            version_history_model.metadata_version_history,
+            expected_metadata_version_history_dict
+        )
+
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 

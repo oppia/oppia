@@ -729,6 +729,23 @@ def _create_exploration(
     model.commit(committer_id, commit_message, commit_cmds_dict)
     exploration.version += 1
 
+    version_history_model = exp_models.ExplorationVersionHistoryModel(
+        id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exploration.id, exploration.version),
+        exploration_id=exploration.id,
+        exploration_version=exploration.version,
+        state_version_history={
+            state_name: state_domain.StateVersionHistory(
+                None, None, committer_id
+            ).to_dict()
+            for state_name in exploration.states
+        },
+        metadata_version_history=(
+            exp_domain.ExplorationMetadataVersionHistory(None, None).to_dict())
+    )
+    version_history_model.update_timestamps()
+    version_history_model.put()
+
     # Trigger statistics model creation.
     exploration_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
