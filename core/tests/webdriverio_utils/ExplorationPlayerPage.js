@@ -30,10 +30,11 @@ var ExplorationPlayerPage = function() {
   //   handler.readItalicText('slanted');
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
+    var conversationContent = $$('.protractor-test-conversation-content');
     await waitFor.visibilityOf(
-      conversationContent.first(), 'Conversation not visible');
+      conversationContent[0], 'Conversation not visible');
     await waitFor.visibilityOf(
-      conversationContent.last(), 'Conversation not fully present');
+      conversationContent[0], 'Conversation not fully present');
     await forms.expectRichText(
       conversationContent.last()
     ).toMatch(richTextInstructions);

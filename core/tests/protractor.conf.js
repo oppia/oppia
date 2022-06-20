@@ -53,10 +53,6 @@ var suites = {
       'protractor_desktop/classroomPageFileUploadFeatures.js'
     ],
 
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
-
     contributorDashboard: [
       'protractor_desktop/contributorDashboard.js'
     ],
@@ -167,10 +163,6 @@ var suites = {
 
     topicAndStoryViewer: [
       'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
-    users: [
-      'protractor_desktop/userJourneys.js',
     ],
 
     wipeout: [

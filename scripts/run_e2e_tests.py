@@ -149,7 +149,8 @@ RERUN_POLICIES = {
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'collections',
-    'navigation'
+    'navigation',
+    'users',
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
@@ -188,7 +189,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'topicsAndSkillsDashboard',
     'skillEditor',
     'topicAndStoryViewer',
-    'users',
     'wipeout'
 ]
 

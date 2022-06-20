@@ -59,6 +59,11 @@ var LibraryPage = function() {
     await _submitSearchQuery(collectionTitle);
   };
 
+  this.expectMainHeaderTextToBe = async function(expectedHeaderText) {
+    var mainHeader = $('.protractor-test-library-main-header');
+    expect(await mainHeader.getText()).toEqual(expectedHeaderText);
+  };
+
   this.playCollection = async function(collectionName) {
     await waitFor.pageToFullyLoad();
     var allCollectionSummaryTile = $(

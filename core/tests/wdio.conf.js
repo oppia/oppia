@@ -31,7 +31,7 @@ var suites = {
   // them. Therefore, we mention the complete directory
   // in 'full'.
   full: [
-    './core/tests/webdriverio/**/*.js',
+    './core/tests/webdriverio/**/*.js'
   ],
 
   collections: [
@@ -40,6 +40,10 @@ var suites = {
 
   navigation: [
     './core/tests/webdriverio/navigation.js'
+  ],
+
+  users: [
+    './core/tests/webdriverio/userJourneys.js'
   ],
 };
 

@@ -258,8 +258,7 @@ describe('Site language', function() {
       // Checking collection player page.
       await browser.url('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-share-collection-footer')).getText())
+      expect(await $('.protractor-test-share-collection-footer').getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
     }

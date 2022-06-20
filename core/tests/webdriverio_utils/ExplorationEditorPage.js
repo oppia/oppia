@@ -28,9 +28,137 @@ var ExplorationEditorSettingsTab = require(
 
 var ExplorationEditorPage = function() {
   /*
+  * Interactive elements
+  */
+  var commitMessageInput = $('.protractor-test-commit-message-input');
+  var neutralElement = $$('.protractor-test-neutral-element')[0];
+  var expTitle = $(
+    '.protractor-test-exploration-title-input');
+  var expObjective = $(
+    '.protractor-test-exploration-objective-input');
+  var expTags = $('.protractor-test-tags');
+  var expInput = expTags.$('<input>');
+  var expCategoryDropdownElement = $(
+    '.protractor-test-exploration-category-dropdown');
+  var expLanguageSelectorElement = $(
+    '.protractor-test-exploration-language-select');
+  var explorationMetadataModalHeaderElement = $(
+    '.protractor-test-metadata-modal-header');
+  var confirmPublish = $('.protractor-test-confirm-publish');
+  var expTagsSelectionChoiceElements = $$('.select2-selection__choice');
+  var modalContentElement = $('.modal-content');
+  var sharePublishModalElement = $('.protractor-test-share-publish-modal');
+  var selectionRenderedElement = $('.select2-selection__rendered');
+  var promptModalElement = $('.protractor-test-save-prompt-modal');
+  var explorationSaveModalElement = $(
+    '.protractor-test-exploration-save-modal');
+  var toastMessage = $('.protractor-test-toast-message');
+
+  /*
+   * Non-Interactive elements
+   */
+  var loadingModal = $('.protractor-test-loading-modal');
+
+  /*
+   * Buttons
+   */
+  var confirmDiscardChangesButton = $(
+    '.protractor-test-confirm-discard-changes');
+  var discardChangesButton = $('.protractor-test-discard-changes');
+  var discardLostChangesButton = $(
+    '.protractor-test-discard-lost-changes-button');
+  var discardAndExportLostChangesButton = $(
+    '.protractor-test-discard-and-export-lost-changes-button');
+  var navigateToImprovementsTabButton = $('.protractor-test-improvements-tab');
+  var navigateToFeedbackTabButton = $('.protractor-test-feedback-tab');
+  var navigateToHistoryTabButton = $('.protractor-test-history-tab');
+  var navigateToMainTabButton = $('.protractor-test-main-tab');
+  var navigateToPreviewTabButton = $('.protractor-test-preview-tab');
+  var navigateToSettingsTabButton = $('.protractor-test-settings-tab');
+  var navigateToStatsTabButton = $('.protractor-test-stats-tab');
+  var navigateToTranslationTabButton = $('.protractor-test-translation-tab');
+  var saveChangesButton = $('.protractor-test-save-changes');
+  var saveDiscardToggleButton = $('.protractor-test-save-discard-toggle');
+  var commitChangesButton = $('.protractor-test-save-draft-button');
+  var saveDraftButtonTextContainer = $('.protractor-test-save-draft-message');
+  var recommendationPromptSaveButton = $(
+    '.protractor-test-recommendation-prompt-save-button');
+  var publishChangesButtonTextContainer = $(
+    '.protractor-test-publish-changes-message');
+  var publishExplorationButton = $('.protractor-test-publish-exploration');
+  var prePublicationConfirmButton = $(
+    '.protractor-test-confirm-pre-publication');
+  var closeButton = $('.protractor-test-share-publish-close');
+
+  /*
    * Workflows
    */
   // ---- CONTROLS ----
+
+  this.publishCardExploration = async function(
+      title, objective, category, language, tags) {
+    await action.waitForAutosave();
+    await action.click('Publish button', publishExplorationButton);
+
+    await action.keys('Exploration title', expTitle, title);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
+    await action.waitForAutosave();
+
+    await action.keys('Exploration objective', expObjective, objective);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
+    await action.waitForAutosave();
+
+    await waitFor.presenceOf(
+      expCategoryDropdownElement,
+      'Category input takes too long to be visible.');
+    await (
+      await forms.AutocompleteDropdownEditor(expCategoryDropdownElement)
+    ).setValue(category);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
+    await action.waitForAutosave();
+
+    await action.select(
+      'Exploration Language', expLanguageSelectorElement,
+      language);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetadataModalHeaderElement);
+    await action.waitForAutosave();
+
+    for (var elem of tags) {
+      await action.click('Exploration input', expInput);
+      await action.keys('Exploration input', expInput, elem + '\n');
+      await action.click(
+        'Exploration metadata modal header',
+        explorationMetadataModalHeaderElement);
+      await action.waitForAutosave();
+    }
+
+    await action.click(
+      'Publish confirmation button', prePublicationConfirmButton);
+    await waitFor.invisibilityOf(
+      prePublicationConfirmButton,
+      'Exploration metadata modal takes too long to disappear.');
+    await waitFor.visibilityOf(
+      modalContentElement, 'Modal Content taking too long to appear');
+
+    await action.click('Confirm Publish', confirmPublish);
+    await waitFor.invisibilityOf(
+      confirmPublish,
+      'Confirm publish modal takes too long to disappear.');
+    await waitFor.visibilityOf(
+      sharePublishModalElement, 'Awesome modal taking too long to appear');
+
+    await action.click('Share publish button', closeButton);
+    await waitFor.invisibilityOf(
+      closeButton, 'Close button taking too long to disappear');
+  };
 
   this.saveChanges = async function(commitMessage) {
     await action.waitForAutosave();
