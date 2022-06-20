@@ -77,6 +77,7 @@ if ((process.env.GITHUB_ACTIONS &&
     ' because it\'s on CircleCI');
 }
 
+// A reference configuration file.
 exports.config = {
     //
     // ====================

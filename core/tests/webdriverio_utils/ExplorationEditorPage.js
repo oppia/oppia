@@ -37,7 +37,6 @@ var ExplorationEditorPage = function() {
   var expObjective = $(
     '.protractor-test-exploration-objective-input');
   var expTags = $('.protractor-test-tags');
-  var expInput = expTags.$('<input>');
   var expCategoryDropdownElement = $(
     '.protractor-test-exploration-category-dropdown');
   var expLanguageSelectorElement = $(
@@ -132,6 +131,7 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
 
     for (var elem of tags) {
+      var expInput = expTags.$('<input>');
       await action.click('Exploration input', expInput);
       await action.keys('Exploration input', expInput, elem + '\n');
       await action.click(

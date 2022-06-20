@@ -30,53 +30,9 @@ var DictionaryEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
       var entry = await elem.$$(
-        '.protractor-test-schema-based-dict-editor').get(index);
+        '.protractor-test-schema-based-dict-editor')[index];
       var editor = getEditor(objectType);
       return await editor(entry);
-    }
-  };
-};
-
-var UnicodeEditor = function(elem) {
-  return {
-    setValue: async function(text) {
-      await action.clear('Input Field', await elem.$('<input>'));
-      await action.keys(
-        'Input Field',
-        await elem.$('<input>'), text);
-    }
-  };
-};
-
-var AutocompleteDropdownEditor = function(elem) {
-  var containerLocator = '.select2-container';
-  var searchInputLocator = '.select2-search input';
-  var dropdownElement = '.select2-dropdown';
-  return {
-    setValue: async function(text) {
-      await action.click('Container Element', elem.$(containerLocator));
-      await action.waitForAutosave();
-      // NOTE: the input field is top-level in the DOM, and is outside the
-      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
-      // field when it is 'activated', i.e. when the dropdown is clicked.
-      await action.keys(
-        'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
-        text + '\n');
-    },
-    expectOptionsToBe: async function(expectedOptions) {
-      await action.click('Container Element', await elem.$(containerLocator));
-      var actualOptions = await dropdownElement.$$('<li>').map(
-        async function(optionElem) {
-          return await action.getText('Option Elem', optionElem);
-        }
-      );
-      expect(actualOptions).toEqual(expectedOptions);
-      // Re-close the dropdown.
-      await action.keys(
-        'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
-        '\n');
     }
   };
 };
@@ -98,19 +54,17 @@ var GraphEditor = function(graphInputContainer) {
     await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.moveToElement(graphInputContainer, xOffset, yOffset);
-    await browser.actions().click().perform();
+    await browser.positionClick();
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = await graphInputContainer.$(
       '.protractor-test-Add-Edge-button');
     await action.click('Add Edge Button', addEdgeButton);
-    await browser.actions().mouseMove(
-      vertexElement(vertexIndex1)).perform();
-    await browser.actions().mouseDown().perform();
-    await browser.actions().mouseMove(
-      vertexElement(vertexIndex2)).perform();
-    await browser.actions().mouseUp().perform();
+    await browser.moveToElement(vertexElement(vertexIndex1));
+    await browser.buttonDown();
+    await browser.moveToElement(vertexElement(vertexIndex2));
+    await browser.buttonUp();
   };
 
   return {
@@ -150,7 +104,7 @@ var GraphEditor = function(graphInputContainer) {
         }
       }
       if (edgesList) {
-        var allEdgesElement = await $$('.protractor-test-graph-edge');
+        var allEdgesElement = $$('.protractor-test-graph-edge');
         // Expecting total no. of edges on the graph matches with the given
         // dict's edges.
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
@@ -159,9 +113,76 @@ var GraphEditor = function(graphInputContainer) {
   };
 };
 
+var ListEditor = function(elem) {
+  var deleteListEntryLocator = '.protractor-test-delete-list-entry';
+  var addListEntryLocator = '.protractor-test-add-list-entry';
+  // NOTE: this returns a promise, not an integer.
+  var _getLength = async function() {
+    var items = (
+      await $$(
+        '#protractor-test-schema-based-list-editor-table-row')).$$('<td>');
+    return items.length;
+  };
+  // If objectType is specified this returns an editor for objects of that type
+  // which can be used to make changes to the newly-added item (for example
+  // by calling setValue() on it). Clients should ensure the given objectType
+  // corresponds to the type of elements in the list.
+  // If objectType is not specified, this function returns nothing.
+  var addItem = async function(objectType = null) {
+    var listLength = await _getLength();
+    var addListEntryButton = elem.$(addListEntryLocator);
+    await action.click('Add List Entry Button', addListEntryButton);
+    if (objectType !== null) {
+      return await getEditor(objectType)(
+        $$('.protractor-test-schema-based-list-editor-table-data')[listLength]);
+    }
+  };
+  var deleteItem = async function(index) {
+    var deleteItemField = await by
+      .repeater('item in localValue track by $index')
+      .row(index);
+    var deleteItemFieldElem = deleteItemField.element(
+      deleteListEntryLocator);
+    await action.click('Delete Item Field Elem', deleteItemFieldElem);
+  };
+
+  return {
+    editItem: async function(index, objectType) {
+      var item = await $$(
+        '.protractor-test-schema-based-list-editor-table-data')[index];
+      var editor = getEditor(objectType);
+      return await editor(item);
+    },
+    addItem: addItem,
+    deleteItem: deleteItem,
+    // This will add or delete list elements as necessary.
+    setLength: async function(desiredLength) {
+      var startingLength = await $$(
+        '#protractor-test-schema-based-list-editor-table-row').$$(
+        '<td>').count();
+      for (var i = startingLength; i < desiredLength; i++) {
+        await addItem();
+      }
+      for (var j = startingLength - 1; j >= desiredLength; j--) {
+        await deleteItem(j);
+      }
+    }
+  };
+};
+
+var RealEditor = function(elem) {
+  return {
+    setValue: async function(value) {
+      await action.clear('Text Input', elem.$('<input>'));
+      await action.keys(
+        'Text Input', elem.$('<input>'), value);
+    }
+  };
+};
+
 var RichTextEditor = async function(elem) {
-  var rteElements = await $$('.protractor-test-rte');
-  var modalDialogElements = await $$('.modal-dialog');
+  var rteElements = $$('.protractor-test-rte');
+  var modalDialogElements = $$('.modal-dialog');
   var modalDialogLength = modalDialogElements.length;
   var closeRteComponentButtonLocator = (
     '.protractor-test-close-rich-text-component-editor');
@@ -266,19 +287,302 @@ var RichTextEditor = async function(elem) {
   };
 };
 
-var CodeStringEditor = function(elem) {
+// Used to edit entries of a set of HTML strings, specifically used in the item
+// selection interaction test to customize interaction details.
+var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
   return {
-    setValue: async function(code) {
-      var stringEditorTextArea = await elem.$('textarea');
-      await action.clear('String Editor Text Area', stringEditorTextArea);
-      await action.keys(
-        'String Editor Text Area',
-        stringEditorTextArea,
-        code);
+    editEntry: async function(index, objectType) {
+      var entry = await elem.$$(
+        '.protractor-test-schema-based-dict-editor')[index];
+      var editor = getEditor(objectType);
+      return await editor(entry);
     }
   };
 };
 
+
+var UnicodeEditor = function(elem) {
+  return {
+    setValue: async function(text) {
+      await action.clear('Input Field', await elem.$('<input>'));
+      await action.keys(
+        'Input Field',
+        await elem.$('<input>'), text);
+    }
+  };
+};
+
+var AutocompleteDropdownEditor = function(elem) {
+  var containerLocator = '.select2-container';
+  var searchInputLocator = '.select2-search input';
+  var dropdownElement = '.select2-dropdown';
+  return {
+    setValue: async function(text) {
+      await action.click('Container Element', elem.$(containerLocator));
+      await action.waitForAutosave();
+      // NOTE: the input field is top-level in the DOM, and is outside the
+      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
+      // field when it is 'activated', i.e. when the dropdown is clicked.
+      await action.keys(
+        'Dropdown Element',
+        $(dropdownElement).$(searchInputLocator),
+        text + '\n');
+    },
+    expectOptionsToBe: async function(expectedOptions) {
+      await action.click('Container Element', await elem.$(containerLocator));
+      var actualOptions = await dropdownElement.$$('<li>').map(
+        async function(optionElem) {
+          return await action.getText('Option Elem', optionElem);
+        }
+      );
+      expect(actualOptions).toEqual(expectedOptions);
+      // Re-close the dropdown.
+      await action.keys(
+        'Dropdown Element',
+        $(dropdownElement).$(searchInputLocator),
+        '\n');
+    }
+  };
+};
+
+var AutocompleteMultiDropdownEditor = function(elem) {
+  var selectionChoiceRemoveLocator =
+    '.select2-selection__choice__remove';
+  var selectionRenderedLocator = '.select2-selection__rendered';
+  return {
+    setValues: async function(texts) {
+      // Clear all existing choices.
+      var deleteButtons = await elem.$(selectionRenderedLocator).$$(
+        '<li>').map(function(choiceElem) {
+        return choiceElem.element(selectionChoiceRemoveLocator);
+      });
+      // We iterate in descending order, because clicking on a delete button
+      // removes the element from the DOM. We also omit the last element
+      // because it is the field for new input.
+      for (var i = deleteButtons.length - 2; i >= 0; i--) {
+        await action.click(`Delete Buttons ${i}`, deleteButtons[i]);
+      }
+
+      for (var i = 0; i < texts.length; i++) {
+        await action.click('Container Element', elem.$(containerLocator));
+        var searchFieldElement = elem.$('.select2-search__field');
+        await action.keys(
+          'Search Field Element',
+          searchFieldElement,
+          texts[i] + '\n');
+      }
+    },
+    expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
+      actualSelection = await elem.$(selectionRenderedLocator).$$(
+        '<li>').map(async function(choiceElem) {
+        return await choiceElem.getText();
+      });
+      // Remove the element corresponding to the last <li>, which actually
+      // corresponds to the field for new input.
+      actualSelection.pop();
+      expect(actualSelection).toEqual(expectedCurrentSelection);
+    }
+  };
+};
+
+var MultiSelectEditor = function(elem) {
+  var searchBarDropdownMenuLocator =
+    '.protractor-test-search-bar-dropdown-menu';
+  var selectedLocator = '.protractor-test-selected';
+  // This function checks that the options corresponding to the given texts
+  // have the expected class name, and then toggles those options accordingly.
+  var _toggleElementStatusesAndVerifyExpectedClass = async function(
+      texts, expectedClassBeforeToggle) {
+    // Open the dropdown menu.
+    var searchBarDropdownToggleElement = elem.$(
+      '.protractor-test-search-bar-dropdown-toggle');
+    await action.click(
+      'Searchbar DropDown Toggle Element',
+      searchBarDropdownToggleElement);
+
+    var filteredElementsCount = 0;
+    for (var i = 0; i < texts.length; i++) {
+      var filteredElement = elem.$(
+        `.protractor-test-search-bar-dropdown-menu span=${texts[i]}`);
+      if (await filteredElement.isExisting()) {
+        filteredElementsCount += 1;
+        expect(await filteredElement.getAttribute('class')).toMatch(
+          expectedClassBeforeToggle);
+        await action.click('Filtered Element', filteredElement);
+      }
+    }
+
+    if (filteredElementsCount !== texts.length) {
+      throw new Error(
+        'Could not toggle element selection. Values requested: ' + texts +
+      '. Found ' + filteredElementsCount + ' matching elements.');
+    }
+
+    // Close the dropdown menu at the end.
+    await action.click(
+      'Searchbar Dropdown Toggle Element',
+      searchBarDropdownToggleElement);
+  };
+
+  return {
+    selectValues: async function(texts) {
+      await _toggleElementStatusesAndVerifyExpectedClass(
+        texts, 'protractor-test-deselected');
+    },
+    deselectValues: async function(texts) {
+      await _toggleElementStatusesAndVerifyExpectedClass(
+        texts, 'protractor-test-selected');
+    },
+    expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
+      // Open the dropdown menu.
+      await action.click(
+        'Searchbar Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
+
+      // Find the selected elements.
+      var actualSelection = await elem.$(searchBarDropdownMenuLocator)
+        .$$(selectedLocator).map(async function(selectedElem) {
+          return await action.getText('Selected Elem', selectedElem);
+        });
+      expect(actualSelection).toEqual(expectedCurrentSelection);
+
+      // Close the dropdown menu at the end.
+      await action.click(
+        'Searchbar Dropdown Toggle Element',
+        searchBarDropdownToggleElement);
+    }
+  };
+};
+
+// This function is sent 'elem', which should be the element immediately
+// containing the various elements of a rich text area, for example
+// <div>
+//   plain
+//   <b>bold</b>
+//   <oppia-noninteractive-math> ... </oppia-noninteractive-math>
+// <div>
+// The richTextInstructions function will be supplied with a 'handler' argument
+// which it should then use to read through the rich-text area using the
+// functions supplied by the RichTextChecker below. In the example above
+// richTextInstructions should consist of:
+//   handler.readPlainText('plain');
+//   handler.readBoldText('bold');
+//   handler.readRteComponent('Math', ...);
+var expectRichText = function(elem) {
+  var toMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(elem, 'RTE taking too long to become visible');
+    // TODO(#9821): Find a better way to parse through the tags rather than
+    // using xpath.
+    // We select all top-level non-paragraph elements, as well as all children
+    // of paragraph elements. (Note that it is possible for <p> elements to
+    // surround, e.g., <i> tags, so we can't just ignore the <p> elements
+    // altogether.)
+    var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
+    var arrayOfTexts = await elem.$$(XPATH_SELECTOR)
+      .map(async function(entry) {
+        // It is necessary to obtain the texts of the elements in advance since
+        // applying .getText() while the RichTextChecker is running would be
+        // asynchronous and so not allow us to update the textPointer
+        // synchronously.
+        return await entry.getText();
+      });
+    // We re-derive the array of elements as we need it too.
+    var arrayOfElements = elem.$$(XPATH_SELECTOR);
+    var fullText = await elem.getText();
+    var checker = await RichTextChecker(
+      arrayOfElements, arrayOfTexts, fullText);
+    await richTextInstructions(checker);
+    await checker.expectEnd();
+  };
+  return {
+    toMatch: toMatch,
+    toEqual: async function(text) {
+      await toMatch(async function(checker) {
+        await checker.readPlainText(text);
+      });
+    }
+  };
+};
+
+// This supplies functions to verify the contents of an area of the page that
+// was created using a rich-text editor, e.g. <div>text<b>bold</b></div>.
+// 'arrayOfElems': the array of promises of top-level element nodes in the
+//   rich-text area, e.g [promise of <b>bold</b>].
+// 'arrayOfTexts': the array of visible texts of top-level element nodes in
+//   the rich-text area, obtained from getText(), e.g. ['bold'].
+// 'fullText': a string consisting of all the visible text in the rich text
+//   area (including both element and text nodes, so more than just the
+//   concatenation of arrayOfTexts), e.g. 'textBold'.
+var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
+  expect(await arrayOfElems.count()).toEqual(arrayOfTexts.length);
+  // These are shared by the returned functions, and records how far through
+  // the child elements and text of the rich text area checking has gone. The
+  // arrayPointer traverses both arrays simultaneously.
+  var arrayPointer = 0;
+  var textPointer = 0;
+  // RTE components insert line breaks above and below themselves and these are
+  // recorded in fullText but not arrayOfTexts so we need to track them
+  // specially.
+  var justPassedRteComponent = false;
+
+  var _readFormattedText = async function(text, tagName) {
+    expect(
+      await (await arrayOfElems[arrayPointer]).getTagName()
+    ).toBe(tagName);
+    // Remove comments introduced by angular for bindings using replace.
+    expect(
+      (
+        await (await arrayOfElems[arrayPointer]).getAttribute('innerHTML')
+      ).replace(/<!--[^>]*-->/g, '').trim()
+    ).toBe(text);
+    expect(arrayOfTexts[arrayPointer]).toEqual(text);
+    arrayPointer = arrayPointer + 1;
+    textPointer = textPointer + text.length;
+    justPassedRteComponent = false;
+  };
+
+  return {
+    readPlainText: function(text) {
+      // Plain text is in a text node so not recorded in either array.
+      expect(
+        fullText.substring(textPointer, textPointer + text.length)
+      ).toEqual(text);
+      textPointer = textPointer + text.length;
+      justPassedRteComponent = false;
+    },
+    readBoldText: async function(text) {
+      await _readFormattedText(text, 'strong');
+    },
+    readItalicText: async function(text) {
+      await _readFormattedText(text, 'em');
+    },
+    // TODO(Jacob): Add functions for other rich text components.
+    // Additional arguments may be sent to this function, and they will be
+    // passed on to the relevant RTE component editor.
+    readRteComponent: async function(componentName) {
+      var elem = await arrayOfElems[arrayPointer];
+      expect(await elem.getTagName()).
+        toBe('oppia-noninteractive-' + componentName.toLowerCase());
+      // Need to convert arguments to an actual array; we tell the component
+      // which element to act on but drop the componentName.
+      var args = [elem];
+      for (var i = 1; i < arguments.length; i++) {
+        args.push(arguments[i]);
+      }
+      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+
+      await richTextComponents.getComponent(componentName).
+        expectComponentDetailsToMatch.apply(null, args);
+      textPointer = textPointer + arrayOfTexts[arrayPointer].length +
+        (justPassedRteComponent ? 1 : 2);
+      arrayPointer = arrayPointer + 1;
+      justPassedRteComponent = true;
+    },
+    expectEnd: async function() {
+      expect(arrayPointer).toBe(await arrayOfElems.count());
+    }
+  };
+};
 
 // This converts a string into a function that represents rich text, which can
 // then be sent to either editRichText() or expectRichText(). The string should
@@ -301,12 +605,154 @@ var toRichText = async function(text) {
   };
 };
 
+/**
+ * This function is used to read and check CodeMirror.
+ * The input 'elem' is the div with the 'CodeMirror-code' class.
+ * This assumes that line numbers are enabled, as line numbers are used to
+ * identify lines.
+ * CodeMirror loads a part of the text at once, and scrolling in the element
+ * loads more divs.
+ */
+var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
+  var lineContentElements = elem.$$('.CodeMirror-line');
+  var lineNumberElements = elem.$$('.CodeMirror-linenumber');
+  var scrollBarElements = $$('.CodeMirror-vscrollbar');
+  var codeMirrorLineNumberLocator = '.CodeMirror-linenumber';
+  var codeMirrorLineBackgroundLocator = '.CodeMirror-linebackground';
+  // The number of lines to scroll between reading different sections of
+  // CodeMirror's text.
+  var NUMBER_OF_LINES_TO_SCROLL = 15;
+
+  /**
+   * This recursive function is used by expectTextWithHighlightingToBe().
+   * currentLineNumber is the current largest line number processed,
+   * scrollTo is the number of pixels from the top of the text that
+   * codeMirror should scroll to,
+   * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
+   * which is to be scrolled.
+   * compareDict is an object whose keys are line numbers and whose values are
+   * objects corresponding to that line with the following key-value pairs:
+   *  - 'text': the exact string of text expected on that line
+   *  - 'highlighted': true or false, whether the line is highlighted
+   *  - 'checked': true or false, whether the line has been checked
+   * compareHighLighting: Whether highlighting should be compared.
+   */
+  var _compareText = async function(compareDict, compareHighLighting) {
+    var scrollTo = 0;
+    var prevScrollTop = -1;
+    var actualDiffDict = {};
+    var scrollBarWebElement = null;
+    if (codeMirrorPaneToScroll === 'first') {
+      scrollBarWebElement = await scrollBarElements[0];
+    } else {
+      var lastElement = scrollBarElements.length - 1;
+      scrollBarWebElement = await scrollBarElements[lastElement];
+    }
+    while (true) {
+      // This is used to match and scroll the text in codemirror to a point
+      // scrollTo pixels from the top of the text or the bottom of the text
+      // if scrollTo is too large.
+      await browser.execute(
+        '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
+        '().scrollTop(' + String(scrollTo) + ');');
+      var lineHeight = await elem.element(
+        codeMirrorLineNumberLocator).getAttribute('clientHeight');
+      var currentScrollTop = await browser.execute(
+        'return $(arguments[0]).scrollTop;', scrollBarWebElement);
+      if (currentScrollTop === prevScrollTop) {
+        break;
+      } else {
+        prevScrollTop = currentScrollTop;
+      }
+      var lineDivElements = elem.$$('./div');
+
+      var totalCount = await lineNumberElements.count();
+      for (var i = 0; i < totalCount; i++) {
+        var lineNumberElement = await lineNumberElements[i];
+        var lineNumber = await lineNumberElement.getText();
+        if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
+          throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
+        }
+        var lineDivElement = await lineDivElements[i];
+        var lineElement = await lineContentElements[i];
+        var isHighlighted = await lineDivElement.$(
+          codeMirrorLineBackgroundLocator).isExisting();
+        var text = await lineElement.getText();
+        actualDiffDict[lineNumber] = {
+          text: text,
+          highlighted: isHighlighted
+        };
+      }
+      scrollTo = scrollTo + lineHeight * NUMBER_OF_LINES_TO_SCROLL;
+    }
+    for (var lineNumber in compareDict) {
+      expect(actualDiffDict[lineNumber].text).toEqual(
+        compareDict[lineNumber].text);
+      if (compareHighLighting) {
+        expect(actualDiffDict[lineNumber].highlighted).toEqual(
+          compareDict[lineNumber].highlighted);
+      }
+    }
+  };
+
+  return {
+    /**
+     * Compares text and highlighting with codeMirror-mergeView. The input
+     * should be an object whose keys are line numbers and whose values should
+     * be an object with the following key-value pairs:
+     *  - text: the exact string of text expected on that line
+     *  - highlighted: true or false
+     * This runs much slower than checking without highlighting, so the
+     * expectTextToBe() function should be used when possible.
+     */
+    expectTextWithHighlightingToBe: async function(expectedTextDict) {
+      for (var lineNumber in expectedTextDict) {
+        expectedTextDict[lineNumber].checked = false;
+      }
+      await _compareText(expectedTextDict, true);
+    },
+    /**
+     * Compares text with codeMirror. The input should be a string (with
+     * line breaks) of the expected display on codeMirror.
+     */
+    expectTextToBe: async function(expectedTextString) {
+      var expectedTextArray = expectedTextString.split('\n');
+      var expectedDict = {};
+      for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
+        lineNumber++) {
+        expectedDict[lineNumber] = {
+          text: expectedTextArray[lineNumber - 1],
+          checked: false
+        };
+      }
+      await _compareText(expectedDict, false);
+    }
+  };
+};
+
+var CodeStringEditor = function(elem) {
+  return {
+    setValue: async function(code) {
+      var stringEditorTextArea = await elem.$('textarea');
+      await action.clear('String Editor Text Area', stringEditorTextArea);
+      await action.keys(
+        'String Editor Text Area',
+        stringEditorTextArea,
+        code);
+    }
+  };
+};
+
 // This is used by the list and dictionary editors to retrieve the editors of
 // their entries dynamically.
 var FORM_EDITORS = {
   CodeString: CodeStringEditor,
   Dictionary: DictionaryEditor,
+  Graph: GraphEditor,
+  List: ListEditor,
+  Real: RealEditor,
   RichText: RichTextEditor,
+  SetOfTranslatableHtmlContentIds: SetOfTranslatableHtmlContentIdsEditor,
   Unicode: UnicodeEditor
 };
 
@@ -321,11 +767,21 @@ var getEditor = function(formName) {
 };
 
 exports.CodeStringEditor = CodeStringEditor;
-exports.RichTextEditor = RichTextEditor;
-exports.toRichText = toRichText;
-exports.UnicodeEditor = UnicodeEditor;
 exports.DictionaryEditor = DictionaryEditor;
+exports.ListEditor = ListEditor;
+exports.RealEditor = RealEditor;
+exports.RichTextEditor = RichTextEditor;
+exports.SetOfTranslatableHtmlContentIdsEditor = (
+  SetOfTranslatableHtmlContentIdsEditor);
+exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
+exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
+exports.MultiSelectEditor = MultiSelectEditor;
 exports.GraphEditor = GraphEditor;
+
+exports.expectRichText = expectRichText;
+exports.RichTextChecker = RichTextChecker;
+exports.toRichText = toRichText;
+exports.CodeMirrorChecker = CodeMirrorChecker;
 
 exports.getEditor = getEditor;

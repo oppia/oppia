@@ -45,8 +45,7 @@ var ExplorationEditorMainTab = function() {
   var defaultResponseTab = $('.protractor-test-default-response-tab');
   var editorWelcomeModal = $('.protractor-test-welcome-modal');
   var editOutcomeDestBubble = $('.protractor-test-dest-bubble');
-  var editOutcomeDestStateInput = editOutcomeDestBubble.$(
-    '.protractor-test-add-state-input');
+  var editOutcomeDestStateIn = '.protractor-test-add-state-input';
   var editOutcomeDestAddExplorationId = $(
     '.protractor-test-add-refresher-exploration-id');
   var editOutcomeDestDropdownOptions = function(targetOption) {
@@ -58,7 +57,6 @@ var ExplorationEditorMainTab = function() {
   var interaction = $('.protractor-test-interaction');
   var interactionEditor = $('.protractor-test-interaction-editor');
   var explorationGraph = $('.protractor-test-exploration-graph');
-  var stateNodes = explorationGraph.$$('.protractor-test-node');
   var nodeLabelLocator = '.protractor-test-node-label';
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(nodeLabelLocator);
@@ -449,6 +447,8 @@ var ExplorationEditorMainTab = function() {
     await action.click('Outcome Destination Option', outcomeDestOption);
 
     if (createNewDest) {
+      var editOutcomeDestStateInput = editOutcomeDestBubble.$(
+        editOutcomeDestStateIn);
       await action.keys(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
     } else if (refresherExplorationId) {
@@ -829,6 +829,7 @@ var ExplorationEditorMainTab = function() {
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = async function(names) {
+    var stateNodes = explorationGraph.$$('.protractor-test-node');
     var stateNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));
@@ -841,6 +842,7 @@ var ExplorationEditorMainTab = function() {
   this.moveToState = async function(targetName) {
     await action.waitForAutosave();
     await general.scrollToTop();
+    var stateNodes = explorationGraph.$$('.protractor-test-node');
     var listOfNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));
