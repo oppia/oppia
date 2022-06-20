@@ -20,6 +20,7 @@ from __future__ import annotations
 from typing import List
 
 from core import feconf
+from core.domain import learner_group_domain
 from core.domain import user_domain
 from core.platform import datastore, models
 
@@ -125,10 +126,17 @@ def is_user_a_facilitator(user_id, group_id):
 
     Returns:
         bool. Whether the user is a facilitator of the learner group.
+
+    Raises:
+        Exception. The learner group does not exist.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
         group_id)
-    return user_id in learner_group_model.facilitators
+    
+    if not learner_group_model:
+        raise Exception('The learner group does not exist.')
+
+    return user_id in learner_group_model.facilitator_user_ids
 
 
 def get_learner_goals_from_model(learner_goals_model):
@@ -149,108 +157,31 @@ def get_learner_goals_from_model(learner_goals_model):
         learner_goals_model.topic_ids_to_master)
 
 
-def save_learner_goals(learner_goals):
-    """Save a learner goals domain object as an LearnerGoalsModel entity
-    in the datastore.
+def get_learner_group_by_id(group_id):
+    """Returns the learner group domain object given the learner group id.
 
     Args:
-        learner_goals: LearnerGoals. The learner goals domain object to
-            be saved in the datastore.
-    """
-    learner_goals_dict = learner_goals.to_dict()
-
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        learner_goals.id, strict=False)
-    if learner_goals_model is not None:
-        learner_goals_model.populate(**learner_goals_dict)
-        learner_goals_model.update_timestamps()
-        learner_goals_model.put()
-    else:
-        learner_goals_dict['id'] = learner_goals.id
-        user_models.LearnerGoalsModel(**learner_goals_dict).put()
-
-
-def mark_topic_to_learn(user_id, topic_id):
-    """Adds the topic id to the learner goals of the user. If the count exceeds
-    feconf.MAX_CURRENT_GOALS_COUNT, the topic is not added.
-
-    Args:
-        user_id: str. The id of the user.
-        topic_id: str. The id of the topic to be added to the
-            learner goals.
+        group_id: str. The id of the learner group.
 
     Returns:
-        bool. The boolean indicates whether the learner goals limit
-        of the user has been exceeded.
+        LearnerGroup. The learner group domain object corresponding to the
+        given id.
 
     Raises:
-        Exception. Given topic is already present.
+        Exception. The learner group does not exist.
     """
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        user_id, strict=False)
-    if not learner_goals_model:
-        learner_goals_model = user_models.LearnerGoalsModel(id=user_id)
+    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
+        group_id)
 
-    learner_goals = get_learner_goals_from_model(learner_goals_model)
+    if not learner_group_model:
+        raise Exception('The learner group does not exist.')
 
-    goals_limit_exceeded = False
-    topic_ids_count = len(learner_goals.topic_ids_to_learn)
-    if topic_id not in learner_goals.topic_ids_to_learn:
-        if topic_ids_count < feconf.MAX_CURRENT_GOALS_COUNT:
-            learner_goals.add_topic_id_to_learn(topic_id)
-        else:
-            goals_limit_exceeded = True
-        save_learner_goals(learner_goals)
-        return goals_limit_exceeded
-    else:
-        raise Exception(
-            'The topic id %s is already present in the learner goals' % (
-                topic_id))
-
-
-def remove_topics_from_learn_goal(user_id, topic_ids_to_remove):
-    """Removes topics from the learner goals of the user (if present).
-
-    Args:
-        user_id: str. The id of the user.
-        topic_ids_to_remove: list(str). The ids of the topics to be removed.
-
-    Raises:
-        Exception. Given topic does not exist.
-    """
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        user_id, strict=False)
-
-    if learner_goals_model:
-        learner_goals = get_learner_goals_from_model(
-            learner_goals_model)
-        for topic_id in topic_ids_to_remove:
-            if topic_id in learner_goals.topic_ids_to_learn:
-                learner_goals.remove_topic_id_from_learn(topic_id)
-            else:
-                raise Exception(
-                    'The topic id %s is not present in LearnerGoalsModel' % (
-                        topic_id))
-        save_learner_goals(learner_goals)
-
-
-def get_all_topic_ids_to_learn(user_id):
-    """Returns a list with the ids of all the topics that are in the
-    goals of the user.
-
-    Args:
-        user_id: str. The id of the user.
-
-    Returns:
-        list(str). A list of the ids of the topics that are in the
-        learner goals of the user.
-    """
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        user_id, strict=False)
-
-    if learner_goals_model:
-        learner_goals = get_learner_goals_from_model(
-            learner_goals_model)
-
-        return learner_goals.topic_ids_to_learn
-    return []
+    return learner_group_domain.LearnerGroup(
+        learner_group_model.id,
+        learner_group_model.title,
+        learner_group_model.description,
+        learner_group_model.facilitator_user_ids,
+        learner_group_model.student_user_ids,
+        learner_group_model.invited_user_ids,
+        learner_group_model.subtopic_page_ids,
+        learner_group_model.story_ids)

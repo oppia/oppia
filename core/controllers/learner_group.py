@@ -38,7 +38,7 @@ LEARNER_GROUP_SCHEMA = {
         },
         'default_value': None
     },
-    'members_usernames': {
+    'student_usernames': {
         'schema': {
             'type': 'list'
         },
@@ -50,7 +50,7 @@ LEARNER_GROUP_SCHEMA = {
         },
         'default_value': None
     },
-    'subtopics_page_ids': {
+    'subtopic_page_ids': {
         'schema': {
             'type': 'list'
         },
@@ -78,19 +78,19 @@ class CreateLearnerGroupHandler(base.BaseHandler):
 
         title = self.payload.get('group_title')
         description = self.payload.get('group_description')
-        members_usernames = self.payload.get('members_usernames')
+        student_usernames = self.payload.get('student_usernames')
         invited_usernames = self.payload.get('invited_usernames')
-        subtopics_page_ids = self.payload.get('subtopics_page_ids')
+        subtopic_page_ids = self.payload.get('subtopic_page_ids')
         story_ids = self.payload.get('story_ids')
 
-        members_user_ids: user_services.get_multi_user_ids_from_usernames(
-            members_usernames)
+        student_user_ids: user_services.get_multi_user_ids_from_usernames(
+            student_usernames)
         invited_user_ids: user_services.get_multi_user_ids_from_usernames(
             invited_usernames)
 
         learner_group_id = learner_group_services.create_learner_group(
-            self.user_id, title, description, members_user_ids,
-            invited_user_ids, subtopics_page_ids, story_ids)
+            self.user_id, title, description, student_user_ids,
+            invited_user_ids, subtopic_page_ids, story_ids)
 
         self.values.update({
             'group_id': learner_group_id
@@ -116,30 +116,8 @@ class LearnerGroupHandler(base.BaseHandler):
     }
 
     HANDLER_ARGS_SCHEMAS = {
-        'GET': LEARNER_GROUP_SCHEMA
+        'PUT': LEARNER_GROUP_SCHEMA
     }
-
-    @acl_decorators.can_access_teacher_dashboard
-    def get(self, learner_group_id):
-        """Handles GET requests for facilitator's view of learner group."""
-
-        learner_group = (
-            learner_group_services.get_facilitator_view_of_learner_group(
-                learner_group_id))
-
-        if learner_group is not None:
-            self.render_json({
-                'learner_group_id': learner_group.id,
-                'title': learner_group.title,
-                'description': learner_group.description,
-                'facilitator_username': learner_group.facilitator_username,
-                'members_usernames': learner_group.members_usernames,
-                'invited_usernames': learner_group.invited_usernames,
-                'subtopics_page_ids': learner_group.subtopics_page_ids,
-                'stoty_ids': learner_group.story_ids
-            })
-        else:
-            raise self.PageNotFoundException
 
     @acl_decorators.can_access_teacher_dashboard
     def put(self, learner_group_id):
@@ -147,17 +125,17 @@ class LearnerGroupHandler(base.BaseHandler):
 
         title = self.payload.get('group_title')
         description = self.payload.get('group_description')
-        members_usernames = self.payload.get('members_usernames')
+        student_usernames = self.payload.get('student_usernames')
         invited_usernames = self.payload.get('invited_usernames')
-        subtopics_page_ids = self.payload.get('subtopics_page_ids')
+        subtopic_page_ids = self.payload.get('subtopic_page_ids')
         story_ids = self.payload.get('story_ids')
 
         is_valid_request = learner_group_services.is_user_a_facilitator(
             self.user_id, learner_group_id)
 
         if is_valid_request:
-            members_user_ids: user_services.get_multi_user_ids_from_usernames(
-                members_usernames)
+            student_user_ids: user_services.get_multi_user_ids_from_usernames(
+                student_usernames)
             invited_user_ids: user_services.get_multi_user_ids_from_usernames(
                 invited_usernames)
 
@@ -166,9 +144,9 @@ class LearnerGroupHandler(base.BaseHandler):
                 title,
                 description,
                 self.user_id,
-                members_user_ids,
+                student_user_ids,
                 invited_user_ids,
-                subtopics_page_ids,
+                subtopic_page_ids,
                 story_ids)
         else:
             raise self.UnauthorizedUserException(
@@ -198,6 +176,19 @@ class LearnerGroupHandler(base.BaseHandler):
 class LearnerGroupUserProgressHandler(base.BaseHandler):
     """Handles operations related to the learner group users progress."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
     @acl_decorators.can_access_learner_dashboard
     def get(self, learner_group_id):
         """Handles GET requests for facilitator's view of users progress
@@ -214,7 +205,7 @@ class LearnerGroupUserProgressHandler(base.BaseHandler):
                 'title': learner_group.title,
                 'description': learner_group.description,
                 'facilitator': learner_group.facilitator,
-                'members_usernames': learner_group.members_usernames,
+                'student_usernames': learner_group.student_usernames,
                 'invited_usernames': learner_group.invited_usernames,
                 'syllabus': learner_group.syllabus
             })
@@ -224,6 +215,19 @@ class LearnerGroupUserProgressHandler(base.BaseHandler):
 
 class LearnerGroupSyllabusHandler(base.BaseHandler):
     """Handles operations related to the learner group syllabus."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
 
     @acl_decorators.can_access_learner_dashboard
     def get(self, learner_group_id):
@@ -240,6 +244,43 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
                 'learner_group_id': learner_group_id,
                 'subtopic_summaries': filtered_syllabus.subtopic_summaries,
                 'story_summaries': filtered_syllabus.story_summaries
+            })
+        else:
+            raise self.PageNotFoundException
+
+
+class TeacherDashboardHandler(base.BaseHandler):
+    """Handles operations related to the teacher dashboard."""
+
+    @acl_decorators.can_access_teacher_dashboard
+    def get(self):
+        """Handles GET requests for the teacher dashboard."""
+
+        
+
+class FacilitatorGroupPreferencesHandler(base.BaseHandler):
+    """Handles operations related to the facilitator group preferences."""
+
+    @acl_decorators.can_access_teacher_dashboard
+    def get(self, learner_group_id):
+        """Handles GET requests for facilitator's view of learner group."""
+
+        is_valid_request = learner_group_services.is_user_a_facilitator(
+            self.user_id, learner_group_id)
+
+        if is_valid_request:
+            learner_group = learner_group_services.get_learner_group_by_id(
+                    learner_group_id)
+
+            self.render_json({
+                'learner_group_id': learner_group.id,
+                'title': learner_group.title,
+                'description': learner_group.description,
+                'facilitator_username': learner_group.facilitator_username,
+                'student_usernames': learner_group.student_usernames,
+                'invited_usernames': learner_group.invited_usernames,
+                'subtopic_page_ids': learner_group.subtopic_page_ids,
+                'stoty_ids': learner_group.story_ids
             })
         else:
             raise self.PageNotFoundException
