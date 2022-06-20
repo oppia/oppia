@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to search explorations metadata.
+ * @fileoverview Service to search explorations.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -26,13 +26,10 @@ import { LibraryPageConstants } from
   'pages/library-page/library-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import {
-  ExplorationMetaDataBackendDict,
-  ExplorationMetadata
-} from 'domain/exploration/exploration-metadata.model';
+import { ExplorationSearchResult, ExplorationSearchResultBackendDict } from 'domain/exploration/exploration-search-result.model';
 
 interface SearchExplorationBackendResponse {
-  'collection_node_metadata_list': ExplorationMetaDataBackendDict[];
+  'collection_node_metadata_list': ExplorationSearchResultBackendDict[];
 }
 
 @Injectable({
@@ -46,7 +43,7 @@ export class SearchExplorationsBackendApiService {
 
   private _fetchExplorations(
       searchQuery: string,
-      successCallback: (value: ExplorationMetadata[]) => void,
+      successCallback: (value: ExplorationSearchResult[]) => void,
       errorCallback: (reason: string) => void): void {
     var queryUrl = this.urlInterpolationService.interpolateUrl(
       LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
@@ -55,24 +52,24 @@ export class SearchExplorationsBackendApiService {
     );
     this.http.get<SearchExplorationBackendResponse>(
       queryUrl).toPromise().then(response => {
-      var explorationMetadataBackendList = cloneDeep(
+      var explorationSearchResultBackendList = cloneDeep(
         response.collection_node_metadata_list);
-      var explorationMetadataList = explorationMetadataBackendList.map(
-        explorationMetaData => ExplorationMetadata.
-          createFromBackendDict(explorationMetaData));
-      successCallback(explorationMetadataList);
+      var explorationSearchResultList = explorationSearchResultBackendList.map(
+        explorationSearchResult => ExplorationSearchResult.
+          createFromBackendDict(explorationSearchResult));
+      successCallback(explorationSearchResultList);
     }, (errorResponse) => {
       errorCallback(errorResponse.error.error);
     });
   }
 
   /**
-   * Returns exploration's metadata dict, given a search query. Search
+   * Returns exploration's search result dict, given a search query. Search
    * queries are tokens that will be matched against exploration's title
    * and objective.
    */
   async fetchExplorationsAsync(
-      searchQuery: string): Promise<ExplorationMetadata[]> {
+      searchQuery: string): Promise<ExplorationSearchResult[]> {
     return new Promise((resolve, reject) => {
       this._fetchExplorations(searchQuery, resolve, reject);
     });
