@@ -22,7 +22,7 @@ from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-from typing import List, Optional, cast
+from typing import List, Optional
 import webapp2
 
 MYPY = False

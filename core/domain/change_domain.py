@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict, List, cast
+from typing import Dict, List
 
 
 def validate_cmd(
