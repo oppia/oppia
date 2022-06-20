@@ -1314,7 +1314,8 @@ class RecommendationsHandler(base.BaseHandler):
             },
             'stringified_author_recommended_ids': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 }
             },
             'story_id': {
@@ -1324,8 +1325,7 @@ class RecommendationsHandler(base.BaseHandler):
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.ENTITY_ID_REGEX
                     }]
-                },
-                'default_value': None
+                }
             },
             'current_node_id': {
                 'schema': {
@@ -1334,8 +1334,7 @@ class RecommendationsHandler(base.BaseHandler):
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.ENTITY_ID_REGEX
                     }]
-                },
-                'default_value': None
+                }
             }
         }
     }
@@ -1348,8 +1347,8 @@ class RecommendationsHandler(base.BaseHandler):
         include_system_recommendations = self.normalized_request.get(
             'include_system_recommendations')
         try:
-            author_recommended_exp_ids = json.loads(self.normalized_request.get(
-                'stringified_author_recommended_ids'))
+            author_recommended_exp_ids = self.normalized_request.get(
+                'stringified_author_recommended_ids')
         except Exception as e:
             raise self.PageNotFoundException from e
 
