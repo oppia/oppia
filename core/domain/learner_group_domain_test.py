@@ -38,23 +38,23 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'group_id': '3232',
             'title': 'title',
             'description': 'description',
-            'facilitators_user_ids': ['user_1'],
-            'students_user_ids': ['user_2', 'user_3', 'user_4'],
+            'facilitator_user_ids': ['user_1'],
+            'student_user_ids': ['user_2', 'user_3', 'user_4'],
             'invited_user_ids': ['user_5', 'user_6'],
-            'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
+            'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
 
         self.assertEqual(learner_group.group_id, '3232')
         self.assertEqual(learner_group.title, 'title')
         self.assertEqual(learner_group.description, 'description')
-        self.assertEqual(learner_group.facilitators_user_ids, ['user_1'])
+        self.assertEqual(learner_group.facilitator_user_ids, ['user_1'])
         self.assertEqual(
-            learner_group.students_user_ids, ['user_2', 'user_3', 'user_4'])
+            learner_group.student_user_ids, ['user_2', 'user_3', 'user_4'])
         self.assertEqual(
             learner_group.invited_user_ids, ['user_5', 'user_6'])
         self.assertEqual(
-            learner_group.subtopics_page_ids,
+            learner_group.subtopic_page_ids,
             ['subtopic_1', 'subtopic_2'])
         self.assertEqual(learner_group.story_ids, ['story_1', 'story_2'])
 
@@ -75,10 +75,10 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'group_id': '3232',
             'title': 'title',
             'description': 'description',
-            'facilitators_user_ids': ['user_1'],
-            'students_user_ids': ['user_2', 'user_3', 'user_4'],
+            'facilitator_user_ids': ['user_1'],
+            'student_user_ids': ['user_2', 'user_3', 'user_4'],
             'invited_user_ids': ['user_5', 'user_6'],
-            'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
+            'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
 
