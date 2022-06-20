@@ -375,6 +375,8 @@ class ExplorationModel(base_models.VersionedModel):
                 from storage, otherwise there are only marked as deleted.
                 Default is False.
         """
+        versioned_models = cls.get_multi(entity_ids, include_deleted=True)
+
         super(ExplorationModel, cls).delete_multi(
             entity_ids, committer_id,
             commit_message, force_deletion=force_deletion)
@@ -383,7 +385,6 @@ class ExplorationModel(base_models.VersionedModel):
             commit_log_models = []
             exp_rights_models = ExplorationRightsModel.get_multi(
                 entity_ids, include_deleted=True)
-            versioned_models = cls.get_multi(entity_ids, include_deleted=True)
 
             versioned_and_exp_rights_models = zip(
                 versioned_models, exp_rights_models)
@@ -402,6 +403,27 @@ class ExplorationModel(base_models.VersionedModel):
             ExplorationCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
+        else:
+            # Delete the ExplorationVersionHistoryModels if force_deletion is
+            # True.
+            if force_deletion:
+                versioned_models_without_none = [
+                    model for model in versioned_models if model is not None]
+                version_history_ids = []
+                for model in versioned_models_without_none:
+                    for version in range(1, model.version + 1):
+                        version_history_ids.append(
+                            ExplorationVersionHistoryModel.get_instance_id(
+                                model.id, version))
+                version_history_models_with_none = (
+                    ExplorationVersionHistoryModel.get_multi(
+                        version_history_ids))
+                version_history_models = [
+                    model for model in version_history_models_with_none
+                    if model is not None
+                ]
+                ExplorationVersionHistoryModel.delete_multi(
+                    version_history_models)
 
     # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
     # to remove Any used below.

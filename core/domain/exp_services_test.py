@@ -1558,6 +1558,46 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             version_history_model.metadata_version_history,
             expected_metadata_version_history_dict
         )
+        self.assertIn(self.owner_id, version_history_model.committer_ids)
+
+    def test_soft_deletion_does_not_delete_version_history_models(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_0_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        version_history_model_class = exp_models.ExplorationVersionHistoryModel
+        version_history_models_before_deletion = (
+            version_history_model_class.query(
+                version_history_model_class.exploration_id == exploration.id
+            ).fetch())
+        exp_services.delete_exploration(self.owner_id, exploration.id)
+        version_history_models_after_deletion = (
+            version_history_model_class.query(
+                version_history_model_class.exploration_id == exploration.id
+            ).fetch())
+
+        self.assertEqual(
+            version_history_models_before_deletion,
+            version_history_models_after_deletion)
+
+    def test_hard_deletion_deletes_version_history_models(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_0_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        version_history_model_class = exp_models.ExplorationVersionHistoryModel
+        version_history_models_before_deletion = (
+            version_history_model_class.query(
+                version_history_model_class.exploration_id == exploration.id
+            ).fetch())
+        exp_services.delete_exploration(
+            self.owner_id, exploration.id, force_deletion=True)
+        version_history_models_after_deletion = (
+            version_history_model_class.query(
+                version_history_model_class.exploration_id == exploration.id
+            ).fetch())
+
+        self.assertNotEqual(
+            version_history_models_before_deletion,
+            version_history_models_after_deletion)
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):

@@ -741,7 +741,8 @@ def _create_exploration(
             for state_name in exploration.states
         },
         metadata_version_history=(
-            exp_domain.ExplorationMetadataVersionHistory(None, None).to_dict())
+            exp_domain.ExplorationMetadataVersionHistory(None, None).to_dict()),
+        committer_ids=[committer_id]
     )
     version_history_model.update_timestamps()
     version_history_model.put()
