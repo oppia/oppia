@@ -54,7 +54,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({  # type: ignore[no-untyped-call]
+            state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}
                 }
@@ -92,7 +92,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({  # type: ignore[no-untyped-call]
+                state_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -110,7 +110,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({  # type: ignore[no-untyped-call]
+                state_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -199,7 +199,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({  # type: ignore[no-untyped-call]
+                state_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -245,7 +245,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({  # type: ignore[no-untyped-call]
+                state_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }
@@ -322,7 +322,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 }),
-                state_domain.WrittenTranslations.from_dict({  # type: ignore[no-untyped-call]
+                state_domain.WrittenTranslations.from_dict({
                     'translations_mapping': {
                         '1': {}, '2': {}, '3': {}
                     }

@@ -508,7 +508,7 @@ class SkillContentsDict(TypedDict):
     explanation: state_domain.SubtitledHtmlDict
     worked_examples: List[WorkedExampleDict]
     recorded_voiceovers: state_domain.RecordedVoiceoversDict
-    written_translations: state_domain.WrittenTranslationDict
+    written_translations: state_domain.WrittenTranslationsDict
 
 
 class VersionedSkillContentsDict(TypedDict):
@@ -526,7 +526,7 @@ class SkillContents:
         explanation: state_domain.SubtitledHtml,
         worked_examples: List[WorkedExample],
         recorded_voiceovers: state_domain.RecordedVoiceovers,
-        written_translations: state_domain.WrittenTranslation
+        written_translations: state_domain.WrittenTranslations
     ) -> None:
         """Constructs a SkillContents domain object.
 
