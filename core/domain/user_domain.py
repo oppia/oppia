@@ -1609,5 +1609,5 @@ class LearnerGroupUser:
                     self.student_of_learner_groups_ids):
                 raise utils.ValidationError(
                     'Learner cannot have progress sharing permissions of '
-                    'group %s since they are not it\'s student.' % (
+                    'group %s since they are not its student.' % (
                         prog_sharing_permission.group_id))

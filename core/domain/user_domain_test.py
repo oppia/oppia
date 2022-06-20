@@ -1620,4 +1620,4 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
                 'user1', ['345'], ['367'],
                 [progress_sharing_permission]),
             'Learner cannot have progress sharing permissions of '
-            'group 123 since they are not it\'s student.')
+            'group 123 since they are not its student.')
