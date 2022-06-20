@@ -26,6 +26,7 @@ from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_domain
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -892,3 +893,68 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExpSummaryModel
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
+
+
+class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
+    """Unit tests for ExplorationVersionHistoryModel."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            exp_models.ExplorationVersionHistoryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        )
+
+    def test_get_export_policy(self) -> None:
+        export_policy_dict = base_models.BaseModel.get_export_policy()
+        export_policy_dict.update({
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'metadata_version_history': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+        self.assertEqual(
+            exp_models.ExplorationVersionHistoryModel.get_export_policy(),
+            export_policy_dict)
+
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            exp_models.ExplorationVersionHistoryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_instance_id(self):
+        expected_instance_id = 'exp1-2'
+        actual_instance_id = (
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                'exp1', 2))
+
+        self.assertEqual(actual_instance_id, expected_instance_id)
+
+    def test_has_reference_to_user_id(self) -> None:
+        exp_models.ExplorationVersionHistoryModel(
+            exploration_id='exp1',
+            exploration_version=2,
+            state_version_history={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.StateVersionHistory(
+                        1, feconf.DEFAULT_INIT_STATE_NAME, 'user_1'
+                    ).to_dict()
+                )
+            },
+            metadata_version_history={
+                'previously_edited_in_version': 1,
+                'committer_id': 'user_1'
+            },
+            committer_ids=['user_1']
+        ).put()
+
+        self.assertTrue(
+            exp_models.ExplorationVersionHistoryModel
+            .has_reference_to_user_id('user_1'))
+        self.assertFalse(
+            exp_models.ExplorationVersionHistoryModel
+            .has_reference_to_user_id('user_2'))

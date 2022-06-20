@@ -1113,3 +1113,112 @@ class ExpSummaryModel(base_models.BaseModel):
             'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+
+class ExplorationVersionHistoryModel(base_models.BaseModel):
+    """Version history model for an oppia exploration.
+
+    Version history means some information about the previous commit on each
+    state and the exploration metadata at a particular version of the
+    exploration. The information about each state comprises of the version
+    number of the exploration on which the state was previously edited,
+    the name of the state at the previous version and the id of the user who
+    committed those changes. For metadata, the information comprises of the
+    version number of the explortion on which the metadata was previously
+    edited and the id of the user who committed those changes.
+
+    A new instance of this model is created each time a new exploration
+    is created or some changes are saved in an exploration.
+
+    The id of the model is generated as follows:
+    {exploration_id}-{exploration_version}
+    """
+
+    # The id of the corresponding exploration.
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The version of the corresponding exploration.
+    exploration_version = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The details of the previous commit on each state at a particular
+    # version of the exploration. For each state, the structure of the version
+    # history data looks like the following:
+    #   previously_edited_in_version: int.
+    #   state_name_in_previous_version: string.
+    #   committer_id: string.
+    state_version_history = datastore_services.JsonProperty(
+        default={}, indexed=False)
+    # The details of the previous commit on the exploration metadata at a
+    # particular version of the exploration. The structure of the metadata
+    # version history looks like the following:
+    #   previously_edited_in_version: int.
+    #   committer_id: string.
+    metadata_version_history = datastore_services.JsonProperty(
+        default={}, indexed=False)
+    # The user ids of the users who did the 'previous commit' on each state
+    # in a particular version of the exploration. It is required during the
+    # wipeout process to query for the models efficiently.
+    committer_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+
+    @classmethod
+    def get_instance_id(cls, exp_id: str, exp_version: int) -> str:
+        """Returns ID of the exploration version history model.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+            exp_version: int. The version of the exploration.
+
+        Returns:
+            str. A string containing exploration ID and
+            exploration version.
+        """
+        return '%s-%s' % (exp_id, exp_version)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether ExplorationVersionHistoryModel references
+        the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return ExplorationVersionHistoryModel.query(
+            ExplorationVersionHistoryModel.committer_ids == user_id
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to pseudonymize corresponding to a user:
+        committer_ids field and the user ids stored in state_version_history
+        or metadata_version_history.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """The version history of states or exploration metadata is not
+        relevant for the purposes of Takeout since they don't contain relevant
+        data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user, but this isn't exported
+        because the version history of states or exploration metadata is not
+        relevant for the purposes of exporting since they don't contain
+        relevant data corresponding to users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'metadata_version_history': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
