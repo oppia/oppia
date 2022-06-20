@@ -89,7 +89,7 @@ export class ContributionAndReviewBackendApiService {
       fetchType: string,
       limit: number,
       offset: number,
-      topicName: string
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -101,11 +101,11 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset, topicName);
+        'skill', 'add_question', limit, offset);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'exploration', 'translate_content', limit, offset, topicName);
+        'exploration', 'translate_content', limit, offset, explorationId);
     }
     throw new Error('Invalid fetch type');
   }
@@ -134,7 +134,7 @@ export class ContributionAndReviewBackendApiService {
       suggestionType: string,
       limit: number,
       offset: number,
-      topicName: string
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -142,11 +142,17 @@ export class ContributionAndReviewBackendApiService {
         suggestion_type: suggestionType
       }
     );
-    const params = {
+    const params: {
+      limit: string;
+      offset: string;
+      exploration_id?: string;
+    } = {
       limit: limit.toString(),
       offset: offset.toString(),
-      topic_name: topicName
     };
+    if (explorationId !== undefined) {
+      params.exploration_id = explorationId;
+    }
     return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
   }
 
