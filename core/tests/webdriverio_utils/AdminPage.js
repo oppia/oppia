@@ -29,12 +29,12 @@ var AdminPage = function() {
   };
 
   var _switchToRolesTab = async function() {
-    var adminRolesTab = await $('.protractor-test-admin-roles-tab');
+    var adminRolesTab = $('.protractor-test-admin-roles-tab');
     await action.click('Admin roles tab button', adminRolesTab);
 
     await expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     var adminRolesTabContainer = (
-      await $('.protractor-test-roles-tab-container'));
+      $('.protractor-test-roles-tab-container'));
     await waitFor.visibilityOf(
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
@@ -43,13 +43,13 @@ var AdminPage = function() {
     await this.get();
     await _switchToRolesTab();
     var usernameInputFieldForRolesEditing = (
-      await $('.protractor-test-username-for-role-editor'));
+      $('.protractor-test-username-for-role-editor'));
     await action.keys(
       'Username input field', usernameInputFieldForRolesEditing, username);
-    var editUserRoleButton = await $('.protractor-test-role-edit-button');
+    var editUserRoleButton = $('.protractor-test-role-edit-button');
     await action.click('Edit user role button', editUserRoleButton);
     var roleEditorContainer = (
-      await $('.protractor-test-roles-editor-card-container'));
+      $('.protractor-test-roles-editor-card-container'));
     await waitFor.visibilityOf(
       roleEditorContainer, 'Role editor card takes too long to appear.');
   };
@@ -57,15 +57,15 @@ var AdminPage = function() {
   this.addRole = async function(name, newRole) {
     await this._editUserRole(name);
 
-    var addNewRoleButton = await $('.protractor-test-add-new-role-button');
+    var addNewRoleButton = $('.protractor-test-add-new-role-button');
     await action.click('Add new role', addNewRoleButton);
-    var roleSelector = await $('.protractor-test-new-role-selector');
+    var roleSelector = $('.protractor-test-new-role-selector');
     await action.matSelect('New role selector', roleSelector, newRole);
 
-    var progressSpinner = await $('.protractor-test-progress-spinner');
+    var progressSpinner = $('.protractor-test-progress-spinner');
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
-    var removeButtonElement = await $(
+    var removeButtonElement = $(
       '.protractor-test-' + newRole.split(' ').join('-') +
       '-remove-button-container');
     await waitFor.visibilityOf(
