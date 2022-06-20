@@ -262,9 +262,9 @@ class BaseChange:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
-            # Internally __dict__() method is annotated with Dict[str, Any]
-            # return type. So to narrow down the return type from Any to str
-            # we used cast here.
-            return cast(str, self.__dict__[name])
+            name = self.__dict__[name]
+            # Ruling out the possibility of Any for mypy type checking.
+            assert isinstance(name, str)
+            return name
         except KeyError as e:
             raise AttributeError(name) from e

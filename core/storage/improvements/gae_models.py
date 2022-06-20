@@ -17,6 +17,7 @@
 """Models related to Oppia improvement tasks."""
 
 from __future__ import annotations
+
 import datetime
 
 from core import feconf

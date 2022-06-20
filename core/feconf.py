@@ -1387,7 +1387,8 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'optional_attribute_names': [],
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
-        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES},
+        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES
+    },
     'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_ROLE,

@@ -50,11 +50,6 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
         self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         # Necessary to provide sufficient debug information when failures occur.
 
-        # Internally variable 'maxDiff' is defined as a strict integer variable
-        # but here we are assigning None value to it, which cause MyPy to throw
-        # an assignment error. Thus to avoid an error, we used ignore here.
-        self.maxDiff = None  # type: ignore[assignment]
-
     def _new_obsolete_task(
         self,
         state_name: str = feconf.DEFAULT_INIT_STATE_NAME,

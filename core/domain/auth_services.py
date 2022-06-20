@@ -68,10 +68,7 @@ def get_all_profiles_by_parent_user_id(
         list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
         with the given parent user.
     """
-    # Here we used cast because the return type of .fetch() method is Sequence
-    # but here we want a more narrow type which is List.
-    return cast(
-        List[auth_models.UserAuthDetailsModel],
+    return list(
         auth_models.UserAuthDetailsModel.query(
             auth_models.UserAuthDetailsModel.parent_user_id == parent_user_id
         ).fetch()

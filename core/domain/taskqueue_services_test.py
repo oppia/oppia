@@ -17,6 +17,7 @@
 """Tests for the domain taskqueue services."""
 
 from __future__ import annotations
+
 import datetime
 
 from core import feconf

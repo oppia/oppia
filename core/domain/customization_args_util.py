@@ -26,8 +26,8 @@ from typing import Any, Dict, List
 
 
 # In argument 'customization_args', we used Any type because it accepts the
-# values of customization args and that values can be of type str, int, bool
-# , List and other types too. So to make it generalize for every type of
+# values of customization args and that values can be of type str, int, Dict,
+# bool, List and other types too. So to make it generalize for every type of
 # values, we used Any here.
 def get_full_customization_args(
     customization_args: Dict[str, Dict[str, Any]],
@@ -62,8 +62,8 @@ def get_full_customization_args(
 
 
 # In argument 'customization_args', we used Any type because it accepts the
-# values of customization args and that values can be of type str, int, bool
-# , List and other types too. So to make it generalize for every type of
+# values of customization args and that values can be of type str, int, Dict,
+# bool, List and other types too. So to make it generalize for every type of
 # values, we used Any here.
 def validate_customization_args_and_values(
     item_name: str,
