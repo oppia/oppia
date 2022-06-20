@@ -49,6 +49,9 @@ export class OpportunitiesListItemComponent {
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
 
+  @Input() showOpportunityButton: boolean = true;
+  @Input() showDescription: boolean = true;
+
   labelText!: string;
   labelStyle!: { 'background-color': string };
   progressPercentage!: string;

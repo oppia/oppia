@@ -1,18 +1,28 @@
-<div class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
+<div *ngIf="showOpportunityButton" class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
   <div class="oppia-opportunities-details">
-    <div class="oppia-opportunities-subheading oppia-animate-fadein">
+
+
+    <div *ngIf="showDescription" class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
-            class="protractor-test-opportunity-list-item-subheading"
+            class="protractor-test-opportunity-list-item-subheading subheading-large"
             [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
+      </span>
+      <span title="{{ opportunity?.subheading }}"
+            class="protractor-test-opportunity-list-item-subheading subheading-small"
+            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
+
+
     <div class="oppia-opportunities-heading oppia-animate-fadein">
       <span class="protractor-test-opportunity-list-item-heading" title="{{ opportunity?.heading }}" [hidden]="opportunityDataIsLoading">
         {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
+
+
   </div>
   <div class="oppia-opportunities-progress oppia-animate-fadein" *ngIf="progressBarRequired">
     <div class="oppia-opportunities-progress-bar">
@@ -60,9 +70,82 @@
         {{ opportunity?.actionButtonTitle }}
       </button>
     </div>
-  </div>
+  </div>  
 </div>
+
+<button *ngIf="!showOpportunityButton" class="oppia-opportunities-list-item button-list-item protractor-test-opportunity-list-item"
+        [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
+        [disabled]="opportunityButtonDisabled"
+        (click)="clickActionButton.emit(opportunity.id)">
+
+  <div class="oppia-opportunities-details">
+    <div *ngIf="showDescription" class="oppia-opportunities-subheading oppia-animate-fadein">
+      <span title="{{ opportunity?.subheading }}"
+            class="protractor-test-opportunity-list-item-subheading"
+            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
+      </span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+
+    <div class="oppia-opportunities-heading oppia-animate-fadein">
+      <span class="protractor-test-opportunity-list-item-heading" title="{{ opportunity?.heading }}" [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
+      </span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+  </div>
+
+  <div class="oppia-opportunities-progress oppia-animate-fadein" *ngIf="progressBarRequired">
+    <div class="oppia-opportunities-progress-bar">
+      <div [hidden]="opportunityDataIsLoading" *ngIf="!translationProgressBar" class="progress">
+        <div class="progress-bar bg-success" role="progressbar" [ngStyle]="progressBarStyle"></div>
+      </div>
+      <div [hidden]="opportunityDataIsLoading"  *ngIf="translationProgressBar" class="progress">
+        <div class="progress-bar bg-success" role="progressbar" [ngStyle]="translatedProgressStyle" ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted" container="body" placement="bottom"></div>
+        <div class="progress-bar bg-light-green" role="progressbar" [ngStyle]="inReviewProgressStyle" ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review" container="body" placement="bottom"></div>
+        <div class="progress-bar bg-light" role="progressbar" [ngStyle]="untranslatedProgressStyle" ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards available for translation" container="body" placement="bottom"></div>
+      </div>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+    <div class="oppia-opportunities-progress-label">
+      <span class="protractor-test-opportunity-list-item-progress-percentage"
+            *ngIf="translationProgressBar"
+            [hidden]="opportunityDataIsLoading"
+            [disableTooltip]="!translationProgressBar"
+            ngbTooltip="Percentage of accepted translated cards"
+            placement="bottom">
+        ({{ progressPercentage }})
+      </span>
+      <span class="protractor-test-opportunity-list-item-progress-percentage"
+            *ngIf="!translationProgressBar"
+            [hidden]="opportunityDataIsLoading"
+            ngbTooltip="Percentage of accepted questions for skill out of target number of questions per skill ({{targetNumQuestionsPerSkill}})">
+        ({{ progressPercentage }})
+      </span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+  </div>
+
+  <div class="oppia-opportunities-label-container oppia-animate-fadein" *ngIf="labelRequired">
+    <div class="oppia-opportunities-label" [ngStyle]="labelStyle">
+      <span class="protractor-test-opportunity-list-item-label" [hidden]="opportunityDataIsLoading">{{ labelText }}</span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+  </div>
+
+</button>
+
 <style>
+  .subheading-large {
+    display: block;
+  }
+  .subheading-small {
+    display: none;
+  }
+  .button-list-item {
+    text-align: left;
+    width: 100%;
+  }
   .bg-light-green {
     background-color: rgb(172, 197, 172);
   }
@@ -119,6 +202,7 @@
     font-size: 20px;
     font-weight: bold;
     height: 50%;
+    margin: auto 0;
   }
   .oppia-opportunities-button-container {
     align-items: center;
@@ -137,7 +221,7 @@
   .oppia-opportunities-label {
     background-color: #fff;
     border-radius: 8px;
-    min-width: 150px;
+    padding: 2px;
     opacity: 0.8;
     text-align: center;
   }
@@ -150,16 +234,19 @@
     width: 25%;
   }
   .oppia-opportunities-details {
+    align-items: flex-start;
     display: flex;
     flex-direction: column;
     margin: 1.8% 0;
     width: 60%;
   }
   .oppia-opportunities-list-item {
+    align-items: center;
     background-color: #fff;
     border: 1px solid #e8e7e2;
     display: flex;
-    height: 90px;
+    height: fit-content;
+    min-height: 90px;
     justify-content: space-between;
     margin-top: 24px;
     padding: 0% 3%;
@@ -170,5 +257,31 @@
     -ms-animation: fadein 0.5s linear 1 normal forwards; /* Internet Explorer */
     -o-animation: fadein 0.5s linear 1 normal forwards; /* Opera < 12.1 */
     animation: fadein 0.5s linear 1 normal forwards;
+  }
+
+  @media only screen and (max-width: 700px) {
+    .oppia-opportunities-list-item {      
+      margin: auto 0;
+      margin-top: 12px;
+      width: 100%;
+    }
+  }
+
+  @media only screen and (max-width: 500px) {
+    .oppia-opportunities-label {
+      font-size: 16px;
+    }
+    .oppia-opportunities-heading {
+      font-size: 18px;
+    }
+    .oppia-opportunities-button-container {
+      font-size: 16px;
+    }
+    .subheading-large {
+      display: none;
+    }
+    .subheading-small {
+      display: block;
+    }
   }
 </style>
