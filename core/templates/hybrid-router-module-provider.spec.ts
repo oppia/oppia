@@ -18,10 +18,11 @@
 
 import { Component } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { RouterTestingModule } from '@angular/router/testing';
 
-import { SmartRouterLink, SmartRouterModule } from 'hybrid-router-module-provider';
+import { SmartRouterLink } from 'hybrid-router-module-provider';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
@@ -51,9 +52,6 @@ class MockWindowRef {
 }
 
 describe('Smart router link directive', () => {
-  let componentA: MockCompA;
-  let componentB: MockCompB;
-  let componentC: MockCompC;
   let mockCompAFixture: ComponentFixture<MockCompA>;
   let mockCompBFixture: ComponentFixture<MockCompB>;
   let mockCompCFixture: ComponentFixture<MockCompC>;
@@ -62,36 +60,32 @@ describe('Smart router link directive', () => {
   let mockCompCLink;
   let mockWindowRef: MockWindowRef;
 
-  let smartRouterLink: SmartRouterLink;
-
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
-        RouterModule.forRoot([]),
-        SmartRouterModule
+        RouterTestingModule.withRoutes([
+          { path: 'contact', component: MockCompA },
+          { path: 'contact', component: MockCompB },
+          { path: 'contact', component: MockCompC }
+        ]),
       ],
       declarations: [
         MockCompA,
         MockCompB,
         MockCompC,
+        SmartRouterLink,
       ],
       providers: [
         {
           provide: WindowRef,
-          useClass: mockWindowRef
-        },
-        {
-          provide: APP_BASE_HREF,
-          useValue: '/'
+          useValue: mockWindowRef
         }
       ]
     }).compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
-    smartRouterLink = TestBed.inject(SmartRouterLink);
-
     mockCompAFixture = TestBed.createComponent(MockCompA);
     mockCompBFixture = TestBed.createComponent(MockCompB);
     mockCompCFixture = TestBed.createComponent(MockCompC);
@@ -104,22 +98,28 @@ describe('Smart router link directive', () => {
   }));
 
   it('should navigate by refreshing from non-router page', fakeAsync(() => {
-    spyOn(smartRouterLink, 'onClick').and.callThrough();
-    mockCompALink.click();
+    mockCompAFixture.detectChanges();
     tick();
-    console.log(mockWindowRef.nativeWindow.location.href);
-    expect(smartRouterLink.onClick).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    mockCompALink.click();
+    mockCompAFixture.detectChanges();
+    tick();
+
     expect(mockWindowRef.nativeWindow.location.href).toBe('/contact');
   }));
 
   it(
     'should navigate without refreshing inside normal router',
     fakeAsync(() => {
-      //spyOn(smartRouterLink, 'onClick').and.callThrough();
-      mockCompBLink.click();
+      mockCompBFixture.detectChanges();
       tick();
-      console.log(mockWindowRef.nativeWindow.location.href);
-      //expect(smartRouterLink.onClick).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+      mockCompBLink.click();
+      mockCompBFixture.detectChanges();
+      tick();
+
       expect(mockWindowRef.nativeWindow.location.href).toBe('/contact');
     })
   );
@@ -127,11 +127,14 @@ describe('Smart router link directive', () => {
   it(
     'should navigate by refreshing from lightweight router to normal router',
     fakeAsync(() => {
-      //spyOn(smartRouterLink, 'onClick').and.callThrough();
-      mockCompCLink.click();
+      mockCompCFixture.detectChanges();
       tick();
-      console.log(mockWindowRef.nativeWindow.location.href);
-      //expect(smartRouterLink.onClick).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+      mockCompCLink.click();
+      mockCompCFixture.detectChanges();
+      tick();
+
       expect(mockWindowRef.nativeWindow.location.href).toBe('/contact');
     })
   );
