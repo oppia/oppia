@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ExplorationMetadata model.
+ * @fileoverview Tests for ExplorationSearchResult model.
  */
-import { ExplorationMetadata } from
-  'domain/exploration/exploration-metadata.model';
 
-describe('Exploration Metadata model', () => {
-  let sampleExplorationMetadata: ExplorationMetadata;
+import { ExplorationSearchResult } from './exploration-search-result.model';
+
+describe('Exploration Search Result model', () => {
+  let sampleExplorationSearchResult: ExplorationSearchResult;
 
   beforeEach(() => {
-    let sampleExplorationMetadataBackendDict: ExplorationMetadata = {
+    let sampleExplorationSearchResultBackendDict: ExplorationSearchResult = {
       id: '12',
       objective:
         'learn how to count permutations accurately and systematically',
@@ -30,14 +30,14 @@ describe('Exploration Metadata model', () => {
     };
 
 
-    sampleExplorationMetadata = ExplorationMetadata.
-      createFromBackendDict(sampleExplorationMetadataBackendDict);
+    sampleExplorationSearchResult = ExplorationSearchResult.
+      createFromBackendDict(sampleExplorationSearchResultBackendDict);
   });
 
   it('should be able to get all the values', function() {
-    expect(sampleExplorationMetadata.id).toEqual('12');
-    expect(sampleExplorationMetadata.objective).toEqual(
+    expect(sampleExplorationSearchResult.id).toEqual('12');
+    expect(sampleExplorationSearchResult.objective).toEqual(
       'learn how to count permutations accurately and systematically');
-    expect(sampleExplorationMetadata.title).toEqual('Protractor Test');
+    expect(sampleExplorationSearchResult.title).toEqual('Protractor Test');
   });
 });

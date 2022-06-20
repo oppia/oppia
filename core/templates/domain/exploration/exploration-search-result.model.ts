@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,27 +14,29 @@
 
 /**
  * @fileoverview Model class for creating instances of frontend
- * exploration metadata domain objects.
+ * exploration search result domain objects.
  */
 
-export interface ExplorationMetaDataBackendDict {
+export interface ExplorationSearchResultBackendDict {
   id: string;
   objective: string;
   title: string;
 }
 
-export class ExplorationMetadata {
+export class ExplorationSearchResult {
   constructor(
     public id: string,
     public objective: string,
-    public title: string) {}
+    public title: string
+  ) {}
 
   static createFromBackendDict(
-      explorationMetadataBackendDict: ExplorationMetaDataBackendDict):
-        ExplorationMetadata {
-    return new ExplorationMetadata(
-      explorationMetadataBackendDict.id,
-      explorationMetadataBackendDict.objective,
-      explorationMetadataBackendDict.title);
+      explorationSearchResultBackendDict: ExplorationSearchResultBackendDict
+  ): ExplorationSearchResult {
+    return new ExplorationSearchResult(
+      explorationSearchResultBackendDict.id,
+      explorationSearchResultBackendDict.objective,
+      explorationSearchResultBackendDict.title
+    );
   }
 }
