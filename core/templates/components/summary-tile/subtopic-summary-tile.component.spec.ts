@@ -79,30 +79,16 @@ describe('SubtopicSummaryTileComponent', () => {
   });
 
   it('should set component properties on initialization', () => {
-    expect(component.thumbnailBgColor).toBe(undefined);
-    expect(component.subtopicTitle).toBe(undefined);
-    expect(component.thumbnailUrl).toBe(undefined);
-    expect(component.subtopicTitleTranslationKey).toBe(undefined);
-
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
     spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
       .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
 
     component.ngOnInit();
 
-    expect(component.thumbnailBgColor).toBe('#a11f40');
     expect(component.subtopicTitle).toBe('Title');
     expect(component.thumbnailUrl).toBe('/thumbnail/url');
     expect(component.subtopicTitleTranslationKey).toBe(
       'I18N_SUBTOPIC_123abcd_title_TITLE');
-  });
-
-  it('should set thumbnail url as null if thumbnail is not present', () => {
-    spyOn(component.subtopic, 'getThumbnailFilename').and.returnValue(null);
-
-    component.ngOnInit();
-
-    expect(component.thumbnailUrl).toBe(null);
   });
 
   it('should check if subtopic translation is displayed correctly', () => {
@@ -121,12 +107,6 @@ describe('SubtopicSummaryTileComponent', () => {
     let hackySubtopicTitleTranslationIsDisplayed =
       component.isHackySubtopicTitleTranslationDisplayed();
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
-  });
-
-  it('should not open subtopic page if classroom or topic url' +
-    ' does not exist', () => {
-    component.classroomUrlFragment = null;
-    expect(component.openSubtopicPage()).toBe(undefined);
   });
 
   it('should open subtopic page when user clicks on subtopic card', () => {

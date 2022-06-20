@@ -41,7 +41,7 @@ class MockStateSolutionService {
 }
 
 class MockExplorationHtmlFormatterService {
-  getAnswerHtml(x, y, z): string {
+  getAnswerHtml(x: string, y: string, z: string): string {
     return x + y + z;
   }
 }
@@ -136,7 +136,7 @@ describe('Solution editor component', () => {
 
   it('should save new solution', () => {
     let solution = solutionObjectFactory.createNew(
-      true, null, 'Html', 'XyzID');
+      true, 'answer', 'Html', 'XyzID');
     spyOn(component.saveSolution, 'emit').and.stub();
 
     component.updateNewSolution(solution);

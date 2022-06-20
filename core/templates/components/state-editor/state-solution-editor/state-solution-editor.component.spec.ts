@@ -115,7 +115,6 @@ describe('State Solution Editor Component', () => {
     component.ngOnInit();
 
     expect(component.solutionCardIsShown).toBeTrue();
-    expect(component.correctAnswer).toBe(null);
     expect(component.inlineSolutionEditorIsActive).toBeFalse();
     expect(component.SOLUTION_EDITOR_FOCUS_LABEL).toBe(
       'currentCorrectAnswerEditorHtmlForSolutionEditor');
@@ -229,12 +228,6 @@ describe('State Solution Editor Component', () => {
       .and.returnValue(true);
 
     expect(component.isEditable()).toBeTrue();
-  });
-
-  it('should return the saved solution', () => {
-    stateSolutionService.savedMemento = solution;
-
-    expect(component.savedMemento()).toEqual(solution);
   });
 
   it('should toggle activity of inline solution editor', () => {

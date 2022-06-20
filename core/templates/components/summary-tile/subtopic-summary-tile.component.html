@@ -2,11 +2,11 @@
      (click)="openSubtopicPage()"
      [ngClass]="{'disabled-link': !classroomUrlFragment}">
   <div class="subtopic-thumbnail protractor-test-subtopic-thumbnail"
-       [ngStyle]="{background: thumbnailBgColor}">
+       [ngStyle]="{background: subtopic.getThumbnailBgColor()}">
     <img [src]="thumbnailUrl"
          class="img-thumbnail"
          alt=""
-         [ngStyle]="{background: thumbnailBgColor}">
+         [ngStyle]="{background: subtopic.getThumbnailBgColor()}">
   </div>
   <div class="subtopic-title">
     <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">

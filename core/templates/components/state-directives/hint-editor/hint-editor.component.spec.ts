@@ -58,7 +58,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -75,7 +75,6 @@ describe('HintEditorComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.hintMemento).toBe(null);
     expect(component.isEditable).toBe(true);
     expect(component.hintEditorIsOpen).toBe(false);
   });
@@ -96,7 +95,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -106,7 +105,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -126,7 +125,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -136,7 +135,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -158,7 +157,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -168,7 +167,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -176,7 +175,6 @@ describe('HintEditorComponent', () => {
     component.cancelThisHintEdit();
 
     expect(component.hint.hintContent).toEqual(earlierHint.hintContent);
-    expect(component.hintMemento).toBe(null);
     expect(component.hintEditorIsOpen).toBe(false);
   });
 
@@ -187,7 +185,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };
@@ -199,7 +197,7 @@ describe('HintEditorComponent', () => {
 
       toBackendDict(): HintBackendDict {
         return {
-          hint_content: this.hintContent
+          hint_content: this.hintContent.toBackendDict()
         };
       }
     };

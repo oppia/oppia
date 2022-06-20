@@ -69,8 +69,6 @@ describe('ThumbnailUploaderComponent', () => {
   it('should set uploaded and editable thumbnail on initialization', () => {
     component.filename = 'thumbnail-1';
 
-    expect(component.editableThumbnailDataUrl).toBe(undefined);
-    expect(component.uploadedImage).toBe(undefined);
     expect(component.thumbnailIsLoading).toBeTrue();
 
     component.ngOnInit();
@@ -119,11 +117,9 @@ describe('ThumbnailUploaderComponent', () => {
       }
     };
     component.thumbnailIsLoading = false;
-    expect(component.editableThumbnailDataUrl).toBe(undefined);
 
     component.ngOnChanges(changes);
 
-    expect(component.editableThumbnailDataUrl).toBe(undefined);
     expect(imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename)
       .not.toHaveBeenCalled();
     expect(component.thumbnailIsLoading).toBeFalse();
@@ -195,8 +191,6 @@ describe('ThumbnailUploaderComponent', () => {
     const updateFilenameSpy = spyOn(component.updateFilename, 'emit');
     const updateBgColorSpy = spyOn(component.updateBgColor, 'emit');
 
-    expect(component.tempImageName).toBe(undefined);
-    expect(component.uploadedImage).toBe(undefined);
     expect(component.thumbnailIsLoading).toBe(true);
 
     component.showEditThumbnailModal();
@@ -363,15 +357,4 @@ describe('ThumbnailUploaderComponent', () => {
       {backdrop: 'static'}
     );
   }));
-
-  it('should raise an alert if an empty file is uploaded', () => {
-    spyOn(alertsService, 'addWarning');
-    spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
-      .and.returnValue(null);
-
-    component.saveThumbnailImageData(null, () => {});
-
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Could not get resampled file.');
-  });
 });

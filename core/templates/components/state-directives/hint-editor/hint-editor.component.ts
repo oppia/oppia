@@ -36,19 +36,23 @@ interface HintFormSchema {
   templateUrl: './hint-editor.component.html'
 })
 export class HintEditorComponent implements OnInit, OnDestroy {
-  @Input() hint: Hint;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() hint!: Hint;
   @Input() indexPlusOne!: number;
+  hintEditorIsOpen!: boolean;
+  hintMemento!: Hint;
+  isEditable!: boolean;
+  editHintForm!: FormGroup;
+  HINT_FORM_SCHEMA!: HintFormSchema;
+
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
 
   @Output() saveHint = new EventEmitter<void>();
 
   directiveSubscriptions = new Subscription();
-  hintEditorIsOpen: boolean;
-  hintMemento: Hint;
-  isEditable: boolean;
-  editHintForm: FormGroup;
-  HINT_FORM_SCHEMA: HintFormSchema;
 
   constructor(
     private contextService: ContextService,
@@ -80,10 +84,12 @@ export class HintEditorComponent implements OnInit, OnDestroy {
     this.hintEditorIsOpen = false;
     const contentHasChanged = (
       this.hintMemento.hintContent.html !== this.hint.hintContent.html);
-    this.hintMemento = null;
 
     if (contentHasChanged) {
       const hintContentId = this.hint.hintContent.contentId;
+      if (hintContentId === null) {
+        throw new Error('Expected content id to be non-null');
+      }
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [hintContentId]);
     }
@@ -93,7 +99,6 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 
   cancelThisHintEdit(): void {
     this.hint.hintContent = cloneDeep(this.hintMemento.hintContent);
-    this.hintMemento = null;
     this.hintEditorIsOpen = false;
   }
 
@@ -117,7 +122,6 @@ export class HintEditorComponent implements OnInit, OnDestroy {
           this.contextService.getEntityType() === 'question')
       }
     };
-    this.hintMemento = null;
   }
 
   ngOnDestroy(): void {

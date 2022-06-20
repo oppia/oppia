@@ -31,19 +31,22 @@ import { UrlService } from 'services/contextual/url.service';
   templateUrl: 'learner-story-summary-tile.component.html'
 })
 export class LearnerStorySummaryTileComponent implements OnInit {
-  @Input() storySummary: StorySummary;
-  @Input() displayArea: string;
-  @Input() topicName?: string;
-  nodeCount: number;
-  completedNodeCount: number;
-  storyProgress: number;
-  thumbnailUrl: string = null;
-  storyLink: string;
-  storyTitle: string;
-  nextIncompleteNodeTitle: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() storySummary!: StorySummary;
+  @Input() displayArea!: string;
+  @Input() topicName!: string;
+  nodeCount!: number;
+  completedNodeCount!: number;
+  storyProgress!: number;
+  thumbnailUrl!: string;
+  storyLink!: string;
+  storyTitle!: string;
+  nextIncompleteNodeTitle!: string;
+  thumbnailBgColor!: string;
+  starImageUrl!: string;
   storyCompleted: boolean = false;
-  thumbnailBgColor: string;
-  starImageUrl: string = '';
   cardIsHovered: boolean = false;
 
   constructor(
@@ -53,24 +56,26 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   ) {}
 
   getStoryLink(): string {
-    if (!this.storySummary.getClassroomUrlFragment() ||
-      !this.storySummary.getTopicUrlFragment()) {
+    let classroomUrlFragment = this.storySummary.getClassroomUrlFragment();
+    let topicUrlFragment = this.storySummary.getTopicUrlFragment();
+    if (classroomUrlFragment === undefined || topicUrlFragment === undefined) {
       return '#';
     }
     if (this.isDisplayAreaHome()) {
       var allNodes = this.storySummary.getAllNodes();
       var node = allNodes[this.completedNodeCount];
-      if (node) {
+      let nodeExplorationId = node.getExplorationId();
+      if (node && nodeExplorationId) {
         let result = this.urlInterpolationService.interpolateUrl(
           '/explore/<exp_id>', {
-            exp_id: node.getExplorationId()
+            exp_id: nodeExplorationId
           });
         result = this.urlService.addField(
           result, 'topic_url_fragment',
-          this.storySummary.getTopicUrlFragment());
+          topicUrlFragment);
         result = this.urlService.addField(
           result, 'classroom_url_fragment',
-          this.storySummary.getClassroomUrlFragment());
+          classroomUrlFragment);
         result = this.urlService.addField(
           result, 'story_url_fragment',
           this.storySummary.getUrlFragment());
@@ -81,9 +86,9 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     }
     return this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
-        classroom_url_fragment: this.storySummary.getClassroomUrlFragment(),
+        classroom_url_fragment: classroomUrlFragment,
         story_url_fragment: this.storySummary.getUrlFragment(),
-        topic_url_fragment: this.storySummary.getTopicUrlFragment()
+        topic_url_fragment: topicUrlFragment
       });
   }
 
@@ -111,9 +116,11 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.nextIncompleteNodeTitle = (
         `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
     }
-    if (!this.topicName) {
-      this.topicName = this.storySummary.getTopicName();
+    let topicName = this.storySummary.getTopicName();
+    if (topicName === undefined) {
+      throw new Error('Topic name is not defined.');
     }
+    this.topicName = topicName;
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
 
@@ -132,6 +139,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     if (this.displayArea === 'homeTab' && this.cardIsHovered) {
       return '-webkit-filter: blur(2px); filter: blur(2px);';
     }
+    return 'height: 144px; width: 192px;';
   }
 }
 

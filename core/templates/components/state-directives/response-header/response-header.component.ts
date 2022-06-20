@@ -24,6 +24,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface DeleteValue {
   index: number;
@@ -35,16 +36,19 @@ interface DeleteValue {
   templateUrl: './response-header.component.html'
 })
 export class ResponseHeaderComponent {
-  @Input() index: number;
-  @Input() summary: string;
-  @Input() shortSummary: string;
-  @Input() isActive: boolean;
-  @Input() outcome: Outcome;
-  @Input() numRules: number;
-  @Input() isResponse: boolean;
-  @Input() correctnessFeedbackEnabled: boolean;
-  @Input() showWarning: boolean;
-  @Input() defaultOutcome: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() index!: number;
+  @Input() summary!: string;
+  @Input() shortSummary!: string;
+  @Input() isActive!: boolean;
+  @Input() outcome!: Outcome;
+  @Input() numRules!: number;
+  @Input() isResponse!: boolean;
+  @Input() correctnessFeedbackEnabled!: boolean;
+  @Input() showWarning!: boolean;
+  @Input() defaultOutcome!: boolean;
   @Output() delete = new EventEmitter<DeleteValue>();
   @Output() navigateToState = new EventEmitter<string>();
 
@@ -62,7 +66,7 @@ export class ResponseHeaderComponent {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  getCurrentInteractionId(): string {
+  getCurrentInteractionId(): string | null {
     return this.stateInteractionIdService.savedMemento;
   }
 
@@ -73,7 +77,10 @@ export class ResponseHeaderComponent {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     const interactionId = this.getCurrentInteractionId();
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    if (interactionId) {
+      return INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear;
+    }
+    return false;
   }
 
   isCorrect(): boolean {

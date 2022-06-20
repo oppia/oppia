@@ -136,7 +136,6 @@ describe('Learner Topic Goals Summary Tile Component', () => {
 
   it('should get # as story node link url if all chapters' +
     ' are read', () => {
-    component.storyNodeToDisplay = null;
     let storyNodeLink = component.getStoryNodeLink();
     fixture.detectChanges();
     expect(storyNodeLink).toBe('#');

@@ -75,18 +75,10 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = outcome;
 
-    expect(component.canAddPrerequisiteSkill).toBeUndefined();
-    expect(component.feedbackEditorIsOpen).toBeUndefined();
-    expect(component.destinationEditorIsOpen).toBeUndefined();
-    expect(component.correctnessLabelEditorIsOpen).toBeUndefined();
     expect(component.savedOutcome).toBeUndefined();
 
     component.ngOnInit();
 
-    expect(component.canAddPrerequisiteSkill).toBeFalse();
-    expect(component.feedbackEditorIsOpen).toBeFalse();
-    expect(component.destinationEditorIsOpen).toBeFalse();
-    expect(component.correctnessLabelEditorIsOpen).toBeFalse();
     expect(component.savedOutcome).toEqual(outcome);
   });
 
@@ -330,34 +322,6 @@ describe('Outcome Editor Component', () => {
     component.onChangeCorrectnessLabel();
 
     expect(component.savedOutcome.labelledAsCorrect).toBeTrue();
-  });
-
-  it('should set destination as null when saving feedback in' +
-    ' question mode', () => {
-    component.savedOutcome = new Outcome(
-      'Saved Dest',
-      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
-      false,
-      [],
-      'ExpId',
-      'SkillId',
-    );
-    component.outcome = new Outcome(
-      'Dest',
-      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
-      true,
-      [],
-      '',
-      '',
-    );
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.saveThisFeedback(true);
-
-    expect(component.savedOutcome.dest).toBe(null);
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalledWith(['contentId']);
   });
 
   it('should set destination when saving feedback not in question mode', () => {

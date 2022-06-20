@@ -23,6 +23,7 @@ import { ContextService } from 'services/context.service';
 import { SolutionExplanationEditor } from './solution-explanation-editor.component';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 class MockStateSolutionService {
   displayed = {
@@ -136,7 +137,10 @@ describe('Solution explanation editor', () => {
     const updatedHtml = 'updateHtml';
 
     component.updateExplanationHtml(updatedHtml);
-    expect(stateSolutionService.displayed.explanation._html).toBe(updatedHtml);
+
+    let solutionDisplayed = stateSolutionService.displayed as Solution;
+
+    expect(solutionDisplayed.explanation._html).toBe(updatedHtml);
   });
 
   it('should save the explanation', fakeAsync(() => {

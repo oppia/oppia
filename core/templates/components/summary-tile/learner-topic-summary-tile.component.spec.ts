@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { LearnerTopicSummary, LearnerTopicSummaryBackendDict } from 'domain/topic/learner-topic-summary.model';
 import { LearnerTopicSummaryTileComponent } from './learner-topic-summary-tile.component';
 
 
@@ -159,7 +159,7 @@ describe('Learner Topic Summary Tile Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: null,
+      classroom: '',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [{
         id: '0',
@@ -173,7 +173,7 @@ describe('Learner Topic Summary Tile Component', () => {
         url_fragment: 'story-title',
         all_node_dicts: [nodeDict]
       }],
-      url_fragment: null,
+      url_fragment: '',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,

@@ -63,7 +63,7 @@ export class AddOrUpdateSolutionModalComponent
   correctAnswerEditorHtml!: string;
   data!: SolutionInterface;
   savedMemento!: InteractionAnswer;
-  solutionType!: Solution;
+  solutionType!: Solution | null;
   tempAnsOption!: string;
   EMPTY_SOLUTION_DATA!: SolutionInterface;
   COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
@@ -140,36 +140,38 @@ export class AddOrUpdateSolutionModalComponent
 
   ngOnInit(): void {
     this.solutionType = this.stateSolutionService.savedMemento;
-    this.savedMemento = (
-      this.stateSolutionService.savedMemento?.correctAnswer);
-    this.correctAnswerEditorHtml = (
-      this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento,
-        this.stateCustomizationArgsService.savedMemento,
-        false,
-        this.SOLUTION_EDITOR_FOCUS_LABEL,
-        this.savedMemento ? 'savedMemento()' : null)
-    );
-    this.answerIsValid = false;
-    this.EMPTY_SOLUTION_DATA = {
-      answerIsExclusive: false,
-      correctAnswer: undefined,
-      explanationHtml: '',
-      explanationContentId: this.COMPONENT_NAME_SOLUTION
-    };
-    this.data = this.solutionType ? {
-      answerIsExclusive: (
-        this.stateSolutionService.savedMemento.answerIsExclusive),
-      correctAnswer: undefined,
-      explanationHtml: (
-        this.stateSolutionService.savedMemento.explanation.html),
-      explanationContentId: (
-        this.stateSolutionService.savedMemento.explanation.contentId)
-    } : cloneDeep(this.EMPTY_SOLUTION_DATA);
-    this.currentInteractionService.setOnSubmitFn(
-      (answer: InteractionAnswer) => {
-        this.data.correctAnswer = answer;
-      });
+    if (this.solutionType) {
+      this.savedMemento = (
+        this.solutionType?.correctAnswer);
+      this.correctAnswerEditorHtml = (
+        this.explorationHtmlFormatterService.getInteractionHtml(
+          this.stateInteractionIdService.savedMemento,
+          this.stateCustomizationArgsService.savedMemento,
+          false,
+          this.SOLUTION_EDITOR_FOCUS_LABEL,
+          this.savedMemento ? 'savedMemento()' : null)
+      );
+      this.answerIsValid = false;
+      this.EMPTY_SOLUTION_DATA = {
+        answerIsExclusive: false,
+        correctAnswer: undefined,
+        explanationHtml: '',
+        explanationContentId: this.COMPONENT_NAME_SOLUTION
+      };
+      this.data = this.solutionType ? {
+        answerIsExclusive: (
+          this.solutionType.answerIsExclusive),
+        correctAnswer: undefined,
+        explanationHtml: (
+          this.solutionType.explanation.html),
+        explanationContentId: (
+          this.solutionType.explanation.contentId)
+      } : cloneDeep(this.EMPTY_SOLUTION_DATA);
+      this.currentInteractionService.setOnSubmitFn(
+        (answer: InteractionAnswer) => {
+          this.data.correctAnswer = answer;
+        });
+    }
     this.ansOptions = ['The only', 'One'];
     this.tempAnsOption = this.ansOptions[1];
   }

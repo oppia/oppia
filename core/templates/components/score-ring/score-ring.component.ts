@@ -26,12 +26,15 @@ import { QuestionPlayerConstants } from '../question-directives/question-player/
 })
 export class ScoreRingComponent implements AfterViewInit, OnChanges {
   constructor() {}
-  @Input() score;
-  @Input() testIsPassed: boolean;
-  @ViewChild('scoreRing') scoreRingElement: ElementRef<SVGCircleElement>;
-  circle: SVGCircleElement;
-  radius: number;
-  circumference: number;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() score!: number;
+  @Input() testIsPassed!: boolean;
+  @ViewChild('scoreRing') scoreRingElement!: ElementRef<SVGCircleElement>;
+  circle!: SVGCircleElement;
+  radius!: number;
+  circumference!: number;
   COLORS_FOR_PASS_FAIL_MODE = QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE;
 
   setScore(percent: number): void {
