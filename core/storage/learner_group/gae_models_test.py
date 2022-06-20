@@ -299,7 +299,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         # Delete reference for a group id in student_of_learner_groups_ids.
         learner_group_models.LearnerGroupModel.delete_learner_group_references(
             '754')
-        
+
         # Delete reference for a group id in invited_to_learner_groups_ids.
         learner_group_models.LearnerGroupModel.delete_learner_group_references(
             '129')
@@ -317,6 +317,3 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             ]
         }
         self.assertEqual(user_data, expected_data)
-
-        
-
