@@ -747,8 +747,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
                         'id': 'has_length_at_most',
                         'max_value': 10000
                     }]
-                },
-                'default_value': None
+                }
             },
             'include_author': {
                 'schema': {
