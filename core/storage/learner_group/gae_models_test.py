@@ -29,12 +29,9 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import learner_group_models
-    from mypy_imports import user_models
 
-(base_models, learner_group_models, user_models) = (
-    models.Registry.import_models(
-        [models.NAMES.base_model, models.NAMES.learner_group, models.NAMES.user
-        ]))
+(base_models, learner_group_models) = models.Registry.import_models(
+        [models.NAMES.base_model, models.NAMES.learner_group])
 
 
 class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
@@ -277,43 +274,3 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_11'))
-
-    def test_delete_learner_group_references(self) -> None:
-        """Test delete_learner_group_references function."""
-
-        user_models.LearnerGroupUserModel(
-            id='user_34',
-            invited_to_learner_groups_ids=['129', '431'],
-            student_of_learner_groups_ids=['754', '234'],
-            progress_sharing_permissions_list=[
-                {
-                    'group_id': '754',
-                    'sharing_is_turned_on': False
-                },
-                {
-                    'group_id': '234',
-                    'sharing_is_turned_on': True
-                }
-            ]).put()
-
-        # Delete reference for a group id in student_of_learner_groups_ids.
-        learner_group_models.LearnerGroupModel.delete_learner_group_references(
-            '754')
-
-        # Delete reference for a group id in invited_to_learner_groups_ids.
-        learner_group_models.LearnerGroupModel.delete_learner_group_references(
-            '129')
-
-        user_data = user_models.LearnerGroupUserModel.export_data(
-            'user_34')
-        expected_data = {
-            'invited_to_learner_groups_ids': ['431'],
-            'student_of_learner_groups_ids': ['234'],
-            'progress_sharing_permissions_list': [
-                {
-                    'group_id': '234',
-                    'sharing_is_turned_on': True
-                }
-            ]
-        }
-        self.assertEqual(user_data, expected_data)

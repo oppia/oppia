@@ -290,55 +290,8 @@ class LearnerGroupModel(base_models.BaseModel):
             # only one facilitator_user_id, delete the group.
             elif user_id in learner_group_model.facilitator_user_ids and (
                     len(learner_group_model.facilitator_user_ids) == 1):
-                learner_group_model.delete_learner_group_references(
-                    learner_group_model.id)
+                # Remove references of the group from all related learner
+                # group user models.
+                user_models.LearnerGroupUserModel.delete_learner_group_references( # pylint: disable=line-too-long
+                        learner_group_model.id)
                 learner_group_model.delete()
-
-    @classmethod
-    def delete_learner_group_references(cls, group_id: str) -> None:
-        """Delete all references of learner group stored in learner group
-        users model.
-
-        Args:
-            group_id: str. The group_id denotes which group's data to delete.
-        """
-        found_models = user_models.LearnerGroupUserModel.get_all().filter(
-            datastore_services.any_of(
-                user_models.LearnerGroupUserModel
-                    .student_of_learner_groups_ids == group_id,
-                user_models.LearnerGroupUserModel
-                    .invited_to_learner_groups_ids == group_id
-        ))
-
-        for learner_group_user_model in found_models:
-            # If the user has been invited to join the group, delete the
-            # group id from the invited_to_learner_groups_ids list.
-            if group_id in (
-                    learner_group_user_model.invited_to_learner_groups_ids):
-                learner_group_user_model.invited_to_learner_groups_ids.remove(
-                    group_id)
-                learner_group_user_model.update_timestamps()
-                learner_group_user_model.put()
-
-            # If the user is a student of the group, delete the group id
-            # from the student_of_learner_groups_ids list and the progress
-            # sharing permissions corresponding to that group.
-            elif group_id in (
-                    learner_group_user_model.student_of_learner_groups_ids):
-                learner_group_user_model.student_of_learner_groups_ids.remove(
-                    group_id)
-
-                updated_progress_sharing_permissions_list = []
-
-                for progress_sharing_permission in (
-                    learner_group_user_model
-                        .progress_sharing_permissions_list):
-                    if progress_sharing_permission['group_id'] != group_id:
-                        updated_progress_sharing_permissions_list.append(
-                            progress_sharing_permission)
-
-                learner_group_user_model.progress_sharing_permissions_list = (
-                    updated_progress_sharing_permissions_list)
-
-                learner_group_user_model.update_timestamps()
-                learner_group_user_model.put()
