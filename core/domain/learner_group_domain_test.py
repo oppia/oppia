@@ -38,23 +38,23 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'group_id': '3232',
             'title': 'title',
             'description': 'description',
-            'facilitators_user_ids': ['user_1'],
-            'members_user_ids': ['user_2', 'user_3', 'user_4'],
+            'facilitator_user_ids': ['user_1'],
+            'student_user_ids': ['user_2', 'user_3', 'user_4'],
             'invited_user_ids': ['user_5', 'user_6'],
-            'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
+            'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
 
         self.assertEqual(learner_group.group_id, '3232')
         self.assertEqual(learner_group.title, 'title')
         self.assertEqual(learner_group.description, 'description')
-        self.assertEqual(learner_group.facilitators_user_ids, ['user_1'])
+        self.assertEqual(learner_group.facilitator_user_ids, ['user_1'])
         self.assertEqual(
-            learner_group.members_user_ids, ['user_2', 'user_3', 'user_4'])
+            learner_group.student_user_ids, ['user_2', 'user_3', 'user_4'])
         self.assertEqual(
             learner_group.invited_user_ids, ['user_5', 'user_6'])
         self.assertEqual(
-            learner_group.subtopics_page_ids,
+            learner_group.subtopic_page_ids,
             ['subtopic_1', 'subtopic_2'])
         self.assertEqual(learner_group.story_ids, ['story_1', 'story_2'])
 
@@ -75,10 +75,10 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'group_id': '3232',
             'title': 'title',
             'description': 'description',
-            'facilitators_user_ids': ['user_1'],
-            'members_user_ids': ['user_2', 'user_3', 'user_4'],
+            'facilitator_user_ids': ['user_1'],
+            'student_user_ids': ['user_2', 'user_3', 'user_4'],
             'invited_user_ids': ['user_5', 'user_6'],
-            'subtopics_page_ids': ['subtopic_1', 'subtopic_2'],
+            'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
 
@@ -105,7 +105,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['user_5', 'user_6'],
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
-            'Learner group member cannot be invited to join the group.')
+            'Learner group student cannot be invited to join the group.')
 
         self._assert_validation_error( # type: ignore[no-untyped-call]
             learner_group_domain.LearnerGroup(
@@ -115,7 +115,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['user_5', 'user_6'],
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
-            'Learner group facilitator cannot be a member of the group.')
+            'Learner group facilitator cannot be a student of the group.')
 
         self._assert_validation_error( # type: ignore[no-untyped-call]
             learner_group_domain.LearnerGroup(

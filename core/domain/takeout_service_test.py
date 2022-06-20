@@ -869,10 +869,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.LEARNER_GROUP_ID,
             title='sample title',
             description='sample description',
-            facilitators_user_ids=[self.USER_ID_1],
-            members_user_ids=['user_id_2'],
+            facilitator_user_ids=[self.USER_ID_1],
+            student_user_ids=['user_id_2'],
             invited_user_ids=['user_id_3'],
-            subtopics_page_ids=['subtopic_id_1', 'subtopic_id_2'],
+            subtopic_page_ids=['subtopic_id_1', 'subtopic_id_2'],
             story_ids=['skill_id_1', 'skill_id_2']
         )
         learner_group_model.update_timestamps()
@@ -881,7 +881,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         learner_group_user_model = user_models.LearnerGroupUserModel(
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['123'],
-            member_of_learner_groups_ids=['654'],
+            student_of_learner_groups_ids=['654'],
             progress_sharing_permissions_list=[
                 {
                     'group_id': '654',
@@ -1652,12 +1652,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'title': 'sample title',
             'description': 'sample description',
             'facilitator_user_id': self.USER_ID_1,
-            'subtopics_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
+            'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['skill_id_1', 'skill_id_2']
         }
         expected_learner_group_user_data = {
             'invited_to_learner_groups_ids': ['123'],
-            'member_of_learner_groups_ids': ['654'],
+            'student_of_learner_groups_ids': ['654'],
             'progress_sharing_permissions_list': [
                 {
                     'group_id': '654',
