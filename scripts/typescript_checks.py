@@ -196,6 +196,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/domain/collection/collection-update.service.ts',
     'core/templates/domain/collection/editable-collection-backend-api.service.spec.ts',
     'core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts',
+    'core/templates/domain/exploration/ExplorationMetadataObjectFactory.ts',
     'core/templates/domain/exploration/StatesObjectFactorySpec.ts',
     'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
     'core/templates/domain/exploration/param-metadata.model.spec.ts',
