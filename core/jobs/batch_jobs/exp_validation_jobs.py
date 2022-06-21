@@ -152,22 +152,28 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     end_value = (
                         rte_component['customization_args']
                         ['end-with-value'])
+                    video_id = (
+                        rte_component['customization_args']
+                        ['video_id-with-value'])
 
                     if int(start_value) > int(end_value):
                         rte_components_errors.append(
                             f'State - {key} Video tag start '
-                            f'value is greater than end value.'
+                            f'value is greater than end value '
+                            f'having video id {video_id}.'
                         )
 
                 # Validates link url is not https and text value is not empty.
                 elif rte_component['id'] == 'oppia-noninteractive-link':
                     text_with_value = rte_component['customization_args'][
                         'text-with-value']
+                    url_with_value = rte_component['customization_args'][
+                        'url-with-value']
 
                     if text_with_value == '':
                         rte_components_errors.append(
                             f'State - {key} Link tag text '
-                            f'value is empty.'
+                            f'value is empty having url {url_with_value}'
                         )
 
             states_with_values.append(
@@ -433,7 +439,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     )
                 # Validates if the choice is empty or duplicate.
                 seen_choices = []
-                choice = None
                 choice_empty = False
                 choice_duplicate = False
                 for choice in choices:
@@ -442,12 +447,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     if choice.html in seen_choices:
                         choice_duplicate = True
                     seen_choices.append(choice.html)
-                if choice_empty and choice is not None:
+                if choice_empty:
                     mc_interaction_invalid_values.append(
                         'There should not be any empty ' +
                         'choices'
                     )
-                if choice_duplicate and choice is not None:
+                if choice_duplicate:
                     mc_interaction_invalid_values.append(
                         'There should not be any duplicate ' +
                         'choices'
@@ -682,7 +687,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         'Atleast 2 choices should be there')
                 # Validates if the choice is empty or duplicate.
                 seen_choices = []
-                choice = None
                 choice_empty = False
                 choice_duplicate = False
                 for choice in choices:
@@ -691,12 +695,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     if choice.html in seen_choices:
                         choice_duplicate = True
                     seen_choices.append(choice.html)
-                if choice_empty and choice is not None:
+                if choice_empty and choice:
                     drag_drop_interaction_values.append(
                         'There should not be any empty ' +
                         'choices'
                     )
-                if choice_duplicate and choice is not None:
+                if choice_duplicate and choice:
                     drag_drop_interaction_values.append(
                         'There should not be any duplicate ' +
                         'choices'
