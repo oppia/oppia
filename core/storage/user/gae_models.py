@@ -3118,19 +3118,10 @@ class LearnerGroupUserModel(base_models.BaseModel):
         ))
 
         for learner_group_user_model in found_models:
-            # If the user has been invited to join the group, delete the
-            # group id from the invited_to_learner_groups_ids list.
-            if group_id in (
-                    learner_group_user_model.invited_to_learner_groups_ids):
-                learner_group_user_model.invited_to_learner_groups_ids.remove(
-                    group_id)
-                learner_group_user_model.update_timestamps()
-                learner_group_user_model.put()
-
             # If the user is a student of the group, delete the group id
             # from the student_of_learner_groups_ids list and the progress
             # sharing permissions corresponding to that group.
-            elif group_id in (
+            if group_id in (
                     learner_group_user_model.student_of_learner_groups_ids):
                 learner_group_user_model.student_of_learner_groups_ids.remove(
                     group_id)
@@ -3147,5 +3138,12 @@ class LearnerGroupUserModel(base_models.BaseModel):
                 learner_group_user_model.progress_sharing_permissions = (
                     updated_progress_sharing_permissions)
 
-                learner_group_user_model.update_timestamps()
-                learner_group_user_model.put()
+            # Else it means that the user has been invited to join the
+            # group, in that case delete the group id from the
+            # invited_to_learner_groups_ids list.
+            else:
+                learner_group_user_model.invited_to_learner_groups_ids.remove(
+                    group_id)
+
+            learner_group_user_model.update_timestamps()
+            learner_group_user_model.put()
