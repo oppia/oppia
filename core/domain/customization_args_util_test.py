@@ -209,10 +209,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Invalid customization arg name: 23'
         ):
-            # Here, argument 'customization_args' is of type dictionary and it's
-            # keys are expected to be of type string but for testing purposes we
-            # are providing keys of type int, which causes MyPy to throw error.
-            # Thus to silent the error, we used ignore here.
+            # TODO(#13059): After we fully type the codebase we plan to get
+            # rid of the tests that intentionally test wrong inputs that we
+            # can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'ItemSelectionInput',
@@ -298,10 +297,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Invalid customization arg name: False'
         ):
-            # Here, argument 'customization_args' is of type dictionary and it's
-            # keys are expected to be of type string but for testing purposes we
-            # are providing keys of type bool, which causes MyPy to throw error.
-            # Thus to silent the error, we used ignore here.
+            # TODO(#13059): After we fully type the codebase we plan to get
+            # rid of the tests that intentionally test wrong inputs that we
+            # can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
@@ -349,10 +347,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'Expected customization args to be a dict, received %s'
             % customization_args_with_invalid_type
         ):
-            # Here, argument 'customization_args' is of type Dict but for
-            # testing purposes we are providing int value, which causes
-            # MyPy to throw an error. Thus to silent the error, we used
-            # ignore here.
+            # TODO(#13059): After we fully type the codebase we plan to get
+            # rid of the tests that intentionally test wrong inputs that we
+            # can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
