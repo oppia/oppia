@@ -90,7 +90,7 @@ class BaseInteractionDict(TypedDict):
     narrow_instructions: Optional[str]
     default_outcome_heading: Optional[str]
     rule_descriptions: Dict[str, str]
-    can_have_solution: Optional[bool]
+    can_have_solution: bool
     show_generic_submit_button: bool
 
 
@@ -152,7 +152,7 @@ class BaseInteraction:
     # be None unless the interaction is linear and non-terminal.
     default_outcome_heading: Optional[str] = None
     # Whether the solution feature supports this interaction.
-    can_have_solution: Optional[bool] = None
+    can_have_solution: bool = False
     # Whether to show a Submit button in the progress navigation area. This is
     # a generic submit button so do not use this if special interaction-specific
     # behavior is required. The interaction directive must also register
