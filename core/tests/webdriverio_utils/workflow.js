@@ -132,13 +132,6 @@ var publishExploration = async function() {
   var testConfirmPublish = $('.protractor-test-confirm-publish');
   await action.click('Test Confirm Publish', testConfirmPublish);
 
-  var acceptCookieButton = $(
-    '.protractor-test-oppia-cookie-banner-accept-button');
-  var cookieButtonPresent = await acceptCookieButton.isDisplayed();
-  if (cookieButtonPresent) {
-    await action.click('Accept Cookie Button', acceptCookieButton);
-  }
-
   var sharePublishModal = $('.protractor-test-share-publish-modal');
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');

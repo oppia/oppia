@@ -62,13 +62,13 @@ var login = async function(email, useManualNavigation = true) {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
-  var loginPage = await $('.protractor-test-login-page');
+  var loginPage = $('.protractor-test-login-page');
   await waitFor.presenceOf(loginPage, 'Login page did not load');
 
-  var emailInput = await $('.protractor-test-sign-in-email-input');
+  var emailInput = $('.protractor-test-sign-in-email-input');
   await action.keys('Email input', emailInput, email);
 
-  var signInButton = await $('.protractor-test-sign-in-button');
+  var signInButton = $('.protractor-test-sign-in-button');
 
   await waitFor.clientSideRedirection(async() => {
     // Click the "sign in" button to trigger redirection.
@@ -92,7 +92,7 @@ var logout = async function() {
     return !(/logout/.test(url));
   }, async() => {
     await waitFor.visibilityOf(
-      await $(splashPage), 'Splash page takes too long to appear');
+      $(splashPage), 'Splash page takes too long to appear');
     await waitFor.pageToFullyLoad();
   });
 };
@@ -101,24 +101,24 @@ var logout = async function() {
 // that this will fail if the user already has a username.
 var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
-  let cookieBannerAcceptButton = (
-    await $('.protractor-test-oppia-cookie-banner-accept-button'));
-  let cookie = await browser.getCookies(['OPPIA_COOKIES_ACKNOWLEDGED']);
-  if (!cookie) {
-    await action.click('Cookie Banner Accept button', cookieBannerAcceptButton);
+  var cookieBannerAcceptButton = $(
+    '.protractor-test-oppia-cookie-banner-accept-button');
+  var cookieButtonPresent = await cookieBannerAcceptButton.isDisplayed();
+  if (cookieButtonPresent) {
+    await action.click('Accept Cookie Button', cookieBannerAcceptButton);
   }
 
-  var signupPage = await $('.protractor-test-signup-page');
+  var signupPage = $('.protractor-test-signup-page');
   await waitFor.presenceOf(signupPage, 'Signup page did not load');
 
-  var usernameInput = await $('.protractor-test-username-input');
+  var usernameInput = $('.protractor-test-username-input');
   await action.keys('Username input', usernameInput, username);
 
   var agreeToTermsCheckbox = await (
     $('.protractor-test-agree-to-terms-checkbox'));
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
-  var registerUser = await $('.protractor-test-register-user');
+  var registerUser = $('.protractor-test-register-user');
 
   var currentUrl = decodeURIComponent(await browser.getUrl());
 
