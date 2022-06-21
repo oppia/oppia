@@ -278,7 +278,7 @@ export class ContributionOpportunitiesBackendApiService {
     };
     return this.userService.getUserInfoAsync().then(
       async(userInfo) => {
-        if (userInfo?.isLoggedIn()) {
+        if (userInfo.isLoggedIn()) {
           const res = (
             await this.http.get<PreferredTranslationLanguageBackendDict>(
               '/preferredtranslationlanguage'
