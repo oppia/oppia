@@ -635,13 +635,22 @@ def update_states_version_history(
             state_domain.StateVersionHistory(None, None, committer_id))
 
     # Now, handle the updation of version history of states which were renamed.
+    # Firstly, we need to clean up the exp_versions_diff.old_to_new_state_names
+    # dict from the state names which are not effectively changed. For example,
+    # if a state was renamed from state_1 to state_2 and then from state_2 to
+    # state_1 in the same commit, then there is no effective change in state
+    # name and we need to clear them from this dict.
+    effective_old_to_new_state_names = {}
     for old_state_name, new_state_name in (
         exp_versions_diff.old_to_new_state_names.items()):
         if old_state_name != new_state_name:
-            states_version_history[new_state_name] = (
-                state_domain.StateVersionHistory(
-                    prev_version, old_state_name, committer_id))
-            del states_version_history[old_state_name]
+            effective_old_to_new_state_names[old_state_name] = new_state_name
+    for old_state_name, new_state_name in (
+        effective_old_to_new_state_names.items()):
+        states_version_history[new_state_name] = (
+            state_domain.StateVersionHistory(
+                prev_version, old_state_name, committer_id))
+        del states_version_history[old_state_name]
 
     # The following list includes states which exist in both the old states
     # and new states and were not renamed.
@@ -649,7 +658,7 @@ def update_states_version_history(
     for state_name in old_states:
         if (
             not(state_name in exp_versions_diff.deleted_state_names) and
-            not(state_name in exp_versions_diff.old_to_new_state_names)
+            not(state_name in effective_old_to_new_state_names)
         ):
             states_which_were_not_renamed.append(state_name)
 
