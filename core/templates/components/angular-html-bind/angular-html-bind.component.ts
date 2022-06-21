@@ -51,13 +51,16 @@ import { InteractiveTextInputComponent } from 'interactions/TextInput/directives
   templateUrl: './angular-html-bind.component.html',
 })
 export class AngularHtmlBindComponent {
-  @Input() htmlData: string;
-  @Input() classStr: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() htmlData!: string;
+  @Input() classStr!: string;
   @Input() parentScope: unknown;
   htmlDataIsInteraction: boolean = false;
 
-  @ViewChild('interactionContainer', {read: ViewContainerRef}) viewContainerRef:
-  ViewContainerRef;
+  @ViewChild('interactionContainer', {
+    read: ViewContainerRef}) viewContainerRef!: ViewContainerRef;
 
   mapping = {
     'OPPIA-INTERACTIVE-CODE-REPL': InteractiveCodeReplComponent,
@@ -122,9 +125,6 @@ export class AngularHtmlBindComponent {
               componentRef.instance[
                 this.camelCaseFromHyphen(attributes[i].name)] =
               this.parentScope[this.camelCaseFromHyphen(attributes[i].name)];
-
-              componentRef.location.nativeElement.setAttribute(
-                attributes[i].name, attributes[i].value);
             } else {
               componentRef.instance[
                 this.camelCaseFromHyphen(attributes[i].name)] = null;
