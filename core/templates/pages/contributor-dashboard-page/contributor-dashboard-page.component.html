@@ -19,7 +19,9 @@
             <div class="user-and-rights">
               <div class="oppia-profile-details-container">
                 <span ng-if="$ctrl.profilePictureDataUrl">
-                  <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="rounded-circle" alt="User Avatar">
+                  <img ng-src="<[$ctrl.profilePictureDataUrl]>" 
+                           class="rounded-circle" 
+                           alt="User Avatar">
                 </span>
                 <span ng-if="!$ctrl.profilePictureDataUrl">
                   <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
