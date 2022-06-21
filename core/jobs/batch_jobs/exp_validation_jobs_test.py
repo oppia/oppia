@@ -696,9 +696,8 @@ class ExpStateValidationJobTests(
     ' url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">' +
     '</oppia-noninteractive-link></p>\n\n<p><oppia-noninteractive-math' +
     ' math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;' +
-    '2/3&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;' +
-    'mathImg_20220606_180525_2toc4729js_height_2d731_width_3d519_vertical' +
-    '_0d833.svgas&amp;quot;}\"></oppia-noninteractive-math>' +
+    '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;' +
+    'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>' +
     '<oppia-noninteractive-skillreview skill_id-with-value=' +
     '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;' +
     '&amp;quot;\"></oppia-noninteractive-skillreview>&nbsp;heading' +
@@ -707,12 +706,12 @@ class ExpStateValidationJobTests(
     + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     + '&amp;quot;\" ' +
-    'filepath-with-value=\"&amp;quot;img_20220606_174455_f8yf0gg4rz_height_350'
-    + '_width_450.svgg&amp;quot;\"></oppia-noninteractive-image>' +
+    'filepath-with-value=\"&amp;quot;img_1'
+    + '.svgg&amp;quot;\"></oppia-noninteractive-image>' +
     '<oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
     'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value=' +
     '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;' +
-    'img_20220606_114604' + '_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">'
+    'img_2' + '_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">'
     + '</oppia-noninteractive-image>"<oppia-noninteractive-video ' +
     'autoplay-with-value=\"true\" end-with-value=\"11\" ' +
     'start-with-value=\"13\"' +
@@ -1396,15 +1395,17 @@ class ExpStateValidationJobTests(
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_3_STATE_1\', \'rte_components_errors\':'
               + ' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
-              + 'than 160.\', \'State - EXP_3_STATE_1 Image tag alt value is '
-              + 'less than 5.\', ' +
+              + 'than 160 having value img_1.svgg.\', \'State - ' +
+              'EXP_3_STATE_1 Image tag alt value is '
+              + 'less than 5 having value img_1.svgg.\', ' +
               '\'State - EXP_3_STATE_1 Image tag filepath value does ' +
-              'not have svg extension.\', '
-              '\'State - EXP_3_STATE_1 Link tag text value '
-              + 'is empty.\', \'State - EXP_3_STATE_1 Link tag url value ' +
-              'does not start with https.\', ' +
+              'not have svg extension having value img_1.svgg.\', '
+              '\'State - EXP_3_STATE_1 Link tag text value ' +
+              'is empty.\', ' +
               '\'State - EXP_3_STATE_1 Math tag svg_filename' +
-              ' value has a non svg extension.\', \'State - EXP_3_STATE_1 ' +
+              ' value has a non svg extension having value ' +
+              'mathImg.svgas.\', \'State - EXP_3_STATE_1 Math tag raw_latex ' +
+              'value is empty.\', \'State - EXP_3_STATE_1 ' +
               'Skill review tag text value is empty.\', \'State - ' +
               'EXP_3_STATE_1 Video tag start value is greater ' +
               'than end value.\']}]'),
@@ -1576,15 +1577,17 @@ class ExpStateValidationJobTests(
               ', and the state RTE erroneous data are ' +
               '[{\'state_name\': \'EXP_3_STATE_1\', \'rte_components_errors\':'
               + ' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
-              + 'than 160.\', \'State - EXP_3_STATE_1 Image tag alt value is '
-              + 'less than 5.\', ' +
+              + 'than 160 having value img_1.svgg.\', \'State - ' +
+              'EXP_3_STATE_1 Image tag alt value is '
+              + 'less than 5 having value img_1.svgg.\', ' +
               '\'State - EXP_3_STATE_1 Image tag filepath value does ' +
-              'not have svg extension.\', '
-              '\'State - EXP_3_STATE_1 Link tag text value '
-              + 'is empty.\', \'State - EXP_3_STATE_1 Link tag url value ' +
-              'does not start with https.\', ' +
+              'not have svg extension having value img_1.svgg.\', '
+              '\'State - EXP_3_STATE_1 Link tag text value ' +
+              'is empty.\', ' +
               '\'State - EXP_3_STATE_1 Math tag svg_filename' +
-              ' value has a non svg extension.\', \'State - EXP_3_STATE_1 ' +
+              ' value has a non svg extension having value ' +
+              'mathImg.svgas.\', \'State - EXP_3_STATE_1 Math tag raw_latex ' +
+              'value is empty.\', \'State - EXP_3_STATE_1 ' +
               'Skill review tag text value is empty.\', \'State - ' +
               'EXP_3_STATE_1 Video tag start value is greater ' +
               'than end value.\']}]'),

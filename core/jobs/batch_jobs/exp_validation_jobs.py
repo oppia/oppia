@@ -30,6 +30,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+from typing import Dict, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -46,7 +47,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
     @staticmethod
     def filter_invalid_state_rte_values(
         states_dict: dict[str, state_domain.State]
-    ) -> list[dict[str, list]]:
+    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
         """Returns the errored state RTE values, validates the following -
 
         - Image tags contain filepath, alt, and caption attributes,
@@ -61,12 +62,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
         and url begins with HTTPS.
 
         Args:
-            states_dict: dict[str, State]. The dictionary containing
-                state name as key and State object as value.
+            states_dict: dict[str, state_domain.State]. The dictionary
+                containing state name as key and State object as value.
 
         Returns:
-            states_with_values: list[dict]. The list of dictionaries
-            containing the errored values.
+            states_with_values: List[Dict[str, List[Dict[str, List[str]]]]].
+            The list of dictionaries containing the errored values.
         """
         states_with_values = []
         for key, value in states_dict.items():
@@ -76,7 +77,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             for rte_component in rte_components:
                 # RTE image validations for caption, alt and filepath.
                 if rte_component['id'] == 'oppia-noninteractive-image':
-                    # Validates if caption value is greater than 160.
+                    # Validates if caption value is <= 160.
                     cap_with_value = rte_component['customization_args'][
                         'caption-with-value']
                     alt_with_value = rte_component['customization_args'][
@@ -86,34 +87,50 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     if len(cap_with_value) > 160:
                         rte_components_errors.append(
-                            'State - {key} Image tag caption value '.format(
-                                key=key) +
-                            'is greater than 160.')
+                            f'State - {key} Image tag caption value '
+                            f'is greater than 160 '
+                            f'having value {file_with_value}.'
+                        )
 
                     # Validates if alt value is less than 5.
                     if len(alt_with_value) < 5:
                         rte_components_errors.append(
-                            'State - {key} Image tag alt value '.format(
-                                key=key) +
-                            'is less than 5.')
+                            f'State - {key} Image tag alt value '
+                            f'is less than 5 '
+                            f'having value {file_with_value}.'
+                        )
 
                     # Validates if filepath extension is not svg.
-                    if file_with_value[-3:] != 'svg':
+                    if (
+                        len(file_with_value) > 0 and
+                        file_with_value[-3:] != 'svg'
+                    ):
                         rte_components_errors.append(
-                            'State - {key} Image tag filepath value '.format(
-                                key=key) +
-                            'does not have svg extension.')
+                            f'State - {key} Image tag filepath value '
+                            f'does not have svg extension '
+                            f'having value {file_with_value}.'
+                        )
 
                 # Validates if math tag filepath extension is not svg.
                 elif rte_component['id'] == 'oppia-noninteractive-math':
                     svg_filename = rte_component['customization_args'][
                         'math_content-with-value']['svg_filename']
 
+                    raw_latex = rte_component['customization_args'][
+                        'math_content-with-value']['raw_latex']
+
                     if svg_filename[-3:] != 'svg':
                         rte_components_errors.append(
-                            'State - {key} Math tag svg_filename '.format(
-                                key=key) +
-                            'value has a non svg extension.')
+                            f'State - {key} Math tag svg_filename '
+                            f'value has a non svg extension '
+                            f'having value {svg_filename}.'
+                        )
+
+                    if raw_latex == '':
+                        rte_components_errors.append(
+                            f'State - {key} Math tag raw_latex '
+                            f'value is empty.'
+                        )
 
                 # Validates if skillreview text value is empty.
                 elif (rte_component['id'] ==
@@ -123,9 +140,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     if text_with_value == '':
                         rte_components_errors.append(
-                            'State - {key} Skill review tag text '.format(
-                                key=key) +
-                            'value is empty.')
+                            f'State - {key} Skill review tag text '
+                            f'value is empty.'
+                        )
 
                 # Validates if video start value is greater than end value.
                 elif rte_component['id'] == 'oppia-noninteractive-video':
@@ -138,39 +155,33 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     if int(start_value) > int(end_value):
                         rte_components_errors.append(
-                            'State - {key} Video tag start '.format(
-                                key=key) +
-                            'value is greater than end value.')
+                            f'State - {key} Video tag start '
+                            f'value is greater than end value.'
+                        )
 
                 # Validates link url is not https and text value is not empty.
                 elif rte_component['id'] == 'oppia-noninteractive-link':
-                    url_value = rte_component['customization_args'][
-                        'url-with-value'][:5]
                     text_with_value = rte_component['customization_args'][
                         'text-with-value']
 
                     if text_with_value == '':
                         rte_components_errors.append(
-                            'State - {key} Link tag text '.format(
-                                key=key) +
-                            'value is empty.')
-
-                    if url_value != 'https':
-                        rte_components_errors.append(
-                            'State - {key} Link tag url '.format(
-                                key=key) +
-                            'value does not start with https.')
+                            f'State - {key} Link tag text '
+                            f'value is empty.'
+                        )
 
             states_with_values.append(
-                {'state_name': key,
-                'rte_components_errors': rte_components_errors}
+                {
+                    'state_name': key,
+                    'rte_components_errors': rte_components_errors
+                }
             )
         return states_with_values
 
     @staticmethod
     def filter_invalid_frac_numeric_num_unit_interactions(
-        states_dict: dict[str, state_domain.State]
-    ) -> list[dict[str, list]]:
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
         """Returns the errored state interaction values for
 
             - FractionInput
@@ -239,99 +250,93 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             # Validates if the denominator value is zero.
                             if den == 0:
                                 fraction_interaction_invalid_values.append(
-                                    'The rule {rule} of answer '.format(
-                                        rule=rule_spec_index) +
-                                    'group {answer_group} has '.format(
-                                        answer_group=ans_group_index) +
-                                    'denominator equals to zero.')
+                                    f'The rule {rule_spec_index} of answer '
+                                    f'group {ans_group_index} has '
+                                    f'denominator equals to zero.'
+                                )
 
                             # Validates if the value not in simplest form.
-                            if allow_req_simple_form is True:
+                            if allow_req_simple_form:
                                 if whole == 0:
                                     d = math.gcd(num, den)
                                     val_num = num // d
                                     val_den = den // d
                                 if val_num != num and val_den != den:
                                     fraction_interaction_invalid_values.append(
-                                        'The rule {rule} of answer '.format(
-                                            rule=rule_spec_index) +
-                                        'group {answer_group} do '.format(
-                                            answer_group=ans_group_index) +
-                                        'not have value in simple form')
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {ans_group_index} do '
+                                        f'not have value in simple form'
+                                    )
 
                             # Validates if the value not in proper frac form.
-                            if allow_imp_frac is False:
+                            if not allow_imp_frac:
                                 if den <= num:
                                     fraction_interaction_invalid_values.append(
-                                        'The rule {rule} of answer '.format(
-                                            rule=rule_spec_index) +
-                                        'group {answer_group} do '.format(
-                                            answer_group=ans_group_index) +
-                                        'not have value in proper fraction')
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {ans_group_index} do '
+                                        f'not have value in proper fraction'
+                                    )
 
                             # Validates if the value has non zero integ part.
-                            if allow_non_zero_integ_part is False:
+                            if not allow_non_zero_integ_part:
                                 if whole != 0:
                                     fraction_interaction_invalid_values.append(
-                                        'The rule {rule} of answer '.format(
-                                            rule=rule_spec_index) +
-                                        'group {answer_group} has '.format(
-                                            answer_group=ans_group_index) +
-                                        'non zero integer part.')
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {ans_group_index} has '
+                                        f'non zero integer part.'
+                                    )
 
                         # Validates if the den is 0 having rule HasDenEqTo.
                         if rule_spec.rule_type == 'HasDenominatorEqualTo':
                             if rule_spec.inputs['x'] == 0:
                                 fraction_interaction_invalid_values.append(
-                                    'The rule {rule} of answer '.format(
-                                        rule=rule_spec_index) +
-                                    'group {answer_group} has '.format(
-                                        answer_group=ans_group_index) +
-                                    'denominator equals to zero ' +
-                                    'having rule type HasDenominatorEqualTo.')
+                                    f'The rule {rule_spec_index} of answer '
+                                    f'group {ans_group_index} has '
+                                    f'denominator equals to zero '
+                                    f'having rule type HasDenominatorEqualTo.'
+                                )
 
                         # Validates if the value != 0 when setting is turn off.
                         if rule_spec.rule_type == 'HasIntegerPartEqualTo':
-                            if (allow_non_zero_integ_part is False and
-                            rule_spec.inputs['x'] != 0):
+                            if (
+                                    not allow_non_zero_integ_part and
+                                    rule_spec.inputs['x'] != 0
+                            ):
                                 fraction_interaction_invalid_values.append(
-                                    'The rule {rule} of answer '.format(
-                                        rule=rule_spec_index) +
-                                    'group {answer_group} has '.format(
-                                        answer_group=ans_group_index) +
-                                    'non zero integer part having ' +
-                                    'rule type HasIntegerPartEqualTo.')
+                                    f'The rule {rule_spec_index} of answer '
+                                    f'group {ans_group_index} has '
+                                    f'non zero integer part having '
+                                    f'rule type HasIntegerPartEqualTo.'
+                                )
 
                 # Validates various values of NumericInput interaction.
                 if value.interaction.id == 'NumericInput':
                     for rule_spec in answer_group.rule_specs:
                         rule_spec_index = str(answer_group.rule_specs.index(
                             rule_spec))
-                        # Validates if tol value < 0 of rule IsWithTol.
+                        # Validates if tol value > 0 of rule IsWithTol.
                         if rule_spec.rule_type == 'IsWithinTolerance':
-                            if rule_spec.inputs['tol'] < 0:
+                            if rule_spec.inputs['tol'] <= 0:
                                 numeric_input_interaction_values.append(
-                                    'The rule {rule} of answer '.format(
-                                        rule=rule_spec_index) +
-                                    'group {answer_group} having '.format(
-                                        answer_group=ans_group_index) +
-                                    'rule type IsWithinTolerance ' +
-                                    'have tol value less than zero.')
+                                    f'The rule {rule_spec_index} of answer '
+                                    f'group {ans_group_index} having '
+                                    f'rule type IsWithinTolerance '
+                                    f'have tol value less than zero.'
+                                )
 
-                        # Validates if the 1st value is greater than 2nd.
+                        # Validates if the 1st value is lesser than 2nd.
                         if rule_spec.rule_type == 'IsInclusivelyBetween':
                             if rule_spec.inputs['a'] > rule_spec.inputs['b']:
                                 numeric_input_interaction_values.append(
-                                    'The rule {rule} of answer '.format(
-                                        rule=rule_spec_index) +
-                                    'group {answer_group} having '.format(
-                                        answer_group=ans_group_index) +
-                                    'rule type IsInclusivelyBetween ' +
-                                    'have a value greater than b value')
+                                    f'The rule {rule_spec_index} of answer '
+                                    f'group {ans_group_index} having '
+                                    f'rule type IsInclusivelyBetween '
+                                    f'have a value greater than b value'
+                                )
 
                 # Validates for NumberWithUnits interaction.
                 if value.interaction.id == 'NumberWithUnits':
-                    # Validates if IsEqui comes before IsEqual for same value.
+                    # Validates if IsEqual comes before IsEqui for same value.
                     for rule_spec in answer_group.rule_specs:
                         rule_spec_index = str(answer_group.rule_specs.index(
                             rule_spec))
@@ -342,28 +347,28 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             if (rule_spec.inputs['f'] in
                                 number_with_units_rules):
                                 number_with_units_errors.append(
-                                    'The rule {rule} of answer '.format(
-                                        rule=rule_spec_index) +
-                                    'group {answer_group} has '.format(
-                                        answer_group=ans_group_index) +
-                                    'rule type equal is coming after ' +
-                                    'rule type equivalent having same value')
+                                    f'The rule {rule_spec_index} of answer '
+                                    f'group {ans_group_index} has '
+                                    f'rule type equal is coming after '
+                                    f'rule type equivalent having same value'
+                                )
 
             states_with_values.append(
-                {'state_name': key,
-                'numeric_input_interaction_values':
-                numeric_input_interaction_values,
-                'fraction_interaction_invalid_values':
-                fraction_interaction_invalid_values,
-                'number_with_units_errors': number_with_units_errors,
+                {
+                    'state_name': key,
+                    'numeric_input_interaction_values': (
+                        numeric_input_interaction_values),
+                    'fraction_interaction_invalid_values': (
+                        fraction_interaction_invalid_values),
+                    'number_with_units_errors': number_with_units_errors,
                 }
             )
         return states_with_values
 
     @staticmethod
     def filter_invalid_multi_choice_and_item_selec_interac(
-        states_dict: dict[str, state_domain.State]
-    ) -> list[dict[str, list]]:
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
         """Returns the errored state interaction values for
 
             - MultipleChoiceInput
@@ -401,7 +406,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 answer_group_index = str(
                     answer_groups.index(answer_group))
                 if value.interaction.id == 'MultipleChoiceInput':
-                    # Validates if the rule is already present.
+                    # Validates if the answer choice is already present.
                     for rule_spec in answer_group.rule_specs:
                         rule_spec_index = str(
                             answer_group.rule_specs.index(rule_spec))
@@ -413,43 +418,19 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                     rule_spec.inputs['x'])
                             else:
                                 mc_interaction_invalid_values.append(
-                                    'rule - {rule}, answer group '.format(
-                                        rule=rule_spec_index) +
-                                    '- {ans_group} is already present.'.format(
-                                        ans_group=answer_group_index))
-
-                # Validates if value < min or > max of rule type equals.
-                if value.interaction.id == 'ItemSelectionInput':
-                    choices = (
-                    value.interaction.customization_args['choices'].value)
-                    min_value = (
-                        value.interaction.customization_args
-                        ['minAllowableSelectionCount'].value)
-                    max_value = (
-                        value.interaction.customization_args
-                        ['maxAllowableSelectionCount'].value)
-                    for rule_spec in answer_group.rule_specs:
-                        rule_spec_index = str(
-                            answer_group.rule_specs.index(rule_spec))
-                        if rule_spec.rule_type == 'Equals':
-                            if (len(rule_spec.inputs['x']) < min_value or
-                                len(rule_spec.inputs['x']) > max_value):
-                                item_selec_interaction_values.append(
-                                    'Selected choices of rule {rule} '.format(
-                                        rule=rule_spec_index) +
-                                    'of answer group {ans_group} '.format(
-                                        ans_group=answer_group_index) +
-                                    'either less than min_selection_value ' +
-                                    'or greter than max_selection_value.')
-
+                                    f'rule - {rule_spec_index}, answer group '
+                                    f'- {answer_group_index} is '
+                                    f'already present.'
+                                )
             if value.interaction.id == 'MultipleChoiceInput':
                 choices = (
                     value.interaction.customization_args['choices'].value)
                 # Validates if the choices are less than 4.
                 if len(choices) < 4:
                     mc_interaction_invalid_values.append(
-                        'There should be atleast 4 choices'
-                        + ' found ' + str(len(choices)))
+                        f'There should be atleast 4 choices '
+                        f'found {str(len(choices))}'
+                    )
                 # Validates if the choice is empty or duplicate.
                 seen_choices = []
                 choice = None
@@ -463,18 +444,47 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     seen_choices.append(choice.html)
                 if choice_empty and choice is not None:
                     mc_interaction_invalid_values.append(
-                        'There should not be any empty' +
-                        ' choices')
+                        'There should not be any empty ' +
+                        'choices'
+                    )
                 if choice_duplicate and choice is not None:
                     mc_interaction_invalid_values.append(
-                        'There should not be any duplicate' +
-                        ' choices')
+                        'There should not be any duplicate ' +
+                        'choices'
+                    )
                 # Validates if all have feedback and still have deflt outcome.
                 if (len(choices) == len(value.interaction.answer_groups)
                     and value.interaction.default_outcome is not None):
                     mc_interaction_invalid_values.append(
-                        'All choices have feedback'
-                        + ' and still has default outcome')
+                        'All choices have feedback ' +
+                        'and still has default outcome'
+                    )
+
+            for answer_group in answer_groups:
+                answer_group_index = str(
+                    answer_groups.index(answer_group))
+                # Validates if value < min or > max of rule type equals.
+                if value.interaction.id == 'ItemSelectionInput':
+                    choices = (
+                    value.interaction.customization_args['choices'].value)
+                    min_value = (
+                        value.interaction.customization_args
+                        ['minAllowableSelectionCount'].value)
+                    max_value = (
+                        value.interaction.customization_args
+                        ['maxAllowableSelectionCount'].value)
+                    for rule_spec in answer_group.rule_specs:
+                        rule_index = str(
+                            answer_group.rule_specs.index(rule_spec))
+                        if rule_spec.rule_type == 'Equals':
+                            if (len(rule_spec.inputs['x']) < min_value or
+                                len(rule_spec.inputs['x']) > max_value):
+                                item_selec_interaction_values.append(
+                                    f'Selected choices of rule {rule_index} '
+                                    f'of answer group {answer_group_index} '
+                                    f'either less than min_selection_value '
+                                    f'or greter than max_selection_value.'
+                                )
 
             if value.interaction.id == 'ItemSelectionInput':
                 choices = (
@@ -488,18 +498,17 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 # Validates if the min > max value.
                 if min_value > max_value:
                     item_selec_interaction_values.append(
-                        'Min value which is {min_value} '.format(
-                            min_value=str(min_value)) +
-                        'is greater than max value ' +
-                        'which is {max_value}'.format(
-                            max_value=str(max_value)))
+                        f'Min value which is {str(min_value)} '
+                        f'is greater than max value '
+                        f'which is {str(max_value)}'
+                    )
+                # Validates if no of choices are less than max selection value.
                 if len(choices) < max_value:
                     item_selec_interaction_values.append(
-                        'Number of choices which is {choices} '.format(
-                            choices=str(len(choices))) +
-                        'is lesser than the ' +
-                        'max value selection which is {max_value}'.format(
-                            max_value=str(max_value)))
+                        f'Number of choices which is {str(len(choices))} '
+                        f'is lesser than the '
+                        f'max value selection which is {str(max_value)}'
+                    )
                 # Validates if the choice is empty or duplicate.
                 seen_choices = []
                 choice_empty = False
@@ -512,25 +521,30 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     seen_choices.append(choice.html)
                 if choice_empty:
                     item_selec_interaction_values.append(
-                        'There should not be any empty' +
-                        ' choices')
+                        'There should not be any empty ' +
+                        'choices'
+                    )
                 if choice_duplicate:
                     item_selec_interaction_values.append(
-                        'There should not be any duplicate' +
-                        ' choices')
+                        'There should not be any duplicate ' +
+                        'choices'
+                    )
 
             states_with_values.append(
-                {'state_name': key,
-                'mc_interaction_invalid_values': mc_interaction_invalid_values,
-                'item_selec_interaction_values': item_selec_interaction_values
+                {
+                    'state_name': key,
+                    'mc_interaction_invalid_values': (
+                        mc_interaction_invalid_values),
+                    'item_selec_interaction_values': (
+                        item_selec_interaction_values)
                 }
             )
         return states_with_values
 
     @staticmethod
     def filter_invalid_cont_end_drag_drop_interactions(
-        states_dict: dict[str, state_domain.State]
-    ) -> list[dict[str, list]]:
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
         """Returns the errored state interaction values for
 
             - DragAndDropSortInput
@@ -582,56 +596,57 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             for ele in rule_spec.inputs['x']:
                                 if len(ele) > 1:
                                     drag_drop_interaction_values.append(
-                                        'The rule {rule} '.format(
-                                            rule=rule_spec_index) +
-                                        'of answer group {ans_group} '.format(
-                                            ans_group=answer_group_index) +
-                                        'have multiple items at same place ' +
-                                        'when multiple items in same ' +
-                                        'position settings is turned off.')
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {answer_group_index} '
+                                        f'have multiple items at same place '
+                                        f'when multiple items in same '
+                                        f'position settings is turned off.'
+                                    )
 
                             # Validates OneItemIncPos present if multi set on.
-                            if (rule_spec.rule_type ==
-                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+                            if (
+                                rule_spec.rule_type ==
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                            ):
                                 drag_drop_interaction_values.append(
-                                    'The rule {rule} '.format(
-                                        rule=rule_spec_index) +
-                                    'of answer group {ans_group} '.format(
-                                        ans_group=answer_group_index) +
-                                    'having rule type - IsEqualToOrderingWith'
-                                    + 'OneItemAtIncorrectPosition should not '
-                                    + 'be there when the ' +
-                                    'multiple items in same position ' +
-                                    'setting is turned off.')
+                                    f'The rule {rule_spec_index} '
+                                    f'of answer group {answer_group_index} '
+                                    f'having rule type - IsEqualToOrderingWith'
+                                    f'OneItemAtIncorrectPosition should not '
+                                    f'be there when the '
+                                    f'multiple items in same position '
+                                    f'setting is turned off.'
+                                )
 
                             # Validates if both values are same of rule XBefY.
-                            if (rule_spec.rule_type ==
-                            'HasElementXBeforeElementY'):
+                            if (
+                                rule_spec.rule_type ==
+                            'HasElementXBeforeElementY'
+                            ):
                                 if (rule_spec.inputs['x'] ==
                                 rule_spec.inputs['y']):
                                     drag_drop_interaction_values.append(
-                                        'The rule {rule} '.format(
-                                            rule=rule_spec_index) +
-                                        'of answer group {ans_group} '.format(
-                                            ans_group=answer_group_index) +
-                                        'the value 1 and value 2 cannot be ' +
-                                        'same when rule type is ' +
-                                        'HasElementXBeforeElementY')
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {answer_group_index} '
+                                        f'the value 1 and value 2 cannot be '
+                                        f'same when rule type is '
+                                        f'HasElementXBeforeElementY'
+                                    )
 
             # Validates for EndExploration interaction.
             if value.interaction.id == 'EndExploration':
                 # Validates if default value is present.
                 if value.interaction.default_outcome is not None:
                     end_interaction_invalid_values.append(
-                        'There should be no default' +
-                        ' value present in the end exploration interaction.'
+                        'There should be no default ' +
+                        'value present in the end exploration interaction.'
                     )
 
                 # Validates if answer group is present.
                 if len(value.interaction.answer_groups) > 0:
                     end_interaction_invalid_values.append(
-                        'There should be no answer'
-                        + ' groups present in the end exploration interaction.'
+                        'There should be no answer ' +
+                        'groups present in the end exploration interaction.'
                     )
 
                 recc_exp_ids = (
@@ -640,9 +655,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 # Validates if the recc exp ids more than 3.
                 if len(recc_exp_ids) > 3:
                     end_interaction_invalid_values.append(
-                        'Total number of recommended ' +
-                        'explorations should not be more than 3, found ' +
-                        '{rec_len}.'.format(rec_len=str(len(recc_exp_ids)))
+                        f'Total number of recommended '
+                        f'explorations should not be more than 3, found '
+                        f'{str(len(recc_exp_ids))}.'
                     )
 
             # Validates for Continue interaction.
@@ -653,10 +668,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 # Validates if value is empty or len > 20.
                 if text_value == '' or len(text_value) > 20:
                     continue_interaction_invalid_values.append(
-                        'The text value is invalid, either'
-                        + ' it is empty or the character length is more'
-                        + ' than 20, the value is {tex_value}'.format(
-                            tex_value=str(text_value))
+                        f'The text value is invalid, either '
+                        f'it is empty or the character length is more '
+                        f'than 20, the value is {str(text_value)}'
                     )
 
             if value.interaction.id == 'DragAndDropSortInput':
@@ -679,28 +693,32 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     seen_choices.append(choice.html)
                 if choice_empty and choice is not None:
                     drag_drop_interaction_values.append(
-                        'There should not be any empty' +
-                        ' choices')
+                        'There should not be any empty ' +
+                        'choices'
+                    )
                 if choice_duplicate and choice is not None:
                     drag_drop_interaction_values.append(
-                        'There should not be any duplicate' +
-                        ' choices')
+                        'There should not be any duplicate ' +
+                        'choices'
+                    )
 
             states_with_values.append(
-                {'state_name': key,
-                'end_interaction_invalid_values':
-                end_interaction_invalid_values,
-                'continue_interaction_invalid_values':
-                continue_interaction_invalid_values,
-                'drag_drop_interaction_values': drag_drop_interaction_values
+                {
+                    'state_name': key,
+                    'end_interaction_invalid_values': (
+                        end_interaction_invalid_values),
+                    'continue_interaction_invalid_values': (
+                        continue_interaction_invalid_values),
+                    'drag_drop_interaction_values': (
+                        drag_drop_interaction_values)
                 }
             )
         return states_with_values
 
     @staticmethod
     def filter_invalid_state_values(
-        states_dict: dict[str, state_domain.State]
-    ) -> list[dict[str, list]]:
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
         """Returns the errored state values, validates the following -
 
         - tagged_skill_misconception_id should be None
@@ -740,80 +758,85 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 # Validates if tagged_skill_misconception_id not None.
                 if answer_group.tagged_skill_misconception_id is not None:
                     tagged_skill_misconception_ids.append(
-                        'The tagged_skill_misconception_id ' +
-                        f'of answer group {answer_group_index} ' +
-                        'is not None.')
+                        f'The tagged_skill_misconception_id '
+                        f'of answer group {answer_group_index} '
+                        f'is not None.'
+                    )
 
                 # Validates if lab_as_cor is True but dest is state itself.
-                if (answer_group.outcome.dest == key
-                and answer_group.outcome.labelled_as_correct is True):
+                if (
+                        answer_group.outcome.dest == key and
+                        answer_group.outcome.labelled_as_correct
+                ):
                     wrong_labelled_as_correct_values.append(
-                        'The value of labelled_as_correct ' +
-                        'of answer group {ans_group} '.format(
-                            ans_group=answer_group_index) +
-                        'is True but the destination ' +
-                        'is the state itself.')
+                        f'The value of labelled_as_correct '
+                        f'of answer group {answer_group_index} '
+                        f'is True but the destination '
+                        f'is the state itself.'
+                    )
 
                 # Validates if no rule spec is present.
                 if len(answer_group.rule_specs) == 0:
                     not_single_rule_spec.append(
-                        'There is no rule present ' +
-                        'in answer group {ans_group}'.format(
-                            ans_group=answer_group_index) +
-                        ', atleast one is required.')
+                        f'There is no rule present '
+                        f'in answer group {answer_group_index}'
+                        f', atleast one is required.'
+                    )
 
                 # Validates if refresher_exploration_id is not None.
                 if answer_group.outcome.refresher_exploration_id is not None:
                     invalid_refresher_exploration_id.append(
-                        'The refresher_exploration_id ' +
-                        'of answer group {ans_group} '.format(
-                            ans_group=answer_group_index) +
-                        'is not None.')
+                        f'The refresher_exploration_id '
+                        f'of answer group {answer_group_index} '
+                        f'is not None.'
+                    )
 
                 # Validates if the outcome dest is not valid.
                 if answer_group.outcome.dest not in states_list:
                     invalid_destinations.append(
-                        'The destination {dest} '.format(
-                            dest=str(answer_group.outcome.dest)) +
-                        'of answer group {ans_group} '.format(
-                            ans_group=answer_group_index) +
-                        'is not valid.')
+                        f'The destination {str(answer_group.outcome.dest)} '
+                        f'of answer group {answer_group_index} '
+                        f'is not valid.'
+                    )
 
             # Validates if dest of defalut outcome is not valid.
             if value.interaction.default_outcome is not None:
                 if value.interaction.default_outcome.dest not in states_list:
                     invalid_default_outcome_dest.append(
-                        'The destination of default outcome ' +
-                        'is not valid, the value is {dest}'.format(
-                            dest=str(value.interaction.default_outcome.dest))
+                        f'The destination of default outcome '
+                        f'is not valid, the value is '
+                        f'{str(value.interaction.default_outcome.dest)}'
                     )
 
                 def_outcome_ref_exp_id = (
                     value.interaction.default_outcome.refresher_exploration_id)
                 if def_outcome_ref_exp_id is not None:
                     invalid_refresher_exploration_id.append(
-                        'The refresher_exploration_id '
-                        + 'of default outcome is not None.')
+                        'The refresher_exploration_id ' +
+                        'of default outcome is not None.'
+                    )
 
             states_with_values.append(
-                {'state_name': key,
-                'tagged_skill_misconception_ids':
-                tagged_skill_misconception_ids,
-                'wrong_labelled_as_correct_values':
-                wrong_labelled_as_correct_values,
-                'not_single_rule_spec': not_single_rule_spec,
-                'invalid_refresher_exploration_id':
-                invalid_refresher_exploration_id,
-                'invalid_destinations': invalid_destinations,
-                'invalid_default_outcome_dest': invalid_default_outcome_dest,
+                {
+                    'state_name': key,
+                    'tagged_skill_misconception_ids': (
+                        tagged_skill_misconception_ids),
+                    'wrong_labelled_as_correct_values': (
+                        wrong_labelled_as_correct_values),
+                    'not_single_rule_spec': not_single_rule_spec,
+                    'invalid_refresher_exploration_id': (
+                        invalid_refresher_exploration_id),
+                    'invalid_destinations': invalid_destinations,
+                    'invalid_default_outcome_dest': (
+                        invalid_default_outcome_dest)
                 }
             )
         return states_with_values
 
     @staticmethod
     def remove_empty_values(
-        errored_values: list[dict[str, list]]
-    ) -> list[dict[str, list]]:
+        errored_values: List[dict[str, list]]
+    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
         """Remove the empty arrays
 
         Args:
@@ -870,8 +893,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
             | 'Show info for rte' >> beam.MapTuple(
                 lambda exp_id, exp_states_rte_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {exp_id}, ' +
-                   f'created on {exp_created_on}, and the state' +
+                   f'The id of exp is {exp_id}, '
+                   f'created on {exp_created_on}, and the state'
                    f' RTE erroneous data are {exp_states_rte_errors}'
                 ))
             )
@@ -899,9 +922,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
             >> beam.MapTuple(
                 lambda exp_id, exp_states_interaction_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {exp_id}, ' +
-                   f'created on {exp_created_on}, and the state fraction,' +
-                   ' numeric and number with units interaction erroneous ' +
+                   f'The id of exp is {exp_id}, '
+                   f'created on {exp_created_on}, and the state fraction, '
+                   f'numeric and number with units interaction erroneous '
                    f'data are {exp_states_interaction_errors}'
                 ))
             )
@@ -929,9 +952,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
             >> beam.MapTuple(
                 lambda exp_id, exp_states_interaction_errors, exp_created_on:
                 (job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {exp_id}, ' +
-                   f'created on {exp_created_on}, and the state multiple ' +
-                   'choice and item selection interactions ' +
+                   f'The id of exp is {exp_id}, '
+                   f'created on {exp_created_on}, and the state multiple '
+                   f'choice and item selection interactions '
                    f'erroneous data are {exp_states_interaction_errors}'
                 ))
             )
@@ -956,9 +979,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
             | 'Show info for continue, end, drag and drop' >> beam.MapTuple(
                 lambda exp_id, exp_states_interaction_errors, exp_created_on:
                 (job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {exp_id}, ' +
-                   f'created on {exp_created_on}, and the state continue, ' +
-                   'end and drag and drop interactions ' +
+                   f'The id of exp is {exp_id}, '
+                   f'created on {exp_created_on}, and the state continue, '
+                   f'end and drag and drop interactions '
                    f'erroneous data are {exp_states_interaction_errors}'
                 ))
             )
@@ -982,8 +1005,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
             | 'Show info for state values' >> beam.MapTuple(
                 lambda exp_id, exp_states_errors, exp_created_on:
                 (job_run_result.JobRunResult.as_stderr(
-                   f'The id of exp is {exp_id}, ' +
-                   f'created on {exp_created_on}, and the state' +
+                   f'The id of exp is {exp_id}, '
+                   f'created on {exp_created_on}, and the state'
                    f' erroneous data are {exp_states_errors}'
                 ))
             )
