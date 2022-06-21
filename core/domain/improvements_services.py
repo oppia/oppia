@@ -28,7 +28,7 @@ from core.domain import exp_domain
 from core.domain import improvements_domain
 from core.platform import models
 
-from typing import Dict, Iterator, List, Optional, Tuple, cast
+from typing import Dict, Iterator, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -55,24 +55,15 @@ def _yield_all_tasks_ordered_by_status(
         improvements_domain.TaskEntry. All of the tasks corresponding to the
         given composite_entity_id.
     """
+    results: Sequence[improvements_models.TaskEntryModel] = []
     query = improvements_models.TaskEntryModel.query(
         improvements_models.TaskEntryModel.composite_entity_id ==
         composite_entity_id).order(improvements_models.TaskEntryModel.status)
     cursor, more = (None, True)
     while more:
-        # Here we used cast because we need to narrow the return type of
-        # .fetch_page() method from Tuple[Sequence[...], Optional[Cursor], bool]
-        # to Tuple[List[...], Optional[Cursor], bool] for more strict typing.
-        results, cursor, more = cast(
-            Tuple[
-                List[improvements_models.TaskEntryModel],
-                Optional[datastore_services.Cursor],
-                bool
-            ],
-            query.fetch_page(
+        results, cursor, more = query.fetch_page(
                 feconf.MAX_TASK_MODELS_PER_FETCH,
                 start_cursor=cursor
-            )
         )
         for task_model in results:
             yield get_task_entry_from_model(task_model)
@@ -159,32 +150,25 @@ def fetch_exploration_task_history_page(
                 this batch. If False, there are no more results; if True, there
                 are probably more results.
     """
+    results: Sequence[improvements_models.TaskEntryModel] = []
     start_cursor = (
         datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
         if urlsafe_start_cursor else None
     )
-    # Here we used cast because we need to narrow down the return type
-    # of .fetch_page() method from Tuple[Sequence[...], Optional[Cursor], bool]
-    # to Tuple[List[...], Optional[Cursor], bool] for more strict typing.
-    results, cursor, more = cast(
-        Tuple[
-            List[improvements_models.TaskEntryModel],
-            Optional[datastore_services.Cursor],
-            bool
-        ],
-        (
-            improvements_models.TaskEntryModel.query(
-                improvements_models.TaskEntryModel.entity_type == (
-                    constants.TASK_ENTITY_TYPE_EXPLORATION),
-                improvements_models.TaskEntryModel.entity_id == exploration.id,
-                improvements_models.TaskEntryModel.status == (
-                    constants.TASK_STATUS_RESOLVED)
+    results, cursor, more = (
+        improvements_models.TaskEntryModel.query(
+            improvements_models.TaskEntryModel.entity_type == (
+                constants.TASK_ENTITY_TYPE_EXPLORATION
+            ),
+            improvements_models.TaskEntryModel.entity_id == exploration.id,
+            improvements_models.TaskEntryModel.status == (
+                constants.TASK_STATUS_RESOLVED
             )
-            .order(-improvements_models.TaskEntryModel.resolved_on)
-            .fetch_page(
-                feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE,
-                start_cursor=start_cursor
-            )
+        ).order(
+            -improvements_models.TaskEntryModel.resolved_on
+        ).fetch_page(
+            feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE,
+            start_cursor=start_cursor
         )
     )
     # The urlsafe returns bytes and we need to decode them to string.
