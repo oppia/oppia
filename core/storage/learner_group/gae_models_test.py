@@ -106,7 +106,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         # Test get_new_id method.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'New id generator is producing too many collisions.'):
+            'New id generator is producing too many collisions.'
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 learner_group_model_cls, 'get_by_id',
