@@ -205,7 +205,7 @@ def get_displayable_translation_languages(entity_type, entity):
             entity_type, entity.id, entity.version))
 
     for entity_translation in entity_translations:
-        if entity_translation.are_translations_displayable(entity_translation):
+        if entity.are_translations_displayable(entity_translation):
             language_code_list.append(entity_translation.language_code)
 
     return language_code_list

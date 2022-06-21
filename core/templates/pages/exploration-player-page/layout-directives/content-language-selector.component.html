@@ -3,8 +3,8 @@
   <span class="oppia-exploration-language" [innerHTML]="'I18N_PLAYER_AUDIO_LANGUAGE' | translate:{abc: xyz}"></span>
   <select #select
           class="oppia-content-language-selector"
-          [ngModel]="selectedLanguageCode"
-          (ngModelChange)="select.value =onSelectLanguage($event.value)">
+          [(ngModel)]="selectedLanguageCode"
+          (ngModelChange)="onSelectLanguage($event)">
     <option *ngFor="let language of languageOptions" [value]="language.value">{{language.displayed}}</option>
   </select>
 </div>

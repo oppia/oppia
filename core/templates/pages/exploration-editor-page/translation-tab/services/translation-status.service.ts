@@ -39,11 +39,13 @@ require(
 
 angular.module('oppia').factory('TranslationStatusService', [
   'EntityTranslationsService', 'ExplorationStatesService', 'LoaderService',
+  'StateEditorService',
   'StateRecordedVoiceoversService', 'TranslationLanguageService',
   'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
   'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
   function(
     EntityTranslationsService, ExplorationStatesService, LoaderService,
+    StateEditorService,
     StateRecordedVoiceoversService, TranslationLanguageService,
       TranslationTabActiveModeService, COMPONENT_NAME_HINT,
       COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
@@ -302,6 +304,7 @@ angular.module('oppia').factory('TranslationStatusService', [
               LoaderService.hideLoadingScreen();
               entityTranslation = entityTranslationObject;
               _computeAllStatesStatus();
+              StateEditorService.onRefreshStateTranslation.emit();
             })
         } else {
           _computeAllStatesStatus();

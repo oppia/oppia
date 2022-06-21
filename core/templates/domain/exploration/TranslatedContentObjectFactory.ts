@@ -38,7 +38,7 @@ export type DataFormatToDefaultValuesKey = (
   keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES);
 
 export interface TranslatedContentBackendDict {
-  'translation': string|string[];
+  'content_value': string|string[];
   'content_format': string;
   'needs_update': boolean;
 }
@@ -99,7 +99,7 @@ export class TranslatedContent {
   static createFromBackendDict(
       translationBackendDict: TranslatedContentBackendDict): TranslatedContent {
     return new TranslatedContent(
-      translationBackendDict.translation,
+      translationBackendDict.content_value,
       translationBackendDict.content_format as DataFormatToDefaultValuesKey,
       translationBackendDict.needs_update);
   }

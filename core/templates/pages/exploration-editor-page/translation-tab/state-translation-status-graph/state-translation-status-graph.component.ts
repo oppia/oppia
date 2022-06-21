@@ -51,7 +51,7 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
     function(
         $scope, ExplorationStatesService, GraphDataService,
         StateEditorService, StateRecordedVoiceoversService,
-        StateWrittenTranslationsService, TranslationStatusService) {
+        TranslationStatusService) {
       var ctrl = this;
 
       $scope.getGraphData = function() {
@@ -75,9 +75,6 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
           StateRecordedVoiceoversService.init(
             StateEditorService.getActiveStateName(),
             stateData.recordedVoiceovers);
-          StateWrittenTranslationsService.init(
-            StateEditorService.getActiveStateName(),
-            stateData.writtenTranslations);
           StateEditorService.onRefreshStateTranslation.emit();
         }
       };
