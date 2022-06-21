@@ -24,6 +24,7 @@ from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -31,6 +32,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -5242,3 +5244,135 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])
+
+
+class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
+    """Provides testing of the deletion part of wipeout service."""
+
+    USER_1_EMAIL = 'user1@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'user2@email.com'
+    USER_2_USERNAME = 'username2'
+    EXPLORATION_ID_0 = 'An_exploration_0_id'
+    EXPLORATION_ID_1 = 'An_exploration_1_id'
+    VERSION_1 = 1
+    VERSION_2 = 2
+    VERSION_3 = 3
+    STATE_1 = 'state_1'
+    STATE_2 = 'state_2'
+    STATE_3 = 'state_3'
+
+    def setUp(self):
+        super(WipeoutServiceDeleteVersionHistoryModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+
+        model_1 = exp_models.ExplorationVersionHistoryModel(
+            id='%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_1),
+            exploration_id=self.EXPLORATION_ID_0,
+            exploration_version=self.VERSION_1,
+            state_version_history={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.StateVersionHistory(
+                        None, None, self.user_1_id).to_dict())
+            },
+            metadata_version_history=(
+                exp_domain.ExplorationMetadataVersionHistory(
+                    None, self.user_1_id).to_dict()),
+            committer_ids=[self.user_1_id]
+        )
+        model_1.update_timestamps()
+        model_1.put()
+
+        model_2 = exp_models.ExplorationVersionHistoryModel(
+            id='%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2),
+            exploration_id=self.EXPLORATION_ID_0,
+            exploration_version=self.VERSION_2,
+            state_version_history={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.StateVersionHistory(
+                        None, None, self.user_1_id).to_dict()),
+                self.STATE_1: state_domain.StateVersionHistory(
+                    None, None, self.user_2_id).to_dict()
+            },
+            metadata_version_history=(
+                exp_domain.ExplorationMetadataVersionHistory(
+                    self.VERSION_1, self.user_2_id).to_dict()),
+            committer_ids=[self.user_1_id, self.user_2_id]
+        )
+        model_2.update_timestamps()
+        model_2.put()
+
+        model_3 = exp_models.ExplorationVersionHistoryModel(
+            id='%s-%s' % (self.EXPLORATION_ID_1, self.VERSION_1),
+            exploration_id=self.EXPLORATION_ID_1,
+            exploration_version=self.VERSION_1,
+            state_version_history={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.StateVersionHistory(
+                        None, None, self.user_1_id).to_dict())
+            },
+            metadata_version_history=(
+                exp_domain.ExplorationMetadataVersionHistory(
+                    None, self.user_1_id).to_dict()),
+            committer_ids=[self.user_1_id]
+        )
+        model_3.update_timestamps()
+        model_3.put()
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_one_version_history_model_is_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+        pseudonymizable_user_id_mapping = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.exploration.value])
+        pseudonymized_id = pseudonymizable_user_id_mapping[
+            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2)]
+        pseudonymized_model = exp_models.ExplorationVersionHistoryModel.get(
+            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2))
+
+        self.assertNotIn(
+            self.user_2_id, pseudonymized_model.committer_ids)
+        self.assertIn(
+            pseudonymized_id, pseudonymized_model.committer_ids)
+        self.assertEqual(pseudonymized_model.state_version_history, {
+            feconf.DEFAULT_INIT_STATE_NAME: (
+                state_domain.StateVersionHistory(
+                    None, None, self.user_1_id).to_dict()),
+            self.STATE_1: state_domain.StateVersionHistory(
+                None, None, pseudonymized_id).to_dict()
+        })
+        self.assertEqual(
+            pseudonymized_model.metadata_version_history,
+            exp_domain.ExplorationMetadataVersionHistory(
+                self.VERSION_1, pseudonymized_id).to_dict())
+
+    def test_multiple_version_history_models_are_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        pseudonymizable_user_id_mapping = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id).pseudonymizable_entity_mappings[
+                    models.NAMES.exploration.value])
+        version_history_ids = [
+            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_1),
+            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2),
+            '%s-%s' % (self.EXPLORATION_ID_1, self.VERSION_1)
+        ]
+        pseudonymized_models = (
+            exp_models.ExplorationVersionHistoryModel.get_multi(
+                version_history_ids))
+
+        for model in pseudonymized_models:
+            pseudonymized_id = pseudonymizable_user_id_mapping[model.id]
+            self.assertNotIn(
+                self.user_1_id, model.committer_ids)
+            self.assertIn(
+                pseudonymized_id, model.committer_ids)
