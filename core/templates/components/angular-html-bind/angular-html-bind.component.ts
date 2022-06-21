@@ -108,7 +108,7 @@ export class AngularHtmlBindComponent {
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
       if (dom.body.firstElementChild &&
         this.mapping[dom.body.firstElementChild.tagName]) {
-        this.htmlDataIsInteraction = true;
+
         const componentFactory = this.componentFactoryResolver
           .resolveComponentFactory(
             this.mapping[dom.body.firstElementChild.tagName]);
@@ -134,7 +134,9 @@ export class AngularHtmlBindComponent {
           }
         }
 
+        this.htmlDataIsInteraction = true;
         componentRef.changeDetectorRef.detectChanges();
+        this.changeDetectorRef.detectChanges();
       }
     }
   }
