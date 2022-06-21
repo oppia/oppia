@@ -188,7 +188,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
             '\n'
             'class SampleModel(datastore_services.Model):\n'
             '    ...\n'),
-        'excluded_files': (),
+        'excluded_files': (
+            'scripts/check_backend_associated_test_file.py',),
         'excluded_dirs': ('core/platform',),
     },
     {
