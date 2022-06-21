@@ -1663,6 +1663,39 @@ def delete_exploration_summaries(exploration_ids):
     exp_models.ExpSummaryModel.delete_multi(existing_summary_models)
 
 
+def revert_version_history(
+    exploration_id, current_version, revert_to_version):
+    """Reverts the version history to the given version number. Puts the
+    reverted version history model into the datastore.
+
+    Args:
+        exploration_id: str. The id of the exploration for which the version
+            history is to be reverted to the current version.
+        current_version: int. The current version of the exploration.
+        revert_to_version: int. The version to which the version history
+            is to be reverted.
+    """
+    version_history_model_id = (
+        exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exploration_id, revert_to_version))
+    version_history_model = exp_models.ExplorationVersionHistoryModel.get(
+        version_history_model_id, strict=False)
+
+    if version_history_model is not None:
+        new_version_history_model = exp_models.ExplorationVersionHistoryModel(
+            id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                exploration_id, current_version + 1),
+            exploration_id=exploration_id,
+            exploration_version=current_version + 1,
+            state_version_history=version_history_model.state_version_history,
+            metadata_version_history=(
+                version_history_model.metadata_version_history),
+            committer_ids=version_history_model.committer_ids
+        )
+        new_version_history_model.update_timestamps()
+        new_version_history_model.put()
+
+
 def revert_exploration(
         committer_id, exploration_id, current_version, revert_to_version):
     """Reverts an exploration to the given version number. Commits changes.
@@ -1711,6 +1744,8 @@ def revert_exploration(
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
         [exploration.id])
+
+    revert_version_history(exploration_id, current_version, revert_to_version)
 
     regenerate_exploration_and_contributors_summaries(exploration_id)
 

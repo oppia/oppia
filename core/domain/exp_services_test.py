@@ -7851,3 +7851,33 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         self.assertEqual(
             new_model.metadata_version_history, expected_dict)
+
+    def test_update_version_history_on_revert_exploration(self):
+        old_model = self.version_history_model_class.get(
+            '%s-%s' % (self.EXP_0_ID, 1))
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+              'property_name': 'title',
+              'new_value': 'New title'})], 'Changed title')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'Another state'
+                })
+            ], 'Renamed state')
+        exp_services.revert_exploration(self.owner_id, self.EXP_0_ID, 3, 1)
+
+        new_model = self.version_history_model_class.get(
+            '%s-%s' % (self.EXP_0_ID, 4))
+
+        self.assertEqual(
+            old_model.state_version_history,
+            new_model.state_version_history)
+        self.assertEqual(
+            old_model.metadata_version_history,
+            new_model.metadata_version_history)
+        self.assertEqual(old_model.committer_ids, new_model.committer_ids)
