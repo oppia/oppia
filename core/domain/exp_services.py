@@ -776,6 +776,72 @@ def get_updated_committer_ids(
     return committer_ids
 
 
+def update_version_history(
+    exploration, change_list, committer_id, old_states, old_metadata):
+    """Creates the updated ExplorationVersionHistoryModel for the new version
+    of the exploration (after the commit) and puts it into the datastore.
+
+    Args:
+        exploration: Exploration. The explortion after the latest commit.
+        change_list: list(ExplorationChange). A list of changes introduced in
+            the latest commit.
+        committer_id: str. The id of the user who made the latest commit.
+        old_states: dict(str, State). The states in the previous version of
+            the exploration (before the latest commit).
+        old_metadata: ExplorationMetadata. The exploration metadata at the
+            previous version of the exploration (before the latest commit).
+    """
+    version_history_model_id = (
+        exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exploration.id, exploration.version - 1))
+    version_history_model = exp_models.ExplorationVersionHistoryModel.get(
+        version_history_model_id, strict=False)
+
+    if version_history_model is not None:
+        new_states = exploration.states
+        new_metadata = exploration.get_metadata()
+        states_version_history = {
+            state_name: state_domain.StateVersionHistory.from_dict(
+                state_version_history_dict)
+            for state_name, state_version_history_dict in (
+                version_history_model.state_version_history.items())
+        }
+        metadata_version_history = (
+            exp_domain.ExplorationMetadataVersionHistory.from_dict(
+                version_history_model.metadata_version_history))
+
+        updated_states_version_history = update_states_version_history(
+            states_version_history, change_list, old_states, new_states,
+            exploration.version, committer_id
+        )
+        updated_metadata_version_history = update_metadata_version_history(
+            metadata_version_history, change_list, old_metadata, new_metadata,
+            exploration.version, committer_id
+        )
+        updated_committer_ids = get_updated_committer_ids(
+            updated_states_version_history, updated_metadata_version_history)
+
+        updated_version_history_model_id = (
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                exploration.id, exploration.version))
+        updated_version_history_model = (
+            exp_models.ExplorationVersionHistoryModel(
+                id=updated_version_history_model_id,
+                exploration_id=exploration.id,
+                exploration_version=exploration.version,
+                state_version_history={
+                    state_name: version_history.to_dict()
+                    for state_name, version_history in (
+                        updated_states_version_history.items())
+                },
+                metadata_version_history=(
+                    updated_metadata_version_history.to_dict()),
+                committer_ids=updated_committer_ids
+            ))
+        updated_version_history_model.update_timestamps()
+        updated_version_history_model.put()
+
+
 def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
@@ -847,55 +913,10 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
-    # Handle the updation process of the exploration version history.
-    version_history_model_id = (
-        exp_models.ExplorationVersionHistoryModel.get_instance_id(
-            exploration.id, exploration.version - 1))
-    version_history_model = exp_models.ExplorationVersionHistoryModel.get(
-        version_history_model_id, strict=False)
-    if version_history_model is not None:
-        new_states = exploration.states
-        new_metadata = exploration.get_metadata()
-        states_version_history = {
-            state_name: state_domain.StateVersionHistory.from_dict(
-                state_version_history_dict)
-            for state_name, state_version_history_dict in (
-                version_history_model.state_version_history.items())
-        }
-        metadata_version_history = (
-            exp_domain.ExplorationMetadataVersionHistory.from_dict(
-                version_history_model.metadata_version_history))
-
-        updated_states_version_history = update_states_version_history(
-            states_version_history, change_list, old_states, new_states,
-            exploration.version, committer_id
-        )
-        updated_metadata_version_history = update_metadata_version_history(
-            metadata_version_history, change_list, old_metadata, new_metadata,
-            exploration.version, committer_id
-        )
-        updated_committer_ids = get_updated_committer_ids(
-            updated_states_version_history, updated_metadata_version_history)
-
-        updated_version_history_model_id = (
-            exp_models.ExplorationVersionHistoryModel.get_instance_id(
-                exploration.id, exploration.version))
-        updated_version_history_model = (
-            exp_models.ExplorationVersionHistoryModel(
-                id=updated_version_history_model_id,
-                exploration_id=exploration.id,
-                exploration_version=exploration.version,
-                state_version_history={
-                    state_name: version_history.to_dict()
-                    for state_name, version_history in (
-                        updated_states_version_history.items())
-                },
-                metadata_version_history=(
-                    updated_metadata_version_history.to_dict()),
-                committer_ids=updated_committer_ids
-            ))
-        updated_version_history_model.update_timestamps()
-        updated_version_history_model.put()
+    # Update the version history data for each state and the exploration
+    # metadata in the new version of the exploration. 
+    update_version_history(
+        exploration, change_list, committer_id, old_states, old_metadata)
 
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
@@ -983,7 +1004,8 @@ def _create_exploration(
             for state_name in exploration.states
         },
         metadata_version_history=(
-            exp_domain.ExplorationMetadataVersionHistory(None, None).to_dict()),
+            exp_domain.ExplorationMetadataVersionHistory(
+                None, committer_id).to_dict()),
         committer_ids=[committer_id]
     )
     version_history_model.update_timestamps()

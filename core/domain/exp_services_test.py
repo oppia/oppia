@@ -1548,7 +1548,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             ).to_dict()
         }
         expected_metadata_version_history_dict = (
-            exp_domain.ExplorationMetadataVersionHistory(None, None).to_dict())
+            exp_domain.ExplorationMetadataVersionHistory(
+                None, self.owner_id).to_dict())
 
         self.assertEqual(
             version_history_model.state_version_history,
