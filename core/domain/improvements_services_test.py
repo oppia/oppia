@@ -327,17 +327,7 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
                 state_name='State %d' % (i,), exploration_version=i)
             task_entry.resolved_on = (
                 self.MOCK_DATE + datetime.timedelta(minutes=5 * i))
-            # last_updated of tasks are descending to ensure that the tasks
-            # returned are ordered by resolved_on instead.
 
-            # Here, task_entry is an instance of TaskEntry and TaskEntry does
-            # not contain any attribute like 'last_updated'. But for testing
-            # purposes here we are defining a new attribute (last_updated) and
-            # assigning it with some value. which causes MyPy to throw
-            # "attribute is not defined in class" error. thus to silent the
-            # error, we used ignore here.
-            task_entry.last_updated = (  # type: ignore[attr-defined]
-                self.MOCK_DATE - datetime.timedelta(minutes=5 * i))
             task_entries.append(task_entry)
         improvements_services.put_tasks(
             task_entries, update_last_updated_time=False)
