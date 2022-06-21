@@ -37,6 +37,10 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     let actualInputToTruncate = '';
     let inputUpdate;
 
+    // As input variable can be of 19 types and
+    // there properties are also different
+    // we need to fix all InteractionAnswer properties.
+    // we can do this in later stage.
     if (typeof (input) !== 'object') {
       inputUpdate = {
         code: input
