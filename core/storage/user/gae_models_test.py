@@ -3346,7 +3346,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['123', '432'],
             student_of_learner_groups_ids=['754', '234'],
-            progress_sharing_permissions_list=[
+            progress_sharing_permissions=[
                 {
                     'group_id': '754',
                     'sharing_is_turned_on': False
@@ -3360,7 +3360,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_2,
             invited_to_learner_groups_ids=['129', '431'],
             student_of_learner_groups_ids=['754', '234'],
-            progress_sharing_permissions_list=[
+            progress_sharing_permissions=[
                 {
                     'group_id': '754',
                     'sharing_is_turned_on': False
@@ -3395,7 +3395,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['129', '431'],
             student_of_learner_groups_ids=['754', '234'],
-            progress_sharing_permissions_list=[
+            progress_sharing_permissions=[
                 {
                     'group_id': '754',
                     'sharing_is_turned_on': False
@@ -3411,7 +3411,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
         expected_data = {
             'invited_to_learner_groups_ids': ['129', '431'],
             'student_of_learner_groups_ids': ['754', '234'],
-            'progress_sharing_permissions_list': [
+            'progress_sharing_permissions': [
                 {
                     'group_id': '754',
                     'sharing_is_turned_on': False
@@ -3439,7 +3439,7 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
                     base_models.EXPORT_POLICY.EXPORTED,
                 'student_of_learner_groups_ids':
                     base_models.EXPORT_POLICY.EXPORTED,
-                'progress_sharing_permissions_list':
+                'progress_sharing_permissions':
                     base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
@@ -3455,3 +3455,43 @@ class LearnerGroupUserModelTests(test_utils.GenericTestBase):
         # Check if passing a non-existent user_id does not fail.
         user_models.LearnerGroupUserModel.apply_deletion_policy(
             'fake_user_id')
+
+    def test_delete_learner_group_references(self) -> None:
+        """Test delete_learner_group_references function."""
+
+        user_models.LearnerGroupUserModel(
+            id='user_34',
+            invited_to_learner_groups_ids=['129', '431'],
+            student_of_learner_groups_ids=['754', '234'],
+            progress_sharing_permissions=[
+                {
+                    'group_id': '754',
+                    'sharing_is_turned_on': False
+                },
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]).put()
+
+        # Delete reference for a group id in student_of_learner_groups_ids.
+        user_models.LearnerGroupUserModel.delete_learner_group_references(
+            '754')
+
+        # Delete reference for a group id in invited_to_learner_groups_ids.
+        user_models.LearnerGroupUserModel.delete_learner_group_references(
+            '129')
+
+        user_data = user_models.LearnerGroupUserModel.export_data(
+            'user_34')
+        expected_data = {
+            'invited_to_learner_groups_ids': ['431'],
+            'student_of_learner_groups_ids': ['234'],
+            'progress_sharing_permissions': [
+                {
+                    'group_id': '234',
+                    'sharing_is_turned_on': True
+                }
+            ]
+        }
+        self.assertEqual(user_data, expected_data)

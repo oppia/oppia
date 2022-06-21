@@ -1555,7 +1555,7 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             'user_id': 'user1',
             'invited_to_learner_groups_ids': ['123', '432'],
             'student_of_learner_groups_ids': ['754'],
-            'progress_sharing_permissions_list': [
+            'progress_sharing_permissions': [
                 {
                     'group_id': '754',
                     'sharing_is_turned_on': False
@@ -1571,7 +1571,7 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             learner_group_user.student_of_learner_groups_ids,
             ['754'])
         self.assertEqual(
-            learner_group_user.progress_sharing_permissions_list,
+            learner_group_user.progress_sharing_permissions,
             [progress_sharing_permission])
         self.assertEqual(
             learner_group_user.to_dict(),
@@ -1591,7 +1591,7 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             'user_id': 'user1',
             'invited_to_learner_groups_ids': ['123', '432'],
             'student_of_learner_groups_ids': ['754'],
-            'progress_sharing_permissions_list': [
+            'progress_sharing_permissions': [
                 {
                     'group_id': '754',
                     'sharing_is_turned_on': False

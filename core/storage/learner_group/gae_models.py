@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Model for an Oppia learner groups."""
+"""Models for learner groups."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ datastore_services = models.Registry.import_datastore_services()
 class LearnerGroupModel(base_models.BaseModel):
     """Class for storing learner group data.
 
-    Instances of this class are keyed by the group_id.
+    Instances of this class are keyed by the group ID.
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -91,9 +91,9 @@ class LearnerGroupModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'description': base_models.EXPORT_POLICY.EXPORTED,
-            'facilitator_user_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'student_user_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'invited_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'facilitator_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'student_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'invited_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subtopic_page_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -150,18 +150,6 @@ class LearnerGroupModel(base_models.BaseModel):
         entity.put()
         return entity
 
-    @staticmethod
-    def get_field_names_for_takeout() -> Dict[str, str]:
-        """We do not want to export all user ids in the facilitator_user_ids,
-        student_user_ids and invited_user_ids fields, so we export them as
-        fields only containing the current user's id.
-        """
-        return {
-            'facilitator_user_ids': 'facilitator_user_id',
-            'student_user_ids': 'student_user_id',
-            'invited_user_ids': 'invited_user_id'
-        }
-
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, List[str]]]:
         """Takeout: Export LearnerGroupModel user-based properties.
@@ -181,52 +169,13 @@ class LearnerGroupModel(base_models.BaseModel):
         ))
         user_data = {}
         for learner_group_model in found_models:
-            # If the user is a student, we export all fields except
-            # facilitator_user_ids, invited_user_ids and the student_user_id
-            # field is exported only containing the current user's id.
-            if user_id in learner_group_model.student_user_ids:
-                user_data[learner_group_model.id] = {
-                    'title': learner_group_model.title,
-                    'description': learner_group_model.description,
-                    'facilitator_user_id': '',
-                    'student_user_id': user_id,
-                    'invited_user_id': '',
-                    'subtopic_page_ids':
-                        learner_group_model.subtopic_page_ids,
-                    'story_ids': learner_group_model.story_ids
-                }
-
-            # If the user has been invited to join the group,
-            # we export all fields except facilitator_user_ids,
-            # student_user_ids and the invited_user_id field is exported
-            # only containing the current user's id.
-            elif user_id in learner_group_model.invited_user_ids:
-                user_data[learner_group_model.id] = {
-                    'title': learner_group_model.title,
-                    'description': learner_group_model.description,
-                    'facilitator_user_id': '',
-                    'student_user_id': '',
-                    'invited_user_id': user_id,
-                    'subtopic_page_ids':
-                        learner_group_model.subtopic_page_ids,
-                    'story_ids': learner_group_model.story_ids
-                }
-
-            # If the user is the facilitator of the group, we export all
-            # fields except student_user_ids, invited_user_ids and the
-            # facilitator_user_id field is exported only containing the
-            # current user's id.
-            elif user_id in learner_group_model.facilitator_user_ids:
-                user_data[learner_group_model.id] = {
-                    'title': learner_group_model.title,
-                    'description': learner_group_model.description,
-                    'facilitator_user_id': user_id,
-                    'student_user_id': '',
-                    'invited_user_id': '',
-                    'subtopic_page_ids':
-                        learner_group_model.subtopic_page_ids,
-                    'story_ids': learner_group_model.story_ids
-                }
+            user_data[learner_group_model.id] = {
+                'title': learner_group_model.title,
+                'description': learner_group_model.description,
+                'subtopic_page_ids':
+                    learner_group_model.subtopic_page_ids,
+                'story_ids': learner_group_model.story_ids
+            }
         return user_data
 
     @classmethod
@@ -263,19 +212,19 @@ class LearnerGroupModel(base_models.BaseModel):
         ))
 
         for learner_group_model in found_models:
-            # If the user is a student, delete the user from the
-            # student_user_ids list.
-            if user_id in learner_group_model.student_user_ids:
-                learner_group_model.student_user_ids.remove(user_id)
-                learner_group_model.update_timestamps()
-                learner_group_model.put()
-
-            # If the user has been invited to join the group, delete the
-            # user from the invited_user_ids list.
-            elif user_id in learner_group_model.invited_user_ids:
-                learner_group_model.invited_user_ids.remove(user_id)
-                learner_group_model.update_timestamps()
-                learner_group_model.put()
+            # If the user is the facilitator of the group and there is
+            # only one facilitator_user_id, delete the group.
+            if user_id in learner_group_model.facilitator_user_ids and (
+                    len(learner_group_model.facilitator_user_ids) == 1):
+                # Remove references of the group from all related learner
+                # group user models.
+                (
+                    user_models.LearnerGroupUserModel
+                        .delete_learner_group_references(
+                            learner_group_model.id)
+                )
+                learner_group_model.delete()
+                return
 
             # If the user is the facilitator of the group and there are
             # more then one facilitator_user_ids, delete the user from the
@@ -283,62 +232,16 @@ class LearnerGroupModel(base_models.BaseModel):
             elif user_id in learner_group_model.facilitator_user_ids and (
                     len(learner_group_model.facilitator_user_ids) > 1):
                 learner_group_model.facilitator_user_ids.remove(user_id)
-                learner_group_model.update_timestamps()
-                learner_group_model.put()
 
-            # If the user is the facilitator of the group and there is
-            # only one facilitator_user_id, delete the group.
-            elif user_id in learner_group_model.facilitator_user_ids and (
-                    len(learner_group_model.facilitator_user_ids) == 1):
-                learner_group_model.delete_learner_group_references(
-                    learner_group_model.id)
-                learner_group_model.delete()
+            # If the user is a student, delete the user from the
+            # student_user_ids list.
+            elif user_id in learner_group_model.student_user_ids:
+                learner_group_model.student_user_ids.remove(user_id)
 
-    @classmethod
-    def delete_learner_group_references(cls, group_id: str) -> None:
-        """Delete all references of learner group stored in learner group
-        users model.
+            # Else it means that the user has been invited to join the group,
+            # in that case delete the user from the invited_user_ids list.
+            else:
+                learner_group_model.invited_user_ids.remove(user_id)
 
-        Args:
-            group_id: str. The group_id denotes which group's data to delete.
-        """
-        found_models = user_models.LearnerGroupUserModel.get_all().filter(
-            datastore_services.any_of(
-                user_models.LearnerGroupUserModel
-                    .student_of_learner_groups_ids == group_id,
-                user_models.LearnerGroupUserModel
-                    .invited_to_learner_groups_ids == group_id
-        ))
-
-        for learner_group_user_model in found_models:
-            # If the user has been invited to join the group, delete the
-            # group id from the invited_to_learner_groups_ids list.
-            if group_id in (
-                    learner_group_user_model.invited_to_learner_groups_ids):
-                learner_group_user_model.invited_to_learner_groups_ids.remove(
-                    group_id)
-                learner_group_user_model.update_timestamps()
-                learner_group_user_model.put()
-
-            # If the user is a student of the group, delete the group id
-            # from the student_of_learner_groups_ids list and the progress
-            # sharing permissions corresponding to that group.
-            elif group_id in (
-                    learner_group_user_model.student_of_learner_groups_ids):
-                learner_group_user_model.student_of_learner_groups_ids.remove(
-                    group_id)
-
-                updated_progress_sharing_permissions_list = []
-
-                for progress_sharing_permission in (
-                    learner_group_user_model
-                        .progress_sharing_permissions_list):
-                    if progress_sharing_permission['group_id'] != group_id:
-                        updated_progress_sharing_permissions_list.append(
-                            progress_sharing_permission)
-
-                learner_group_user_model.progress_sharing_permissions_list = (
-                    updated_progress_sharing_permissions_list)
-
-                learner_group_user_model.update_timestamps()
-                learner_group_user_model.put()
+            learner_group_model.update_timestamps()
+            learner_group_model.put()
