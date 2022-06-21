@@ -637,10 +637,11 @@ def update_states_version_history(
     # Now, handle the updation of version history of states which were renamed.
     for old_state_name, new_state_name in (
         exp_versions_diff.old_to_new_state_names.items()):
-        states_version_history[new_state_name] = (
-            state_domain.StateVersionHistory(
-                prev_version, old_state_name, committer_id))
-        del states_version_history[old_state_name]
+        if old_state_name != new_state_name:
+            states_version_history[new_state_name] = (
+                state_domain.StateVersionHistory(
+                    prev_version, old_state_name, committer_id))
+            del states_version_history[old_state_name]
 
     # The following list includes states which exist in both the old states
     # and new states and were not renamed.
@@ -914,7 +915,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
     # Update the version history data for each state and the exploration
-    # metadata in the new version of the exploration. 
+    # metadata in the new version of the exploration.
     update_version_history(
         exploration, change_list, committer_id, old_states, old_metadata)
 
