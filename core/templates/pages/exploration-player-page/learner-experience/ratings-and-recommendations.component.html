@@ -25,7 +25,7 @@
     <div *ngIf="recommendedExplorationSummaries.length > 0" class="test">
       <div class="conversation-skin-final-recommendations-header-container">
         <span *ngIf="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
-            translate="I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE">
+              translate="I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE">
         </span>
       </div>
       <div class="ratings-and-recommendations-exp-summary-tiles-container conversation-skin-recommended-activities-container">
@@ -82,11 +82,11 @@
 <style>
   .oppia-sign-up-button {
     background-color: #00645c;
+    border-radius: 15px;
     font-size: 1em;
+    margin-bottom: 25px;
     min-width: max-content;
     width: 154px;
-    margin-bottom: 25px;
-    border-radius: 15px;
   }
   .conversation-skin-final-summary {
     margin-bottom: 25px;
@@ -100,10 +100,10 @@
 
   .conversation-skin-final-ratings {
     background-color: white;
+    border-bottom: 2px solid #bbb;
+    border-top: 2px solid #bbb;
     margin: 0 auto 60px;
     padding: 0 0 20px 0;
-    border-top: 2px solid #BBB;
-    border-bottom: 2px solid #BBB;
     text-align: center;
   }
 
@@ -127,11 +127,11 @@
 
   .conversation-skin-back-to-collection-container {
     border: 1px solid #00645c;
-    width: 35%;
     border-radius: 40px;
-    text-align: center;
     margin: auto;
     padding: 5px;
+    text-align: center;
+    width: 35%;
   }
 
   .conversation-skin-back-to-collection {
@@ -140,14 +140,14 @@
 
   .conversation-skin-login-container {
     background-color: #fff;
+    border-bottom: 2px solid #bbb;
+    border-top: 2px solid #bbb;
     margin-bottom: 24px;
     margin-top: 24px;
     padding: 1.5em 2em;
     padding-bottom: 0.5em;
     text-align: center;
     width: 100%;
-    border-top: 2px solid #BBB;
-    border-bottom: 2px solid #BBB;
   }
 
   .conversation-skin-login-container .conversation-skin-login-text {
@@ -160,15 +160,15 @@
   }
 
   .conversation-skin-login-container .conversation-skin-hide-sign-up-section-text {
-    text-decoration: underline;
     color: #00645c;
     cursor: pointer;
+    text-decoration: underline;
   }
 
   .conversation-skin-login-container .conversation-skin-login-button-text {
     color: #00645c;
-    text-decoration: underline;
     cursor: pointer;
+    text-decoration: underline;
   }
 
   .conversation-skin-login-container .conversation-skin-login-secondary-options {
