@@ -21,9 +21,8 @@
 // HTML bind component that trusts the value it is given and also evaluates
 // custom component tags in the provided value.
 
-import { TemplatePortal } from '@angular/cdk/portal';
 import { ChangeDetectorRef, Component, ComponentFactoryResolver, Input,
-  SimpleChanges, TemplateRef, ViewChild, ViewContainerRef }
+  SimpleChanges, ViewChild, ViewContainerRef }
   from '@angular/core';
 
 import { AlgebraicExpressionInputInteractionComponent } from 'interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component';
@@ -49,18 +48,16 @@ import { InteractiveTextInputComponent } from 'interactions/TextInput/directives
 
 @Component({
   selector: 'angular-html-bind',
-  templateUrl: './angular-html-bind.component.html'
+  templateUrl: './angular-html-bind.component.html',
 })
 export class AngularHtmlBindComponent {
   @Input() htmlData: string;
-  @Input() parentScope;
-  @ViewChild('templatePortalContent') templatePortalContent:
-  TemplateRef<unknown>;
+  @Input() classStr: string;
+  @Input() parentScope: unknown;
+  htmlDataIsInteraction: boolean = false;
 
   @ViewChild('interactionContainer', {read: ViewContainerRef}) viewContainerRef:
   ViewContainerRef;
-
-  templatePortal: TemplatePortal<unknown>;
 
   mapping = {
     'OPPIA-INTERACTIVE-CODE-REPL': InteractiveCodeReplComponent,
@@ -106,14 +103,12 @@ export class AngularHtmlBindComponent {
   ) {}
 
   ngAfterViewInit(): void {
-    this.templatePortal = new TemplatePortal(
-      this.templatePortalContent, this.viewContainerRef);
-    this.changeDetectorRef.detectChanges();
     let domparser = new DOMParser();
     if (this.htmlData) {
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
       if (dom.body.firstElementChild &&
         this.mapping[dom.body.firstElementChild.tagName]) {
+        this.htmlDataIsInteraction = true;
         const componentFactory = this.componentFactoryResolver
           .resolveComponentFactory(
             this.mapping[dom.body.firstElementChild.tagName]);

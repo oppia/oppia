@@ -84,7 +84,7 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind class="protractor-test-conversation-input"
+          <angular-html-bind classStr="protractor-test-conversation-input"
                              [htmlData]="displayedCard.getInteractionHtml()">
           </angular-html-bind>
         </div>

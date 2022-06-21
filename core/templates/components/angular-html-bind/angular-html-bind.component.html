@@ -1,7 +1,8 @@
-<ng-template [cdkPortalOutlet]="templatePortal"></ng-template>
+<div *ngIf="!htmlDataIsInteraction"
+     [innerHTML]="htmlData"
+     [class]="classStr">
+</div>
 
-<ng-template #templatePortalContent>
-  <div [innerHTML]="htmlData"></div>
-</ng-template>
-
-<ng-template #interactionContainer></ng-template>
+<div [class]="classStr">
+  <ng-template #interactionContainer></ng-template>
+</div>

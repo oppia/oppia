@@ -10,7 +10,7 @@
         <mat-list-item class="pl-0" *ngFor="let explanation of rubric.getExplanations()">
           <div class="oppia-skill-description-label">Skill description:</div>
           <div class="oppia-skill-description-container">
-            <angular-html-bind class="oppia-skill-description-text"
+            <angular-html-bind classStr="oppia-skill-description-text"
                                [htmlData]="explanation">
             </angular-html-bind>
           </div>

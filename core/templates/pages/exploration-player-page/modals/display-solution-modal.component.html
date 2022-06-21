@@ -5,7 +5,7 @@
 <div class="modal-body">
   <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
   <span>
-    <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
+    <angular-html-bind classStr="oppia-learner-hint-and-solution-modal-body"
                        [htmlData]="shortAnswerHtml.answer">
     </angular-html-bind>
   </span>
@@ -13,7 +13,7 @@
   <br>
   <label> <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span> </label>
   <span>
-    <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
+    <angular-html-bind classStr="oppia-learner-hint-and-solution-modal-body"
                        [htmlData]="solutionExplanationHtml">
     </angular-html-bind>
   </span>
