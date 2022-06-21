@@ -1511,14 +1511,18 @@ class Topic:
         raise Exception(
             'The subtopic with id %s does not exist.' % subtopic_id)
 
-    def add_subtopic(self, new_subtopic_id: int, title: str,
-                     url_frag: str) -> None:
+    def add_subtopic(
+        self,
+        new_subtopic_id: int,
+        title: str,
+        url_frag: str
+    ) -> None:
         """Adds a subtopic with the given id and title.
 
         Args:
             new_subtopic_id: int. The id of the new subtopic.
             title: str. The title for the new subtopic.
-            url-frag: str. The url fragment of the new subtopic.
+            url_frag: str. The url fragment of the new subtopic.
 
         Raises:
             Exception. The new subtopic ID is not equal to the expected next
