@@ -607,6 +607,66 @@ class SessionStateStats:
         }
         return session_state_stats_dict
 
+    @staticmethod
+    def validate_aggregated_stats_dict(aggregated_stats):
+        """Validates the SessionStateStats domain object.
+
+        Args:
+            aggregated_stats: dict. The aggregated stats dict to validate.
+
+        Returns:
+            aggregated_stats: dict. The validated aggregated stats dict.
+
+        Raises:
+            ValidationError. Whether the aggregated_stats dict is invalid.
+        """
+
+        exploration_stats_properties = [
+            'num_starts',
+            'num_actual_starts',
+            'num_completions'
+        ]
+        state_stats_properties = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'total_hit_count',
+            'first_hit_count',
+            'num_times_solution_viewed',
+            'num_completions'
+        ]
+        for exp_stats_property in exploration_stats_properties:
+            if exp_stats_property not in aggregated_stats:
+                raise utils.ValidationError(
+                    '%s not in aggregated stats dict.' % (exp_stats_property))
+            if not isinstance(aggregated_stats[exp_stats_property], int):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (
+                        exp_stats_property,
+                        aggregated_stats[exp_stats_property]
+                    )
+                )
+        state_stats_mapping = aggregated_stats['state_stats_mapping']
+        for state_name in state_stats_mapping:
+            for state_stats_property in state_stats_properties:
+                if state_stats_property not in state_stats_mapping[state_name]:
+                    raise utils.ValidationError(
+                        '%s not in state stats mapping of %s in aggregated '
+                        'stats dict.' % (state_stats_property, state_name))
+                if not isinstance(
+                    state_stats_mapping[state_name][state_stats_property],
+                    int
+                ):
+                    state_stats = state_stats_mapping[state_name]
+                    raise utils.ValidationError(
+                        'Expected %s to be an int, received %s' % (
+                            state_stats_property,
+                            state_stats[state_stats_property]
+                        )
+                    )
+        # The aggregated_stats parameter does not represent any domain class,
+        # hence dict form of the data is returned from here.
+        return aggregated_stats
+
     def __eq__(self, other):
         """Implements == comparison between two SessionStateStats instances,
         returning whether they hold the same values.

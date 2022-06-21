@@ -2300,6 +2300,53 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['target_id_to_opportunity_dict'][self.EXP_ID], None)
 
+    def test_translation_suggestions_fetches_extra_page_if_filtered_result_is_empty( # pylint: disable=line-too-long
+        self
+    ):
+        # Create a new exploration, link a new story, and create a corresponding
+        # translation suggestion.
+        self.login(self.AUTHOR_EMAIL)
+        exp_id = 'exp2'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Exploration title',
+            category='Algebra', end_state_name='End State',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, exp_id)
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_2', self.TOPIC_ID, exp_id)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'translation_html': 'translation2',
+            'data_format': 'html'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, 1, self.author_id, add_translation_change_dict,
+            'test description')
+        # Disable the new exploration so that its corresponding translation
+        # suggestion is filtered out.
+        exp_services.set_exploration_edits_allowed(exp_id, False)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content', {
+                'limit': 1,
+                'offset': 0
+            })
+
+        # The new translation suggestion is returned first, but because it is
+        # filtered out, the controller performs another fetch.
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(
+            response['suggestions'][0]['change']['translation_html'],
+            '<p>new content html in Hindi</p>')
+        # Offset reflects the extra fetch.
+        self.assertEqual(response['next_offset'], 2)
+
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
 
@@ -2477,86 +2524,20 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.REVIEWER_EMAIL)
 
-    def test_exploration_handler_returns_data_with_no_topic(self):
-        # If no topic name is provided, we fetch all available
-        # translation suggestions.
+    def test_exploration_handler_returns_data_with_no_exploration_id(self):
+        # If no exploration ID is provided, no suggestions are returned.
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0
             })
-        self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(response['next_offset'], 1)
-        suggestion = response['suggestions'][0]
-        self.assertDictEqual(
-            suggestion['change'], self.translate_suggestion_change)
-        self.assertEqual(
-            suggestion['suggestion_type'],
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        )
-        self.assertEqual(
-            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(suggestion['language_code'], 'hi')
-        self.assertEqual(suggestion['author_name'], 'author')
-        self.assertEqual(suggestion['status'], 'review')
-        self.assertDictEqual(
-            response['target_id_to_opportunity_dict'],
-            {
-                'exp1': {
-                    'chapter_title': 'Node1',
-                    'content_count': 2,
-                    'id': 'exp1',
-                    'story_title': 'A story',
-                    'topic_name': 'topic',
-                    'translation_counts': {},
-                    'translation_in_review_counts': {}
-                }
-            }
-        )
+        self.assertEqual(len(response['suggestions']), 0)
+        self.assertEqual(response['next_offset'], 0)
 
-    def test_exploration_handler_returns_data_with_topic_value_all(self):
-        # If the passed topic name value is All, we fetch all available
-        # translation suggestions.
+    def test_exploration_handler_returns_data_with_valid_exploration_id(self):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': feconf.ALL_LITERAL_CONSTANT,
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
-            })
-        self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(response['next_offset'], 1)
-        suggestion = response['suggestions'][0]
-        self.assertDictEqual(
-            suggestion['change'], self.translate_suggestion_change)
-        self.assertEqual(
-            suggestion['suggestion_type'],
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        )
-        self.assertEqual(
-            suggestion['target_type'], feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(suggestion['language_code'], 'hi')
-        self.assertEqual(suggestion['author_name'], 'author')
-        self.assertEqual(suggestion['status'], 'review')
-        self.assertDictEqual(
-            response['target_id_to_opportunity_dict'],
-            {
-                'exp1': {
-                    'chapter_title': 'Node1',
-                    'content_count': 2,
-                    'id': 'exp1',
-                    'story_title': 'A story',
-                    'topic_name': 'topic',
-                    'translation_counts': {},
-                    'translation_in_review_counts': {}
-                }
-            }
-        )
-
-    def test_exploration_handler_returns_data_with_valid_topic_and_exp_ids( # pylint: disable=line-too-long
-            self):
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': 'topic',
+                'exploration_id': self.EXP_ID,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0
             })
@@ -2590,261 +2571,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(response['next_offset'], 1)
-
-    def test_exploration_handler_raises_exception_with_invalid_topic_and_no_exp_id( # pylint: disable=line-too-long
-            self):
-        with self.assertRaisesRegex(
-              Exception,
-                'The supplied input topic: invalid_topic is not valid'):
-            self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', params={
-                'topic_name': 'invalid_topic',
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
-            })
-
-    def test_get_reviewable_suggestions_when_state_of_a_target_is_removed(
-        self):
-        exploration = self.save_new_valid_exploration(
-            'exp2', self.owner_id, objective='The objective')
-        init_state = exploration.states[exploration.init_state_name]
-        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
-        default_outcome_dict['dest'] = exploration.init_state_name
-        exp_services.update_exploration(
-            self.owner_id, 'exp2', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-                    'state_name': exploration.init_state_name,
-                    'new_value': default_outcome_dict
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'state_name': 'New state',
-                    'new_value': 'MultipleChoiceInput'
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'New state',
-                    'new_value': 1
-                })], 'Add state name')
-
-        self.logout()
-        self.login(self.AUTHOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        updated_exploration = exp_fetchers.get_exploration_by_id('exp2')
-        self.translate_suggestion_change = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'New state',
-            'content_id': 'ca_choices_0',
-            'language_code': 'hi',
-            'content_html': '<p>Option A</p>',
-            'translation_html': '<p>new content html in Hindi</p>',
-            'data_format': 'html'
-        }
-        self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
-                'target_id': 'exp2',
-                'target_version_at_submission': updated_exploration.version,
-                'change': self.translate_suggestion_change,
-                'description': 'Adds translation',
-            }, csrf_token=csrf_token
-        )
-
-        self.logout()
-
-        self.login(self.REVIEWER_EMAIL)
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', {
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
-            })
-
-        # Since there is a properly created translation in the setup and another
-        # one in this test case, there should be 2 suggestions when it is
-        # requested for available translations.
-        self.assertEqual(len(response['suggestions']), 2)
-        self.assertEqual(response['next_offset'], 2)
-
-        self.logout()
-
-        exp_services.update_exploration(
-            self.owner_id, 'exp2', [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'New state',
-            })], 'delete state')
-
-        self.login(self.REVIEWER_EMAIL)
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', {
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
-            })
-
-        # Now the state of the exploration created in this case is deleted.
-        # Therefore only one translation should be retrieved.
-        self.assertEqual(len(response['suggestions']), 1)
-        # The suggestion with the deleted exploration state was filtered out
-        # after the storage query, so the next offset skips the filtered
-        # suggestion.
-        self.assertEqual(response['next_offset'], 2)
-
-        self.logout()
-
-    def test_get_reviewable_suggestions_when_original_content_is_removed(self):
-        exploration = self.save_new_valid_exploration(
-            'exp2', self.owner_id, objective='The objective')
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_next_content_id_index(3)
-        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
-        default_outcome_dict['dest'] = exploration.init_state_name
-        exp_services.update_exploration(
-            self.owner_id, 'exp2', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-                    'state_name': exploration.init_state_name,
-                    'new_value': default_outcome_dict
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'state_name': 'New state',
-                    'new_value': 'MultipleChoiceInput'
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'New state',
-                    'new_value': 1
-                })], 'Add state name')
-
-        self.logout()
-        self.login(self.AUTHOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        updated_exploration = exp_fetchers.get_exploration_by_id('exp2')
-        self.translate_suggestion_change = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'New state',
-            'content_id': 'ca_choices_1',
-            'language_code': 'hi',
-            'content_html': '<p>Option B</p>',
-            'translation_html': '<p>new content html in Hindi</p>',
-            'data_format': 'html'
-        }
-        self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
-                'target_id': 'exp2',
-                'target_version_at_submission': updated_exploration.version,
-                'change': self.translate_suggestion_change,
-                'description': 'Adds translation',
-            }, csrf_token=csrf_token
-        )
-
-        self.logout()
-
-        # Since there is a properly created translation in the setup and another
-        # one in this test case, there should be 2 suggestions when it is
-        # requested for available translations.
-        self.login(self.REVIEWER_EMAIL)
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', {
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
-            })
-
-        self.assertEqual(len(response['suggestions']), 2)
-
-        self.logout()
-
-        exp_services.update_exploration(
-            self.owner_id, 'exp2', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
-                    }
-                })], 'Add state name')
-
-        # Now the original content that the translation was made does not exist.
-        # Therefore only one translation should be retrieved.
-        self.login(self.REVIEWER_EMAIL)
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content', {
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
-            })
-
-        self.assertEqual(len(response['suggestions']), 1)
-
-        self.logout()
 
     def test_topic_translate_handler_returns_no_data(self):
         response = self.get_json(

@@ -1079,6 +1079,11 @@ class Topic:
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
                 'Topic thumbnail image is not provided.')
+        if self.canonical_story_references:
+            for reference in self.canonical_story_references:
+                if not isinstance(reference.story_is_published, bool):
+                    raise utils.ValidationError(
+                        'story_is_published value should be boolean type')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
@@ -1194,11 +1199,11 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)  # type: ignore[no-untyped-call]
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
         subtopic_dict['thumbnail_size_in_bytes'] = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)  # type: ignore[no-untyped-call]
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
         return subtopic_dict
 
