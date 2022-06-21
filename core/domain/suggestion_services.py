@@ -588,38 +588,111 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     ])
 
 
-def get_reviewable_suggestions(user_id, suggestion_type):
-    """Returns a list of suggestions of given suggestion_type which the user
-    can review.
+def get_reviewable_translation_suggestions_by_offset(
+        user_id, opportunity_summary_exp_ids, limit, offset):
+    """Returns a list of translation suggestions matching the
+     passed opportunity IDs which the user can review.
 
     Args:
         user_id: str. The ID of the user.
-        suggestion_type: str. The type of the suggestion.
+        opportunity_summary_exp_ids: list(str) or None.
+            The list of exploration IDs for which suggestions
+            are fetched. If the list is empty, no suggestions are
+            fetched. If the value is None, all reviewable
+            suggestions are fetched. If the list consists of some
+            valid number of ids, suggestions corresponding to the
+            IDs are fetched.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning of all
+            results matching the query.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given user is allowed
-        to review.
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of translation suggestions
+            which the supplied user is permitted to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
     """
-    all_suggestions = []
-    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        contribution_rights = user_services.get_user_contribution_rights(
-            user_id)
-        language_codes = (
-            contribution_rights.can_review_translation_for_language_codes)
-        all_suggestions = ([
-            get_suggestion_from_model(s) for s in (
-                suggestion_models.GeneralSuggestionModel
-                .get_in_review_translation_suggestions(
-                    user_id, language_codes))
-        ])
-    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        all_suggestions = ([
-            get_suggestion_from_model(s) for s in (
-                suggestion_models.GeneralSuggestionModel
-                .get_in_review_question_suggestions(user_id))
-        ])
+    contribution_rights = user_services.get_user_contribution_rights(
+        user_id)
+    language_codes = (
+        contribution_rights.can_review_translation_for_language_codes)
 
-    return all_suggestions
+    in_review_translation_suggestions = []
+    next_offset = 0
+    if opportunity_summary_exp_ids is None:
+        in_review_translation_suggestions, next_offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestions_by_offset(
+                limit, offset,
+                user_id, language_codes))
+    elif len(opportunity_summary_exp_ids) > 0:
+        in_review_translation_suggestions, next_offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestions_with_exp_ids_by_offset(
+                limit, offset,
+                user_id, language_codes,
+                opportunity_summary_exp_ids))
+
+    translation_suggestions = ([
+        get_suggestion_from_model(s)
+        for s in in_review_translation_suggestions
+    ])
+    return translation_suggestions, next_offset
+
+
+def get_reviewable_translation_suggestions(user_id):
+    """Returns the target IDs of translation suggestions for which the supplied
+    user can review.
+
+    Args:
+        user_id: str. The ID of the user.
+
+    Returns:
+        list(str). A set of target IDs of the translation suggestions that the
+        supplied user can review.
+    """
+    contribution_rights = user_services.get_user_contribution_rights(user_id)
+    language_codes = (
+        contribution_rights.can_review_translation_for_language_codes)
+    # The user cannot review any translations, so return early.
+    if len(language_codes) == 0:
+        return set()
+    in_review_translation_suggestions = (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_translation_suggestions(user_id, language_codes))
+    return [
+        get_suggestion_from_model(s)
+        for s in in_review_translation_suggestions
+    ]
+
+
+def get_reviewable_question_suggestions_by_offset(
+        user_id, limit, offset):
+    """Returns a list of question suggestions which the user
+       can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning of all
+            results matching the query.
+
+    Returns:
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of question suggestions which
+            the given user is allowed to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+    """
+    suggestions, next_offset = (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_question_suggestions_by_offset(limit, offset, user_id))
+
+    question_suggestions = ([
+        get_suggestion_from_model(s) for s in suggestions
+    ])
+    return question_suggestions, next_offset
 
 
 def get_question_suggestions_waiting_longest_for_review():
@@ -706,6 +779,58 @@ def get_translation_suggestions_in_review_by_exp_ids(exp_ids, language_code):
         get_suggestion_from_model(model) if model else None
         for model in suggestion_models_in_review
     ]
+
+
+def get_suggestions_with_translatable_explorations(suggestions):
+    """Filters the supplied suggestions for those suggestions that have
+    translatable exploration content. That is, the following are true:
+    - The suggestion's change content corresponds to an existing exploration
+    content card.
+    - The suggestion's corresponding exploration allows edits.
+
+    Args:
+        suggestions: list(Suggestion). List of translation suggestions to
+            filter.
+
+    Returns:
+        list(Suggestion). List of filtered translation suggestions.
+    """
+
+    def _has_translatable_exploration(suggestion, suggestion_exp_id_to_exp):
+        """Returns whether the supplied suggestion corresponds to a translatable
+        exploration content card.
+
+        Args:
+            suggestion: Suggestion. Translation suggestion domain object to
+                check.
+            suggestion_exp_id_to_exp: dict(str, Exploration). Dictionary mapping
+                suggestion target exploration IDs to their corresponding
+                Exploration domain objects.
+
+        Returns:
+            bool. Whether the supplied suggestion corresponds to a translatable
+            exploration content card.
+        """
+        exploration = suggestion_exp_id_to_exp[suggestion.target_id]
+        content_id_exists = False
+
+        # Checks whether the suggestion's change content still exists in the
+        # corresponding exploration.
+        # For more details, see https://github.com/oppia/oppia/issues/14339.
+        if suggestion.change.state_name in exploration.states:
+            content_id_exists = exploration.states[
+                suggestion.change.state_name].has_content_id(
+                    suggestion.change.content_id)
+        return content_id_exists and exploration.edits_allowed
+
+    suggestion_exp_ids = {
+        suggestion.target_id for suggestion in suggestions}
+    suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
+        list(suggestion_exp_ids))
+    return list(filter(
+        lambda suggestion: _has_translatable_exploration(
+            suggestion, suggestion_exp_id_to_exp),
+        suggestions))
 
 
 def _get_plain_text_from_html_content_string(html_content_string):
@@ -935,6 +1060,38 @@ def get_submitted_suggestions(user_id, suggestion_type):
             .get_user_created_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+
+
+def get_submitted_suggestions_by_offset(
+        user_id, suggestion_type, limit, offset):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of suggestion.
+        limit: int. The maximum number of results to return.
+        offset: int. The number of results to skip from the beginning
+            of all results matching the query.
+
+    Returns:
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of suggestions of the supplied
+                type which the supplied user has submitted.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+    """
+    submitted_suggestion_models, next_offset = (
+        suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_by_offset(
+                limit,
+                offset,
+                suggestion_type,
+                user_id))
+    suggestions = ([
+        get_suggestion_from_model(s) for s in submitted_suggestion_models
+    ])
+    return suggestions, next_offset
 
 
 def get_info_about_suggestions_waiting_too_long_for_review():

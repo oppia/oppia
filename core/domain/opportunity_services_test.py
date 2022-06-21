@@ -88,7 +88,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
         ) for i in range(5)]
@@ -97,7 +97,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -789,7 +789,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
         ) for i in range(5)]
@@ -798,7 +798,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -848,6 +848,26 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunities['0'],
             opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(opportunities['0'].id, '0')
+
+    def test_get_exploration_opportunity_summaries_by_no_topic_id(self):
+        opportunity_summaries = (
+            opportunity_services
+                .get_exploration_opportunity_summaries_by_topic_id(
+                'None'))
+
+        self.assertEqual(opportunity_summaries, [])
+
+    def test_get_exploration_opportunity_summaries_by_valid_topic_id(self):
+        opportunity_summaries = (
+            opportunity_services
+                .get_exploration_opportunity_summaries_by_topic_id(
+                'topic'))
+
+        self.assertEqual(len(opportunity_summaries), 1)
+        self.assertIsInstance(
+            opportunity_summaries[0],
+            opportunity_domain.ExplorationOpportunitySummary)
+        self.assertEqual(opportunity_summaries[0].topic_id, 'topic')
 
     def test_get_exploration_opportunity_summaries_by_ids_for_invalid_id(self):
         opportunities = (

@@ -19,12 +19,10 @@
 from __future__ import annotations
 
 import datetime
-import os
 
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import fs_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -40,7 +38,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
@@ -57,7 +55,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_topic(self) -> None:
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         expected_topic_dict: topic_domain.TopicDict = {
             'id': self.topic_id,
             'name': 'Name',
@@ -79,7 +77,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'version': 0,
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
-            'page_title_fragment_for_web': ''
+            'page_title_fragment_for_web': 'fragm'
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -565,6 +563,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
 
+    def test_validation_fails_with_story_is_published_set_to_non_bool_value(
+        self
+    ) -> None:
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id')
+        ]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        # Here, a bool value is expected but for test purpose we're assigning it
+        # a string type. Thus to avoid MyPy error, we added an ignore here.
+        self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore[assignment]
+        self._assert_validation_error(
+            'story_is_published value should be boolean type')
+
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.topic.url_fragment = ''
         validation_message = 'Topic URL Fragment field should not be empty.'
@@ -733,32 +747,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_abbreviated_name('abbrev')
         self.assertEqual(self.topic.abbreviated_name, 'abbrev')
 
-    def test_update_thumbnail_filename(self) -> None:
-        self.assertEqual(self.topic.thumbnail_filename, None)
-        # Test exception when thumbnail is not found on filesystem.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception,
-            'The thumbnail img.svg for topic with id %s does not exist'
-            ' in the filesystem.' % (self.topic_id)):
-            self.topic.update_thumbnail_filename('img.svg')
-
-        # Save the dummy image to the filesystem to be used as thumbnail.
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            'rb', encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
-            fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic.id))
-        fs.commit(  # type: ignore[no-untyped-call]
-            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
-            mimetype='image/svg+xml')
-
-        # Test successful update of thumbnail present in the filesystem.
-        self.topic.update_thumbnail_filename('img.svg')
-        self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
-        self.assertEqual(self.topic.thumbnail_size_in_bytes, len(raw_image))
-
     def test_update_thumbnail_bg_color(self) -> None:
         self.assertEqual(self.topic.thumbnail_bg_color, None)
         self.topic.update_thumbnail_bg_color('#C6DCDA')
@@ -780,37 +768,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         self.topic.update_subtopic_title(1, 'new title')
         self.assertEqual(self.topic.subtopics[0].title, 'new title')
-
-    def test_update_subtopic_thumbnail_filename(self) -> None:
-        self.assertEqual(len(self.topic.subtopics), 1)
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_filename, 'image.svg')
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_size_in_bytes, 21131)
-
-        # Test Exception when the thumbnail is not found in filesystem.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'The thumbnail %s for subtopic with topic_id %s does'
-            ' not exist in the filesystem.' % (
-                'new_image.svg', self.topic_id)):
-            self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
-
-        # Test successful update of thumbnail_filename when the thumbnail
-        # is found in the filesystem.
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
-            fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
-                feconf.ENTITY_TYPE_TOPIC, self.topic_id))
-        fs.commit(  # type: ignore[no-untyped-call]
-            'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
-        self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
-        self.assertEqual(
-            self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
 
     def test_update_subtopic_url_fragment(self) -> None:
         self.assertEqual(len(self.topic.subtopics), 1)

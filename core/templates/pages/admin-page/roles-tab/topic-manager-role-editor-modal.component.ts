@@ -28,13 +28,18 @@ import { AlertsService } from 'services/alerts.service';
   templateUrl: './topic-manager-role-editor-modal.component.html',
 })
 export class TopicManagerRoleEditorModalComponent implements OnInit {
-  @Input() managedTopicIds;
-  @Input() topicIdToName;
-  @Input() username;
-
-  newTopicId = null;
-  topicIdsForSelection = [];
-  topicIdInUpdate = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() managedTopicIds!: string[];
+  @Input() topicIdToName!: {[topicId: string]: string};
+  @Input() username!: string;
+  // Set to null when there is no topic left in the list of topics to be
+  // updated. If this value is null, it also means that the 'Add' button
+  // should be disabled.
+  newTopicId: string | null = null;
+  topicIdInUpdate: string | null = null;
+  topicIdsForSelection: string[] = [];
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -49,6 +54,9 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   }
 
   addTopic(): void {
+    if (this.newTopicId === null) {
+      throw new Error('Expected newTopicId to be non-null.');
+    }
     this.managedTopicIds.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
     this.newTopicId = null;
@@ -57,8 +65,11 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     }, errorMessage => {
-      let topicIdIndex = this.managedTopicIds.indexOf(this.newTopicId);
-      this.managedTopicIds.splice(topicIdIndex, 1);
+      if (this.topicIdInUpdate !== null) {
+        let topicIdIndex = this.managedTopicIds.indexOf(
+          this.topicIdInUpdate);
+        this.managedTopicIds.splice(topicIdIndex, 1);
+      }
       this.alertsService.addWarning(
         errorMessage || 'Error communicating with server.');
     });

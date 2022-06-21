@@ -25,6 +25,7 @@ from core import utils
 from core.domain import customization_args_util
 from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.tests import test_utils
 
 
@@ -294,6 +295,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
             ['skillId12345-123'])
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.', True)
+        }
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -441,6 +449,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question.question_state_data_schema_version = 'abc'
         self._assert_validation_error(
             'Expected schema version to be an integer')
+
+        self.question.question_state_data_schema_version = 45
+        self._assert_validation_error(
+            'Expected question state schema version to be %s, received '
+                '%s' % (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION,
+                    self.question.question_state_data_schema_version))
 
         self.question.linked_skill_ids = 'Test'
         self._assert_validation_error(
@@ -1718,6 +1733,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
+<<<<<<< HEAD
         question_data['interaction']['id'] = 'TextInput'
 
         question_data['interaction']['answer_groups'] = [
@@ -1729,21 +1745,58 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 }
             }
         ]
+=======
+        question_data['interaction']['id'] = 'AlgebraicExpressionInput'
+        question_data['interaction']['customization_args'] = {
+            'customOskLetters': ['a', 'b', 'c']
+        }
+        question_data['interaction']['answer_groups'] = [{
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+>>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
 
         test_value = {
             'state': question_data,
             'state_schema_version': 49
         }
 
+<<<<<<< HEAD
         self.assertEqual(
             test_value['state']['interaction']['customization_args'],
             {}
         )
 
+=======
+>>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 50)
+<<<<<<< HEAD
         self.assertEqual(
             test_value['state']['interaction']['customization_args'],
             {
@@ -1761,6 +1814,35 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertIn('dest_if_really_stuck', outcome_dict)
         self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
+=======
+
+        rule_specs = test_value[
+            'state']['interaction']['answer_groups'][0]['rule_specs']
+        self.assertEqual(len(rule_specs), 1)
+        self.assertEqual(rule_specs[0]['rule_type'], 'MatchesExactlyWith')
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'], {
+                'allowedVariables': ['a', 'b', 'c']
+            }
+        )
+
+    def test_get_all_translatable_content_for_question(self):
+        """Get all translatable fields from exploration."""
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            self.question.get_all_contents_which_need_translations(
+                self.dummy_entity_translations)
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents,
+            [
+                'Enter text here',
+                '<p>This is a hint.</p>',
+                '<p>This is a solution.</p>'
+            ])
+>>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):

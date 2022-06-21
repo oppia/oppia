@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import logging
 
 from core import feconf
 from core import utils
@@ -766,13 +767,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         improvements_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             composite_entity_id=self.GENERIC_MODEL_ID,
-            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.GENERIC_MODEL_ID,
             entity_version=1,
-            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
+            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=constants.TASK_TARGET_TYPE_STATE,
             target_id=self.GENERIC_MODEL_ID,
-            status=improvements_models.TASK_STATUS_OPEN,
+            status=constants.TASK_STATUS_OPEN,
             resolver_id=self.USER_ID_1
         ).put()
 
@@ -934,6 +935,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'display_alias': None,
+            'has_viewed_lesson_info_modal_once': False,
         }
         skill_data = {}
         stats_data = {}
@@ -1045,6 +1047,24 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
         expected_images = []
         self.assertEqual(expected_images, observed_images)
+
+    def test_export_data_for_full_user_when_user_id_is_leaked_fails(self):
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            email=self.USER_1_EMAIL,
+            roles=[self.USER_1_ROLE],
+            user_bio='I want to leak uid_abcdefghijabcdefghijabcdefghijab'
+        ).put()
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
+            takeout_service.export_data_for_user(self.USER_ID_1)
+            self.assertEqual(
+                [
+                    '[TAKEOUT] User ID (uid_abcdefghijabcdefghijabcdefghijab) '
+                    'found in the JSON generated for UserSettingsModel and '
+                    'user with ID user_1'
+                ],
+                log_messages
+            )
 
     def test_exports_have_single_takeout_dict_key(self):
         """Test to ensure that all export policies that specify a key for the

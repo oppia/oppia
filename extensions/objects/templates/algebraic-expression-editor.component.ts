@@ -41,7 +41,7 @@ interface FocusObj {
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: string;
@@ -124,7 +124,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     const answerIsValid = (
       this.mathInteractionsService.validateAlgebraicExpression(
         this.currentValue,
-        this.guppyInitializationService.getCustomOskLetters()));
+        this.guppyInitializationService.getAllowedVariables()));
     if (this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive
       // focus, i.e., the user is done typing.

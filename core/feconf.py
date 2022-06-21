@@ -40,6 +40,24 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
+
+# Supported object types for ParamSpec.
+SUPPORTED_OBJ_TYPES = {
+    'UnicodeString',
+}
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -551,7 +569,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.1'
+OPPIA_VERSION = '3.2.5'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -974,6 +992,7 @@ EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
+REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -1546,3 +1565,33 @@ COMMIT_TYPE_CREATE = 'create'
 COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
+
+# Interaction IDs of math related interactions.
+MATH_INTERACTION_IDS = [
+    'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput']
+
+# The task entry ID template used by the task entry model.
+TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
+
+# The composite entity ID template used by the task entry model.
+COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
+
+# The data type for the translated or translatable content in any
+# BaseTranslatableObject.
+ContentValueType = Union[str, List[str]]
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content_value: ContentValueType
+    needs_update: bool

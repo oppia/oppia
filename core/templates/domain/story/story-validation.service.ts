@@ -50,6 +50,19 @@ export class StoryValidationService {
     // skill IDs acquired by a learner as they progress through the story.
     var simulatedSkillIds = new Set(startingNode.getPrerequisiteSkillIds());
 
+    // Validate the prerequisite skills of the starting node.
+    startingNode.getPrerequisiteSkillIds().forEach(
+      (skillId: string) => {
+        if (
+          topicRelevantSkills.includes(skillId)) {
+          issues.push(
+            `The skill with id ${skillId} was specified as a ` +
+            `prerequisite for Chapter ${startingNode.getTitle()} but ` +
+            'was not taught in any chapter before it.');
+        }
+      }
+    );
+
     // The following loop employs a Breadth First Search from the given
     // starting node and makes sure that the user has acquired all the
     // prerequisite skills required by the destination nodes 'unlocked' by

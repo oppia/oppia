@@ -73,6 +73,11 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       if (!$scope.isQuestionValid()) {
         return;
       }
+      if (!QuestionUndoRedoService.hasChanges()) {
+        AlertsService.addInfoMessage(
+          'No changes detected.', 5000);
+        return;
+      }
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
         'Question');
       var imagesData = ImageLocalStorageService.getStoredImagesData();
@@ -123,6 +128,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
         if (AlertsService.warnings.length === 0) {
           $scope.skillDifficulty = result.skillDifficulty;
           $scope.setDifficultyString($scope.skillDifficulty);
+          $scope.$applyAsync();
         }
       }, function() {
         // Note to developers:

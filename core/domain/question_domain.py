@@ -32,6 +32,7 @@ from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import expression_parser
 from core.domain import state_domain
+from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
@@ -130,7 +131,7 @@ class QuestionSuggestionChange(change_domain.BaseChange):
     ]
 
 
-class Question:
+class Question(translation_domain.BaseTranslatableObject):
     """Domain object for a question."""
 
     def __init__(
@@ -171,6 +172,22 @@ class Question:
             inapplicable_skill_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
+
+    def get_translatable_contents_collection(
+        self
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Registers all of translatable fields/objects in the question.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_fields_from_translatable_object(
+            self.question_state_data)
+        return translatable_contents_collection
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
@@ -1125,7 +1142,8 @@ class Question:
 
         state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            html_validation_service.convert_svg_diagram_tags_to_image_tags,
+            state_schema_version=46)
         return question_state_dict
 
     @classmethod
@@ -1175,6 +1193,50 @@ class Question:
 
     @classmethod
     def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
+        """Converts from version 49 to 50. Version 50 removes rules from
+        explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict[
+                'interaction']['id'] in exp_domain.MATH_INTERACTION_TYPES:
+            filtered_answer_groups = []
+            for answer_group_dict in question_state_dict[
+                    'interaction']['answer_groups']:
+                filtered_rule_specs = []
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    if rule_type not in (
+                            exp_domain.MATH_INTERACTION_DEPRECATED_RULES):
+                        filtered_rule_specs.append(
+                            copy.deepcopy(rule_spec_dict))
+                answer_group_dict['rule_specs'] = filtered_rule_specs
+                if len(filtered_rule_specs) > 0:
+                    filtered_answer_groups.append(
+                        copy.deepcopy(answer_group_dict))
+            question_state_dict[
+                'interaction']['answer_groups'] = filtered_answer_groups
+
+            # Renaming cust arg.
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args['allowedVariables'] = []
+            if 'customOskLetters' in customization_args:
+                customization_args['allowedVariables'] = copy.deepcopy(
+                    customization_args['customOskLetters'])
+                del customization_args['customOskLetters']
+
+        return question_state_dict
+
+    def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
         """Converts from version 49 to 50. Version 50 adds a new
         customization arg to TextInput interaction which allows
         creators to fill a catch misspellings checkbox. Also adds
@@ -1204,7 +1266,6 @@ class Question:
 
         question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
 
-        return question_state_dict
 
     @classmethod
     def update_state_from_model(
@@ -1286,6 +1347,14 @@ class Question:
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s' %
                 self.question_state_data_schema_version)
+
+        if self.question_state_data_schema_version != (
+            feconf.CURRENT_STATE_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected question state schema version to be %s, received '
+                '%s' % (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION,
+                    self.question_state_data_schema_version))
 
         if not isinstance(self.question_state_data, state_domain.State):
             raise utils.ValidationError(

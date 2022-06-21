@@ -39,6 +39,6 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertIn(generator.generate_value(
             {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
         self.assertIn(
-            'schema="$ctrl.SCHEMA" '
-            'local-value="$ctrl.customizationArgs.list_of_values"',
+            '[schema]="$ctrl.SCHEMA" ' +
+            'ng-model="$ctrl.customizationArgs.list_of_values"',
             generator.get_html_template())

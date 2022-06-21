@@ -63,33 +63,34 @@ import subprocess
 import sys
 import threading
 
-from core import utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
+from core import utils  # isort:skip
 
 # Install third party dependencies before proceeding.
-from . import codeowner_linter
-from . import css_linter
-from . import general_purpose_linter
-from . import html_linter
-from . import js_ts_linter
-from . import linter_utils
-from . import other_files_linter
-from . import python_linter
-from .. import common
-from .. import concurrent_task_utils
-from .. import install_third_party_libs
+from . import codeowner_linter  # isort:skip
+from . import css_linter  # isort:skip
+from . import general_purpose_linter  # isort:skip
+from . import html_linter  # isort:skip
+from . import js_ts_linter  # isort:skip
+from . import linter_utils  # isort:skip
+from . import other_files_linter  # isort:skip
+from . import python_linter  # isort:skip
+from .. import concurrent_task_utils  # isort:skip
+from .. import install_third_party_libs  # isort:skip
 
 OTHER_SHARD_NAME = 'other'
 
+# Shards are specified by a mapping from shard name to a list of the
+# paths in that shard. For exaple, `'1': ['core/domain/']` will create a
+# shard named `'1'` that contains all the files under core/domain/. A
+# shard name matching OTHER_SHARD_NAME includes all files not under
+# another shard.  Currently we are not sharding the lint checks, so the
+# only shard is the `other` shard that contains all files.
 SHARDS = {
-    '1': [
-        'core/templates/',
-        'extensions/',
-        'core/tests/',
-        'core/storage/',
-        'core/controllers/',
-        'core/platform',
-        'core/jobs/',
-    ],
     'other': None,
 }
 

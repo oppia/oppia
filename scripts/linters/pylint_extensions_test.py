@@ -332,6 +332,37 @@ class HangingIndentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_hanging_indentation_with_a_if_statement_before(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                if 5 > 7:
+                    self.post_json([
+                    '(',
+                    '', '', ''])
+
+                def func(arg1,
+                    arg2, arg3):
+                    a = 2 / 2""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_no_error_message))
+
+        message = testutils.Message(
+            msg_id='no-break-after-hanging-indent',
+            line=7)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
 
 class DocstringParameterCheckerTests(unittest.TestCase):
 
@@ -3213,19 +3244,14 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             .checker.config.disallowed_functions_and_replacements_str) = [
                 'datetime.datetime.now=>datetime.datetime.utcnow',
                 'self.assertEquals=>self.assertEqual',
-                'b.next=>python_utils.NEXT',
             ]
         self.checker_test_object.checker.open()
 
-        (
-            call1, call2,
-            call3, call4
-            ) = astroid.extract_node(
-                """
-        datetime.datetime.now() #@
-        self.assertEquals() #@
-        b.next() #@
-        b.a.next() #@
+        call1, call2, call3 = astroid.extract_node(
+        """
+            datetime.datetime.now() #@
+            self.assertEquals() #@
+            b.a.next() #@
         """)
 
         message_replace_disallowed_datetime = testutils.Message(
@@ -3242,24 +3268,15 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             confidence=interfaces.UNDEFINED
         )
 
-        message_replace_disallowed_next = testutils.Message(
-            msg_id='replace-disallowed-function-calls',
-            node=call3,
-            args=('b.next', 'python_utils.NEXT'),
-            confidence=interfaces.UNDEFINED
-        )
-
         with self.checker_test_object.assertAddsMessages(
             message_replace_disallowed_datetime,
             message_replace_disallowed_assert_equals,
-            message_replace_disallowed_next
         ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
-            self.checker_test_object.checker.visit_call(call3)
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_call(call4)
+            self.checker_test_object.checker.visit_call(call3)
 
     def test_disallowed_removals_regex(self):
         (

@@ -193,6 +193,11 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.loadingDotsAreShown).toBe(false);
   });
 
+  it('should check if exploration is editable', function() {
+    spyOn(editabilityService, 'isLockedByAdmin').and.returnValue(true);
+    expect($scope.isLockedByAdmin()).toBe(true);
+  });
+
   it('should publish exploration when show publish exploration is shown',
     function() {
       $scope.showPublishExplorationModal();

@@ -23,6 +23,7 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -135,7 +136,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '49',
+                    '50',
                     '60'
                 )
         )
@@ -252,6 +253,43 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist'])
 
+    def test_exploration_user_data_is_none_before_starting_exploration(self):
+        auth_id = 'test_id'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        self.assertIsNone(exp_fetchers.get_exploration_user_data(
+            user_id, self.EXP_1_ID))
+
+    def test_get_exploration_user_data(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_services.update_learner_checkpoint_progress(
+            user_id, self.EXP_1_ID, 'Introduction', 1)
+        expected_user_data_dict = {
+            'rating': None,
+            'rated_on': None,
+            'draft_change_list': None,
+            'draft_change_list_last_updated': None,
+            'draft_change_list_exp_version': None,
+            'draft_change_list_id': 0,
+            'mute_suggestion_notifications': (
+                feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+            'mute_feedback_notifications': (
+                feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+            'furthest_reached_checkpoint_exp_version': 1,
+            'furthest_reached_checkpoint_state_name': 'Introduction',
+            'most_recently_reached_checkpoint_exp_version': 1,
+            'most_recently_reached_checkpoint_state_name': 'Introduction'
+        }
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            user_id, self.EXP_1_ID)
+        self.assertIsNotNone(exp_user_data)
+        self.assertEqual(expected_user_data_dict, exp_user_data.to_dict())
+
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
@@ -263,8 +301,9 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
         """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
-category: A category
+category: Algebra
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Introduction
 language_code: en
 objective: An objective

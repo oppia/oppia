@@ -16,7 +16,7 @@
  * @fileoverview Component for the outcome feedback editor.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { ContextService } from 'services/context.service';
@@ -27,9 +27,10 @@ import { ContextService } from 'services/context.service';
 })
 export class OutcomeFeedbackEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() outcome!: Outcome;
+  @Output() outcomeChange: EventEmitter<Outcome> = new EventEmitter();
   OUTCOME_FEEDBACK_SCHEMA!: object;
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -49,11 +50,8 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
     if (newHtmlString !== this.outcome.feedback.html) {
       this.outcome.feedback.html = newHtmlString;
       this.changeDetectorRef.detectChanges();
+      this.outcomeChange.emit(this.outcome);
     }
-  }
-
-  getSchema(): object {
-    return this.OUTCOME_FEEDBACK_SCHEMA;
   }
 }
 angular.module('oppia').directive(

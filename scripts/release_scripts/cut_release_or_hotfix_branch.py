@@ -296,6 +296,8 @@ def execute_branch_cut(target_version, hotfix_number):
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
                 target_version, hotfix_number - 1)
         print('Cutting a new hotfix branch: %s' % new_branch_name)
+        subprocess.check_call(['git', 'checkout', branch_to_cut_from])
+        common.update_branch_with_upstream()
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
@@ -314,16 +316,6 @@ def execute_branch_cut(target_version, hotfix_number):
             'to Github once this script is done.\n'
             'Note: It is fine to push the branch only after creating the '
             'branch protection rule and doing all the cherrypicks.')
-
-    common.ask_user_to_confirm(
-        'Ask Sean (or Ben, if Sean isn\'t available) to create '
-        'a new branch protection rule by:\n'
-        '1. Going to this page: https://github.com/oppia/oppia/'
-        'settings/branch_protection_rules/new.\n'
-        '2. Typing in the full branch name %s.\n'
-        '3. Checking the box: Restrict who can push to matching '
-        'branches (then add the oppia/release-coordinators team)\n' % (
-            new_branch_name))
 
     print('')
     print(

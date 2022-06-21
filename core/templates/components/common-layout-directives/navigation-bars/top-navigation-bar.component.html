@@ -1,17 +1,16 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css" as="style">
-<div [ngClass]="{'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
-     class="navbar-header protractor-test-navbar-header">
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css">
+
+<div class="navbar-header protractor-test-navbar-header oppia-top-navigation-bar">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar($event)"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button ml-0"
      tabindex="0">
-    <i class="material-icons oppia-navbar-menu-icon"
+    <i class="fas fa-bars oppia-navbar-menu-icon"
        *ngIf="!isSidebarShown()"
        [ngClass]="{ 'oppia-stop-scroll': !isSidebarShown() }" >
-       &#xE5D2;
     </i>
-    <i class="material-icons oppia-navbar-close-icon"
+    <i class="fas fa-x-mark oppia-navbar-close-icon"
        *ngIf="isSidebarShown()"
        [ngClass]="{ 'oppia-stop-scroll': isSidebarShown() }" >
        &#10005;
@@ -124,11 +123,11 @@
                            alt="Learn">
                     </picture>
                   </div>
-                  <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
+                  <div class="nav-item-bottom d-flex flex-column">
                     <div *ngIf="classroomData.length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment())"
+                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment()); $event.stopPropagation()"
                            tabindex="0"
                            class="underline"
                            href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
@@ -144,14 +143,8 @@
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
                       <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
-                      <span class="material-icons arrow-forward">arrow_forward</span>
+                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
-                  </div>
-                  <div *ngIf="userIsLoggedIn"
-                       (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                       class="nav-item-bottom-link-logged">
-                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
-                    <span class="material-icons arrow-forward">arrow_forward</span>
                   </div>
                 </a>
                 <a class="nav-content nav-item-right d-flex flex-column" tabindex="0"
@@ -161,7 +154,7 @@
                   <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                        class="nav-item-bottom-link">
                     <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
-                    <span class="material-icons arrow-forward">arrow_forward</span>
+                    <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                   </div>
                 </a>
               </div>
@@ -201,6 +194,7 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
@@ -213,7 +207,7 @@
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
-                <span class="material-icons launch">launch</span>
+                <span class="fas fa-external-link-alt launch"></span>
               </a>
             </li>
           </ul>
@@ -242,12 +236,12 @@
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/partnerships')" href="/partnerships"
+                   href="/partnerships"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
-                    <span class="material-icons language mx-1">language</span>
+                    <span class="fas fa-globe language mx-1"></span>
                     <span class="heading-text">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}</span>
                   </div>
                   <div class="des">
@@ -255,13 +249,12 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/volunteer')"
                    href="/volunteer"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons volunteer mx-1">supervisor_account</span>
+                    <span class="fas fa-user-friends volunteer mx-1"></span>
                     <span class="heading-text">{{'I18N_HEADING_VOLUNTEER'| translate}}</span>
                   </div>
                   <div class="des">
@@ -271,13 +264,12 @@
               </div>
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/contact')"
                    href="/contact"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons contact mx-1">mail</span>
+                    <span class="fas fa-envelope contact mx-1"></span>
                     <span class="heading-text">{{'I18N_TOPNAV_CONTACT_US' | translate}}</span>
                   </div>
                   <div class="des">
@@ -285,13 +277,12 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
-                   (click)="navigateToPage('/donate')"
                    href="/donate"
                    [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons fav mx-1">favorite</span>
+                    <span class="fas fa-heart fav mx-1"></span>
                     <span class="heading-text">{{'I18N_TOPNAV_DONATE' | translate}}</span>
                   </div>
                   <div class="des">
@@ -330,9 +321,9 @@
         autofocus>
       <div class="oppia-navbar-button-container dropdown">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown"
+                class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button protractor-test-language-dropdown"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
-          <i class="material-icons language-icon"> &#xE894; </i>
+          <i class="fas fa-globe language-icon"></i>
           <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
@@ -347,7 +338,7 @@
              (keydown)="onMenuKeypress($event, 'languageMenu', {enter: ACTION_CLOSE})">
             <div class="language-element oppia-nav-right-dropdown" [ngClass]="{'language-element-selected': currentLanguageCode === language.id}">
               <span *ngIf="currentLanguageCode === language.id">
-                <i class="material-icons"> &#xE876; </i>
+                <i class="fas fa-check oppia-tick-mark"></i>
               </span>
               <span [ngClass]="{'language-padding-left': currentLanguageCode !== language.id}">
                 {{ language.text }}
@@ -531,5 +522,3 @@
     </li>
   </ul>
 </div>
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css">

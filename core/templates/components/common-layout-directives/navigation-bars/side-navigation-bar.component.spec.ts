@@ -101,6 +101,9 @@ describe('Side Navigation Bar Component', () => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should create', () => {
@@ -142,6 +145,27 @@ describe('Side Navigation Bar Component', () => {
   it('should close sidebar on swipe left', () => {
     spyOn(sidebarStatusService, 'closeSidebar');
     componentInstance.closeSidebarOnSwipeleft();
+    expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
+  });
+
+  it('should navigate to learner dashboard when learner clicks on ' +
+  'HOME, when not on the learner dashboard', () => {
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    spyOn(sidebarStatusService, 'closeSidebar');
+    componentInstance.navigateToLearnerDashboard();
+
+    expect(sidebarStatusService.closeSidebar).not.toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/learner-dashboard');
+  });
+
+  it('should not navigate to learner dashboard when learner clicks on ' +
+  'HOME, when on the learner dashboard', () => {
+    componentInstance.currentUrl = '/learner-dashboard';
+
+    spyOn(sidebarStatusService, 'closeSidebar');
+    componentInstance.navigateToLearnerDashboard();
+
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
   });
 
@@ -206,7 +230,6 @@ describe('Side Navigation Bar Component', () => {
       spyOn(
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
-      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
 
       componentInstance.ngOnInit();
 
@@ -215,8 +238,6 @@ describe('Side Navigation Bar Component', () => {
       expect(componentInstance.classroomData).toEqual(array);
       expect(componentInstance.topicTitlesTranslationKeys).toEqual(
         topicTitlesTranslationKeys);
-      expect(siteAnalyticsService.registerClassroomPageViewed)
-        .toHaveBeenCalled();
     }));
 
   it('should check whether hacky translations are displayed or not', () => {
@@ -231,5 +252,9 @@ describe('Side Navigation Bar Component', () => {
     hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });

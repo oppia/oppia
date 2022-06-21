@@ -53,7 +53,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     TICKET_ID = '%s.%s.%s' % (
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
-    USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
@@ -87,6 +86,9 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         """Set up  models in datastore for use in testing."""
         super(AppFeedbackReportModelTests, self).setUp()
 
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL) # type: ignore[no-untyped-call]
+
         self.feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
                 id='%s.%s.%s' % (
@@ -94,7 +96,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                     int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
                     'randomInteger123'),
                 platform=self.PLATFORM_ANDROID,
-                scrubbed_by=self.USER_ID,
+                scrubbed_by=self.user_id,
                 ticket_id='%s.%s.%s' % (
                     'random_hash',
                     int(self.TICKET_CREATION_TIMESTAMP_MSEC),
@@ -135,8 +137,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_ANDROID)
         self.assertEqual(
@@ -160,8 +160,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_WEB)
         self.assertEqual(
@@ -202,10 +200,13 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             model.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_export_data_nontrivial(self) -> None:
+    def test_export_data_without_scrubber(self) -> None:
+        self.feedback_report_model.scrubbed_by = 'id'
+        self.feedback_report_model.update_timestamps()
+        self.feedback_report_model.put()
+
         exported_data = (
-            app_feedback_report_models.AppFeedbackReportModel.export_data(
-                self.USER_ID))
+            app_feedback_report_models.AppFeedbackReportModel.export_data('id'))
 
         report_id = '%s.%s.%s' % (
             self.PLATFORM_ANDROID,
@@ -213,7 +214,31 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             'randomInteger123')
         expected_data = {
             report_id: {
-                'scrubbed_by': self.USER_ID,
+                'scrubbed_by': None,
+                'platform': self.PLATFORM_ANDROID,
+                'ticket_id': self.TICKET_ID,
+                'submitted_on': utils.get_human_readable_time_string(
+                    self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
+                'local_timezone_offset_hrs': 0,
+                'report_type': self.REPORT_TYPE_SUGGESTION,
+                'category': self.CATEGORY_OTHER,
+                'platform_version': self.PLATFORM_VERSION
+            }
+        }
+        self.assertEqual(exported_data, expected_data)
+
+    def test_export_data_with_scrubber(self) -> None:
+        exported_data = (
+            app_feedback_report_models.AppFeedbackReportModel.export_data(
+                self.user_id))
+
+        report_id = '%s.%s.%s' % (
+            self.PLATFORM_ANDROID,
+            int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
+            'randomInteger123')
+        expected_data = {
+            report_id: {
+                'scrubbed_by': self.NEW_USER_USERNAME,
                 'platform': self.PLATFORM_ANDROID,
                 'ticket_id': self.TICKET_ID,
                 'submitted_on': utils.get_human_readable_time_string(
@@ -279,8 +304,6 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
             'randomInteger123')
         model_entity = model_class.get(report_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert model_entity is not None
         model_entity.scrubbed_by = 'scrubber_user'
         model_entity.update_timestamps()
         model_entity.put()
@@ -356,8 +379,6 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get(
                 ticket_id))
-        # Ruling out the possibility of None for mypy type checking.
-        assert ticket_model is not None
 
         self.assertEqual(ticket_model.id, ticket_id)
         self.assertEqual(ticket_model.platform, self.PLATFORM)

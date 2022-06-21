@@ -79,6 +79,11 @@ export interface TopicsAndSkillsDashboardDataBackendDict {
   'categorized_skills_dict': CategorizedSkillsBackendDict;
 }
 
+export interface CategorizedAndUntriagedSkillsDataBackendDict {
+  'untriaged_skill_summary_dicts': ShortSkillSummaryBackendDict[];
+  'categorized_skills_dict': CategorizedSkillsBackendDict;
+}
+
 export interface TopicsAndSkillDashboardData {
   allClassroomNames: string[];
   canDeleteTopic: boolean;
@@ -89,6 +94,11 @@ export interface TopicsAndSkillDashboardData {
   mergeableSkillSummaries: SkillSummary[];
   totalSkillCount: number;
   topicSummaries: CreatorTopicSummary[];
+  categorizedSkillsDict: CategorizedSkills;
+}
+
+export interface CategorizedAndUntriagedSkillsData {
+  untriagedSkillSummaries: ShortSkillSummary[];
   categorizedSkillsDict: CategorizedSkills;
 }
 
@@ -157,6 +167,38 @@ export class TopicsAndSkillsDashboardBackendApiService {
           response.topic_summary_dicts.map(
             backendDict => CreatorTopicSummary.createFromBackendDict(
               backendDict))),
+        categorizedSkillsDict: categorizedSkills
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  async fetchCategorizedAndUntriagedSkillsDataAsync():
+      Promise<CategorizedAndUntriagedSkillsData> {
+    return this.http.get<CategorizedAndUntriagedSkillsDataBackendDict>(
+      '/topics_and_skills_dashboard/categorized_and_untriaged_skills_data'
+    ).toPromise().then(response => {
+      let categorizedSkills: CategorizedSkills = {};
+      for (let topic in response.categorized_skills_dict) {
+        let subtopicSkillsDict = response.categorized_skills_dict[topic];
+        let subtopicSkills: SubtopicSkills = {
+          uncategorized: []
+        };
+        for (let subtopic in subtopicSkillsDict) {
+          subtopicSkills[subtopic] = (
+            subtopicSkillsDict[subtopic].map(
+              backendDict => ShortSkillSummary
+                .createFromBackendDict(backendDict)));
+        }
+        categorizedSkills[topic] = subtopicSkills;
+      }
+
+      return {
+        untriagedSkillSummaries: (
+          response.untriaged_skill_summary_dicts.map(
+            backendDict => ShortSkillSummary
+              .createFromBackendDict(backendDict))),
         categorizedSkillsDict: categorizedSkills
       };
     }, errorResponse => {
