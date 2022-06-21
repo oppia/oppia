@@ -23,6 +23,8 @@ import sys
 TOPMOST_LEVEL_PATH = './'
 
 # These files are data files for testing and have no logic to be tested.
+# NOTE TO DEVELOPERS: do not add any new files to this list without asking
+# @U8NWXD first.
 FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/linters/test_files/invalid_annotations.py',
     'scripts/linters/test_files/invalid_author.py',
@@ -97,5 +99,8 @@ def main() -> None:
         print('-----------------------------------------------')
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when check_backend_associated_test_file.py
+# is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()
