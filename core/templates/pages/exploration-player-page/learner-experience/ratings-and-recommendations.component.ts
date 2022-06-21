@@ -141,14 +141,14 @@ export class RatingsAndRecommendationsComponent {
 
   hideSignUpSection(): void {
     if (this.localStorage) {
-      (localStorage as Storage).setItem(
-        'hideSignUpSection', 'true');
+      (this.localStorage as Storage).setItem(
+        'hide_sign_up_section', 'true');
     }
   }
 
   isSignUpSectionHidden(): boolean {
     if (this.localStorage) {
-      return localStorage.getItem('hideSignUpSection') === 'true';
+      return this.localStorage.getItem('hide_sign_up_section') === 'true';
     }
     return false;
   }

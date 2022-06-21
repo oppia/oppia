@@ -203,4 +203,33 @@ describe('Ratings and recommendations component', () => {
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
   }));
+
+  it('should save user\'s sign up section preference to localStorage', () => {
+    spyOn(componentInstance.localStorage, 'setItem');
+
+    componentInstance.hideSignUpSection();
+
+    expect(componentInstance.localStorage.setItem).toHaveBeenCalledWith(
+      'hide_sign_up_section', 'true');
+  });
+
+  it('should get user\'s sign up section preference from localStorage', () => {
+    let getItemSpy =
+      spyOn(componentInstance.localStorage, 'getItem').and.returnValue('true');
+
+    expect(componentInstance.isSignUpSectionHidden()).toBe(true);
+    expect(componentInstance.localStorage.getItem).toHaveBeenCalledWith(
+      'hide_sign_up_section');
+
+    getItemSpy.and.returnValue(null);
+
+    expect(componentInstance.isSignUpSectionHidden()).toBe(false);
+  });
+
+  it('should not get user\'s preference if localStorage isn\'t accessible',
+    () => {
+      componentInstance.localStorage = null;
+
+      expect(componentInstance.isSignUpSectionHidden()).toBe(false);
+    });
 });
