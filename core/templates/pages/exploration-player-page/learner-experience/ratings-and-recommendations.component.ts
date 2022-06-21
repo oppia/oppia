@@ -68,6 +68,16 @@ export class RatingsAndRecommendationsComponent {
   userRating: number;
   directiveSubscriptions = new Subscription();
   @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;
+  localStorage = (function() {
+    let test = 'test';
+    let result;
+    try {
+      localStorage.setItem(test, test);
+      result = localStorage.getItem(test) === test;
+      localStorage.removeItem(test);
+      return result && localStorage;
+    } catch (exception) {}
+  }());
 
   constructor(
     private alertsService: AlertsService,
@@ -130,7 +140,17 @@ export class RatingsAndRecommendationsComponent {
   }
 
   hideSignUpSection(): void {
+    if (this.localStorage) {
+      (localStorage as Storage).setItem(
+        'hideSignUpSection', 'true');
+    }
+  }
 
+  isSignUpSectionHidden(): boolean {
+    if (this.localStorage) {
+      return localStorage.getItem('hideSignUpSection') === 'true';
+    }
+    return false;
   }
 }
 

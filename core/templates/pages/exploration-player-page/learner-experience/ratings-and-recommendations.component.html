@@ -49,7 +49,7 @@
     </div>
   </div>
 
-  <div *ngIf="inStoryMode && !userIsLoggedIn" class="conversation-skin-login-container">
+  <div *ngIf="inStoryMode && !userIsLoggedIn && !isSignUpSectionHidden()" class="conversation-skin-login-container">
     <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
     <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
     <div class="mt-2">
