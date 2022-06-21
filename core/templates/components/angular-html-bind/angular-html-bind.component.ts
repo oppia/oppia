@@ -108,7 +108,6 @@ export class AngularHtmlBindComponent {
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
       if (dom.body.firstElementChild &&
         this.mapping[dom.body.firstElementChild.tagName]) {
-
         const componentFactory = this.componentFactoryResolver
           .resolveComponentFactory(
             this.mapping[dom.body.firstElementChild.tagName]);
@@ -123,6 +122,9 @@ export class AngularHtmlBindComponent {
               componentRef.instance[
                 this.camelCaseFromHyphen(attributes[i].name)] =
               this.parentScope[this.camelCaseFromHyphen(attributes[i].name)];
+
+              componentRef.location.nativeElement.setAttribute(
+                attributes[i].name, attributes[i].value);
             } else {
               componentRef.instance[
                 this.camelCaseFromHyphen(attributes[i].name)] = null;
@@ -131,6 +133,9 @@ export class AngularHtmlBindComponent {
             componentRef.instance[
               this.camelCaseFromHyphen(attributes[i].name)] =
               attributes[i].value;
+
+            componentRef.location.nativeElement.setAttribute(
+              attributes[i].name, attributes[i].value);
           }
         }
 
