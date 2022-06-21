@@ -206,6 +206,8 @@ describe('Teach Oppia Modal Controller', function() {
   }));
 
   describe('when successfully fetching top unresolved answers', function() {
+    let onchange = new EventEmitter();
+
     beforeEach(angular.mock.inject(function($injector, $controller) {
       alertsService = $injector.get('AlertsService');
       $httpBackend = $injector.get('$httpBackend');
@@ -259,6 +261,9 @@ describe('Teach Oppia Modal Controller', function() {
         $uibModalInstance: $uibModalInstance
       });
       $httpBackend.flush();
+
+      spyOnProperty(trainingModalService, 'onFinishTrainingCallback')
+        .and.returnValue(onchange);
       ctrl.$onInit();
       $rootScope.$apply();
     }));
@@ -269,15 +274,17 @@ describe('Teach Oppia Modal Controller', function() {
 
     it('should initialize unresolved answer properties after controller is' +
       ' initialized', fakeAsync(() => {
-      let onchange = new EventEmitter();
-      spyOn(trainingModalService, 'onFinishTrainingCallback')
-        .and.returnValue(onchange);
+      let unresolvedAnswers = $scope.unresolvedAnswers[0];
 
-      onchange.emit('si');
-      mockEmitter.emit(null);
+      let finishTrainingResult = {
+        answerIndex: 0,
+        answer: 'answer Data for truncateInputBasedOnInteractionAnswerType'
+      };
+      $scope.interactionId = 'TextInput';
+
+      onchange.emit(finishTrainingResult);
+      $scope.$apply();
       tick();
-
-      var unresolvedAnswers = $scope.unresolvedAnswers[0];
 
       expect(unresolvedAnswers.answer).toBe('Answer Text');
       expect(unresolvedAnswers.answerTemplate).toBe('');

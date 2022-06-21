@@ -41,6 +41,8 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     // there properties are also different
     // we need to fix all InteractionAnswer properties.
     // we can do this in later stage.
+    // For now i am using the if block logic to do the task.
+    // by doing so we don't need to change this in whole codebase.
     if (typeof (input) !== 'object') {
       inputUpdate = {
         code: input
