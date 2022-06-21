@@ -35,9 +35,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'rb', encoding=None) as f:
             self.raw_image = f.read()
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with TestBase._assert_validation_error().
-    def _assert_validation_error(  # type: ignore[override]
+    def _assert_image_validation_error(
         self,
         image: Optional[Union[str, bytes]],
         filename: Optional[str],
@@ -50,34 +48,34 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
                 image, filename)
 
     def test_image_validation_checks(self) -> None:
-        self._assert_validation_error(None, 'image.png', 'No image supplied')
-        self._assert_validation_error(
+        self._assert_image_validation_error(None, 'image.png', 'No image supplied')
+        self._assert_image_validation_error(
             self.raw_image, None, 'No filename supplied')
 
         large_image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 4000)
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             large_image, 'image.svg', 'Image exceeds file size limit of 100 KB')
 
         invalid_svg = b'<badsvg></badsvg>'
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             invalid_svg, 'image.svg',
             'Unsupported tags/attributes found in the SVG')
 
         no_xmlns_attribute_svg = invalid_svg = b'<svg></svg>'
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             no_xmlns_attribute_svg, 'image.svg',
             'The svg tag does not contains the \'xmlns\' attribute.')
 
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             b'not an image', 'image.png', 'Image not recognized')
 
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             self.raw_image, '.png', 'Invalid filename')
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             self.raw_image, 'image/image.png',
             'Filenames should not include slashes')
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             self.raw_image, 'image', 'Image filename with no extension')
-        self._assert_validation_error(
+        self._assert_image_validation_error(
             self.raw_image, 'image.pdf', 'Expected a filename ending in .png')

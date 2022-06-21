@@ -39,9 +39,10 @@ class RuleSpecsExtensionDict(TypedDict):
 class Registry:
     """Registry of rules."""
 
-    _state_schema_version_to_html_field_types_to_rule_specs: (
-        Dict[Optional[int], Dict[str, RuleSpecsExtensionDict]]
-    ) = {}
+    _state_schema_version_to_html_field_types_to_rule_specs: Dict[
+        Optional[int],
+        Dict[str, RuleSpecsExtensionDict]
+    ] = {}
 
     @classmethod
     def get_html_field_types_to_rule_specs(

@@ -37,9 +37,10 @@ if MYPY: # pragma: no cover
 class Registry:
     """Registry of all platform parameters."""
 
-    DEFAULT_VALUE_BY_TYPE_DICT: (
-        Dict[platform_parameter_domain.DataTypes, Union[bool, str, int]]
-    ) = {
+    DEFAULT_VALUE_BY_TYPE_DICT: Dict[
+        platform_parameter_domain.DataTypes,
+        Union[bool, str, int]
+    ] = {
         platform_parameter_domain.DataTypes.BOOL: False,
         platform_parameter_domain.DataTypes.NUMBER: 0,
         platform_parameter_domain.DataTypes.STRING: '',
@@ -48,9 +49,9 @@ class Registry:
     # The keys of parameter_registry are the property names, and the values
     # are PlatformParameter instances with initial settings defined in this
     # file.
-    parameter_registry: (
-        Dict[str, platform_parameter_domain.PlatformParameter]
-    ) = {}
+    parameter_registry: Dict[
+        str, platform_parameter_domain.PlatformParameter
+    ] = {}
 
     @classmethod
     def create_platform_parameter(
@@ -89,12 +90,8 @@ class Registry:
                 'Unsupported data type \'%s\', must be one of'' %s.' % (
                     data_type.value, allowed_data_types))
 
-        # The key 'name' in PlatformParameterDict is defined as a type of str
-        # but here we are providing Optional[str] which causes MyPy to throw
-        # 'incompatible types assignment' error. Thus to silent the error, we
-        # used ignore statement here.
         param_dict: platform_parameter_domain.PlatformParameterDict = {
-            'name': name.value if name else None,  # type: ignore[typeddict-item]
+            'name': name.value,
             'description': description,
             'data_type': data_type.value,
             'rules': [],
