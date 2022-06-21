@@ -30,7 +30,7 @@ export class EntityTranslationsService {
   private entityId: string;
   private entityType: string;
   private entityVersion: number;
-  private translationsMapping: any;
+  public entityTranslation: EntityTranslation;
   constructor(
     private entityTranslationBackendApiService: EntityTranslationBackendApiService
   ){}
@@ -52,7 +52,7 @@ export class EntityTranslationsService {
             this.entityVersion,
             languageCode
           ).then((entityTranslation) => {
-            this.translationsMapping = entityTranslation.translationMapping;
+            this.entityTranslation = entityTranslation;
             resolve(entityTranslation);
           });
         });

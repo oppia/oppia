@@ -65,6 +65,7 @@ import {
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { EntityTranslationsService } from 'services/entity-translations.services';
 
 angular.module('oppia').component('stateTranslation', {
   bindings: {
@@ -73,7 +74,7 @@ angular.module('oppia').component('stateTranslation', {
   template: require('./state-translation.component.html'),
   controller: [
     '$filter', '$scope', 'CkEditorCopyContentService',
-    'ExplorationCorrectnessFeedbackService',
+    'EntityTranslationsService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationHtmlFormatterService', 'ExplorationLanguageCodeService',
     'ExplorationStatesService', 'RouterService', 'StateEditorService',
     'TranslationLanguageService', 'TranslationStatusService',
@@ -86,7 +87,7 @@ angular.module('oppia').component('stateTranslation', {
     'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     function(
         $filter, $scope, CkEditorCopyContentService,
-        ExplorationCorrectnessFeedbackService,
+        EntityTranslationsService, ExplorationCorrectnessFeedbackService,
         ExplorationHtmlFormatterService, ExplorationLanguageCodeService,
         ExplorationStatesService, RouterService, StateEditorService,
         TranslationLanguageService, TranslationStatusService,
@@ -205,6 +206,7 @@ angular.module('oppia').component('stateTranslation', {
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, activeDataFormat);
         $scope.activatedTabId = tabId;
+        updateTranslatedContent();
       };
 
       $scope.getHumanReadableRuleInputValues = function(inputValue, inputType) {
@@ -334,6 +336,7 @@ angular.module('oppia').component('stateTranslation', {
           $scope.stateHints[newIndex].hintContent.contentId);
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, TRANSLATION_DATA_FORMAT_HTML);
+        updateTranslatedContent();
       };
 
       $scope.changeActiveRuleContentIndex = function(newIndex) {
@@ -353,6 +356,7 @@ angular.module('oppia').component('stateTranslation', {
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, activeDataFormat);
         $scope.activeRuleContentIndex = newIndex;
+        updateTranslatedContent();
       };
 
       $scope.changeActiveCustomizationArgContentIndex = function(newIndex) {
@@ -377,6 +381,7 @@ angular.module('oppia').component('stateTranslation', {
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, activeDataFormat);
         $scope.activeCustomizationArgContentIndex = newIndex;
+        updateTranslatedContent();
       };
 
       $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -397,6 +402,7 @@ angular.module('oppia').component('stateTranslation', {
           }
           TranslationTabActiveContentIdService.setActiveContent(
             activeContentId, TRANSLATION_DATA_FORMAT_HTML);
+          updateTranslatedContent();
         }
       };
 
@@ -549,7 +555,17 @@ angular.module('oppia').component('stateTranslation', {
             'to match text. Please re-translate the content.';
         }
         $scope.onTabClick($scope.TAB_ID_CONTENT);
+        updateTranslatedContent();
       };
+
+      var updateTranslatedContent = function() {
+        if (!TranslationTabActiveModeService.isVoiceoverModeActive()) {
+          $scope.activeTranslatedContent = (
+            EntityTranslationsService.entityTranslation.getWrittenTranslation(
+              TranslationTabActiveContentIdService.getActiveContentId()));
+        }
+      };
+
       ctrl.$onInit = function() {
         // Define tab constants.
         $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
@@ -577,6 +593,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.stateDefaultOutcome = null;
         $scope.stateHints = [];
         $scope.stateSolution = null;
+        $scope.activeTranslatedContent = null;
         ctrl.directiveSubscriptions.add(
           StateEditorService.onRefreshStateTranslation.subscribe(
             () => $scope.initStateTranslation())

@@ -47,7 +47,7 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
   controller: [
     '$scope', 'ExplorationStatesService', 'GraphDataService',
     'StateEditorService', 'StateRecordedVoiceoversService',
-    'StateWrittenTranslationsService', 'TranslationStatusService',
+    'TranslationStatusService',
     function(
         $scope, ExplorationStatesService, GraphDataService,
         StateEditorService, StateRecordedVoiceoversService,
