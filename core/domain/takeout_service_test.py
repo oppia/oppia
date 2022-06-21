@@ -882,7 +882,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['123'],
             student_of_learner_groups_ids=['654'],
-            progress_sharing_permissions_list=[
+            progress_sharing_permissions=[
                 {
                     'group_id': '654',
                     'sharing_is_turned_on': False
@@ -1651,14 +1651,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_learner_group_data = {
             'title': 'sample title',
             'description': 'sample description',
-            'facilitator_user_id': self.USER_ID_1,
             'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['skill_id_1', 'skill_id_2']
         }
         expected_learner_group_user_data = {
             'invited_to_learner_groups_ids': ['123'],
             'student_of_learner_groups_ids': ['654'],
-            'progress_sharing_permissions_list': [
+            'progress_sharing_permissions': [
                 {
                     'group_id': '654',
                     'sharing_is_turned_on': False

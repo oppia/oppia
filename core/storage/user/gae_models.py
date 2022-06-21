@@ -3028,7 +3028,7 @@ class LearnerGroupUserModel(base_models.BaseModel):
     # List of ProgressSharingPermission dicts, which is defined in
     # user_domain.py, each dict corresponds to a learner group and
     # has stores progress sharing permission status for that group.
-    progress_sharing_permissions_list = (
+    progress_sharing_permissions = (
         datastore_services.JsonProperty(repeated=True, indexed=False))
 
     @staticmethod
@@ -3059,8 +3059,8 @@ class LearnerGroupUserModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> Dict[str, Union[List[str], List[Dict[str, Union[bool, str]]], None]]:
         """(Takeout) Exports the data from LearnerGroupUserModel
         into dict format.
@@ -3081,8 +3081,8 @@ class LearnerGroupUserModel(base_models.BaseModel):
                 learner_group_user_model.invited_to_learner_groups_ids),
             'student_of_learner_groups_ids': (
                 learner_group_user_model.student_of_learner_groups_ids),
-            'progress_sharing_permissions_list': (
-                learner_group_user_model.progress_sharing_permissions_list)
+            'progress_sharing_permissions': (
+                learner_group_user_model.progress_sharing_permissions)
         }
 
     @staticmethod
@@ -3099,7 +3099,7 @@ class LearnerGroupUserModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'student_of_learner_groups_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'progress_sharing_permissions_list':
+            'progress_sharing_permissions':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -3135,17 +3135,17 @@ class LearnerGroupUserModel(base_models.BaseModel):
                 learner_group_user_model.student_of_learner_groups_ids.remove(
                     group_id)
 
-                updated_progress_sharing_permissions_list = []
+                updated_progress_sharing_permissions = []
 
                 for progress_sharing_permission in (
                     learner_group_user_model
-                        .progress_sharing_permissions_list):
+                        .progress_sharing_permissions):
                     if progress_sharing_permission['group_id'] != group_id:
-                        updated_progress_sharing_permissions_list.append(
+                        updated_progress_sharing_permissions.append(
                             progress_sharing_permission)
 
-                learner_group_user_model.progress_sharing_permissions_list = (
-                    updated_progress_sharing_permissions_list)
+                learner_group_user_model.progress_sharing_permissions = (
+                    updated_progress_sharing_permissions)
 
                 learner_group_user_model.update_timestamps()
                 learner_group_user_model.put()
