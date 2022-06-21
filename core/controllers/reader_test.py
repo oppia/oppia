@@ -1861,7 +1861,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
 
-    def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
+    def test_stats_events_handler_raises_error_with_missing_exp_stats_property(
             self):
         self.aggregated_stats.pop('num_starts')
 
@@ -1879,7 +1879,26 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
+    def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
+        self
+    ):
+        self.aggregated_stats['num_starts'] = 'invalid'
+
+        response = self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+        }, expected_status_int=400)
+
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: Expected num_starts to be an int, received invalid'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_stats_events_handler_raise_error_with_missing_state_stats_property(
             self):
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
@@ -1893,6 +1912,28 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             'Schema validation for \'aggregated_stats\' '
             'failed: total_hit_count not in '
             'state stats mapping of Home in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
+            self):
+        self.aggregated_stats['state_stats_mapping']['Home'][
+            'total_hit_count'
+        ] = 'invalid'
+
+        response = self.post_json(
+            '/explorehandler/stats_events/%s' % self.exp_id,
+            {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+            }, expected_status_int=400
+        )
+
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: Expected total_hit_count to be an int, received invalid'
         )
         self.assertEqual(response['error'], error_msg)
 
@@ -1990,7 +2031,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/answer_submitted_event/%s' % exp_id,
             {
                 'old_state_name': state_name_1,
-                'answer': [],
+                'answer': 1.1,
                 'version': version,
                 'client_time_spent_in_secs': 0,
                 'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
@@ -2003,7 +2044,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'Schema validation for \'answer\' failed: ' +
-            'Type of [] is not present in options'
+            'Type of 1.1 is not present in options'
         )
 
 

@@ -409,6 +409,7 @@ import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/se
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 import { CuratedExplorationValidationService } from 'pages/exploration-editor-page/services/curated-exploration-validation.service';
 import { CuratedExplorationValidationBackendApiService } from 'pages/exploration-editor-page/services/curated-exploration-validation-backend-api.service';
+import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -524,6 +525,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationMetadataObjectFactory', ExplorationMetadataObjectFactory],
   ['ExplorationParamSpecsService', ExplorationParamSpecsService],
   ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationRightsBackendApiService', ExplorationRightsBackendApiService],
