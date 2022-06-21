@@ -1,0 +1,109 @@
+<div class="end-chapter-celebration-check-mark">
+  <svg class="tick-svg" viewBox="0 0 40 40">
+    <circle class="enclosing-circle"
+            stroke="#00645c"
+            stroke-width="3"
+            fill="none"
+            r="15"
+            cx="20"
+            cy="20"
+            [ngClass]="{'circle-animation': circleIsShown}">
+    </circle>
+    <polyline class="inner-tick"
+              fill="none"
+              stroke="#00645c"
+              stroke-width="3"
+              points="11,20 16,25 28,15"
+              [ngClass]="{'tick-animation': innerTickIsShown}"/>
+  </svg>
+</div>
+
+<style>
+  .enclosing-circle {
+    stroke-dasharray: 94.26;
+    stroke-dashoffset: 94.26;
+  }
+
+  .inner-tick {
+    stroke-dasharray: 23;
+    stroke-dashoffset: 23;
+  }
+
+  @keyframes circle-animation-standard-keyframes-rule {
+    0% {
+      stroke-dashoffset: 94.26;
+    }
+    45.45% {
+      stroke-dashoffset: 0;
+    }
+    54.55% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: 94.26;
+    }
+  }
+
+  .circle-animation {
+    animation-delay: 0.5s;
+    animation-duration: 3.3s;
+    animation-name: circle-animation-standard-keyframes-rule;
+    animation-timing-function: cubic-bezier(0.1, 0.5, 0, 1);
+  }
+
+  @keyframes inner-tick-animation-standard-keyframes-rule {
+    0% {
+      stroke-dashoffset: 23;
+    }
+    28% {
+      stroke-dashoffset: 0;
+    }
+    72% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: 23;
+    }
+  }
+
+  .tick-animation {
+    animation-delay: 0.75s;
+    animation-duration: 2.5s;
+    animation-name: inner-tick-animation-standard-keyframes-rule;
+    animation-timing-function: cubic-bezier(0.1, 0.5, 0, 1);
+  }
+
+  @keyframes overall-reduced-motion-keyframes-rule {
+    0% {
+      opacity: 0;
+      stroke-dashoffset: 0;
+    }
+    100% {
+      opacity: 1;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion) {
+    .circle-animation {
+      animation-delay: 0.5s;
+      animation-duration: 1s;
+      animation-fill-mode: forwards;
+      animation-name: overall-reduced-motion-keyframes-rule;
+      animation-timing-function: linear;
+    }
+    .tick-animation {
+      animation-delay: 0.75s;
+      animation-duration: 0.5s;
+      animation-fill-mode: forwards;
+      animation-name: overall-reduced-motion-keyframes-rule;
+      animation-timing-function: linear;
+    }
+  }
+  @media (max-width: 768px) {
+    .end-chapter-celebration-check-mark {
+      margin: auto;
+      width: 70%;
+    }
+  }
+</style>

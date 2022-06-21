@@ -31,10 +31,23 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'oppia-progress-nav',
-  templateUrl: './progress-nav.component.html'
+  templateUrl: './progress-nav.component.html',
+  animations: [
+    trigger('fadeInOut', [
+      transition('void => *', []),
+      transition('* <=> *', [
+        style({ opacity: 0 }),
+        animate('1s ease', keyframes([
+          style({ opacity: 0 }),
+          style({ opacity: 1 })
+        ]))
+      ])
+    ])
+  ]
 })
 export class ProgressNavComponent {
   @Input() isLearnAgainButton: boolean;

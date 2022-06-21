@@ -134,7 +134,7 @@ ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML = (
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'videos/*', 'i18n/*', '*.component.html',
-    '*_directive.html', '*.directive.html',
+    '*_directive.html', '*.directive.html', 'audio/*',
     '*.template.html', '*.png', '*.json', '*.webp')
 
 HASH_BLOCK_SIZE = 2**20

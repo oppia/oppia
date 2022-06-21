@@ -13,7 +13,8 @@
       <oppia-tutor-card [displayedCard]="displayedCard"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
-                        [startCardChangeAnimation]="startCardChangeAnimation">
+                        [startCardChangeAnimation]="startCardChangeAnimation"
+                        [inStoryMode]="inStoryMode">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"

@@ -27,7 +27,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     core/domain/platform_parameter_list.py.
     """
 
-    EXPECTED_PARAM_NAMES = ['dummy_feature', 'dummy_parameter']
+    EXPECTED_PARAM_NAMES = ['dummy_feature', 'dummy_parameter',
+                            'end_chapter_celebration']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()

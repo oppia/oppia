@@ -42,7 +42,8 @@ PARAM_NAMES = params.PARAM_NAMES # pylint: disable=invalid-name
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    params.PARAM_NAMES.dummy_feature
+    params.PARAM_NAMES.dummy_feature,
+    params.PARAM_NAMES.end_chapter_celebration,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must

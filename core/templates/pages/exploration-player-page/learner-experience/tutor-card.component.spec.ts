@@ -19,7 +19,7 @@
 import { SimpleChanges } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync, flush } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -43,14 +43,32 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerPositionService } from '../services/player-position.service';
 import { TutorCardComponent } from './tutor-card.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
       hash: '',
       pathname: '/path/name'
+    },
+    matchMedia: function(query: string) {
+      return {
+        matches: false
+      };
     }
   };
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EndChapterCelebration: {
+        isEnabled: true
+      }
+    };
+  }
 }
 
 describe('Tutor card component', () => {
@@ -72,6 +90,8 @@ describe('Tutor card component', () => {
   let urlService: UrlService;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
+  let windowRef: WindowRef;
+  let platformFeatureService: PlatformFeatureService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', new Interaction([], [], null, null, [], null, null)
@@ -105,6 +125,11 @@ describe('Tutor card component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -132,6 +157,8 @@ describe('Tutor card component', () => {
     userService = TestBed.inject(UserService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    windowRef = TestBed.inject(WindowRef);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -187,17 +214,192 @@ describe('Tutor card component', () => {
   it('should refresh displayed card on changes', fakeAsync(() => {
     let updateDisplayedCardSpy = spyOn(
       componentInstance, 'updateDisplayedCard');
+    spyOn(componentInstance, 'isOnTerminalCard');
     const changes: SimpleChanges = {
       displayedCard: {
         previousValue: false,
         currentValue: true,
         firstChange: false,
-        isFirstChange: () => false
+        isFirstChange: () => false,
       }
     };
     componentInstance.ngOnChanges(changes);
     expect(updateDisplayedCardSpy).toHaveBeenCalled();
+    expect(componentInstance.isOnTerminalCard).toHaveBeenCalled();
   }));
+
+  it('should trigger celebratory animation if on the last card of a chapter',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+      spyOn(componentInstance, 'triggerCelebratoryAnimation');
+      componentInstance.animationHasPlayedOnce = false;
+      componentInstance.inStoryMode = true;
+      const changes: SimpleChanges = {
+        displayedCard: {
+          previousValue: false,
+          currentValue: true,
+          firstChange: false,
+          isFirstChange: () => false
+        }
+      };
+
+      componentInstance.ngOnChanges(changes);
+
+      expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+      expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalled();
+    }));
+
+  it('should not trigger celebratory animation if the feature is not enabled',
+    () => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+        {
+          EndChapterCelebration: {
+            isEnabled: false
+          }
+        }
+      );
+      spyOn(componentInstance, 'triggerCelebratoryAnimation');
+      componentInstance.animationHasPlayedOnce = false;
+      componentInstance.inStoryMode = true;
+      const changes: SimpleChanges = {
+        displayedCard: {
+          previousValue: false,
+          currentValue: true,
+          firstChange: false,
+          isFirstChange: () => false
+        }
+      };
+
+      componentInstance.ngOnChanges(changes);
+
+      expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+      expect(
+        componentInstance.triggerCelebratoryAnimation).not.toHaveBeenCalled();
+    });
+
+  it('should not trigger celebratory animation if not in story mode',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+      spyOn(componentInstance, 'triggerCelebratoryAnimation');
+      componentInstance.animationHasPlayedOnce = false;
+      componentInstance.inStoryMode = false;
+      const changes: SimpleChanges = {
+        displayedCard: {
+          previousValue: false,
+          currentValue: true,
+          firstChange: false,
+          isFirstChange: () => false
+        }
+      };
+
+      componentInstance.ngOnChanges(changes);
+
+      expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+      expect(
+        componentInstance.triggerCelebratoryAnimation).not.toHaveBeenCalled();
+    }));
+
+  it('should animate the check mark and the confetti ' +
+      'if animations are enabled', fakeAsync(() => {
+    expect(componentInstance.checkMarkHidden).toBe(true);
+    expect(componentInstance.animationHasPlayedOnce).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
+
+    spyOn(windowRef.nativeWindow, 'matchMedia').and.callThrough();
+    componentInstance.checkMarkComponent =
+      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
+        'EndChapterCheckMarkComponent', ['animateCheckMark']);
+    componentInstance.confettiComponent =
+      jasmine.createSpyObj<EndChapterConfettiComponent>(
+        'EndChapterConfettiComponent', ['animateConfetti']);
+
+    componentInstance.triggerCelebratoryAnimation();
+
+    tick(1);
+    expect(componentInstance.checkMarkComponent.animateCheckMark)
+      .toHaveBeenCalled();
+    expect(componentInstance.animationHasPlayedOnce).toBe(true);
+
+    tick(2000);
+    expect(componentInstance.confettiComponent.animateConfetti)
+      .toHaveBeenCalled();
+
+    tick(4000);
+    expect(componentInstance.checkMarkHidden).toBe(true);
+  }));
+
+  it('should not animate the confetti if animations ' +
+      'are not enabled', fakeAsync(() => {
+    expect(componentInstance.checkMarkHidden).toBe(true);
+    expect(componentInstance.animationHasPlayedOnce).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
+
+    spyOn(windowRef.nativeWindow, 'matchMedia').and.returnValue({
+      matches: true,
+      media: 'prefers-reduced-motion',
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      onchange: () => {},
+      dispatchEvent: (ev: Event) => true
+    });
+    componentInstance.checkMarkComponent =
+      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
+        'EndChapterCheckMarkComponent', ['animateCheckMark']);
+    componentInstance.confettiComponent =
+      jasmine.createSpyObj<EndChapterConfettiComponent>(
+        'EndChapterConfettiComponent', ['animateConfetti']);
+
+    componentInstance.triggerCelebratoryAnimation();
+
+    tick(1);
+    expect(componentInstance.checkMarkComponent.animateCheckMark)
+      .toHaveBeenCalled();
+    expect(componentInstance.animationHasPlayedOnce).toBe(true);
+
+    tick(2000);
+    expect(componentInstance.confettiComponent.animateConfetti)
+      .not.toHaveBeenCalled();
+
+    tick(500);
+    expect(componentInstance.checkMarkHidden).toBe(true);
+  }));
+
+  it('should skip animation when a click is made onscreen', fakeAsync(() => {
+    expect(componentInstance.checkMarkSkipped).toBe(false);
+
+    spyOn(window, 'clearTimeout');
+    componentInstance.checkMarkComponent =
+      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
+        'EndChapterCheckMarkComponent', ['animateCheckMark']);
+    componentInstance.confettiComponent =
+      jasmine.createSpyObj<EndChapterConfettiComponent>(
+        'EndChapterConfettiComponent', ['animateConfetti']);
+    componentInstance.triggerCelebratoryAnimation();
+    let fakeClickEvent = new MouseEvent('click');
+    document.dispatchEvent(fakeClickEvent);
+
+    tick(1);
+    expect(clearTimeout).toHaveBeenCalled();
+    expect(componentInstance.checkMarkSkipped).toBe(true);
+    tick(500);
+    expect(componentInstance.checkMarkHidden).toBe(true);
+
+    flush();
+  }));
+
+  it('should not skip animation if it hasn\'t been triggered yet',
+    fakeAsync(() => {
+      let fakeClickEvent = new MouseEvent('click');
+      document.dispatchEvent(fakeClickEvent);
+
+      expect(componentInstance.checkMarkSkipped).toBe(false);
+    }));
 
   it('should update displayed card', fakeAsync(() => {
     mockDisplayedCard.markAsCompleted();
