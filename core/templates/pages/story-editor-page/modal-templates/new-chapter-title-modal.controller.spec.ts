@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { AlertsService } from 'services/alerts.service';
 import { EditableStoryBackendApiService } from
@@ -32,14 +32,18 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
-  var $q = null;
   var $rootScope = null;
   var $uibModalInstance = null;
   var StoryEditorStateService = null;
   var StoryUpdateService = null;
   var storyObjectFactory = null;
   var explorationIdValidationService = null;
+  var curatedExplorationValidationService = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
+  var canExplorationBeCuratedResponse = {
+    canBeCurated: true,
+    errorMessage: ''
+  };
 
   importAllAngularServices();
 
@@ -70,10 +74,11 @@ describe('Create New Chapter Modal Controller', function() {
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $rootScope = $injector.get('$rootScope');
-    $q = $injector.get('$q');
     StoryUpdateService = $injector.get('StoryUpdateService');
     storyObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
+    curatedExplorationValidationService = $injector.get(
+      'CuratedExplorationValidationService');
     explorationIdValidationService = $injector.get(
       'ExplorationIdValidationService');
 
@@ -191,17 +196,41 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.isValid()).toEqual(false);
   });
 
+  it('should show warning message when exploration cannot be curated',
+    fakeAsync(() => {
+      spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
+      spyOn(
+        curatedExplorationValidationService, 'canExplorationBeCurated'
+      ).and.resolveTo({
+        canBeCurated: false,
+        errorMessage: (
+          'The exploration should not have training data ' +
+          'for any answer group in any state.')
+      });
+      $scope.save();
+      flushMicrotasks();
+      $rootScope.$apply();
+
+      expect($scope.invalidExpId).toEqual(true);
+      expect($scope.invalidExpErrorString).toEqual(
+        'The exploration should not have training data ' +
+        'for any answer group in any state.');
+    }));
+
   it('should warn that the exploration is not published when trying to save' +
-    ' a chapter with an invalid exploration id', function() {
+    ' a chapter with an invalid exploration id', fakeAsync(function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
-    var deferred = $q.defer();
-    deferred.resolve(false);
     spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-      .and.returnValue(deferred.promise);
+      .and.resolveTo(false);
+    spyOn(
+      curatedExplorationValidationService, 'canExplorationBeCurated'
+    ).and.resolveTo(canExplorationBeCuratedResponse);
     $scope.save();
+    flushMicrotasks();
     $rootScope.$apply();
+
     expect($scope.invalidExpId).toEqual(true);
-  });
+  }));
 
   it('should warn that the exploration already exists in the story when' +
     ' trying to save a chapter with an already used exploration id',
@@ -236,82 +265,86 @@ describe('Create New Chapter Modal Controller', function() {
   });
 
   it('should prevent exploration from being added if it doesn\'t exist ' +
-    'or isn\'t published yet', function() {
+    'or isn\'t published yet', fakeAsync(function() {
     $scope.title = 'dummy_title';
-    var deferred = $q.defer();
-    deferred.resolve(false);
+    spyOn(
+      curatedExplorationValidationService, 'canExplorationBeCurated'
+    ).and.resolveTo(canExplorationBeCuratedResponse);
     spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-      .and.returnValue(deferred.promise);
+      .and.returnValue(false);
     const correctnessFeedbackSpy =
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled');
     const categorySpy =
       spyOn(explorationIdValidationService, 'isDefaultCategoryAsync');
     $scope.save();
+    flushMicrotasks();
     $rootScope.$apply();
     expect($scope.invalidExpId).toEqual(true);
     expect(correctnessFeedbackSpy).not.toHaveBeenCalled();
     expect(categorySpy).not.toHaveBeenCalled();
     expect($uibModalInstance.close).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should prevent exploration from being added if its correctness ' +
-  'feedback is disabled', function() {
+  'feedback is disabled', fakeAsync(function() {
     $scope.title = 'dummy_title';
-    var deferred = $q.defer();
-    deferred.resolve(true);
+    spyOn(
+      curatedExplorationValidationService, 'canExplorationBeCurated'
+    ).and.resolveTo(canExplorationBeCuratedResponse);
     spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-      .and.returnValue(deferred.promise);
-    var deferred2 = $q.defer();
-    deferred2.resolve(false);
+      .and.resolveTo(true);
     spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
-      .and.returnValue(deferred2.promise);
+      .and.resolveTo(false);
     $scope.save();
+    flushMicrotasks();
     $rootScope.$apply();
     expect($scope.correctnessFeedbackDisabled).toBe(true);
     expect($uibModalInstance.close).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should prevent exploration from being added if its category ' +
-  'is not default', function() {
+  'is not default', fakeAsync(function() {
     $scope.title = 'dummy_title';
 
-    var deferred = $q.defer();
-    deferred.resolve(true);
-    var deferred2 = $q.defer();
-    deferred2.resolve(false);
-
+    spyOn(
+      curatedExplorationValidationService, 'canExplorationBeCurated'
+    ).and.resolveTo(canExplorationBeCuratedResponse);
     spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-      .and.returnValue(deferred.promise);
+      .and.resolveTo(true);
     spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
-      .and.returnValue(deferred.promise);
+      .and.resolveTo(true);
     spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
-      .and.returnValue(deferred2.promise);
+      .and.resolveTo(false);
 
     $scope.save();
+    flushMicrotasks();
     $rootScope.$apply();
 
     expect($scope.categoryIsDefault).toBe(false);
     expect($uibModalInstance.close).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should attempt to save exploration when all validation checks pass',
-    function() {
+    fakeAsync(function() {
       $scope.title = 'dummy_title';
-      var deferred = $q.defer();
-      deferred.resolve(true);
+      spyOn(
+        curatedExplorationValidationService, 'canExplorationBeCurated'
+      ).and.resolveTo(canExplorationBeCuratedResponse);
       spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-        .and.returnValue(deferred.promise);
+        .and.resolveTo(true);
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
-        .and.returnValue(deferred.promise);
+        .and.resolveTo(true);
       spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
-        .and.returnValue(deferred.promise);
+        .and.resolveTo(true);
       const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
       const updateTitleSpy = spyOn($scope, 'updateTitle');
       $scope.save();
+      flushMicrotasks();
       $rootScope.$apply();
+
       expect(updateTitleSpy).toHaveBeenCalled();
       expect(updateExplorationIdSpy).toHaveBeenCalled();
-    });
+    }));
 
   it('should clear error message when changing exploration id', function() {
     $scope.title = nodeTitles[0];
