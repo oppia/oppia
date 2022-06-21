@@ -219,9 +219,9 @@ class MockRelationshipsOf(validation_decorators.RelationshipsOf):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value for the unit tests.
-    _ID_REFERENCING_PROPERTIES: (
-        Dict[model_property.ModelProperty, Set[str]]
-    ) = collections.defaultdict(set)
+    _ID_REFERENCING_PROPERTIES: Dict[
+        model_property.ModelProperty, Set[str]
+    ] = collections.defaultdict(set)
 
     @classmethod
     def clear(cls) -> None:

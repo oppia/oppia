@@ -79,9 +79,9 @@ class AuditsExisting:
     and only if ValidateExplorationModelId inherits from ValidateModelId.
     """
 
-    _DO_FN_TYPES_BY_KIND: (
-        Dict[str, Set[Type[beam.DoFn]]]
-    ) = collections.defaultdict(set)
+    _DO_FN_TYPES_BY_KIND: Dict[
+        str, Set[Type[beam.DoFn]]
+    ] = collections.defaultdict(set)
 
     def __init__(self, *model_types: Type[base_models.BaseModel]) -> None:
         """Initializes the decorator to target the given types of models.
@@ -195,9 +195,10 @@ class RelationshipsOf:
 
     # A dict(ModelProperty: set(str)). The keys are properties of a model whose
     # values refer to the IDs of their corresponding set of model kinds.
-    _ID_REFERENCING_PROPERTIES: (
-        Dict[model_property.ModelProperty, Set[str]]
-    ) = collections.defaultdict(set)
+    _ID_REFERENCING_PROPERTIES: Dict[
+        model_property.ModelProperty,
+        Set[str]
+    ] = collections.defaultdict(set)
 
     def __init__(self, model_class: Type[base_models.BaseModel]) -> None:
         """Initializes a new RelationshipsOf decorator.
@@ -240,8 +241,7 @@ class RelationshipsOf:
     def get_id_referencing_properties_by_kind_of_possessor(
         cls
     ) -> Dict[
-        str,
-        Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
+        str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
     ]:
         """Returns properties whose values refer to the IDs of the corresponding
         set of model kinds, grouped by the kind of model the properties belong
@@ -252,15 +252,15 @@ class RelationshipsOf:
             (ModelProperty, set(kind of models)), grouped by the kind of model
             the properties belong to.
         """
-        by_kind: (
-            Callable[[model_property.ModelProperty], str]
-        ) = lambda model_property: model_property.model_kind
+        by_kind: Callable[
+            [model_property.ModelProperty], str
+        ] = lambda model_property: model_property.model_kind
         id_referencing_properties_by_kind_of_possessor = itertools.groupby(
             sorted(cls._ID_REFERENCING_PROPERTIES.keys(), key=by_kind),
             key=by_kind)
-        references_of: (
-            Callable[[model_property.ModelProperty], Set[str]]
-        ) = lambda p: cls._ID_REFERENCING_PROPERTIES[p]
+        references_of: Callable[
+            [model_property.ModelProperty], Set[str]
+        ] = lambda p: cls._ID_REFERENCING_PROPERTIES[p]
         return {
             kind: tuple((p, tuple(references_of(p))) for p in properties)
             for kind, properties in (
