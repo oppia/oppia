@@ -5270,7 +5270,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
 
         model_1 = exp_models.ExplorationVersionHistoryModel(
-            id='%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_1),
+            id='version-history-%s-%s' % (
+                self.EXPLORATION_ID_0, self.VERSION_1),
             exploration_id=self.EXPLORATION_ID_0,
             exploration_version=self.VERSION_1,
             state_version_history={
@@ -5287,7 +5288,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
         model_1.put()
 
         model_2 = exp_models.ExplorationVersionHistoryModel(
-            id='%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2),
+            id='version-history-%s-%s' % (
+                self.EXPLORATION_ID_0, self.VERSION_2),
             exploration_id=self.EXPLORATION_ID_0,
             exploration_version=self.VERSION_2,
             state_version_history={
@@ -5306,7 +5308,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
         model_2.put()
 
         model_3 = exp_models.ExplorationVersionHistoryModel(
-            id='%s-%s' % (self.EXPLORATION_ID_1, self.VERSION_1),
+            id='version-history-%s-%s' % (
+                self.EXPLORATION_ID_1, self.VERSION_1),
             exploration_id=self.EXPLORATION_ID_1,
             exploration_version=self.VERSION_1,
             state_version_history={
@@ -5334,9 +5337,9 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                 self.user_2_id).pseudonymizable_entity_mappings[
                     models.NAMES.exploration.value])
         pseudonymized_id = pseudonymizable_user_id_mapping[
-            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2)]
+            'version-history-%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2)]
         pseudonymized_model = exp_models.ExplorationVersionHistoryModel.get(
-            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2))
+            'version-history-%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2))
 
         self.assertNotIn(
             self.user_2_id, pseudonymized_model.committer_ids)
@@ -5362,9 +5365,9 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                 self.user_1_id).pseudonymizable_entity_mappings[
                     models.NAMES.exploration.value])
         version_history_ids = [
-            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_1),
-            '%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2),
-            '%s-%s' % (self.EXPLORATION_ID_1, self.VERSION_1)
+            'version-history-%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_1),
+            'version-history-%s-%s' % (self.EXPLORATION_ID_0, self.VERSION_2),
+            'version-history-%s-%s' % (self.EXPLORATION_ID_1, self.VERSION_1)
         ]
         pseudonymized_models = (
             exp_models.ExplorationVersionHistoryModel.get_multi(

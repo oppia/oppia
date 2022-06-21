@@ -1441,11 +1441,9 @@ def _pseudonymize_version_history_models(pending_deletion_request):
     # id generation. Also, we don't need different pseudonymized ids for
     # pseudonymizing the same user_id in different models.
     pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
-    pending_deletion_request.pseudonymizable_entity_mappings[
-        models.NAMES.exploration.value] = {
-            entity_id: pseudonymized_id
-            for entity_id in version_history_ids
-        }
+    for entity_id in version_history_ids:
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.exploration.value][entity_id] = pseudonymized_id
     save_pending_deletion_requests([pending_deletion_request])
 
     @transaction_services.run_in_transaction_wrapper

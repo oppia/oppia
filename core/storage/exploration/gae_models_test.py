@@ -926,7 +926,7 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_instance_id(self) -> None:
-        expected_instance_id = 'exp1-2'
+        expected_instance_id = 'version-history-exp1-2'
         actual_instance_id = (
             exp_models.ExplorationVersionHistoryModel.get_instance_id(
                 'exp1', 2))

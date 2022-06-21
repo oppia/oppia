@@ -1195,7 +1195,7 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
             str. A string containing exploration ID and
             exploration version.
         """
-        return '%s-%s' % (exp_id, exp_version)
+        return 'version-history-%s-%s' % (exp_id, exp_version)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
