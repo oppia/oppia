@@ -52,7 +52,7 @@ describe('End chapter confetti component', function() {
 
     component.ngOnInit();
 
-    expect(component.audioUrl).toBe('audio_url.mp3');
+    expect(component.endChapterCelebratoryAudio.src).toContain('audio_url.mp3');
   });
 
   it('should animate the confetti and play audio', () => {
