@@ -126,9 +126,9 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
         # Swap out data with replacement filename.
         image_key = dictionary_path[-1]
         image_data = pointer[image_key]
-        # Ruling out the possibility of Any for mypy type checking.
-        assert isinstance(image_data, str)
         if image_data is not None:
+            # Ruling out the possibility of Any for mypy type checking.
+            assert isinstance(image_data, str)
             takeout_image_files.append(
                 takeout_domain.TakeoutImage(image_data, replacement_filename))
             pointer[image_key] = replacement_filename
