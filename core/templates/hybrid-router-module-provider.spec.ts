@@ -17,42 +17,61 @@
  */
 
 import { Component } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { Location } from '@angular/common';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { SmartRouterLink } from 'hybrid-router-module-provider';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import {UserService} from "services/user.service";
 
 @Component({
   selector: 'mock-comp-a',
+  // As template is only used for testing we ignore the lint check, otherwise,
+  // we would have to create HTML files for each mock component.
+  // eslint-disable-next-line angular/no-inline-template
   template: '<a href="/contact" [smartRouterLink]="\'/contact\'"></a>'
 })
 class MockCompA {}
 
 @Component({
   selector: 'mock-comp-b',
-  template: '<a href="/contact" [smartRouterLink]="\'/contact\'"></a><router-outlet>'
+  // As template is only used for testing we ignore the lint check, otherwise,
+  // we would have to create HTML files for each mock component.
+  // eslint-disable-next-line angular/no-inline-template
+  template: (
+    '<a href="/contact" [smartRouterLink]="\'/contact\'"></a><router-outlet>'
+  )
 })
 class MockCompB {}
 
 @Component({
   selector: 'mock-comp-c',
-  template: '<a href="/contact" [smartRouterLink]="\'/contact\'"></a><router-outlet custom="light">'
+  // As template is only used for testing we ignore the lint check, otherwise,
+  // we would have to create HTML files for each mock component.
+  // eslint-disable-next-line angular/no-inline-template
+  template: (
+    '<a href="/contact" [smartRouterLink]="\'/contact\'"></a>' +
+    '<router-outlet custom="light">'
+  )
 })
 class MockCompC {}
 
 @Component({
   selector: 'mock-comp-d',
+  // As template is only used for testing we ignore the lint check, otherwise,
+  // we would have to create HTML files for each mock component.
+  // eslint-disable-next-line angular/no-inline-template
   template: '<a href="/" [smartRouterLink]="\'/\'"></a><router-outlet>'
 })
 class MockCompD {}
 
 @Component({
   selector: 'mock-comp-e',
-  template: '<a href="/" [smartRouterLink]="\'/\'"></a><router-outlet custom="light">'
+  // As template is only used for testing we ignore the lint check, otherwise,
+  // we would have to create HTML files for each mock component.
+  // eslint-disable-next-line angular/no-inline-template
+  template: (
+    '<a href="/" [smartRouterLink]="\'/\'"></a><router-outlet custom="light">'
+  )
 })
 class MockCompE {}
 
@@ -65,16 +84,6 @@ class MockWindowRef {
 }
 
 describe('Smart router link directive', () => {
-  let mockCompAFixture: ComponentFixture<MockCompA>;
-  let mockCompBFixture: ComponentFixture<MockCompB>;
-  let mockCompCFixture: ComponentFixture<MockCompC>;
-  let mockCompDFixture: ComponentFixture<MockCompD>;
-  let mockCompEFixture: ComponentFixture<MockCompE>;
-  let mockCompALink;
-  let mockCompBLink;
-  let mockCompCLink;
-  let mockCompDLink;
-  let mockCompELink;
   let mockWindowRef: MockWindowRef;
 
   beforeEach(waitForAsync(() => {
@@ -106,25 +115,11 @@ describe('Smart router link directive', () => {
     }).compileComponents();
   }));
 
-  beforeEach(waitForAsync(() => {
-    mockCompAFixture = TestBed.createComponent(MockCompA);
-    mockCompBFixture = TestBed.createComponent(MockCompB);
-    mockCompCFixture = TestBed.createComponent(MockCompC);
-    mockCompDFixture = TestBed.createComponent(MockCompD);
-    mockCompEFixture = TestBed.createComponent(MockCompE);
-    mockCompALink = (
-      mockCompAFixture.debugElement.nativeElement.querySelector('a'));
-    mockCompBLink = (
-      mockCompBFixture.debugElement.nativeElement.querySelector('a'));
-    mockCompCLink = (
-      mockCompCFixture.debugElement.nativeElement.querySelector('a'));
-    mockCompDLink = (
-      mockCompDFixture.debugElement.nativeElement.querySelector('a'));
-    mockCompELink = (
-      mockCompEFixture.debugElement.nativeElement.querySelector('a'));
-  }));
-
   it('should navigate by refreshing from non-router page', fakeAsync(() => {
+    let mockCompAFixture = TestBed.createComponent(MockCompA);
+    let mockCompALink = (
+      mockCompAFixture.debugElement.nativeElement.querySelector('a'));
+
     mockCompAFixture.detectChanges();
     tick();
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
@@ -139,6 +134,10 @@ describe('Smart router link directive', () => {
   it(
     'should navigate without refreshing inside normal router',
     fakeAsync(() => {
+      let mockCompBFixture = TestBed.createComponent(MockCompB);
+      let mockCompBLink = (
+        mockCompBFixture.debugElement.nativeElement.querySelector('a'));
+
       mockCompBFixture.detectChanges();
       tick();
       expect(mockWindowRef.nativeWindow.location.href).toBe('');
@@ -147,13 +146,16 @@ describe('Smart router link directive', () => {
       mockCompBFixture.detectChanges();
       tick();
 
-      expect(mockWindowRef.nativeWindow.location.href).toBe('/contact');
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
     })
   );
 
   it(
     'should navigate by refreshing from lightweight router to normal router',
     fakeAsync(() => {
+      let mockCompCFixture = TestBed.createComponent(MockCompC);
+      let mockCompCLink = (
+        mockCompCFixture.debugElement.nativeElement.querySelector('a'));
       mockCompCFixture.detectChanges();
       tick();
       expect(mockWindowRef.nativeWindow.location.href).toBe('');
@@ -169,6 +171,10 @@ describe('Smart router link directive', () => {
   it(
     'should navigate by refreshing from normal router to lightweight router',
     fakeAsync(() => {
+      let mockCompDFixture = TestBed.createComponent(MockCompD);
+      let mockCompDLink = (
+        mockCompDFixture.debugElement.nativeElement.querySelector('a'));
+
       mockCompDFixture.detectChanges();
       tick();
       expect(mockWindowRef.nativeWindow.location.href).toBe('');
@@ -177,7 +183,7 @@ describe('Smart router link directive', () => {
       mockCompDFixture.detectChanges();
       tick();
 
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+      expect(mockWindowRef.nativeWindow.location.href).toBe('/');
     })
   );
 
@@ -185,6 +191,10 @@ describe('Smart router link directive', () => {
   it(
     'should navigate without refreshing inside lightweight router',
     fakeAsync(() => {
+      let mockCompEFixture = TestBed.createComponent(MockCompE);
+      let mockCompELink = (
+        mockCompEFixture.debugElement.nativeElement.querySelector('a'));
+
       mockCompEFixture.detectChanges();
       tick();
       expect(mockWindowRef.nativeWindow.location.href).toBe('');
