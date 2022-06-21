@@ -128,6 +128,10 @@ export class RatingsAndRecommendationsComponent {
       }
     });
   }
+
+  hideSignUpSection(): void {
+
+  }
 }
 
 angular.module('oppia').directive('oppiaRatingsAndRecommendations',
