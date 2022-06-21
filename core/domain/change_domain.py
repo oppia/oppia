@@ -262,9 +262,7 @@ class BaseChange:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
-            dict_name = self.__dict__[name]
-            # Ruling out the possibility of Any for mypy type checking.
-            assert isinstance(dict_name, str)
+            dict_name: str = self.__dict__[name]
             return dict_name
         except KeyError as e:
             raise AttributeError(name) from e
