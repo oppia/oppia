@@ -71,11 +71,11 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             })]
         )
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title')
+            1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = ['skill_id_1']
         subtopic.url_fragment = 'sub-url-frag-one'
         subtopic2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2')
+            2, 'Subtopic Title 2', 'url-frag-two')
         subtopic2.skill_ids = ['skill_id_2']
         subtopic2.url_fragment = 'sub-url-frag-two'
 

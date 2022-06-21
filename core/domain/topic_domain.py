@@ -424,8 +424,11 @@ class Subtopic:
 
     @classmethod
     def create_default_subtopic(
-        cls, subtopic_id: int, title: str,
-        url_frag: str = 'url-frag') -> Subtopic:
+        cls,
+        subtopic_id: int,
+        title: str,
+        url_frag: str
+    ) -> Subtopic:
         """Creates a Subtopic object with default values.
 
         Args:
@@ -496,13 +499,14 @@ class Subtopic:
                 'received %s' % (title_limit, self.title))
 
         url_fragment_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT  # pylint: disable=line-too-long
+        regex = android_validation_constants.SUBTOPIC_URL_FRAGMENT_REGEXP
         if len(self.url_fragment) > url_fragment_limit:
             raise utils.ValidationError(
                 'Expected subtopic url fragment to be less '
                 'than or equal to %d characters, received %s'
                 % (url_fragment_limit, self.url_fragment))
 
-        if not bool(re.match('^[a-z]+(-[a-z]+)*$', self.url_fragment)):
+        if not bool(re.match(regex, self.url_fragment)):
             raise utils.ValidationError(
                 'Invalid url fragment: %s' % self.url_fragment)
 
@@ -1507,12 +1511,14 @@ class Topic:
         raise Exception(
             'The subtopic with id %s does not exist.' % subtopic_id)
 
-    def add_subtopic(self, new_subtopic_id: int, title: str) -> None:
+    def add_subtopic(self, new_subtopic_id: int, title: str,
+                     url_frag: str) -> None:
         """Adds a subtopic with the given id and title.
 
         Args:
             new_subtopic_id: int. The id of the new subtopic.
             title: str. The title for the new subtopic.
+            url-frag: str. The url fragment of the new subtopic.
 
         Raises:
             Exception. The new subtopic ID is not equal to the expected next
@@ -1525,7 +1531,7 @@ class Topic:
                 % (new_subtopic_id, self.next_subtopic_id))
         self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
-            Subtopic.create_default_subtopic(new_subtopic_id, title))
+            Subtopic.create_default_subtopic(new_subtopic_id, title, url_frag))
 
     def delete_subtopic(self, subtopic_id: int) -> None:
         """Deletes the subtopic with the given id and adds all its skills to
