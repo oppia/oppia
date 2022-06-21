@@ -165,8 +165,7 @@ export class CkEditorCopyContentService {
           this.htmlEscaperService.escapedStrToUnescapedStr(value));
       }
 
-      console.log(startupData);
-      editor.execCommand(widgetName, { startupData });
+      editor.execCommand(widgetName, { startupData, isFirst: true });
     }
   }
 
