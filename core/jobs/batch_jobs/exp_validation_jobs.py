@@ -695,12 +695,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     if choice.html in seen_choices:
                         choice_duplicate = True
                     seen_choices.append(choice.html)
-                if choice_empty and choice:
+                if choice_empty:
                     drag_drop_interaction_values.append(
                         'There should not be any empty ' +
                         'choices'
                     )
-                if choice_duplicate and choice:
+                if choice_duplicate:
                     drag_drop_interaction_values.append(
                         'There should not be any duplicate ' +
                         'choices'
