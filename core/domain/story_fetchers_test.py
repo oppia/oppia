@@ -242,7 +242,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         # Tests error should be raised if story or node doesn't exist.
         with self.assertRaisesRegex(
             Exception,
-            'Story node with id node_5 does not exist in this story.'):
+            'The node with id node_5 is not part of this story.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 self.STORY_ID, 'node_5')
 

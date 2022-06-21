@@ -115,7 +115,7 @@ export class CkEditorInitializerService {
                   customizationArgSpecs,
                   customizationArgs,
                   function(customizationArgsDict) {
-                    that.data.isOpenFirst = false;
+                    that.data.isFirst = false;
                     for (var arg in customizationArgsDict) {
                       if (customizationArgsDict.hasOwnProperty(arg)) {
                         that.setData(arg, customizationArgsDict[arg]);
@@ -150,8 +150,8 @@ export class CkEditorInitializerService {
                     }
                   },
                   function(widgetShouldBeRemoved) {
-                    if (widgetShouldBeRemoved || that.data.isOpenFirst) {
-                      that.data.isOpenFirst = false;
+                    if (widgetShouldBeRemoved || that.data.isFirst) {
+                      that.data.isFirst = false;
                       var newWidgetSelector = (
                         '[data-cke-widget-id="' + that.id + '"]');
                       if (newWidgetSelector !== null) {
