@@ -7608,7 +7608,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             version_history_models_before_deletion,
             version_history_models_after_deletion)
 
-    def test_update_version_history_on_add_state(self):
+    def test_version_history_on_add_state(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
 
@@ -7629,7 +7629,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             state_domain.StateVersionHistory(
                 None, None, self.owner_id).to_dict())
 
-    def test_update_version_history_on_delete_state(self):
+    def test_version_history_on_delete_state(self):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -7654,7 +7654,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             new_model.state_version_history.get('New state'), None)
 
-    def test_update_version_history_on_rename_state(self):
+    def test_version_history_on_rename_state(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
         new_state_name = 'Another name'
@@ -7685,7 +7685,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             state_domain.StateVersionHistory(
                 1, feconf.DEFAULT_INIT_STATE_NAME, self.owner_id).to_dict())
 
-    def test_not_update_version_history_on_rename_when_no_net_change(self):
+    def test_version_history_on_cancelled_rename_state(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
         new_state_name = 'Another name'
@@ -7716,7 +7716,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             new_model.state_version_history.get(
                 feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
 
-    def test_update_version_history_on_edit_state_property(self):
+    def test_version_history_on_edit_state_property(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
 
@@ -7761,7 +7761,41 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             state_domain.StateVersionHistory(
                 1, feconf.DEFAULT_INIT_STATE_NAME, self.owner_id).to_dict())
 
-    def test_not_update_version_history_on_only_translation_commits(self):
+    def test_version_history_on_cancelled_edit_state_property(self):
+        old_model = self.version_history_model_class.get(
+            '%s-%s' % (self.EXP_0_ID, 1))
+        expected_dict = state_domain.StateVersionHistory(
+            None, None, self.owner_id).to_dict()
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': None
+                })
+            ], 'Edited interaction id'
+        )
+
+        new_model = self.version_history_model_class.get(
+            '%s-%s' % (self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+    def test_version_history_on_only_translation_commits(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
         expected_dict = state_domain.StateVersionHistory(
@@ -7801,7 +7835,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             new_model.state_version_history.get(
                 feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
 
-    def test_update_version_history_on_edit_exploration_property(self):
+    def test_version_history_on_edit_exploration_property(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
 
@@ -7824,7 +7858,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             exp_domain.ExplorationMetadataVersionHistory(
                 1, self.owner_id).to_dict())
 
-    def test_not_update_version_history_when_metadata_changes_cancelled(self):
+    def test_version_history_on_cancelled_edit_exploration_property(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
         expected_dict = exp_domain.ExplorationMetadataVersionHistory(
@@ -7852,7 +7886,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             new_model.metadata_version_history, expected_dict)
 
-    def test_update_version_history_on_revert_exploration(self):
+    def test_version_history_on_revert_exploration(self):
         old_model = self.version_history_model_class.get(
             '%s-%s' % (self.EXP_0_ID, 1))
 
