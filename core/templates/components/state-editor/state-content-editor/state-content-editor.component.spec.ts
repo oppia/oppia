@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -53,6 +53,7 @@ describe('StateHintsEditorComponent', () => {
         MockTranslatePipe
       ],
       providers: [
+        ChangeDetectorRef,
         ChangeListService,
         ExternalSaveService,
         StateContentService,
@@ -174,5 +175,16 @@ describe('StateHintsEditorComponent', () => {
 
     expect(component.saveStateContent.emit)
       .toHaveBeenCalled();
+  });
+
+  it('should update when card height limit is reached', () => {
+    component.limitIsReached = false;
+    spyOn(component, 'isCardHeightLimitReached').and.returnValue(
+      !component.limitIsReached);
+
+    component.ngAfterViewChecked();
+
+    expect(component.limitIsReached).toBeTrue();
+    expect(component.isCardHeightLimitReached).toHaveBeenCalled();
   });
 });

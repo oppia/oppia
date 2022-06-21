@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,40 +55,44 @@ export class AngularHtmlBindComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() htmlData!: string;
+  // This property contains the list of classes that needs to be applied to
+  // parent container of the created interaction.
   @Input() classStr!: string;
+  // The passed htmlData sometimes accesses property from parent scope.
   @Input() parentScope: unknown;
+
   htmlDataIsInteraction: boolean = false;
 
   @ViewChild('interactionContainer', {
     read: ViewContainerRef}) viewContainerRef!: ViewContainerRef;
 
-  mapping = {
-    'OPPIA-INTERACTIVE-CODE-REPL': InteractiveCodeReplComponent,
-    'OPPIA-INTERACTIVE-END-EXPLORATION': InteractiveEndExplorationComponent,
-    'OPPIA-INTERACTIVE-CONTINUE': OppiaInteractiveContinue,
-    'OPPIA-INTERACTIVE-IMAGE-CLICK-INPUT': InteractiveImageClickInput,
-    'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT':
-    InteractiveItemSelectionInputComponent,
-    'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT':
-    InteractiveMultipleChoiceInputComponent,
-    'OPPIA-INTERACTIVE-NUMERIC-INPUT': InteractiveNumericInput,
-    'OPPIA-INTERACTIVE-TEXT-INPUT': InteractiveTextInputComponent,
-    'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT':
-    InteractiveDragAndDropSortInputComponent,
-    'OPPIA-INTERACTIVE-FRACTION-INPUT': InteractiveFractionInputComponent,
-    'OPPIA-INTERACTIVE-GRAPH-INPUT': InteractiveGraphInput,
-    'OPPIA-INTERACTIVE-SET-INPUT': InteractiveSetInputComponent,
-    'OPPIA-INTERACTIVE-NUMERIC-EXPRESSION-INPUT':
-    InteractiveNumericExpressionInput,
+  TAG_TO_INTERACTION_MAPPING = {
     'OPPIA-INTERACTIVE-ALGEBRAIC-EXPRESSION-INPUT':
     AlgebraicExpressionInputInteractionComponent,
+    'OPPIA-INTERACTIVE-CODE-REPL': InteractiveCodeReplComponent,
+    'OPPIA-INTERACTIVE-CONTINUE': OppiaInteractiveContinue,
+    'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT':
+    InteractiveDragAndDropSortInputComponent,
+    'OPPIA-INTERACTIVE-END-EXPLORATION': InteractiveEndExplorationComponent,
+    'OPPIA-INTERACTIVE-FRACTION-INPUT': InteractiveFractionInputComponent,
+    'OPPIA-INTERACTIVE-GRAPH-INPUT': InteractiveGraphInput,
+    'OPPIA-INTERACTIVE-IMAGE-CLICK-INPUT': InteractiveImageClickInput,
+    'OPPIA-INTERACTIVE-INTERACTIVE-MAP': InteractiveInteractiveMapComponent,
+    'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT':
+    InteractiveItemSelectionInputComponent,
     'OPPIA-INTERACTIVE-MATH-EQUATION-INPUT': InteractiveMathEquationInput,
+    'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT':
+    InteractiveMultipleChoiceInputComponent,
+    'OPPIA-INTERACTIVE-MUSIC-NOTES-INPUT': MusicNotesInputComponent,
     'OPPIA-INTERACTIVE-NUMBER-WITH-UNITS': InteractiveNumberWithUnitsComponent,
+    'OPPIA-INTERACTIVE-NUMERIC-EXPRESSION-INPUT':
+    InteractiveNumericExpressionInput,
+    'OPPIA-INTERACTIVE-NUMERIC-INPUT': InteractiveNumericInput,
+    'OPPIA-INTERACTIVE-PENCIL-CODE-EDITOR': PencilCodeEditor,
     'OPPIA-INTERACTIVE-RATIO-EXPRESSION-INPUT':
     InteractiveRatioExpressionInputComponent,
-    'OPPIA-INTERACTIVE-PENCIL-CODE-EDITOR': PencilCodeEditor,
-    'OPPIA-INTERACTIVE-MUSIC-NOTES-INPUT': MusicNotesInputComponent,
-    'OPPIA-INTERACTIVE-INTERACTIVE-MAP': InteractiveInteractiveMapComponent,
+    'OPPIA-INTERACTIVE-SET-INPUT': InteractiveSetInputComponent,
+    'OPPIA-INTERACTIVE-TEXT-INPUT': InteractiveTextInputComponent,
   };
 
   camelCaseFromHyphen(str: string): string {
@@ -106,40 +110,46 @@ export class AngularHtmlBindComponent {
   ) {}
 
   ngAfterViewInit(): void {
-    let domparser = new DOMParser();
     if (this.htmlData) {
+      let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
-      if (dom.body.firstElementChild &&
-        this.mapping[dom.body.firstElementChild.tagName]) {
-        const componentFactory = this.componentFactoryResolver
-          .resolveComponentFactory(
-            this.mapping[dom.body.firstElementChild.tagName]);
 
+      if (dom.body.firstElementChild &&
+        this.TAG_TO_INTERACTION_MAPPING[
+          dom.body.firstElementChild.tagName]) {
+        let interactionTagName = this.TAG_TO_INTERACTION_MAPPING[
+          dom.body.firstElementChild.tagName];
+
+        const componentFactory = this.componentFactoryResolver
+          .resolveComponentFactory(interactionTagName);
         const componentRef = this.viewContainerRef.createComponent(
           componentFactory);
+
         let attributes = dom.body.firstElementChild.attributes;
 
-        for (let i = 0; i < attributes.length; i++) {
-          if (/[\])}[{(]/g.test(attributes[i].name)) {
+        Array.from(attributes).forEach(attribute => {
+          let attributeNameInCamelCase = this.camelCaseFromHyphen(
+            attribute.name);
+
+          let attributeValue = attribute.value;
+
+          // Properties enclosed with [] needs to be resolved from parent scope.
+          if (/[\])}[{(]/g.test(attribute.name)) {
             if (this.parentScope) {
-              componentRef.instance[
-                this.camelCaseFromHyphen(attributes[i].name)] =
-              this.parentScope[this.camelCaseFromHyphen(attributes[i].name)];
+              attributeValue = this.parentScope[attributeNameInCamelCase];
             } else {
-              componentRef.instance[
-                this.camelCaseFromHyphen(attributes[i].name)] = null;
+              attributeValue = null;
             }
           } else {
-            componentRef.instance[
-              this.camelCaseFromHyphen(attributes[i].name)] =
-              attributes[i].value;
-
             componentRef.location.nativeElement.setAttribute(
-              attributes[i].name, attributes[i].value);
+              attribute.name, attributeValue);
           }
-        }
+
+          componentRef.instance[attributeNameInCamelCase] = attributeValue;
+        });
 
         this.htmlDataIsInteraction = true;
+
         componentRef.changeDetectorRef.detectChanges();
         this.changeDetectorRef.detectChanges();
       }
