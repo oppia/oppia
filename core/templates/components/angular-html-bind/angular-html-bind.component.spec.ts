@@ -18,11 +18,9 @@
 
 import { ComponentFactoryResolver, ComponentRef, ViewContainerRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { InteractiveNumericExpressionInput } from 'interactions/NumericExpressionInput/directives/oppia-interactive-numeric-expression-input.component';
 import { AngularHtmlBindComponent } from './angular-html-bind.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Angular html bind', () => {
+describe('Angular html bind', () => {
   let fixture: ComponentFixture<AngularHtmlBindComponent>;
   let componentInstance: AngularHtmlBindComponent;
   let componentFactoryResolver: ComponentFactoryResolver;
