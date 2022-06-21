@@ -1911,6 +1911,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exploration.get_content_count(), 6)
 
+    def test_get_metadata(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        actual_metadata_dict = exploration.get_metadata().to_dict()
+        expected_metadata_dict = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
+            'param_specs': {},
+            'param_changes': [],
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
+            'edits_allowed': exploration.edits_allowed
+        }
+
+        self.assertEqual(actual_metadata_dict, expected_metadata_dict)
+
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
@@ -4310,7 +4333,145 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V54
+    YAML_CONTENT_V55 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 55
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 50
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V55
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -4443,7 +4604,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4547,7 +4708,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
@@ -4698,7 +4859,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4812,7 +4973,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
@@ -4925,7 +5086,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 54
+schema_version: 55
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5001,7 +5162,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 49
+states_schema_version: 50
 tags: []
 title: Title
 """)
@@ -10989,3 +11150,70 @@ class ExplorationChangesMergeabilityUnitTests(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
             self.assertEqual(expected_email_html_body_2, messages[1].html)
+
+
+class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_exploration_metadata_gets_created(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.update_param_specs({
+            'ExampleParamOne': (
+                param_domain.ParamSpec('UnicodeString').to_dict())
+        })
+        exploration.update_param_changes([
+            param_domain.ParamChange(
+                'ParamChange', 'RandomSelector', {
+                    'list_of_values': ['3', '4'],
+                    'parse_with_jinja': True
+                }
+            ),
+            param_domain.ParamChange(
+                'ParamChange', 'RandomSelector', {
+                    'list_of_values': ['5', '6'],
+                    'parse_with_jinja': True
+                }
+            )
+        ])
+        actual_metadata_dict = exp_domain.ExplorationMetadata(
+            exploration.title, exploration. category, exploration.objective,
+            exploration.language_code, exploration.tags, exploration.blurb,
+            exploration.author_notes, exploration.states_schema_version,
+            exploration.init_state_name, exploration.param_specs,
+            exploration.param_changes, exploration.auto_tts_enabled,
+            exploration.correctness_feedback_enabled, exploration.edits_allowed
+        ).to_dict()
+        expected_metadata_dict = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
+            'param_specs': {
+                'ExampleParamOne': (
+                    param_domain.ParamSpec('UnicodeString').to_dict())
+            },
+            'param_changes': [
+                param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['3', '4'],
+                        'parse_with_jinja': True
+                    }
+                ).to_dict(),
+                param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['5', '6'],
+                        'parse_with_jinja': True
+                    }
+                ).to_dict()
+            ],
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
+            'edits_allowed': exploration.edits_allowed
+        }
+
+        self.assertEqual(actual_metadata_dict, expected_metadata_dict)

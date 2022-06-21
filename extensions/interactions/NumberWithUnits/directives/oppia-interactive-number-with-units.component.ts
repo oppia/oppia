@@ -108,7 +108,7 @@ export class InteractiveNumberWithUnitsComponent
         this.numberWithUnitsObjectFactory.fromRawInputString(this.answer));
       // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit(
-        numberWithUnits as unknown as string,
+        numberWithUnits,
         this.numberWithUnitsRulesService as unknown as InteractionRulesService);
     } catch (parsingError) {
       this.errorMessageI18nKey = parsingError.message;
