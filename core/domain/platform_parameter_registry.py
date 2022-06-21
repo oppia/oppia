@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import feconf
 from core.domain import caching_services
 from core.domain import platform_parameter_domain
@@ -56,7 +58,7 @@ class Registry:
     @classmethod
     def create_platform_parameter(
         cls,
-        name: platform_parameter_list.PARAM_NAMES,
+        name: enum.Enum,
         description: str,
         data_type: platform_parameter_domain.DataTypes,
         is_feature: bool = False,
@@ -106,7 +108,7 @@ class Registry:
     @classmethod
     def create_feature_flag(
         cls,
-        name: platform_parameter_list.PARAM_NAMES,
+        name: enum.Enum,
         description: str,
         stage: platform_parameter_domain.FeatureStages
     ) -> platform_parameter_domain.PlatformParameter:

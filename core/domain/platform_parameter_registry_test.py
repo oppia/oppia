@@ -82,12 +82,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         })
 
     def test_create_platform_parameter(self) -> None:
-        # Here, the argument 'name' of create_platform_parameter() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument
-        # type' error. Thus to silent the error, we used ignore here.
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.BOOL)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'test', DataTypes.BOOL)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
@@ -98,11 +94,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             INVALID = 'invalid'
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Unsupported data type \'invalid\''):
-            # Here, the argument 'name' of create_platform_parameter()
-            # expecting PARAM_NAMES enum but for testing purposes here
-            # we are providing ParamNames enum. Due to this MyPy throws
-            # 'incompatible argument type' error. Thus to silent the error,
-            # we used ignore here.
+            # TODO(#13059): After we fully type the codebase we plan to get
+            # rid of the tests that intentionally test wrong inputs that we
+            # can normally catch by typing.
             registry.Registry.create_platform_parameter(
                 ParamNames.PARAMETER_A, 'test', DataType.INVALID)  # type: ignore[arg-type]
 
@@ -114,44 +108,28 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self._create_example_parameter_with_name(param_name)
 
     def test_create_feature_flag(self) -> None:
-        # Here, the argument 'name' of create_feature_flag() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument type'
-        # error. Thus to silent the error, we used ignore here.
         feature = registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'test feature', FeatureStages.DEV)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'test feature', FeatureStages.DEV)
         self.assertEqual(feature.data_type, DataTypes.BOOL.value)
         self.assertTrue(feature.is_feature)
         self.assertEqual(feature.feature_stage, FeatureStages.DEV.value)
         feature.validate()
 
     def test_default_value_of_bool_platform_parameter(self) -> None:
-        # Here, the argument 'name' of create_platform_parameter() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument type'
-        # error. Thus to silent the error, we used ignore here.
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)
         parameter.validate()
         self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self) -> None:
-        # Here, the argument 'name' of create_platform_parameter() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument type'
-        # error. Thus to silent the error, we used ignore here.
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.STRING)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'test', DataTypes.STRING)
         parameter.validate()
         self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_number_platform_parameter(self) -> None:
-        # Here, the argument 'name' of create_platform_parameter() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument type'
-        # error. Thus to silent the error, we used ignore here.
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)
         parameter.validate()
         self.assertEqual(parameter.default_value, 0)
 
@@ -268,12 +246,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         parameter_name = 'parameter_a'
-        # Here, the argument 'name' of create_feature_flag() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument type'
-        # error. Thus to silent the error, we used ignore here.
         registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -300,12 +274,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         parameter_name = 'parameter_a'
-        # Here, the argument 'name' of create_feature_flag() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument type'
-        # error. Thus to silent the error, we used ignore here.
         registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -332,12 +302,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         parameter_name = 'parameter_a'
-        # Here, the argument 'name' of create_feature_flag() expecting
-        # PARAM_NAMES enum but for testing purposes here we are providing
-        # ParamNames enum. Due to this MyPy throws 'incompatible argument type'
-        # error. Thus to silent the error, we used ignore here.
         registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)  # type: ignore[arg-type]
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
