@@ -11,7 +11,8 @@
              ng-click="$ctrl.onTabClick(tabName)"
              href=""
              class="oppia-opportunities-tabs-text protractor-test-<[tabName]>">
-            <[tabDetails.tabName]></a>
+            <[tabDetails.tabName]>
+          </a>
           <div class="oppia-active-tab-hilighter"></div>
         </li>
       </ul>
@@ -33,7 +34,7 @@
                 </span>
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
-                <div class="oppia-contributor-username-container" 
+                <div class="oppia-contributor-username-container"
                      data-tab-name="username">
                   <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
                   <span class="protractor-test-username"
@@ -270,9 +271,9 @@
     outline: 0;
   }
   .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+    align-items: center;
     color: #4a4a4a;
     display: flex;
-    align-items: center;
     font-size: 20px;
   }
   .oppia-collapsed-dashboard-language-container-label {
