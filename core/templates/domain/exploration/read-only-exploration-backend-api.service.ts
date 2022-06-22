@@ -26,6 +26,7 @@ import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFact
 import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
 
 export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
@@ -41,6 +42,7 @@ export interface ReadOnlyExplorationBackendDict {
 export interface FetchExplorationBackendResponse {
   'can_edit': boolean;
   'exploration': ReadOnlyExplorationBackendDict;
+  'exploration_metadata': ExplorationMetadataBackendDict;
   'exploration_id': string;
   'is_logged_in': boolean;
   'session_id': string;
