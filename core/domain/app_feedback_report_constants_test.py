@@ -24,5 +24,5 @@ from . import app_feedback_report_constants
 
 class AppFeedbackReportConstantsTests(test_utils.GenericTestBase):
 
-    def test_trivial(self):
+    def test_trivial(self) -> None:
         self.assertIsNotNone(app_feedback_report_constants.CATEGORY.__dict__)

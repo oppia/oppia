@@ -24,7 +24,7 @@ from . import takeout_domain
 
 class TakeoutDataTests(test_utils.GenericTestBase):
 
-    def test_that_domain_object_is_created_correctly(self):
+    def test_that_domain_object_is_created_correctly(self) -> None:
         user_data = {
                 'model_name': {
                     'property1': 'value1',
@@ -38,7 +38,7 @@ class TakeoutDataTests(test_utils.GenericTestBase):
 
 class TakeoutImageTests(test_utils.GenericTestBase):
 
-    def test_that_domain_object_is_created_correctly(self):
+    def test_that_domain_object_is_created_correctly(self) -> None:
         takeout_image_data = takeout_domain.TakeoutImage(
             'b64_fake_image_data', '/test/')
         self.assertEqual(
@@ -49,7 +49,7 @@ class TakeoutImageTests(test_utils.GenericTestBase):
 
 class TakeoutImageReplacementInstructionTests(test_utils.GenericTestBase):
 
-    def test_that_domain_object_is_created_correctly(self):
+    def test_that_domain_object_is_created_correctly(self) -> None:
         image_replacement_data = (
             takeout_domain.TakeoutImageReplacementInstruction(
                 ('exp1', 'exp2'), 'test', 'key1'))

@@ -25,7 +25,7 @@ from . import change_domain
 
 class ChangeDomainTests(test_utils.GenericTestBase):
 
-    def test_that_domain_object_is_created_correctly(self):
+    def test_that_domain_object_is_created_correctly(self) -> None:
         change_object = change_domain.BaseChange({
             'cmd': feconf.CMD_DELETE_COMMIT
         })
