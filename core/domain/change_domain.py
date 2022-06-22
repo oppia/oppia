@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict, List
+from typing import Dict, List, cast
 
 
 def validate_cmd(
@@ -261,4 +261,7 @@ class BaseChange:
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
-        pass
+        try:
+            return cast(self.__dict__[name], str)
+        except KeyError as e:
+            raise AttributeError(name) from e
