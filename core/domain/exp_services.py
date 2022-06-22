@@ -2082,7 +2082,7 @@ def update_logged_out_user_progress(
             checkpoint was most recently reached.
     """
     # Fetch the model associated with the unique_progress_url_id.
-    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get_by_id(
         unique_progress_url_id)
 
     # Create a model if it doesn't already exist.
@@ -2168,7 +2168,7 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
         TransientCheckpointUrlModel.
     """
     # Fetch the model associated with the unique_progress_url_id.
-    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get_by_id(
         unique_progress_url_id)
 
     if checkpoint_url_model is None:

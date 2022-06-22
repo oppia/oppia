@@ -476,7 +476,7 @@ def get_logged_out_user_progress(unique_progress_url_id: str):
         given unique_progress_url_id. If the model corresponding to given
         unique_progress_url_id is not found, return None.
     """
-    logged_out_user_progress_model = exp_models.TransientCheckpointUrlModel.get(
+    logged_out_user_progress_model = exp_models.TransientCheckpointUrlModel.get_by_id(
         unique_progress_url_id)
 
     if logged_out_user_progress_model is None:
