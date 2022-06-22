@@ -4,14 +4,16 @@
     "sourceType": "module"
   },
   "extends": [
-    "eslint:recommended"
+    "eslint:recommended",
+    "plugin:wdio/recommended"
   ],
   "plugins": [
     "angular",
     "html",
     "unused-imports",
     "@typescript-eslint",
-    "oppia"
+    "oppia",
+    "wdio"
   ],
   "overrides": [
     {
@@ -42,7 +44,9 @@
       "files": [
         "core/tests/protractor/*.js",
         "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js"
+        "core/tests/protractor_desktop/*.js",
+        "core/tests/webdriverio/*.js",
+        "core/tests/webdriverio_utils/*.js"
       ],
       "excludedFiles": [
         "ClassroomPage.js",
@@ -387,6 +391,8 @@
       }
     ],
     "unused-imports/no-unused-imports-ts": "error",
+    "wdio/no-debug": "error",
+    "wdio/no-pause": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
     "@typescript-eslint/ban-types": [

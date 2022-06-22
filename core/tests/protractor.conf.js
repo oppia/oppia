@@ -53,10 +53,6 @@ var suites = {
       'protractor_desktop/classroomPageFileUploadFeatures.js'
     ],
 
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
-
     contributorDashboard: [
       'protractor_desktop/contributorDashboard.js'
     ],
@@ -113,10 +109,6 @@ var suites = {
       'protractor_desktop/learnerDashboard.js'
     ],
 
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
-
     library: [
       'protractor/libraryFlow.js'
     ],
@@ -131,10 +123,6 @@ var suites = {
 
     preferences: [
       'protractor_desktop/preferences.js'
-    ],
-
-    profileFeatures: [
-      'protractor_desktop/profileFeatures.js'
     ],
 
     profileMenu: [

@@ -49,6 +49,7 @@ GENERATED_FILE_PATHS = (
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
+    'core/tests/wdio.conf.js',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
