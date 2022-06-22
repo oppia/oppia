@@ -143,7 +143,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         def mock_url_open(unused_url):
             self.check_function_calls['url_open_is_called'] = True
-            # The function is used as follows: python_utils.url_open(req).read()
+            # The function is used as follows: utils.url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
             temp_file = tempfile.NamedTemporaryFile()
