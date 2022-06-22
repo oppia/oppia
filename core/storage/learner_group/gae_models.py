@@ -30,10 +30,8 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
-    from mypy_imports import user_models
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -243,15 +241,17 @@ class LearnerGroupModel(base_models.BaseModel):
             # If the user is the facilitator of the group and there is
             # only one facilitator_user_id, delete the group.
             if user_id in learner_group_model.facilitator_user_ids and (
-                    len(learner_group_model.facilitator_user_ids) == 1):
+                len(learner_group_model.facilitator_user_ids) == 1
+            ):
                 learner_group_model.delete()
                 continue
 
             # If the user is the facilitator of the group and there are
             # more then one facilitator_user_ids, delete the user from the
             # facilitator_user_ids list.
-            elif user_id in learner_group_model.facilitator_user_ids and (
-                    len(learner_group_model.facilitator_user_ids) > 1):
+            if user_id in learner_group_model.facilitator_user_ids and (
+                len(learner_group_model.facilitator_user_ids) > 1
+            ):
                 learner_group_model.facilitator_user_ids.remove(user_id)
 
             # If the user is a student, delete the user from the
