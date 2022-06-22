@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick, flush, discardPeriodicTasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -345,15 +345,18 @@ describe('Exploration editor page component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should start editor tutorial when on main page', () => {
+    it('should start editor tutorial when on main page', fakeAsync(() => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
+
       rs.navigateToMainTab();
       $scope.$apply();
       mockOpenEditorTutorialEmitter.emit();
+      tick();
+
       expect(ctrl.startEditorTutorial).toHaveBeenCalled();
       expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
-    });
+    }));
 
     it('should start editor tutorial when not on main page', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
@@ -713,6 +716,9 @@ describe('Exploration editor page component', function() {
 
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
       expect(successCallback).toHaveBeenCalled();
+
+      flush();
+      discardPeriodicTasks();
     }));
 
     it('should start editor tutorial when closing welcome exploration' +

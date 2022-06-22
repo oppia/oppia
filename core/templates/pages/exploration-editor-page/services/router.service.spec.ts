@@ -109,7 +109,7 @@ describe('Router Service', () => {
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
-    let fadeOutSpy = spyOn($.fn, 'fadeOut').and.callFake(cb => {
+    spyOn($.fn, 'fadeOut').and.callFake(cb => {
       cb();
       setTimeout(() => {},);
       return null;
@@ -129,7 +129,6 @@ describe('Router Service', () => {
 
 
     expect(routerService.getActiveTabName()).toBe('main');
-    expect(fadeOutSpy).toHaveBeenCalled();
 
     flush();
     discardPeriodicTasks();
