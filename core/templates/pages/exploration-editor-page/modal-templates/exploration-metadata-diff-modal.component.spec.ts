@@ -120,9 +120,11 @@ describe('Exploration Metadata Diff Modal Component', () => {
       tick(201);
 
       expect(component.headers).toEqual(headers);
-      expect(component.newMetadata.toBackendDict()).toEqual(
+      expect(component.newMetadata).not.toBeNull();
+      expect(component.oldMetadata).not.toBeNull();
+      expect(component.newMetadata?.toBackendDict()).toEqual(
         newExplorationMetadataBackendDict);
-      expect(component.oldMetadata.toBackendDict()).toEqual(
+      expect(component.oldMetadata?.toBackendDict()).toEqual(
         oldExplorationMetadataBackendDict);
     }));
 

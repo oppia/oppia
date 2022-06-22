@@ -17,7 +17,7 @@
  * exploration versions.
  */
 
-import { OnInit } from '@angular/core';
+import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -42,9 +42,9 @@ interface mergeviewOptions {
 })
 export class ExplorationMetadataDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  oldMetadata: ExplorationMetadata | null;
-  newMetadata: ExplorationMetadata | null;
-  headers: headersAndYamlStrs;
+  @Input() oldMetadata: ExplorationMetadata | null;
+  @Input() newMetadata: ExplorationMetadata | null;
+  @Input() headers: headersAndYamlStrs;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: ''
