@@ -26,10 +26,10 @@ from typing import Iterator, Optional, Sequence
 
 # Do not import any Oppia modules here,
 # import them below the "install_third_party_libs.main()" line.
-from . import install_third_party_libs
+# from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build).
-install_third_party_libs.main()
+# install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

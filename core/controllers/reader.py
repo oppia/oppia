@@ -598,7 +598,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict']
+                            'options': ['int', 'basestring', 'dict', 'list']
                         }
                     }
                 },
@@ -621,7 +621,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             'answer': {
                 'schema': {
                     'type': 'weak_multiple',
-                    'options': ['int', 'basestring', 'dict']
+                    'options': ['int', 'basestring', 'dict', 'list']
                 }
             },
             'client_time_spent_in_secs': {
@@ -1044,7 +1044,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict']
+                            'options': ['int', 'basestring', 'dict', 'list']
                         }
                     }
                 }
@@ -1162,7 +1162,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict']
+                            'options': ['int', 'basestring', 'dict', 'list']
                         }
                     }
                 }
