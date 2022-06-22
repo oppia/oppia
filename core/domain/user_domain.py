@@ -1483,30 +1483,31 @@ class ExplorationUserData:
         }
 
 
-class LearnerGroupStudentDict(TypedDict):
-    """Dictionary for LearnerGroupStudent domain object."""
+class LearnerGroupsUserDict(TypedDict):
+    """Dictionary for LearnerGroupsUser domain object."""
 
     user_id: str
     invited_to_learner_groups_ids: List[str]
-    student_of_learner_groups_details: List[LearnerGroupStudentDetailsDict]
+    learner_groups_user_details: List[LearnerGroupUserDetailsDict]
+    learner_groups_user_details_schema_version: int
 
 
-class LearnerGroupStudentDetailsDict(TypedDict):
-    """Dictionary for student details of a particular learner group."""
+class LearnerGroupUserDetailsDict(TypedDict):
+    """Dictionary for user details of a particular learner group."""
 
     group_id: str
     progress_sharing_is_turned_on: bool
 
 
-class LearnerGroupStudentDetails:
-    """Domain object for student details of a particular learner group."""
+class LearnerGroupUserDetails:
+    """Domain object for user details of a particular learner group."""
 
     def __init__(
         self,
         group_id: str,
         progress_sharing_is_turned_on: bool
     ) -> None:
-        """Constructs a LearnerGroupStudentDetails domain object.
+        """Constructs a LearnerGroupUserDetails domain object.
 
         Attributes:
             group_id: str. The id of the learner group.
@@ -1516,12 +1517,12 @@ class LearnerGroupStudentDetails:
         self.group_id = group_id
         self.progress_sharing_is_turned_on = progress_sharing_is_turned_on
 
-    def to_dict(self) -> LearnerGroupStudentDetailsDict:
-        """Convert the LearnerGroupStudentDetails domain instance into a
+    def to_dict(self) -> LearnerGroupUserDetailsDict:
+        """Convert the LearnerGroupUserDetails domain instance into a
         dictionary form with its keys as the attributes of this class.
 
         Returns:
-            dict. A dictionary containing the LearnerGroupStudentDetails class
+            dict. A dictionary containing the LearnerGroupUserDetails class
             information in a dictionary form.
         """
 
@@ -1531,62 +1532,66 @@ class LearnerGroupStudentDetails:
         }
 
 
-class LearnerGroupStudent:
-    """Domain object for learner group student."""
+class LearnerGroupsUser:
+    """Domain object for learner groups user."""
 
     def __init__(
         self,
         user_id: str,
         invited_to_learner_groups_ids: List[str],
-        student_of_learner_groups_details: List[LearnerGroupStudentDetails]
+        learner_groups_user_details: List[LearnerGroupUserDetails],
+        learner_groups_user_details_schema_version: int
     ) -> None:
-        """Constructs a LearnerGroupStudent domain object.
+        """Constructs a LearnerGroupsUser domain object.
 
         Attributes:
             user_id: str. The user id.
             invited_to_learner_groups_ids: list(str). List of learner group ids
                 that the user has been invited to join as student.
-            student_of_learner_groups_details:
-                list(LearnerGroupStudentDetails). List of student details of
+            learner_groups_user_details:
+                list(LearnerGroupUserDetails). List of user details of
                 all learner groups that the user is student of.
+            learner_groups_user_details_schema_version: int. The version
+                of the learner groups user details schema blob.
         """
         self.user_id = user_id
         self.invited_to_learner_groups_ids = invited_to_learner_groups_ids
-        self.student_of_learner_groups_details = (
-            student_of_learner_groups_details)
+        self.learner_groups_user_details = learner_groups_user_details
+        self.learner_groups_user_details_schema_version = (
+            learner_groups_user_details_schema_version)
 
-    def to_dict(self) -> LearnerGroupStudentDict:
-        """Convert the LearnerGroupStudent domain instance into a dictionary
+    def to_dict(self) -> LearnerGroupsUserDict:
+        """Convert the LearnerGroupsUser domain instance into a dictionary
         form with its keys as the attributes of this class.
 
         Returns:
-            dict. A dictionary containing the LearnerGroupStudent class
+            dict. A dictionary containing the LearnerGroupsUser class
             information in a dictionary form.
         """
 
-        student_of_learner_groups_details_dict = [
+        learner_groups_user_details_dict = [
             learner_group_details.to_dict()
-            for learner_group_details in (
-                self.student_of_learner_groups_details)
+            for learner_group_details in self.learner_groups_user_details
         ]
 
         return {
             'user_id': self.user_id,
             'invited_to_learner_groups_ids':
                 self.invited_to_learner_groups_ids,
-            'student_of_learner_groups_details':
-                student_of_learner_groups_details_dict
+            'learner_groups_user_details': learner_groups_user_details_dict,
+            'learner_groups_user_details_schema_version': (
+                self.learner_groups_user_details_schema_version)
         }
 
     def validate(self) -> None:
-        """Validates the LearnerGroupStudent domain object.
+        """Validates the LearnerGroupsUser domain object.
 
         Raises:
-            ValidationError. One or more attributes of the LearnerGroupStudent
+            ValidationError. One or more attributes of the LearnerGroupsUser
                 are invalid.
         """
 
-        for learner_group_details in self.student_of_learner_groups_details:
+        for learner_group_details in self.learner_groups_user_details:
             if learner_group_details.group_id in (
                     self.invited_to_learner_groups_ids):
                 raise utils.ValidationError(

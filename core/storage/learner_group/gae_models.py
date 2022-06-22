@@ -23,7 +23,7 @@ import string
 
 from core.platform import models
 
-from typing import Dict, List
+from typing import Dict, List, Union
 from typing_extensions import Literal
 
 MYPY = False
@@ -161,7 +161,8 @@ class LearnerGroupModel(base_models.BaseModel):
         }
 
     @classmethod
-    def export_data(cls, user_id: str) -> Dict[str, Dict[str, List[str]]]:
+    def export_data(cls, user_id: str) -> Dict[
+        str, Dict[str, Union[str, List[str]]]]:
         """Takeout: Export LearnerGroupModel user-based properties.
 
         Args:
@@ -285,7 +286,7 @@ class LearnerGroupModel(base_models.BaseModel):
         # future implementation of users getting notified should be added here.
         # Remove references of the group from all related learner
         # group user models.
-        user_models.LearnerGroupStudentModel.delete_learner_group_references(
+        user_models.LearnerGroupsUserModel.delete_learner_group_references(
             learner_group_model.id, referenced_user_ids)
 
         learner_group_model.delete()

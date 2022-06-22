@@ -401,7 +401,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         19) Simulates user_1 scrubbing a report.
         20) Creates new BlogPostModel and BlogPostRightsModel.
         21) Creates a TranslationContributionStatsModel.
-        22) Creates new LearnerGroupModel and LearnerGroupStudentModel.
+        22) Creates new LearnerGroupModel and LearnerGroupsUserModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -878,18 +878,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         learner_group_model.update_timestamps()
         learner_group_model.put()
 
-        learner_grp_student_model = user_models.LearnerGroupStudentModel(
+        learner_grp_user_model = user_models.LearnerGroupsUserModel(
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['group_id_1'],
-            student_of_learner_groups_details=[
+            learner_groups_user_details=[
                 {
                     'group_id': 'group_id_2',
                     'progress_sharing_is_turned_on': False
                 }
-            ]
+            ],
+            learner_groups_user_details_schema_version=1
         )
-        learner_grp_student_model.update_timestamps()
-        learner_grp_student_model.put()
+        learner_grp_user_model.update_timestamps()
+        learner_grp_user_model.put()
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
@@ -1010,7 +1011,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'editable_blog_post_ids': []
         }
         expected_learner_group_model_data = {}
-        expected_learner_grp_student_model_data = {}
+        expected_learner_grp_user_model_data = {}
 
         expected_user_data = {
             'app_feedback_report': app_feedback_report,
@@ -1028,7 +1029,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_goals': learner_goals_data,
             'learner_playlist': learner_playlist_data,
             'learner_group': expected_learner_group_model_data,
-            'learner_group_student': expected_learner_grp_student_model_data,
+            'learner_groups_user': expected_learner_grp_user_model_data,
             'task_entry': task_entry_data,
             'topic_rights': topic_rights_data,
             'collection_progress': collection_progress_data,
@@ -1654,9 +1655,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['skill_id_1', 'skill_id_2']
         }
-        expected_learner_group_student_data = {
+        expected_learner_groups_user_data = {
             'invited_to_learner_groups_ids': ['group_id_1'],
-            'student_of_learner_groups_details': [
+            'learner_groups_user_details': [
                 {
                     'group_id': 'group_id_2',
                     'progress_sharing_is_turned_on': False
@@ -1702,7 +1703,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_goals': expected_learner_goals_data,
             'learner_playlist': expected_learner_playlist_data,
             'learner_group': expected_learner_group_data,
-            'learner_group_student': expected_learner_group_student_data,
+            'learner_groups_user': expected_learner_groups_user_data,
             'task_entry': expected_task_entry_data,
             'topic_rights': expected_topic_data,
             'collection_progress': expected_collection_progress_data,

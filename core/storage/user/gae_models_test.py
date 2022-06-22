@@ -3316,8 +3316,8 @@ class DeletedUsernameModelTests(test_utils.GenericTestBase):
         )
 
 
-class LearnerGroupStudentModelTests(test_utils.GenericTestBase):
-    """Tests for LearnerGroupStudentModel."""
+class LearnerGroupsUserModelTests(test_utils.GenericTestBase):
+    """Tests for LearnerGroupsUserModel."""
 
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
@@ -3325,27 +3325,27 @@ class LearnerGroupStudentModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            user_models.LearnerGroupStudentModel.get_deletion_policy(),
+            user_models.LearnerGroupsUserModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertFalse(
-            user_models.LearnerGroupStudentModel
+            user_models.LearnerGroupsUserModel
             .has_reference_to_user_id(self.USER_ID_1)
         )
         self.assertFalse(
-            user_models.LearnerGroupStudentModel
+            user_models.LearnerGroupsUserModel
             .has_reference_to_user_id(self.USER_ID_2)
         )
         self.assertFalse(
-            user_models.LearnerGroupStudentModel
+            user_models.LearnerGroupsUserModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-        user_models.LearnerGroupStudentModel(
+        user_models.LearnerGroupsUserModel(
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['group_id_1', 'group_id_2'],
-            student_of_learner_groups_details=[
+            learner_groups_user_details=[
                 {
                     'group_id': 'group_id_3',
                     'progress_sharing_is_turned_on': False
@@ -3355,10 +3355,10 @@ class LearnerGroupStudentModelTests(test_utils.GenericTestBase):
                     'progress_sharing_is_turned_on': True
                 }
             ]).put()
-        user_models.LearnerGroupStudentModel(
+        user_models.LearnerGroupsUserModel(
             id=self.USER_ID_2,
             invited_to_learner_groups_ids=['group_id_1', 'group_id_1'],
-            student_of_learner_groups_details=[
+            learner_groups_user_details=[
                 {
                     'group_id': 'group_id_3',
                     'progress_sharing_is_turned_on': False
@@ -3370,29 +3370,28 @@ class LearnerGroupStudentModelTests(test_utils.GenericTestBase):
             ]).put()
 
         self.assertTrue(
-            user_models.LearnerGroupStudentModel
+            user_models.LearnerGroupsUserModel
             .has_reference_to_user_id(self.USER_ID_1)
         )
         self.assertTrue(
-            user_models.LearnerGroupStudentModel
+            user_models.LearnerGroupsUserModel
             .has_reference_to_user_id(self.USER_ID_2)
         )
         self.assertFalse(
-            user_models.LearnerGroupStudentModel
+            user_models.LearnerGroupsUserModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
     def test_export_data_trivial(self) -> None:
-        user_data = user_models.LearnerGroupStudentModel.export_data(
+        user_data = user_models.LearnerGroupsUserModel.export_data(
             self.USER_ID_1)
-        expected_data: Dict[
-            str, Union[List[str], List[Dict[str, object]], None]] = {}
+        expected_data: user_models.LearnerGroupsUserDataDict
         self.assertEqual(user_data, expected_data)
 
-        user_models.LearnerGroupStudentModel(
+        user_models.LearnerGroupsUserModel(
             id=self.USER_ID_1,
             invited_to_learner_groups_ids=['group_id_1', 'group_id_2'],
-            student_of_learner_groups_details=[
+            learner_groups_user_details=[
                 {
                     'group_id': 'group_id_3',
                     'progress_sharing_is_turned_on': False
@@ -3403,11 +3402,11 @@ class LearnerGroupStudentModelTests(test_utils.GenericTestBase):
                 }
             ]).put()
 
-        user_data = user_models.LearnerGroupStudentModel.export_data(
+        user_data = user_models.LearnerGroupsUserModel.export_data(
             self.USER_ID_1)
         expected_data = {
             'invited_to_learner_groups_ids': ['group_id_1', 'group_id_2'],
-            'student_of_learner_groups_details': [
+            'learner_groups_user_details': [
                 {
                     'group_id': 'group_id_3',
                     'progress_sharing_is_turned_on': False
@@ -3422,41 +3421,43 @@ class LearnerGroupStudentModelTests(test_utils.GenericTestBase):
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            user_models.LearnerGroupStudentModel.
+            user_models.LearnerGroupsUserModel.
                 get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
 
     def test_get_export_policy(self) -> None:
         self.assertEqual(
-            user_models.LearnerGroupStudentModel.get_export_policy(), {
+            user_models.LearnerGroupsUserModel.get_export_policy(), {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'invited_to_learner_groups_ids':
                     base_models.EXPORT_POLICY.EXPORTED,
-                'student_of_learner_groups_details':
+                'learner_groups_user_details':
                     base_models.EXPORT_POLICY.EXPORTED,
+                'learner_groups_user_details_schema_version':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
 
     def test_apply_deletion_policy(self) -> None:
-        user_models.LearnerGroupStudentModel.apply_deletion_policy(
+        user_models.LearnerGroupsUserModel.apply_deletion_policy(
             self.USER_ID_1)
         self.assertFalse(
-            user_models.LearnerGroupStudentModel.has_reference_to_user_id(
+            user_models.LearnerGroupsUserModel.has_reference_to_user_id(
                 self.USER_ID_1)
         )
         # Check if passing a non-existent user_id does not fail.
-        user_models.LearnerGroupStudentModel.apply_deletion_policy(
+        user_models.LearnerGroupsUserModel.apply_deletion_policy(
             'fake_user_id')
 
     def test_delete_learner_group_references(self) -> None:
         """Test delete_learner_group_references function."""
 
-        user_models.LearnerGroupStudentModel(
+        user_models.LearnerGroupsUserModel(
             id='user_34',
             invited_to_learner_groups_ids=['group_id_1', 'group_id_2'],
-            student_of_learner_groups_details=[
+            learner_groups_user_details=[
                 {
                     'group_id': 'group_id_3',
                     'progress_sharing_is_turned_on': False
@@ -3467,19 +3468,19 @@ class LearnerGroupStudentModelTests(test_utils.GenericTestBase):
                 }
             ]).put()
 
-        # Delete reference for a group id in student_of_learner_groups_details.
-        user_models.LearnerGroupStudentModel.delete_learner_group_references(
+        # Delete reference for a group id in learner_groups_user_details.
+        user_models.LearnerGroupsUserModel.delete_learner_group_references(
             'group_id_3', ['user_34'])
 
         # Delete reference for a group id in invited_to_learner_groups_ids.
-        user_models.LearnerGroupStudentModel.delete_learner_group_references(
+        user_models.LearnerGroupsUserModel.delete_learner_group_references(
             'group_id_1', ['user_34'])
 
-        user_data = user_models.LearnerGroupStudentModel.export_data(
+        user_data = user_models.LearnerGroupsUserModel.export_data(
             'user_34')
         expected_data = {
             'invited_to_learner_groups_ids': ['group_id_2'],
-            'student_of_learner_groups_details': [
+            'learner_groups_user_details': [
                 {
                     'group_id': 'group_id_4',
                     'progress_sharing_is_turned_on': True

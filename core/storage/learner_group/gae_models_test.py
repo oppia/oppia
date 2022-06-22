@@ -130,6 +130,15 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_group_model_instance.description, 'description')
 
+    def test_get_field_names_for_takeout(self) -> None:
+        expected_results = {
+            'facilitator_user_ids': 'role_in_group',
+        }
+        self.assertEqual(
+            learner_group_models.LearnerGroupModel
+            .get_field_names_for_takeout(),
+            expected_results)
+
     def test_export_data_on_students(self) -> None:
         """Test export data on users that are students of the learner group."""
 
