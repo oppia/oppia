@@ -89,12 +89,12 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="!showMoreInSection['incomplete']">
-            <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="showMoreInSection['incomplete']">
-            <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
@@ -159,12 +159,12 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="!showMoreInSection['completed']">
-            <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="showMoreInSection['completed']">
-            <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
@@ -343,12 +343,12 @@
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="!showMoreInSection['playlist']">
-          <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+          <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
         </button>
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="showMoreInSection['playlist']">
-          <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+          <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
         </button>
       </div>
     </div>
@@ -381,12 +381,12 @@
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="!showMoreInSection['subscription'] && !windowIsNarrow">
-        <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+        <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
       </button>
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="showMoreInSection['subscription'] && !windowIsNarrow">
-        <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+        <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
       </button>
     </div>
   </div>
