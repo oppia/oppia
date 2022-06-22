@@ -42,9 +42,15 @@ interface mergeviewOptions {
 })
 export class ExplorationMetadataDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() oldMetadata: ExplorationMetadata | null;
-  @Input() newMetadata: ExplorationMetadata | null;
-  @Input() headers: headersAndYamlStrs;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
+  // The following properties will be null when there is no change introduced
+  // in either of the state. It remains same as original State.
+  @Input() oldMetadata!: ExplorationMetadata | null;
+  @Input() newMetadata!: ExplorationMetadata | null;
+  @Input() headers!: headersAndYamlStrs;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: ''
