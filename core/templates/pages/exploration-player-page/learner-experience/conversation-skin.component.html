@@ -20,7 +20,8 @@
                         [explorationIsInPreviewMode]="isInPreviewMode"
                         [isRefresherExploration]="isRefresherExploration"
                         [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                        [parentExplorationIds]="parentExplorationIds">
+                        [parentExplorationIds]="parentExplorationIds"
+                        [inStoryMode]="inStoryMode">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
