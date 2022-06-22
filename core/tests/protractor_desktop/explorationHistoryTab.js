@@ -104,7 +104,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       4: {
-        text: '  content_id: content',
+        text: '  content_id: content_0',
         highlighted: false
       },
       5: {
@@ -142,7 +142,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       13: {
-        text: '      content_id: default_outcome',
+        text: '      content_id: default_outcome_1',
         highlighted: false
       },
       14: {
@@ -182,50 +182,30 @@ describe('Exploration history', function() {
         highlighted: false
       },
       23: {
-        text: 'next_content_id_index: 0',
-        highlighted: true
-      },
-      24: {
         text: 'param_changes: []',
         highlighted: false
       },
-      25: {
+      24: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      26: {
+      25: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      27: {
-        text: '    content: {}',
+      26: {
+        text: '    content_0: {}',
         highlighted: false
       },
-      28: {
-        text: '    default_outcome: {}',
+      27: {
+        text: '    default_outcome_1: {}',
         highlighted: true
       },
-      29: {
+      28: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      30: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      31: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      32: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      33: {
-        text: '    default_outcome: {}',
-        highlighted: true
-      },
-      34: {
+      29: {
         text: '',
         highlighted: false
       }
@@ -245,7 +225,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       4: {
-        text: '  content_id: content',
+        text: '  content_id: content_0',
         highlighted: false
       },
       5: {
@@ -273,7 +253,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       11: {
-        text: '        content_id: feedback_1',
+        text: '        content_id: feedback_2',
         highlighted: true
       },
       12: {
@@ -349,7 +329,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       30: {
-        text: '      content_id: default_outcome',
+        text: '      content_id: default_outcome_1',
         highlighted: false
       },
       31: {
@@ -389,58 +369,34 @@ describe('Exploration history', function() {
         highlighted: false
       },
       40: {
-        text: 'next_content_id_index: 2',
-        highlighted: true
-      },
-      41: {
         text: 'param_changes: []',
         highlighted: false
       },
-      42: {
+      41: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      43: {
+      42: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
+      43: {
+        text: '    content_0: {}',
+        highlighted: false
+      },
       44: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      45: {
-        text: '    default_outcome: {}',
-        highlighted: false
-      },
-      46: {
-        text: '    feedback_1: {}',
+        text: '    default_outcome_1: {}',
         highlighted: true
       },
-      47: {
+      45: {
+        text: '    feedback_2: {}',
+        highlighted: true
+      },
+      46: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      48: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      49: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      50: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      51: {
-        text: '    default_outcome: {}',
-        highlighted: true
-      },
-      52: {
-        text: '    feedback_1: {}',
-        highlighted: true
-      },
-      53: {
+      47: {
         text: '',
         highlighted: false
       }
@@ -450,7 +406,7 @@ describe('Exploration history', function() {
       'card_is_checkpoint: false\n' +
       'classifier_model_id: null\n' +
       'content:\n' +
-      '  content_id: content\n' +
+      '  content_id: content_3\n' +
       '  html: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
@@ -458,12 +414,12 @@ describe('Exploration history', function() {
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value:\n' +
-      '        content_id: ca_buttonText_0\n' +
+      '        content_id: customization_arg_buttonText_5\n' +
       '        unicode_str: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    feedback:\n' +
-      '      content_id: default_outcome\n' +
+      '      content_id: default_outcome_4\n' +
       '      html: \'\'\n' +
       '    labelled_as_correct: false\n' +
       '    missing_prerequisite_skill_id: null\n' +
@@ -473,19 +429,13 @@ describe('Exploration history', function() {
       '  id: Continue\n' +
       '  solution: null\n' +
       'linked_skill_id: null\n' +
-      'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
       '  voiceovers_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
-      '    content: {}\n' +
-      '    default_outcome: {}\n' +
+      '    content_3: {}\n' +
+      '    customization_arg_buttonText_5: {}\n' +
+      '    default_outcome_4: {}\n' +
       'solicit_answer_details: false\n' +
-      'written_translations:\n' +
-      '  translations_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
-      '    content: {}\n' +
-      '    default_outcome: {}\n' +
       '';
 
     var expectedHistoryStates = [{
@@ -586,7 +536,7 @@ describe('Exploration history', function() {
       color: COLOR_CHANGED
     }, {
       label: 'second',
-      color: COLOR_UNCHANGED
+      color: COLOR_CHANGED
     }, {
       label: 'final card',
       color: COLOR_UNCHANGED

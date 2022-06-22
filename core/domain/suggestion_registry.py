@@ -862,7 +862,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             self.change.question_dict['question_state_data_schema_version'],
             self.change.question_dict['language_code'], None,
             self.change.question_dict['linked_skill_ids'],
-            self.change.question_dict['inapplicable_skill_misconception_ids'])
+            self.change.question_dict['inapplicable_skill_misconception_ids'],
+            self.change.question_dict['next_content_id_index'])
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
         if question_state_data_schema_version != (
