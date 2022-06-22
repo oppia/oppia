@@ -267,6 +267,7 @@ describe('Read only exploration backend API service', () => {
     expect(successHandler).toHaveBeenCalledWith({
       can_edit: true,
       exploration: null,
+      exploration_metadata: null,
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',
