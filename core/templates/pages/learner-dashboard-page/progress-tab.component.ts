@@ -33,22 +33,25 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
  })
 export class ProgressTabComponent implements OnInit {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
-  @Input() completedStoriesList: StorySummary[];
-  @Input() partiallyLearntTopicsList: LearnerTopicSummary[] = [];
-  @Input() activeSubsection?: string;
-  @Input() learntTopicsList: LearnerTopicSummary[] = [];
-  topicsInSkillProficiency: LearnerTopicSummary[] = [];
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() completedStoriesList!: StorySummary[];
+  @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
+  @Input() activeSubsection!: string;
+  @Input() learntTopicsList!: LearnerTopicSummary[];
+  width!: number;
+  displaySkills!: boolean[];
+  goldBadgeImageUrl!: string;
+  bronzeBadgeImageUrl!: string;
+  silverBadgeImageUrl!: string;
+  emptyBadgeImageUrl!: string;
+  topicsInSkillProficiency!: LearnerTopicSummary[];
+  subtopicMastery!: Record<string, SubtopicMasterySummaryBackendDict>;
+  topicIdsInSkillProficiency!: string[];
+  topicMastery!: [number, LearnerTopicSummary][];
   emptySkillProficiency: boolean = true;
-  displaySkills: boolean[];
   widthConst: number = 233;
-  subtopicMastery: Record<string, SubtopicMasterySummaryBackendDict> = {};
-  topicIdsInSkillProficiency: string[] = [];
-  goldBadgeImageUrl: string = '';
-  bronzeBadgeImageUrl: string = '';
-  silverBadgeImageUrl: string = '';
-  emptyBadgeImageUrl: string = '';
-  topicMastery: [number, LearnerTopicSummary][] = [];
-  width: number;
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
 

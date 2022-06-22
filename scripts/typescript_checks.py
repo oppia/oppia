@@ -23,13 +23,16 @@ import shutil
 import subprocess
 import sys
 
-from core import utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import Optional, Sequence
+from core import utils # isort:skip
 
-import yaml
+import yaml # isort:skip
 
-from . import common
+from typing import List, Optional, Sequence  # isort:skip
 
 # Contains the name of all files that are not strictly typed.
 # This list must be kept up-to-date; the changes (only remove) should be done
@@ -38,7 +41,7 @@ from . import common
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @vojtechjelinek first.
 # pylint: disable=line-too-long, single-line-pragma
-NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
+TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/App.ts',
     'core/templates/AppSpec.ts',
     'core/templates/Polyfills.ts',
@@ -193,6 +196,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/domain/collection/collection-update.service.ts',
     'core/templates/domain/collection/editable-collection-backend-api.service.spec.ts',
     'core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts',
+    # 'core/templates/domain/exploration/ExplorationMetadataObjectFactory.ts',
     'core/templates/domain/exploration/StatesObjectFactorySpec.ts',
     'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
     'core/templates/domain/exploration/param-metadata.model.spec.ts',
@@ -205,12 +209,12 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/domain/question/question-update.service.ts',
     'core/templates/domain/skill/skill-update.service.spec.ts',
     'core/templates/domain/skill/skill-update.service.ts',
-    'core/templates/domain/state_card/state-card.model.spec.ts',
-    # 'core/templates/domain/statistics/learner-answer-info.model.ts',
+    # 'core/templates/domain/state_card/state-card.model.spec.ts',
+    'core/templates/domain/statistics/learner-answer-info.model.ts',
     'core/templates/domain/topic/SubtopicPage.model.spec.ts',
-    'core/templates/domain/topic/learner-topic-summary.model.spec.ts',
-    'core/templates/domain/topic/newly-created-story.model.spec.ts',
-    'core/templates/domain/topic/topic-rights.model.spec.ts',
+    # 'core/templates/domain/topic/learner-topic-summary.model.spec.ts',
+    # 'core/templates/domain/topic/newly-created-story.model.spec.ts',
+    # 'core/templates/domain/topic/topic-rights.model.spec.ts',
     'core/templates/domain/topic/topic-update.service.spec.ts',
     'core/templates/domain/topic/topic-update.service.ts',
     'core/templates/filters/convert-html-to-unicode.filter.spec.ts',
@@ -224,7 +228,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/filters/format-timer.pipe.ts',
     'core/templates/filters/parameterize-rule-description.filter.spec.ts',
     'core/templates/filters/parameterize-rule-description.filter.ts',
-    'core/templates/filters/remove-duplicates-in-array.pipe.spec.ts',
+    # 'core/templates/filters/remove-duplicates-in-array.pipe.spec.ts',
     'core/templates/filters/string-utility-filters/camel-case-to-hyphens.filter.spec.ts',
     'core/templates/filters/string-utility-filters/camel-case-to-hyphens.filter.ts',
     'core/templates/filters/string-utility-filters/capitalize.filter.spec.ts',
@@ -232,25 +236,25 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/filters/string-utility-filters/convert-to-plain-text.filter.ts',
     'core/templates/filters/string-utility-filters/get-abbreviated-text.filter.spec.ts',
     'core/templates/filters/string-utility-filters/get-abbreviated-text.filter.ts',
-    'core/templates/filters/string-utility-filters/get-abbreviated-text.pipe.spec.ts',
+    # 'core/templates/filters/string-utility-filters/get-abbreviated-text.pipe.spec.ts',
     'core/templates/filters/string-utility-filters/normalize-whitespace-punctuation-and-case.filter.ts',
     'core/templates/filters/string-utility-filters/normalize-whitespace.filter.spec.ts',
     'core/templates/filters/string-utility-filters/normalize-whitespace.filter.ts',
     'core/templates/filters/string-utility-filters/replace-inputs-with-ellipses.filter.spec.ts',
     'core/templates/filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts',
-    'core/templates/filters/string-utility-filters/replace-inputs-with-ellipses.pipe.spec.ts',
+    # 'core/templates/filters/string-utility-filters/replace-inputs-with-ellipses.pipe.spec.ts',
     'core/templates/filters/string-utility-filters/truncate-and-capitalize.filter.spec.ts',
     'core/templates/filters/string-utility-filters/truncate-and-capitalize.filter.ts',
     'core/templates/filters/string-utility-filters/truncate-at-first-ellipsis.filter.spec.ts',
     'core/templates/filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts',
-    'core/templates/filters/string-utility-filters/truncate-at-first-ellipsis.pipe.spec.ts',
+    # 'core/templates/filters/string-utility-filters/truncate-at-first-ellipsis.pipe.spec.ts',
     'core/templates/filters/string-utility-filters/truncate-at-first-line.filter.spec.ts',
     'core/templates/filters/string-utility-filters/truncate-at-first-line.filter.ts',
     'core/templates/filters/string-utility-filters/truncate.filter.spec.ts',
     'core/templates/filters/string-utility-filters/truncate.filter.ts',
     'core/templates/filters/string-utility-filters/underscores-to-camel-case.filter.spec.ts',
     'core/templates/filters/string-utility-filters/underscores-to-camel-case.filter.ts',
-    'core/templates/filters/string-utility-filters/underscores-to-camel-case.pipe.spec.ts',
+    # 'core/templates/filters/string-utility-filters/underscores-to-camel-case.pipe.spec.ts',
     'core/templates/filters/string-utility-filters/wrap-text-with-ellipsis.filter.spec.ts',
     'core/templates/filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts',
     'core/templates/filters/summarize-nonnegative-number.filter.spec.ts',
@@ -286,17 +290,17 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/collection-editor-page/settings-tab/collection-details-editor.component.spec.ts',
     'core/templates/pages/collection-editor-page/settings-tab/collection-details-editor.component.ts',
     'core/templates/pages/collection-editor-page/settings-tab/collection-permissions-card.component.ts',
-    'core/templates/pages/collection-player-page/collection-local-nav/collection-local-nav.component.ts',
-    'core/templates/pages/collection-player-page/collection-navbar/collection-navbar.component.ts',
-    'core/templates/pages/collection-player-page/collection-node-list/collection-node-list.component.ts',
+    # 'core/templates/pages/collection-player-page/collection-local-nav/collection-local-nav.component.ts',
+    # 'core/templates/pages/collection-player-page/collection-navbar/collection-navbar.component.ts',
+    # 'core/templates/pages/collection-player-page/collection-node-list/collection-node-list.component.ts',
     'core/templates/pages/collection-player-page/collection-player-page.component.spec.ts',
     'core/templates/pages/collection-player-page/collection-player-page.component.ts',
     'core/templates/pages/collection-player-page/collection-player-page.import.ts',
     'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.spec.ts',
     'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.ts',
     'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.import.ts',
-    'core/templates/pages/contributor-dashboard-admin-page/navbar/contributor-dashboard-admin-navbar.component.ts',
-    'core/templates/pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service.spec.ts',
+    # 'core/templates/pages/contributor-dashboard-admin-page/navbar/contributor-dashboard-admin-navbar.component.ts',
+    # 'core/templates/pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.ts',
     'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.component.spec.ts',
@@ -314,14 +318,14 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.spec.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
     'core/templates/pages/contributor-dashboard-page/translation-opportunities/translation-opportunities.component.spec.ts',
-    'core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts',
-    'core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.ts',
+    # 'core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts',
+    # 'core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.ts',
     'core/templates/pages/creator-dashboard-page/creator-dashboard-page.import.ts',
-    'core/templates/pages/donate-page/donate-page.component.spec.ts',
-    'core/templates/pages/error-pages/error-page-root.component.ts',
-    'core/templates/pages/error-pages/error-page.component.ts',
+    # 'core/templates/pages/donate-page/donate-page.component.spec.ts',
+    # 'core/templates/pages/error-pages/error-page-root.component.ts',
+    # 'core/templates/pages/error-pages/error-page.component.ts',
     'core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.ts',
+    # 'core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.ts',
     'core/templates/pages/exploration-editor-page/editor-navigation/editor-navbar-breadcrumb.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-navigation/editor-navbar-breadcrumb.component.ts',
     'core/templates/pages/exploration-editor-page/editor-navigation/editor-navigation.component.spec.ts',
@@ -425,7 +429,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/exploration-editor-page/services/user-email-preferences.service.ts',
     'core/templates/pages/exploration-editor-page/settings-tab/settings-tab.component.spec.ts',
     'core/templates/pages/exploration-editor-page/settings-tab/settings-tab.component.ts',
-    'core/templates/pages/exploration-editor-page/settings-tab/templates/moderator-unpublish-exploration-modal.component.ts',
+    # 'core/templates/pages/exploration-editor-page/settings-tab/templates/moderator-unpublish-exploration-modal.component.ts',
     'core/templates/pages/exploration-editor-page/settings-tab/templates/preview-summary-tile-modal.component.ts',
     'core/templates/pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.spec.ts',
     'core/templates/pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts',
@@ -439,8 +443,8 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/exploration-editor-page/translation-tab/audio-translation-bar/audio-translation-bar.directive.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/modal-templates/add-audio-translation-modal.controller.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/modal-templates/add-audio-translation-modal.controller.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/modal-templates/translation-tab-busy-modal.component.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component.ts',
+    # 'core/templates/pages/exploration-editor-page/translation-tab/modal-templates/translation-tab-busy-modal.component.ts',
+    # 'core/templates/pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-status.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-status.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
@@ -477,9 +481,9 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.ts',
     'core/templates/pages/exploration-player-page/learner-experience/tutor-card.component.spec.ts',
     'core/templates/pages/exploration-player-page/learner-experience/tutor-card.component.ts',
-    'core/templates/pages/exploration-player-page/modals/display-hint-modal.component.spec.ts',
-    'core/templates/pages/exploration-player-page/modals/display-hint-modal.component.ts',
-    'core/templates/pages/exploration-player-page/modals/flag-exploration-modal.component.ts',
+    # 'core/templates/pages/exploration-player-page/modals/display-hint-modal.component.spec.ts',
+    # 'core/templates/pages/exploration-player-page/modals/display-hint-modal.component.ts',
+    # 'core/templates/pages/exploration-player-page/modals/flag-exploration-modal.component.ts',
     'core/templates/pages/exploration-player-page/modals/refresher-exploration-confirmation-modal.component.ts',
     'core/templates/pages/exploration-player-page/services/answer-classification.service.spec.ts',
     'core/templates/pages/exploration-player-page/services/exploration-engine.service.spec.ts',
@@ -500,21 +504,21 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.ts',
     'core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts',
     'core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.ts',
-    'core/templates/pages/learner-dashboard-page/community-lessons-tab.component.spec.ts',
-    'core/templates/pages/learner-dashboard-page/community-lessons-tab.component.ts',
-    'core/templates/pages/learner-dashboard-page/goals-tab.component.spec.ts',
-    'core/templates/pages/learner-dashboard-page/goals-tab.component.ts',
-    'core/templates/pages/learner-dashboard-page/home-tab.component.ts',
+    # 'core/templates/pages/learner-dashboard-page/community-lessons-tab.component.spec.ts',
+    # 'core/templates/pages/learner-dashboard-page/community-lessons-tab.component.ts',
+    # 'core/templates/pages/learner-dashboard-page/goals-tab.component.spec.ts',
+    # 'core/templates/pages/learner-dashboard-page/goals-tab.component.ts',
+    # 'core/templates/pages/learner-dashboard-page/home-tab.component.ts',
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.spec.ts',
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.ts',
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.import.ts',
-    'core/templates/pages/learner-dashboard-page/progress-tab.component.spec.ts',
-    'core/templates/pages/learner-dashboard-page/progress-tab.component.ts',
-    'core/templates/pages/library-page/library-footer/library-footer.component.ts',
+    # 'core/templates/pages/learner-dashboard-page/progress-tab.component.spec.ts',
+    # 'core/templates/pages/learner-dashboard-page/progress-tab.component.ts',
+    # 'core/templates/pages/library-page/library-footer/library-footer.component.ts',
     'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts',
-    'core/templates/pages/library-page/search-results/activity-tiles-infinity-grid.component.spec.ts',
-    'core/templates/pages/library-page/search-results/activity-tiles-infinity-grid.component.ts',
-    'core/templates/pages/library-page/search-results/search-results.component.ts',
+    # 'core/templates/pages/library-page/search-results/activity-tiles-infinity-grid.component.spec.ts',
+    # 'core/templates/pages/library-page/search-results/activity-tiles-infinity-grid.component.ts',
+    # 'core/templates/pages/library-page/search-results/search-results.component.ts',
     'core/templates/pages/oppia-root/app.module.ts',
     'core/templates/pages/oppia-root/routing/app.routing.module.ts',
     'core/templates/pages/oppia-root/routing/guards/can-access-splash-page.guard.spec.ts',
@@ -538,8 +542,8 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/review-test-page/review-test-page.component.spec.ts',
     'core/templates/pages/review-test-page/review-test-page.component.ts',
     'core/templates/pages/review-test-page/review-test-page.import.ts',
-    'core/templates/pages/signup-page/signup-page.component.spec.ts',
-    'core/templates/pages/signup-page/signup-page.component.ts',
+    # 'core/templates/pages/signup-page/signup-page.component.spec.ts',
+    # 'core/templates/pages/signup-page/signup-page.component.ts',
     'core/templates/pages/skill-editor-page/editor-tab/skill-concept-card-editor/skill-concept-card-editor.component.spec.ts',
     'core/templates/pages/skill-editor-page/editor-tab/skill-concept-card-editor/skill-concept-card-editor.component.ts',
     'core/templates/pages/skill-editor-page/editor-tab/skill-concept-card-editor/worked-example-editor.component.spec.ts',
@@ -571,8 +575,8 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/skill-editor-page/skill-editor-page.import.ts',
     'core/templates/pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts',
     'core/templates/pages/skill-editor-page/skill-preview-tab/skill-preview-tab.controller.spec.ts',
-    'core/templates/pages/splash-page/splash-page.component.spec.ts',
-    'core/templates/pages/splash-page/splash-page.component.ts',
+    # 'core/templates/pages/splash-page/splash-page.component.spec.ts',
+    # 'core/templates/pages/splash-page/splash-page.component.ts',
     'core/templates/pages/splash-page/splash-page.module.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.spec.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts',
@@ -582,7 +586,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/story-editor-page/editor-tab/story-node-editor.directive.ts',
     'core/templates/pages/story-editor-page/modal-templates/new-chapter-title-modal.controller.spec.ts',
     'core/templates/pages/story-editor-page/modal-templates/new-chapter-title-modal.controller.ts',
-    'core/templates/pages/story-editor-page/modal-templates/story-editor-save-modal.component.ts',
+    # 'core/templates/pages/story-editor-page/modal-templates/story-editor-save-modal.component.ts',
     'core/templates/pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.component.spec.ts',
     'core/templates/pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.component.ts',
     'core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.spec.ts',
@@ -594,17 +598,17 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/story-editor-page/story-editor-page.import.ts',
     'core/templates/pages/story-editor-page/story-preview-tab/story-preview-tab.component.spec.ts',
     'core/templates/pages/story-editor-page/story-preview-tab/story-preview-tab.component.ts',
-    'core/templates/pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component.spec.ts',
-    'core/templates/pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component.ts',
-    'core/templates/pages/story-viewer-page/navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component.ts',
-    'core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts',
-    'core/templates/pages/story-viewer-page/story-viewer-page.component.ts',
-    'core/templates/pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component.ts',
-    'core/templates/pages/subtopic-viewer-page/navbar-pre-logo-action/subtopic-viewer-navbar-pre-logo-action.component.ts',
-    'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.ts',
+    # 'core/templates/pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component.spec.ts',
+    # 'core/templates/pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component.ts',
+    'core/templates/pages/story-viewer-page/navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component.ts', #T
+    'core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts', #T
+    'core/templates/pages/story-viewer-page/story-viewer-page.component.ts', #T
+    # 'core/templates/pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component.ts',
+    # 'core/templates/pages/subtopic-viewer-page/navbar-pre-logo-action/subtopic-viewer-navbar-pre-logo-action.component.ts',
+    # 'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.ts',
     'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
-    'core/templates/pages/teach-page/teach-page.component.spec.ts',
-    'core/templates/pages/teach-page/teach-page.component.ts',
+    # 'core/templates/pages/teach-page/teach-page.component.spec.ts',
+    # 'core/templates/pages/teach-page/teach-page.component.ts',
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.spec.ts',
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts',
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.spec.ts',
@@ -613,11 +617,11 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/topic-editor-page/modal-templates/create-new-story-modal.controller.spec.ts',
     'core/templates/pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component.spec.ts',
     'core/templates/pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component.ts',
-    'core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component.spec.ts',
-    'core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component.ts',
+    # 'core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component.spec.ts',
+    # 'core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component.ts',
     'core/templates/pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component.spec.ts',
     'core/templates/pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component.ts',
-    'core/templates/pages/topic-editor-page/modal-templates/topic-editor-save-modal.component.ts',
+    # 'core/templates/pages/topic-editor-page/modal-templates/topic-editor-save-modal.component.ts',
     'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.component.ts',
     'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar.component.spec.ts',
     'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar.component.ts',
@@ -636,6 +640,7 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/templates/pages/topic-editor-page/services/topic-editor-routing.service.ts',
     'core/templates/pages/topic-editor-page/services/topic-editor-state.service.spec.ts',
     'core/templates/pages/topic-editor-page/services/topic-editor-state.service.ts',
+    'core/templates/pages/topic-editor-page/services/topic-editor-staleness-detection.service.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.spec.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.spec.ts',
@@ -689,81 +694,81 @@ NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH = [
     'core/tests/services_sources/DTest.service.ts',
     'core/tests/services_sources/ETestFactory.ts',
     'core/tests/services_sources/F.directive.ts',
-    'extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.spec.ts',
-    'extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts',
+    # 'extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.spec.ts',
+    # 'extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts',
     'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.spec.ts',
     'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts',
-    'extensions/interactions/Continue/directives/oppia-interactive-continue.component.spec.ts',
-    'extensions/interactions/Continue/directives/oppia-interactive-continue.component.ts',
-    'extensions/interactions/DragAndDropSortInput/directives/oppia-interactive-drag-and-drop-sort-input.component.spec.ts',
-    'extensions/interactions/DragAndDropSortInput/directives/oppia-interactive-drag-and-drop-sort-input.component.ts',
-    'extensions/interactions/DragAndDropSortInput/directives/oppia-response-drag-and-drop-sort-input.component.ts',
-    'extensions/interactions/DragAndDropSortInput/directives/oppia-short-response-drag-and-drop-sort-input.component.ts',
-    'extensions/interactions/EndExploration/directives/oppia-interactive-end-exploration.component.spec.ts',
-    'extensions/interactions/EndExploration/directives/oppia-interactive-end-exploration.component.ts',
-    'extensions/interactions/FractionInput/directives/oppia-interactive-fraction-input.component.spec.ts',
-    'extensions/interactions/FractionInput/directives/oppia-interactive-fraction-input.component.ts',
+    # 'extensions/interactions/Continue/directives/oppia-interactive-continue.component.spec.ts',
+    # 'extensions/interactions/Continue/directives/oppia-interactive-continue.component.ts',
+    # 'extensions/interactions/DragAndDropSortInput/directives/oppia-interactive-drag-and-drop-sort-input.component.spec.ts',
+    # 'extensions/interactions/DragAndDropSortInput/directives/oppia-interactive-drag-and-drop-sort-input.component.ts',
+    # 'extensions/interactions/DragAndDropSortInput/directives/oppia-response-drag-and-drop-sort-input.component.ts',
+    # 'extensions/interactions/DragAndDropSortInput/directives/oppia-short-response-drag-and-drop-sort-input.component.ts',
+    # 'extensions/interactions/EndExploration/directives/oppia-interactive-end-exploration.component.spec.ts',
+    # 'extensions/interactions/EndExploration/directives/oppia-interactive-end-exploration.component.ts',
+    # 'extensions/interactions/FractionInput/directives/oppia-interactive-fraction-input.component.spec.ts',
+    # 'extensions/interactions/FractionInput/directives/oppia-interactive-fraction-input.component.ts',
     'extensions/interactions/GraphInput/directives/graph-viz.component.spec.ts',
     'extensions/interactions/GraphInput/directives/graph-viz.component.ts',
-    'extensions/interactions/GraphInput/directives/oppia-interactive-graph-input.component.spec.ts',
-    'extensions/interactions/GraphInput/directives/oppia-interactive-graph-input.component.ts',
-    'extensions/interactions/GraphInput/directives/oppia-response-graph-input.component.spec.ts',
-    'extensions/interactions/GraphInput/directives/oppia-short-response-graph-input.component.spec.ts',
+    # 'extensions/interactions/GraphInput/directives/oppia-interactive-graph-input.component.spec.ts',
+    # 'extensions/interactions/GraphInput/directives/oppia-interactive-graph-input.component.ts',
+    # 'extensions/interactions/GraphInput/directives/oppia-response-graph-input.component.spec.ts',
+    # 'extensions/interactions/GraphInput/directives/oppia-short-response-graph-input.component.spec.ts',
     'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.spec.ts',
     'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts',
-    'extensions/interactions/ImageClickInput/directives/oppia-response-image-click-input.component.spec.ts',
-    'extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.spec.ts',
-    'extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts',
-    'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.spec.ts',
-    'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.ts',
-    'extensions/interactions/ItemSelectionInput/directives/oppia-response-item-selection-input.component.spec.ts',
-    'extensions/interactions/ItemSelectionInput/directives/oppia-response-item-selection-input.component.ts',
-    'extensions/interactions/ItemSelectionInput/directives/oppia-short-response-item-selection-input.component.ts',
-    'extensions/interactions/MathEquationInput/directives/oppia-interactive-math-equation-input.component.spec.ts',
-    'extensions/interactions/MathEquationInput/directives/oppia-interactive-math-equation-input.component.ts',
-    'extensions/interactions/MathEquationInput/directives/oppia-response-math-equation-input.component.ts',
-    'extensions/interactions/MathEquationInput/directives/oppia-short-response-math-equation-input.component.ts',
+    # 'extensions/interactions/ImageClickInput/directives/oppia-response-image-click-input.component.spec.ts',
+    # 'extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.spec.ts',
+    # 'extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts',
+    # 'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.spec.ts',
+    # 'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.ts',
+    # 'extensions/interactions/ItemSelectionInput/directives/oppia-response-item-selection-input.component.spec.ts',
+    # 'extensions/interactions/ItemSelectionInput/directives/oppia-response-item-selection-input.component.ts',
+    # 'extensions/interactions/ItemSelectionInput/directives/oppia-short-response-item-selection-input.component.ts',
+    # 'extensions/interactions/MathEquationInput/directives/oppia-interactive-math-equation-input.component.spec.ts',
+    # 'extensions/interactions/MathEquationInput/directives/oppia-interactive-math-equation-input.component.ts',
+    # 'extensions/interactions/MathEquationInput/directives/oppia-response-math-equation-input.component.ts',
+    # 'extensions/interactions/MathEquationInput/directives/oppia-short-response-math-equation-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MusicNotesInput/directives/music-notes-input.spec.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-response-music-notes-input.component.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-short-response-music-notes-input.component.ts',
-    'extensions/interactions/NumberWithUnits/directives/oppia-interactive-number-with-units.component.spec.ts',
-    'extensions/interactions/NumberWithUnits/directives/oppia-interactive-number-with-units.component.ts',
-    'extensions/interactions/NumberWithUnits/directives/oppia-response-number-with-units.component.ts',
-    'extensions/interactions/NumberWithUnits/directives/oppia-short-response-number-with-units.component.ts',
-    'extensions/interactions/NumericExpressionInput/directives/oppia-interactive-numeric-expression-input.component.spec.ts',
-    'extensions/interactions/NumericExpressionInput/directives/oppia-interactive-numeric-expression-input.component.ts',
-    'extensions/interactions/NumericExpressionInput/directives/oppia-response-numeric-expression-input.component.ts',
-    'extensions/interactions/NumericExpressionInput/directives/oppia-short-response-numeric-expression-input.component.ts',
-    'extensions/interactions/NumericInput/directives/oppia-interactive-numeric-input.component.spec.ts',
-    'extensions/interactions/NumericInput/directives/oppia-interactive-numeric-input.component.ts',
-    'extensions/interactions/NumericInput/directives/oppia-response-numeric-input.component.ts',
-    'extensions/interactions/NumericInput/directives/oppia-short-response-numeric-input.component.ts',
+    # 'extensions/interactions/NumberWithUnits/directives/oppia-interactive-number-with-units.component.spec.ts',
+    # 'extensions/interactions/NumberWithUnits/directives/oppia-interactive-number-with-units.component.ts',
+    # 'extensions/interactions/NumberWithUnits/directives/oppia-response-number-with-units.component.ts',
+    # 'extensions/interactions/NumberWithUnits/directives/oppia-short-response-number-with-units.component.ts',
+    # 'extensions/interactions/NumericExpressionInput/directives/oppia-interactive-numeric-expression-input.component.spec.ts',
+    # 'extensions/interactions/NumericExpressionInput/directives/oppia-interactive-numeric-expression-input.component.ts',
+    # 'extensions/interactions/NumericExpressionInput/directives/oppia-response-numeric-expression-input.component.ts',
+    # 'extensions/interactions/NumericExpressionInput/directives/oppia-short-response-numeric-expression-input.component.ts',
+    # 'extensions/interactions/NumericInput/directives/oppia-interactive-numeric-input.component.spec.ts',
+    # 'extensions/interactions/NumericInput/directives/oppia-interactive-numeric-input.component.ts',
+    # 'extensions/interactions/NumericInput/directives/oppia-response-numeric-input.component.ts',
+    # 'extensions/interactions/NumericInput/directives/oppia-short-response-numeric-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/oppia-response-pencil-code-editor.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/oppia-short-response-pencil-code-editor.component.ts',
-    'extensions/interactions/RatioExpressionInput/directives/oppia-interactive-ratio-expression-input.component.spec.ts',
-    'extensions/interactions/RatioExpressionInput/directives/oppia-interactive-ratio-expression-input.component.ts',
-    'extensions/interactions/RatioExpressionInput/directives/oppia-response-ratio-expression-input.component.ts',
-    'extensions/interactions/RatioExpressionInput/directives/oppia-short-response-ratio-expression-input.component.ts',
-    'extensions/interactions/SetInput/directives/oppia-interactive-set-input.component.spec.ts',
-    'extensions/interactions/SetInput/directives/oppia-interactive-set-input.component.ts',
-    'extensions/interactions/TextInput/directives/oppia-interactive-text-input.component.spec.ts',
-    'extensions/interactions/TextInput/directives/oppia-interactive-text-input.component.ts',
-    'extensions/interactions/TextInput/directives/oppia-response-text-input.component.spec.ts',
-    'extensions/interactions/TextInput/directives/oppia-short-response-text-input.component.spec.ts',
+    # 'extensions/interactions/RatioExpressionInput/directives/oppia-interactive-ratio-expression-input.component.spec.ts',
+    # 'extensions/interactions/RatioExpressionInput/directives/oppia-interactive-ratio-expression-input.component.ts',
+    # 'extensions/interactions/RatioExpressionInput/directives/oppia-response-ratio-expression-input.component.ts',
+    # 'extensions/interactions/RatioExpressionInput/directives/oppia-short-response-ratio-expression-input.component.ts',
+    # 'extensions/interactions/SetInput/directives/oppia-interactive-set-input.component.spec.ts',
+    # 'extensions/interactions/SetInput/directives/oppia-interactive-set-input.component.ts',
+    # 'extensions/interactions/TextInput/directives/oppia-interactive-text-input.component.spec.ts',
+    # 'extensions/interactions/TextInput/directives/oppia-interactive-text-input.component.ts',
+    # 'extensions/interactions/TextInput/directives/oppia-response-text-input.component.spec.ts',
+    # 'extensions/interactions/TextInput/directives/oppia-short-response-text-input.component.spec.ts',
     'extensions/interactions/base-validator.spec.ts',
     'extensions/interactions/rules.spec.ts',
-    'extensions/objects/templates/coord-two-dim-editor.component.spec.ts',
+    # 'extensions/objects/templates/coord-two-dim-editor.component.spec.ts',
     'extensions/objects/templates/graph-property-editor.component.spec.ts',
     'extensions/objects/templates/graph-property-editor.component.ts',
     'extensions/objects/templates/image-editor.component.spec.ts',
     'extensions/objects/templates/image-editor.component.ts',
     'extensions/objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component.ts',
     'extensions/objects/templates/parameter-name-editor.component.ts',
-    'extensions/objects/templates/skill-selector-editor.component.spec.ts',
-    'extensions/objects/templates/skill-selector-editor.component.ts',
+    # 'extensions/objects/templates/skill-selector-editor.component.spec.ts',
+    # 'extensions/objects/templates/skill-selector-editor.component.ts',
     'extensions/objects/templates/svg-editor.component.spec.ts',
     'extensions/objects/templates/svg-editor.component.ts',
     'extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.spec.ts',
@@ -797,6 +802,8 @@ _PARSER.add_argument(
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
 STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
+TEMP_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-strict.json'
+PREFIXES = ('core', 'extensions', 'typings')
 
 
 def validate_compiled_js_dir() -> None:
@@ -810,6 +817,82 @@ def validate_compiled_js_dir() -> None:
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
+def compile_temp_strict_tsconfig(
+    config_path: str, error_messages: List[str]
+) -> None:
+    """Compiles temporary strict TS config with files those are neither
+    strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If there are any
+    errors, we restores the original config.
+
+    Args:
+        config_path: str. The config that should be used to run the typescript
+            checks.
+        error_messages: List[str]. A list of error messages produced by
+            compiling the strict typescript config.
+    """
+    # Generate file names from the error messages.
+    errors = [x.strip() for x in error_messages]
+    # Remove the empty lines and error explanation lines.
+    errors = [x for x in errors if x.startswith(PREFIXES)]
+    # Remove error explanation lines.
+    errors = [x.split('(', 1)[0] for x in errors]
+    # Remove the duplicate occurrences of the file names.
+    files_with_errors = sorted(set(errors))
+
+    # List of missing files that are neither strictly typed nor present in
+    # TS_STRICT_EXCLUDE_PATHS.
+    files_not_type_strict = []
+    for filename in files_with_errors:
+        if filename not in TS_STRICT_EXCLUDE_PATHS:
+            files_not_type_strict.append(filename)
+
+    # Add "typings" folder to get global imports while compiling.
+    files_not_type_strict.append('typings')
+
+    # Update "include" field of temp-tsconfig-strict.json with files those
+    # are neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
+    # Example: List "files_not_type_strict".
+    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+        strict_ts_config = yaml.safe_load(f)
+        strict_ts_config['include'] = files_not_type_strict
+
+    with utils.open_file(TEMP_STRICT_TSCONFIG_FILEPATH, 'w') as f:
+        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+        f.write('\n')
+
+    # Compile temp-tsconfig-strict.json with files those are neither strictly
+    # typed nor present in TS_STRICT_EXCLUDE_PATHS. All those files
+    # present inside include property.
+    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+    validate_compiled_js_dir()
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
+    cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, encoding='utf-8')
+
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert process.stdout is not None
+    error_messages = list(iter(process.stdout.readline, ''))
+
+    # Remove temporary strict TS config.
+    if os.path.exists(TEMP_STRICT_TSCONFIG_FILEPATH):
+        os.remove(TEMP_STRICT_TSCONFIG_FILEPATH)
+
+    if error_messages:
+        print('\n' + '\n'.join(error_messages))
+        print(
+            '%s Errors found during compilation.\n' % (
+                len([x for x in error_messages if x.startswith(PREFIXES)]))
+            )
+        sys.exit(1)
+    else:
+        print('Compilation successful!')
+
+
 def compile_and_check_typescript(config_path: str) -> None:
     """Compiles typescript files and checks the compilation errors.
 
@@ -817,6 +900,17 @@ def compile_and_check_typescript(config_path: str) -> None:
         config_path: str. The config that should be used to run the typescript
             checks.
     """
+    # Set strict TS config include property to ["core", "extensions", "typings"]
+    # This make sure to restore include property to its original value after the
+    # checks get aborted mid-way.
+    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+        strict_ts_config = yaml.safe_load(f)
+        strict_ts_config['include'] = PREFIXES
+
+    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
+        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+        f.write('\n')
+
     os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
     validate_compiled_js_dir()
 
@@ -827,92 +921,14 @@ def compile_and_check_typescript(config_path: str) -> None:
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
 
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
-
     # The value of `process.stdout` should not be None since we passed
     # the `stdout=subprocess.PIPE` argument to `Popen`.
     assert process.stdout is not None
     error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
-        # Generate file names from the error messages.
-        errors = [x.strip() for x in error_messages]
-        # Remove the empty lines and error explanation lines.
-        prefixes = ('core', 'extension', 'typings')
-        errors = [x for x in errors if x.startswith(prefixes)]
-        # Remove error explanation lines.
-        errors = [x.split('(', 1)[0] for x in errors]
-        # Remove the duplicate occurrences of the file names.
-        errors = list(dict.fromkeys(errors))
-        files_with_errors = sorted(errors)
-
-        # List of missing files that are neither strictly typed nor present in
-        # NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
-        files_not_type_strict = []
-        for filename in files_with_errors:
-            if filename not in NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH:
-                files_not_type_strict.append(filename)
-
-        # Add "typings" folder to get global imports while compiling.
-        files_not_type_strict.append('typings')
-
-        # Update "include" field of tsconfig-strict.json with files that are
-        # neither strict typed nor present in
-        # NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH.
-        # Example: List "files_not_type_strict".
-        file_name = os.path.join(os.getcwd(), 'tsconfig-strict.json')
-        with open(file_name, 'r', encoding='utf-8') as f:
-            tsconfig_strict_json_dict = yaml.safe_load(f)
-            tsconfig_strict_json_dict['include'] = files_not_type_strict
-
-        tsconfig_strict_json_dict = (
-            json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True))
-
-        with open(file_name, 'w', encoding='utf-8') as f:
-            f.write(tsconfig_strict_json_dict + '\n')
-
-        # Compile tsconfig-strict.json with updated "include" property.
-        os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
-        validate_compiled_js_dir()
-
-        if os.path.exists(COMPILED_JS_DIR):
-            shutil.rmtree(COMPILED_JS_DIR)
-
-        cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
-        process = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, encoding='utf-8')
-
-        if os.path.exists(COMPILED_JS_DIR):
-            shutil.rmtree(COMPILED_JS_DIR)
-
-        # The value of `process.stdout` should not be None since we passed
-        # the `stdout=subprocess.PIPE` argument to `Popen`.
-        assert process.stdout is not None
-        error_messages = list(iter(process.stdout.readline, ''))
-
-        # Update tsconfig-strict.json and set to its intial "include" state
-        # example "include": ["core", "extensions", "typings"].
-        with open(file_name, 'r', encoding='utf-8') as f:
-            tsconfig_strict_json_dict = yaml.safe_load(f)
-            tsconfig_strict_json_dict['include'] = (
-                ['core', 'extensions', 'typings'])
-
-        tsconfig_strict_json_dict = (
-            json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True))
-
-        with open(file_name, 'w', encoding='utf-8') as f:
-            f.write(tsconfig_strict_json_dict + '\n')
-
-        if error_messages:
-            print('\n' + '\n'.join(error_messages))
-            print(
-                str(len([x for x in error_messages if x.startswith(prefixes)]))
-                + ' Errors found during compilation.\n')
-            sys.exit(1)
-        else:
-            print('Compilation successful!')
-
+        compile_temp_strict_tsconfig(
+            TEMP_STRICT_TSCONFIG_FILEPATH, error_messages)
     else:
         if error_messages:
             print('Errors found during compilation\n')

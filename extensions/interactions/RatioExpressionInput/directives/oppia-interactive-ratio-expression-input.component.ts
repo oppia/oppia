@@ -39,13 +39,16 @@ import { RatioInputAnswer, InteractionAnswer } from 'interactions/answer-defs';
 })
 export class InteractiveRatioExpressionInputComponent
   implements OnInit, OnDestroy {
-  @Input() placeholderWithValue: string;
-  @Input() numberOfTermsWithValue: string;
-  @Input() labelForFocusTarget: string;
-  @Input() savedSolution: InteractionAnswer;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() placeholderWithValue!: string;
+  @Input() numberOfTermsWithValue!: string;
+  @Input() labelForFocusTarget!: string;
+  @Input() savedSolution!: InteractionAnswer;
+  expectedNumberOfTerms!: number;
+  placeholder!: string;
   componentSubscriptions: Subscription = new Subscription();
-  expectedNumberOfTerms: number;
-  placeholder: string;
   FORM_ERROR_TYPE: string = 'RATIO_EXPRESSION_INPUT_FORMAT_ERROR';
   errorMessageI18nKey: string = '';
   answer: string = '';
@@ -125,7 +128,8 @@ export class InteractiveRatioExpressionInputComponent
         this.ratioExpressionInputRulesService as unknown as
         InteractionRulesService);
     } catch (parsingError) {
-      this.errorMessageI18nKey = parsingError.message;
+      let error = parsingError as Error;
+      this.errorMessageI18nKey = error.message;
       this.isValid = false;
     }
   }

@@ -22,6 +22,8 @@ import { InteractiveDragAndDropSortInputComponent } from './oppia-interactive-dr
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CdkDragDrop, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { DragAndDropAnswer } from 'interactions/answer-defs';
 
 interface ContainerModel<T> {
   id: string;
@@ -35,7 +37,9 @@ describe('Drag and drop sort input interactive component', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         choices: {
           value: JSON.parse(attributes.choicesWithValue)
@@ -49,8 +53,12 @@ describe('Drag and drop sort input interactive component', () => {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: DragAndDropAnswer, rulesService: CurrentInteractionService
+    ) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
     }
   }
@@ -82,12 +90,9 @@ describe('Drag and drop sort input interactive component', () => {
       return {
         previousIndex: previousIndex,
         currentIndex: currentIndex,
-        item: undefined,
-        container: undefined,
-        previousContainer: undefined,
         isPointerOverContainer: true,
         distance: { x: 0, y: 0 }
-      };
+      } as CdkDragDrop<T[], T[]>;
     }
 
     private createContainer(
@@ -201,7 +206,6 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list of lists when user did not save a solution',
       () => {
-        component.savedSolution = undefined;
         component.ngOnInit();
 
         expect(component.allowMultipleItemsInSamePosition).toBe(true);
@@ -401,7 +405,7 @@ describe('Drag and drop sort input interactive component', () => {
       const containerData = component.multipleItemsInSamePositionArray[1];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedItems', containerData, undefined, undefined);
+        'selectedItems', containerData, 0, 0);
       component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(1);
@@ -417,7 +421,7 @@ describe('Drag and drop sort input interactive component', () => {
       ];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedItems', containerData, undefined, undefined);
+        'selectedItems', containerData, 0, 0);
       component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(-1);
@@ -493,7 +497,6 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list when user did not save a solution',
       () => {
-        component.savedSolution = undefined;
         component.ngOnInit();
 
         expect(component.allowMultipleItemsInSamePosition).toBe(false);

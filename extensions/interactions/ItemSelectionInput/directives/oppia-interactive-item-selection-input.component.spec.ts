@@ -29,6 +29,8 @@ import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjec
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { ItemSelectionAnswer } from 'interactions/answer-defs';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('oppiaInteractiveItemSelectionInput', function() {
   let component: InteractiveItemSelectionInputComponent;
@@ -39,7 +41,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         choices: {
           value: JSON.parse(attributes.choicesWithValue)
@@ -55,8 +59,11 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: ItemSelectionAnswer, rulesService: CurrentInteractionService) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -160,7 +167,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -174,7 +181,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -232,7 +239,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }

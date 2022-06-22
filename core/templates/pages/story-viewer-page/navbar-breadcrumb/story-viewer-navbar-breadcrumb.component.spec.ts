@@ -100,7 +100,9 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
         topic_name: 'Topic Name 1',
         topic_id: 'topic1',
         topic_description: 'Description',
-        practice_tab_is_displayed: false
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'content',
+        page_title_fragment_for_web: 'title',
       } as ReadOnlyTopicBackendDict)
     );
   });

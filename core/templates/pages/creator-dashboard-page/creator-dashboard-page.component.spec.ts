@@ -17,7 +17,7 @@
  */
 
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
-import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import { CreatorDashboardStats, CreatorDashboardStatsBackendDict } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
@@ -181,13 +181,13 @@ describe('Creator Dashboard Page Component', () => {
         collections_list: [],
         subscribers_list: [],
         dashboard_stats: {
-          average_ratings: null,
+          average_ratings: 0,
           num_ratings: 0,
           total_open_feedback: 0,
           total_plays: 10
         },
         last_week_stats: {
-          average_ratings: null,
+          average_ratings: 0,
           num_ratings: 0,
           total_open_feedback: 0,
           total_plays: 5
@@ -436,7 +436,7 @@ describe('Creator Dashboard Page Component', () => {
       }],
       subscribers_list: [],
       dashboard_stats: {
-        average_ratings: null,
+        average_ratings: 0,
         num_ratings: 0,
         total_open_feedback: 0,
         total_plays: 10

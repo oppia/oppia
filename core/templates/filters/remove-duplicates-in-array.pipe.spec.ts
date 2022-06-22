@@ -42,9 +42,10 @@ describe('Testing RemoveDuplicatesInArrayPipe', () => {
 
   it('should throw error when the input is invalid', () => {
     expect(() => {
+      // Use unknown type conversion to check input is invalid.
       pipe.transform({
         filter: undefined
-      } as string[]);
+      } as unknown as string[]);
     }).toThrowError('Bad input for removeDuplicatesInArray: {}');
   });
 });

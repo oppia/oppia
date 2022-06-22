@@ -89,10 +89,10 @@ describe('CoordTwoDimEditorComponent', () => {
           lng: 50
         }
       }
-    } as unknown as LeafletEvent;
+    } as alias.DragEndEvent;
     spyOn(component, 'leafletMove').and.callThrough();
     spyOn(alias, 'marker').and.returnValue({
-      on: (txt, func) => {
+      on: (txt, func: alias.DragEndEventHandlerFn) => {
         func(e);
       }
     } as alias.Marker);
