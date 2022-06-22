@@ -409,6 +409,7 @@ import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/se
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
+import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -835,6 +836,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
+  ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],

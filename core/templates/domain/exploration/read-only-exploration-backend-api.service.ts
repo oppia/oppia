@@ -27,6 +27,7 @@ import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactor
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
+import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 
 export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
@@ -69,7 +70,10 @@ export class ReadOnlyExplorationBackendApiService {
 
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService,
+    private versionedExplorationCachingService:
+      VersionedExplorationCachingService
+  ) {}
 
   private async _fetchExplorationAsync(
       explorationId: string, version: number | null
@@ -78,12 +82,28 @@ export class ReadOnlyExplorationBackendApiService {
       const explorationDataUrl = this._getExplorationUrl(
         explorationId, version);
 
-      this.http.get<FetchExplorationBackendResponse>(
-        explorationDataUrl).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      // If version is not null, then check whether the data is already cached.
+      // If so, then resolve the Promise with the cached data.
+      if (
+        version && this.versionedExplorationCachingService.isCached(
+          explorationId, version
+        )) {
+        resolve(
+          this.versionedExplorationCachingService
+            .retrieveCachedVersionedExplorationData(explorationId, version));
+      } else {
+        this.http.get<FetchExplorationBackendResponse>(
+          explorationDataUrl).toPromise().then(response => {
+          // If version if not null, then cache the fetched data.
+          if (version) {
+            this.versionedExplorationCachingService
+              .cacheVersionedExplorationData(explorationId, version, response);
+          }
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+      }
     });
   }
 
