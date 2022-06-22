@@ -31,9 +31,7 @@ class MockActiveModal {
 // eslint-disable-next-line oppia/no-test-blockers
 fdescribe('Router Service', () => {
   let routerService: RouterService;
-  let ngbModal: NgbModal;
   let testSubscriptions: Subscription;
-  let externalSaveSpy = null;
 
   beforeEach((() => {
     TestBed.configureTestingModule({
@@ -47,7 +45,6 @@ fdescribe('Router Service', () => {
       ]
     });
 
-    ngbModal = TestBed.inject(NgbModal);
     routerService = TestBed.inject(RouterService);
   }));
 
@@ -71,7 +68,7 @@ fdescribe('Router Service', () => {
     });
 
     expect(routerService.getActiveTabName()).toBe('main');
-    routerService.navigateToMainTab('newState');
+    routerService.navigateToMainTab('settings');
 
     tick(3000);
     flush();
@@ -83,7 +80,7 @@ fdescribe('Router Service', () => {
 
     expect(routerService.getActiveTabName()).toBe('main');
 
-    routerService.navigateToMainTab('newState');
+    routerService.navigateToMainTab('settings');
 
     tick(3000);
     flush();
