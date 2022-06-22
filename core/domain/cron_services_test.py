@@ -15,3 +15,5 @@
 # limitations under the License.
 
 """Unit tests for core/domain/cron_services.py"""
+
+from __future__ import annotations

@@ -49,7 +49,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/image_constants.py',
     'core/tests/data/unicode_and_str_handler.py',
 
-    # TODO @IamEzio: The files below are to be tested.
+    # The files below are to be tested.
     # GSoC'22: Improve line and branch coverage for the backend and frontend.
     'scripts/run_frontend_tests.py',
     'scripts/create_expression_parser.py',
