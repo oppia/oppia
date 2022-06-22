@@ -238,8 +238,7 @@ describe('Site language', function() {
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
-    var placeholderElement = await element(
-      by.css('.protractor-test-float-form-input'));
+    var placeholderElement = await $('.protractor-test-float-form-input');
     await waitFor.visibilityOf(
       placeholderElement, 'Placeholder Element taking too long to appear');
     await waitFor.elementAttributeToBe(

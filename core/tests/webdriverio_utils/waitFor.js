@@ -130,12 +130,13 @@ var visibilityOf = async function(element, errorMessage) {
 var elementAttributeToBe = async function(
     element, attribute, value, errorMessage
 ) {
-  await browser.waitUntil(
-    await element.getAttribute(attribute) === value,
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await browser.waitUntil(async function() {
+    return await element.getAttribute(attribute) === value;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage
+  });
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
