@@ -3475,6 +3475,10 @@ class LearnerGroupsUserModelTests(test_utils.GenericTestBase):
         user_models.LearnerGroupsUserModel.delete_learner_group_references(
             'group_id_1', ['user_34'])
 
+        # Test delete reference for a group id for uninvolved users.
+        user_models.LearnerGroupsUserModel.delete_learner_group_references(
+            'group_id_1', ['uninvolved_user_1'])
+
         user_data = user_models.LearnerGroupsUserModel.export_data(
             'user_34')
         expected_data = {
