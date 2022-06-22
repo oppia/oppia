@@ -408,6 +408,7 @@ import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { YamlService } from './yaml.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -841,6 +842,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['WorkedExampleObjectFactory', WorkedExampleObjectFactory],
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
+  ['YamlService', YamlService],
   ['baseInteractionValidationService', baseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
