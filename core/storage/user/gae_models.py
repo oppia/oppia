@@ -27,7 +27,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
-from typing_extensions import Literal
+from typing_extensions import Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -3013,23 +3013,37 @@ class DeletedUsernameModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **empty_dict)
 
 
-class LearnerGroupUserModel(base_models.BaseModel):
+class LearnerGroupUserDetailsDict(TypedDict):
+    """Dictionary for user details of a particular learner group to export."""
+
+    group_id: str
+    progress_sharing_is_turned_on: bool
+
+
+class LearnerGroupsUserDataDict(TypedDict):
+    """Dictionary for user data to export."""
+
+    invited_to_learner_groups_ids: List[str]
+    learner_groups_user_details: List[LearnerGroupUserDetailsDict]
+
+
+class LearnerGroupsUserModel(base_models.BaseModel):
     """Model for storing user's learner groups related data.
 
     Instances of this class are keyed by the user id.
     """
 
-    # List of learner group ids which the user has been invited to join.
+    # List of learner group ids which the student has been invited to join.
     invited_to_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    # List of learner group ids which the user has joined as a student.
-    student_of_learner_groups_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-    # List of ProgressSharingPermission dicts, which is defined in
-    # user_domain.py, each dict corresponds to a learner group and
-    # has stores progress sharing permission status for that group.
-    progress_sharing_permissions = (
+    # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
+    # group and has details of the user correspoding to that group.
+    learner_groups_user_details = (
         datastore_services.JsonProperty(repeated=True, indexed=False))
+    # Version of learner group details blob schema.
+    learner_groups_user_details_schema_version = (
+        datastore_services.IntegerProperty(
+            required=True, default=0, indexed=True))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -3038,7 +3052,7 @@ class LearnerGroupUserModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether LearnerGroupUserModel exists for the given user.
+        """Check whether LearnerGroupsUserModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -3050,39 +3064,36 @@ class LearnerGroupUserModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of LearnerGroupUserModel for the user.
+        """Delete instances of LearnerGroupsUserModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
         cls.delete_by_id(user_id)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.export_data().
     @classmethod
-    def export_data(
-        cls,
-        user_id: str
-    ) -> Dict[str, Union[List[str], List[Dict[str, Union[bool, str]]], None]]:
-        """(Takeout) Exports the data from LearnerGroupUserModel
+    def export_data(cls, user_id: str) -> LearnerGroupsUserDataDict: # type: ignore[override]
+        """(Takeout) Exports the data from LearnerGroupsUserModel
         into dict format.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from LearnerGroupUserModel.
+            dict. Dictionary of the data from LearnerGroupsUserModel.
         """
-        learner_group_user_model = cls.get_by_id(user_id)
+        learner_grp_user_model = cls.get_by_id(user_id)
 
-        if learner_group_user_model is None:
+        if learner_grp_user_model is None:
             return {}
 
         return {
             'invited_to_learner_groups_ids': (
-                learner_group_user_model.invited_to_learner_groups_ids),
-            'student_of_learner_groups_ids': (
-                learner_group_user_model.student_of_learner_groups_ids),
-            'progress_sharing_permissions': (
-                learner_group_user_model.progress_sharing_permissions)
+                learner_grp_user_model.invited_to_learner_groups_ids),
+            'learner_groups_user_details': (
+                learner_grp_user_model.learner_groups_user_details)
         }
 
     @staticmethod
@@ -3097,53 +3108,56 @@ class LearnerGroupUserModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'invited_to_learner_groups_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'student_of_learner_groups_ids':
+            'learner_groups_user_details':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'progress_sharing_permissions':
-                base_models.EXPORT_POLICY.EXPORTED
+            'learner_groups_user_details_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
-    def delete_learner_group_references(cls, group_id: str) -> None:
-        """Delete all references of given learner group stored in learner group
-        users model.
+    def delete_learner_group_references(
+        cls, group_id: str, user_ids: List[str]
+    ) -> None:
+        """Delete all references of given learner group stored in learner
+        groups user model.
 
         Args:
-            group_id: str. The group_id denotes which group's data to delete.
+            group_id: str. The group_id denotes which group's reference to
+                delete.
+            user_ids: list(str). The user_ids denotes ids of users that were
+                referenced in the given group.
         """
-        found_models = cls.get_all().filter(
-            datastore_services.any_of(
-                cls.student_of_learner_groups_ids == group_id,
-                cls.invited_to_learner_groups_ids == group_id
-        ))
+        found_models = cls.get_multi(user_ids)
 
-        for learner_group_user_model in found_models:
-            # If the user is a student of the group, delete the group id
-            # from the student_of_learner_groups_ids list and the progress
-            # sharing permissions corresponding to that group.
-            if group_id in (
-                    learner_group_user_model.student_of_learner_groups_ids):
-                learner_group_user_model.student_of_learner_groups_ids.remove(
+        learner_groups_user_models_to_put = []
+
+        for learner_grp_usr_model in found_models:
+            if learner_grp_usr_model is None:
+                continue
+
+            # If the user has been invited to join the group as student, delete
+            # the group id from the invited_to_learner_groups_ids list.
+            if (
+                group_id in learner_grp_usr_model.invited_to_learner_groups_ids
+            ):
+                learner_grp_usr_model.invited_to_learner_groups_ids.remove(
                     group_id)
 
-                updated_progress_sharing_permissions = []
+            # If the user is a student of the group, delete the corresponding
+            # learner group details of the student stored in
+            # learner_groups_user_details field.
+            updated_details = []
 
-                for progress_sharing_permission in (
-                    learner_group_user_model
-                        .progress_sharing_permissions):
-                    if progress_sharing_permission['group_id'] != group_id:
-                        updated_progress_sharing_permissions.append(
-                            progress_sharing_permission)
+            for learner_group_details in (
+                learner_grp_usr_model.learner_groups_user_details
+            ):
+                if learner_group_details['group_id'] != group_id:
+                    updated_details.append(learner_group_details)
 
-                learner_group_user_model.progress_sharing_permissions = (
-                    updated_progress_sharing_permissions)
+            learner_grp_usr_model.learner_groups_user_details = (
+                updated_details)
 
-            # Else it means that the user has been invited to join the
-            # group, in that case delete the group id from the
-            # invited_to_learner_groups_ids list.
-            else:
-                learner_group_user_model.invited_to_learner_groups_ids.remove(
-                    group_id)
+            learner_groups_user_models_to_put.append(learner_grp_usr_model)
 
-            learner_group_user_model.update_timestamps()
-            learner_group_user_model.put()
+        cls.update_timestamps_multi(learner_groups_user_models_to_put)
+        cls.put_multi(learner_groups_user_models_to_put)

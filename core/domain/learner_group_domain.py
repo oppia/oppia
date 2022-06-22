@@ -32,7 +32,7 @@ class LearnerGroupDict(TypedDict):
     description: str
     facilitator_user_ids: List[str]
     student_user_ids: List[str]
-    invited_user_ids: List[str]
+    invited_student_user_ids: List[str]
     subtopic_page_ids: List[str]
     story_ids: List[str]
 
@@ -47,10 +47,9 @@ class LearnerGroup:
         description: str,
         facilitator_user_ids: List[str],
         student_user_ids: List[str],
-        invited_user_ids: List[str],
+        invited_student_user_ids: List[str],
         subtopic_page_ids: List[str],
-        story_ids: List[str],
-
+        story_ids: List[str]
     ) -> None:
         """Constructs a LearnerGroup domain object.
 
@@ -62,8 +61,8 @@ class LearnerGroup:
                 facilitators of the learner group.
             student_user_ids: List[str]. The list of user ids of students
                 of the learner group.
-            invited_user_ids: List[str]. The list of user ids of the users
-                invited to join the learner group.
+            invited_student_user_ids: List[str]. The list of user ids of the
+                users invited to join the learner group as a student.
             subtopic_page_ids: List[str]. The list of subtopic page ids that
                 are part of the learner group syllabus. A subtopic page id is
                 depicted as topicId:subtopicId string.
@@ -74,7 +73,7 @@ class LearnerGroup:
         self.description = description
         self.facilitator_user_ids = facilitator_user_ids
         self.student_user_ids = student_user_ids
-        self.invited_user_ids = invited_user_ids
+        self.invited_student_user_ids = invited_student_user_ids
         self.subtopic_page_ids = subtopic_page_ids
         self.story_ids = story_ids
 
@@ -93,7 +92,7 @@ class LearnerGroup:
             'description': self.description,
             'facilitator_user_ids': self.facilitator_user_ids,
             'student_user_ids': self.student_user_ids,
-            'invited_user_ids': self.invited_user_ids,
+            'invited_student_user_ids': self.invited_student_user_ids,
             'subtopic_page_ids': self.subtopic_page_ids,
             'story_ids': self.story_ids
         }
@@ -110,20 +109,20 @@ class LearnerGroup:
             raise utils.ValidationError(
                 'Expected learner group to have at least one facilitator.')
 
-        invited_user_ids_set = set(self.invited_user_ids)
-        student_user_ids_set = set(self.student_user_ids)
+        invited_student_set = set(self.invited_student_user_ids)
+        student_set = set(self.student_user_ids)
 
-        if len(invited_user_ids_set.intersection(student_user_ids_set)) > 0:
+        if len(invited_student_set.intersection(student_set)) > 0:
             raise utils.ValidationError(
                 'Learner group student cannot be invited to join the group.')
 
         facilitator_set = set(self.facilitator_user_ids)
 
-        if len(facilitator_set.intersection(student_user_ids_set)) > 0:
+        if len(facilitator_set.intersection(student_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be a student of the group.')
 
-        if len(facilitator_set.intersection(invited_user_ids_set)) > 0:
+        if len(facilitator_set.intersection(invited_student_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be invited to '
                 'join the group.')

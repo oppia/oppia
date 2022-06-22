@@ -47,7 +47,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             description='description',
             facilitator_user_ids=['user_1', 'user_11'],
             student_user_ids=['user_2', 'user_3', 'user_4'],
-            invited_user_ids=['user_5', 'user_6'],
+            invited_student_user_ids=['user_5', 'user_6'],
             subtopic_page_ids=['subtopic_1', 'subtopic_2'],
             story_ids=['story_1', 'story_2'])
         self.learner_group_model.update_timestamps()
@@ -73,9 +73,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'description': base_models.EXPORT_POLICY.EXPORTED,
-            'facilitator_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'facilitator_user_ids': base_models.EXPORT_POLICY.EXPORTED,
             'student_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'invited_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'invited_student_user_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subtopic_page_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
         }
@@ -129,20 +130,62 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_group_model_instance.description, 'description')
 
-    def test_export_data_on_learner_group_members(self) -> None:
-        """Test export data on users that are part of the learner group."""
+    def test_get_field_names_for_takeout(self) -> None:
+        expected_results = {
+            'facilitator_user_ids': 'role_in_group',
+        }
+        self.assertEqual(
+            learner_group_models.LearnerGroupModel
+            .get_field_names_for_takeout(),
+            expected_results)
 
-        member_user_data = (
+    def test_export_data_on_students(self) -> None:
+        """Test export data on users that are students of the learner group."""
+
+        student_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_2'))
-        expected_member_user_data = {
+        expected_student_user_data = {
             '3232': {
                 'title': 'title',
                 'description': 'description',
+                'role_in_group': 'student',
                 'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
             }
         }
-        self.assertEqual(expected_member_user_data, member_user_data)
+        self.assertEqual(expected_student_user_data, student_user_data)
+
+    def test_export_data_on_invited_students(self) -> None:
+        """Test export data on students that have been invited to join the
+        learner group.
+        """
+        invited_student_data = (
+            learner_group_models.LearnerGroupModel.export_data('user_6'))
+        expected_invited_student_data = {
+            '3232': {
+                'title': 'title',
+                'description': 'description',
+                'role_in_group': 'invited_student'
+            }
+        }
+        self.assertEqual(expected_invited_student_data, invited_student_data)
+
+    def test_export_data_on_facilitators(self) -> None:
+        """Test export data on users that are facilitators of
+        the learner group.
+        """
+        facilitator_user_data = (
+            learner_group_models.LearnerGroupModel.export_data('user_1'))
+        expected_facilitator_user_data = {
+            '3232': {
+                'title': 'title',
+                'description': 'description',
+                'role_in_group': 'facilitator',
+                'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
+                'story_ids': ['story_1', 'story_2']
+            }
+        }
+        self.assertEqual(expected_facilitator_user_data, facilitator_user_data)
 
     def test_export_data_on_uninvolved_user(self) -> None:
         """Test export data on users who do not have any involvement with
