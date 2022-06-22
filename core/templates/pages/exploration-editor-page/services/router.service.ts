@@ -42,6 +42,8 @@ export class RouterService {
     FEEDBACK: { name: 'feedback', path: '/feedback' },
   };
 
+  oldStateName: string;
+
   /** @private */
   private centerGraphEventEmitter = new EventEmitter();
   private SLUG_GUI = 'gui';
@@ -221,6 +223,11 @@ export class RouterService {
   }
 
   navigateToMainTab(stateName: string): void {
+    if (stateName === this.oldStateName) {
+      return;
+    }
+
+    this.oldStateName = stateName;
     this._savePendingChanges();
 
     if (this._getCurrentStateFromLocationPath() === stateName) {
