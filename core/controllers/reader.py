@@ -1324,7 +1324,8 @@ class RecommendationsHandler(base.BaseHandler):
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.ENTITY_ID_REGEX
                     }]
-                }
+                },
+                'default_value': None
             },
             'current_node_id': {
                 'schema': {
@@ -1333,7 +1334,8 @@ class RecommendationsHandler(base.BaseHandler):
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.ENTITY_ID_REGEX
                     }]
-                }
+                },
+                'default_value': None
             }
         }
     }
