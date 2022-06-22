@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,12 +61,12 @@ var ProfilePage = function() {
     var interestTexts = await interests.map(async function(interestElem) {
       await waitFor.visibilityOf(
         interestElem,
-        'InterestElem is taking too long to appear');
+        'InterestElem is taking too long to appear'); 
       return await interestElem.getText();
     });
     for (var index = 0; index < interestTexts.length; index++) {
       var interestText = interestTexts[index];
-      expect(expectedInterests.includes(interestText)).toBe(true);
+      expect(expectedInterests.includes(await interestText)).toBe(true);
     }
   };
 

@@ -33,93 +33,93 @@ var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
 var ProfilePage = require('../webdriverio_utils/ProfilePage.js');
 
-describe('Un-customized profile page', function() {
-  var TEST_USERNAME = 'defaultProfileFeatures';
-  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+// describe('Un-customized profile page', function() {
+//   var TEST_USERNAME = 'defaultProfileFeatures';
+//   var TEST_EMAIL = TEST_USERNAME + '@example.com';
 
-  var profilePage = null;
+//   var profilePage = null;
 
-  beforeAll(async function() {
-    profilePage = new ProfilePage.ProfilePage();
-    await users.createUser(TEST_EMAIL, TEST_USERNAME);
-  });
+//   beforeAll(async function() {
+//     profilePage = new ProfilePage.ProfilePage();
+//     await users.createUser(TEST_EMAIL, TEST_USERNAME);
+//   });
 
-  it('should display photo, default bio, and interest placeholder when ' +
-    'logged in',
-  async function() {
-    await users.login(TEST_EMAIL);
-    await profilePage.get(TEST_USERNAME);
-    await profilePage.expectCurrUserToHaveProfilePhoto();
-    await profilePage.expectUserToHaveBio(DEFAULT_BIO);
-    await profilePage.expectUserToHaveNoInterests();
-    await profilePage.expectUserToHaveInterestPlaceholder(
-      PLACEHOLDER_INTEREST_TEXT);
-    await users.logout();
-  }
-  );
+//   it('should display photo, default bio, and interest placeholder when ' +
+//     'logged in',
+//   async function() {
+//     await users.login(TEST_EMAIL);
+//     await profilePage.get(TEST_USERNAME);
+//     await profilePage.expectCurrUserToHaveProfilePhoto();
+//     await profilePage.expectUserToHaveBio(DEFAULT_BIO);
+//     await profilePage.expectUserToHaveNoInterests();
+//     await profilePage.expectUserToHaveInterestPlaceholder(
+//       PLACEHOLDER_INTEREST_TEXT);
+//     await users.logout();
+//   }
+//   );
 
-  it('should display default photo, default bio, and no interests when ' +
-    'logged out',
-  async function() {
-    await profilePage.get(TEST_USERNAME);
-    await profilePage.expectOtherUserToHaveProfilePhoto();
-    await profilePage.expectUserToHaveBio(DEFAULT_BIO);
-    await profilePage.expectUserToHaveNoInterests();
-    await profilePage.expectUserToHaveInterestPlaceholder(
-      PLACEHOLDER_INTEREST_TEXT);
-  }
-  );
+//   it('should display default photo, default bio, and no interests when ' +
+//     'logged out',
+//   async function() {
+//     await profilePage.get(TEST_USERNAME);
+//     await profilePage.expectOtherUserToHaveProfilePhoto();
+//     await profilePage.expectUserToHaveBio(DEFAULT_BIO);
+//     await profilePage.expectUserToHaveNoInterests();
+//     await profilePage.expectUserToHaveInterestPlaceholder(
+//       PLACEHOLDER_INTEREST_TEXT);
+//   }
+//   );
 
-  afterEach(async function() {
-    await general.checkForConsoleErrors([]);
-  });
-});
+//   afterEach(async function() {
+//     await general.checkForConsoleErrors([]);
+//   });
+// });
 
-describe('Customized profile page for current user', function() {
-  var TEST_USERNAME = 'customizedProfileFeatures';
-  var TEST_EMAIL = TEST_USERNAME + '@example.com';
-  var TEST_BIO = 'My test bio!';
-  var TEST_INTERESTS = ['math', 'social studies'];
+// describe('Customized profile page for current user', function() {
+//   var TEST_USERNAME = 'customizedProfileFeatures';
+//   var TEST_EMAIL = TEST_USERNAME + '@example.com';
+//   var TEST_BIO = 'My test bio!';
+//   var TEST_INTERESTS = ['math', 'social studies'];
 
-  var profilePage = null;
+//   var profilePage = null;
 
-  beforeAll(async function() {
-    profilePage = new ProfilePage.ProfilePage();
-    var preferencesPage = new PreferencesPage.PreferencesPage();
-    await users.createUser(TEST_EMAIL, TEST_USERNAME);
-    await users.login(TEST_EMAIL);
-    await preferencesPage.get();
-    await preferencesPage.setUserBio(TEST_BIO);
-    await preferencesPage.get();
-    await preferencesPage.setUserInterests(TEST_INTERESTS);
-    await users.logout();
-  });
+//   beforeAll(async function() {
+//     profilePage = new ProfilePage.ProfilePage();
+//     var preferencesPage = new PreferencesPage.PreferencesPage();
+//     await users.createUser(TEST_EMAIL, TEST_USERNAME);
+//     await users.login(TEST_EMAIL);
+//     await preferencesPage.get();
+//     await preferencesPage.setUserBio(TEST_BIO);
+//     await preferencesPage.get();
+//     await preferencesPage.setUserInterests(TEST_INTERESTS);
+//     await users.logout();
+//   });
 
-  it('should display photo, custom bio, and interests when logged in',
-    async function() {
-      await users.login(TEST_EMAIL);
-      await profilePage.get(TEST_USERNAME);
-      await profilePage.expectCurrUserToHaveProfilePhoto();
-      await profilePage.expectUserToHaveBio(TEST_BIO);
-      await profilePage.expectUserToHaveInterests(TEST_INTERESTS);
-      await profilePage.expectUserToNotHaveInterestPlaceholder();
-      await users.logout();
-    });
+//   it('should display photo, custom bio, and interests when logged in',
+//     async function() {
+//       await users.login(TEST_EMAIL);
+//       await profilePage.get(TEST_USERNAME);
+//       await profilePage.expectCurrUserToHaveProfilePhoto();
+//       await profilePage.expectUserToHaveBio(TEST_BIO);
+//       await profilePage.expectUserToHaveInterests(TEST_INTERESTS);
+//       await profilePage.expectUserToNotHaveInterestPlaceholder();
+//       await users.logout();
+//     });
 
-  it('should display default photo, custom bio, and interests when logged out',
-    async function() {
-      await profilePage.get(TEST_USERNAME);
-      await profilePage.expectOtherUserToHaveProfilePhoto();
-      await profilePage.expectUserToHaveBio(TEST_BIO);
-      await profilePage.expectUserToHaveInterests(TEST_INTERESTS);
-      await profilePage.expectUserToNotHaveInterestPlaceholder();
-    }
-  );
+//   it('should display default photo, custom bio, and interests when logged out',
+//     async function() {
+//       await profilePage.get(TEST_USERNAME);
+//       await profilePage.expectOtherUserToHaveProfilePhoto();
+//       await profilePage.expectUserToHaveBio(TEST_BIO);
+//       await profilePage.expectUserToHaveInterests(TEST_INTERESTS);
+//       await profilePage.expectUserToNotHaveInterestPlaceholder();
+//     }
+//   );
 
-  afterEach(async function() {
-    await general.checkForConsoleErrors([]);
-  });
-});
+//   afterEach(async function() {
+//     await general.checkForConsoleErrors([]);
+//   });
+// });
 
 describe('Visiting user profile page', function() {
   var TEST_USERNAME = 'myUser';

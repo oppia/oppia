@@ -48,8 +48,8 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestStateIn = '.protractor-test-add-state-input';
   var editOutcomeDestAddExplorationId = $(
     '.protractor-test-add-refresher-exploration-id');
-  var editOutcomeDestDropdownOptions = function(targetOption) {
-    return $$(`option=${targetOption}`)[0];
+  var editOutcomeDestDropdownOptions = async function(targetOption) {
+    return await $$(`option=${targetOption}`)[0];
   };
   var feedbackBubble = $('.protractor-test-feedback-bubble');
   var feedbackEditor = $('.protractor-test-open-feedback-editor');
@@ -75,7 +75,6 @@ var ExplorationEditorMainTab = function() {
   var responseBody = function(responseNum) {
     return $('.protractor-test-response-body-' + responseNum);
   };
-  var responseTab = $$('.protractor-test-response-tab');
   var stateContentDisplay = $('.protractor-test-state-content-display');
   var stateEditButton = $('.protractor-test-edit-content-pencil-button');
   var stateNameContainer = $('.protractor-test-state-name-container');
@@ -85,8 +84,6 @@ var ExplorationEditorMainTab = function() {
     '.protractor-test-state-content-editor';
   var addOrUpdateSolutionModal = $(
     '.protractor-test-add-or-update-solution-modal');
-  var answerDescriptionFragment = $$(
-    '.protractor-test-answer-description-fragment');
   var answerDescription = $('.protractor-test-answer-description');
   var deleteNodeLocator = '.protractor-test-delete-node';
   var titleElement = $('.ng-joyride-title');
@@ -126,8 +123,6 @@ var ExplorationEditorMainTab = function() {
   var stateNameSubmitButton = stateNameContainer.$(
     '.protractor-test-state-name-submit');
   var answerCorrectnessToggle = $('.protractor-test-editor-correctness-toggle');
-  var skipButtons = $$('.ng-joyride .skipBtn');
-  var nextTutorialStageButtons = $$('.ng-joyride .nextBtn');
   var startTutorialButton = $('.protractor-test-start-tutorial');
   var submitSolutionButton = $('.protractor-test-submit-solution-button');
 
@@ -151,6 +146,7 @@ var ExplorationEditorMainTab = function() {
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
+    var skipButtons = await $$('.ng-joyride .skipBtn');
     if (await skipButtons.length === 1) {
       await action.click('Skip button', skipButtons[0]);
     } else if (await skipButtons.length !== 0) {
@@ -188,10 +184,11 @@ var ExplorationEditorMainTab = function() {
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.
+      var nextTutorialStageButtons = await $$('.ng-joyride .nextBtn');
       await waitFor.elementToBeClickable(
         nextTutorialStageButtons[0],
         'Next Tutorial Stage button is not clickable');
-      if (await nextTutorialStageButtons.count() === 1) {
+      if (await nextTutorialStageButtons.length === 1) {
         await action.click(
           'Next Tutorial Stage button', nextTutorialStageButtons[0]);
         await waitFor.invisibilityOf(
@@ -281,6 +278,7 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
+        var responseTab = await $$('.protractor-test-response-tab');
         await waitFor.visibilityOf(responseTab[0]);
         headerElem = responseTab[responseNum];
       }
@@ -730,6 +728,8 @@ var ExplorationEditorMainTab = function() {
     }
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
     expect(parameterValues.length).toEqual(parameterTypes.length);
+    var answerDescriptionFragment = await $$(
+      '.protractor-test-answer-description-fragment');
     for (var i = 0; i < parameterValues.length; i++) {
       var parameterElement = answerDescriptionFragment[i * 2 + 1];
       var parameterEditor = await forms.getEditor(
