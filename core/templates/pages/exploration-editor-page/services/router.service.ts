@@ -80,7 +80,8 @@ export class RouterService {
     }
 
     this.windowRef.nativeWindow.location.hash = newPath;
-    newPath = newPath.replace('%20', ' ');
+    newPath = decodeURI(newPath);
+
     // TODO(oparry): Determine whether this is necessary, since
     // _savePendingChanges() is called by each of the navigateTo... functions.
     this.externalSaveService.onExternalSave.emit();
