@@ -196,8 +196,7 @@ class RelationshipsOf:
     # A dict(ModelProperty: set(str)). The keys are properties of a model whose
     # values refer to the IDs of their corresponding set of model kinds.
     _ID_REFERENCING_PROPERTIES: Dict[
-        model_property.ModelProperty,
-        Set[str]
+        model_property.ModelProperty, Set[str]
     ] = collections.defaultdict(set)
 
     def __init__(self, model_class: Type[base_models.BaseModel]) -> None:
