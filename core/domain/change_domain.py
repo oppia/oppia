@@ -262,7 +262,9 @@ class BaseChange:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
-            dict_name: str = self.__dict__[name]
+            dict_name = self.__dict__[name]
+            assert isinstance(dict_name, str)
             return dict_name
         except KeyError as e:
-            raise AttributeError(name) from e
+            raise AttributeError(
+                'Attribute %s does not exist' % name) from e
