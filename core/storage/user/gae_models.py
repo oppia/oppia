@@ -3129,6 +3129,8 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         """
         found_models = cls.get_multi(user_ids)
 
+        learner_groups_user_models_to_put = []
+
         for learner_grp_usr_model in found_models:
             if learner_grp_usr_model is None:
                 continue
@@ -3155,5 +3157,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
             learner_grp_usr_model.learner_groups_user_details = (
                 updated_details)
 
-            learner_grp_usr_model.update_timestamps()
-            learner_grp_usr_model.put()
+            learner_groups_user_models_to_put.append(learner_grp_usr_model)
+
+        cls.update_timestamps_multi(learner_groups_user_models_to_put)
+        cls.put_multi(learner_groups_user_models_to_put)

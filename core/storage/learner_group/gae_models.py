@@ -237,6 +237,8 @@ class LearnerGroupModel(base_models.BaseModel):
                 cls.facilitator_user_ids == user_id
         ))
 
+        learner_group_models_to_put = []
+
         for learner_group_model in found_models:
             # If the user is the facilitator of the group and there is
             # only one facilitator_user_id, delete the group.
@@ -264,5 +266,7 @@ class LearnerGroupModel(base_models.BaseModel):
             elif user_id in learner_group_model.invited_student_user_ids:
                 learner_group_model.invited_student_user_ids.remove(user_id)
 
-            learner_group_model.update_timestamps()
-            learner_group_model.put()
+            learner_group_models_to_put.append(learner_group_model)
+
+        cls.update_timestamps_multi(learner_group_models_to_put)
+        cls.put_multi(learner_group_models_to_put)
