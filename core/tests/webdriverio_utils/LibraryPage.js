@@ -27,6 +27,12 @@ var LibraryPage = function() {
   var mainHeader = $('.protractor-test-library-main-header');
   var allCollectionSummaryTile = $(
     '.protractor-test-collection-summary-tile');
+  var allExplorationSummaryTile = $(
+    '.protractor-test-exp-summary-tile');
+  var allExplorationsTitled = function(explorationName) {
+    return $$(
+      `.protractor-test-exp-summary-tile-title=${explorationName}`);
+  };
 
   var allCollectionsTitled = function(collectionName) {
     return $$(
@@ -58,6 +64,27 @@ var LibraryPage = function() {
     await browser.url(LIBRARY_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
+
+  this.findExploration = async function(explorationTitle) {
+    await waitFor.pageToFullyLoad();
+    await _submitSearchQuery(explorationTitle);
+  };
+
+  this.playExploration = async function(explorationName) {
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      allExplorationSummaryTile,
+      'Library Page does not have any explorations');
+
+    var explorationCard = await allExplorationsTitled(explorationName)[0];
+    await waitFor.visibilityOf(
+      explorationCard, 'Unable to find exploration ' + explorationName);
+    // The Exploration summary card is masked by a dummy element. Therefore, a
+    // Javascript click is used.
+    await action.click('Exploration Card', explorationCard, true);
+    await waitFor.pageToFullyLoad();
+  };
+
 
   this.findCollection = async function(collectionTitle) {
     await waitFor.pageToFullyLoad();

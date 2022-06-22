@@ -34,10 +34,18 @@ var ExplorationEditorSettingsTab = function() {
     '.protractor-test-exploration-objective-input');
   var explorationTitleInput = $(
     '.protractor-test-exploration-title-input');
+  var disableCorrectnessFeedbackButton = $(
+    '.protractor-test-enable-mark-correctness-feedback');
 
   /*
    * Workflows
    */
+  this.disableCorrectnessFeedback = async function() {
+    await action.waitForAutosave();
+    await action.click(
+      'Disable Correctness Feedback Button', disableCorrectnessFeedbackButton);
+  };
+
   this.setCategory = async function(category) {
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');

@@ -488,7 +488,7 @@ var expectRichText = function(elem) {
         return await entry.getText();
       });
     // We re-derive the array of elements as we need it too.
-    var arrayOfElements = elem.$$(XPATH_SELECTOR);
+    var arrayOfElements = await elem.$$(XPATH_SELECTOR);
     var fullText = await elem.getText();
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
@@ -515,7 +515,7 @@ var expectRichText = function(elem) {
 //   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textBold'.
 var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
-  expect(await arrayOfElems.count()).toEqual(arrayOfTexts.length);
+  expect(await arrayOfElems.length).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
   // the child elements and text of the rich text area checking has gone. The
   // arrayPointer traverses both arrays simultaneously.
@@ -580,7 +580,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       justPassedRteComponent = true;
     },
     expectEnd: async function() {
-      expect(arrayPointer).toBe(await arrayOfElems.count());
+      expect(arrayPointer).toBe(await arrayOfElems.length);
     }
   };
 };

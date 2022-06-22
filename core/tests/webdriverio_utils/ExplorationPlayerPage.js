@@ -19,9 +19,15 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
+var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
+  var waitingForResponseElem = $(
+    '.protractor-test-input-response-loading-dots');
   var explorationHeader = $('.protractor-test-exploration-header');
+  var conversationInput = $('.protractor-test-conversation-input');
+
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
   // sent a handler (as given in forms.RichTextChecker) to which calls such as
@@ -39,6 +45,21 @@ var ExplorationPlayerPage = function() {
     ).toMatch(richTextInstructions);
   };
 
+  // `answerData` is a variable that is passed to the
+  // corresponding interaction's protractor utilities.
+  // Its definition and type are interaction-specific.
+  this.submitAnswer = async function(interactionId, answerData) {
+    // TODO(#11969): Move this wait to interactions submitAnswer function.
+    await waitFor.presenceOf(
+      conversationInput, 'Conversation input takes too long to appear.');
+    // The .first() targets the inline interaction, if it exists. Otherwise,
+    // it will get the supplemental interaction.
+    await interactions.getInteraction(interactionId).submitAnswer(
+      conversationInput, answerData);
+    await waitFor.invisibilityOf(
+      waitingForResponseElem, 'Response takes too long to appear');
+  };
+
   this.expectExplorationNameToBe = async function(name) {
     await waitFor.visibilityOf(
       explorationHeader, 'Exploration Header taking too long to appear.');
@@ -47,6 +68,17 @@ var ExplorationPlayerPage = function() {
     expect(
       await explorationHeader.getText()
     ).toBe(name);
+  };
+
+  this.expectExplorationToNotBeOver = async function() {
+    var conversationContent = await $$(
+      '.protractor-test-conversation-content');
+    var lastElement = conversationContent.length - 1;
+    await waitFor.visibilityOf(
+      conversationContent[lastElement], 'Ending message not visible');
+    expect(
+      await conversationContent[lastElement].getText()
+    ).not.toEqual('Congratulations, you have finished!');
   };
 };
 

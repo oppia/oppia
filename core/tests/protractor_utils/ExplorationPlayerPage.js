@@ -22,7 +22,6 @@ var action = require('./action.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
-var action = require('./action.js');
 const { browser } = require('protractor');
 
 var ExplorationPlayerPage = function() {

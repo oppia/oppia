@@ -42,7 +42,8 @@ var alertToBePresent = async() => {
  * @param {string} errorMessage - Error message when element is not clickable.
  */
 var elementToBeClickable = async function(element, errorMessage) {
-  await element.waitForClickable(
+  await browser.waitUntil(
+    until.elementToBeClickable(element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -97,10 +98,12 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
-  await element.waitForDisplayed({
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
-  });
+  await browser.waitUntil(
+    await until.presenceOf(element),
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: errorMessage
+    });
 };
 
 /**

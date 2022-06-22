@@ -202,6 +202,7 @@ var createAndPublishTwoCardExploration = async function(
   await explorationEditorMainTab.setInteraction('Continue');
   var responseEditor = await explorationEditorMainTab.getResponseEditor(
     'default');
+  debugger;
   await responseEditor.setDestination('second card', true, null);
   await explorationEditorMainTab.moveToState('second card');
   await explorationEditorMainTab.setContent(await forms.toRichText('card 2'));

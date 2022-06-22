@@ -48,9 +48,8 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestStateIn = '.protractor-test-add-state-input';
   var editOutcomeDestAddExplorationId = $(
     '.protractor-test-add-refresher-exploration-id');
-  var editOutcomeDestDropdownOptions = async function(targetOption) {
-    return await $$(`option=${targetOption}`)[0];
-  };
+  var editOutcomeDestDropdownOptions = $(
+    '.e2e-destination-selector-dropdown');
   var feedbackBubble = $('.protractor-test-feedback-bubble');
   var feedbackEditor = $('.protractor-test-open-feedback-editor');
   var fadeIn = $('.protractor-test-editor-cards-container');
@@ -59,7 +58,7 @@ var ExplorationEditorMainTab = function() {
   var explorationGraph = $('.protractor-test-exploration-graph');
   var nodeLabelLocator = '.protractor-test-node-label';
   var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(nodeLabelLocator);
+    return nodeElement.$(nodeLabelLocator);
   };
   var interactionTab = function(tabId) {
     return $('.protractor-test-interaction-tab-' + tabId);
@@ -73,7 +72,7 @@ var ExplorationEditorMainTab = function() {
     '.protractor-test-open-outcome-feedback-editor');
   var postTutorialPopover = $('.ng-joyride .popover-content');
   var responseBody = function(responseNum) {
-    return $('.protractor-test-response-body-' + responseNum);
+    return $(`.protractor-test-response-body-${responseNum}`);
   };
   var stateContentDisplay = $('.protractor-test-state-content-display');
   var stateEditButton = $('.protractor-test-edit-content-pencil-button');
@@ -285,7 +284,7 @@ var ExplorationEditorMainTab = function() {
 
       var isVisible = await responseBody(responseNum).isExisting();
       if (!isVisible) {
-        await action.click('Response Editor Header', headerElem, true);
+        await action.click('Response Editor Header', headerElem);
       }
     } else {
       headerElem = addResponseHeader;
@@ -441,8 +440,7 @@ var ExplorationEditorMainTab = function() {
       targetOption = destName;
     }
 
-    var outcomeDestOption = await editOutcomeDestDropdownOptions(targetOption);
-    await action.click('Outcome Destination Option', outcomeDestOption);
+    await editOutcomeDestDropdownOptions.selectByVisibleText(targetOption);
 
     if (createNewDest) {
       var editOutcomeDestStateInput = editOutcomeDestBubble.$(
@@ -829,7 +827,7 @@ var ExplorationEditorMainTab = function() {
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = async function(names) {
-    var stateNodes = explorationGraph.$$('.protractor-test-node');
+    var stateNodes = await explorationGraph.$$('.protractor-test-node');
     var stateNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));
