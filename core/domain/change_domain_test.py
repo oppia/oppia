@@ -38,41 +38,29 @@ class BaseChangeTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         change_domain.BaseChange.ALLOWED_COMMANDS = self.ALLOWED_COMMANDS
-        self.valid_cmd_attribute = (
-            self.ALLOWED_COMMANDS[0]['required_attribute_names'] +
-            self.ALLOWED_COMMANDS[0]['optional_attribute_names']
-        )
-
-    def test_to_dict(self) -> None:
-        config_property_change_dict = {
+        self.config_property_change_dict = {
             'cmd': 'change_property_value',
             'new_value': 'new_value',
             'old_value': 'old_value'
         }
-        change_object = change_domain.BaseChange(config_property_change_dict)
+        self.change_object = change_domain.BaseChange(self.config_property_change_dict)
+
+    def test_to_dict(self) -> None:
         self.assertEqual(
-            change_object.to_dict(),
-            config_property_change_dict
+            self.change_object.to_dict(),
+            self.config_property_change_dict
         )
 
     def test_only_valid_attribute_names_exist_in_instance(self) -> None:
-        config_property_change_dict = {
-            'cmd': 'change_property_value',
-            'new_value': 'new_value',
-            'old_value': 'old_value'
-        }
-        change_object = change_domain.BaseChange(config_property_change_dict)
-        for name in self.valid_cmd_attribute:
-            attribute_value = getattr(change_object, name)
+        valid_cmd_attribute = (
+            self.ALLOWED_COMMANDS[0]['required_attribute_names'] +
+            self.ALLOWED_COMMANDS[0]['optional_attribute_names']
+        )
+        for name in valid_cmd_attribute:
+            attribute_value = getattr(self.change_object, name)
             self.assertIsNotNone(attribute_value)
 
     def test_extra_attributes_does_not_exist_in_change_instance(self) -> None:
-        config_property_change_dict = {
-            'cmd': 'change_property_value',
-            'new_value': 'new_value',
-            'old_value': 'old_value'
-        }
-        change_object = change_domain.BaseChange(config_property_change_dict)
         with self.assertRaisesRegex(# type: ignore[no-untyped-call]
             AttributeError, 'Attribute extra_value does not exist'):
-            getattr(change_object, 'extra_value')
+            getattr(self.change_object, 'extra_value')
