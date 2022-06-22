@@ -185,3 +185,53 @@ def get_learner_group_by_id(group_id):
         learner_group_model.invited_user_ids,
         learner_group_model.subtopic_page_ids,
         learner_group_model.story_ids)
+
+
+def remove_learner_group(group_id):
+    """Removes the learner group with of given learner group ID.
+
+    Args:
+        group_id: str. The id of the learner group to be removed.
+
+    Raises:
+        Exception. The learner group does not exist.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
+        group_id)
+
+    if not learner_group_model:
+        raise Exception('The learner group does not exist.')
+
+    user_models.LearnerGroupUserModel.delete_learner_group_references(group_id)
+    learner_group_model.delete()
+
+
+def get_students_progress_through_syllabus(group_id, student_user_ids):
+    """Returns the progress of the students in the learner group through the
+    syllabus.
+
+    Args:
+        group_id: str. The id of the learner group.
+        student_user_ids: list(str). The ids of the students in the learner
+            group.
+
+    Returns:
+        list(dict). The progress of the students in the learner group through
+        the syllabus.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
+        group_id)
+
+    if not learner_group_model:
+        raise Exception('The learner group does not exist.')
+
+    subtopic_page_ids = learner_group_model.subtopic_page_ids
+    story_ids = learner_group_model.story_ids
+
+    students_stories_progress = {}
+    for student_user_id in student_user_ids:
+        stories_progress = user_models.StoryProgressModel.get_multi(
+            student_user_id, story_ids)
+        students_stories_progress[student_user_id] = stories_progress
+
+    

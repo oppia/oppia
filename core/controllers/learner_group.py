@@ -40,25 +40,45 @@ LEARNER_GROUP_SCHEMA = {
     },
     'student_usernames': {
         'schema': {
-            'type': 'list'
+            'type': 'list',
+            'items': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_USERNAME_LENGTH
+                }]
+            }
         },
         'default_value': None
     },
     'invited_usernames': {
         'schema': {
-            'type': 'list'
+            'type': 'list',
+            'items': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_USERNAME_LENGTH
+                }]
+            }
         },
         'default_value': None
     },
     'subtopic_page_ids': {
         'schema': {
-            'type': 'list'
+            'type': 'list',
+            'items': {
+                'type': 'basestring'
+            }
         },
         'default_value': None
     },
     'story_ids': {
         'schema': {
-            'type': 'list'
+            'type': 'list',
+            'items': {
+                'type': 'basestring'
+            }
         },
         'default_value': None
     }
@@ -189,15 +209,41 @@ class LearnerGroupUserProgressHandler(base.BaseHandler):
         }
     }
 
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'student_usernames': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring',
+                        'validators': [{
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_USERNAME_LENGTH
+                        }]
+                    },
+                    'validators': [{
+                        'id': 'has_length_at_least',
+                        'min_value': 1
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_access_learner_dashboard
     def get(self, learner_group_id):
         """Handles GET requests for facilitator's view of users progress
         through learner group syllabus.
         """
 
-        learner_group = (
-            learner_group_services.get_facilitator_view_of_learner_group(
-                learner_group_id))
+        student_usernames = self.payload.get('student_usernames')
+
+        student_user_ids: user_services.get_multi_user_ids_from_usernames(
+            student_usernames)
+
+        students_progress = (
+            learner_group_services.get_students_progress_through_syllabus(
+                learner_group_id, student_user_ids))
 
         if learner_group is not None:
             self.render_json({
