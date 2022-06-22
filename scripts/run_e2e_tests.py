@@ -22,12 +22,16 @@ import os
 import subprocess
 import sys
 
-from core.constants import constants
-from scripts import build
-from scripts import common
-from scripts import flake_checker
-from scripts import install_third_party_libs
-from scripts import servers
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core.constants import constants  # isort:skip
+from scripts import build  # isort:skip
+from scripts import flake_checker  # isort:skip
+from scripts import install_third_party_libs  # isort:skip
+from scripts import servers  # isort:skip
 
 MAX_RETRY_COUNT = 3
 GOOGLE_APP_ENGINE_PORT = 9001

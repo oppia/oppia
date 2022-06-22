@@ -128,6 +128,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
         if (AlertsService.warnings.length === 0) {
           $scope.skillDifficulty = result.skillDifficulty;
           $scope.setDifficultyString($scope.skillDifficulty);
+          $scope.$applyAsync();
         }
       }, function() {
         // Note to developers:
