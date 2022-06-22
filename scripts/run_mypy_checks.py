@@ -142,8 +142,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/topic_services_test.py',
     'core/domain/user_services.py',
     'core/domain/user_services_test.py',
-    'core/domain/visualization_registry.py',
-    'core/domain/visualization_registry_test.py',
     'core/domain/voiceover_services.py',
     'core/domain/voiceover_services_test.py',
     'core/domain/wipeout_service.py',
