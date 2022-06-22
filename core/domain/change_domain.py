@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
 def validate_cmd(
@@ -257,3 +257,14 @@ class BaseChange:
         # This is done because schema_utils used the validate method
         # to verify that the domain object is correct.
         self.validate_dict(self.to_dict())
+
+    def __getattr__(self, name: str) -> str:
+        # AttributeError needs to be thrown in order to make
+        # instances of this class picklable.
+        try:
+            dict_name = self.__dict__[name]
+            assert isinstance(dict_name, str)
+            return dict_name
+        except KeyError as e:
+            raise AttributeError(
+                'Attribute %s does not exist' % name) from e
