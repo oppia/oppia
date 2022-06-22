@@ -1525,7 +1525,6 @@ class LearnerGroupUserDetails:
             dict. A dictionary containing the LearnerGroupUserDetails class
             information in a dictionary form.
         """
-
         return {
             'group_id': self.group_id,
             'progress_sharing_is_turned_on': self.progress_sharing_is_turned_on
@@ -1568,7 +1567,6 @@ class LearnerGroupsUser:
             dict. A dictionary containing the LearnerGroupsUser class
             information in a dictionary form.
         """
-
         learner_groups_user_details_dict = [
             learner_group_details.to_dict()
             for learner_group_details in self.learner_groups_user_details
@@ -1590,7 +1588,6 @@ class LearnerGroupsUser:
             ValidationError. One or more attributes of the LearnerGroupsUser
                 are invalid.
         """
-
         for learner_group_details in self.learner_groups_user_details:
             if learner_group_details.group_id in (
                     self.invited_to_learner_groups_ids):

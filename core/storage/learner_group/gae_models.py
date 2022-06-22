@@ -203,7 +203,7 @@ class LearnerGroupModel(base_models.BaseModel):
                     'subtopic_page_ids':
                         learner_group_model.subtopic_page_ids,
                     'story_ids': learner_group_model.story_ids
-            }
+                }
         return user_data
 
     @classmethod
@@ -244,8 +244,8 @@ class LearnerGroupModel(base_models.BaseModel):
             # only one facilitator_user_id, delete the group.
             if user_id in learner_group_model.facilitator_user_ids and (
                     len(learner_group_model.facilitator_user_ids) == 1):
-                cls.delete_learner_group(learner_group_model)
-                return
+                learner_group_model.delete()
+                continue
 
             # If the user is the facilitator of the group and there are
             # more then one facilitator_user_ids, delete the user from the
@@ -266,27 +266,3 @@ class LearnerGroupModel(base_models.BaseModel):
 
             learner_group_model.update_timestamps()
             learner_group_model.put()
-
-    @classmethod
-    def delete_learner_group(
-        cls, learner_group_model: LearnerGroupModel
-    ) -> None:
-        """Delete a learner group.
-
-        Args:
-            learner_group_model: LearnerGroupModel. The learner group model
-                to be deleted.
-        """
-        referenced_user_ids = (
-            learner_group_model.student_user_ids +
-            learner_group_model.invited_student_user_ids)
-
-        # Note: Before deleting the learner group references, we need to send
-        # notifications to the users that are part of this learner group. The
-        # future implementation of users getting notified should be added here.
-        # Remove references of the group from all related learner
-        # group user models.
-        user_models.LearnerGroupsUserModel.delete_learner_group_references(
-            learner_group_model.id, referenced_user_ids)
-
-        learner_group_model.delete()

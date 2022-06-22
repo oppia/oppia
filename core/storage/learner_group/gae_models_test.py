@@ -251,15 +251,3 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_11'))
-
-    def test_delete_learner_group_model_instance(self) -> None:
-        learner_group_model = (
-            learner_group_models.LearnerGroupModel.get_by_id('3232'))
-        self.assertIsNotNone(learner_group_model)
-
-        learner_group_models.LearnerGroupModel.delete_learner_group(
-            learner_group_model
-        )
-
-        self.assertIsNone(
-            learner_group_models.LearnerGroupModel.get_by_id('3232'))

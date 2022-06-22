@@ -3129,15 +3129,16 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         """
         found_models = cls.get_multi(user_ids)
 
-        for learner_grp_user_model in found_models:
-            if learner_grp_user_model is None:
+        for learner_grp_usr_model in found_models:
+            if learner_grp_usr_model is None:
                 continue
 
             # If the user has been invited to join the group as student, delete
             # the group id from the invited_to_learner_groups_ids list.
-            if learner_grp_user_model is not None and group_id in (
-                    learner_grp_user_model.invited_to_learner_groups_ids):
-                learner_grp_user_model.invited_to_learner_groups_ids.remove(
+            if (
+                group_id in learner_grp_usr_model.invited_to_learner_groups_ids
+            ):
+                learner_grp_usr_model.invited_to_learner_groups_ids.remove(
                     group_id)
 
             # If the user is a student of the group, delete the corresponding
@@ -3146,12 +3147,13 @@ class LearnerGroupsUserModel(base_models.BaseModel):
             updated_details = []
 
             for learner_group_details in (
-                learner_grp_user_model.learner_groups_user_details):
+                learner_grp_usr_model.learner_groups_user_details
+            ):
                 if learner_group_details['group_id'] != group_id:
                     updated_details.append(learner_group_details)
 
-            learner_grp_user_model.learner_groups_user_details = (
+            learner_grp_usr_model.learner_groups_user_details = (
                 updated_details)
 
-            learner_grp_user_model.update_timestamps()
-            learner_grp_user_model.put()
+            learner_grp_usr_model.update_timestamps()
+            learner_grp_usr_model.put()

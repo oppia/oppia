@@ -49,8 +49,7 @@ class LearnerGroup:
         student_user_ids: List[str],
         invited_student_user_ids: List[str],
         subtopic_page_ids: List[str],
-        story_ids: List[str],
-
+        story_ids: List[str]
     ) -> None:
         """Constructs a LearnerGroup domain object.
 
