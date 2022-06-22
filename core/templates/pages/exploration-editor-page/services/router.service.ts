@@ -80,7 +80,7 @@ export class RouterService {
     }
 
     this.windowRef.nativeWindow.location.hash = newPath;
-
+    newPath = newPath.replace('%20', ' ');
     // TODO(oparry): Determine whether this is necessary, since
     // _savePendingChanges() is called by each of the navigateTo... functions.
     this.externalSaveService.onExternalSave.emit();
@@ -144,23 +144,28 @@ export class RouterService {
   _doNavigationWithState(path: string, pathType: string): void {
     let pathBase = '/' + pathType + '/';
     let putativeStateName = path.substring(pathBase.length);
-    let waitForStatesToLoad = setInterval(() => {
-      if (this.explorationStatesService.isInitialized()) {
-        clearInterval(waitForStatesToLoad);
-        if (this.explorationStatesService.hasState(putativeStateName)) {
-          this.stateEditorService.setActiveStateName(putativeStateName);
-          if (pathType === this.SLUG_GUI) {
-            this.windowRef.nativeWindow.location.hash = path;
-            this.stateEditorRefreshService.onRefreshStateEditor.emit();
-            // Fire an event to center the Graph in the Editor.
-            this.centerGraphEventEmitter.emit();
+
+    this.ngZone.runOutsideAngular(() => {
+      let waitForStatesToLoad = setInterval(() => {
+        this.ngZone.run(() => {
+          if (this.explorationStatesService.isInitialized()) {
+            clearInterval(waitForStatesToLoad);
+            if (this.explorationStatesService.hasState(putativeStateName)) {
+              this.stateEditorService.setActiveStateName(putativeStateName);
+              if (pathType === this.SLUG_GUI) {
+                this.windowRef.nativeWindow.location.hash = path;
+                this.stateEditorRefreshService.onRefreshStateEditor.emit();
+                // Fire an event to center the Graph in the Editor.
+                this.centerGraphEventEmitter.emit();
+              }
+            } else {
+              this._changeTab(
+                pathBase + this.explorationInitStateNameService.savedMemento);
+            }
           }
-        } else {
-          this._changeTab(
-            pathBase + this.explorationInitStateNameService.savedMemento);
-        }
-      }
-    }, 300);
+        });
+      }, 300);
+    });
   }
 
   _savePendingChanges(): void {
