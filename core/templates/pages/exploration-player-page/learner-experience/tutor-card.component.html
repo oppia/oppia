@@ -1,10 +1,18 @@
 <link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css" as="style">
 <link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.rtl.css" as="style">
 
+<oppia-end-chapter-confetti #confetti
+                            class="end-chapter-confetti">
+</oppia-end-chapter-confetti>
 <oppia-audio-bar *ngIf="showAudioBar()"></oppia-audio-bar>
 <div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard"
      [ngStyle]="{'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
-  <div class="oppia-learner-view-card-content">
+  <oppia-end-chapter-check-mark #checkMark
+                                [ngClass]="{'check-mark-hidden': checkMarkHidden, 'check-mark-skipped': checkMarkSkipped}"
+                                class="end-chapter-check-mark">
+  </oppia-end-chapter-check-mark>
+  <div class="oppia-learner-view-card-content"
+       [ngClass]="{'learner-view-card-transition-class': isOnTerminalCard(), 'card-content-hidden': !checkMarkHidden}">
     <div class="oppia-learner-view-card-top-section">
       <oppia-content-language-selector></oppia-content-language-selector>
       <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
