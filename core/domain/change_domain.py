@@ -262,6 +262,6 @@ class BaseChange:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
-            return cast(self.__dict__[name], str)
+            return cast(str, self.__dict__[name])
         except KeyError as e:
             raise AttributeError(name) from e
