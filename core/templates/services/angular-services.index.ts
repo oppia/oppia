@@ -408,6 +408,7 @@ import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/se
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { YamlService } from './yaml.service';
+import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -588,6 +589,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['HintsAndSolutionManagerService', HintsAndSolutionManagerService],
   ['HintObjectFactory', HintObjectFactory],
   ['HistoryTabBackendApiService', HistoryTabBackendApiService],
+  ['HistoryTabYamlConversionService', HistoryTabYamlConversionService],
   ['HtmlEscaperService', HtmlEscaperService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],
   ['I18nService', I18nService],

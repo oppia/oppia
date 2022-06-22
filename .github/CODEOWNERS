@@ -244,6 +244,7 @@
 /core/templates/services/image-upload-helper.service*.ts @kevintab95
 /core/templates/services/staleness-detection.service*.ts @kevintab95
 /core/templates/services/validators.service*.ts @kevintab95
+/core/templates/services/yaml.service*.ts @kevintab95
 
 
 # Forms pages.
