@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -53,7 +53,6 @@ describe('StateHintsEditorComponent', () => {
         MockTranslatePipe
       ],
       providers: [
-        ChangeDetectorRef,
         ChangeListService,
         ExternalSaveService,
         StateContentService,

@@ -20,13 +20,11 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import {PortalModule} from '@angular/cdk/portal';
 import { AngularHtmlBindComponent } from './angular-html-bind.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    PortalModule
   ],
   declarations: [
     AngularHtmlBindComponent

@@ -117,11 +117,11 @@ export class AngularHtmlBindComponent {
       if (dom.body.firstElementChild &&
         this.TAG_TO_INTERACTION_MAPPING[
           dom.body.firstElementChild.tagName]) {
-        let interactionTagName = this.TAG_TO_INTERACTION_MAPPING[
+        let interaction = this.TAG_TO_INTERACTION_MAPPING[
           dom.body.firstElementChild.tagName];
 
         const componentFactory = this.componentFactoryResolver
-          .resolveComponentFactory(interactionTagName);
+          .resolveComponentFactory(interaction);
         const componentRef = this.viewContainerRef.createComponent(
           componentFactory);
 
