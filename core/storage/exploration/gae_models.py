@@ -34,9 +34,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services  # pylint: disable=unused-import
 
-# Constant used for generating unique progress url ID.
-_MAX_PID_LENGTH = 6
-
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -916,25 +913,6 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseModel.get().
-    @classmethod
-    def get( # type: ignore[override]
-        cls, unique_progress_url_id: str
-    ) -> Optional[TransientCheckpointUrlModel]:
-        """Gets TransientCheckpointUrlModel for given unique_progress_url_id.
-
-        Args:
-            unique_progress_url_id: str. The 6 digit long unique id
-                assigned to the progress made by a logged-out user.
-
-        Returns:
-            TransientCheckpointUrlModel|None. The TransientCheckpointUrlModel
-            instance which matches with the given unique_progress_url_id.
-        """
-        return super(TransientCheckpointUrlModel, cls).get(
-            unique_progress_url_id, strict=False)
-
     @classmethod
     def create(
         cls,
@@ -980,7 +958,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             new_id = '%s' % ''.join(
                 random.choice(string.ascii_letters)
-                for _ in range(_MAX_PID_LENGTH))
+                for _ in range(constants.MAX_PID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 

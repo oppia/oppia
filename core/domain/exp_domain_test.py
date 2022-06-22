@@ -504,7 +504,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             self.transient_checkpoint_url.validate()
 
     def test_furthest_reached_checkpoint_state_name_incorrect_type(
-        self) -> None:
+        self
+    ) -> None:
         self.transient_checkpoint_url.furthest_reached_checkpoint_state_name = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,

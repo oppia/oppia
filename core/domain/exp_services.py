@@ -2068,7 +2068,7 @@ def update_logged_out_user_progress(
     unique_progress_url_id: str,
     state_name: str,
     exp_version: int,
-    ) -> None:
+) -> None:
     """Updates the logged-out user's progress in the
         associated TransientCheckpointUrlModel.
 
@@ -2082,26 +2082,29 @@ def update_logged_out_user_progress(
             checkpoint was most recently reached.
     """
     # Fetch the model associated with the unique_progress_url_id.
-    model = exp_models.TransientCheckpointUrlModel.get(unique_progress_url_id)
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+        unique_progress_url_id)
 
     # Create a model if it doesn't already exist.
-    if model is None:
-        model = exp_models.TransientCheckpointUrlModel.create(
+    if checkpoint_url_model is None:
+        checkpoint_url_model = exp_models.TransientCheckpointUrlModel.create(
             exploration_id, unique_progress_url_id)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, True, exp_version)
 
     # If the exploration is being visited the first time.
-    if model.furthest_reached_checkpoint_state_name is None:
-        model.furthest_reached_checkpoint_exp_version = exp_version
-        model.furthest_reached_checkpoint_state_name = state_name
-    elif model.furthest_reached_checkpoint_exp_version <= exp_version:
+    if checkpoint_url_model.furthest_reached_checkpoint_state_name is None:
+        checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
+            exp_version)
+        checkpoint_url_model.furthest_reached_checkpoint_state_name = (
+            state_name)
+    elif checkpoint_url_model.furthest_reached_checkpoint_exp_version <= exp_version: # pylint: disable=line-too-long
         furthest_reached_checkpoint_exp = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
                 strict=True,
-                version=model.furthest_reached_checkpoint_exp_version
+                version=checkpoint_url_model.furthest_reached_checkpoint_exp_version # pylint: disable=line-too-long
             )
         )
         checkpoints_in_current_exp = user_services.get_checkpoints_in_order(
@@ -2116,16 +2119,17 @@ def update_logged_out_user_progress(
                 get_most_distant_reached_checkpoint_in_current_exploration(
                     checkpoints_in_current_exp,
                     checkpoints_in_older_exp,
-                    model.furthest_reached_checkpoint_state_name
+                    checkpoint_url_model.furthest_reached_checkpoint_state_name
                 )
         )
 
         # If the furthest reached checkpoint doesn't exist in current
         # exploration.
         if furthest_reached_checkpoint_in_current_exp is None:
-            model.furthest_reached_checkpoint_exp_version = (
+            checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
                 exp_version)
-            model.furthest_reached_checkpoint_state_name = state_name
+            checkpoint_url_model.furthest_reached_checkpoint_state_name = (
+                state_name)
         else:
             # Index of the furthest reached checkpoint.
             frc_index = checkpoints_in_current_exp.index(
@@ -2133,16 +2137,18 @@ def update_logged_out_user_progress(
             # If furthest reached checkpoint is behind most recently
             # reached checkpoint.
             if frc_index <= checkpoints_in_current_exp.index(state_name):
-                model.furthest_reached_checkpoint_exp_version = (
+                checkpoint_url_model.furthest_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
                     exp_version)
-                model.furthest_reached_checkpoint_state_name = (
+                checkpoint_url_model.furthest_reached_checkpoint_state_name = (
                     state_name)
 
-    model.most_recently_reached_checkpoint_exp_version = exp_version
-    model.most_recently_reached_checkpoint_state_name = state_name
-    model.last_updated = datetime.datetime.utcnow()
-    model.update_timestamps()
-    model.put()
+    checkpoint_url_model.most_recently_reached_checkpoint_exp_version = (
+        exp_version)
+    checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
+        state_name)
+    checkpoint_url_model.last_updated = datetime.datetime.utcnow()
+    checkpoint_url_model.update_timestamps()
+    checkpoint_url_model.put()
 
 
 def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
@@ -2162,9 +2168,10 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
         TransientCheckpointUrlModel.
     """
     # Fetch the model associated with the unique_progress_url_id.
-    model = exp_models.TransientCheckpointUrlModel.get(unique_progress_url_id)
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+        unique_progress_url_id)
 
-    if model is None:
+    if checkpoint_url_model is None:
         return None
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -2172,13 +2179,13 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
         exp_fetchers.get_exploration_by_id(
             exploration_id,
             True,
-            model.most_recently_reached_checkpoint_exp_version
+            checkpoint_url_model.most_recently_reached_checkpoint_exp_version
         ))
     furthest_reached_exploration = (
         exp_fetchers.get_exploration_by_id(
             exploration_id,
             True,
-            model.furthest_reached_checkpoint_exp_version
+            checkpoint_url_model.furthest_reached_checkpoint_exp_version
         ))
 
     most_recently_reached_checkpoint_in_current_exploration = (
@@ -2190,7 +2197,7 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
                 user_services.get_checkpoints_in_order(
                     most_recently_interacted_exploration.init_state_name,
                     most_recently_interacted_exploration.states),
-                model.most_recently_reached_checkpoint_state_name
+                checkpoint_url_model.most_recently_reached_checkpoint_state_name
             )
     )
 
@@ -2203,7 +2210,7 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
                 user_services.get_checkpoints_in_order(
                     furthest_reached_exploration.init_state_name,
                     furthest_reached_exploration.states),
-                model.furthest_reached_checkpoint_state_name
+                checkpoint_url_model.furthest_reached_checkpoint_state_name
             )
     )
 
@@ -2211,27 +2218,27 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
     # exploration.
     if (
         most_recently_reached_checkpoint_in_current_exploration !=
-        model.most_recently_reached_checkpoint_state_name
+        checkpoint_url_model.most_recently_reached_checkpoint_state_name
     ):
-        model.most_recently_reached_checkpoint_state_name = (
+        checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
             most_recently_reached_checkpoint_in_current_exploration)
-        model.most_recently_reached_checkpoint_exp_version = (
+        checkpoint_url_model.most_recently_reached_checkpoint_exp_version = (
             latest_exploration.version)
-        model.update_timestamps()
-        model.put()
+        checkpoint_url_model.update_timestamps()
+        checkpoint_url_model.put()
 
     # If the furthest reached checkpoint doesn't exist in current
     # exploration.
     if (
         furthest_reached_checkpoint_in_current_exploration !=
-        model.furthest_reached_checkpoint_state_name
+        checkpoint_url_model.furthest_reached_checkpoint_state_name
     ):
-        model.furthest_reached_checkpoint_state_name = (
+        checkpoint_url_model.furthest_reached_checkpoint_state_name = (
             furthest_reached_checkpoint_in_current_exploration)
-        model.furthest_reached_checkpoint_exp_version = (
+        checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
             latest_exploration.version)
-        model.update_timestamps()
-        model.put()
+        checkpoint_url_model.update_timestamps()
+        checkpoint_url_model.put()
 
     return exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
 

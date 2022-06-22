@@ -376,11 +376,13 @@ class TransientCheckpointUrl:
     """
 
     def __init__(
-            self, exploration_id,
+            self,
+            exploration_id,
             furthest_reached_checkpoint_state_name,
             furthest_reached_checkpoint_exp_version,
             most_recently_reached_checkpoint_state_name,
-            most_recently_reached_checkpoint_exp_version):
+            most_recently_reached_checkpoint_exp_version
+        ):
         """Initializes a TransientCheckpointUrl domain object.
 
         Args:

@@ -1457,7 +1457,11 @@ class TransientCheckpointUrlPage(base.BaseHandler):
         'unique_progress_url_id': {
             'schema': {
                 'type': 'basestring',
-            }
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_PID_LENGTH
+                }]
+            },
         }
     }
     HANDLER_ARGS_SCHEMAS = {
