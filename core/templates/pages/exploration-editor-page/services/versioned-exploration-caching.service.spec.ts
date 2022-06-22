@@ -30,7 +30,7 @@ describe('Versioned exploration caching service', () => {
     exploration: {
       init_state_name: 'Introduction',
       param_changes: [],
-      param_specs: null,
+      param_specs: {},
       title: 'Exploration',
       language_code: 'en',
       correctness_feedback_enabled: true,
@@ -39,12 +39,16 @@ describe('Versioned exploration caching service', () => {
         Introduction: {
           param_changes: [],
           classifier_model_id: null,
-          recorded_voiceovers: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
           solicit_answer_details: true,
           card_is_checkpoint: true,
-          written_translations: null,
+          written_translations: {
+            translations_mapping: {}
+          },
           linked_skill_id: null,
-          next_content_id_index: null,
+          next_content_id_index: 0,
           content: {
             html: '',
             content_id: 'content'
