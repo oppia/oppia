@@ -31,7 +31,7 @@ export class YamlService {
     return yaml.dump(objectToBeStringified);
   }
 
-  parse(yamlStringToBeParsed: string): Object {
+  parse(yamlStringToBeParsed: string): unknown {
     return yaml.load(yamlStringToBeParsed);
   }
 }

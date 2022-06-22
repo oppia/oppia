@@ -75,6 +75,22 @@ describe('Read only exploration backend API service', () => {
         }
       }
     },
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    },
     version: 1,
     can_edit: true,
     preferred_audio_language_code: 'en',
@@ -222,6 +238,7 @@ describe('Read only exploration backend API service', () => {
     roebas.cacheExploration('0', {
       can_edit: true,
       exploration: null,
+      exploration_metadata: null,
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',
@@ -275,6 +292,7 @@ describe('Read only exploration backend API service', () => {
     roebas.cacheExploration('0', {
       can_edit: true,
       exploration: null,
+      exploration_metadata: null,
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',

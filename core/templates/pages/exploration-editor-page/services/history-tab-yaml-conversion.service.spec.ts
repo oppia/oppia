@@ -55,7 +55,7 @@ describe('History tab yaml conversion service', () => {
   it('should return an empty string when the given entity is falsy',
     fakeAsync(() => {
       historyTabYamlConversionService
-        .getYamlStringFromStateOrMetadata(undefined)
+        .getYamlStringFromStateOrMetadata(null)
         .then((result) => {
           expect(result).toEqual('');
         });

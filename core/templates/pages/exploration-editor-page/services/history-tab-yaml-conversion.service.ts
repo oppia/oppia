@@ -33,7 +33,7 @@ export class HistoryTabYamlConversionService {
   ) {}
 
   getYamlStringFromStateOrMetadata(
-      entity: State | ExplorationMetadata
+      entity: (State | ExplorationMetadata) | null
   ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       // Note: the timeout is needed or the string will be sent
