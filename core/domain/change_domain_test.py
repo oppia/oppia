@@ -43,7 +43,9 @@ class BaseChangeTests(test_utils.GenericTestBase):
             'new_value': 'new_value',
             'old_value': 'old_value'
         }
-        self.change_object = change_domain.BaseChange(self.config_property_change_dict)
+        self.change_object = change_domain.BaseChange(
+            self.config_property_change_dict
+        )
 
     def test_to_dict(self) -> None:
         self.assertEqual(
