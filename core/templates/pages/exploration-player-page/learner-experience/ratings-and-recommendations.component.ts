@@ -31,6 +31,7 @@ import { LearnerViewRatingService } from '../services/learner-view-rating.servic
 import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 interface ResultActionButton {
   type: string;
@@ -86,7 +87,8 @@ export class RatingsAndRecommendationsComponent {
     private userService: UserService,
     private windowRef: WindowRef,
     private explorationPlayerStateService: ExplorationPlayerStateService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -151,6 +153,10 @@ export class RatingsAndRecommendationsComponent {
       return this.localStorage.getItem('hide_sign_up_section') === 'true';
     }
     return false;
+  }
+
+  isEndChapterFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 }
 

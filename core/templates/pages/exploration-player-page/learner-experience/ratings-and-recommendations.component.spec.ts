@@ -29,6 +29,17 @@ import { MockLimitToPipe } from '../templates/information-card-modal.component.s
 import { RatingsAndRecommendationsComponent } from './ratings-and-recommendations.component';
 import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EndChapterCelebration: {
+        isEnabled: true
+      }
+    };
+  }
+}
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -39,6 +50,7 @@ describe('Ratings and recommendations component', () => {
   let userService: UserService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let urlInterpolationService: UrlInterpolationService;
+  let platformFeatureService: PlatformFeatureService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -72,6 +84,10 @@ describe('Ratings and recommendations component', () => {
         ExplorationPlayerStateService,
         UrlInterpolationService,
         {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+        },
+        {
           provide: WindowRef,
           useClass: MockWindowRef
         }
@@ -90,6 +106,7 @@ describe('Ratings and recommendations component', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
   });
 
   it('should populate internal properties and subscribe to event' +
@@ -232,4 +249,21 @@ describe('Ratings and recommendations component', () => {
 
       expect(componentInstance.isSignUpSectionHidden()).toBe(false);
     });
+
+  it('should correctly determine if the feature is enabled or not', () => {
+    let featureSpy =
+      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough();
+
+    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(true);
+
+    featureSpy.and.returnValue(
+      {
+        EndChapterCelebration: {
+          isEnabled: false
+        }
+      }
+    );
+
+    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(false);
+  });
 });

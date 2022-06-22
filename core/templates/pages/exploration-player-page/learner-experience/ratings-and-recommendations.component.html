@@ -62,7 +62,7 @@
         Already have an account?
         <span class="conversation-skin-login-button-text" translate="" (click)="signIn()">Sign In</span>
       </button>
-      <button class="conversation-skin-hide-sign-up-section-button">
+      <button class="conversation-skin-hide-sign-up-section-button" *ngIf="isEndChapterFeatureEnabled()">
         <span class="conversation-skin-hide-sign-up-section-text" translate="I18N_SIGNUP_SECTION_DONT_ASK_ME_AGAIN" (click)="hideSignUpSection()"></span>
       </button>
     </div>
