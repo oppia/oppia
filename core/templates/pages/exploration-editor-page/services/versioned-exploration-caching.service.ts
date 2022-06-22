@@ -97,4 +97,3 @@ export class VersionedExplorationCachingService {
 angular.module('oppia').factory(
   'VersionedExplorationCachingService',
   downgradeInjectable(VersionedExplorationCachingService));
-
