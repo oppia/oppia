@@ -29,7 +29,13 @@ COMPILED_REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.txt'
 
 
 def assert_in_venv() -> None:
-    '''Raise an error if we are not in a virtual environment.'''
+    '''Raise an error if we are not in a virtual environment.
+
+    No error is raised if we are running on GitHub Actions because a
+    virtual environment is unnecessary there.
+    '''
+    if 'GITHUB_ACTION' in os.environ:
+        return
     if sys.prefix == sys.base_prefix:
         raise AssertionError(
             'Oppia must be developed within a virtual environment.')
