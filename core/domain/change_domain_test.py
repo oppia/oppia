@@ -54,7 +54,7 @@ class BaseChangeTests(test_utils.GenericTestBase):
             change_object.to_dict(),
             config_property_change_dict
         )
-    
+
     def test_only_valid_attribute_names_exist_in_instance(self) -> None:
         config_property_change_dict = {
             'cmd': 'change_property_value',
@@ -76,4 +76,3 @@ class BaseChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(# type: ignore[no-untyped-call]
             AttributeError, 'Attribute extra_value does not exist'):
             getattr(change_object, 'extra_value')
-            
