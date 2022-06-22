@@ -29,7 +29,6 @@ from typing import Dict, List, Optional, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from core.domain import platform_parameter_list
     from mypy_imports import config_models
 
 (config_models,) = models.Registry.import_models(
