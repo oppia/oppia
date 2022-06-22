@@ -40,7 +40,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'description': 'description',
             'facilitator_user_ids': ['user_1'],
             'student_user_ids': ['user_2', 'user_3', 'user_4'],
-            'invited_user_ids': ['user_5', 'user_6'],
+            'invited_student_user_ids': ['user_5', 'user_6'],
             'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }
@@ -52,7 +52,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_group.student_user_ids, ['user_2', 'user_3', 'user_4'])
         self.assertEqual(
-            learner_group.invited_user_ids, ['user_5', 'user_6'])
+            learner_group.invited_student_user_ids, ['user_5', 'user_6'])
         self.assertEqual(
             learner_group.subtopic_page_ids,
             ['subtopic_1', 'subtopic_2'])
@@ -77,7 +77,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'description': 'description',
             'facilitator_user_ids': ['user_1'],
             'student_user_ids': ['user_2', 'user_3', 'user_4'],
-            'invited_user_ids': ['user_5', 'user_6'],
+            'invited_student_user_ids': ['user_5', 'user_6'],
             'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
             'story_ids': ['story_1', 'story_2']
         }

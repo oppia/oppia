@@ -1503,62 +1503,60 @@ class ExplorationUserDataTests(test_utils.GenericTestBase):
             expected_exploration_user_data_dict)
 
 
-class ProgressSharingPermissionTests(test_utils.GenericTestBase):
-    """Tests for ProgressSharingPermission domain object."""
+class LearnerGroupStudentDetailsTests(test_utils.GenericTestBase):
+    """Tests for LearnerGroupStudentDetails domain object."""
 
     def test_initialization(self) -> None:
-        progress_sharing_permission = (
-            user_domain.ProgressSharingPermission(
+        learner_group_student_details = (
+            user_domain.LearnerGroupStudentDetails(
                 'group_id_1', True))
 
-        expected_progress_sharing_permission_dict = {
+        expected_learner_grp_student_details_dict = {
             'group_id': 'group_id_1',
-            'sharing_is_turned_on': True
+            'progress_sharing_is_turned_on': True
         }
 
         self.assertEqual(
-            progress_sharing_permission.group_id, 'group_id_1')
+            learner_group_student_details.group_id, 'group_id_1')
         self.assertEqual(
-            progress_sharing_permission.sharing_is_turned_on, True)
+            learner_group_student_details.progress_sharing_is_turned_on, True)
         self.assertEqual(
-            progress_sharing_permission.to_dict(),
-            expected_progress_sharing_permission_dict)
+            learner_group_student_details.to_dict(),
+            expected_learner_grp_student_details_dict)
 
     def test_to_dict(self) -> None:
-        progress_sharing_permission = (
-            user_domain.ProgressSharingPermission(
+        learner_group_student_details = (
+            user_domain.LearnerGroupStudentDetails(
                 'group_id_1', True))
-        expected_progress_sharing_permission_dict = {
+        expected_learner_grp_student_details_dict = {
             'group_id': 'group_id_1',
-            'sharing_is_turned_on': True
+            'progress_sharing_is_turned_on': True
         }
 
         self.assertEqual(
-            progress_sharing_permission.to_dict(),
-            expected_progress_sharing_permission_dict)
+            learner_group_student_details.to_dict(),
+            expected_learner_grp_student_details_dict)
 
 
-class LearnerGroupUserTest(test_utils.GenericTestBase):
-    """Tests for LearnerGroupUser domain object."""
+class LearnerGroupStudentTest(test_utils.GenericTestBase):
+    """Tests for LearnerGroupStudent domain object."""
 
     def test_initialization(self) -> None:
-        progress_sharing_permission = (
-            user_domain.ProgressSharingPermission(
-                '754', False))
-        learner_group_user = user_domain.LearnerGroupUser(
+        learner_group_student_details = (
+            user_domain.LearnerGroupStudentDetails(
+                'group_id_1', False))
+        learner_group_user = user_domain.LearnerGroupStudent(
             'user1',
-            ['123', '432'],
-            ['754'],
-            [progress_sharing_permission])
+            ['group_id_2', 'group_id_3'],
+            [learner_group_student_details])
 
         expected_learner_group_user_dict = {
             'user_id': 'user1',
-            'invited_to_learner_groups_ids': ['123', '432'],
-            'student_of_learner_groups_ids': ['754'],
-            'progress_sharing_permissions': [
+            'invited_to_learner_groups_ids': ['group_id_2', 'group_id_3'],
+            'student_of_learner_groups_details': [
                 {
-                    'group_id': '754',
-                    'sharing_is_turned_on': False
+                    'group_id': 'group_id_1',
+                    'progress_sharing_is_turned_on': False
                 }
             ]
         }
@@ -1566,35 +1564,30 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
         self.assertEqual(learner_group_user.user_id, 'user1')
         self.assertEqual(
             learner_group_user.invited_to_learner_groups_ids,
-            ['123', '432'])
+            ['group_id_2', 'group_id_3'])
         self.assertEqual(
-            learner_group_user.student_of_learner_groups_ids,
-            ['754'])
-        self.assertEqual(
-            learner_group_user.progress_sharing_permissions,
-            [progress_sharing_permission])
+            learner_group_user.student_of_learner_groups_details,
+            [learner_group_student_details])
         self.assertEqual(
             learner_group_user.to_dict(),
             expected_learner_group_user_dict)
 
     def test_to_dict(self) -> None:
-        progress_sharing_permission = (
-            user_domain.ProgressSharingPermission(
-                '754', False))
-        learner_group_user = user_domain.LearnerGroupUser(
+        learner_group_student_details = (
+            user_domain.LearnerGroupStudentDetails(
+                'group_id_1', False))
+        learner_group_user = user_domain.LearnerGroupStudent(
             'user1',
-            ['123', '432'],
-            ['754'],
-            [progress_sharing_permission])
+            ['group_id_2', 'group_id_3'],
+            [learner_group_student_details])
 
         expected_learner_group_user_dict = {
             'user_id': 'user1',
-            'invited_to_learner_groups_ids': ['123', '432'],
-            'student_of_learner_groups_ids': ['754'],
-            'progress_sharing_permissions': [
+            'invited_to_learner_groups_ids': ['group_id_2', 'group_id_3'],
+            'student_of_learner_groups_details': [
                 {
-                    'group_id': '754',
-                    'sharing_is_turned_on': False
+                    'group_id': 'group_id_1',
+                    'progress_sharing_is_turned_on': False
                 }
             ]
         }
@@ -1604,20 +1597,12 @@ class LearnerGroupUserTest(test_utils.GenericTestBase):
             expected_learner_group_user_dict)
 
     def test_validation(self) -> None:
-        progress_sharing_permission = (
-            user_domain.ProgressSharingPermission(
-                '123', True))
+        learner_group_student_details = (
+            user_domain.LearnerGroupStudentDetails(
+                'group_id_1', True))
 
         self._assert_validation_error( # type: ignore[no-untyped-call]
-            user_domain.LearnerGroupUser(
-                'user1', ['123'], ['123'],
-                [progress_sharing_permission]),
-            'Learner group user cannot be a student and be invited at the '
-            'same time in the same learner group.')
-
-        self._assert_validation_error( # type: ignore[no-untyped-call]
-            user_domain.LearnerGroupUser(
-                'user1', ['345'], ['367'],
-                [progress_sharing_permission]),
-            'Learner cannot have progress sharing permissions of '
-            'group 123 since they are not its student.')
+            user_domain.LearnerGroupStudent(
+                'user1', ['group_id_1'], [learner_group_student_details]),
+            'Learner cannot be invited to join learner group group_id_1 since '
+            'they are already its student.')
