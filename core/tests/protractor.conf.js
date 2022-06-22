@@ -397,6 +397,8 @@ exports.config = {
       displaySpecDuration: true
     }));
 
+    // Set a wide enough window size for the navbar in the library pages to
+    // display fully.
     browser.driver.manage().window().setSize(1285, 1000);
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
