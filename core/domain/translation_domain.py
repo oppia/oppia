@@ -49,7 +49,7 @@ class TranslatableContentFormat(enum.Enum):
     SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
     @classmethod
-    def is_data_format_list(cls, data_format):
+    def is_data_format_list(cls, data_format: str) -> bool:
         """Checks whether the content of translation with given format is of
         a list type.
         Args:
