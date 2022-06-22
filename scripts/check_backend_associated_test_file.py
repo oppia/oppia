@@ -22,10 +22,10 @@ import sys
 
 TOPMOST_LEVEL_PATH = './'
 
-# These files are data files for testing and have no logic to be tested.
-# NOTE TO DEVELOPERS: do not add any new files to this list without asking
+# NOTE TO DEVELOPERS: Do not add any new files to this list without asking
 # @U8NWXD first.
 FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
+    # These are data files for testing and have no logic to be tested.
     'scripts/linters/test_files/invalid_annotations.py',
     'scripts/linters/test_files/invalid_author.py',
     'scripts/linters/test_files/invalid_copyright.py',
@@ -48,6 +48,56 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/failing_tests.py',
     'core/tests/data/image_constants.py',
     'core/tests/data/unicode_and_str_handler.py',
+
+    # TODO @IamEzio: The files below are to be tested.
+    # GSoC'22: Improve line and branch coverage for the backend and frontend
+    'scripts/run_frontend_tests.py',
+    'scripts/create_expression_parser.py',
+    'scripts/run_custom_eslint_tests.py',
+    'scripts/run_backend_tests.py',
+    'scripts/run_lighthouse_tests.py',
+    'scripts/run_portserver.py',
+    'scripts/run_presubmit_checks.py',
+    'scripts/run_tests.py',
+    'scripts/start.py',
+    'setup.py',
+    'mypy_imports.py',
+    'proto_files/text_classifier_pb2.py',
+    'proto_files/training_job_response_payload_pb2.py',
+    'scripts/check_backend_associated_test_file.py',
+    'scripts/third_party_size_check.py',
+    'scripts/linters/warranted_angular_security_bypasses.py',
+    'core/feconf.py',
+    'core/handler_schema_constants.py',
+    'core/platform/datastore/cloud_datastore_services.py',
+    'core/platform/transactions/cloud_transaction_services.py',
+    'extensions/actions/AnswerSubmit/AnswerSubmit.py',
+    'extensions/actions/ExplorationQuit/ExplorationQuit.py',
+    'extensions/actions/ExplorationStart/ExplorationStart.py',
+    'extensions/interactions/AlgebraicExpressionInput/AlgebraicExpressionInput.py',
+    'extensions/interactions/CodeRepl/CodeRepl.py',
+    'extensions/interactions/Continue/Continue.py',
+    'extensions/interactions/DragAndDropSortInput/DragAndDropSortInput.py',
+    'extensions/interactions/EndExploration/EndExploration.py',
+    'extensions/interactions/FractionInput/FractionInput.py',
+    'extensions/interactions/GraphInput/GraphInput.py',
+    'extensions/interactions/ImageClickInput/ImageClickInput.py',
+    'extensions/interactions/InteractiveMap/InteractiveMap.py',
+    'extensions/interactions/ItemSelectionInput/ItemSelectionInput.py',
+    'extensions/interactions/MathEquationInput/MathEquationInput.py',
+    'extensions/interactions/MultipleChoiceInput/MultipleChoiceInput.py',
+    'extensions/interactions/MusicNotesInput/MusicNotesInput.py',
+    'extensions/interactions/NumberWithUnits/NumberWithUnits.py',
+    'extensions/interactions/NumericExpressionInput/NumericExpressionInput.py',
+    'extensions/interactions/NumericInput/NumericInput.py',
+    'extensions/interactions/PencilCodeEditor/PencilCodeEditor.py',
+    'extensions/interactions/RatioExpressionInput/RatioExpressionInput.py',
+    'extensions/interactions/SetInput/SetInput.py',
+    'extensions/interactions/TextInput/TextInput.py',
+    'extensions/issues/CyclicStateTransitions/CyclicStateTransitions.py',
+    'extensions/issues/EarlyQuit/EarlyQuit.py',
+    'extensions/issues/MultipleIncorrectSubmissions/MultipleIncorrectSubmissions.py',
+    'extensions/visualizations/models.py',
 ]
 
 
@@ -59,15 +109,15 @@ def main() -> None:
             full_path = os.path.join(root, file)
             _, file_extension = os.path.splitext(full_path)
             if (file_extension == '.py') and (
-                'third_party' not in full_path) and (
-                    'node_modules' not in full_path):
+                '/third_party/' not in full_path) and (
+                    '/node_modules/' not in full_path):
                 all_backend_files.append(full_path)
 
     all_backend_files.sort()
     files_without_test = []
     for file in all_backend_files:
-        if '_test.py' not in file:
-            test_file = file.replace('.py', '_test.py')
+        if not file.endswith('_test.py'):
+            test_file = file.replace(file[len(file) - 3:], '_test.py')
             if test_file not in all_backend_files:
                 files_without_test.append(file)
 
@@ -88,9 +138,9 @@ def main() -> None:
                 ' file.\n'.format(file))
 
     if errors:
-        print('---------------------------------------------')
-        print('Some backend files lack associated test file.')
-        print('---------------------------------------------')
+        print('------------------------------------------------')
+        print('Some backend files lack an associated test file.')
+        print('------------------------------------------------')
         logging.error(errors)
         sys.exit(1)
     else:
