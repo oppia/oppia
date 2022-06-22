@@ -21,11 +21,12 @@ from __future__ import annotations
 from core.tests import test_utils
 from . import takeout_domain
 
+
 class TakeoutDataTests(test_utils.GenericTestBase):
 
     def test_that_domain_object_is_created_correctly(self):
         user_data = {
-                'model_name' : {
+                'model_name': {
                     'property1': 'value1',
                     'property2': 'value2'
                 }

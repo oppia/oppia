@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.tests import test_utils
 from . import app_feedback_report_constants
 
+
 class AppFeedbackReportConstantsTests(test_utils.GenericTestBase):
 
     def test_trivial(self):

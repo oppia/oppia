@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.tests import test_utils
 from . import classroom_domain
 
+
 class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def test_that_domain_object_is_created_correctly(self):

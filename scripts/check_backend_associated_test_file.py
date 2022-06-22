@@ -50,7 +50,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/unicode_and_str_handler.py',
 
     # TODO @IamEzio: The files below are to be tested.
-    # GSoC'22: Improve line and branch coverage for the backend and frontend
+    # GSoC'22: Improve line and branch coverage for the backend and frontend.
     'scripts/run_frontend_tests.py',
     'scripts/create_expression_parser.py',
     'scripts/run_custom_eslint_tests.py',
@@ -74,7 +74,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'extensions/actions/AnswerSubmit/AnswerSubmit.py',
     'extensions/actions/ExplorationQuit/ExplorationQuit.py',
     'extensions/actions/ExplorationStart/ExplorationStart.py',
-    'extensions/interactions/AlgebraicExpressionInput/AlgebraicExpressionInput.py',
+    'extensions/interactions/AlgebraicExpressionInput/AlgebraicExpressionInput.py', # pylint: disable=line-too-long
     'extensions/interactions/CodeRepl/CodeRepl.py',
     'extensions/interactions/Continue/Continue.py',
     'extensions/interactions/DragAndDropSortInput/DragAndDropSortInput.py',
@@ -96,7 +96,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'extensions/interactions/TextInput/TextInput.py',
     'extensions/issues/CyclicStateTransitions/CyclicStateTransitions.py',
     'extensions/issues/EarlyQuit/EarlyQuit.py',
-    'extensions/issues/MultipleIncorrectSubmissions/MultipleIncorrectSubmissions.py',
+    'extensions/issues/MultipleIncorrectSubmissions/MultipleIncorrectSubmissions.py', # pylint: disable=line-too-long
     'extensions/visualizations/models.py',
 ]
 
