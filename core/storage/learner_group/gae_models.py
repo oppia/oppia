@@ -267,7 +267,8 @@ class LearnerGroupModel(base_models.BaseModel):
             learner_group_model.put()
 
     @classmethod
-    def delete_learner_group(cls, learner_group_model: LearnerGroupModel
+    def delete_learner_group(
+        cls, learner_group_model: LearnerGroupModel
     ) -> None:
         """Delete a learner group.
 
@@ -275,7 +276,8 @@ class LearnerGroupModel(base_models.BaseModel):
             learner_group_model: LearnerGroupModel. The learner group model
                 to be deleted.
         """
-        referenced_user_ids = (learner_group_model.student_user_ids + 
+        referenced_user_ids = (
+            learner_group_model.student_user_ids +
             learner_group_model.invited_student_user_ids)
 
         # Note: Before deleting the learner group references, we need to send

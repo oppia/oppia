@@ -21,7 +21,6 @@ from __future__ import annotations
 import types
 
 from core.platform import models
-from core.storage import learner_group
 from core.tests import test_utils
 
 from typing import Dict, List, Union
@@ -76,7 +75,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             'description': base_models.EXPORT_POLICY.EXPORTED,
             'facilitator_user_ids': base_models.EXPORT_POLICY.EXPORTED,
             'student_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'invited_student_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'invited_student_user_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subtopic_page_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
         }

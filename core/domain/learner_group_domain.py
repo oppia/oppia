@@ -110,20 +110,20 @@ class LearnerGroup:
             raise utils.ValidationError(
                 'Expected learner group to have at least one facilitator.')
 
-        invited_student_user_ids_set = set(self.invited_student_user_ids)
-        student_user_ids_set = set(self.student_user_ids)
+        invited_student_set = set(self.invited_student_user_ids)
+        student_set = set(self.student_user_ids)
 
-        if len(invited_student_user_ids_set.intersection(student_user_ids_set)) > 0:
+        if len(invited_student_set.intersection(student_set)) > 0:
             raise utils.ValidationError(
                 'Learner group student cannot be invited to join the group.')
 
         facilitator_set = set(self.facilitator_user_ids)
 
-        if len(facilitator_set.intersection(student_user_ids_set)) > 0:
+        if len(facilitator_set.intersection(student_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be a student of the group.')
 
-        if len(facilitator_set.intersection(invited_student_user_ids_set)) > 0:
+        if len(facilitator_set.intersection(invited_student_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be invited to '
                 'join the group.')

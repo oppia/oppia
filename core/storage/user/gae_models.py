@@ -3097,7 +3097,8 @@ class LearnerGroupStudentModel(base_models.BaseModel):
         })
 
     @classmethod
-    def delete_learner_group_references(cls, group_id: str, user_ids: List[str]
+    def delete_learner_group_references(
+        cls, group_id: str, user_ids: List[str]
     ) -> None:
         """Delete all references of given learner group stored in learner group
         student models.
