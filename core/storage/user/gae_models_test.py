@@ -3385,8 +3385,7 @@ class LearnerGroupsUserModelTests(test_utils.GenericTestBase):
     def test_export_data_trivial(self) -> None:
         user_data = user_models.LearnerGroupsUserModel.export_data(
             self.USER_ID_1)
-        expected_data: user_models.LearnerGroupsUserDataDict
-        self.assertEqual(user_data, expected_data)
+        self.assertEqual(user_data, {})
 
         user_models.LearnerGroupsUserModel(
             id=self.USER_ID_1,
@@ -3404,7 +3403,7 @@ class LearnerGroupsUserModelTests(test_utils.GenericTestBase):
 
         user_data = user_models.LearnerGroupsUserModel.export_data(
             self.USER_ID_1)
-        expected_data = {
+        expected_data: user_models.LearnerGroupsUserDataDict = {
             'invited_to_learner_groups_ids': ['group_id_1', 'group_id_2'],
             'learner_groups_user_details': [
                 {
