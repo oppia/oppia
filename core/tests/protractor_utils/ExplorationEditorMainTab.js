@@ -113,6 +113,10 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-explanation-textarea'));
   var stateEditorTag = element(
     by.css('.protractor-test-state-content-editor'));
+  var updateTranslationsModalElement = element(
+    by.css('.protractor-test-update-translations-modal'));
+  var leaveTranslationsAsIsButton = element(
+    by.css('.protractor-test-leave-translations-as-is'));
 
   /*
    * Buttons
@@ -495,6 +499,17 @@ var ExplorationEditorMainTab = function() {
         'Edit Outcome Add Exploration Id',
         editOutcomeDestAddExplorationId, refresherExplorationId);
     }
+  };
+
+  this.leaveTranslationsAsIs = async function() {
+    await waitFor.visibilityOf(
+      updateTranslationsModalElement,
+      'Update translations modal takes too long to appear');
+    await action.click(
+      'Leave translations as is button', leaveTranslationsAsIsButton);
+    await waitFor.invisibilityOf(
+      updateTranslationsModalElement,
+      'Update translations modal takes too long to close');
   };
 
   // ---- CONTENT ----
