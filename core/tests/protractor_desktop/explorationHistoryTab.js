@@ -33,6 +33,7 @@ describe('Exploration history', function() {
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
   var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
 
   // Constants for colors of nodes in history graph.
   var COLOR_ADDED = 'rgb(78, 162, 78)';
@@ -45,6 +46,7 @@ describe('Exploration history', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -599,6 +601,62 @@ describe('Exploration history', function() {
     await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
     await users.logout();
+  });
+
+  it('should show the history of exploration metadata', async function() {
+    await users.createUser('user@historyTab.com', 'userHistoryTab');
+    await users.login('user@historyTab.com');
+    await workflow.createExploration(true);
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Dummy Exploration');
+    await explorationEditorSettingsTab.setCategory('Algorithms');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.saveChanges();
+
+    var METADATA_1_STRING = (
+      'title: \'\'\n' +
+      'category: \'\'\n' +
+      'objective: \'\'\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 50\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    var METADATA_2_STRING = (
+      'title: Dummy Exploration\n' +
+      'category: Algorithms\n' +
+      'objective: Learn more about Oppia\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 50\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    await explorationEditorPage.navigateToHistoryTab();
+    var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions('1', '2');
+    await historyGraph.openExplorationMetadataHistory();
+    await historyGraph.expectTextToMatch(METADATA_1_STRING, METADATA_2_STRING);
+    await historyGraph.closeExplorationMetadataHistory();
   });
 
   it('should revert to old exploration commit', async function() {
