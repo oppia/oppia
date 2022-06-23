@@ -498,7 +498,8 @@ class Subtopic:
                 'Expected subtopic title to be less than %d characters, '
                 'received %s' % (title_limit, self.title))
 
-        url_fragment_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT  # pylint: disable=line-too-long
+        url_fragment_limit = (
+            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
         regex = android_validation_constants.SUBTOPIC_URL_FRAGMENT_REGEXP
         if len(self.url_fragment) > url_fragment_limit:
             raise utils.ValidationError(
