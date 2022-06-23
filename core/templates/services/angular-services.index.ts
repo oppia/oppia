@@ -415,6 +415,7 @@ import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/ed
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -745,6 +746,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillEditorStalenessDetectionService',
     SkillEditorStalenessDetectionService],
   ['SkillEditorStateService', SkillEditorStateService],
+  ['SkillEditorRoutingService', SkillEditorRoutingService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
