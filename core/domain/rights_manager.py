@@ -31,6 +31,8 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 
+from typing import Optional, overload
+
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
@@ -382,7 +384,23 @@ def create_new_collection_rights(collection_id, committer_id):
     subscription_services.subscribe_to_collection(committer_id, collection_id)
 
 
-def get_collection_rights(collection_id, strict=True):
+@overload
+def get_collection_rights(
+    collection_id: str
+) -> rights_domain.ActivityRights: ...
+
+
+@overload
+def get_collection_rights(
+    collection_id: str,
+    strict: bool = False
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
+def get_collection_rights(
+    collection_id: str,
+    strict: bool = True
+) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights for this collection from the datastore.
 
     Args:
