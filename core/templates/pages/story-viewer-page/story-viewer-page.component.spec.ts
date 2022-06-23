@@ -49,14 +49,14 @@ class MockTranslateService {
 }
 
 describe('Story Viewer Page component', () => {
-  let httpTestingController = null;
+  let httpTestingController: HttpTestingController;
   let component: StoryViewerPageComponent;
-  let alertsService = null;
+  let alertsService: AlertsService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
-  let urlService: UrlService = null;
-  let userService: UserService = null;
-  let pageTitleService = null;
+  let urlService: UrlService;
+  let userService: UserService;
+  let pageTitleService: PageTitleService;
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;

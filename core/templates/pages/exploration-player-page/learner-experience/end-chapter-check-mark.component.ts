@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,23 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview FormatTime filter for Oppia.
+ * @fileoverview Component for the end chapter celebration check mark component.
  */
 
-import { Injectable, Pipe, PipeTransform} from '@angular/core';
+import { Component } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
+@Component({
+  selector: 'oppia-end-chapter-check-mark',
+  template: require('./end-chapter-check-mark.component.html'),
 })
-@Pipe({name: 'formatTime'})
-export class FormatTimePipe implements PipeTransform {
-  transform(input: number): string {
-    let formatNum = function(n: number) {
-      return (n < 10 ? '0' : '') + n;
-    };
+export class EndChapterCheckMarkComponent {
+  constructor() {}
+  circleIsShown: boolean = false;
+  innerTickIsShown: boolean = false;
 
-    let seconds = input % 60;
-    let minutes = Math.floor(input / 60);
-    return (formatNum(minutes) + ':' + formatNum(seconds));
+  animateCheckMark(): void {
+    this.circleIsShown = true;
+    this.innerTickIsShown = true;
   }
 }

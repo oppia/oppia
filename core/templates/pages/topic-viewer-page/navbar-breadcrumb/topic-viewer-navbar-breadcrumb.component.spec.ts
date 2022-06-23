@@ -21,7 +21,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlService } from 'services/contextual/url.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { ReadOnlyTopicObjectFactory } from
+import { ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
@@ -67,8 +67,10 @@ describe('Topic viewer navbar breadcrumb component', () => {
         topic_name: 'Topic Name 1',
         topic_id: 'topic1',
         topic_description: 'Description',
-        practice_tab_is_displayed: false
-      }));
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'content',
+        page_title_fragment_for_web: 'title',
+      } as ReadOnlyTopicBackendDict));
   }));
 
   beforeEach(() => {

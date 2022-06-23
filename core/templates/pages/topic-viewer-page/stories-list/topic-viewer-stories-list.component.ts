@@ -30,14 +30,17 @@ import { WindowDimensionsService } from
   styleUrls: []
 })
 export class StoriesListComponent implements OnInit {
-  @Input() canonicalStorySummaries: StorySummary[];
-  @Input() classroomUrlFragment: string;
-  @Input() topicUrlFragment: string;
-  @Input() topicName: string;
-  @Input() topicDescription: string;
-  @Input() topicId: string;
-  topicNameTranslationKey: string;
-  topicDescTranslationKey: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() canonicalStorySummaries!: StorySummary[];
+  @Input() classroomUrlFragment!: string;
+  @Input() topicUrlFragment!: string;
+  @Input() topicName!: string;
+  @Input() topicDescription!: string;
+  @Input() topicId!: string;
+  topicNameTranslationKey!: string;
+  topicDescTranslationKey!: string;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,

@@ -43,7 +43,7 @@ class MockWindowRef {
       }
     },
     history: {
-      pushState(data, title: string, url?: string | null) {}
+      pushState(title: string, url?: string | null) {}
     }
   };
 
@@ -60,11 +60,11 @@ class MockTranslateService {
 }
 
 describe('Topic viewer page', () => {
-  let httpTestingController = null;
-  let alertsService = null;
-  let pageTitleService = null;
-  let urlService = null;
-  let windowDimensionsService = null;
+  let httpTestingController: HttpTestingController;
+  let alertsService: AlertsService;
+  let pageTitleService: PageTitleService;
+  let urlService: UrlService;
+  let windowDimensionsService: WindowDimensionsService;
   let topicViewerPageComponent: TopicViewerPageComponent;
   let windowRef: MockWindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
