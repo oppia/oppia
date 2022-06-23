@@ -70,7 +70,8 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'dummy-subtopic'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,
