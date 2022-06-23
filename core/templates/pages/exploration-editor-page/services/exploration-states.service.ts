@@ -19,7 +19,6 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Location } from '@angular/common';
 import { EventEmitter, Injectable } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
