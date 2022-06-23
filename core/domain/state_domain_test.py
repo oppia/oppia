@@ -4441,7 +4441,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'destination', state_domain.SubtitledHtml(
+                    'destination', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
@@ -4477,7 +4477,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'destination', state_domain.SubtitledHtml(
+                    'destination', None, state_domain.SubtitledHtml(
                         'feedback', '<p>Feedback</p>'),
                     False, [], None, None),
                 [

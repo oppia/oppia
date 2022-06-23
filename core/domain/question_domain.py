@@ -1236,6 +1236,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         return question_state_dict
 
+    @classmethod
     def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
         """Converts from version 49 to 50. Version 50 adds a new
         customization arg to TextInput interaction which allows
@@ -1265,7 +1266,6 @@ class Question(translation_domain.BaseTranslatableObject):
             answer_group['outcome']['dest_if_really_stuck'] = None
 
         question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
-
 
     @classmethod
     def update_state_from_model(
