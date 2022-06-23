@@ -102,6 +102,8 @@ export class I18nService {
         // This removes the need of continously syncing URL lang param and
         // cache, and avoids race conditions.
         this.setLocalStorageKeys(siteLanguageCode);
+        this._updateDirection(
+          this.supportedSiteLanguageCodes[siteLanguageCode]);
       } else {
         // In the case where the URL contains an invalid language code, we
         // load the site using last cached language code and remove the language
@@ -120,6 +122,8 @@ export class I18nService {
       this.translateCacheService.getCachedLanguage());
     if (cachedLanguageCode) {
       this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguageCode);
+      this._updateDirection(
+        this.supportedSiteLanguageCodes[cachedLanguageCode]);
     }
   }
 
@@ -135,22 +139,33 @@ export class I18nService {
   updateUserPreferredLanguage(newLangCode: string): void {
     let oldLangDirection = (
       this.i18nLanguageCodeService.getCurrentLanguageDirection());
+    let reloadPage = (
+      oldLangDirection !== this.supportedSiteLanguageCodes[newLangCode]);
     this.setLocalStorageKeys(newLangCode);
-    if (oldLangDirection === this.supportedSiteLanguageCodes[newLangCode]) {
+
+    // When we know that the page will be reloaded we don't need to switch
+    // the language now.
+    if (!reloadPage) {
       this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
     }
+
     this.userService.getUserInfoAsync().then((userInfo) => {
+      // If user is logged in first save the language and then reload,
+      // otherwise just reload.
       if (userInfo.isLoggedIn()) {
         this.userBackendApiService.updatePreferredSiteLanguageAsync(
           newLangCode
         ).then(() => {
-          if (
-            oldLangDirection !== this.supportedSiteLanguageCodes[newLangCode]
-          ) {
+          if (reloadPage) {
             window.location.reload();
             return;
           }
         });
+      } else {
+        if (reloadPage) {
+          window.location.reload();
+          return;
+        }
       }
     });
 
