@@ -1733,19 +1733,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
-<<<<<<< HEAD
-        question_data['interaction']['id'] = 'TextInput'
-
-        question_data['interaction']['answer_groups'] = [
-            {
-                'outcome': {
-                    'feedback': {
-                        'content_id': 'content_id'
-                    }
-                }
-            }
-        ]
-=======
         question_data['interaction']['id'] = 'AlgebraicExpressionInput'
         question_data['interaction']['customization_args'] = {
             'customOskLetters': ['a', 'b', 'c']
@@ -1777,44 +1764,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
 
         test_value = {
             'state': question_data,
             'state_schema_version': 49
         }
 
-<<<<<<< HEAD
-        self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {}
-        )
-
-=======
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 50)
-<<<<<<< HEAD
-        self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {
-                'catchMisspellings': {
-                    'value': False
-                }
-            }
-        )
-
-        default_outcome_dict = test_value['state']['interaction']['default_outcome'] # pylint: disable=line-too-long
-        outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome'] # pylint: disable=line-too-long
-
-        self.assertIn('dest_if_really_stuck', default_outcome_dict)
-        self.assertEqual(default_outcome_dict['dest_if_really_stuck'], None)
-
-        self.assertIn('dest_if_really_stuck', outcome_dict)
-        self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
-=======
 
         rule_specs = test_value[
             'state']['interaction']['answer_groups'][0]['rule_specs']
@@ -1842,7 +1801,54 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 '<p>This is a hint.</p>',
                 '<p>This is a solution.</p>'
             ])
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
+
+    def test_question_state_dict_conversion_from_v50_to_v51(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'TextInput'
+
+        question_data['interaction']['answer_groups'] = [
+            {
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'content_id'
+                    }
+                }
+            }
+        ]
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 50
+        }
+
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {}
+        )
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 51)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'],
+            {
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        )
+
+        default_outcome_dict = test_value['state']['interaction']['default_outcome'] # pylint: disable=line-too-long
+        outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome'] # pylint: disable=line-too-long
+
+        self.assertIn('dest_if_really_stuck', default_outcome_dict)
+        self.assertEqual(default_outcome_dict['dest_if_really_stuck'], None)
+
+        self.assertIn('dest_if_really_stuck', outcome_dict)
+        self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):

@@ -155,27 +155,6 @@ describe('Contributions and review component', function() {
       getUserCreatedTranslationSuggestionsAsyncSpy = spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
         .and.returnValue(Promise.resolve({
-<<<<<<< HEAD
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                skill_id: 'skill1',
-                question_dict: {
-                  id: '1',
-                  question_state_data: {
-                    content: {
-                      html: 'Question 1',
-                      content_id: 'content_1'
-                    },
-                    interaction: {
-                      answer_groups: [{
-                        outcome: {
-                          dest: 'outcome 1',
-                          dest_if_really_stuck: null,
-=======
           suggestionIdToDetails: {
             suggestion_1: {
               suggestion: {
@@ -195,6 +174,7 @@ describe('Contributions and review component', function() {
                         answer_groups: [{
                           outcome: {
                             dest: 'outcome 1',
+                            dest_if_really_stuck: null,
                             feedback: {
                               content_id: 'content_5',
                               html: ''
@@ -213,11 +193,14 @@ describe('Contributions and review component', function() {
                               unicode_str: ''
                             }
                           },
-                          rows: { value: 1 }
+                          rows: { value: 1 },
+                          catchMisspellings: {
+                            value: false
+                          }
                         },
                         default_outcome: {
                           dest: null,
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
+                          dest_if_really_stuck: null,
                           feedback: {
                             html: 'Correct Answer',
                             content_id: 'content_2'
@@ -239,28 +222,11 @@ describe('Contributions and review component', function() {
                             content_id: 'content_4'
                           }
                         },
-<<<<<<< HEAD
-                        rows: { value: 1 },
-                        catchMisspellings: {
-                          value: false
-                        }
-                      },
-                      default_outcome: {
-                        dest: null,
-                        dest_if_really_stuck: null,
-                        feedback: {
-                          html: 'Correct Answer',
-                          content_id: 'content_2'
-                        },
-                        param_changes: [],
-                        labelled_as_correct: true
-=======
                         id: 'TextInput'
                       },
                       param_changes: [],
                       recorded_voiceovers: {
                         voiceovers_mapping: {}
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
                       },
                       written_translations: {
                         translations_mapping: {}
@@ -610,27 +576,6 @@ describe('Contributions and review component', function() {
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
         .and.returnValue($q.resolve({
-<<<<<<< HEAD
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'add_question',
-              change: {
-                skill_id: 'skill1',
-                question_dict: {
-                  id: '1',
-                  question_state_data: {
-                    content: {
-                      html: 'Question 1',
-                      content_id: 'content_1'
-                    },
-                    interaction: {
-                      answer_groups: [{
-                        outcome: {
-                          dest: 'outcome 1',
-                          dest_if_really_stuck: null,
-=======
           suggestionIdToDetails: {
             suggestion_1: {
               suggestion: {
@@ -650,6 +595,7 @@ describe('Contributions and review component', function() {
                         answer_groups: [{
                           outcome: {
                             dest: 'outcome 1',
+                            dest_if_really_stuck: null,
                             feedback: {
                               content_id: 'content_5',
                               html: ''
@@ -668,11 +614,14 @@ describe('Contributions and review component', function() {
                               unicode_str: ''
                             }
                           },
-                          rows: { value: 1 }
+                          rows: { value: 1 },
+                          catchMisspellings: {
+                            value: false
+                          }
                         },
                         default_outcome: {
                           dest: null,
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
+                          dest_if_really_stuck: null,
                           feedback: {
                             html: 'Correct Answer',
                             content_id: 'content_2'
@@ -694,28 +643,11 @@ describe('Contributions and review component', function() {
                             content_id: 'content_4'
                           }
                         },
-<<<<<<< HEAD
-                        rows: { value: 1 },
-                        catchMisspellings: {
-                          value: false
-                        }
-                      },
-                      default_outcome: {
-                        dest: null,
-                        dest_if_really_stuck: null,
-                        feedback: {
-                          html: 'Correct Answer',
-                          content_id: 'content_2'
-                        },
-                        param_changes: [],
-                        labelled_as_correct: true
-=======
                         id: 'TextInput'
                       },
                       param_changes: [],
                       recorded_voiceovers: {
                         voiceovers_mapping: {}
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
                       },
                       written_translations: {
                         translations_mapping: {}
@@ -895,27 +827,6 @@ describe('Contributions and review component', function() {
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
         .and.returnValue($q.resolve({
-<<<<<<< HEAD
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'add_question',
-              change: {
-                skill_id: 'skill1',
-                question_dict: {
-                  id: '1',
-                  question_state_data: {
-                    content: {
-                      html: 'Question 1',
-                      content_id: 'content_1'
-                    },
-                    interaction: {
-                      answer_groups: [{
-                        outcome: {
-                          dest: 'outcome 1',
-                          dest_if_really_stuck: null,
-=======
           suggestionIdToDetails: {
             suggestion_1: {
               suggestion: {
@@ -935,6 +846,7 @@ describe('Contributions and review component', function() {
                         answer_groups: [{
                           outcome: {
                             dest: 'outcome 1',
+                            dest_if_really_stuck: null,
                             feedback: {
                               content_id: 'content_5',
                               html: ''
@@ -953,11 +865,14 @@ describe('Contributions and review component', function() {
                               unicode_str: ''
                             }
                           },
-                          rows: { value: 1 }
+                          rows: { value: 1 },
+                          catchMisspellings: {
+                            value: false
+                          }
                         },
                         default_outcome: {
                           dest: null,
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
+                          dest_if_really_stuck: null,
                           feedback: {
                             html: 'Correct Answer',
                             content_id: 'content_2'
@@ -979,28 +894,11 @@ describe('Contributions and review component', function() {
                             content_id: 'content_4'
                           }
                         },
-<<<<<<< HEAD
-                        rows: { value: 1 },
-                        catchMisspellings: {
-                          value: false
-                        }
-                      },
-                      default_outcome: {
-                        dest: null,
-                        dest_if_really_stuck: null,
-                        feedback: {
-                          html: 'Correct Answer',
-                          content_id: 'content_2'
-                        },
-                        param_changes: [],
-                        labelled_as_correct: true
-=======
                         id: 'TextInput'
                       },
                       param_changes: [],
                       recorded_voiceovers: {
                         voiceovers_mapping: {}
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
                       },
                       written_translations: {
                         translations_mapping: {}
@@ -1354,27 +1252,6 @@ describe('Contributions and review component', function() {
       spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
         .and.returnValue(Promise.resolve({
-<<<<<<< HEAD
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                skill_id: 'skill1',
-                question_dict: {
-                  id: '1',
-                  question_state_data: {
-                    content: {
-                      html: 'Question 1',
-                      content_id: 'content_1'
-                    },
-                    interaction: {
-                      answer_groups: [{
-                        outcome: {
-                          dest: 'outcome 1',
-                          dest_if_really_stuck: null,
-=======
           suggestionIdToDetails: {
             suggestion_1: {
               suggestion: {
@@ -1394,6 +1271,7 @@ describe('Contributions and review component', function() {
                         answer_groups: [{
                           outcome: {
                             dest: 'outcome 1',
+                            dest_if_really_stuck: null,
                             feedback: {
                               content_id: 'content_5',
                               html: ''
@@ -1412,11 +1290,14 @@ describe('Contributions and review component', function() {
                               unicode_str: ''
                             }
                           },
-                          rows: { value: 1 }
+                          rows: { value: 1 },
+                          catchMisspellings: {
+                            value: false
+                          }
                         },
                         default_outcome: {
                           dest: null,
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
+                          dest_if_really_stuck: null,
                           feedback: {
                             html: 'Correct Answer',
                             content_id: 'content_2'
@@ -1438,28 +1319,11 @@ describe('Contributions and review component', function() {
                             content_id: 'content_4'
                           }
                         },
-<<<<<<< HEAD
-                        rows: { value: 1 },
-                        catchMisspellings: {
-                          value: false
-                        }
-                      },
-                      default_outcome: {
-                        dest: null,
-                        dest_if_really_stuck: null,
-                        feedback: {
-                          html: 'Correct Answer',
-                          content_id: 'content_2'
-                        },
-                        param_changes: [],
-                        labelled_as_correct: true
-=======
                         id: 'TextInput'
                       },
                       param_changes: [],
                       recorded_voiceovers: {
                         voiceovers_mapping: {}
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
                       },
                       written_translations: {
                         translations_mapping: {}

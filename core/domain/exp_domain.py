@@ -2088,8 +2088,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
+    @classmethod
     def _convert_states_v50_dict_to_v51_dict(cls, states_dict):
-        """Converts from version 49 to 50. Version 50 adds a new
+        """Converts from version 50 to 51. Version 51 adds a new
         customization arg to TextInput interaction which allows
         creators to fill a catch misspellings checkbox. Also adds
         a new dest_if_really_stuck field to the Outcome class to redirect
@@ -2159,7 +2160,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 55
+    CURRENT_EXP_SCHEMA_VERSION = 56
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2345,16 +2346,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
         """Converts a v54 exploration dict into a v55 exploration dict.
-<<<<<<< HEAD
-        Version 50 adds a new customization arg to TextInput interaction
-        which allows creators to fill a catch misspellings checkbox. Also adds
-        a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts.
-=======
         Removes rules from explorations that use one of the following rules:
         [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
         `customOskLetters` cust arg to `allowedVariables`.
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -2369,6 +2363,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 50
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v55_dict_to_v56_dict(cls, exploration_dict):
+        """Converts a v55 exploration dict into a v56 exploration dict.
+        Version 56 adds a new customization arg to TextInput interaction
+        which allows creators to fill a catch misspellings checkbox. Also adds
+        a new dest_if_really_stuck field to the Outcome class to redirect
+        the learners to a state for strengthening concepts.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v54.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v55.
+        """
+        exploration_dict['schema_version'] = 56
+
+        exploration_dict['states'] = cls._convert_states_v50_dict_to_v51_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 51
 
         return exploration_dict
 
@@ -2452,6 +2470,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v54_dict_to_v55_dict(
                 exploration_dict)
             exploration_schema_version = 55
+
+        if exploration_schema_version == 55:
+            exploration_dict = cls._convert_v55_dict_to_v56_dict(
+                exploration_dict)
+            exploration_schema_version = 56
 
         return exploration_dict
 

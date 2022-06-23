@@ -86,15 +86,11 @@ describe('Extracting Image file names in the state service', () => {
                 html: ''
               },
               dest: 'State 3',
-<<<<<<< HEAD
               dest_if_really_stuck: null,
-              param_changes: []
-=======
               param_changes: [],
               labelled_as_correct: false,
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -295,15 +291,11 @@ describe('Extracting Image file names in the state service', () => {
                       '</oppia-noninteractive-image></p>'
               },
               dest: 'State 4',
-<<<<<<< HEAD
               dest_if_really_stuck: null,
-              param_changes: []
-=======
               param_changes: [],
               labelled_as_correct: false,
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -791,15 +783,11 @@ describe('Extracting Image file names in the state service', () => {
                 html: '<p>Try again!</p>'
               },
               dest: 'State 4',
-<<<<<<< HEAD
               dest_if_really_stuck: null,
-              param_changes: []
-=======
               param_changes: [],
               labelled_as_correct: false,
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
->>>>>>> 3f1af7c7c7c418d836b03824e9bb72ca705d11ce
             },
             confirmed_unclassified_answers: [],
             customization_args: {
