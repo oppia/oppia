@@ -24,7 +24,7 @@ from core.domain import config_domain
 from core.domain import learner_group_domain
 from core.domain import skill_services
 from core.domain import topic_fetchers
-from core.domain import user_domain
+from core.domain import user_services
 from core.platform import models
 
 (user_models, learner_group_models) = models.Registry.import_models(
@@ -137,68 +137,6 @@ def remove_learner_group(group_id) -> None:
     learner_group_model.delete()
 
 
-def get_students_progress_through_syllabus(
-        student_user_ids, subtopic_page_ids, story_ids
-    ):
-    """Returns the progress of the students in the learner group through the
-    syllabus.
-
-    Args:
-        group_id: str. The id of the learner group.
-        student_user_ids: list(str). The ids of the students in the learner
-            group.
-
-    Returns:
-        list(dict). The progress of the students in the learner group through
-        the syllabus.
-    """
-
-    all_students_progress = []
-
-    topic_ids = get_topic_ids_from_subtopic_page_ids(
-        subtopic_page_ids)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
-    all_skill_ids = []
-
-    for topic in enumerate(topics):
-        if topic:
-            all_skill_ids.extend(topic.get_all_skill_ids())
-
-    all_skill_ids = list(set(all_skill_ids))
-
-    for user_id in student_user_ids:
-        student_progress = {}
-
-        stories_progress = user_models.StoryProgressModel.get_multi(
-            user_id, story_ids)
-        student_progress['stories'] = stories_progress
-
-        all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(
-            user_id, all_skill_ids)
-
-        subtopic_prog_dict = {}
-        for topic in topics:
-            subtopic_prog_dict[topic.id] = {}
-            for subtopic in topic.subtopics:
-                subtopic_page_id = topic.id + ':' + subtopic.id
-                if not subtopic_page_id in subtopic_page_ids:
-                    continue
-                skill_mastery_dict = {
-                    skill_id: mastery
-                    for skill_id, mastery in all_skills_mastery_dict.items()
-                    if mastery is not None and skill_id in subtopic.skill_ids
-                }
-                if skill_mastery_dict:
-                    # Subtopic mastery is average of skill masteries.
-                    subtopic_prog_dict[topic.id][subtopic.id] = (
-                        sum(skill_mastery_dict.values()) /
-                        len(skill_mastery_dict))
-
-        student_progress['subtopics'] = subtopic_prog_dict
-
-        all_students_progress[user_id] = student_progress
-
-
 def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
     """Returns the topic ids corresponding to the given subtopic page ids.
 
@@ -217,7 +155,8 @@ def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
 
 
 def get_filtered_learner_group_syllabus(
-        learner_group_id, filter_keyword, filter_type, filter_category,
+        learner_group_id, filter_keyword,
+        filter_type, filter_category,
         filter_language
     ):
     """Returns the syllabus of the learner group filtered by the given

@@ -93,3 +93,25 @@ def get_learner_groups_of_facilitator(user_id: str):
                 learner_group_model.story_ids))
 
     return learner_groups
+
+
+def get_progress_sharing_permission(user_id, group_id):
+    """Returns the progress sharing permission of the given user in the given
+    group.
+
+    Args:
+        user_id: str. The id of the user.
+        group_id: str. The id of the learner group.
+
+    Returns:
+        bool: True if the user has progress sharing permission of the given
+            group as True, False otherwise.
+    """
+    learner_group_user_model = user_models.LearnerGroupsUserModel.get_by_id(
+        user_id)
+
+    for group_details in learner_group_user_model.learner_groups_user_details:
+        if group_details.group_id == group_id:
+            return group_details.progress_sharing_is_turned_on
+
+    return False

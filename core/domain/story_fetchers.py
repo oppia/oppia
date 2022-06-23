@@ -294,6 +294,34 @@ def get_completed_nodes_in_story(user_id, story_id):
     return completed_nodes
 
 
+def get_progress_in_stories(user_id, story_ids):
+    """Returns the progress of the user in all given stories.
+
+    Args:
+        user_id: str. The user id of the user.
+        story_ids: list(str). The list of story ids.
+
+    Returns:
+        list(StoryProgress). The list of story progress of the user.
+    """
+    all_stories_progress = []
+    all_stories = get_stories_by_ids(story_ids)
+    for story in all_stories:
+        story_progress = {}
+        completed_node_ids = get_completed_node_ids(user_id, story.id)
+        all_node_ids = [node.id for node in story.story_contents.nodes]
+
+        story_progress = story_domain.StoryProgress(
+            story.id,
+            completed_node_ids,
+            all_node_ids
+        )
+
+        all_stories_progress.append(story_progress)
+
+    return all_stories_progress
+
+
 def get_pending_and_all_nodes_in_story(user_id, story_id):
     """Returns the nodes that are pending in a story
 

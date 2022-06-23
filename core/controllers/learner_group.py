@@ -20,7 +20,7 @@ from typing import List
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import learner_group_domain
+from core.domain import learner_group_domain, skill_services, story_fetchers
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import topic_fetchers
@@ -275,13 +275,9 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
         subtopic_page_ids = learner_group.subtopic_page_ids
         story_ids = learner_group.story_ids
-
-        all_students_progress = []
-
         topic_ids = (
             learner_group_services.get_topic_ids_from_subtopic_page_ids(
                 subtopic_page_ids))
-
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
         all_skill_ids = []
 
@@ -291,21 +287,39 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
         all_skill_ids = list(set(all_skill_ids))
 
+        all_students_progress = []
+
         for user_id in student_user_ids:
+            progress_sharing_permission = (
+                learner_group_fetchers.get_progress_sharing_permission(
+                    user_id, learner_group_id))
+
             student_progress = {
                 'username': user_services.get_username(user_id),
                 'stories': {},
                 'subtopics': {},
-                'progress_sharing_is_turned_on': False
+                'progress_sharing_is_turned_on': progress_sharing_permission
             }
 
-            stories_progress = user_models.StoryProgressModel.get_multi(
-                user_id, story_ids)
-            student_progress['stories'] = stories_progress
+            # If progress sharing is turned off, then we don't need to
+            # fetch the progress of the student.
+            if not progress_sharing_permission:
+                all_students_progress.append(student_progress)
+                continue
 
-            all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(
-                user_id, all_skill_ids)
+            # Fetch the progress of the student in all the stories assigned
+            # in the group syllabus.
+            student_progress['stories'] = (
+                story_fetchers.get_progress_in_stories(user_id, story_ids)
+            )
 
+            # Fetch the progress of the student in all the subtopics assigned
+            # in the group syllabus.
+            skills_mastery_dict = (
+                skill_services.get_multi_user_skill_mastery(
+                    user_id, all_skill_ids
+                )
+            )
             subtopic_prog_dict = {}
             for topic in topics:
                 subtopic_prog_dict[topic.id] = {}
@@ -315,8 +329,10 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                         continue
                     skill_mastery_dict = {
                         skill_id: mastery
-                        for skill_id, mastery in all_skills_mastery_dict.items()
-                        if mastery is not None and skill_id in subtopic.skill_ids
+                        for skill_id, mastery in skills_mastery_dict.items()
+                        if mastery is not None and (
+                            skill_id in subtopic.skill_ids
+                        )
                     }
                     if skill_mastery_dict:
                         # Subtopic mastery is average of skill masteries.
@@ -326,6 +342,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
             student_progress['subtopics'] = subtopic_prog_dict
 
+            # Add current student's progress to all students progress.
             all_students_progress[user_id] = student_progress
 
         self.render_json({
@@ -389,7 +406,7 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
 
         filtered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
-                learner_group_id, filter_keyword
+                learner_group_id, filter_keyword,
                 filter_type, filter_category, filter_language
             )
         )
