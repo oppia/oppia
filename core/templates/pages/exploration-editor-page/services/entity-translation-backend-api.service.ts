@@ -46,7 +46,10 @@ export class EntityTranslationBackendApiService {
   }
 
   async fetchEntityTranslationAsync(
-      entityId, entityType, entityVersion, languageCode): Promise<EntityTranslation> {
+      entityId: string,
+      entityType: string,
+      entityVersion: number,
+      languageCode: string): Promise<EntityTranslation> {
     return new Promise((resolve, reject) => {
       this.httpClient.get<EntityTranslationBackendDict>(
         this._getUrl(

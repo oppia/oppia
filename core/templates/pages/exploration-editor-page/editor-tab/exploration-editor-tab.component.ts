@@ -78,8 +78,8 @@ angular.module('oppia').component('explorationEditorTab', {
   controller: [
     '$rootScope', '$scope', '$templateCache', '$timeout', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
-    'ExplorationNextContentIdIndexService',
-    'ExplorationInitStateNameService', 'ExplorationStatesService',
+    'ExplorationInitStateNameService',
+    'ExplorationNextContentIdIndexService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService',
     'GenerateContentIdService', 'GraphDataService', 'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
@@ -89,8 +89,8 @@ angular.module('oppia').component('explorationEditorTab', {
     function(
         $rootScope, $scope, $templateCache, $timeout, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
-        ExplorationNextContentIdIndexService,
-        ExplorationInitStateNameService, ExplorationStatesService,
+        ExplorationInitStateNameService,
+        ExplorationNextContentIdIndexService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService,
         GenerateContentIdService, GraphDataService, LoaderService,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
@@ -288,40 +288,6 @@ angular.module('oppia').component('explorationEditorTab', {
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
           contentIds) {
-        // Var stateName = StateEditorService.getActiveStateName();
-        // var state = ExplorationStatesService.getState(stateName);
-        // var recordedVoiceovers = state.recordedVoiceovers;
-        // var writtenTranslations = state.writtenTranslations;
-        // const shouldPrompt = contentIds.some(contentId => {
-        //   return (
-        //     recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
-        //     writtenTranslations.hasUnflaggedWrittenTranslations(contentId));
-        // });
-        // if (shouldPrompt) {
-        //   NgbModal.open(
-        //     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
-        //       backdrop: 'static',
-        //     }).result.then(function() {
-        //     contentIds.forEach(contentId => {
-        //       if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-        //         recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-        //           contentId);
-        //         ExplorationStatesService.saveRecordedVoiceovers(
-        //           stateName, recordedVoiceovers);
-        //       }
-        //       if (writtenTranslations.hasUnflaggedWrittenTranslations(
-        //         contentId)) {
-        //         writtenTranslations.markAllTranslationsAsNeedingUpdate(
-        //           contentId);
-        //         ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
-        //           contentId, stateName);
-        //       }
-        //     });
-        //   }, function() {
-        //     // This callback is triggered when the Cancel button is
-        //     // clicked. No further action is needed.
-        //   });
-        // }
       };
 
       ctrl.navigateToState = function(stateName) {

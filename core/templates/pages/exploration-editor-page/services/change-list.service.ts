@@ -217,7 +217,10 @@ export class ChangeListService {
    *
    * @param {string} stateName - The name of the newly-added state
    */
-  addState(stateName: string, contentIdForContent, contentIdForDefaultOutcome): void {
+  addState(
+      stateName: string,
+      contentIdForContent: string,
+      contentIdForDefaultOutcome: string): void {
     this.addChange({
       cmd: 'add_state',
       state_name: stateName,

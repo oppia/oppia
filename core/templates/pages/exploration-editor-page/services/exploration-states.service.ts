@@ -198,16 +198,20 @@ export class ExplorationStatesService {
     }
   };
 
-  _extractContentIds(backendName, value) {
+  _extractContentIds(
+      backendName: string,
+      value: StatePropertyValues): Set<string[]> {
     let contents = this._CONTENT_EXTRACTORS[backendName](value);
     return new Set(contents.map(content => content.contentId));
   }
 
-  _verifyChangesInitialContents(backendName, value) {
+  _verifyChangesInitialContents(
+      backendName: string,
+      value: StatePropertyValues): void {
     let contents: SubtitledHtml[];
 
     if (backendName === 'content') {
-      contents = [value];
+      contents = [value as SubtitledHtml];
     } else if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
       contents = this._CONTENT_EXTRACTORS[backendName](value);
     } else {

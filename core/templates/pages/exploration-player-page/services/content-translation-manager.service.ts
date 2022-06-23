@@ -19,14 +19,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
-import { HttpClient } from '@angular/common/http';
 
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
-import { EntityTranslation, EntityTranslationBackendDict } from 'domain/translation/EntityTranslationObjectFactory';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
+import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 export interface LanguageCodeToEntityTranslations {
   [languageCode: string]: EntityTranslation;
 }
@@ -53,26 +53,29 @@ export class ContentTranslationManagerService {
   version: number;
 
   constructor(
-    private httpClient: HttpClient,
     private ngbModal: NgbModal,
     private playerTranscriptService: PlayerTranscriptService,
-    private extensionTagAssemblerService: ExtensionTagAssemblerService
+    private extensionTagAssemblerService: ExtensionTagAssemblerService,
+    private entityTranslationBackendApiService: (
+      EntityTranslationBackendApiService)
   ) {}
 
-  fetchAndDisplayTranslations(languageCode: string): Promise<any> {
-    const url = (
-      `/entity_translations_handler/${this.entityType}/${this.entityId}/${this.version}/${languageCode}`);
-    const modalRef = this.ngbModal.open(TranslationsFetchingMessageModalComponent, {
-      backdrop: 'static',
-    });
-    return this.httpClient.get<EntityTranslationBackendDict>(url).toPromise()
-      .then((response) => {
-        modalRef.close();
-        const entityTranslations = EntityTranslation.createFromBackendDict(
-          response);
-        this.languageCodeToEntityTranslations[languageCode] = entityTranslations;
-        this.displayTranslations(languageCode);
+  fetchAndDisplayTranslations(languageCode: string): void {
+    const modalRef = this.ngbModal.open(
+      TranslationsFetchingMessageModalComponent, {
+        backdrop: 'static',
       });
+    this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
+      this.entityId,
+      this.entityType,
+      this.version,
+      languageCode).then((entityTranslation) => {
+      this.languageCodeToEntityTranslations[languageCode] = entityTranslation;
+      this.displayTranslations(languageCode);
+      modalRef.close();
+    }, () => {
+      modalRef.close();
+    });
   }
 
   setOriginalTranscript(explorationLanguageCode: string): void {
@@ -112,8 +115,9 @@ export class ContentTranslationManagerService {
     this.onStateCardContentUpdateEmitter.emit();
   }
 
-  _displayTranslationsForCard(card: StateCard, languageCode): void {
-    const entityTranslations = this.languageCodeToEntityTranslations[languageCode];
+  _displayTranslationsForCard(card: StateCard, languageCode: string): void {
+    const entityTranslations = this.languageCodeToEntityTranslations[
+      languageCode];
     card.swapContentsWithTranslation(entityTranslations);
     if (card.getInteractionId()) {
       // DOMParser().parseFromString() creates a HTML document from
@@ -128,7 +132,7 @@ export class ContentTranslationManagerService {
     }
   }
 
-  init(entityType: string, entityId: string, version: number) {
+  init(entityType: string, entityId: string, version: number): void {
     this.entityType = entityType;
     this.entityId = entityId;
     this.version = version;
