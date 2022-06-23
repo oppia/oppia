@@ -932,7 +932,7 @@ URLS = [
         learner_group.LearnerGroupSyllabusHandler),
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
-        learner_group.LearnerGroupUserProgressHandler)
+        learner_group.LearnerGroupStudentProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.

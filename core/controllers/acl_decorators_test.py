@@ -4046,7 +4046,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
 
 class AccessTeacherDashboardDecoratorTests(test_utils.GenericTestBase):
-    """Tests the decorator can_access_teacher_dashboard."""
+    """Tests the decorator can_access_learner_groups."""
 
     user = 'user'
     user_email = 'user@example.com'
@@ -4058,7 +4058,7 @@ class AccessTeacherDashboardDecoratorTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
-        @acl_decorators.can_access_teacher_dashboard
+        @acl_decorators.can_access_learner_groups
         def get(self):
             return self.render_json({'success': True})
 
@@ -4080,7 +4080,7 @@ class AccessTeacherDashboardDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
-    def test_exploration_editor_can_access_teacher_dashboard(self):
+    def test_exploration_editor_can_access_learner_groups(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')

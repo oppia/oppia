@@ -270,3 +270,22 @@ class LearnerGroupModel(base_models.BaseModel):
 
         cls.update_timestamps_multi(learner_group_models_to_put)
         cls.put_multi(learner_group_models_to_put)
+
+    @classmethod
+    def get_by_facilitator_id(
+        cls, facilitator_id: str
+    ) -> List[LearnerGroupModel]:
+        """Returns a list of all LearnerGroupModels that have the given
+        facilitator id.
+
+        Args:
+            facilitator_id: str. The id of the facilitator.
+
+        Returns:
+            list(LearnerGroupModel). A list of all LearnerGroupModels that
+            have the given facilitator id.
+        """
+        return cls.get_all().filter(
+            datastore_services.any_of(
+                cls.facilitator_user_ids == facilitator_id
+        ))

@@ -20,104 +20,88 @@ from __future__ import annotations
 from typing import List
 
 from core import feconf
+from core.domain import config_domain
 from core.domain import learner_group_domain
+from core.domain import skill_services
+from core.domain import topic_fetchers
 from core.domain import user_domain
-from core.platform import datastore, models
+from core.platform import models
 
 (user_models, learner_group_models) = models.Registry.import_models(
     [models.NAMES.user], [models.NAMES.learner_group])
 
 
-def create_learner_group(
-    facilitator_id, title, description, members,
-    invitations, subtopic_ids, story_ids):
-    """Creates a new learner group.
-
-    Args:
-        facilitator_id: str. The id of the user who is creating the learner
-            group.
-        title: str. The title of the learner group.
-        description: str. The description of the learner group.
-        members: list(str). List of user_ids of the members of the
-            learner group.
-        invitations: list(str). List of user_ids of the users who have
-            been invited to the learner group.
-        subtopic_ids: list(str). The ids of the subtopics that are part of the
-            learner group syllabus.
-        story_ids: list(str). The ids of the stories that are part of the
-            learner group syllabus.
+def is_learner_group_feature_enabled() -> bool:
+    """Checks if the learner group feature is enabled.
 
     Returns:
-        learner_group_id: str. The id of the learner group created.
+        bool. Whether the learner group feature is enabled.
     """
-
-    learner_group_id = learner_group_models.LearnerGroupModel.get_new_id()
-
-    learner_group_model = learner_group_models.LearnerGroupModel(
-        id=learner_group_id,
-        facilitator_id=facilitator_id,
-        title=title,
-        description=description,
-        members=members,
-        invitations=invitations,
-        subtopic_ids=subtopic_ids,
-        story_ids=story_ids)
-
-    learner_group_model.update_timestamps()
-    learner_group_model.put()
-
-    return learner_group_id
+    return config_domain.LEARNER_GROUPS_ARE_ENABLED.value
 
 
 def update_learner_group(
-        group_id, title, description, facilitators, members,
-        invitations, subtopic_ids, story_ids):
-    """Updates a learner group.
+        group_id, title, description,
+        facilitator_user_ids, student_ids, invited_student_ids,
+        subtopic_page_ids, story_ids
+    ) -> learner_group_domain.LearnerGroup:
+    """Updates a learner group or creates a new group if not present.
 
     Args:
         group_id: str. The id of the learner group to be updated.
         title: str. The title of the learner group.
         description: str. The description of the learner group.
-        facilitators: str. List of user_ids of the facilitators of the
+        facilitator_user_ids: str. List of user ids of the facilitators of the
             learner group.
-        members: list(str). List of user_ids of the members of the
+        student_ids: list(str). List of user ids of the students of the
             learner group.
-        invitations: list(str). List of user_ids of the users who have
-            been invited to the learner group.
-        subtopic_ids: list(str). The ids of the subtopics that are part of the
-            learner group syllabus.
+        invited_student_ids: list(str). List of user ids of the students who
+            have been invited to join the learner group.
+        subtopic_page_ids: list(str). The ids of the subtopics pages that are
+            part of the learner group syllabus. Each subtopic page id is
+            represented as a topicId:subtopicId string.
         story_ids: list(str). The ids of the stories that are part of the
             learner group syllabus.
 
     Returns:
-        learner_group: LearnerGroup. The domain object of the updated
-            learner group.
-
-    Raises:
-        Exception. The learner group does not exist.
+        learner_group: learner_group_domain.LearnerGroup. The domain object
+            of the updated or the newly created learner group.
     """
-    
+
     learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
         group_id)
 
     if not learner_group_model:
-        raise Exception('The learner group does not exist.')
+        learner_group_model = learner_group_models.LearnerGroupModel.create(
+            group_id, title, description
+        )
 
     learner_group_model.title = title
     learner_group_model.description = description
-    learner_group_model.facilitators = facilitators
-    learner_group_model.members = members
-    learner_group_model.invitations = invitations
-    learner_group_model.subtopic_ids = subtopic_ids
+    learner_group_model.facilitator_user_ids = facilitator_user_ids
+    learner_group_model.student_user_ids = student_ids
+    learner_group_model.invited_student_user_ids = invited_student_ids
+    learner_group_model.subtopic_page_ids = subtopic_page_ids
     learner_group_model.story_ids = story_ids
 
     learner_group_model.update_timestamps()
     learner_group_model.put()
 
-    return learner_group_model
+    learner_group = learner_group_domain.LearnerGroup(
+        learner_group_model.id,
+        learner_group_model.title,
+        learner_group_model.description,
+        learner_group_model.facilitator_user_ids,
+        learner_group_model.student_user_ids,
+        learner_group_model.invited_user_ids,
+        learner_group_model.subtopic_page_ids,
+        learner_group_model.story_ids
+    )
+
+    return learner_group
 
 
-def is_user_a_facilitator(user_id, group_id):
+def is_user_a_facilitator(user_id, group_id) -> bool:
     """Checks if the user is a facilitator of the leaner group.
 
     Args:
@@ -132,81 +116,30 @@ def is_user_a_facilitator(user_id, group_id):
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
         group_id)
-    
-    if not learner_group_model:
-        raise Exception('The learner group does not exist.')
 
     return user_id in learner_group_model.facilitator_user_ids
 
 
-def get_learner_goals_from_model(learner_goals_model):
-    """Returns the learner goals domain object given the learner goals
-    model loaded from the datastore.
-
-    Args:
-        learner_goals_model: LearnerGoalsModel. The
-            learner goals model from the datastore.
-
-    Returns:
-        LearnerGoals. The learner goals domain object corresponding to the
-        given model.
-    """
-    return user_domain.LearnerGoals(
-        learner_goals_model.id,
-        learner_goals_model.topic_ids_to_learn,
-        learner_goals_model.topic_ids_to_master)
-
-
-def get_learner_group_by_id(group_id):
-    """Returns the learner group domain object given the learner group id.
-
-    Args:
-        group_id: str. The id of the learner group.
-
-    Returns:
-        LearnerGroup. The learner group domain object corresponding to the
-        given id.
-
-    Raises:
-        Exception. The learner group does not exist.
-    """
-    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
-        group_id)
-
-    if not learner_group_model:
-        raise Exception('The learner group does not exist.')
-
-    return learner_group_domain.LearnerGroup(
-        learner_group_model.id,
-        learner_group_model.title,
-        learner_group_model.description,
-        learner_group_model.facilitator_user_ids,
-        learner_group_model.student_user_ids,
-        learner_group_model.invited_user_ids,
-        learner_group_model.subtopic_page_ids,
-        learner_group_model.story_ids)
-
-
-def remove_learner_group(group_id):
+def remove_learner_group(group_id) -> None:
     """Removes the learner group with of given learner group ID.
 
     Args:
         group_id: str. The id of the learner group to be removed.
-
-    Raises:
-        Exception. The learner group does not exist.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
         group_id)
 
-    if not learner_group_model:
-        raise Exception('The learner group does not exist.')
-
-    user_models.LearnerGroupUserModel.delete_learner_group_references(group_id)
+    # Note: We are not deleting the references of the learner group from the
+    # related learner group user models. These references are deleted when the
+    # user tries to access a deleted learner group so that they get a
+    # notification saying the group was deleted instead of the group just being
+    # silently removed.
     learner_group_model.delete()
 
 
-def get_students_progress_through_syllabus(group_id, student_user_ids):
+def get_students_progress_through_syllabus(
+        student_user_ids, subtopic_page_ids, story_ids
+    ):
     """Returns the progress of the students in the learner group through the
     syllabus.
 
@@ -219,19 +152,91 @@ def get_students_progress_through_syllabus(group_id, student_user_ids):
         list(dict). The progress of the students in the learner group through
         the syllabus.
     """
-    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
-        group_id)
 
-    if not learner_group_model:
-        raise Exception('The learner group does not exist.')
+    all_students_progress = []
+
+    topic_ids = get_topic_ids_from_subtopic_page_ids(
+        subtopic_page_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    all_skill_ids = []
+
+    for topic in enumerate(topics):
+        if topic:
+            all_skill_ids.extend(topic.get_all_skill_ids())
+
+    all_skill_ids = list(set(all_skill_ids))
+
+    for user_id in student_user_ids:
+        student_progress = {}
+
+        stories_progress = user_models.StoryProgressModel.get_multi(
+            user_id, story_ids)
+        student_progress['stories'] = stories_progress
+
+        all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(
+            user_id, all_skill_ids)
+
+        subtopic_prog_dict = {}
+        for topic in topics:
+            subtopic_prog_dict[topic.id] = {}
+            for subtopic in topic.subtopics:
+                subtopic_page_id = topic.id + ':' + subtopic.id
+                if not subtopic_page_id in subtopic_page_ids:
+                    continue
+                skill_mastery_dict = {
+                    skill_id: mastery
+                    for skill_id, mastery in all_skills_mastery_dict.items()
+                    if mastery is not None and skill_id in subtopic.skill_ids
+                }
+                if skill_mastery_dict:
+                    # Subtopic mastery is average of skill masteries.
+                    subtopic_prog_dict[topic.id][subtopic.id] = (
+                        sum(skill_mastery_dict.values()) /
+                        len(skill_mastery_dict))
+
+        student_progress['subtopics'] = subtopic_prog_dict
+
+        all_students_progress[user_id] = student_progress
+
+
+def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
+    """Returns the topic ids corresponding to the given subtopic page ids.
+
+    Args:
+        subtopic_page_ids: list(str). The ids of the subtopic pages.
+
+    Returns:
+        list(str). The topic ids corresponding to the given subtopic page ids.
+    """
+    topic_ids: List[str] = []
+
+    for subtopic_page_id in subtopic_page_ids:
+        topic_ids.append(subtopic_page_id.split(':')[0])
+
+    return topic_ids
+
+
+def get_filtered_learner_group_syllabus(
+        learner_group_id, filter_keyword, filter_type, filter_category,
+        filter_language
+    ):
+    """Returns the syllabus of the learner group filtered by the given
+    filter arguments.
+
+    Args:
+        learner_group_id: str. The id of the learner group.
+        filter_keyword: str. The keyword to filter the syllabus.
+        filter_type: str. The type of the syllabus item to filter.
+        filter_category: str. The category of the syllabus items.
+
+    Returns:
+        list(dict). The filtered syllabus of the learner group.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
+        learner_group_id)
 
     subtopic_page_ids = learner_group_model.subtopic_page_ids
     story_ids = learner_group_model.story_ids
 
-    students_stories_progress = {}
-    for student_user_id in student_user_ids:
-        stories_progress = user_models.StoryProgressModel.get_multi(
-            student_user_id, story_ids)
-        students_stories_progress[student_user_id] = stories_progress
+    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
 
-    

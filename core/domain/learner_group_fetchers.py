@@ -1,0 +1,95 @@
+# coding: utf-8
+#
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Getter commands for learner group models."""
+
+from __future__ import annotations
+from typing import List
+
+from core import feconf
+from core.domain import config_domain
+from core.domain import learner_group_domain
+from core.domain import skill_services
+from core.domain import topic_fetchers
+from core.domain import user_domain
+from core.platform import models
+
+(user_models, learner_group_models) = models.Registry.import_models(
+    [models.NAMES.user], [models.NAMES.learner_group])
+
+
+def get_new_learner_group_id():
+    """Returns a new learner group id.
+
+    Returns:
+        str. A new learner group id.
+    """
+    return learner_group_models.LearnerGroupModel.get_new_id()
+
+
+def get_learner_group_by_id(group_id):
+    """Returns the learner group domain object given the learner group id.
+
+    Args:
+        group_id: str. The id of the learner group.
+
+    Returns:
+        LearnerGroup or None. The learner group domain object corresponding to
+        the given id or None if no learner group exists for the given group id.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
+        group_id)
+
+    if not learner_group_model:
+        return None
+
+    return learner_group_domain.LearnerGroup(
+        learner_group_model.id,
+        learner_group_model.title,
+        learner_group_model.description,
+        learner_group_model.facilitator_user_ids,
+        learner_group_model.student_user_ids,
+        learner_group_model.invited_user_ids,
+        learner_group_model.subtopic_page_ids,
+        learner_group_model.story_ids)
+
+
+def get_learner_groups_of_facilitator(user_id: str):
+    """Returns a list of learner groups of the given facilitator.
+
+    Args:
+        user_id: str. The id of the facilitator.
+
+    Returns:
+        list(LearnerGroup). A list of learner groups of the given facilitator.
+    """
+    learner_group_models = (
+        learner_group_models.LearnerGroupModel.get_by_facilitator_id(user_id))
+
+    learner_groups = []
+    for learner_group_model in learner_group_models:
+        learner_groups.append(
+            learner_group_domain.LearnerGroup(
+                learner_group_model.id,
+                learner_group_model.title,
+                learner_group_model.description,
+                learner_group_model.facilitator_user_ids,
+                learner_group_model.student_user_ids,
+                learner_group_model.invited_user_ids,
+                learner_group_model.subtopic_page_ids,
+                learner_group_model.story_ids))
+
+    return learner_groups

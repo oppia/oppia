@@ -21,7 +21,9 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import learner_group_domain
+from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 
 
@@ -51,7 +53,7 @@ LEARNER_GROUP_SCHEMA = {
         },
         'default_value': None
     },
-    'invited_usernames': {
+    'invited_student_usernames': {
         'schema': {
             'type': 'list',
             'items': {
@@ -92,31 +94,44 @@ class CreateLearnerGroupHandler(base.BaseHandler):
         'POST': LEARNER_GROUP_SCHEMA
     }
 
-    @acl_decorators.can_access_teacher_dashboard
+    @acl_decorators.can_access_learner_groups
     def post(self):
         """Creates a new learner group."""
 
         title = self.payload.get('group_title')
         description = self.payload.get('group_description')
         student_usernames = self.payload.get('student_usernames')
-        invited_usernames = self.payload.get('invited_usernames')
+        invited_student_usernames = self.payload.get(
+            'invited_student_usernames')
         subtopic_page_ids = self.payload.get('subtopic_page_ids')
         story_ids = self.payload.get('story_ids')
 
-        student_user_ids: user_services.get_multi_user_ids_from_usernames(
+        student_ids: user_services.get_multi_user_ids_from_usernames(
             student_usernames)
-        invited_user_ids: user_services.get_multi_user_ids_from_usernames(
-            invited_usernames)
+        invited_student_ids: user_services.get_multi_user_ids_from_usernames(
+            invited_student_usernames)
 
-        learner_group_id = learner_group_services.create_learner_group(
-            self.user_id, title, description, student_user_ids,
-            invited_user_ids, subtopic_page_ids, story_ids)
+        # Create a new learner group ID.
+        new_learner_grp_id = learner_group_fetchers.get_new_learner_group_id()
 
-        self.values.update({
-            'group_id': learner_group_id
+        learner_group = learner_group_services.update_learner_group(
+            new_learner_grp_id, title, description, [self.user_id],
+            student_ids, invited_student_ids, subtopic_page_ids, story_ids
+        )
+
+        self.render_json({
+            'learner_group_id': learner_group.id,
+            'title': learner_group.title,
+            'description': learner_group.description,
+            'facilitator_username': user_services.get_usernames(
+                learner_group.facilitator_user_ids),
+            'student_usernames': user_services.get_usernames(
+                learner_group.student_user_ids),
+            'invited_student_usernames': user_services.get_usernames(
+                learner_group.invited_student_user_ids),
+            'subtopic_page_ids': learner_group.subtopic_page_ids,
+            'stoty_ids': learner_group.story_ids
         })
-
-        self.render_json(self.values)
 
 
 class LearnerGroupHandler(base.BaseHandler):
@@ -139,62 +154,73 @@ class LearnerGroupHandler(base.BaseHandler):
         'PUT': LEARNER_GROUP_SCHEMA
     }
 
-    @acl_decorators.can_access_teacher_dashboard
+    @acl_decorators.can_access_learner_groups
     def put(self, learner_group_id):
         """Updates an existing learner group."""
 
         title = self.payload.get('group_title')
         description = self.payload.get('group_description')
         student_usernames = self.payload.get('student_usernames')
-        invited_usernames = self.payload.get('invited_usernames')
+        invited_student_usernames = self.payload.get(
+            'invited_student_usernames')
         subtopic_page_ids = self.payload.get('subtopic_page_ids')
         story_ids = self.payload.get('story_ids')
 
         is_valid_request = learner_group_services.is_user_a_facilitator(
-            self.user_id, learner_group_id)
+            self.user_id, learner_group_id
+        )
 
-        if is_valid_request:
-            student_user_ids: user_services.get_multi_user_ids_from_usernames(
-                student_usernames)
-            invited_user_ids: user_services.get_multi_user_ids_from_usernames(
-                invited_usernames)
-
-            learner_group_services.update_learner_group(
-                learner_group_id,
-                title,
-                description,
-                self.user_id,
-                student_user_ids,
-                invited_user_ids,
-                subtopic_page_ids,
-                story_ids)
-        else:
+        if not is_valid_request:
             raise self.UnauthorizedUserException(
                 'You are not a facilitator of this learner group.')
 
-        self.render_json(self.values)
+        student_ids: user_services.get_multi_user_ids_from_usernames(
+            student_usernames
+        )
+        invited_student_ids: user_services.get_multi_user_ids_from_usernames(
+            invited_student_usernames
+        )
 
-    @acl_decorators.can_access_teacher_dashboard
+        learner_group = learner_group_services.update_learner_group(
+            learner_group_id, title, description, [self.user_id],
+            student_ids, invited_student_ids, subtopic_page_ids, story_ids
+        )
+
+        self.render_json({
+            'learner_group_id': learner_group.id,
+            'title': learner_group.title,
+            'description': learner_group.description,
+            'facilitator_username': user_services.get_usernames(
+                learner_group.facilitator_user_ids),
+            'student_usernames': user_services.get_usernames(
+                learner_group.student_user_ids),
+            'invited_student_usernames': user_services.get_usernames(
+                learner_group.invited_student_user_ids),
+            'subtopic_page_ids': learner_group.subtopic_page_ids,
+            'stoty_ids': learner_group.story_ids
+        })
+
+    @acl_decorators.can_access_learner_groups
     def delete(self, learner_group_id):
         """Deletes a learner group."""
 
         is_valid_request = learner_group_services.is_user_a_facilitator(
-            self.user_id, learner_group_id)
+            self.user_id, learner_group_id
+        )
 
-        if is_valid_request:
-            learner_group_deleted = (
-                learner_group_services.remove_learner_group(learner_group_id))
-        else:
+        if not is_valid_request:
             raise self.UnauthorizedUserException(
                 'You are not a facilitator of this learner group.')
 
+        learner_group_services.remove_learner_group(learner_group_id)
+
         self.render_json({
-            'learner_group_deleted': learner_group_deleted
+            'success': True
         })
 
 
-class LearnerGroupUserProgressHandler(base.BaseHandler):
-    """Handles operations related to the learner group users progress."""
+class LearnerGroupStudentProgressHandler(base.BaseHandler):
+    """Handles operations related to the learner group student's progress."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
@@ -232,8 +258,8 @@ class LearnerGroupUserProgressHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_dashboard
     def get(self, learner_group_id):
-        """Handles GET requests for facilitator's view of users progress
-        through learner group syllabus.
+        """Handles GET requests for users progress through learner
+        group syllabus.
         """
 
         student_usernames = self.payload.get('student_usernames')
@@ -241,22 +267,70 @@ class LearnerGroupUserProgressHandler(base.BaseHandler):
         student_user_ids: user_services.get_multi_user_ids_from_usernames(
             student_usernames)
 
-        students_progress = (
-            learner_group_services.get_students_progress_through_syllabus(
-                learner_group_id, student_user_ids))
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
 
-        if learner_group is not None:
-            self.render_json({
-                'learner_group_id': learner_group.id,
-                'title': learner_group.title,
-                'description': learner_group.description,
-                'facilitator': learner_group.facilitator,
-                'student_usernames': learner_group.student_usernames,
-                'invited_usernames': learner_group.invited_usernames,
-                'syllabus': learner_group.syllabus
-            })
-        else:
+        if learner_group is None:
             raise self.PageNotFoundException
+
+        subtopic_page_ids = learner_group.subtopic_page_ids
+        story_ids = learner_group.story_ids
+
+        all_students_progress = []
+
+        topic_ids = (
+            learner_group_services.get_topic_ids_from_subtopic_page_ids(
+                subtopic_page_ids))
+
+        topics = topic_fetchers.get_topics_by_ids(topic_ids)
+        all_skill_ids = []
+
+        for topic in enumerate(topics):
+            if topic:
+                all_skill_ids.extend(topic.get_all_skill_ids())
+
+        all_skill_ids = list(set(all_skill_ids))
+
+        for user_id in student_user_ids:
+            student_progress = {
+                'username': user_services.get_username(user_id),
+                'stories': {},
+                'subtopics': {},
+                'progress_sharing_is_turned_on': False
+            }
+
+            stories_progress = user_models.StoryProgressModel.get_multi(
+                user_id, story_ids)
+            student_progress['stories'] = stories_progress
+
+            all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(
+                user_id, all_skill_ids)
+
+            subtopic_prog_dict = {}
+            for topic in topics:
+                subtopic_prog_dict[topic.id] = {}
+                for subtopic in topic.subtopics:
+                    subtopic_page_id = topic.id + ':' + subtopic.id
+                    if not subtopic_page_id in subtopic_page_ids:
+                        continue
+                    skill_mastery_dict = {
+                        skill_id: mastery
+                        for skill_id, mastery in all_skills_mastery_dict.items()
+                        if mastery is not None and skill_id in subtopic.skill_ids
+                    }
+                    if skill_mastery_dict:
+                        # Subtopic mastery is average of skill masteries.
+                        subtopic_prog_dict[topic.id][subtopic.id] = (
+                            sum(skill_mastery_dict.values()) /
+                            len(skill_mastery_dict))
+
+            student_progress['subtopics'] = subtopic_prog_dict
+
+            all_students_progress[user_id] = student_progress
+
+        self.render_json({
+            'students_progress': all_students_progress
+        })
 
 
 class LearnerGroupSyllabusHandler(base.BaseHandler):
@@ -275,58 +349,114 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
         }
     }
 
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'filter_keyword': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None
+            },
+            'filter_type': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None
+            },
+            'filter_category': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None
+            },
+            'filter_language': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_access_learner_dashboard
     def get(self, learner_group_id):
         """Handles GET requests for learner group syllabus views."""
 
-        filter_args = self.payload.get('filter_args')
+        filter_keyword = self.payload.get('filter_keyword')
+        filter_type = self.payload.get('filter_type')
+        filter_category = self.payload.get('filter_category')
+        filter_language = self.payload.get('filter_language')
+
         filtered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
-                learner_group_id,
-                filter_args))
+                learner_group_id, filter_keyword
+                filter_type, filter_category, filter_language
+            )
+        )
 
-        if filtered_syllabus is not None:
-            self.render_json({
-                'learner_group_id': learner_group_id,
-                'subtopic_summaries': filtered_syllabus.subtopic_summaries,
-                'story_summaries': filtered_syllabus.story_summaries
-            })
-        else:
-            raise self.PageNotFoundException
+        self.render_json({
+            'learner_group_id': learner_group_id,
+            'subtopic_summaries': filtered_syllabus.subtopic_summaries,
+            'story_summaries': filtered_syllabus.story_summaries
+        })
 
 
 class TeacherDashboardHandler(base.BaseHandler):
     """Handles operations related to the teacher dashboard."""
 
-    @acl_decorators.can_access_teacher_dashboard
+    @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests for the teacher dashboard."""
 
-        
+        is_valid_request = (
+            learner_group_services.is_learner_group_feature_enabled()
+        )
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
+
+        learner_groups = (
+            learner_group_fetchers.get_learner_groups_of_facilitator(
+                self.user_id)
+        )
+
+        learner_groups_data = []
+        for learner_group in learner_groups:
+            learner_groups_data.append({
+                'id': learner_group.id,
+                'title': learner_group.title,
+                'description': learner_group.description,
+                'member_count': len(learner_group.member_ids)
+            })
+
+        self.render_json({
+            'learner_groups': learner_groups_data
+        })
+ 
 
 class FacilitatorGroupPreferencesHandler(base.BaseHandler):
     """Handles operations related to the facilitator group preferences."""
 
-    @acl_decorators.can_access_teacher_dashboard
+    @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id):
         """Handles GET requests for facilitator's view of learner group."""
 
         is_valid_request = learner_group_services.is_user_a_facilitator(
             self.user_id, learner_group_id)
 
-        if is_valid_request:
-            learner_group = learner_group_services.get_learner_group_by_id(
-                    learner_group_id)
-
-            self.render_json({
-                'learner_group_id': learner_group.id,
-                'title': learner_group.title,
-                'description': learner_group.description,
-                'facilitator_username': learner_group.facilitator_username,
-                'student_usernames': learner_group.student_usernames,
-                'invited_usernames': learner_group.invited_usernames,
-                'subtopic_page_ids': learner_group.subtopic_page_ids,
-                'stoty_ids': learner_group.story_ids
-            })
-        else:
+        if not is_valid_request:
             raise self.PageNotFoundException
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+                learner_group_id)
+
+        self.render_json({
+            'learner_group_id': learner_group.id,
+            'title': learner_group.title,
+            'description': learner_group.description,
+            'facilitator_username': learner_group.facilitator_username,
+            'student_usernames': learner_group.student_usernames,
+            'invited_student_usernames': learner_group.invited_student_usernames,
+            'subtopic_page_ids': learner_group.subtopic_page_ids,
+            'stoty_ids': learner_group.story_ids
+        })

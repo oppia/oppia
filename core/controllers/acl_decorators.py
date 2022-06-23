@@ -2200,19 +2200,19 @@ def can_access_learner_dashboard(handler):
 
     return test_can_access
 
-def can_access_teacher_dashboard(handler):
-    """Decorator to check access to teacher dashboard.
+def can_access_learner_groups(handler):
+    """Decorator to check access to learner groups.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if
-        one can access the teacher dashboard.
+        one can access the learner groups.
     """
 
     def test_can_access(self, **kwargs):
-        """Checks if the user can access the teacher dashboard.
+        """Checks if the user can access the learner groups.
 
         Args:
             **kwargs: *. Keyword arguments.
