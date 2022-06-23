@@ -120,7 +120,9 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         """
         learner_goals_model = user_models.LearnerGoalsModel.get(
             user_id, strict=False)
-
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if learner_goals_model:
             topic_ids: List[str] = learner_goals_model.topic_ids_to_learn
             return topic_ids

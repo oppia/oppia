@@ -390,6 +390,9 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
     if recommendations_model is None:
         return []
     else:
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         recommended_exploration_ids: List[str] = (
             recommendations_model.recommended_exploration_ids
         )

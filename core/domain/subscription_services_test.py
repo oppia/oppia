@@ -83,6 +83,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if subscriptions_model:
             feedback_thread_ids: List[str] = (
                 subscriptions_model.general_feedback_thread_ids
@@ -104,6 +107,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if subscriptions_model:
             exploration_ids: List[str] = subscriptions_model.exploration_ids
             return exploration_ids
@@ -123,6 +129,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if subscriptions_model:
             collection_ids: List[str] = subscriptions_model.collection_ids
             return collection_ids
@@ -430,6 +439,9 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         """
         subscribers_model = user_models.UserSubscribersModel.get(
             user_id, strict=False)
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if subscribers_model:
             subscriber_ids: List[str] = subscribers_model.subscriber_ids
             return subscriber_ids
@@ -448,6 +460,9 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if subscriptions_model:
             creator_ids: List[str] = subscriptions_model.creator_ids
             return creator_ids
