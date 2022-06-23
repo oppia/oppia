@@ -397,6 +397,12 @@ class ExpStateValidationJobTests(
               'inputs': {
                 'x': 2
               }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 4
+              }
             }
           ],
           'outcome': {

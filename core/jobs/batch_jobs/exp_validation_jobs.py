@@ -134,7 +134,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                 # Validates if skillreview text value is non empty.
                 elif (
-                        rte_component['id'] == 
+                        rte_component['id'] ==
                         'oppia-noninteractive-skillreview'
                 ):
                     text_with_value = rte_component['customization_args'][
@@ -458,16 +458,15 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     answer_group.rule_specs.index(rule_spec))
                 if rule_spec.rule_type == 'Equals':
                     if rule_spec.inputs['x'] in selected_equals_choices:
-                        choice_prev_selected = True
-                    if not choice_prev_selected:
-                        selected_equals_choices.append(
-                            rule_spec.inputs['x'])
-                    else:
                         mc_interaction_invalid_values.append(
                             f'rule - {rule_spec_index}, answer group '
                             f'- {answer_group_index} is '
                             f'already present.'
                         )
+                    else:
+                        selected_equals_choices.append(
+                            rule_spec.inputs['x'])
+
         choices = (
             state.interaction.customization_args['choices'].value)
         # Validates all inputs should have atleast 4 choices.
