@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core/domain/app_feedback_report_constants.py"""
+"""Unit tests for core/handler_schema_constants.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import app_feedback_report_constants
+from . import handler_schema_constants
 
 
-class AppFeedbackReportConstantsTests(test_utils.GenericTestBase):
+class HandlerSchemaConstantsTests(test_utils.GenericTestBase):
 
     def test_trivial(self) -> None:
         pass
