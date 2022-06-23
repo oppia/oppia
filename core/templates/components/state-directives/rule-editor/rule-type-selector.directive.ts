@@ -27,6 +27,9 @@ require(
   'state-interaction-id.service');
 require('third-party-imports/select2.import.ts');
 
+import { Directive, ElementRef, EventEmitter, Injector, Input, Output } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
 angular.module('oppia').directive('ruleTypeSelector', [function() {
   return {
     restrict: 'E',
@@ -85,14 +88,14 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
           // Select the first choice by default.
           if (!ctrl.localValue) {
             ctrl.localValue = choices[0].id;
-            ctrl.onSelectionChange()(ctrl.localValue);
+            ctrl.onSelectionChange(ctrl.localValue);
           }
 
           // Initialize the dropdown.
           $(select2Node).val(ctrl.localValue).trigger('change');
 
           $(select2Node).on('change', function(e) {
-            ctrl.onSelectionChange()($(select2Node).val());
+            ctrl.onSelectionChange($(select2Node).val());
             // This is needed to propagate the change and display input fields
             // for parameterizing the rule. Otherwise, the input fields do not
             // get updated when the rule type is changed.
@@ -103,3 +106,14 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
     ]
   };
 }]);
+
+@Directive({
+  selector: 'rule-type-selector'
+})
+export class RuleTypeSelectorDirective extends UpgradeComponent {
+  @Input() localValue;
+  @Output() onSelectionChange = new EventEmitter();
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('ruleTypeSelector', elementRef, injector);
+  }
+}

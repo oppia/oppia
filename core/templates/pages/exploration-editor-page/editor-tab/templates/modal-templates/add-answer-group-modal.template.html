@@ -9,9 +9,8 @@
       <strong>If the learner's answer...</strong>
     </div>
 
-    <rule-editor modal-id="modalId" rule="tmpRule" is-editable="EditabilityService.isEditable()" is-editing-rule-inline="false">
-    </rule-editor>
-
+    <oppia-rule-editor [modal-id]="modalId" [rule]="tmpRule" [is-editable]="EditabilityService.isEditable()" [is-editing-rule-inline]="false">
+    </oppia-rule-editor>
     <br>
 
     <div ng-if="!feedbackEditorIsOpen && !isLinearWithNoFeedback(tmpOutcome)"
