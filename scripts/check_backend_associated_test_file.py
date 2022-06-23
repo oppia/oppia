@@ -95,7 +95,7 @@ def main() -> None:
             to_be_replaced = '.py'
             to_replace_with = '_test.py'
             test_file = file[::-1].replace(
-                to_be_replaced[::-1], to_replace_with[::-1], 1)[::-1] 
+                to_be_replaced[::-1], to_replace_with[::-1], 1)[::-1]
             if test_file not in all_backend_files:
                 files_without_test.append(file)
 
