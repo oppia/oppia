@@ -904,7 +904,6 @@ export class ConversationSkinComponent {
 
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
     this._addNewCard(initialCard);
-
     this.nextCard = initialCard;
     this.explorationPlayerStateService.onPlayerStateChange.emit(
       this.nextCard.getStateName());
