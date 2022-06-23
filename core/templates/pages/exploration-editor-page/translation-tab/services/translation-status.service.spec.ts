@@ -39,7 +39,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
-describe('Translation status service', function() {
+fdescribe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();

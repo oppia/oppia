@@ -416,6 +416,7 @@ import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-r
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -830,6 +831,7 @@ export const angularServices: [string, Type<{}>][] = [
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TranslationTopicService', TranslationTopicService],
+  ['TranslationStatusService', TranslationStatusService],
   ['TruncatePipe', TruncatePipe],
   ['TrainingDataService', TrainingDataService],
   ['TrainingModalService', TrainingModalService],
