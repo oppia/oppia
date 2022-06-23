@@ -6174,7 +6174,7 @@ export default {
   "MAX_STATE_NAME_LENGTH": 50,
 
   // Maximum allowed length of unique progress url ID.
-  "MAX_PID_LENGTH": 6,
+  "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],

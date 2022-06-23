@@ -958,7 +958,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             new_id = '%s' % ''.join(
                 random.choice(string.ascii_letters)
-                for _ in range(constants.MAX_PID_LENGTH))
+                for _ in range(constants.MAX_PROGRESS_URL_ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 

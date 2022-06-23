@@ -260,7 +260,7 @@ class ExplorationHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_PID_LENGTH
+                        'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
                     }]
                 },
                 'default_value': None
@@ -1459,7 +1459,7 @@ class TransientCheckpointUrlPage(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'has_length_at_most',
-                    'max_value': constants.MAX_PID_LENGTH
+                    'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
                 }]
             },
         }
