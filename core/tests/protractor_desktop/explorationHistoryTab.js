@@ -21,6 +21,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 
 var ExplorationEditorPage =
@@ -523,6 +524,11 @@ describe('Exploration history', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.deleteState('second');
     await explorationEditorMainTab.moveToState('first');
+    await waitFor.visibilityOf(
+      element(
+        by.css('.protractor-test-default-response-tab')),
+      'State Name Container takes too long to appear');
+
     responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.setDestination('final card', false, null);
     await explorationEditorPage.saveChanges();
