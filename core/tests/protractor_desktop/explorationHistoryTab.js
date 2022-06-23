@@ -604,16 +604,9 @@ describe('Exploration history', function() {
   });
 
   it('should show the history of exploration metadata', async function() {
-    await users.createUser('user@historyTab.com', 'userHistoryTab');
-    await users.login('user@historyTab.com');
+    await users.createUser('user3@historyTab.com', 'user3HistoryTab');
+    await users.login('user3@historyTab.com');
     await workflow.createExploration(true);
-
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Dummy Exploration');
-    await explorationEditorSettingsTab.setCategory('Algorithms');
-    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorPage.saveChanges();
 
     var METADATA_1_STRING = (
       'title: \'\'\n' +
@@ -651,12 +644,19 @@ describe('Exploration history', function() {
       ''
     );
 
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Dummy Exploration');
+    await explorationEditorSettingsTab.setCategory('Algorithms');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.saveChanges();
     await explorationEditorPage.navigateToHistoryTab();
     var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.selectTwoVersions('1', '2');
     await historyGraph.openExplorationMetadataHistory();
     await historyGraph.expectTextToMatch(METADATA_1_STRING, METADATA_2_STRING);
     await historyGraph.closeExplorationMetadataHistory();
+    await users.logout();
   });
 
   it('should revert to old exploration commit', async function() {
