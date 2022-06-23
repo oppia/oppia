@@ -519,12 +519,6 @@ angular.module('oppia').component('explorationEditorPage', {
               setDocumentTitle();
               $rootScope.$applyAsync();
             }
-          ),
-          StateEditorRefreshService.onRefreshStateEditor.subscribe(
-            () => {
-              RouterService.navigateToMainTab(
-                StateEditorService.activeStateName);
-            }
           )
         );
         ctrl.directiveSubscriptions.add(
