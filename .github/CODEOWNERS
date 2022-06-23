@@ -476,6 +476,8 @@
 /core/templates/domain/topics_and_skills_dashboard/ @aks681 @kevintab95
 /core/templates/pages/topics-and-skills-dashboard-page/ @aks681 @kevintab95
 
+# Learner group project.
+/core/domain/learner_group*.py @aks681 @paprajapati9
 
 # Beam jobs
 /setup.py @vojtechjelinek
