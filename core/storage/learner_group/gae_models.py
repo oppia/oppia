@@ -23,8 +23,8 @@ import string
 
 from core.platform import models
 
-from typing import Dict, List, Union
-from typing_extensions import Literal
+from typing import Dict, List
+from typing_extensions import Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -34,6 +34,16 @@ if MYPY: # pragma: no cover
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class LearnerGroupDataDict(TypedDict):
+    """Dictionary for learner group data to export."""
+
+    title: str
+    description: str
+    role_in_group: str
+    subtopic_page_ids: List[str]
+    story_ids: List[str]
 
 
 class LearnerGroupModel(base_models.BaseModel):
@@ -159,8 +169,7 @@ class LearnerGroupModel(base_models.BaseModel):
         }
 
     @classmethod
-    def export_data(cls, user_id: str) -> Dict[
-        str, Dict[str, Union[str, List[str]]]]:
+    def export_data(cls, user_id: str) -> Dict[str, LearnerGroupDataDict]:
         """Takeout: Export LearnerGroupModel user-based properties.
 
         Args:
@@ -178,8 +187,9 @@ class LearnerGroupModel(base_models.BaseModel):
         ))
         user_data = {}
         for learner_group_model in found_models:
+            learner_group_data: LearnerGroupDataDict
             if user_id in learner_group_model.student_user_ids:
-                user_data[learner_group_model.id] = {
+                learner_group_data = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
                     'role_in_group': 'student',
@@ -188,13 +198,15 @@ class LearnerGroupModel(base_models.BaseModel):
                     'story_ids': learner_group_model.story_ids
                 }
             elif user_id in learner_group_model.invited_student_user_ids:
-                user_data[learner_group_model.id] = {
+                learner_group_data = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
-                    'role_in_group': 'invited_student'
+                    'role_in_group': 'invited_student',
+                    'subtopic_page_ids': [],
+                    'story_ids': []
                 }
             elif user_id in learner_group_model.facilitator_user_ids:
-                user_data[learner_group_model.id] = {
+                learner_group_data = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
                     'role_in_group': 'facilitator',
@@ -202,6 +214,8 @@ class LearnerGroupModel(base_models.BaseModel):
                         learner_group_model.subtopic_page_ids,
                     'story_ids': learner_group_model.story_ids
                 }
+            user_data[learner_group_model.id] = learner_group_data
+
         return user_data
 
     @classmethod

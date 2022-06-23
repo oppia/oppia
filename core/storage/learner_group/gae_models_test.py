@@ -165,7 +165,9 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             '3232': {
                 'title': 'title',
                 'description': 'description',
-                'role_in_group': 'invited_student'
+                'role_in_group': 'invited_student',
+                'subtopic_page_ids': [],
+                'story_ids': []
             }
         }
         self.assertEqual(expected_invited_student_data, invited_student_data)
