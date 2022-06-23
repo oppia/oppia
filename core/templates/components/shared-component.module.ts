@@ -87,6 +87,7 @@ import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/mod
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
+import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
 import { SearchBarModule } from 'pages/library-page/search-bar/search-bar.module';
 import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { FilteredChoicesFieldComponent } from './filter-fields/filtered-choices-field/filtered-choices-field.component';
@@ -123,6 +124,8 @@ import { QuestionMisconceptionEditorComponent } from './question-directives/ques
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
+import { RuleEditorComponent } from './state-directives/rule-editor/rule-editor.component';
+import { RuleTypeSelectorDirective } from './state-directives/rule-editor/rule-type-selector.directive';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 
@@ -206,6 +209,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ExplorationEmbedButtonModalComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
+    HtmlSelectComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LearnerAnswerInfoCard,
@@ -261,6 +265,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ReviewMaterialEditorComponent,
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
+    RuleTypeSelectorDirective,
+    RuleEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
@@ -317,6 +323,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
+    HtmlSelectComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     ProgressNavComponent,
@@ -356,6 +363,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ReviewMaterialEditorComponent,
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
+    RuleEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
@@ -414,6 +422,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
+    HtmlSelectComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     ProfileLinkImageComponent,
@@ -462,6 +471,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ReviewMaterialEditorComponent,
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
+    RuleTypeSelectorDirective,
+    RuleEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
@@ -470,3 +481,5 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
 })
 
 export class SharedComponentsModule { }
+
+

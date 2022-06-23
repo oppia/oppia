@@ -32,7 +32,11 @@ import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-
 import { BooleanEditorComponent } from 'objects/templates/boolean-editor.component';
 import { CodeStringEditorComponent } from 'objects/templates/code-string-editor.component';
 import { CoordTwoDimEditorComponent } from 'objects/templates/coord-two-dim-editor.component';
+<<<<<<< HEAD
 import { AllowedVariablesEditorComponent } from 'objects/templates/allowed-variables-editor.component';
+=======
+import { CustomOskLettersEditorComponent } from 'objects/templates/custom-osk-letters-editor.component';
+>>>>>>> 2b256e1c5f090fe6d2879098795ca31576222c30
 import { DragAndDropPositiveIntEditorComponent } from 'objects/templates/drag-and-drop-positive-int-editor.component';
 import { FilepathEditorComponent } from 'objects/templates/filepath-editor.component';
 import { FractionEditorComponent } from 'objects/templates/fraction-editor.component';
@@ -76,7 +80,11 @@ const EDITORS = {
   'boolean': BooleanEditorComponent,
   'code-string': CodeStringEditorComponent,
   'coord-two-dim': CoordTwoDimEditorComponent,
+<<<<<<< HEAD
   'allowed-variables': AllowedVariablesEditorComponent,
+=======
+  'custom-osk-letters': CustomOskLettersEditorComponent,
+>>>>>>> 2b256e1c5f090fe6d2879098795ca31576222c30
   'drag-and-drop-positive-int': DragAndDropPositiveIntEditorComponent,
   filepath: FilepathEditorComponent,
   fraction: FractionEditorComponent,
