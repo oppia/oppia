@@ -178,6 +178,9 @@ describe('Conversation skin component', () => {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           answer_groups: [
@@ -191,6 +194,7 @@ describe('Conversation skin component', () => {
                   html: '<p>Good Job</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Mid'
               },
               training_data: [],
@@ -219,6 +223,7 @@ describe('Conversation skin component', () => {
               html: '<p>Try again.</p>'
             },
             param_changes: [],
+            dest_if_really_stuck: null,
             dest: 'Start'
           }
         },
@@ -314,6 +319,7 @@ describe('Conversation skin component', () => {
                   html: ' <p>Good Job</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'End'
               },
               training_data: [],
@@ -342,6 +348,7 @@ describe('Conversation skin component', () => {
               html: '<p>try again.</p>'
             },
             param_changes: [],
+            dest_if_really_stuck: null,
             dest: 'Mid'
           }
         },
