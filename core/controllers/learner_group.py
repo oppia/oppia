@@ -15,14 +15,14 @@
 """Controllers for the learner groups."""
 
 from __future__ import annotations
-from typing import List
 
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import learner_group_domain, skill_services, story_fetchers
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import skill_services
+from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import user_services
 
@@ -90,6 +90,7 @@ LEARNER_GROUP_SCHEMA = {
 class CreateLearnerGroupHandler(base.BaseHandler):
     """Handles creation of a new learner group."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': LEARNER_GROUP_SCHEMA
     }
@@ -421,6 +422,11 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
 class TeacherDashboardHandler(base.BaseHandler):
     """Handles operations related to the teacher dashboard."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests for the teacher dashboard."""
@@ -449,10 +455,26 @@ class TeacherDashboardHandler(base.BaseHandler):
         self.render_json({
             'learner_groups': learner_groups_data
         })
- 
+
 
 class FacilitatorGroupPreferencesHandler(base.BaseHandler):
     """Handles operations related to the facilitator group preferences."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id):
@@ -473,7 +495,8 @@ class FacilitatorGroupPreferencesHandler(base.BaseHandler):
             'description': learner_group.description,
             'facilitator_username': learner_group.facilitator_username,
             'student_usernames': learner_group.student_usernames,
-            'invited_student_usernames': learner_group.invited_student_usernames,
+            'invited_student_usernames':
+                learner_group.invited_student_usernames,
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'stoty_ids': learner_group.story_ids
         })

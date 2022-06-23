@@ -2200,6 +2200,7 @@ def can_access_learner_dashboard(handler):
 
     return test_can_access
 
+
 def can_access_learner_groups(handler):
     """Decorator to check access to learner groups.
 

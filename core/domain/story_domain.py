@@ -1738,6 +1738,7 @@ class StoryProgress:
             'all_node_ids': self.all_node_ids
         }
 
+
 class StorySummaryDict(HumanReadableStorySummaryDict):
     """Dictionary representing the StorySummary object."""
 

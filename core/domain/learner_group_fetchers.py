@@ -17,18 +17,12 @@
 """Getter commands for learner group models."""
 
 from __future__ import annotations
-from typing import List
 
-from core import feconf
-from core.domain import config_domain
 from core.domain import learner_group_domain
-from core.domain import skill_services
-from core.domain import topic_fetchers
-from core.domain import user_domain
 from core.platform import models
 
-(user_models, learner_group_models) = models.Registry.import_models(
-    [models.NAMES.user], [models.NAMES.learner_group])
+(learner_group_models, user_models) = models.Registry.import_models(
+    [models.NAMES.learner_group], [models.NAMES.user])
 
 
 def get_new_learner_group_id():
@@ -76,21 +70,21 @@ def get_learner_groups_of_facilitator(user_id: str):
     Returns:
         list(LearnerGroup). A list of learner groups of the given facilitator.
     """
-    learner_group_models = (
+    learner_grp_models = (
         learner_group_models.LearnerGroupModel.get_by_facilitator_id(user_id))
 
     learner_groups = []
-    for learner_group_model in learner_group_models:
+    for learner_grp_model in learner_grp_models:
         learner_groups.append(
             learner_group_domain.LearnerGroup(
-                learner_group_model.id,
-                learner_group_model.title,
-                learner_group_model.description,
-                learner_group_model.facilitator_user_ids,
-                learner_group_model.student_user_ids,
-                learner_group_model.invited_user_ids,
-                learner_group_model.subtopic_page_ids,
-                learner_group_model.story_ids))
+                learner_grp_model.id,
+                learner_grp_model.title,
+                learner_grp_model.description,
+                learner_grp_model.facilitator_user_ids,
+                learner_grp_model.student_user_ids,
+                learner_grp_model.invited_user_ids,
+                learner_grp_model.subtopic_page_ids,
+                learner_grp_model.story_ids))
 
     return learner_groups
 
@@ -104,8 +98,8 @@ def get_progress_sharing_permission(user_id, group_id):
         group_id: str. The id of the learner group.
 
     Returns:
-        bool: True if the user has progress sharing permission of the given
-            group as True, False otherwise.
+        bool. True if the user has progress sharing permission of the given
+        group as True, False otherwise.
     """
     learner_group_user_model = user_models.LearnerGroupsUserModel.get_by_id(
         user_id)

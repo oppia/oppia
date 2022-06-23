@@ -17,18 +17,15 @@
 """Services for the learner groups."""
 
 from __future__ import annotations
-from typing import List
 
-from core import feconf
 from core.domain import config_domain
 from core.domain import learner_group_domain
-from core.domain import skill_services
-from core.domain import topic_fetchers
-from core.domain import user_services
 from core.platform import models
 
-(user_models, learner_group_models) = models.Registry.import_models(
-    [models.NAMES.user], [models.NAMES.learner_group])
+from typing import List
+
+(learner_group_models, user_models) = models.Registry.import_models(
+    [models.NAMES.learner_group], [models.NAMES.user])
 
 
 def is_learner_group_feature_enabled() -> bool:
@@ -179,3 +176,7 @@ def get_filtered_learner_group_syllabus(
 
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
 
+    return {
+        'story_summaries': '',
+        'subtopic_summaries': ''
+    }
