@@ -34,11 +34,8 @@ import {
   SubtitledHtml
 } from 'domain/exploration/subtitled-html.model';
 
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
-import { AppConstants } from 'app.constants';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model'
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface StateBackendDict {
   // The classifier model ID associated with a state, if applicable,
@@ -135,9 +132,9 @@ export class StateObjectFactory {
   // Create a default state until the actual state is saved.
   // Passes name as null before saving a state.
   createDefaultState(
-    newStateName: string | null,
-    contentIdForContent,
-    contentIdForDefaultOutcome): State {
+      newStateName: string | null,
+      contentIdForContent: string,
+      contentIdForDefaultOutcome: string): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
@@ -150,16 +147,17 @@ export class StateObjectFactory {
       card_is_checkpoint: newStateTemplate.card_is_checkpoint
     });
     newState.content.contentId = contentIdForContent;
-    newState.interaction.defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
-    newState.recordedVoiceovers.addContentId(contentIdForContent);
-    newState.recordedVoiceovers.addContentId(contentIdForDefaultOutcome);
     if (
       newState.interaction.defaultOutcome !== null &&
       newStateName !== null
     ) {
       let defaultOutcome = newState.interaction.defaultOutcome;
+      defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
       defaultOutcome.dest = newStateName as string;
     }
+    newState.recordedVoiceovers.addContentId(contentIdForContent);
+    newState.recordedVoiceovers.addContentId(contentIdForDefaultOutcome);
+
     return newState;
   }
 

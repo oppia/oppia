@@ -28,7 +28,6 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
 })
 export class MarkTranslationsAsNeedingUpdateModalComponent
   extends ConfirmOrCancelModal {
-
   @Input() contentId: string;
 
   constructor(

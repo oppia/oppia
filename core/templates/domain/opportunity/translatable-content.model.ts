@@ -17,7 +17,7 @@
  */
 
 export interface TranslatableItemBackendDict {
-  'content_id': string,
+  'content_id': string;
   'content_value': string | string[];
   'content_format': string;
   'content_type': string;

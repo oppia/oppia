@@ -65,7 +65,6 @@ import {
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
-import { EntityTranslationsService } from 'services/entity-translations.services';
 
 angular.module('oppia').component('stateTranslation', {
   bindings: {
@@ -75,9 +74,8 @@ angular.module('oppia').component('stateTranslation', {
   controller: [
     '$filter', '$scope', 'CkEditorCopyContentService',
     'EntityTranslationsService', 'ExplorationCorrectnessFeedbackService',
-    'ExplorationHtmlFormatterService', 'ExplorationLanguageCodeService',
-    'ExplorationStatesService', 'RouterService', 'StateEditorService',
-    'TranslationLanguageService', 'TranslationStatusService',
+    'ExplorationHtmlFormatterService', 'ExplorationStatesService',
+    'RouterService', 'StateEditorService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService',
     'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
     'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
@@ -88,9 +86,8 @@ angular.module('oppia').component('stateTranslation', {
     function(
         $filter, $scope, CkEditorCopyContentService,
         EntityTranslationsService, ExplorationCorrectnessFeedbackService,
-        ExplorationHtmlFormatterService, ExplorationLanguageCodeService,
-        ExplorationStatesService, RouterService, StateEditorService,
-        TranslationLanguageService, TranslationStatusService,
+        ExplorationHtmlFormatterService, ExplorationStatesService,
+        RouterService, StateEditorService, TranslationStatusService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
         COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
@@ -112,12 +109,6 @@ angular.module('oppia').component('stateTranslation', {
       ctrl.directiveSubscriptions = new Subscription();
       $scope.isVoiceoverModeActive = function() {
         return (TranslationTabActiveModeService.isVoiceoverModeActive());
-      };
-      var isTranslatedTextRequired = function() {
-        return (
-          TranslationTabActiveModeService.isVoiceoverModeActive() &&
-          TranslationLanguageService.getActiveLanguageCode() !== (
-            ExplorationLanguageCodeService.displayed));
       };
       $scope.getRequiredHtml = function(subtitledHtml) {
         var html = subtitledHtml.html;

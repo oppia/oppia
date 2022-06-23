@@ -51,8 +51,8 @@ export const AppConstants = {
   EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?v=<version>'),
   ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE: (
-    '/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/'
-    + '<language_code>'),
+    '/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/' +
+    '<language_code>'),
 
   WARNING_TYPES: {
     // These must be fixed before the exploration can be saved.

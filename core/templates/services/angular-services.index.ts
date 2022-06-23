@@ -539,7 +539,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationImprovementsService', ExplorationImprovementsService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
-  ['ExplorationNextContentIdIndexService', ExplorationNextContentIdIndexService],
+  [
+    'ExplorationNextContentIdIndexService',
+    ExplorationNextContentIdIndexService],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationObjectiveService', ExplorationObjectiveService],

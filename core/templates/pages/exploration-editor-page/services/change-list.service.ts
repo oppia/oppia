@@ -395,7 +395,7 @@ export class ChangeListService {
    *
    * @param {string} contentId - The content id of the translated content.
    */
-   removeTranslations(contentId: string): void {
+  removeTranslations(contentId: string): void {
     this.addChange({
       cmd: 'remove_translations',
       content_id: contentId

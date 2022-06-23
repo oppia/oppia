@@ -69,7 +69,6 @@ require('services/site-analytics.service.ts');
 require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 
 angular.module('oppia').component('explorationEditorTab', {
   bindings: {
@@ -82,7 +81,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'ExplorationNextContentIdIndexService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService',
-    'GenerateContentIdService', 'GraphDataService', 'LoaderService', 'NgbModal',
+    'GenerateContentIdService', 'GraphDataService', 'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
@@ -93,7 +92,7 @@ angular.module('oppia').component('explorationEditorTab', {
         ExplorationNextContentIdIndexService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService,
-        GenerateContentIdService, GraphDataService, LoaderService, NgbModal,
+        GenerateContentIdService, GraphDataService, LoaderService,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -289,7 +288,7 @@ angular.module('oppia').component('explorationEditorTab', {
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
           contentIds) {
-        // var stateName = StateEditorService.getActiveStateName();
+        // Var stateName = StateEditorService.getActiveStateName();
         // var state = ExplorationStatesService.getState(stateName);
         // var recordedVoiceovers = state.recordedVoiceovers;
         // var writtenTranslations = state.writtenTranslations;

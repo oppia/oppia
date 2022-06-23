@@ -44,9 +44,9 @@ angular.module('oppia').factory('TranslationStatusService', [
   'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
   'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
   function(
-    EntityTranslationsService, ExplorationStatesService, LoaderService,
-    StateEditorService,
-    StateRecordedVoiceoversService, TranslationLanguageService,
+      EntityTranslationsService, ExplorationStatesService, LoaderService,
+      StateEditorService,
+      StateRecordedVoiceoversService, TranslationLanguageService,
       TranslationTabActiveModeService, COMPONENT_NAME_HINT,
       COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
@@ -86,7 +86,7 @@ angular.module('oppia').factory('TranslationStatusService', [
         needsUpdate: false,
       };
       if (entityTranslation && entityTranslation.hasWrittenTranslation(
-          contentId)) {
+        contentId)) {
         let translatedContent = entityTranslation.getWrittenTranslation(
           contentId);
         if (translatedContent.translation !== '') {
@@ -208,12 +208,12 @@ angular.module('oppia').factory('TranslationStatusService', [
       var contentIdList = [];
 
       if (availableContentIds.length > 0) {
-          var searchKey = componentName + '_';
-          availableContentIds.forEach(function(contentId) {
-            if (contentId.indexOf(searchKey) > -1) {
-              contentIdList.push(contentId);
-            }
-          });
+        var searchKey = componentName + '_';
+        availableContentIds.forEach(function(contentId) {
+          if (contentId.indexOf(searchKey) > -1) {
+            contentIdList.push(contentId);
+          }
+        });
       }
       return contentIdList;
     };
@@ -298,14 +298,14 @@ angular.module('oppia').factory('TranslationStatusService', [
       refresh: function() {
         if (TranslationTabActiveModeService.isTranslationModeActive()) {
           langCode = TranslationLanguageService.getActiveLanguageCode();
-          LoaderService.showLoadingScreen("Loading");
-          EntityTranslationsService.refreshEntityTranslationsAsync(langCode).then(
-            (entityTranslationObject) => {
+          LoaderService.showLoadingScreen('Loading');
+          EntityTranslationsService.refreshEntityTranslationsAsync(langCode)
+            .then((entityTranslationObject) => {
               LoaderService.hideLoadingScreen();
               entityTranslation = entityTranslationObject;
               _computeAllStatesStatus();
               StateEditorService.onRefreshStateTranslation.emit();
-            })
+            });
         } else {
           _computeAllStatesStatus();
         }

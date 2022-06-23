@@ -172,7 +172,6 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service';
 import { GraphInputRulesService } from

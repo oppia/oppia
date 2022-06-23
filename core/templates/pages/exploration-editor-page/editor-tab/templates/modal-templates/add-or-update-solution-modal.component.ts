@@ -18,7 +18,6 @@
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ContextService } from 'services/context.service';
@@ -162,7 +161,7 @@ export class AddOrUpdateSolutionModalComponent
           this.stateSolutionService.savedMemento.explanation.html),
         explanationContentId: (
           this.stateSolutionService.savedMemento.explanation.contentId)
-      }
+      };
     } else {
       this.data = {
         answerIsExclusive: false,

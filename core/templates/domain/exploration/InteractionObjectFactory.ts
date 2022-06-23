@@ -113,13 +113,15 @@ export class Interaction extends BaseTranslatableObject {
     this._translatableFields = Interaction.getCustomizationArgContents(
       this.customizationArgs);
     this._translatableObjects = [
-      ...this.answerGroups, ...this.hints]
+      ...this.answerGroups, ...this.hints];
 
     if (this.defaultOutcome) {
       this._translatableObjects.push(this.defaultOutcome);
     }
 
-    if (this.solution) this._translatableObjects.push(this.solution);
+    if (this.solution) {
+      this._translatableObjects.push(this.solution);
+    }
   }
 
   setId(newValue: string): void {

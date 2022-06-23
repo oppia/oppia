@@ -52,7 +52,7 @@ export class Question {
   constructor(
       id: string | null, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
-      inapplicableSkillMisconceptionIds: string[], nextContentIdIndex:number) {
+      inapplicableSkillMisconceptionIds: string[], nextContentIdIndex: number) {
     this._id = id;
     this._stateData = stateData;
     this._languageCode = languageCode;

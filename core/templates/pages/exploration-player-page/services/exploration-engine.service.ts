@@ -331,7 +331,7 @@ export class ExplorationEngineService {
       preferredAudioLanguage: string,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
-      displayableLanguageCodes,
+      displayableLanguageCodes: string[],
       successCallback: (stateCard: StateCard, label: string) => void
   ): void {
     this.exploration = this.explorationObjectFactory.createFromBackendDict(

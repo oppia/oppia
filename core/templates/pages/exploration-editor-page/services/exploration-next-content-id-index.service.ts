@@ -17,18 +17,19 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
- import { Injectable } from '@angular/core';
- import { downgradeInjectable } from '@angular/upgrade/static';
- import { ExplorationPropertyService } from './exploration-property.service';
- import { AlertsService } from 'services/alerts.service';
- import { ChangeListService } from './change-list.service';
- import { LoggerService } from 'services/contextual/logger.service';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class ExplorationNextContentIdIndexService extends ExplorationPropertyService {
+export class ExplorationNextContentIdIndexService
+    extends ExplorationPropertyService {
   propertyName: string = 'next_content_id_index';
   displayed: number;
   savedMemento: number;
@@ -40,7 +41,6 @@ export class ExplorationNextContentIdIndexService extends ExplorationPropertySer
   ) {
     super(alertsService, changeListService, loggerService);
   }
-
 }
 
 angular.module('oppia').factory('ExplorationNextContentIdIndexService',

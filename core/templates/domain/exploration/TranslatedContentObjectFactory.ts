@@ -17,9 +17,6 @@
  * TranslatedContent domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, InjectionToken } from '@angular/core';
-import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
@@ -51,11 +48,11 @@ export class TranslatedContent {
   ) {}
 
   markAsNeedingUpdate(): void {
-      this.needsUpdate = true;
+    this.needsUpdate = true;
   }
 
   toggleNeedsUpdateAttribute(): void {
-      this.needsUpdate = !this.needsUpdate;
+    this.needsUpdate = !this.needsUpdate;
   }
 
   isHtml(): boolean {
@@ -74,7 +71,7 @@ export class TranslatedContent {
   }
 
   getTranslation(): string|string[] {
-      return this.translation;
+    return this.translation;
   }
 
   setTranslation(translation: string|string[]): void {
@@ -91,7 +88,7 @@ export class TranslatedContent {
   toBackendDict(): TranslatedContentBackendDict {
     return {
       content_format: this.dataFormat,
-      translation: this.translation,
+      content_value: this.translation,
       needs_update: this.needsUpdate
     };
   }

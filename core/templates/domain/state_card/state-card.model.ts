@@ -30,8 +30,7 @@ import { InteractionCustomizationArgs } from
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-import { WrittenTranslations } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 
@@ -269,11 +268,11 @@ export class StateCard {
     return this._contentId;
   }
 
-  swapContentsWithTranslation(entityTranslations: EntityTranslation) {
+  swapContentsWithTranslation(entityTranslations: EntityTranslation): void {
     if (entityTranslations.hasWrittenTranslation(this._contentId)) {
       this.contentHtml = (
-        entityTranslations.getWrittenTranslation(this._contentId).translation as string);
-
+        entityTranslations.getWrittenTranslation(
+          this._contentId).translation as string);
     }
     this._interaction.swapContentsWithTranslation(entityTranslations);
   }

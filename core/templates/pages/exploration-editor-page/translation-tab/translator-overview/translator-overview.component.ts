@@ -42,13 +42,13 @@ angular.module('oppia').component('translatorOverview', {
     'FocusManagerService', 'LanguageUtilService',
     'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
-    'UrlService', 'DEFAULT_AUDIO_LANGUAGE',
+    'DEFAULT_AUDIO_LANGUAGE',
     function(
         $scope, $window, ContextService, ExplorationLanguageCodeService,
         FocusManagerService, LanguageUtilService,
         RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
-        UrlService, DEFAULT_AUDIO_LANGUAGE) {
+        DEFAULT_AUDIO_LANGUAGE) {
       var ctrl = this;
       var LAST_SELECTED_TRANSLATION_LANGUAGE = (
         'last_selected_translation_lang');

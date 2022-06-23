@@ -101,8 +101,8 @@ export class ContentTranslationManagerService {
       this.playerTranscriptService.restoreImmutably(this.originalTranscript);
     } else if (
       !this.languageCodeToEntityTranslations.hasOwnProperty(languageCode)) {
-        this.fetchAndDisplayTranslations(languageCode);
-        return;
+      this.fetchAndDisplayTranslations(languageCode);
+      return;
     } else {
       const cards = this.playerTranscriptService.transcript;
       cards.forEach(

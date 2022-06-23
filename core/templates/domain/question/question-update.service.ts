@@ -18,7 +18,6 @@
 
 import { Change } from
   'domain/editor/undo_redo/change.model';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -114,17 +113,17 @@ angular.module('oppia').factory('QuestionUpdateService', [
           });
       },
       setQuestionNextContentIdIndex: function(question, newValue) {
-      var oldValue = question.getNextContentIdIndex();
-      _applyPropertyChange(
-        question, QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
-        newValue, oldValue,
-        function(changeDict, question) {
-          var newValue = _getNewPropertyValueFromChangeDict(changeDict);
-          question.setNextContentIdIndex(newValue);
-        }, function(changeDict, question) {
-          question.setNextContentIdIndex(changeDict['old_value']);
-        });
-    },
+        var oldValue = question.getNextContentIdIndex();
+        _applyPropertyChange(
+          question, QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
+          newValue, oldValue,
+          function(changeDict, question) {
+            var newValue = _getNewPropertyValueFromChangeDict(changeDict);
+            question.setNextContentIdIndex(newValue);
+          }, function(changeDict, question) {
+            question.setNextContentIdIndex(changeDict.old_value);
+          });
+      },
       setQuestionStateData: function(question, updateFunction) {
         var oldStateData = angular.copy(question.getStateData());
         // We update the question here before making the change,

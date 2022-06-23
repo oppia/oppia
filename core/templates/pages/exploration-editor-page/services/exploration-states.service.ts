@@ -42,7 +42,6 @@ import { StateEditorRefreshService } from 'pages/exploration-editor-page/service
 import { State } from 'domain/state/StateObjectFactory';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { DataFormatToDefaultValuesKey } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
@@ -70,6 +69,7 @@ export class ExplorationStatesService {
   stateRenamedCallbacks: (
     (oldStateName: string, newStateName: string) => void
   )[] = [];
+
   initalContentsMapping: ContentsMapping = {};
   contentChangesCanAffectTranslations: boolean = false;
 
@@ -174,8 +174,8 @@ export class ExplorationStatesService {
       let contents = [];
       answerGroups.forEach(
         answerGroup => {
-          contents = contents.concat(answerGroup.getAllContents())
-      });
+          contents = contents.concat(answerGroup.getAllContents());
+        });
 
       return contents;
     },
@@ -185,7 +185,7 @@ export class ExplorationStatesService {
     hints: (hints) => {
       let contents = [];
       hints.forEach(hint => {
-        contents = contents.concat(hint.getAllContents())
+        contents = contents.concat(hint.getAllContents());
       });
       return contents;
     },
@@ -426,13 +426,13 @@ export class ExplorationStatesService {
   }
 
   init(
-    statesBackendDict: StateObjectsBackendDict,
-    contentChangesCanAffectTranslations: boolean): void {
+      statesBackendDict: StateObjectsBackendDict,
+      contentChangesCanAffectTranslations: boolean): void {
     this._states = (
       this.statesObjectFactory.createFromBackendDict(statesBackendDict));
     this.contentChangesCanAffectTranslations = (
       contentChangesCanAffectTranslations);
-      // Initialize the solutionValidityService.
+    // Initialize the solutionValidityService.
     this.solutionValidityService.init(this._states.getStateNames());
     this._states.getStateNames().forEach((stateName: string) => {
       const state = this._states.getState(stateName);
@@ -652,16 +652,16 @@ export class ExplorationStatesService {
     this.alertsService.clearWarnings();
 
     let contentIdForContent = this.generateContentIdService
-      .getNextStateId('content')
+      .getNextStateId('content');
     let contentIdForDefaultOutcome = this.generateContentIdService
-      .getNextStateId('default_outcome')
+      .getNextStateId('default_outcome');
 
     this._states.addState(
       newStateName, contentIdForContent, contentIdForDefaultOutcome);
 
     this.changeListService.addState(
       newStateName, contentIdForContent, contentIdForDefaultOutcome);
-    this.explorationNextContentIdIndexService.saveDisplayedValue()
+    this.explorationNextContentIdIndexService.saveDisplayedValue();
     this.stateAddedCallbacks.forEach((callback) => {
       callback(newStateName);
     });

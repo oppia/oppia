@@ -21,19 +21,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { ExplorationNextContentIdIndexService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-
   getNextIndex: () => number;
   revertUnusedIndexes: () => void;
 
-  init(getNextIndex: () => number, revertUnusedIndexes): void {
+  init(getNextIndex: () => number, revertUnusedIndexes: () => void): void {
     this.getNextIndex = getNextIndex;
     this.revertUnusedIndexes = revertUnusedIndexes;
   }

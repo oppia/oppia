@@ -26,7 +26,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class TranslationsFetchingMessageModalComponent
     extends ConfirmOrCancelModal {
-
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {

@@ -1,9 +1,9 @@
-import { SubtitledHtml } from "domain/exploration/subtitled-html.model";
-import { TranslatedContent } from "domain/exploration/TranslatedContentObjectFactory";
-import { EntityTranslation } from "domain/translation/EntityTranslationObjectFactory";
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 
 export class BaseTranslatableObject {
-  _translatableFields: any;
+  _translatableFields: SubtitledHtml[];
   _translatableObjects: BaseTranslatableObject[] | null[];
 
   constructor() {
@@ -23,34 +23,35 @@ export class BaseTranslatableObject {
       writtenTranslation.needsUpdate === false);
   }
 
-  swapContentsWithTranslation(entityTranslations: EntityTranslation) {
+  swapContentsWithTranslation(entityTranslations: EntityTranslation): void {
     this._translatableFields.forEach((translatableField) => {
-      if (entityTranslations.hasWrittenTranslation(translatableField.contentId)) {
+      const contentId = translatableField.contentId;
+      if (entityTranslations.hasWrittenTranslation(contentId)) {
         let writtenTranslation = entityTranslations.getWrittenTranslation(
-          translatableField.contentId);
+          contentId);
         if (this._isValidStringTranslation(writtenTranslation)) {
-          translatableField.html = writtenTranslation.translation;
+          translatableField.html = writtenTranslation.translation as string;
         }
       }
-    })
+    });
 
     this._translatableObjects.forEach((translatableObject) => {
       translatableObject.swapContentsWithTranslation(entityTranslations);
     });
   }
 
-  getAllContents() {
+  getAllContents(): SubtitledHtml[] {
     let translatableFields = this._translatableFields;
 
     this._translatableObjects.forEach((translatableObject) => {
       translatableFields = translatableFields.concat(
         translatableObject.getAllContents());
-    })
+    });
 
     return translatableFields;
   }
 
-  getAllHTMLs() {
+  getAllHTMLs(): SubtitledHtml[] {
     return this.getAllContents().map((content) => {
       if (content instanceof SubtitledHtml) {
         return content;
@@ -58,9 +59,9 @@ export class BaseTranslatableObject {
     });
   }
 
-  getAllContentIds() {
+  getAllContentIds(): string[] {
     return this.getAllContents().map((content) => {
       return content.contentId;
-    })
+    });
   }
 }

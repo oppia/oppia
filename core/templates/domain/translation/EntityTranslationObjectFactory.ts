@@ -17,27 +17,22 @@
  * EntityTranslation domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
-  DataFormatToDefaultValuesKey,
   TranslatedContent,
   TranslatedContentBackendDict,
-} from 'domain/exploration/TranslatedContentObjectFactory'
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
+} from 'domain/exploration/TranslatedContentObjectFactory';
 
+
+interface TranslationMappingDict {
+  [contentId: string]: TranslatedContentBackendDict;
+}
 export interface EntityTranslationBackendDict {
   'entity_id': string;
   'entity_type': string;
   'entity_version': number;
   'language_code': string;
-  'translations': {
-    [contentId: string]: TranslatedContentBackendDict;
-  };
-}
-interface TranslationMappingDict {
-  [contentId: string]: TranslatedContentBackendDict;
+  'translations': TranslationMappingDict;
 }
 
 interface TranslationMapping {
@@ -78,23 +73,24 @@ export class EntityTranslation {
 
   hasUnflaggedWrittenTranslations(contentId: string): boolean {
     if (!this.translationMapping[contentId].needsUpdate) {
-        return true;
-      }
+      return true;
+    }
     return false;
   }
 
-  static createTranslationMappingFromBackendDict(backendDict): TranslationMapping {
+  static createTranslationMappingFromBackendDict(
+      backendDict: TranslationMappingDict): TranslationMapping {
     const translationsMapping: TranslationMapping = {};
     Object.keys(backendDict).forEach((contentId) => {
       translationsMapping[contentId] = TranslatedContent.createFromBackendDict(
-        backendDict[contentId])
+        backendDict[contentId]);
     });
 
     return translationsMapping;
   }
 
   static createFromBackendDict(
-    backendDict: EntityTranslationBackendDict
+      backendDict: EntityTranslationBackendDict
   ): EntityTranslation {
     return new EntityTranslation(
       backendDict.entity_id,

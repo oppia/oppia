@@ -24,7 +24,6 @@ import {
   StateObjectFactory,
   State
 } from 'domain/state/StateObjectFactory';
-import { AppConstants } from 'app.constants';
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
@@ -48,13 +47,6 @@ export interface WrittenTranslationObjectsDict {
   [stateName: string]: WrittenTranslation[];
 }
 
-const MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5;
-
-const WRITTEN_TRANSLATIONS_KEY = 'writtenTranslations';
-const RECORDED_VOICEOVERS_KEY = 'recordedVoiceovers';
-type TranslationType = (
-  typeof WRITTEN_TRANSLATIONS_KEY | typeof RECORDED_VOICEOVERS_KEY);
-
 export class States {
   constructor(
     private _stateObject: StateObjectFactory,
@@ -73,7 +65,10 @@ export class States {
     return this._states;
   }
 
-  addState(newStateName: string, contentIdForContent: string, contentIdForDefaultOutcome: string): void {
+  addState(
+      newStateName: string,
+      contentIdForContent: string,
+      contentIdForDefaultOutcome: string): void {
     this._states[newStateName] = this._stateObject.createDefaultState(
       newStateName, contentIdForContent, contentIdForDefaultOutcome);
   }
@@ -146,26 +141,18 @@ export class States {
     return finalStateNames;
   }
 
-  _getAllLanguageCodesFor(translationType: TranslationType): string[] {
+  getAllVoiceoverLanguageCodes(): string[] {
     const allLanguageCodes = new Set<string>();
     Object.values(this._states).forEach(state => {
-      state[translationType].getAllContentIds().forEach(contentId => {
+      state.recordedVoiceovers.getAllContentIds().forEach(contentId => {
         const contentLanguageCodes = (
-          state[translationType].getLanguageCodes(contentId));
+          state.recordedVoiceovers.getLanguageCodes(contentId));
         contentLanguageCodes.forEach(
           allLanguageCodes.add,
           allLanguageCodes);
       });
     });
     return [...allLanguageCodes];
-  }
-
-  getAllVoiceoverLanguageCodes(): string[] {
-    return this._getAllLanguageCodesFor(RECORDED_VOICEOVERS_KEY);
-  }
-
-  getAllWrittenTranslationLanguageCodes(): string[] {
-    return this._getAllLanguageCodesFor(WRITTEN_TRANSLATIONS_KEY);
   }
 
   getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {

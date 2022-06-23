@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpSentEvent } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { EntityTranslation, EntityTranslationBackendDict } from 'domain/translation/EntityTranslationObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -33,31 +33,31 @@ export class EntityTranslationBackendApiService {
   ) {}
 
   private _getUrl(
-    entityId, entityType, entityVersion, languageCode
+      entityId, entityType, entityVersion, languageCode
   ) {
     return this.urlInterpolationService.interpolateUrl(
       AppConstants.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE, {
-        'entity_id': entityId,
-        'entity_type': entityType,
-        'entity_version': String(entityVersion),
-        'language_code': languageCode
+        entity_id: entityId,
+        entity_type: entityType,
+        entity_version: String(entityVersion),
+        language_code: languageCode
       }
     );
   }
 
   async fetchEntityTranslationAsync(
-    entityId, entityType, entityVersion, languageCode): Promise<EntityTranslation> {
-      return new Promise((resolve, reject) => {
-        this.httpClient.get<EntityTranslationBackendDict>(
-          this._getUrl(
-            entityId, entityType, entityVersion, languageCode
-          )).toPromise().then(response => {
-          resolve(EntityTranslation.createFromBackendDict(response))
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      entityId, entityType, entityVersion, languageCode): Promise<EntityTranslation> {
+    return new Promise((resolve, reject) => {
+      this.httpClient.get<EntityTranslationBackendDict>(
+        this._getUrl(
+          entityId, entityType, entityVersion, languageCode
+        )).toPromise().then(response => {
+        resolve(EntityTranslation.createFromBackendDict(response));
+      }, errorResponse => {
+        reject(errorResponse.error.error);
       });
-    }
+    });
+  }
 }
 
 
