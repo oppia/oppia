@@ -17,7 +17,7 @@
  */
 
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
-import { CreatorDashboardStats, CreatorDashboardStatsBackendDict } from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';

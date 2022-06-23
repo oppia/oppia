@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { icon, LatLng, LeafletEvent, LeafletMouseEvent, tileLayer} from 'leaflet';
+import { icon, LatLng, LeafletMouseEvent, tileLayer} from 'leaflet';
 import { CoordTwoDimEditorComponent } from './coord-two-dim-editor.component';
 import * as alias from 'leaflet';
 

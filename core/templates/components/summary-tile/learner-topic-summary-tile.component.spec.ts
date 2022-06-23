@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { LearnerTopicSummary, LearnerTopicSummaryBackendDict } from 'domain/topic/learner-topic-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerTopicSummaryTileComponent } from './learner-topic-summary-tile.component';
 
 
