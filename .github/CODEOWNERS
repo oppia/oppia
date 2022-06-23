@@ -543,7 +543,7 @@
 
 # Python typing
 /mypy.ini @oppia/mypy-reviewers
-/mypy_imports.py @oppia/mypy-reviewers
+/mypy_imports*.py @oppia/mypy-reviewers
 /mypy_requirements.txt @oppia/mypy-reviewers
 /stubs/ @oppia/mypy-reviewers
 /scripts/run_mypy_checks*.py @oppia/mypy-reviewers

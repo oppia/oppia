@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from core.utils import ValidationError
+from core import utils
 from . import models
 
 
@@ -33,28 +33,19 @@ class BaseVisualizationTests(test_utils.GenericTestBase):
     def test_valid_options_dict_raises_no_error(self):
         base_obj = models.BaseVisualization('AnswerFrequencies', {}, True)
         base_obj.validate()
-        base_obj._OPTIONS_SPECS = [
+        sorted_tiles_obj = models.SortedTiles(
+            'AnswerFrequencies',
             {
-                'name': 'value1',
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            {
-                'name': 'value2',
-                'schema': {
-                    'type': 'int'
-                }
-            }
-        ]
-        base_obj.options = {'value1': 'random_value', 'value2': 5}
-        base_obj.validate()
+                'header': u'\u00e4',
+                'use_percentages': True
+            }, True)
+        sorted_tiles_obj.validate()
 
     def test_invalid_options_dict_raises_error(self):
         error_message = (
             'For visualization BaseVisualization, expected option names %s;'
             ' received names %s' % ([], ['key1']))
-        with self.assertRaisesRegex(ValidationError, error_message):
+        with self.assertRaisesRegex(utils.ValidationError, error_message):
             models.BaseVisualization(
                 'AnswerFrequencies', {'key1': 'value1'}, True).validate()
 
@@ -62,6 +53,6 @@ class BaseVisualizationTests(test_utils.GenericTestBase):
         error_message = (
             'For visualization BaseVisualization, expected a bool value for '
             'addressed_info_is_supported; received false')
-        with self.assertRaisesRegex(ValidationError, error_message):
+        with self.assertRaisesRegex(utils.ValidationError, error_message):
             models.BaseVisualization(
                 'AnswerFrequencies', {}, 'false').validate()
