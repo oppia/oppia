@@ -26,6 +26,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
+  var neutralElement = $('.protractor-test-settings-container');
   var explorationCategoryInput = $(
     '.protractor-test-exploration-category-input');
   var explorationLanguageInput = $(
@@ -36,10 +37,28 @@ var ExplorationEditorSettingsTab = function() {
     '.protractor-test-exploration-title-input');
   var disableCorrectnessFeedbackButton = $(
     '.protractor-test-enable-mark-correctness-feedback');
+  var deleteExplorationButton = $(
+    '.protractor-test-delete-exploration-button');
+  var confirmDeleteExplorationButton = $(
+    '.protractor-test-really-delete-exploration-button');
 
   /*
    * Workflows
    */
+  this.deleteExploration = async function() {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await action.click('Delete Exploration Button', deleteExplorationButton);
+    await action.click(
+      'Confirm Delete Exploration Button',
+      confirmDeleteExplorationButton);
+    await waitFor.invisibilityOf(
+      confirmDeleteExplorationButton,
+      'Delete Exploration modal takes too long to disappear');
+    // Returning to /creator-dashboard.
+    await waitFor.pageToFullyLoad();
+  };
+
   this.disableCorrectnessFeedback = async function() {
     await action.waitForAutosave();
     await action.click(

@@ -138,19 +138,16 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    var deleteItemField = await by
-      .repeater('item in localValue track by $index')
-      .row(index);
-    var deleteItemFieldElem = deleteItemField.$(
+    var deleteItemFieldElem = elem.$(
       deleteListEntryLocator);
     await action.click('Delete Item Field Elem', deleteItemFieldElem);
   };
 
   return {
     editItem: async function(index, objectType) {
-      var itemList = await $$(
-        '.protractor-test-schema-based-list-editor-table-data');
-      var item = itemList[index];
+      var item = await $$(
+        '.protractor-test-schema-based-list-editor-table-data')[index];
+
       var editor = getEditor(objectType);
       return await editor(item);
     },
@@ -181,7 +178,7 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = async function(elem) {
-  var rteElements = await $$('.protractor-test-rte');
+  var rteElements = await elem.$$('.protractor-test-rte');
   var modalDialogElements = await $$('.modal-dialog');
 
   var closeRteComponentButtonLocator = (
