@@ -19,7 +19,6 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
-var action = require('./action.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {

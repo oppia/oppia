@@ -183,6 +183,7 @@ SUITES_STILL_IN_PROTRACTOR = [
     'learnerDashboard',
     'learner',
     'library',
+    'navigation',
     'playVoiceovers',
     'preferences',
     'profileMenu',
@@ -195,6 +196,7 @@ SUITES_STILL_IN_PROTRACTOR = [
     'topicAndStoryViewer',
     'wipeout'
 ]
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -320,7 +322,7 @@ def run_tests(args):
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
 
-            proc =  stack.enter_context(servers.managed_webdriverio_server(
+            proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
@@ -329,7 +331,7 @@ def run_tests(args):
                 stdout=subprocess.PIPE))
 
         elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
-            proc =  stack.enter_context(servers.managed_webdriverio_server(
+            proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
@@ -363,7 +365,6 @@ def run_tests(args):
                 'The suite requested to run does not exists'
                 'Please provide a valid suite name')
             sys.exit(1)
-
 
         output_lines = []
         while True:

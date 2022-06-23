@@ -157,10 +157,6 @@ var suites = {
       'protractor_desktop/topicAndStoryViewer.js'
     ],
 
-    users: [
-      'protractor_desktop/userJourneys.js',
-    ],
-
     wipeout: [
       'protractor_desktop/wipeout.js',
     ]

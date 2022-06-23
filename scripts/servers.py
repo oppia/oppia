@@ -570,7 +570,7 @@ def managed_webdriver_server(chrome_version=None):
         Exception. Space instead of '\'.
     """
     if chrome_version is None:
-       chrome_version = get_chrome_verison()
+        chrome_version = get_chrome_verison()
 
     print('\n\nCHROME VERSION: %s' % chrome_version)
 
@@ -672,20 +672,25 @@ def managed_protractor_server(
     with managed_protractor_proc as proc:
         yield proc
 
+
 @contextlib.contextmanager
 def managed_webdriverio_server(
-        suite_name='full', dev_mode=True, debug_mode=False, sharding_instances=1,
-        chrome_version=None, **kwargs):
+        suite_name='full', dev_mode=True, debug_mode=False,
+        sharding_instances=1, chrome_version=None, **kwargs):
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
         suite_name: str. The suite name whose tests should be run. If the value
             is `full`, all tests will run.
         dev_mode: bool. Whether the test is running on dev_mode.
-        debug_mode: bool. Whether to run the webdriverio tests in debugging mode.
-            Read the following instructions to learn how to run e2e tests in
-            debugging mode:
+        debug_mode: bool. Whether to run the webdriverio tests in debugging
+            mode. Read the following instructions to learn how to run e2e
+            tests in debugging mode:
             https://webdriver.io/docs/debugging/#the-debug-command.
+        sharding_instances: int. How many sharding instances to be running.
+        chrome_version: str|None. The version of Google Chrome to run the tests
+            on. If None, then the currently-installed version of Google Chrome
+            is used instead.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
 
     Yields:
@@ -709,17 +714,15 @@ def managed_webdriverio_server(
         common.NPX_BIN_PATH,
         common.NODEMODULES_WDIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
         '--suite', suite_name, chrome_version,
-         '--params.devMode=%s' % dev_mode,
+        '--params.devMode=%s' % dev_mode,
     ]
-    
+
     if sharding_instances > 1:
-       webdriverio_args.extend([
+        webdriverio_args.extend([
            '--capabilities[0].maxInstances=%d' % sharding_instances,
        ])
 
     if debug_mode:
-        # NOTE: This is a flag for Node.js, not Protractor, so we insert it
-        # immediately after NODE_BIN_PATH.
         webdriverio_args.insert(0, 'DEBUG=true')
 
     # OK to use shell=True here because we are passing string literals and

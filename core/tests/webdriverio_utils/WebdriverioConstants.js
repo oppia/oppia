@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Provides constant global variables, for use in Protractor
+ * @fileoverview Provides constant global variables, for use in WebdriverIO
  * tests.
  */
 var path = require('path');

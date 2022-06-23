@@ -247,34 +247,6 @@ var addExplorationPlaytester = async function(username) {
   await _addExplorationRole('Playtester', username);
 };
 
-// // Here, roleName is the server-side form of the name (e.g. 'owner').
-// var _getExplorationRoles = async function(roleName) {
-//   var itemName = roleName + 'Name';
-//   var listName = roleName + 'Names';
-//   return await element.all(by.repeater(
-//     itemName + ' in $ctrl.ExplorationRightsService.' + listName +
-//     ' track by $index'
-//   )).map(async function(elem) {
-//     return await elem.getText();
-//   });
-// };
-
-// var getExplorationManagers = async function() {
-//   return await _getExplorationRoles('owner');
-// };
-
-// var getExplorationCollaborators = async function() {
-//   return await _getExplorationRoles('editor');
-// };
-
-// var getExplorationVoiceArtists = async function() {
-//   return await _getExplorationRoles('voiceArtist');
-// };
-
-// var getExplorationPlaytesters = async function() {
-//   return await _getExplorationRoles('viewer');
-// };
-
 var createSkillAndAssignTopic = async function(
     skillDescription, material, topicName) {
   var topicsAndSkillsDashboardPage = (
@@ -382,10 +354,6 @@ exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
 exports.addExplorationVoiceArtist = addExplorationVoiceArtist;
 exports.addExplorationPlaytester = addExplorationPlaytester;
-// exports.getExplorationManagers = getExplorationManagers;
-// exports.getExplorationCollaborators = getExplorationCollaborators;
-// exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
-// exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;

@@ -30,7 +30,6 @@ var ExplorationEditorPage = function() {
   /*
   * Interactive elements
   */
-  var commitMessageInput = $('.protractor-test-commit-message-input');;
   var expTitle = $(
     '.protractor-test-exploration-title-input');
   var expObjective = $(
@@ -45,43 +44,10 @@ var ExplorationEditorPage = function() {
   var confirmPublish = $('.protractor-test-confirm-publish');
   var modalContentElement = $('.modal-content');
   var sharePublishModalElement = $('.protractor-test-share-publish-modal');
-  var selectionRenderedElement = $('.select2-selection__rendered');
-  var promptModalElement = $('.protractor-test-save-prompt-modal');
-  var explorationSaveModalElement = $(
-    '.protractor-test-exploration-save-modal');
-  var toastMessage = $('.protractor-test-toast-message');
-
-  /*
-   * Non-Interactive elements
-   */
-  var loadingModal = $('.protractor-test-loading-modal');
 
   /*
    * Buttons
    */
-  var confirmDiscardChangesButton = $(
-    '.protractor-test-confirm-discard-changes');
-  var discardChangesButton = $('.protractor-test-discard-changes');
-  var discardLostChangesButton = $(
-    '.protractor-test-discard-lost-changes-button');
-  var discardAndExportLostChangesButton = $(
-    '.protractor-test-discard-and-export-lost-changes-button');
-  var navigateToImprovementsTabButton = $('.protractor-test-improvements-tab');
-  var navigateToFeedbackTabButton = $('.protractor-test-feedback-tab');
-  var navigateToHistoryTabButton = $('.protractor-test-history-tab');
-  var navigateToMainTabButton = $('.protractor-test-main-tab');
-  var navigateToPreviewTabButton = $('.protractor-test-preview-tab');
-  var navigateToSettingsTabButton = $('.protractor-test-settings-tab');
-  var navigateToStatsTabButton = $('.protractor-test-stats-tab');
-  var navigateToTranslationTabButton = $('.protractor-test-translation-tab');
-  var saveChangesButton = $('.protractor-test-save-changes');
-  var saveDiscardToggleButton = $('.protractor-test-save-discard-toggle');
-  var commitChangesButton = $('.protractor-test-save-draft-button');
-  var saveDraftButtonTextContainer = $('.protractor-test-save-draft-message');
-  var recommendationPromptSaveButton = $(
-    '.protractor-test-recommendation-prompt-save-button');
-  var publishChangesButtonTextContainer = $(
-    '.protractor-test-publish-changes-message');
   var publishExplorationButton = $('.protractor-test-publish-exploration');
   var prePublicationConfirmButton = $(
     '.protractor-test-confirm-pre-publication');
@@ -171,7 +137,7 @@ var ExplorationEditorPage = function() {
     var commitChangesButton = $(
       '.protractor-test-save-draft-button');
     await action.click('Save draft button', commitChangesButton);
-    // TODO(#13096): Remove browser.sleep from e2e files.
+    // TODO(#13096): Remove browser.pause from e2e files.
     // eslint-disable-next-line wdio/no-pause
     await browser.pause(2500);
     var saveDraftButtonTextContainer = $(
