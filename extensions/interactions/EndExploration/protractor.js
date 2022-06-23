@@ -31,7 +31,7 @@ var customizeInteraction = async function(
     }
     for (var explorationId of recommendedExplorationIdArray) {
       var addExplorationIdButton = element(
-        by.css('.protractor-test-add-list-entry'));
+        by.css('.e2e-test-add-list-entry'));
       await addExplorationIdButton.click();
       await objects.UnicodeStringEditor(
         elem.element(by.tagName('schema-based-unicode-editor'))

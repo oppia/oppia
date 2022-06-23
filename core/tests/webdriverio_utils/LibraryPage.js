@@ -23,20 +23,20 @@ var waitFor = require('./waitFor.js');
 var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
-  var searchButton = $('.protractor-test-search-button');
-  var mainHeader = $('.protractor-test-library-main-header');
+  var searchButton = $('.e2e-test-search-button');
+  var mainHeader = $('.e2e-test-library-main-header');
   var allCollectionSummaryTile = $(
-    '.protractor-test-collection-summary-tile');
+    '.e2e-test-collection-summary-tile');
   var allExplorationSummaryTile = $(
-    '.protractor-test-exp-summary-tile');
+    '.e2e-test-exp-summary-tile');
   var allExplorationsTitled = function(explorationName) {
     return $$(
-      `.protractor-test-exp-summary-tile-title=${explorationName}`);
+      `.e2e-test-exp-summary-tile-title=${explorationName}`);
   };
 
   var allCollectionsTitled = function(collectionName) {
     return $$(
-      `.protractor-test-collection-summary-tile-title=${collectionName}`);
+      `.e2e-test-collection-summary-tile-title=${collectionName}`);
   };
 
   var _submitSearchQuery = async function(searchQuery) {
@@ -47,7 +47,7 @@ var LibraryPage = function() {
     // page is rendered for mobile device.
 
     // Function get is a zero-based index.
-    var searchInputs = await $$('.protractor-test-search-input');
+    var searchInputs = await $$('.e2e-test-search-input');
     var searchInput = (
       browser.isMobile ? searchInputs[1] :
       searchInputs[0]);

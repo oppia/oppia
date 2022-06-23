@@ -34,7 +34,7 @@ var MathEditor = function(elem) {
       await elem.click();
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
-      var mathInputElem = $$('.protractor-test-guppy-div');
+      var mathInputElem = $$('.e2e-test-guppy-div');
       lastElement = mathInputElem.length - 1;
       var present = await mathInputElem[lastElement].isExisting();
       if (present) {
@@ -47,7 +47,7 @@ var MathEditor = function(elem) {
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
       var mathInputElem = $$(
-        '.protractor-test-guppy-div');
+        '.e2e-test-guppy-div');
       lastElement = mathInputElem.length - 1;
       var present = await mathInputElem[lastElement].isExisting();
       if (present) {
@@ -91,12 +91,12 @@ var FilepathEditor = function(elem) {
     upload: async function(filepath) {
       // TODO(Jacob): Modify filepath relative to the directory from which the
       // protractor code is operating.
-      await elem.$('.protractor-test-file-upload')
+      await elem.$('.e2e-test-file-upload')
         .setValue(filepath);
     },
     setName: async function(name) {
-      await elem.$('.protractor-test-file-name').clearValue();
-      await elem.$('.protractor-test-file-name').setValue(name);
+      await elem.$('.e2e-test-file-name').clearValue();
+      await elem.$('.e2e-test-file-name').setValue(name);
     }
   };
 };
@@ -244,10 +244,10 @@ var SkillSelector = function(elem) {
   return {
     setValue: async function(skillDescription) {
       await elem.$(
-        '.protractor-test-skill-name-input').setValue(skillDescription);
+        '.e2e-test-skill-name-input').setValue(skillDescription);
       await waitFor.visibilityOf(elem.$(
-        '.protractor-test-rte-skill-selector-item'));
-      await elem.$('.protractor-test-rte-skill-selector-item').click();
+        '.e2e-test-rte-skill-selector-item'));
+      await elem.$('.e2e-test-rte-skill-selector-item').click();
     }
   };
 };

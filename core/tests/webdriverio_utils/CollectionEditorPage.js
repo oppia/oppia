@@ -21,21 +21,21 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var CollectionEditorPage = function() {
-  var addExplorationButton = $('.protractor-test-add-exploration-button');
-  var addExplorationInput = $('.protractor-test-add-exploration-input');
-  var closeSaveModalButton = $('.protractor-test-close-save-modal-button');
+  var addExplorationButton = $('.e2e-test-add-exploration-button');
+  var addExplorationInput = $('.e2e-test-add-exploration-input');
+  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var collectionEditorObjectiveInput = $(
-    '.protractor-test-collection-editor-objective-input');
-  var commitMessageInput = $('.protractor-test-commit-message-input');
+    '.e2e-test-collection-editor-objective-input');
+  var commitMessageInput = $('.e2e-test-commit-message-input');
   var categoryFilterDropdown = $(
-    '.protractor-test-collection-editor-category-dropdown');
-  var editorPublishButton = $('.protractor-test-editor-publish-button');
-  var editorTitleInput = $('.protractor-test-collection-editor-title-input');
-  var saveChangesButton = $('.protractor-test-collection-save-changes-button');
-  var saveDraftButton = $('.protractor-test-save-draft-button');
-  var saveModal = $('.protractor-test-save-modal');
+    '.e2e-test-collection-editor-category-dropdown');
+  var editorPublishButton = $('.e2e-test-editor-publish-button');
+  var editorTitleInput = $('.e2e-test-collection-editor-title-input');
+  var saveChangesButton = $('.e2e-test-collection-save-changes-button');
+  var saveDraftButton = $('.e2e-test-save-draft-button');
+  var saveModal = $('.e2e-test-save-modal');
   var saveInProgressLabel = $(
-    '.protractor-test-save-in-progress-label');
+    '.e2e-test-save-in-progress-label');
 
   this.addExistingExploration = async function(explorationId) {
     await waitFor.visibilityOf(
@@ -51,7 +51,7 @@ var CollectionEditorPage = function() {
 
   // Shift a node left in the node graph.
   this.shiftNodeLeft = async function(number) {
-    var editorShiftLeft = await $$('.protractor-test-editor-shift-right');
+    var editorShiftLeft = await $$('.e2e-test-editor-shift-right');
     await action.click('Editor Shift Left', editorShiftLeft[number]);
   };
 
@@ -67,13 +67,13 @@ var CollectionEditorPage = function() {
 
   // Shift a node right in the node graph.
   this.shiftNodeRight = async function(number) {
-    var editorShiftRight = await $$('.protractor-test-editor-shift-right');
+    var editorShiftRight = await $$('.e2e-test-editor-shift-right');
     await action.click('Editor Shift Right', editorShiftRight[number]);
   };
 
   // Delete a node in the node graph.
   this.deleteNode = async function(number) {
-    var editorDeleteNode = await $$('.protractor-test-editor-delete-node');
+    var editorDeleteNode = await $$('.e2e-test-editor-delete-node');
     await action.click('Editor Delete Node', editorDeleteNode[number]);
   };
 

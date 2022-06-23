@@ -33,7 +33,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
 var submitAnswer = async function(elem, answer) {
   await elem.element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer);
-  await element(by.css('.protractor-test-submit-answer-button')).click();
+  await element(by.css('.e2e-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'Real';

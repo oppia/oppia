@@ -36,7 +36,7 @@ var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
   // For testing purposes it is required that the order of
   // the quotes is single-quotes within double-quotes.
   var testValue = await browser.execute(
-    'var elem = $(\'.protractor-test-preview-tab .CodeMirror\')[0]' +
+    'var elem = $(\'.e2e-test-preview-tab .CodeMirror\')[0]' +
     '.CodeMirror;return elem.getValue()');
   expect(testValue).toEqual(placeHolderText + '\n');
 };
@@ -44,12 +44,12 @@ var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
 var submitAnswer = async function(conversationInput, answerCode) {
   if (answerCode) {
     await browser.execute(
-      "var elem = $('.protractor-test-preview-tab .CodeMirror')[0]" +
+      "var elem = $('.e2e-test-preview-tab .CodeMirror')[0]" +
       ".CodeMirror;elem.setValue('" + answerCode + "');");
   }
   await browser.execute('window.scrollTo(0,500);');
   var submitAnswerButton = $(
-    '.protractor-test-submit-answer-button');
+    '.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');
   await action.click('Submit Answer Button', submitAnswerButton);

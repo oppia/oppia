@@ -62,7 +62,7 @@ ruleTester.run('protractor-practices', rule, {
     code: 'sam.then.age;',
   }, {
     code: `var profileLink = element(by.css(
-          '.protractor-test-profile-link'));`
+          '.e2e-test-profile-link'));`
   }, {
     code: 'const SKILL_DESCRIPTIONS = 1;'
   }, {
@@ -84,7 +84,7 @@ ruleTester.run('protractor-practices', rule, {
         by.css('.oppia-hide-card-height-warning-icon'));`,
       errors: [{
         message: (
-          'Please use “.protractor-test-” prefix classname selector instead ' +
+          'Please use “.e2e-test-” prefix classname selector instead ' +
           'of “.oppia-hide-card-height-warning-icon”'),
       }],
     },
@@ -159,7 +159,7 @@ ruleTester.run('protractor-practices', rule, {
     {
       code:
       `await element.all(
-      by.css(".protractor-test-collection-exploration")).first()`,
+      by.css(".e2e-test-collection-exploration")).first()`,
       errors: [{
         message: 'Please do not use await for "first()"',
       }],
@@ -167,7 +167,7 @@ ruleTester.run('protractor-practices', rule, {
     {
       code:
       `var oneOffJob = element.all(
-      by.css('.protractor-test-one-off-jobs-rows'));
+      by.css('.e2e-test-one-off-jobs-rows'));
       await oneOffJob.get()
       await invalid.get()`,
       errors: [{

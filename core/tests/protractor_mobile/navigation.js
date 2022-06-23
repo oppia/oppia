@@ -118,7 +118,7 @@ describe('Navigation features on mobile', function() {
 
   it('should navigate to Home page by clicking on the Oppia logo',
     async function() {
-      var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+      var oppiaLogo = element(by.css('.e2e-test-oppia-main-logo'));
       await waitFor.elementToBeClickable(
         oppiaLogo, 'Could not click oppia logo');
       await oppiaLogo.click();

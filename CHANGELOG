@@ -1094,7 +1094,7 @@ Developer UX
 * Fix #13172: Controller to initialize android specific structures (Milestone 1.2) (#13174)
 * Fix Part of #10474:  Enables strict typescript checks for some files - (6) (#13135)
 * Fix Part of #10474:  Enables strict typescript checks for some files- (5) (#13111)
-* Fixes part of #8423: lint check to ensure root element selectors use HTML classes that start with "protractor-test-" (#13105)
+* Fixes part of #8423: lint check to ensure root element selectors use HTML classes that start with "e2e-test-" (#13105)
 * Fix part of #8423: Implement lint check for constant variable names are in all-caps (#13086)
 * Fix Part Of #10474: Make TypeScript checks strict for some files - (4) (#13078)
 * Fix part of #10474: Enables strict typescript checks for some files - (3) (#13052)
@@ -1566,7 +1566,7 @@ Automated QA Team
 * Moving Tests To Github Actions (#12495)
 * Fix librarypage test #10798 (#12486)
 * Skip Selected CI Checks for Low-Risk PRs (#12440)
-* Resolving “no element found using locator: by(css selector, .protractor-test-exp-summary-tile-title)” (#12812)
+* Resolving “no element found using locator: by(css selector, .e2e-test-exp-summary-tile-title)” (#12812)
 * Revert "Handle all server management with managed_process()" (#12797)
 * Fix afterAll failure error (E2E Test passing despite failure in afterAll block) (#12576)
 * Fixes e2e Flake in story Editor (#12530)
@@ -8457,7 +8457,7 @@ Infrastructure:
 Protractor tests:
 * Add protractor tests for the history tab.
 * Add a utility function for scrolling to elements on the page that are not currently in view.
-* Switch protractor utilities to use classes prefixed by 'protractor-test-', where possible.
+* Switch protractor utilities to use classes prefixed by 'e2e-test-', where possible.
 * Add functionality to display screenshots from failed tests.
 
 Demo explorations:

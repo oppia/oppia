@@ -20,13 +20,13 @@
 var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
-  var currUserProfilePhoto = $('.protractor-test-profile-current-user-photo');
+  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
   var createdExplorationStat = $(
-    '.protractor-test-profile-created-stat');
-  var otherUserProfilePhoto = $('.protractor-test-profile-other-user-photo');
-  var bio = $('.protractor-test-profile-bio');
-  var interestPlaceholder = $('.protractor-test-profile-no-interest');
-  var interestPlaceholder = $('.protractor-test-profile-no-interest');
+    '.e2e-test-profile-created-stat');
+  var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
+  var bio = $('.e2e-test-profile-bio');
+  var interestPlaceholder = $('.e2e-test-profile-no-interest');
+  var interestPlaceholder = $('.e2e-test-profile-no-interest');
 
   this.get = async function(userName) {
     await browser.url('/profile/' + userName);
@@ -53,13 +53,13 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveNoInterests = async function() {
-    var interests = await $$('.protractor-test-profile-interest');
+    var interests = await $$('.e2e-test-profile-interest');
     var numInterests = interests.length;
     expect(numInterests).toEqual(0);
   };
 
   this.expectUserToHaveInterests = async function(expectedInterests) {
-    var interests = await $$('.protractor-test-profile-interest');
+    var interests = await $$('.e2e-test-profile-interest');
     var numInterests = interests.length;
     expect(numInterests).toEqual(expectedInterests.length);
 
@@ -88,7 +88,7 @@ var ProfilePage = function() {
 
   this.expectToHaveExplorationCards = async function() {
     var allExplorationCardElements = await $$(
-      '.protractor-test-exploration-dashboard-card');
+      '.e2e-test-exploration-dashboard-card');
     await waitFor.visibilityOf(
       allExplorationCardElements[0],
       'Exploration cards is not present or taking time to display');
@@ -96,10 +96,10 @@ var ProfilePage = function() {
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
     var allExplorationCardElements = await $$(
-      '.protractor-test-exploration-dashboard-card');
+      '.e2e-test-exploration-dashboard-card');
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
-        var cardTitle = card.$('.protractor-test-exp-summary-tile-title');
+        var cardTitle = card.$('.e2e-test-exp-summary-tile-title');
         await waitFor.visibilityOf(
           cardTitle,
           'CardTitle is not present or taking too long to display');

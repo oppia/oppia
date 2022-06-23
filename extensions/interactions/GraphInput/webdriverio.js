@@ -24,7 +24,7 @@ var waitFor = require(
 
 var customizeInteraction = async function(interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.$(
-    '.protractor-test-graph-input-viz-container');
+    '.e2e-test-graph-input-viz-container');
   if (graphDict) {
     await forms.GraphEditor(graphInputContainer).clearDefaultGraph();
     await forms.GraphEditor(graphInputContainer).setValue(graphDict);
@@ -34,7 +34,7 @@ var customizeInteraction = async function(interactionEditor, graphDict) {
 var expectInteractionDetailsToMatch = async function(
     interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.$(
-    '.protractor-test-graph-input-viz-container');
+    '.e2e-test-graph-input-viz-container');
   if (graphDict) {
     await forms.GraphEditor(graphInputContainer)
       .expectCurrentGraphToBe(graphDict);
@@ -46,12 +46,12 @@ var submitAnswer = async function(conversationInput, graphDict) {
   // draw edges on. Otherwise, should allow user to add nodes before creating
   // new nodes.
   var graphInputContainer = conversationInput.$(
-    '.protractor-test-graph-input-viz-container');
+    '.e2e-test-graph-input-viz-container');
   if (graphDict) {
     await forms.GraphEditor(graphInputContainer).setValue(graphDict);
   }
   var submitAnswerButton = $(
-    '.protractor-test-submit-answer-button');
+    '.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');
   await action.click('Submit answer button', submitAnswerButton);

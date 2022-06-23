@@ -32,7 +32,7 @@ var customizeInteraction = async function(
       throw new Error ('Please use array to add recommendation Ids');
     }
     for (var explorationId of recommendedExplorationIdArray) {
-      var addExplorationIdButton = $('.protractor-test-add-list-entry');
+      var addExplorationIdButton = $('.e2e-test-add-list-entry');
       await action.click('Add Exploration Id Button', addExplorationIdButton);
       await objects.UnicodeStringEditor(
         elem.$('<schema-based-unicode-editor>')

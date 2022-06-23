@@ -43,7 +43,7 @@ var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.element(by.tagName(
     'oppia-interactive-numeric-expression-input'))).setValue(answer);
-  await element(by.css('.protractor-test-submit-answer-button')).click();
+  await element(by.css('.e2e-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'NumericExpression';

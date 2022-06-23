@@ -23,26 +23,26 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
-  var emailUpdatesCheckbox = $('.protractor-test-email-updates-checkbox');
+  var emailUpdatesCheckbox = $('.e2e-test-email-updates-checkbox');
   var editorRoleEmailsCheckbox = $(
-    '.protractor-test-editor-role-email-checkbox');
+    '.e2e-test-editor-role-email-checkbox');
   var feedbackMessageEmailsCheckbox = $(
-    '.protractor-test-feedback-message-email-checkbox');
-  var navBar = $('.protractor-test-navbar-dropdown-toggle');
-  var pageHeader = $('.protractor-test-preferences-title');
+    '.e2e-test-feedback-message-email-checkbox');
+  var navBar = $('.e2e-test-navbar-dropdown-toggle');
+  var pageHeader = $('.e2e-test-preferences-title');
   var audioLanguageSelector = (
-    $('.protractor-test-audio-language-selector'));
-  var userBioElement = $('.protractor-test-user-bio');
-  var userInterestsInput = $('.protractor-test-subject-interests-input');
-  var createrDashboardRadio = $('.protractor-test-creator-dashboard-radio');
-  var learnerDashboardRadio = $('.protractor-test-learner-dashboard-radio');
-  var profilePhotoClickable = $('.protractor-test-photo-clickable');
-  var customProfilePhoto = $('.protractor-test-custom-photo');
-  var profilePhotoCropper = $('.protractor-test-photo-crop .cropper-container');
-  var profilePhotoUploadError = $('.protractor-test-upload-error');
-  var deleteAccountButton = $('.protractor-test-delete-account-button');
-  var exportAccountButton = $('.protractor-test-export-account-button');
-  var languageSelector = $('.protractor-test-site-language-selector');
+    $('.e2e-test-audio-language-selector'));
+  var userBioElement = $('.e2e-test-user-bio');
+  var userInterestsInput = $('.e2e-test-subject-interests-input');
+  var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+  var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
+  var profilePhotoClickable = $('.e2e-test-photo-clickable');
+  var customProfilePhoto = $('.e2e-test-custom-photo');
+  var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
+  var profilePhotoUploadError = $('.e2e-test-upload-error');
+  var deleteAccountButton = $('.e2e-test-delete-account-button');
+  var exportAccountButton = $('.e2e-test-export-account-button');
+  var languageSelector = $('.e2e-test-site-language-selector');
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);
@@ -140,7 +140,7 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = async function(name) {
-    var subscriptions = await $$('.protractor-test-subscription-name');
+    var subscriptions = await $$('.e2e-test-subscription-name');
     await waitFor.visibilityOf(
       subscriptions[0],
       'subscriptions[0] taking too long to appear.');
@@ -151,7 +151,7 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedLastSubscriptionToBe = async function(name) {
-    var subscriptions = await $$('.protractor-test-subscription-name');
+    var subscriptions = await $$('.e2e-test-subscription-name');
     var last = subscriptions.length - 1;
     await waitFor.visibilityOf(
       subscriptions[last],
@@ -187,7 +187,7 @@ var PreferencesPage = function() {
   };
 
   this.expectSubscriptionCountToEqual = async function(value) {
-    var subscriptions = await $$('.protractor-test-subscription-name');
+    var subscriptions = await $$('.e2e-test-subscription-name');
     expect(await subscriptions.length).toEqual(value);
   };
 

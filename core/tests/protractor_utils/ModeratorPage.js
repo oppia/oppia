@@ -21,7 +21,7 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ModeratorPage = function() {
-  var moderatorPage = element(by.css('.protractor-test-moderator-page'));
+  var moderatorPage = element(by.css('.e2e-test-moderator-page'));
 
   this.get = async function() {
     await browser.get(general.MODERATOR_URL_SUFFIX);

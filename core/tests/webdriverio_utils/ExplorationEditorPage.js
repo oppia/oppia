@@ -31,27 +31,27 @@ var ExplorationEditorPage = function() {
   * Interactive elements
   */
   var expTitle = $(
-    '.protractor-test-exploration-title-input');
+    '.e2e-test-exploration-title-input');
   var expObjective = $(
-    '.protractor-test-exploration-objective-input');
-  var expTags = $('.protractor-test-tags');
+    '.e2e-test-exploration-objective-input');
+  var expTags = $('.e2e-test-tags');
   var expCategoryDropdownElement = $(
-    '.protractor-test-exploration-category-dropdown');
+    '.e2e-test-exploration-category-dropdown');
   var expLanguageSelectorElement = $(
-    '.protractor-test-exploration-language-select');
+    '.e2e-test-exploration-language-select');
   var explorationMetadataModalHeaderElement = $(
-    '.protractor-test-metadata-modal-header');
-  var confirmPublish = $('.protractor-test-confirm-publish');
+    '.e2e-test-metadata-modal-header');
+  var confirmPublish = $('.e2e-test-confirm-publish');
   var modalContentElement = $('.modal-content');
-  var sharePublishModalElement = $('.protractor-test-share-publish-modal');
+  var sharePublishModalElement = $('.e2e-test-share-publish-modal');
 
   /*
    * Buttons
    */
-  var publishExplorationButton = $('.protractor-test-publish-exploration');
+  var publishExplorationButton = $('.e2e-test-publish-exploration');
   var prePublicationConfirmButton = $(
-    '.protractor-test-confirm-pre-publication');
-  var closeButton = $('.protractor-test-share-publish-close');
+    '.e2e-test-confirm-pre-publication');
+  var closeButton = $('.e2e-test-share-publish-close');
 
   /*
    * Workflows
@@ -126,22 +126,22 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     await action.waitForAutosave();
-    var saveChangesButton = $('.protractor-test-save-changes');
+    var saveChangesButton = $('.e2e-test-save-changes');
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
       var commitMessageInput = $(
-        '.protractor-test-commit-message-input');
+        '.e2e-test-commit-message-input');
       await action.keys(
         'Commit message input', commitMessageInput, commitMessage);
     }
     var commitChangesButton = $(
-      '.protractor-test-save-draft-button');
+      '.e2e-test-save-draft-button');
     await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.pause from e2e files.
     // eslint-disable-next-line wdio/no-pause
     await browser.pause(2500);
     var saveDraftButtonTextContainer = $(
-      '.protractor-test-save-draft-message');
+      '.e2e-test-save-draft-message');
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
       'Changes could not be saved');
@@ -160,7 +160,7 @@ var ExplorationEditorPage = function() {
   // ---- NAVIGATION ----
 
   this.navigateToSettingsTab = async function() {
-    var navigateToSettingsTabButton = await $('.protractor-test-settings-tab');
+    var navigateToSettingsTabButton = await $('.e2e-test-settings-tab');
     await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
   };

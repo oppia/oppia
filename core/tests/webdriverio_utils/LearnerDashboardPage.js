@@ -22,33 +22,33 @@ var action = require('./action.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
-  var homeSection = $('.protractor-test-home-section');
+  var homeSection = $('.e2e-test-home-section');
   var goalsSection =
-    $('.protractor-test-goals-section');
+    $('.e2e-test-goals-section');
   var progressSection =
-    $('.protractor-test-progress-section');
+    $('.e2e-test-progress-section');
   var communityLessonsSection =
-    $('.protractor-test-community-lessons-section');
+    $('.e2e-test-community-lessons-section');
   var feedbackSection =
-    $('.protractor-test-feedback-section');
+    $('.e2e-test-feedback-section');
   var feedbackThread =
-    $('.protractor-test-feedback-thread');
+    $('.e2e-test-feedback-thread');
   var feedbackMessage =
-   $$('.protractor-test-feedback-message');
+   $$('.e2e-test-feedback-message');
   var addToLearnerGoalsButton =
-    $('.protractor-test-add-topic-to-current-goals-button');
+    $('.e2e-test-add-topic-to-current-goals-button');
   var currentGoalsTopicName =
-    $('.protractor-test-topic-name-in-current-goals');
+    $('.e2e-test-topic-name-in-current-goals');
   var editGoalsTopicName =
-    $('.protractor-test-topic-name-in-edit-goals');
+    $('.e2e-test-topic-name-in-edit-goals');
   var skillProficiencyTopicTitle =
-    $('.protractor-test-skill-proficiency-topic-title');
+    $('.e2e-test-skill-proficiency-topic-title');
   var completedGoalsTopicName =
-    $('.protractor-test-completed-goals-topic-name');
+    $('.e2e-test-completed-goals-topic-name');
   var incompleteCommunityLessonsSection = $(
-    '.protractor-test-incomplete-community-lessons-section');
+    '.e2e-test-incomplete-community-lessons-section');
   var completeCommunityLessonsSection = $(
-    '.protractor-test-completed-community-lessons-section');
+    '.e2e-test-completed-community-lessons-section');
 
   this.get = async function() {
     await browser.url(LEARNER_DASHBOARD_URL);
@@ -81,7 +81,7 @@ var LearnerDashboardPage = function() {
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
     var collectionTitle = $(
-      `.protractor-test-collection-summary-tile-title=${title}`);
+      `.e2e-test-collection-summary-tile-title=${title}`);
     await waitFor.visibilityOf(
       collectionTitle, 'Unable to find collection ' + title);
     expect(await collectionTitle.isDisplayed()).toBe(true);
@@ -89,7 +89,7 @@ var LearnerDashboardPage = function() {
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = async function(title) {
     var items = await $$(
-      `.protractor-test-exp-summary-tile-title=${title}`);
+      `.e2e-test-exp-summary-tile-title=${title}`);
     expect(await items.length).toBe(0);
   };
 
@@ -97,7 +97,7 @@ var LearnerDashboardPage = function() {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter.
     var explorationTitle = $(
-      `.protractor-test-exp-summary-tile-title=${title}`);
+      `.e2e-test-exp-summary-tile-title=${title}`);
     expect(await action.getText(
       'Exploration title', explorationTitle)).toMatch(title);
   };
@@ -110,7 +110,7 @@ var LearnerDashboardPage = function() {
       editGoalsTopicName, name,
       `Text "${name}" taking too long to be present in editGoalsTopic`);
     var topicName = $(
-      `.protractor-test-topic-name-in-edit-goals=${name}`);
+      `.e2e-test-topic-name-in-edit-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -122,7 +122,7 @@ var LearnerDashboardPage = function() {
       currentGoalsTopicName, name,
       `Text "${name}" taking too long to be present in currentGoalsTopic`);
     var topicName = $(
-      `.protractor-test-topic-name-in-current-goals=${name}`);
+      `.e2e-test-topic-name-in-current-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -135,7 +135,7 @@ var LearnerDashboardPage = function() {
       skillProficiencyTopicTitle, name,
       `Text "${name}" taking too long to be present in skillProficiencyTopic`);
     var topicName = $(
-      `.protractor-test-skill-proficiency-topic-title=${name}`);
+      `.e2e-test-skill-proficiency-topic-title=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -148,13 +148,13 @@ var LearnerDashboardPage = function() {
       completedGoalsTopicName, name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`);
     var topicName = $(
-      `.protractor-test-completed-goals-topic-name=${name}`);
+      `.e2e-test-completed-goals-topic-name=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNumberOfTopicsInSuggestedForYou = async function(value) {
     var topicNamesInLearnerTopicSummaryTiles = await $$(
-      '.protractor-test-learner-topic-summary-tile-title');
+      '.e2e-test-learner-topic-summary-tile-title');
     if (value > 0) {
       await waitFor.visibilityOf(
         topicNamesInLearnerTopicSummaryTiles[0],
@@ -165,7 +165,7 @@ var LearnerDashboardPage = function() {
 
   this.expectNumberOfStoriesInCompletedStory = async function(value) {
     var storyNamesInLearnerStorySummaryTiles = await $$(
-      '.protractor-test-story-name-in-learner-story-summary-tile');
+      '.e2e-test-story-name-in-learner-story-summary-tile');
     if (value > 0) {
       await waitFor.visibilityOf(
         storyNamesInLearnerStorySummaryTiles[0],
@@ -176,7 +176,7 @@ var LearnerDashboardPage = function() {
 
   this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
     var topicNamesInLearnerStorySummaryTiles = await $$(
-      '.protractor-test-topic-name-in-learner-story-summary-tile');
+      '.e2e-test-topic-name-in-learner-story-summary-tile');
     if (value > 0) {
       await waitFor.visibilityOf(
         topicNamesInLearnerStorySummaryTiles[0],
@@ -190,7 +190,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
-    var subscriptionName = await $$('.protractor-test-subscription-name');
+    var subscriptionName = await $$('.e2e-test-subscription-name');
     await waitFor.visibilityOf(
       subscriptionName[0],
       'Subscription First Name takes too long to appear');
@@ -198,7 +198,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionLastNameToMatch = async function(name) {
-    var subscriptionName = await $$('.protractor-test-subscription-name');
+    var subscriptionName = await $$('.e2e-test-subscription-name');
     var lastElement = subscriptionName.length - 1;
     await waitFor.visibilityOf(
       subscriptionName[lastElement],
@@ -208,7 +208,7 @@ var LearnerDashboardPage = function() {
 
   this.expectFeedbackExplorationTitleToMatch = async function(title) {
     var feedbackExplorationTitle = await $$(
-      '.protractor-test-feedback-exploration');
+      '.e2e-test-feedback-exploration');
     await waitFor.visibilityOf(
       feedbackExplorationTitle[0],
       'Feedback Exploration Title takes too long to appear');
@@ -226,7 +226,7 @@ var LearnerDashboardPage = function() {
       await this.navigateToCommunityLessonsSection();
       var explorationTitleInIncompleteSection = (
         incompleteCommunityLessonsSection.$(
-          `.protractor-test-exp-summary-tile-title=${explorationTitle}`));
+          `.e2e-test-exp-summary-tile-title=${explorationTitle}`));
       expect(await action.getText(
         'Incomplete exploration title',
         explorationTitleInIncompleteSection)).toMatch(explorationTitle);
@@ -237,7 +237,7 @@ var LearnerDashboardPage = function() {
     await this.navigateToCommunityLessonsSection();
     var explorationTitleInCompleteSection = (
       completeCommunityLessonsSection.$(
-        `.protractor-test-exp-summary-tile-title=${explorationTitle}`));
+        `.e2e-test-exp-summary-tile-title=${explorationTitle}`));
     expect(await action.getText(
       'Complete exploration title',
       explorationTitleInCompleteSection)).toMatch(explorationTitle);
@@ -248,7 +248,7 @@ var LearnerDashboardPage = function() {
     await this.navigateToCommunityLessonsSection();
     var collectionTitleInIncompleteSection = (
       incompleteCommunityLessonsSection.$(
-        `.protractor-test-collection-summary-tile-title=${collectionTitle}`));
+        `.e2e-test-collection-summary-tile-title=${collectionTitle}`));
     expect(await action.getText(
       'Incomplete collection title',
       collectionTitleInIncompleteSection)).toMatch(collectionTitle);
@@ -259,7 +259,7 @@ var LearnerDashboardPage = function() {
     await this.navigateToCommunityLessonsSection();
     var collectionTitleInCompleteSection = (
       completeCommunityLessonsSection.$(
-        `.protractor-test-collection-summary-tile-title=${collectionTitle}`));
+        `.e2e-test-collection-summary-tile-title=${collectionTitle}`));
     expect(await action.getText(
       'Complete collection title',
       collectionTitleInCompleteSection)).toMatch(collectionTitle);

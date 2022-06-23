@@ -24,7 +24,7 @@ var waitFor = require(
 
 var customizeInteraction = async function(elem, customLetters) {
   await waitFor.presenceOf(elem.$(
-    '.protractor-test-custom-letters-div'),
+    '.e2e-test-custom-letters-div'),
   'The custom letters div took too long to load.');
   for (let letter of customLetters) {
     if (letter.match(/[a-z]/)) {
@@ -51,7 +51,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.$(
     '<oppia-interactive-math-equation-input>')).setValue(answer);
-  var submitAnswerBtn = $('.protractor-test-submit-answer-button');
+  var submitAnswerBtn = $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
 };
 

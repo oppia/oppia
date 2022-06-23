@@ -137,15 +137,15 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
   if (selectedAction === 'create') {
     await action.click(
       'Create button',
-      modal.$('.protractor-test-create-image'));
+      modal.$('.e2e-test-create-image'));
     for (var i = 0; i < args.length; i++) {
-      var shapeClass = '.protractor-test-create-' + args[i];
+      var shapeClass = '.e2e-test-create-' + args[i];
       var shapeTool = modal.$(shapeClass);
       var customTools = ['bezier', 'piechart', 'svgupload'];
       if (customTools.includes(args[i])) {
         await action.click('Shape tool', shapeTool);
         if (args[i] === 'svgupload') {
-          var imageUploadInput = $('.protractor-test-photo-upload-input');
+          var imageUploadInput = $('.e2e-test-photo-upload-input');
           absPath = path.resolve(__dirname, './circle.svg');
           await waitFor.presenceOf(
             imageUploadInput,
@@ -159,10 +159,10 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
       $(
         '[placeholder = "Description of Image (Example : George Handel, ' +
         '18th century baroque composer)"]'));
-    var saveDiagram =  modal.$('.protractor-test-save-diagram');
+    var saveDiagram =  modal.$('.e2e-test-save-diagram');
     await action.click('Save diagram button', saveDiagram);
     await waitFor.visibilityOf(
-      modal.$('.protractor-test-saved-diagram-container'),
+      modal.$('.e2e-test-saved-diagram-container'),
       'Diagram container not visible');
     await action.keys('Alt text input', altTextInputElement, altText);
   }
@@ -172,7 +172,7 @@ var expectComponentDetailsToMatch = async function(
     elem, selectedAction, args, altText) {
   if (selectedAction === 'create') {
     var svgName = args.join('_');
-    var svgDiagramInputElement = elem.$('.protractor-test-image');
+    var svgDiagramInputElement = elem.$('.e2e-test-image');
     await waitFor.visibilityOf(
       svgDiagramInputElement,
       'SVG Diagram input element takes too long to load.');

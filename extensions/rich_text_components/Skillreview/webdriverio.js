@@ -36,11 +36,11 @@ var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
   expect(await link.getText()).toBe(text);
   await link.click();
   await waitFor.visibilityOf(
-    $('.protractor-test-concept-card-explanation'),
+    $('.e2e-test-concept-card-explanation'),
     'concept-card-explanation taking too long to show up'
   );
   await forms.expectRichText(
-    $('.protractor-test-concept-card-explanation')
+    $('.e2e-test-concept-card-explanation')
   ).toMatch(reviewMaterial);
 };
 

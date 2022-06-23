@@ -36,13 +36,13 @@ var customizeInteraction = async function(elem, richTextInstructionsArray) {
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = await elem.$$(
-    '.protractor-test-multiple-choice-option-container');
+    '.e2e-test-multiple-choice-option-container');
   var optionsCount = await optionElements.length;
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   var promises = [];
   for (var i = 0; i < optionsCount; i++) {
     promises.push(await (await optionElements[i]).$(
-      '.protractor-test-multiple-choice-option')).getText();
+      '.e2e-test-multiple-choice-option')).getText();
   }
   var rteInstructionArrayCopy = [...richTextInstructionsArray];
   rteInstructionArrayCopy.sort();

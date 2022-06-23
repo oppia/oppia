@@ -21,7 +21,7 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var continueButton = element(by.css('.protractor-test-continue-button'));
+var continueButton = element(by.css('.e2e-test-continue-button'));
 
 var customizeInteraction = async function(elem, buttonText) {
   if (buttonText) {

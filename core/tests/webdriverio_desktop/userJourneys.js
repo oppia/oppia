@@ -33,9 +33,9 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
-  var languageDropdown = $('.protractor-test-language-dropdown');
+  var languageDropdown = $('.e2e-test-language-dropdown');
   await action.click('Language Dropdown', languageDropdown);
-  var languageOption = $('.protractor-test-i18n-language-' + language);
+  var languageOption = $('.e2e-test-i18n-language-' + language);
   await action.click('Language Option', languageOption);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();
@@ -238,7 +238,7 @@ describe('Site language', function() {
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
-    var placeholderElement = await $('.protractor-test-float-form-input');
+    var placeholderElement = await $('.e2e-test-float-form-input');
     await waitFor.visibilityOf(
       placeholderElement, 'Placeholder Element taking too long to appear');
     await waitFor.elementAttributeToBe(
@@ -257,7 +257,7 @@ describe('Site language', function() {
       // Checking collection player page.
       await browser.url('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      expect(await $('.protractor-test-share-collection-footer').getText())
+      expect(await $('.e2e-test-share-collection-footer').getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
     }

@@ -23,36 +23,36 @@ var action = require('./action.js');
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
-  var activityCreationModal = $('.protractor-test-creation-modal');
+  var activityCreationModal = $('.e2e-test-creation-modal');
   var explorationFeedbackCount =
-    $('.protractor-test-exp-summary-tile-open-feedback');
+    $('.e2e-test-exp-summary-tile-open-feedback');
   var explorationDashboardCard =
-    $('.protractor-test-exploration-dashboard-card');
-  var collectionCard = $('.protractor-test-collection-card');
+    $('.e2e-test-exploration-dashboard-card');
+  var collectionCard = $('.e2e-test-collection-card');
   var collectionEditorContainer = $(
-    '.protractor-test-collection-editor-cards-container');
-  var subscriptionTab = $('.protractor-test-subscription-tab');
+    '.e2e-test-collection-editor-cards-container');
+  var subscriptionTab = $('.e2e-test-subscription-tab');
   var createActivityButton =
-    $('.protractor-test-create-activity');
+    $('.e2e-test-create-activity');
   var createCollectionButton =
-    $('.protractor-test-create-collection');
+    $('.e2e-test-create-collection');
   var createExplorationButton =
-    $('.protractor-test-create-exploration');
+    $('.e2e-test-create-exploration');
   var createNewExplorationButton =
-    $('.protractor-test-create-new-exploration-button');
-  var listViewButton = $('.protractor-test-oppia-list-view-btn');
-  var titleMaskLocator = '.protractor-test-title-mask';
+    $('.e2e-test-create-new-exploration-button');
+  var listViewButton = $('.e2e-test-oppia-list-view-btn');
+  var titleMaskLocator = '.e2e-test-title-mask';
   // Dashboard stat elements.
-  var averageRating = $('.protractor-test-oppia-average-rating');
-  var totalPlays = $('.protractor-test-oppia-total-plays');
-  var openFeedbacks = $('.protractor-test-oppia-open-feedback');
-  var subscribers = $('.protractor-test-oppia-total-subscribers');
+  var averageRating = $('.e2e-test-oppia-average-rating');
+  var totalPlays = $('.e2e-test-oppia-total-plays');
+  var openFeedbacks = $('.e2e-test-oppia-open-feedback');
+  var subscribers = $('.e2e-test-oppia-total-subscribers');
 
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
     var allExplorationCards = await $$(
-      '.protractor-test-exploration-dashboard-card');
+      '.e2e-test-exploration-dashboard-card');
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
       // Tile text contains title, possibly followed by newline and text.
@@ -156,7 +156,7 @@ var CreatorDashboardPage = function() {
   // Returns titles of each explorations in grid view.
   this.getExpSummaryTileTitles = async function() {
     var expSummaryTileTitleElements = await $$(
-      '.protractor-test-exp-summary-tile-title');
+      '.e2e-test-exp-summary-tile-title');
     await waitFor.visibilityOf(
       expSummaryTileTitleElements[0],
       'Unable to find exploration titles');
@@ -166,7 +166,7 @@ var CreatorDashboardPage = function() {
   // Returns ratings of each explorations in grid view.
   this.getExpSummaryTileRatings = async function() {
     var expSummaryTileRatingElements = await $$(
-      '.protractor-test-exp-summary-tile-rating');
+      '.e2e-test-exp-summary-tile-rating');
     await waitFor.visibilityOf(
       expSummaryTileRatingElements[0],
       'Unable to find exploration ratings');
@@ -176,7 +176,7 @@ var CreatorDashboardPage = function() {
   // Returns open feedback count of each exploration in grid view.
   this.getExpSummaryTileOpenFeedbackCount = async function() {
     var expSummaryTileFeedbackElements = await $$(
-      '.protractor-test-exp-summary-tile-open-feedback');
+      '.e2e-test-exp-summary-tile-open-feedback');
     await waitFor.visibilityOf(
       expSummaryTileFeedbackElements[0],
       'Unable to find exploration feedbacks');
@@ -186,7 +186,7 @@ var CreatorDashboardPage = function() {
   // Returns total views count of each exploration in grid view.
   this.getExpSummaryTileViewsCount = async function() {
     var expSummaryTileViewsElements = await $$(
-      '.protractor-test-exp-summary-tile-num-views');
+      '.e2e-test-exp-summary-tile-num-views');
     await waitFor.visibilityOf(
       expSummaryTileViewsElements[0],
       'Unable to find exploration views');
@@ -196,7 +196,7 @@ var CreatorDashboardPage = function() {
   // Returns titles of each explorations in list view.
   this.getExpSummaryRowTitles = async function() {
     var expSummaryRowTitleElements = await $$(
-      '.protractor-test-exp-summary-row-title');
+      '.e2e-test-exp-summary-row-title');
     await waitFor.visibilityOf(
       expSummaryRowTitleElements[0],
       'Unable to find exploration titles');
@@ -206,7 +206,7 @@ var CreatorDashboardPage = function() {
   // Returns ratings of each explorations in list view.
   this.getExpSummaryRowRatings = async function() {
     var expSummaryRowRatingElements = await $$(
-      '.protractor-test-exp-summary-row-rating');
+      '.e2e-test-exp-summary-row-rating');
     await waitFor.visibilityOf(
       expSummaryRowRatingElements[0],
       'Unable to find exploration ratings');
@@ -216,7 +216,7 @@ var CreatorDashboardPage = function() {
   // Returns open feedback count of each exploration in list view.
   this.getExpSummaryRowOpenFeedbackCount = async function() {
     var expSummaryRowFeedbackElements = await $$(
-      '.protractor-test-exp-summary-row-open-feedback');
+      '.e2e-test-exp-summary-row-open-feedback');
     await waitFor.visibilityOf(
       expSummaryRowFeedbackElements[0],
       'Unable to find exploration feedbacks');
@@ -226,7 +226,7 @@ var CreatorDashboardPage = function() {
   // Returns total views count of each exploration in list view.
   this.getExpSummaryRowViewsCount = async function() {
     var expSummaryRowViewsElements = await $$(
-      '.protractor-test-exp-summary-row-num-views');
+      '.e2e-test-exp-summary-row-num-views');
     await waitFor.visibilityOf(
       expSummaryRowViewsElements[0],
       'Unable to find exploration views');

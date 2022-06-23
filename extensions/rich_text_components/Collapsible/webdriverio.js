@@ -31,12 +31,12 @@ var customizeComponent = async function(modal, heading, contentInstructions) {
 var expectComponentDetailsToMatch = async function(
     elem, heading, contentInstructions) {
   var headerElement = elem.$(
-    '.protractor-test-collapsible-heading');
+    '.e2e-test-collapsible-heading');
   expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   await headerElement.click();
   const collapsibleElem = elem.$(
-    '.protractor-test-collapsible-content');
+    '.e2e-test-collapsible-content');
   await forms.expectRichText(collapsibleElem).toMatch(contentInstructions);
 };
 

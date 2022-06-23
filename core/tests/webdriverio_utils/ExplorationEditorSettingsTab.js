@@ -26,21 +26,21 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var neutralElement = $('.protractor-test-settings-container');
+  var neutralElement = $('.e2e-test-settings-container');
   var explorationCategoryInput = $(
-    '.protractor-test-exploration-category-input');
+    '.e2e-test-exploration-category-input');
   var explorationLanguageInput = $(
-    '.protractor-test-exploration-language-select');
+    '.e2e-test-exploration-language-select');
   var explorationObjectiveInput = $(
-    '.protractor-test-exploration-objective-input');
+    '.e2e-test-exploration-objective-input');
   var explorationTitleInput = $(
-    '.protractor-test-exploration-title-input');
+    '.e2e-test-exploration-title-input');
   var disableCorrectnessFeedbackButton = $(
-    '.protractor-test-enable-mark-correctness-feedback');
+    '.e2e-test-enable-mark-correctness-feedback');
   var deleteExplorationButton = $(
-    '.protractor-test-delete-exploration-button');
+    '.e2e-test-delete-exploration-button');
   var confirmDeleteExplorationButton = $(
-    '.protractor-test-really-delete-exploration-button');
+    '.e2e-test-really-delete-exploration-button');
 
   /*
    * Workflows

@@ -32,103 +32,103 @@ var ExplorationEditorMainTab = function() {
   /*
    * Interactive elements
    */
-  var addResponseDetails = $('.protractor-test-add-response-details');
-  var addResponseHeader = $('.protractor-test-add-response-modal-header');
+  var addResponseDetails = $('.e2e-test-add-response-details');
+  var addResponseHeader = $('.e2e-test-add-response-modal-header');
   var multipleChoiceAnswerOptions = function(optionNum) {
     return $(
-      `.protractor-test-html-multiple-select-option=${optionNum}`);
+      `.e2e-test-html-multiple-select-option=${optionNum}`);
   };
   var itemSelectionAnswerOptions = function(optionNum) {
     return $(
-      `.protractor-test-html-item-select-option=${optionNum}`);
+      `.e2e-test-html-item-select-option=${optionNum}`);
   };
-  var defaultResponseTab = $('.protractor-test-default-response-tab');
-  var editorWelcomeModal = $('.protractor-test-welcome-modal');
-  var editOutcomeDestBubble = $('.protractor-test-dest-bubble');
-  var editOutcomeDestStateIn = '.protractor-test-add-state-input';
+  var defaultResponseTab = $('.e2e-test-default-response-tab');
+  var editorWelcomeModal = $('.e2e-test-welcome-modal');
+  var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
+  var editOutcomeDestStateIn = '.e2e-test-add-state-input';
   var editOutcomeDestAddExplorationId = $(
-    '.protractor-test-add-refresher-exploration-id');
+    '.e2e-test-add-refresher-exploration-id');
   var editOutcomeDestDropdownOptions = $(
     '.e2e-destination-selector-dropdown');
-  var feedbackBubble = $('.protractor-test-feedback-bubble');
-  var feedbackEditor = $('.protractor-test-open-feedback-editor');
-  var fadeIn = $('.protractor-test-editor-cards-container');
-  var interaction = $('.protractor-test-interaction');
-  var interactionEditor = $('.protractor-test-interaction-editor');
-  var explorationGraph = $('.protractor-test-exploration-graph');
-  var nodeLabelLocator = '.protractor-test-node-label';
+  var feedbackBubble = $('.e2e-test-feedback-bubble');
+  var feedbackEditor = $('.e2e-test-open-feedback-editor');
+  var fadeIn = $('.e2e-test-editor-cards-container');
+  var interaction = $('.e2e-test-interaction');
+  var interactionEditor = $('.e2e-test-interaction-editor');
+  var explorationGraph = $('.e2e-test-exploration-graph');
+  var nodeLabelLocator = '.e2e-test-node-label';
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.$(nodeLabelLocator);
   };
   var interactionTab = function(tabId) {
-    return $('.protractor-test-interaction-tab-' + tabId);
+    return $('.e2e-test-interaction-tab-' + tabId);
   };
   var interactionTile = function(interactionId) {
     return $(
-      '.protractor-test-interaction-tile-' + interactionId);
+      '.e2e-test-interaction-tile-' + interactionId);
   };
-  var openOutcomeDestEditor = $('.protractor-test-open-outcome-dest-editor');
+  var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
   var openOutcomeFeedBackEditor = $(
-    '.protractor-test-open-outcome-feedback-editor');
+    '.e2e-test-open-outcome-feedback-editor');
   var postTutorialPopover = $('.ng-joyride .popover-content');
   var responseBody = function(responseNum) {
-    return $(`.protractor-test-response-body-${responseNum}`);
+    return $(`.e2e-test-response-body-${responseNum}`);
   };
-  var stateContentDisplay = $('.protractor-test-state-content-display');
-  var stateEditButton = $('.protractor-test-edit-content-pencil-button');
-  var stateNameContainer = $('.protractor-test-state-name-container');
-  var stateNameInput = $('.protractor-test-state-name-input');
-  var ruleDetails = $('.protractor-test-rule-details');
+  var stateContentDisplay = $('.e2e-test-state-content-display');
+  var stateEditButton = $('.e2e-test-edit-content-pencil-button');
+  var stateNameContainer = $('.e2e-test-state-name-container');
+  var stateNameInput = $('.e2e-test-state-name-input');
+  var ruleDetails = $('.e2e-test-rule-details');
   var stateContentEditorLocator =
-    '.protractor-test-state-content-editor';
+    '.e2e-test-state-content-editor';
   var addOrUpdateSolutionModal = $(
-    '.protractor-test-add-or-update-solution-modal');
-  var answerDescription = $('.protractor-test-answer-description');
-  var deleteNodeLocator = '.protractor-test-delete-node';
+    '.e2e-test-add-or-update-solution-modal');
+  var answerDescription = $('.e2e-test-answer-description');
+  var deleteNodeLocator = '.e2e-test-delete-node';
   var titleElement = $('.ng-joyride-title');
-  var ckEditorElement = $('.protractor-test-ck-editor');
-  var interactionHtmlElement = $('.protractor-test-interaction-html');
-  var answerTab = $('.protractor-test-answer-tab');
-  var hintTextElement = $('.protractor-test-hint-text');
-  var explanationTextAreaElement = $('.protractor-test-explanation-textarea');
-  var stateEditorTag = $('.protractor-test-state-content-editor');
+  var ckEditorElement = $('.e2e-test-ck-editor');
+  var interactionHtmlElement = $('.e2e-test-interaction-html');
+  var answerTab = $('.e2e-test-answer-tab');
+  var hintTextElement = $('.e2e-test-hint-text');
+  var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
+  var stateEditorTag = $('.e2e-test-state-content-editor');
 
   /*
    * Buttons
    */
-  var addAnswerButton = $('.protractor-test-add-answer');
-  var addHintButton = $('.protractor-test-oppia-add-hint-button');
-  var addNewResponseButton = $('.protractor-test-add-new-response');
-  var addResponseButton = $('.protractor-test-open-add-response-modal');
-  var addSolutionButton = $('.protractor-test-oppia-add-solution-button');
-  var addInteractionButton = $('.protractor-test-open-add-interaction-modal');
-  var cancelOutcomeDestButton = $('.protractor-test-cancel-outcome-dest');
-  var closeAddResponseButton = $('.protractor-test-close-add-response-modal');
+  var addAnswerButton = $('.e2e-test-add-answer');
+  var addHintButton = $('.e2e-test-oppia-add-hint-button');
+  var addNewResponseButton = $('.e2e-test-add-new-response');
+  var addResponseButton = $('.e2e-test-open-add-response-modal');
+  var addSolutionButton = $('.e2e-test-oppia-add-solution-button');
+  var addInteractionButton = $('.e2e-test-open-add-interaction-modal');
+  var cancelOutcomeDestButton = $('.e2e-test-cancel-outcome-dest');
+  var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
   var confirmDeleteInteractionButton = $(
-    '.protractor-test-confirm-delete-interaction');
+    '.e2e-test-confirm-delete-interaction');
   var confirmDeleteResponseButton = $(
-    '.protractor-test-confirm-delete-response');
-  var confirmDeleteStateButton = $('.protractor-test-confirm-delete-state');
-  var deleteAnswerButton = $('.protractor-test-delete-answer');
-  var deleteInteractionButton = $('.protractor-test-delete-interaction');
-  var deleteResponseButton = $('.protractor-test-delete-response');
-  var dismissWelcomeModalButton = $('.protractor-test-dismiss-welcome-modal');
-  var saveAnswerButton = $('.protractor-test-save-answer');
-  var saveHintButton = $('.protractor-test-save-hint');
-  var saveInteractionButton = $('.protractor-test-save-interaction');
-  var saveOutcomeDestButton = $('.protractor-test-save-outcome-dest');
-  var saveOutcomeFeedbackButton = $('.protractor-test-save-outcome-feedback');
-  var saveStateContentButton = $('.protractor-test-save-state-content');
+    '.e2e-test-confirm-delete-response');
+  var confirmDeleteStateButton = $('.e2e-test-confirm-delete-state');
+  var deleteAnswerButton = $('.e2e-test-delete-answer');
+  var deleteInteractionButton = $('.e2e-test-delete-interaction');
+  var deleteResponseButton = $('.e2e-test-delete-response');
+  var dismissWelcomeModalButton = $('.e2e-test-dismiss-welcome-modal');
+  var saveAnswerButton = $('.e2e-test-save-answer');
+  var saveHintButton = $('.e2e-test-save-hint');
+  var saveInteractionButton = $('.e2e-test-save-interaction');
+  var saveOutcomeDestButton = $('.e2e-test-save-outcome-dest');
+  var saveOutcomeFeedbackButton = $('.e2e-test-save-outcome-feedback');
+  var saveStateContentButton = $('.e2e-test-save-state-content');
   var stateNameSubmitButton = stateNameContainer.$(
-    '.protractor-test-state-name-submit');
-  var answerCorrectnessToggle = $('.protractor-test-editor-correctness-toggle');
-  var startTutorialButton = $('.protractor-test-start-tutorial');
-  var submitSolutionButton = $('.protractor-test-submit-solution-button');
+    '.e2e-test-state-name-submit');
+  var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
+  var startTutorialButton = $('.e2e-test-start-tutorial');
+  var submitSolutionButton = $('.e2e-test-submit-solution-button');
 
   /*
    * Symbols
    */
-  var correctAnswerTickMark = $('.protractor-test-correct-tick-mark');
+  var correctAnswerTickMark = $('.e2e-test-correct-tick-mark');
 
 
   /*
@@ -277,7 +277,7 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
-        var responseTab = await $$('.protractor-test-response-tab');
+        var responseTab = await $$('.e2e-test-response-tab');
         await waitFor.visibilityOf(responseTab[0]);
         headerElem = responseTab[responseNum];
       }
@@ -505,7 +505,7 @@ var ExplorationEditorMainTab = function() {
   this.addHint = async function(hint) {
     await action.waitForAutosave();
     await action.click('Add Hint', addHintButton);
-    var addHintModal = $('.protractor-test-hint-modal=Add Hint');
+    var addHintModal = $('.e2e-test-hint-modal=Add Hint');
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
     var hintTextButton = await hintTextElement.$$('<p>');
@@ -727,7 +727,7 @@ var ExplorationEditorMainTab = function() {
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
     expect(parameterValues.length).toEqual(parameterTypes.length);
     var answerDescriptionFragment = await $$(
-      '.protractor-test-answer-description-fragment');
+      '.e2e-test-answer-description-fragment');
     for (var i = 0; i < parameterValues.length; i++) {
       var parameterElement = answerDescriptionFragment[i * 2 + 1];
       var parameterEditor = await forms.getEditor(
@@ -812,7 +812,7 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await general.scrollToTop();
     var nodeElement = await explorationGraph.$$(
-      `.protractor-test-node=${stateName}`)[0];
+      `.e2e-test-node=${stateName}`)[0];
     await waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
@@ -827,7 +827,7 @@ var ExplorationEditorMainTab = function() {
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = async function(names) {
-    var stateNodes = await explorationGraph.$$('.protractor-test-node');
+    var stateNodes = await explorationGraph.$$('.e2e-test-node');
     var stateNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));
@@ -840,7 +840,7 @@ var ExplorationEditorMainTab = function() {
   this.moveToState = async function(targetName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var stateNodes = explorationGraph.$$('.protractor-test-node');
+    var stateNodes = explorationGraph.$$('.e2e-test-node');
     var listOfNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));

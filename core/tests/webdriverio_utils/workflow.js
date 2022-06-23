@@ -26,35 +26,35 @@ var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
-  return $('.protractor-test-save-role').isEnabled();
+  return $('.e2e-test-save-role').isEnabled();
 };
 
 // Check if exploration is community owned.
 var isExplorationCommunityOwned = async function() {
-  return $('.protractor-test-is-community-owned').isExisting();
+  return $('.e2e-test-is-community-owned').isExisting();
 };
 
 
 // Check if the warning message is visible when the title is ''.
 var checkForAddTitleWarning = async function() {
-  return $('.protractor-test-title-warning').isDisplayed();
+  return $('.e2e-test-title-warning').isDisplayed();
 };
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
-  var explorationTitleInput = $('.protractor-test-exploration-title-input');
+  var explorationTitleInput = $('.e2e-test-exploration-title-input');
   await action.click('Exploration Title Input', explorationTitleInput);
   var explorationObjectiveInput = $(
-    '.protractor-test-exploration-objective-input');
+    '.e2e-test-exploration-objective-input');
   await action.click('Exploration Objective Input', explorationObjectiveInput);
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
-  var testEditRoles = $('.protractor-test-edit-roles');
+  var testEditRoles = $('.e2e-test-edit-roles');
   await action.click('Test edit roles', testEditRoles);
   await action.keys('Test Role Username', $(
-    '.protractor-test-role-username'), 'Chuck Norris');
+    '.e2e-test-role-username'), 'Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
@@ -74,17 +74,17 @@ var createExplorationAndStartTutorial = async function(isCollectionEditor) {
 
   await creatorDashboardPage.clickCreateActivityButton();
   if (isCollectionEditor) {
-    var activityCreationModal = $('.protractor-test-creation-modal');
+    var activityCreationModal = $('.e2e-test-creation-modal');
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
     var createExplorationButton = $(
-      '.protractor-test-create-exploration');
+      '.e2e-test-create-exploration');
     await action.click('Create Exploration Button', createExplorationButton);
   }
 
   await waitFor.pageToFullyLoad();
-  var stateNameText = $('.protractor-test-state-name-text');
+  var stateNameText = $('.e2e-test-state-name-text');
   await waitFor.visibilityOf(
     stateNameText, 'State name text takes too long to appear.');
 };
@@ -96,7 +96,7 @@ var createCollectionAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
-  var activityCreationModal = $('.protractor-test-creation-modal');
+  var activityCreationModal = $('.e2e-test-creation-modal');
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateCollectionButton();
@@ -109,7 +109,7 @@ var createExplorationAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
-  var activityCreationModal = $('.protractor-test-creation-modal');
+  var activityCreationModal = $('.e2e-test-creation-modal');
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateExplorationButton();
@@ -119,25 +119,25 @@ var createExplorationAsAdmin = async function() {
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
   await waitFor.elementToBeClickable(
-    $('.protractor-test-publish-exploration'));
-  $('.protractor-test-publish-exploration').isDisplayed();
-  var testPublishExploration = $('.protractor-test-publish-exploration');
+    $('.e2e-test-publish-exploration'));
+  $('.e2e-test-publish-exploration').isDisplayed();
+  var testPublishExploration = $('.e2e-test-publish-exploration');
   await action.click('Test Publish Exploration', testPublishExploration);
   var prePublicationButtonElem = $(
-    '.protractor-test-confirm-pre-publication');
+    '.e2e-test-confirm-pre-publication');
   await action.click(
     'Pre Publication Button Element', prePublicationButtonElem);
 
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  var testConfirmPublish = $('.protractor-test-confirm-publish');
+  var testConfirmPublish = $('.e2e-test-confirm-publish');
   await action.click('Test Confirm Publish', testConfirmPublish);
 
-  var sharePublishModal = $('.protractor-test-share-publish-modal');
+  var sharePublishModal = $('.e2e-test-share-publish-modal');
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  var closePublishModalButton = $('.protractor-test-share-publish-close');
+  var closePublishModalButton = $('.e2e-test-share-publish-close');
   await action.click('Close Publish Modal Button', closePublishModalButton);
 };
 
@@ -212,15 +212,15 @@ var createAndPublishTwoCardExploration = async function(
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {
   await action.click(
-    'Edit roles', $('.protractor-test-edit-roles'));
+    'Edit roles', $('.e2e-test-edit-roles'));
   await action.keys(
     'Username input',
-    $('.protractor-test-role-username'),
+    $('.e2e-test-role-username'),
     username);
   await action.select(
-    'Role select', $('.protractor-test-role-select'), roleName);
+    'Role select', $('.e2e-test-role-select'), roleName);
   await action.click(
-    'Save role', $('.protractor-test-save-role'));
+    'Save role', $('.e2e-test-save-role'));
 };
 
 var addExplorationManager = async function(username) {
@@ -233,14 +233,14 @@ var addExplorationCollaborator = async function(username) {
 
 var addExplorationVoiceArtist = async function(username) {
   await action.click('Edit voice artist role button', $(
-    '.protractor-test-edit-voice-artist-roles'));
+    '.e2e-test-edit-voice-artist-roles'));
   await action.keys(
     'New voice artist username input',
-    $('.protractor-test-new-voice-artist-username'), username);
+    $('.e2e-test-new-voice-artist-username'), username);
   await action.click('Add voice artist button', $(
-    '.protractor-test-add-voice-artist-role-button'));
+    '.e2e-test-add-voice-artist-role-button'));
   await waitFor.visibilityOf($(
-    '.protractor-test-voice-artist-' + username));
+    '.e2e-test-voice-artist-' + username));
 };
 
 var addExplorationPlaytester = async function(username) {
@@ -273,7 +273,7 @@ var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
   await action.click('Image clickable element', imageClickableElement);
   var thumbnailResetButton = $(
-    '.protractor-test-thumbnail-reset-button');
+    '.e2e-test-thumbnail-reset-button');
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isExisting()).toBe(true);
     await action.click('Topic thumbnail reset button', thumbnailResetButton);
@@ -282,7 +282,7 @@ var uploadImage = async function(
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  var imageUploadInput = $('.protractor-test-photo-upload-input');
+  var imageUploadInput = $('.e2e-test-photo-upload-input');
   return await action.keys(
     'Image Upload Input', imageUploadInput, absPath, clickInputElement = false);
 };
@@ -295,9 +295,9 @@ var submitImage = async function(
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
-  var imageSubmitButton = $('.protractor-test-photo-upload-submit');
+  var imageSubmitButton = $('.e2e-test-photo-upload-submit');
   await action.click('Image submit button', imageSubmitButton);
-  var imageUploadInput = $('.protractor-test-photo-upload-input');
+  var imageUploadInput = $('.e2e-test-photo-upload-input');
   await waitFor.invisibilityOf(
     imageUploadInput,
     'Image uploader is taking too long to disappear');

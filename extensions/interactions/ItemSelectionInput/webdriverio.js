@@ -35,7 +35,7 @@ var action = require(
 var customizeInteraction = async function(
     elem, richTextInstructionsArray, maxSelectionAllowed) {
   await objects.IntEditor(
-    $$('.protractor-test-multiple-options')
+    $$('.e2e-test-multiple-options')
       .filter(async function(elem, index) {
         var text = await elem.getText();
         return text === 'Maximum number of selections permitted';
@@ -56,12 +56,12 @@ var customizeInteraction = async function(
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = $$(
-    '.protractor-test-item-selection-input-container');
+    '.e2e-test-item-selection-input-container');
   var optionsCount = await optionElements.count();
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   for (var i = 0; i < optionsCount; i++) {
     await forms.expectRichText((await optionElements[i]).$(
-      '.protractor-test-item-selection-option'
+      '.e2e-test-item-selection-option'
     )).toMatch(richTextInstructionsArray[i]);
   }
 };
@@ -77,13 +77,13 @@ var submitAnswer = async function(elem, answer) {
   for (var i = 0; i < answerArray.length; i++) {
     var desiredAnswer = answerArray[i];
     await elem.$(
-      `.protractor-test-item-selection-input-item=${desiredAnswer}`)
+      `.e2e-test-item-selection-input-item=${desiredAnswer}`)
       .$(
-        '.protractor-test-item-selection-input-checkbox').click();
+        '.e2e-test-item-selection-input-checkbox').click();
   }
 
   var submitAnswerButton = $(
-    '.protractor-test-submit-answer-button');
+    '.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');
   await action.click('Submit answer button', submitAnswerButton);

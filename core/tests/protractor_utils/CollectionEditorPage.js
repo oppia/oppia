@@ -21,34 +21,34 @@ var action = require('./action.js');
 
 var CollectionEditorPage = function() {
   var addExplorationButton = element(
-    by.css('.protractor-test-add-exploration-button'));
+    by.css('.e2e-test-add-exploration-button'));
   var addExplorationInput = element(
-    by.css('.protractor-test-add-exploration-input'));
+    by.css('.e2e-test-add-exploration-input'));
   var closeSaveModalButton = element(
-    by.css('.protractor-test-close-save-modal-button'));
+    by.css('.e2e-test-close-save-modal-button'));
   var collectionEditorObjectiveInput = element(
-    by.css('.protractor-test-collection-editor-objective-input'));
+    by.css('.e2e-test-collection-editor-objective-input'));
   var commitMessageInput = element(
-    by.css('.protractor-test-commit-message-input'));
+    by.css('.e2e-test-commit-message-input'));
   var categoryFilterDropdown = element(
-    by.css('.protractor-test-collection-editor-category-dropdown'));
+    by.css('.e2e-test-collection-editor-category-dropdown'));
   var editorDeleteNode = element.all(
-    by.css('.protractor-test-editor-delete-node'));
+    by.css('.e2e-test-editor-delete-node'));
   var editorPublishButton = element(
-    by.css('.protractor-test-editor-publish-button'));
+    by.css('.e2e-test-editor-publish-button'));
   var editorShiftLeft = element.all(
-    by.css('.protractor-test-editor-shift-left'));
+    by.css('.e2e-test-editor-shift-left'));
   var editorShiftRight = element.all(
-    by.css('.protractor-test-editor-shift-right'));
+    by.css('.e2e-test-editor-shift-right'));
   var editorTitleInput = element(
-    by.css('.protractor-test-collection-editor-title-input'));
+    by.css('.e2e-test-collection-editor-title-input'));
   var saveChangesButton = element(
-    by.css('.protractor-test-collection-save-changes-button'));
+    by.css('.e2e-test-collection-save-changes-button'));
   var saveDraftButton = element(
-    by.css('.protractor-test-save-draft-button'));
-  var saveModal = element(by.css('.protractor-test-save-modal'));
+    by.css('.e2e-test-save-draft-button'));
+  var saveModal = element(by.css('.e2e-test-save-modal'));
   var saveInProgressLabel = element(by.css(
-    '.protractor-test-save-in-progress-label'));
+    '.e2e-test-save-in-progress-label'));
 
   this.addExistingExploration = async function(explorationId) {
     await waitFor.visibilityOf(

@@ -20,20 +20,20 @@ var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
   var currUserProfilePhoto = element(
-    by.css('.protractor-test-profile-current-user-photo'));
+    by.css('.e2e-test-profile-current-user-photo'));
   var otherUserProfilePhoto = element(
-    by.css('.protractor-test-profile-other-user-photo'));
+    by.css('.e2e-test-profile-other-user-photo'));
   var bio = element(
-    by.css('.protractor-test-profile-bio'));
+    by.css('.e2e-test-profile-bio'));
   var interests = element.all(
-    by.css('.protractor-test-profile-interest'));
+    by.css('.e2e-test-profile-interest'));
   var interestPlaceholder = element(
-    by.css('.protractor-test-profile-no-interest'));
+    by.css('.e2e-test-profile-no-interest'));
   var allExplorationCardElements = element.all(
-    by.css('.protractor-test-exploration-dashboard-card'));
+    by.css('.e2e-test-exploration-dashboard-card'));
   var createdExplorationStat = element.all(
-    by.css('.protractor-test-profile-created-stat'));
-  var cardTitleCss = by.css('.protractor-test-exp-summary-tile-title');
+    by.css('.e2e-test-profile-created-stat'));
+  var cardTitleCss = by.css('.e2e-test-exp-summary-tile-title');
 
   this.get = async function(userName) {
     await browser.get('/profile/' + userName);

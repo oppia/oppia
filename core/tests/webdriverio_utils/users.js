@@ -24,7 +24,7 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
-var splashPage = '.protractor-test-splash-page';
+var splashPage = '.e2e-test-splash-page';
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -62,13 +62,13 @@ var login = async function(email, useManualNavigation = true) {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
-  var loginPage = $('.protractor-test-login-page');
+  var loginPage = $('.e2e-test-login-page');
   await waitFor.presenceOf(loginPage, 'Login page did not load');
 
-  var emailInput = $('.protractor-test-sign-in-email-input');
+  var emailInput = $('.e2e-test-sign-in-email-input');
   await action.keys('Email input', emailInput, email);
 
-  var signInButton = $('.protractor-test-sign-in-button');
+  var signInButton = $('.e2e-test-sign-in-button');
 
   await waitFor.clientSideRedirection(async() => {
     // Click the "sign in" button to trigger redirection.
@@ -102,23 +102,23 @@ var logout = async function() {
 var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
   var cookieBannerAcceptButton = $(
-    '.protractor-test-oppia-cookie-banner-accept-button');
+    '.e2e-test-oppia-cookie-banner-accept-button');
   var cookieButtonPresent = await cookieBannerAcceptButton.isDisplayed();
   if (cookieButtonPresent) {
     await action.click('Accept Cookie Button', cookieBannerAcceptButton);
   }
 
-  var signupPage = $('.protractor-test-signup-page');
+  var signupPage = $('.e2e-test-signup-page');
   await waitFor.presenceOf(signupPage, 'Signup page did not load');
 
-  var usernameInput = $('.protractor-test-username-input');
+  var usernameInput = $('.e2e-test-username-input');
   await action.keys('Username input', usernameInput, username);
 
   var agreeToTermsCheckbox = await (
-    $('.protractor-test-agree-to-terms-checkbox'));
+    $('.e2e-test-agree-to-terms-checkbox'));
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
-  var registerUser = $('.protractor-test-register-user');
+  var registerUser = $('.e2e-test-register-user');
 
   var currentUrl = decodeURIComponent(await browser.getUrl());
 

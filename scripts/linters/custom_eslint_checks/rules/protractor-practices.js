@@ -44,7 +44,7 @@ module.exports = {
         ' "for loop" instead'),
       disallowAwait: 'Please do not use await for "{{propertyName}}()"',
       useProtractorTest: (
-        'Please use “.protractor-test-” prefix classname selector instead of ' +
+        'Please use “.e2e-test-” prefix classname selector instead of ' +
         '“{{incorrectClassname}}”')
     },
   },
@@ -145,7 +145,7 @@ module.exports = {
         }
       }
       if ((node.arguments[0].type === 'Literal') &&
-        (!node.arguments[0].value.startsWith('.protractor-test-'))) {
+        (!node.arguments[0].value.startsWith('.e2e-test-'))) {
         context.report({
           node: node.arguments[0],
           messageId: 'useProtractorTest',

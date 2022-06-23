@@ -23,9 +23,9 @@ var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
   var waitingForResponseElem = $(
-    '.protractor-test-input-response-loading-dots');
-  var explorationHeader = $('.protractor-test-exploration-header');
-  var conversationInput = $('.protractor-test-conversation-input');
+    '.e2e-test-input-response-loading-dots');
+  var explorationHeader = $('.e2e-test-exploration-header');
+  var conversationInput = $('.e2e-test-conversation-input');
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
@@ -33,7 +33,7 @@ var ExplorationPlayerPage = function() {
   //   handler.readItalicText('slanted');
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
-    var conversationContent = await $$('.protractor-test-conversation-content');
+    var conversationContent = await $$('.e2e-test-conversation-content');
     var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
       conversationContent[0], 'Conversation not visible');
@@ -71,7 +71,7 @@ var ExplorationPlayerPage = function() {
 
   this.expectExplorationToNotBeOver = async function() {
     var conversationContent = await $$(
-      '.protractor-test-conversation-content');
+      '.e2e-test-conversation-content');
     var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
       conversationContent[lastElement], 'Ending message not visible');
