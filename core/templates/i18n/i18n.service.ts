@@ -82,13 +82,6 @@ export class I18nService {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => {
         this.translateService.use(code);
-        for (let i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
-          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id === code) {
-            this._updateDirection(
-              AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction);
-            break;
-          }
-        }
         this.documentAttributeCustomizationService.addAttribute('lang', code);
       }
     );
@@ -140,19 +133,24 @@ export class I18nService {
 
 
   updateUserPreferredLanguage(newLangCode: string): void {
+    let oldLangDirection = (
+      this.i18nLanguageCodeService.getCurrentLanguageDirection());
     this.setLocalStorageKeys(newLangCode);
-    if (
-      this.i18nLanguageCodeService.getCurrentLanguageDirection() !==
-      this.supportedSiteLanguageCodes[newLangCode]
-    ) {
-      window.location.reload();
-      return;
+    if (oldLangDirection === this.supportedSiteLanguageCodes[newLangCode]) {
+      this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
     }
-    this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
     this.userService.getUserInfoAsync().then((userInfo) => {
       if (userInfo.isLoggedIn()) {
         this.userBackendApiService.updatePreferredSiteLanguageAsync(
-          newLangCode);
+          newLangCode
+        ).then(() => {
+          if (
+            oldLangDirection !== this.supportedSiteLanguageCodes[newLangCode]
+          ) {
+            window.location.reload();
+            return;
+          }
+        });
       }
     });
 
@@ -168,6 +166,7 @@ export class I18nService {
 
       if (preferredLangCode) {
         this.i18nLanguageCodeService.setI18nLanguageCode(preferredLangCode);
+        this.setLocalStorageKeys(preferredLangCode);
 
         // This removes the language parameter from the URL if it is present,
         // since, when the user is logged in and has a preferred site language,
