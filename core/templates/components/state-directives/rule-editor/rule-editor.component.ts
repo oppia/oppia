@@ -24,9 +24,8 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-
-var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import DEFAULT_OBJECT_VALUES from 'objects/object_defaults.json';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
  @Component({
    selector: 'oppia-rule-editor',
@@ -39,6 +38,7 @@ export class RuleEditorComponent implements OnInit {
    @Output() onSaveRule = new EventEmitter<void>();
    @Input() rule;
    @Input() modalId;
+
    ruleDescriptionFragments;
    currentInteractionId;
    ruleDescriptionChoices;
@@ -46,7 +46,6 @@ export class RuleEditorComponent implements OnInit {
    eventBusGroup;
    editRuleForm;
    ruleEditForm;
-   interactionSpecs = INTERACTION_SPECS;
 
    constructor(
      private eventBusService: EventBusService,
@@ -64,16 +63,16 @@ export class RuleEditorComponent implements OnInit {
        return '';
      }
 
-     var ruleDescription = (
-       this.interactionSpecs[
+     let ruleDescription = (
+       INTERACTION_SPECS[
          this.currentInteractionId
        ].rule_descriptions[this.rule.type]);
 
-     var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
-     var finalInputArray = ruleDescription.split(PATTERN);
+     let PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+     let finalInputArray = ruleDescription.split(PATTERN);
 
-     var result = [];
-     for (var i = 0; i < finalInputArray.length; i += 3) {
+     let result = [];
+     for (let i = 0; i < finalInputArray.length; i += 3) {
        result.push({
          // Omit the leading noneditable string.
          text: i !== 0 ? finalInputArray[i] : '',
@@ -83,7 +82,7 @@ export class RuleEditorComponent implements OnInit {
          break;
        }
 
-       var answerChoices = this.responsesService.getAnswerChoices();
+       let answerChoices = this.responsesService.getAnswerChoices();
 
        if (answerChoices) {
          // This rule is for a multiple-choice, image-click, or item
@@ -192,26 +191,26 @@ export class RuleEditorComponent implements OnInit {
    }
 
    onSelectNewRuleType(newRuleType): void {
-     var oldRuleInputs = cloneDeep(this.rule.inputs) || {};
-     var oldRuleInputTypes = cloneDeep(this.rule.inputTypes) || {};
+     let oldRuleInputs = cloneDeep(this.rule.inputs) || {};
+     let oldRuleInputTypes = cloneDeep(this.rule.inputTypes) || {};
 
      this.rule.type = newRuleType;
      this.rule.inputs = {};
      this.rule.inputTypes = {};
 
-     var tmpRuleDescription = this.computeRuleDescriptionFragments();
+     let tmpRuleDescription = this.computeRuleDescriptionFragments();
      // This provides the list of choices for the multiple-choice and
      // image-click interactions.
-     var answerChoices = this.responsesService.getAnswerChoices();
+     let answerChoices = this.responsesService.getAnswerChoices();
 
      // Finds the parameters and sets them in ctrl.rule.inputs.
-     var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
      while (true) {
        if (!tmpRuleDescription.match(PATTERN)) {
          break;
        }
-       var varName = tmpRuleDescription.match(PATTERN)[1];
-       var varType = null;
+       let varName = tmpRuleDescription.match(PATTERN)[1];
+       let varType = null;
        if (tmpRuleDescription.match(PATTERN)[2]) {
          varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
        }
@@ -235,7 +234,7 @@ export class RuleEditorComponent implements OnInit {
        tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
      }
 
-     for (var key in this.rule.inputs) {
+     for (let key in this.rule.inputs) {
        if (oldRuleInputs.hasOwnProperty(key) &&
        oldRuleInputTypes[key] === this.rule.inputTypes[key]) {
          this.rule.inputs[key] = oldRuleInputs[key];
