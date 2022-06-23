@@ -222,8 +222,10 @@ export class RouterService {
 
   navigateToMainTab(stateName: string): void {
     this._savePendingChanges();
+    let oldState = decodeURI(
+      this._getCurrentStateFromLocationPath());
 
-    if (this._getCurrentStateFromLocationPath() === stateName) {
+    if (oldState === ('/' + stateName)) {
       return;
     }
 
