@@ -47,9 +47,9 @@ class MockAuditsExisting(validation_decorators.AuditsExisting):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value of _DO_FN_TYPES_BY_KIND for the unit tests.
-    _DO_FN_TYPES_BY_KIND: (
-        Dict[str, Set[Type[beam.DoFn]]]
-    ) = collections.defaultdict(set)
+    _DO_FN_TYPES_BY_KIND: Dict[str, Set[Type[beam.DoFn]]] = (
+        collections.defaultdict(set)
+    )
 
     @classmethod
     def get_audit_do_fn_types(cls, kind: str) -> FrozenSet[Type[beam.DoFn]]:
