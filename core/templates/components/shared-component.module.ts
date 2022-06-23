@@ -128,7 +128,7 @@ import { OutcomeDestinationEditorComponent } from './state-directives/outcome-ed
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 import { RuleEditorComponent } from './state-directives/rule-editor/rule-editor.component';
-import { RuleTypeSelectorDirective } from './state-directives/rule-editor/rule-type-selector.directive';
+import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -274,7 +274,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StaleTabInfoModalComponent,
     UnsavedChangesStatusInfoModalComponent,
     RuleEditorComponent,
-    RuleTypeSelectorDirective
+    HtmlSelectComponent
   ],
 
   entryComponents: [
@@ -373,7 +373,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StaleTabInfoModalComponent,
     UnsavedChangesStatusInfoModalComponent,
     RuleEditorComponent,
-    RuleTypeSelectorDirective
+    HtmlSelectComponent
   ],
 
   exports: [
@@ -481,7 +481,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     RuleEditorComponent,
-    RuleTypeSelectorDirective
+    HtmlSelectComponent
   ],
 })
 
