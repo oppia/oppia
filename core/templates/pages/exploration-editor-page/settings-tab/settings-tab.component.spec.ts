@@ -61,8 +61,7 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Settings Tab Component', () => {
+describe('Settings Tab Component', () => {
   let ctrl = null;
   let $q = null;
   let $rootScope = null;
