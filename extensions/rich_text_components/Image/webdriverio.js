@@ -159,7 +159,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
       $(
         '[placeholder = "Description of Image (Example : George Handel, ' +
         '18th century baroque composer)"]'));
-    var saveDiagram =  modal.$('.e2e-test-save-diagram');
+    var saveDiagram = modal.$('.e2e-test-save-diagram');
     await action.click('Save diagram button', saveDiagram);
     await waitFor.visibilityOf(
       modal.$('.e2e-test-saved-diagram-container'),
