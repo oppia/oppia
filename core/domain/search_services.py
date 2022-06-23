@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain
 from core.domain import collection_domain
+from core.domain import exp_domain
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
