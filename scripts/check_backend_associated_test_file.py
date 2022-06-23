@@ -48,6 +48,8 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/failing_tests.py',
     'core/tests/data/image_constants.py',
     'core/tests/data/unicode_and_str_handler.py',
+    'proto_files/text_classifier_pb2.py',
+    'proto_files/training_job_response_payload_pb2.py',
 
     # The files below are to be tested.
     # GSoC'22: Improve line and branch coverage for the backend and frontend.
@@ -61,25 +63,13 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/run_tests.py',
     'scripts/start.py',
     'setup.py',
-    'mypy_imports.py',
-    'proto_files/text_classifier_pb2.py',
-    'proto_files/training_job_response_payload_pb2.py',
     'scripts/check_backend_associated_test_file.py',
     'scripts/third_party_size_check.py',
     'scripts/linters/warranted_angular_security_bypasses.py',
     'core/feconf.py',
+    'core/domain/cron_services.py',
     'core/platform/datastore/cloud_datastore_services.py',
     'core/platform/transactions/cloud_transaction_services.py',
-    'extensions/interactions/NumericExpressionInput/NumericExpressionInput.py',
-    'extensions/interactions/NumericInput/NumericInput.py',
-    'extensions/interactions/PencilCodeEditor/PencilCodeEditor.py',
-    'extensions/interactions/RatioExpressionInput/RatioExpressionInput.py',
-    'extensions/interactions/SetInput/SetInput.py',
-    'extensions/interactions/TextInput/TextInput.py',
-    'extensions/issues/CyclicStateTransitions/CyclicStateTransitions.py',
-    'extensions/issues/EarlyQuit/EarlyQuit.py',
-    'extensions/issues/MultipleIncorrectSubmissions/MultipleIncorrectSubmissions.py', # pylint: disable=line-too-long
-    'extensions/visualizations/models.py',
 ]
 
 

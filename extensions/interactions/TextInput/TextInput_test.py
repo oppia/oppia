@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core/domain/cron_services.py"""
+"""Unit tests for extensions/interactions/TextInput/TextInput.py"""
 
 from __future__ import annotations
+
+from core.tests import test_utils
+from . import TextInput # pylint: disable=unused-import
+
+
+class TextInputTests(test_utils.GenericTestBase):
+
+    def test_trivial(self) -> None:
+        pass
