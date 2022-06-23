@@ -471,7 +471,7 @@ var ExplorationEditorMainTab = function() {
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = await stateEditorTag.$(stateContentEditorLocator);
+    var stateContentEditor = stateEditorTag.$(stateContentEditorLocator);
     await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');

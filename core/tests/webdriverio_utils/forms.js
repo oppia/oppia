@@ -104,10 +104,10 @@ var GraphEditor = function(graphInputContainer) {
         }
       }
       if (edgesList) {
-        var allEdgesElement = $$('.protractor-test-graph-edge');
+        var allEdgesElement = await $$('.protractor-test-graph-edge');
         // Expecting total no. of edges on the graph matches with the given
         // dict's edges.
-        expect(await allEdgesElement.count()).toEqual(edgesList.length);
+        expect(await allEdgesElement.length).toEqual(edgesList.length);
       }
     }
   };
@@ -118,9 +118,9 @@ var ListEditor = function(elem) {
   var addListEntryLocator = '.protractor-test-add-list-entry';
   // NOTE: this returns a promise, not an integer.
   var _getLength = async function() {
-    var items = (
+    var items =
       await $$(
-        '#protractor-test-schema-based-list-editor-table-row')).$$('<td>');
+        '#protractor-test-schema-based-list-editor-table-row');
     return items.length;
   };
   // If objectType is specified this returns an editor for objects of that type
@@ -133,23 +133,24 @@ var ListEditor = function(elem) {
     var addListEntryButton = elem.$(addListEntryLocator);
     await action.click('Add List Entry Button', addListEntryButton);
     if (objectType !== null) {
-      return await getEditor(objectType)(
-        $$('.protractor-test-schema-based-list-editor-table-data')[listLength]);
+      return await getEditor(objectType)(await $$(
+        '.protractor-test-schema-based-list-editor-table-data')[listLength]);
     }
   };
   var deleteItem = async function(index) {
     var deleteItemField = await by
       .repeater('item in localValue track by $index')
       .row(index);
-    var deleteItemFieldElem = deleteItemField.element(
+    var deleteItemFieldElem = deleteItemField.$(
       deleteListEntryLocator);
     await action.click('Delete Item Field Elem', deleteItemFieldElem);
   };
 
   return {
     editItem: async function(index, objectType) {
-      var item = await $$(
-        '.protractor-test-schema-based-list-editor-table-data')[index];
+      var itemList = await $$(
+        '.protractor-test-schema-based-list-editor-table-data');
+      var item = itemList[index];
       var editor = getEditor(objectType);
       return await editor(item);
     },
@@ -158,8 +159,7 @@ var ListEditor = function(elem) {
     // This will add or delete list elements as necessary.
     setLength: async function(desiredLength) {
       var startingLength = await $$(
-        '#protractor-test-schema-based-list-editor-table-row').$$(
-        '<td>').count();
+        '#protractor-test-schema-based-list-editor-table-row').length;
       for (var i = startingLength; i < desiredLength; i++) {
         await addItem();
       }
@@ -181,8 +181,8 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = async function(elem) {
-  var rteElements = $$('.protractor-test-rte');
-  var modalDialogElements = $$('.modal-dialog');
+  var rteElements = await $$('.protractor-test-rte');
+  var modalDialogElements = await $$('.modal-dialog');
 
   var closeRteComponentButtonLocator = (
     '.protractor-test-close-rich-text-component-editor');

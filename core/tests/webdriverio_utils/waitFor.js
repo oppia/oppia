@@ -162,7 +162,7 @@ var visibilityOfSuccessToast = async function(errorMessage) {
 var fadeInToComplete = async function(element, errorMessage) {
   await visibilityOf(element, 'Editor taking too long to appear');
   await browser.waitUntil(async function() {
-    return await element.getCSSProperty('opacity') === '1';
+    return (await element.getCSSProperty('opacity')).value === 1;
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,

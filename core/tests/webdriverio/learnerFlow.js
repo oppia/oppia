@@ -64,7 +64,8 @@ describe('Learner dashboard functionality', function() {
     }
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
+      'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
+    true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
