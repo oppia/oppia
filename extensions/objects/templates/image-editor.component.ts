@@ -101,6 +101,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   MODE_UPLOADED = 2;
   MODE_SAVED = 3;
 
+  imageIsUploading = false;
+
   // We only use PNG format since that is what canvas can export to in
   // all browsers.
   OUTPUT_IMAGE_FORMAT = {
@@ -558,6 +560,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       metadata: {},
       crop: true
     };
+    this.imageIsUploading = false;
     this.imageResizeRatio = 1;
     this.invalidTagsAndAttributes = {
       tags: [],
@@ -717,7 +720,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         null, x1, y1, width, height);
       this.processGIFImage(
         imageDataURI, width, height, processFrameCb, successCb);
-    } else if (mimeType === 'data:image/svg+xml') {
+    } else if (mimeType === AppConstants.SVG_MIME_TYPE) {
       // Check point 2 in the note before imports and after fileoverview.
       const imageData = this.imgData || (
         this.data.metadata.uploadedImageData as string);
@@ -815,7 +818,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     const imageDataURI = (
       this.imgData || this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
-    const maxImageRatio = (mimeType === 'data:image/svg+xml') ? 2 : 1;
+    const maxImageRatio = (mimeType === AppConstants.SVG_MIME_TYPE) ? 2 : 1;
     // Do not allow the user to increase size beyond 100% for non-SVG images
     // and 200% for SVG images. Users may downsize the image if required.
     // SVG images can be resized to 200% because certain SVGs may not contain a
@@ -912,6 +915,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       },
       crop: true
     };
+    this.imageIsUploading = false;
     if (updateParent) {
       this.alertsService.clearWarnings();
       this.value = filename;
@@ -944,6 +948,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   saveUploadedFile(): void {
     this.alertsService.clearWarnings();
     this.processedImageIsTooLarge = false;
+    this.imageIsUploading = true;
 
     if (!this.data.metadata.uploadedFile) {
       this.alertsService.addWarning('No image file detected.');
@@ -965,6 +970,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
           this.validateProcessedFilesize(obj.image);
           if (this.processedImageIsTooLarge) {
             document.body.style.cursor = 'default';
+            this.imageIsUploading = false;
             return;
           }
           resampledFile = (
@@ -973,6 +979,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
           if (resampledFile === null) {
             this.alertsService.addWarning('Could not get resampled file.');
             document.body.style.cursor = 'default';
+            this.imageIsUploading = false;
             return;
           }
           this.saveImage(dimensions, resampledFile, 'gif');
@@ -982,7 +989,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       let gifWidth = dimensions.width;
       let gifHeight = dimensions.height;
       this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
-    } else if (mimeType === 'data:image/svg+xml') {
+    } else if (mimeType === AppConstants.SVG_MIME_TYPE) {
       resampledFile = (
         this.imageUploadHelperService.convertImageDataToImageFile(
           imageDataURI));
@@ -993,6 +1000,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         imageDataURI, dimensions.width, dimensions.height);
       this.validateProcessedFilesize(resampledImageData);
       if (this.processedImageIsTooLarge) {
+        this.imageIsUploading = false;
         return;
       }
       resampledFile = (
@@ -1000,6 +1008,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
           resampledImageData));
       if (resampledFile === null) {
         this.alertsService.addWarning('Could not get resampled file.');
+        this.imageIsUploading = false;
         return;
       }
       this.saveImage(dimensions, resampledFile, 'png');
