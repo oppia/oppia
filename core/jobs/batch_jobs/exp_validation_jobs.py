@@ -146,7 +146,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             f'value is either empty or None.'
                         )
 
-                # Validates if video start value is lesser than end value.
+                # Validation for oppia-noninteractive-video.
                 elif rte_component['id'] == 'oppia-noninteractive-video':
                     start_value = (
                         rte_component['customization_args']
@@ -157,7 +157,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     video_id = (
                         rte_component['customization_args']
                         ['video_id-with-value'])
+                    autoplay = (
+                        rte_component['customization_args']
+                        ['autoplay-with-value'])
 
+                    # Validates if video start value is lesser than end value.
                     if int(start_value) > int(end_value):
                         rte_components_errors.append(
                             f'State - {key} Video tag start '
@@ -165,10 +169,18 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             f'having video id {video_id}.'
                         )
 
+                    # Validates if video tag video_id is valid.
                     if video_id == '' or video_id is None:
                         rte_components_errors.append(
                             f'State - {key} Video tag does '
                             f'not have a video_id.'
+                        )
+
+                    # Validates if video tag autoplay is valid.
+                    if not isinstance(autoplay, bool):
+                        rte_components_errors.append(
+                            f'State - {key} Video tag autoplay '
+                            f'value is not boolean.'
                         )
 
                 # Validates if link text value is not empty.
@@ -208,7 +220,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             - Fractional denominator should be > 0
 
         Args:
-            value: state_domain.State. State object.
+            state: state_domain.State. State object.
             answer_group: AnswerGroup. AnswerGroup object.
             ans_group_index: int. AnswerGroup index.
 
@@ -438,14 +450,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
             a "Default Feedback"
 
         Args:
-            value: state_domain.State. State object.
+            state: state_domain.State. State object.
 
         Returns:
             mc_interaction_invalid_values: List[str].
             Invalid interaction values.
         """
         selected_equals_choices = []
-        choice_prev_selected = False
         mc_interaction_invalid_values = []
 
         answer_groups = state.interaction.answer_groups
@@ -517,7 +528,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             - `==` should have between min and max number of selections
 
         Args:
-            value: state_domain.State. State object.
+            state: state_domain.State. State object.
 
         Returns:
             item_selec_interaction_values: List[str].
@@ -658,7 +669,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             - for `a < b`, `a` should not be the same as `b`
 
         Args:
-            value: state_domain.State. State object.
+            state: state_domain.State. State object.
 
         Returns:
             drag_drop_interaction_values: List[str].
@@ -673,11 +684,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
             multi_item_value = (
                 state.interaction.customization_args
                 ['allowMultipleItemsInSamePosition'].value)
-            if not multi_item_value:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_index = str(answer_group.rule_specs.index(
-                        rule_spec))
-                    # Validates multi items in same place iff setting on.
+
+            for rule_spec in answer_group.rule_specs:
+                rule_spec_index = str(answer_group.rule_specs.index(
+                    rule_spec))
+                # Validates multi items in same place iff setting on.
+                if not multi_item_value:
                     for ele in rule_spec.inputs['x']:
                         if len(ele) > 1:
                             drag_drop_interaction_values.append(
@@ -688,7 +700,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                                 f'position settings is turned off.'
                             )
 
-                    # Validates == +/- 1 no option if multi item set off.
+                # Validates == +/- 1 no option if multi item set off.
+                if not multi_item_value:
                     if (
                         rule_spec.rule_type ==
                         'IsEqualToOrderingWithOneItemAtIncorrectPosition'
@@ -703,21 +716,21 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             f'setting is turned off.'
                         )
 
-                    # Validates for a < b, a should not be the same as b.
+                # Validates for a < b, a should not be the same as b.
+                if (
+                    rule_spec.rule_type ==
+                    'HasElementXBeforeElementY'
+                ):
                     if (
-                        rule_spec.rule_type ==
-                        'HasElementXBeforeElementY'
+                        rule_spec.inputs['x'] == rule_spec.inputs['y']
                     ):
-                        if (
-                            rule_spec.inputs['x'] == rule_spec.inputs['y']
-                        ):
-                            drag_drop_interaction_values.append(
-                                f'The rule {rule_spec_index} of '
-                                f'answer group {answer_group_index} '
-                                f'the value 1 and value 2 cannot be '
-                                f'same when rule type is '
-                                f'HasElementXBeforeElementY'
-                            )
+                        drag_drop_interaction_values.append(
+                            f'The rule {rule_spec_index} of '
+                            f'answer group {answer_group_index} '
+                            f'the value 1 and value 2 cannot be '
+                            f'same when rule type is '
+                            f'HasElementXBeforeElementY'
+                        )
 
         choices = (
             state.interaction.customization_args['choices'].value)
@@ -756,7 +769,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             - Should be at most 3 recommended explorations
 
         Args:
-            value: state_domain.State. State object.
+            state: state_domain.State. State object.
 
         Returns:
             end_interaction_invalid_values: List[str].
@@ -799,7 +812,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
             - Should not have any answer groups associated with it
 
         Args:
-            value: state_domain.State. State object.
+            state: state_domain.State. State object.
 
         Returns:
             continue_interaction_invalid_values: List[str].

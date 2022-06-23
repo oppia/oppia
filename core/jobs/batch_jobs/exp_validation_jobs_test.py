@@ -747,7 +747,7 @@ class ExpStateValidationJobTests(
     ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;' +
     'quot;\"></oppia-noninteractive-video>' +
     '"<oppia-noninteractive-video ' +
-    'autoplay-with-value=\"true\" end-with-value=\"11\" ' +
+    'autoplay-with-value=\"&amp;quot;&amp;quot;\" end-with-value=\"11\" ' +
     'start-with-value=\"10\"' +
     ' video_id-with-value=\"&amp;quot;&amp;' +
     'quot;\"></oppia-noninteractive-video>'
@@ -1436,7 +1436,9 @@ class ExpStateValidationJobTests(
               f'Skill review tag text value is either empty or None.\', '
               f'\'State - EXP_3_STATE_1 Video tag start value is greater '
               f'than end value having video id Ntcw0H0hwPU.\', \'State - '
-              f'EXP_3_STATE_1 Video tag does not have a video_id.\']}}]'
+              f'EXP_3_STATE_1 Video tag does not have a video_id.\', '
+              f'\'State - EXP_3_STATE_1 Video tag autoplay '
+              f'value is not boolean.\']}}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
@@ -1617,7 +1619,9 @@ class ExpStateValidationJobTests(
               f'Skill review tag text value is either empty or None.\', '
               f'\'State - EXP_3_STATE_1 Video tag start value is greater '
               f'than end value having video id Ntcw0H0hwPU.\', \'State - '
-              f'EXP_3_STATE_1 Video tag does not have a video_id.\']}}]'
+              f'EXP_3_STATE_1 Video tag does not have a video_id.\', '
+              f'\'State - EXP_3_STATE_1 Video tag autoplay '
+              f'value is not boolean.\']}}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
