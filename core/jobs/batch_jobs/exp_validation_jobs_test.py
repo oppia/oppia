@@ -164,12 +164,36 @@ class ExpStateValidationJobTests(
           }
         }
       },
-      'answer_groups': [],
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 0
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_2_STATE_2',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
       'default_outcome': {
         'dest': 'EXP_2_STATE_1',
         'feedback': {
           'content_id': 'default_outcome',
-          'html': ''
+          'html': '<p>try</p>'
         },
         'labelled_as_correct': False,
         'param_changes': [],
@@ -711,11 +735,17 @@ class ExpStateValidationJobTests(
     'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value=' +
     '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;' +
     'img_2_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">' +
-    '</oppia-noninteractive-image>"<oppia-noninteractive-video ' +
+    '</oppia-noninteractive-image><oppia-noninteractive-video ' +
     'autoplay-with-value=\"true\" end-with-value=\"11\" ' +
     'start-with-value=\"13\"' +
     ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;' +
-    'quot;\"></oppia-noninteractive-video>')
+    'quot;\"></oppia-noninteractive-video>' +
+    '"<oppia-noninteractive-video ' +
+    'autoplay-with-value=\"true\" end-with-value=\"11\" ' +
+    'start-with-value=\"10\"' +
+    ' video_id-with-value=\"&amp;quot;&amp;' +
+    'quot;\"></oppia-noninteractive-video>'
+    )
 
     EXP_4_STATE_1 = state_domain.State.create_default_state(
         'EXP_4_STATE_1', is_initial_state=True).to_dict()
@@ -1359,8 +1389,10 @@ class ExpStateValidationJobTests(
               f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\', '
               f'\'continue_interaction_invalid_values\': [\'The text value '
               f'is invalid, either it is empty or the character length is '
-              f'more than 20, the value is Continueeeeeeeeeeeeee'
-              f'eeeeeeeeeeee\']}}, {{\'state_name\': \'EXP_2_STATE_2\', '
+              f'more than 20 or it is None, the value is Continueeeeeeeeeeeeee'
+              f'eeeeeeeeeeee\', \'There should be '
+              f'no answer groups present in the continue exploration '
+              f'interaction.\']}}, {{\'state_name\': \'EXP_2_STATE_2\', '
               f'\'end_interaction_invalid_values\': [\'There should be no '
               f'default value present in the end exploration interaction.\', '
               f'\'There should be no answer groups present in the end '
@@ -1397,7 +1429,8 @@ class ExpStateValidationJobTests(
               f'mathImg.svgas.\', \'State - EXP_3_STATE_1 '
               f'Skill review tag text value is either empty or None.\', '
               f'\'State - EXP_3_STATE_1 Video tag start value is greater '
-              f'than end value having video id Ntcw0H0hwPU.\']}}]'
+              f'than end value having video id Ntcw0H0hwPU.\', \'State - '
+              f'EXP_3_STATE_1 Video tag does not have a video_id.\']}}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
@@ -1543,8 +1576,10 @@ class ExpStateValidationJobTests(
               f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\', '
               f'\'continue_interaction_invalid_values\': [\'The text value '
               f'is invalid, either it is empty or the character length is '
-              f'more than 20, the value is Continueeeeeeeeeeeeee'
-              f'eeeeeeeeeeee\']}}, {{\'state_name\': \'EXP_2_STATE_2\', '
+              f'more than 20 or it is None, the value is Continueeeeeeeeeeeeee'
+              f'eeeeeeeeeeee\', \'There should be '
+              f'no answer groups present in the continue exploration '
+              f'interaction.\']}}, {{\'state_name\': \'EXP_2_STATE_2\', '
               f'\'end_interaction_invalid_values\': [\'There should be no '
               f'default value present in the end exploration interaction.\', '
               f'\'There should be no answer groups present in the end '
@@ -1575,7 +1610,8 @@ class ExpStateValidationJobTests(
               f'mathImg.svgas.\', \'State - EXP_3_STATE_1 '
               f'Skill review tag text value is either empty or None.\', '
               f'\'State - EXP_3_STATE_1 Video tag start value is greater '
-              f'than end value having video id Ntcw0H0hwPU.\']}}]'
+              f'than end value having video id Ntcw0H0hwPU.\', \'State - '
+              f'EXP_3_STATE_1 Video tag does not have a video_id.\']}}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
