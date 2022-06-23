@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,9 +46,8 @@ describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
-  var oppiaLogo = $('.protractor-test-oppia-main-logo');
-  var continueButton = $('.protractor-test-continue-button');
   var clickContinueButton = async function() {
+    var continueButton = $('.protractor-test-continue-button');
     await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
   };
@@ -114,73 +113,73 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and play the correct exploration',
-    async function() {
-      await users.createAndLoginSuperAdminUser(
-        'expCreator@learnerDashboard.com', 'expCreator');
-      // Create or load an exploration named 'Exploration Player Test'.
-      if (browser.isMobile) {
-        await adminPage.reloadExploration('exploration_player_test.yaml');
-      } else {
-        await workflow.createAndPublishExploration(
-          'Exploration Player Test',
-          'Astronomy',
-          'To test the exploration player',
-          'English',
-          true
-        );
-      }
-      await users.logout();
-      var PLAYER_USERNAME = 'expPlayerDM';
-      await users.createAndLoginUser(
-        'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
-      await libraryPage.get();
-      await libraryPage.findExploration('Exploration Player Test');
-      await libraryPage.playExploration('Exploration Player Test');
-    });
+  // it('should visit the exploration player and play the correct exploration',
+  //   async function() {
+  //     await users.createAndLoginSuperAdminUser(
+  //       'expCreator@learnerDashboard.com', 'expCreator');
+  //     // Create or load an exploration named 'Exploration Player Test'.
+  //     if (browser.isMobile) {
+  //       await adminPage.reloadExploration('exploration_player_test.yaml');
+  //     } else {
+  //       await workflow.createAndPublishExploration(
+  //         'Exploration Player Test',
+  //         'Astronomy',
+  //         'To test the exploration player',
+  //         'English',
+  //         true
+  //       );
+  //     }
+  //     await users.logout();
+  //     var PLAYER_USERNAME = 'expPlayerDM';
+  //     await users.createAndLoginUser(
+  //       'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
+  //     await libraryPage.get();
+  //     await libraryPage.findExploration('Exploration Player Test');
+  //     await libraryPage.playExploration('Exploration Player Test');
+  //   });
 
-  it('should visit the collection player and play the correct collection',
-    async function() {
-      await users.createAndLoginSuperAdminUser(
-        'expOfCollectionCreator@learnerDashboard.com',
-        'expOfCollectionCreator');
-      // Create or load a collection named
-      // 'Introduction to Collections in Oppia'.
-      if (browser.isMobile) {
-        await adminPage.reloadCollection(0);
-      } else {
-        await workflow.createAndPublishExploration(
-          'Demo Exploration',
-          'Algebra',
-          'To test collection player',
-          'English',
-          true
-        );
-        testExplorationId = await general.getExplorationIdFromEditor();
-        // Update the role of the user to admin since only admin users
-        // can create a collection.
-        await adminPage.get();
-        await adminPage.addRole('expOfCollectionCreator', 'collection editor');
-        await workflow.createCollectionAsAdmin();
-        await collectionEditorPage.addExistingExploration(testExplorationId);
-        await collectionEditorPage.saveDraft();
-        await collectionEditorPage.closeSaveModal();
-        await collectionEditorPage.publishCollection();
-        await collectionEditorPage.setTitle(
-          'Introduction to Collections in Oppia');
-        await collectionEditorPage.setObjective(
-          'This is a collection to test player.');
-        await collectionEditorPage.setCategory('Algebra');
-        await collectionEditorPage.saveChanges();
-      }
-      await users.logout();
-      var PLAYER_USERNAME = 'collectionPlayerDM';
-      await users.createAndLoginUser(
-        'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
-      await libraryPage.get();
-      await libraryPage.findCollection('Introduction to Collections in Oppia');
-      await libraryPage.playCollection('Introduction to Collections in Oppia');
-    });
+  // it('should visit the collection player and play the correct collection',
+  //   async function() {
+  //     await users.createAndLoginSuperAdminUser(
+  //       'expOfCollectionCreator@learnerDashboard.com',
+  //       'expOfCollectionCreator');
+  //     // Create or load a collection named
+  //     // 'Introduction to Collections in Oppia'.
+  //     if (browser.isMobile) {
+  //       await adminPage.reloadCollection(0);
+  //     } else {
+  //       await workflow.createAndPublishExploration(
+  //         'Demo Exploration',
+  //         'Algebra',
+  //         'To test collection player',
+  //         'English',
+  //         true
+  //       );
+  //       testExplorationId = await general.getExplorationIdFromEditor();
+  //       // Update the role of the user to admin since only admin users
+  //       // can create a collection.
+  //       await adminPage.get();
+  //       await adminPage.addRole('expOfCollectionCreator', 'collection editor');
+  //       await workflow.createCollectionAsAdmin();
+  //       await collectionEditorPage.addExistingExploration(testExplorationId);
+  //       await collectionEditorPage.saveDraft();
+  //       await collectionEditorPage.closeSaveModal();
+  //       await collectionEditorPage.publishCollection();
+  //       await collectionEditorPage.setTitle(
+  //         'Introduction to Collections in Oppia');
+  //       await collectionEditorPage.setObjective(
+  //         'This is a collection to test player.');
+  //       await collectionEditorPage.setCategory('Algebra');
+  //       await collectionEditorPage.saveChanges();
+  //     }
+  //     await users.logout();
+  //     var PLAYER_USERNAME = 'collectionPlayerDM';
+  //     await users.createAndLoginUser(
+  //       'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
+  //     await libraryPage.get();
+  //     await libraryPage.findCollection('Introduction to Collections in Oppia');
+  //     await libraryPage.playCollection('Introduction to Collections in Oppia');
+  //   });
 
   it('should display incomplete and completed explorations', async function() {
     await users.createAndLoginSuperAdminUser(
@@ -221,6 +220,7 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave exploration.
+    var oppiaLogo = $('.protractor-test-oppia-main-logo');
     await action.click('Oppia logo', oppiaLogo);
     await general.acceptAlert();
 
@@ -343,9 +343,9 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.conf.isMobile ? $$(
+    var firstExploration = browser.isMobile ? await $$(
       '.protractor-test-mobile-collection-exploration')[0] :
-      $$('.protractor-test-collection-exploration')[0];
+      await $$('.protractor-test-collection-exploration')[0];
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
@@ -362,6 +362,7 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave collection.
+    var oppiaLogo = $('.protractor-test-oppia-main-logo');
     await action.click('Oppia logo', oppiaLogo);
     await general.acceptAlert();
 
@@ -377,9 +378,9 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.conf.isMobile ? $$(
+    var firstExploration = browser.isMobile ? await $$(
       '.protractor-test-mobile-collection-exploration')[0] :
-      $$('.protractor-test-collection-exploration')[0];
+      await $$('.protractor-test-collection-exploration')[0];
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
@@ -419,7 +420,7 @@ describe('Learner dashboard functionality', function() {
     //    not a super admin. For mobile tests, we sign-in as a super admin.
     // 4. The feature of adding an existing exploration to a collection using
     //    the collection editor page is in beta presently.
-    if (!browser.conf.isMobile) {
+    if (!browser.isMobile) {
       // Add exploration 'Collection Exploration' to 'Test Collection'
       // and publish it.
       await users.login('explorationCreator@learnerDashboard.com');

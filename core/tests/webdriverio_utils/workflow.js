@@ -96,6 +96,7 @@ var createCollectionAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
+  var activityCreationModal = $('.protractor-test-creation-modal');
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateCollectionButton();
@@ -108,6 +109,7 @@ var createExplorationAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
+  var activityCreationModal = $('.protractor-test-creation-modal');
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateExplorationButton();

@@ -35,9 +35,9 @@ var customizeInteraction = async function(elem, richTextInstructionsArray) {
 // the options.
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
-  var optionElements = elem.$$(
+  var optionElements = await elem.$$(
     '.protractor-test-multiple-choice-option-container');
-  var optionsCount = await optionElements.count();
+  var optionsCount = await optionElements.length;
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   var promises = [];
   for (var i = 0; i < optionsCount; i++) {

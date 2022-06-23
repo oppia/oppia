@@ -161,12 +161,13 @@ var visibilityOfSuccessToast = async function(errorMessage) {
 
 var fadeInToComplete = async function(element, errorMessage) {
   await visibilityOf(element, 'Editor taking too long to appear');
-  await browser.waitUntil(
-    await element.getCSSProperty('opacity') === '1',
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await browser.waitUntil(async function() {
+    return await element.getCSSProperty('opacity') === '1';
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage
+  });
 };
 
 var modalPopupToAppear = async function() {
