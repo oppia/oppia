@@ -523,7 +523,6 @@ describe('Exploration history', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.deleteState('second');
     await explorationEditorMainTab.moveToState('first');
-
     responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.setDestination('final card', false, null);
     await explorationEditorPage.saveChanges();
