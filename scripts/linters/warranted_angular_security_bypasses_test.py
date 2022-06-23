@@ -19,8 +19,8 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import ( # pylint: disable=unused-import
-    warranted_angular_security_bypasses)
+from . import (
+    warranted_angular_security_bypasses) # pylint: disable=unused-import
 
 
 class WarrantedAngularSecurityBypassesTests(test_utils.GenericTestBase):
