@@ -1695,6 +1695,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return content_count
 
+    def get_metadata(self):
+        """Gets the ExplorationMetadata domain object for the exploration."""
+        return ExplorationMetadata(
+            self.title, self. category, self.objective, self.language_code,
+            self.tags, self.blurb, self.author_notes,
+            self.states_schema_version, self.init_state_name,
+            self.param_specs, self.param_changes, self.auto_tts_enabled,
+            self.correctness_feedback_enabled, self.edits_allowed
+        )
+
     @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
         """Converts from version 41 to 42. Version 42 changes rule input types
@@ -3304,3 +3314,81 @@ class ExplorationChangeMergeVerifier:
             break
 
         return changes_are_mergeable, False
+
+
+class ExplorationMetadata:
+    """Class to represent the exploration metadata properties."""
+
+    def __init__(
+        self, title, category, objective, language_code, tags, blurb,
+        author_notes, states_schema_version, init_state_name, param_specs,
+        param_changes, auto_tts_enabled, correctness_feedback_enabled,
+        edits_allowed
+    ):
+        """Initializes an ExplorationMetadata domain object.
+
+        Args:
+            title: str. The exploration title.
+            category: str. The category of the exploration.
+            objective: str. The objective of the exploration.
+            language_code: str. The language code of the exploration.
+            tags: list(str). The tags given to the exploration.
+            blurb: str. The blurb of the exploration.
+            author_notes: str. The author notes.
+            states_schema_version: int. Tbe schema version of the exploration.
+            init_state_name: str. The name for the initial state of the
+                exploration.
+            param_specs: dict(str, ParamSpec). A dict where each key-value pair
+                represents respectively, a param spec name and a ParamSpec
+                domain object.
+            param_changes: list(ParamChange). List of ParamChange domain
+                objects.
+            auto_tts_enabled: bool. True if automatic text-to-speech is
+                enabled.
+            correctness_feedback_enabled: bool. True if correctness feedback is
+                enabled.
+            edits_allowed: bool. True when edits to the exploration is allowed.
+        """
+        self.title = title
+        self.category = category
+        self.objective = objective
+        self.language_code = language_code
+        self.tags = tags
+        self.blurb = blurb
+        self.author_notes = author_notes
+        self.states_schema_version = states_schema_version
+        self.init_state_name = init_state_name
+        self.param_specs = param_specs
+        self.param_changes = param_changes
+        self.auto_tts_enabled = auto_tts_enabled
+        self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.edits_allowed = edits_allowed
+
+    def to_dict(self):
+        """Gets the dict representation of ExplorationMetadata domain object.
+
+        Returns:
+            dict. The dict representation of the ExplorationMetadata
+            domain object.
+        """
+        return {
+            'title': self.title,
+            'category': self.category,
+            'objective': self.objective,
+            'language_code': self.language_code,
+            'tags': self.tags,
+            'blurb': self.blurb,
+            'author_notes': self.author_notes,
+            'states_schema_version': self.states_schema_version,
+            'init_state_name': self.init_state_name,
+            'param_specs': {
+                ps_name: ps_value.to_dict()
+                for (ps_name, ps_value) in self.param_specs.items()
+            },
+            'param_changes': [
+                p_change.to_dict() for p_change in self.param_changes
+            ],
+            'auto_tts_enabled': self.auto_tts_enabled,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'edits_allowed': self.edits_allowed
+        }

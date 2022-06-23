@@ -48,16 +48,16 @@ from core.tests import test_utils
 (
     app_feedback_report_models, auth_models, blog_models,
     collection_models, config_models, email_models, exp_models,
-    feedback_models, improvements_models, question_models, skill_models,
-    story_models, subtopic_models, suggestion_models, topic_models,
-    user_models
+    feedback_models, improvements_models, learner_group_models,
+    question_models, skill_models, story_models, subtopic_models,
+    suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.auth, models.NAMES.blog,
     models.NAMES.collection, models.NAMES.config, models.NAMES.email,
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.learner_group, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -5044,6 +5044,177 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         for blog_post_rights_model in blog_post_rights_models:
             self.assertTrue(
                 self.user_1_id not in blog_post_rights_model.editor_ids)
+
+
+class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
+    """Provides testing of the deletion part of wipeout service."""
+
+    USER_1_EMAIL = 'some1@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some2@email.com'
+    USER_2_USERNAME = 'username2'
+    USER_3_EMAIL = 'some3@email.com'
+    USER_3_USERNAME = 'username3'
+    USER_4_EMAIL = 'some4@email.com'
+    USER_4_USERNAME = 'username4'
+    LEARNER_GROUP_ID_1 = 'group_id_1'
+    LEARNER_GROUP_ID_2 = 'group_id_2'
+
+    def setUp(self):
+        super(WipeoutServiceDeletelLearnerGroupModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
+        self.signup(self.USER_4_EMAIL, self.USER_4_USERNAME)
+
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.user_3_id = self.get_user_id_from_email(self.USER_3_EMAIL)
+        self.user_4_id = self.get_user_id_from_email(self.USER_4_EMAIL)
+
+        learner_group_models.LearnerGroupModel(
+            id=self.LEARNER_GROUP_ID_1,
+            title='title_1',
+            description='description_1',
+            facilitator_user_ids=[self.user_1_id, self.user_4_id],
+            student_user_ids=[self.user_2_id],
+            invited_student_user_ids=[self.user_3_id],
+            subtopic_page_ids=[],
+            story_ids=[]
+        ).put()
+
+        learner_group_models.LearnerGroupModel(
+            id=self.LEARNER_GROUP_ID_2,
+            title='title_2',
+            description='description_2',
+            facilitator_user_ids=[self.user_1_id],
+            student_user_ids=[self.user_2_id],
+            invited_student_user_ids=[self.user_3_id],
+            subtopic_page_ids=[],
+            story_ids=[]
+        ).put()
+
+    def test_delete_student_is_successful(self):
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+        learner_group_model_1 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_1))
+        learner_group_model_2 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_2))
+
+        self.assertIsNotNone(learner_group_model_1)
+        self.assertIsNotNone(learner_group_model_2)
+
+        self.assertTrue(
+            self.user_2_id in learner_group_model_1.student_user_ids)
+        self.assertTrue(
+            self.user_2_id in learner_group_model_2.student_user_ids)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+
+        # Deleting a user should not delete the learner groups that the user
+        # is a student of but only remove their user id from student_user_ids
+        # field of the learner group models.
+        learner_group_model_1 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_1))
+        learner_group_model_2 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_2))
+
+        self.assertIsNotNone(learner_group_model_1)
+        self.assertIsNotNone(learner_group_model_2)
+
+        self.assertTrue(
+            self.user_2_id not in learner_group_model_1.student_user_ids)
+        self.assertTrue(
+            self.user_2_id not in learner_group_model_2.student_user_ids)
+
+    def test_delete_invited_user_is_successful(self):
+        wipeout_service.pre_delete_user(self.user_3_id)
+        self.process_and_flush_pending_tasks()
+
+        learner_group_model_1 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_1))
+        learner_group_model_2 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_2))
+
+        self.assertIsNotNone(learner_group_model_1)
+        self.assertIsNotNone(learner_group_model_2)
+
+        self.assertTrue(
+            self.user_3_id in learner_group_model_1.invited_student_user_ids)
+        self.assertTrue(
+            self.user_3_id in learner_group_model_2.invited_student_user_ids)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_3_id))
+
+        # Deleting a user should not delete the learner groups that the user
+        # has been invited to join as student but only remove their user id
+        # from invited_student_user_ids field of the learner group models.
+        learner_group_model_1 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_1))
+        learner_group_model_2 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_2))
+
+        self.assertIsNotNone(learner_group_model_1)
+        self.assertIsNotNone(learner_group_model_2)
+
+        self.assertTrue(
+            self.user_3_id not in (
+                learner_group_model_1.invited_student_user_ids))
+        self.assertTrue(
+            self.user_3_id not in (
+                learner_group_model_2.invited_student_user_ids))
+
+    def test_delete_facilitator_is_successful(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        learner_group_model_1 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_1))
+        learner_group_model_2 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_2))
+
+        self.assertIsNotNone(learner_group_model_1)
+        self.assertIsNotNone(learner_group_model_2)
+
+        self.assertTrue(
+            self.user_1_id in learner_group_model_1.facilitator_user_ids)
+        self.assertTrue(
+            self.user_1_id in learner_group_model_2.facilitator_user_ids)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        learner_group_model_1 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_1))
+        learner_group_model_2 = (
+            learner_group_models.LearnerGroupModel.get_by_id(
+                self.LEARNER_GROUP_ID_2))
+
+        # Deleting a user should not delete the learner groups with more
+        # one facilitators including the current user but only remove their
+        # user id from facilitator_user_ids field of the learner group models.
+        self.assertIsNotNone(learner_group_model_1)
+        self.assertTrue(
+            self.user_1_id not in learner_group_model_1.facilitator_user_ids)
+
+        # Deleting a user should delete the learner groups with only the
+        # current user being facilitator.
+        self.assertIsNone(learner_group_model_2)
 
 
 class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
