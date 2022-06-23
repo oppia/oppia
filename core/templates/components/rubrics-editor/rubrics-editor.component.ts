@@ -169,8 +169,8 @@ export class RubricsEditorComponent {
       data: this.editableExplanations[difficulty]
     };
     this.saveRubric.emit(rubricData);
-    this.explanationsMemento[difficulty] =
-    [...this.editableExplanations[difficulty]];
+    this.explanationsMemento[difficulty] = [
+      ...this.editableExplanations[difficulty]];
     this.explanationEditorIsOpen[
       difficulty][
       this.editableExplanations[difficulty].length - 1] = true;
@@ -187,8 +187,8 @@ export class RubricsEditorComponent {
       data: this.editableExplanations[difficulty]
     };
     this.saveRubric.emit(rubricData);
-    this.explanationsMemento[difficulty] =
-    [...this.editableExplanations[difficulty]];
+    this.explanationsMemento[difficulty] = [
+      ...this.editableExplanations[difficulty]];
   }
 
 

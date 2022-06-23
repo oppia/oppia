@@ -16,7 +16,7 @@
   </div>
 
   <div *ngIf="this.selectedRubricIndex != null">
-    <div *ngFor="let explanation of this.rubric.getExplanations(); index as idx">
+    <div *ngFor="let explanation of this.explanationsMemento[this.rubric.getDifficulty()]; index as idx">
       <div *ngIf="!this.explanationEditorIsOpen[this.rubric.getDifficulty()][idx]">
         <div class="oppia-readonly-rule-tile"
              [ngClass]="{'oppia-editable-section': this.isEditable()}">
@@ -55,7 +55,8 @@
           <div>
             <button type="button"
                     class="btn btn-danger protractor-test-delete-rubric-explanation-button"
-                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)">
+                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)"
+                    [disabled]="this.selectedRubricIndex === 1 && this.explanationsMemento[this.rubric.getDifficulty()].length <= 1">
               Delete
             </button>
             <button type="button"
@@ -87,8 +88,8 @@
             [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty()) || this.hasReachedExplanationCountLimit()">
       + ADD EXPLANATION FOR DIFFICULTY
     </button>
-    <div *ngIf="!this.isMediumLevelExplanationValid()"
-         class="rubric-error-message">
+    <div *ngIf="this.explanationsMemento[this.skillDifficultyMedium]?.length <= 1"
+         class="helper-text">
       There should be at least one explanation for the Medium level rubric.
     </div>
   </div>
