@@ -299,7 +299,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 class LoggedOutUserProgressTests(test_utils.GenericTestBase):
     """Tests the fetching of the logged-out user progress."""
 
-    UNIQUE_PROGRESS_URL_ID = 'unique_progress_url_id'
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
     EXP_1_ID = 'exploration_1_id'
 
     def setUp(self):

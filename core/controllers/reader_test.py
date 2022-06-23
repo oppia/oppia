@@ -3048,7 +3048,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
     """Tests for transient checkpoint url handler."""
 
     def test_exploration_page_raises_error_with_invalid_pid(self):
-        unique_progress_url_id = 'invalidID'
+        unique_progress_url_id = 'pid123'
 
         self.get_html_response(
             '/progress/%s' % (unique_progress_url_id),

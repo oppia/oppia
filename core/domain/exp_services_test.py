@@ -7538,7 +7538,7 @@ class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether logged-out user progress is updated correctly"""
 
     EXP_ID = 'exp_id0'
-    UNIQUE_PROGRESS_URL_ID = 'unique_progress_url_id'
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
 
     SAMPLE_EXPLORATION_YAML = (
 """
@@ -7873,7 +7873,7 @@ class SyncLoggedInAndLoggedOutProgressTests(test_utils.GenericTestBase):
     """Tests whether logged-in user progress is synced correctly"""
 
     EXP_ID = 'exp_id0'
-    UNIQUE_PROGRESS_URL_ID = 'unique_progress_url_id'
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
 
     SAMPLE_EXPLORATION_YAML = (
 """
