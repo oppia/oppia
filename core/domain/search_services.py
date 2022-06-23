@@ -248,7 +248,7 @@ def search_explorations(
     # tuple with 2 elements. For the first tuple element, it's return type
     # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
     # the type of first element is always an List[str]. So, to narrow down
-    # the type from Union to List, we used cast here. 
+    # the type from Union to List, we used cast here.
     result_ids, result_offset = cast(
         Tuple[List[str], Optional[int]],
         platform_search_services.search(
@@ -315,7 +315,7 @@ def search_collections(
     # tuple with 2 elements. For the first tuple element, it's return type
     # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
     # the type of first element is always an List[str]. So, to narrow down
-    # the type from Union to List, we used cast here. 
+    # the type from Union to List, we used cast here.
     result_ids, result_offset = cast(
         Tuple[List[str], Optional[int]],
         platform_search_services.search(
@@ -326,6 +326,7 @@ def search_collections(
         )
     )
     return result_ids, result_offset
+
 
 def delete_collections_from_search_index(collection_ids: List[str]) -> None:
     """Removes the given collections from the search index.
