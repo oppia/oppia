@@ -417,6 +417,7 @@ def delete_user(pending_deletion_request):
             ('manager_ids',))
         _pseudonymize_blog_post_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.email)
+    _delete_models(user_id, models.NAMES.learner_group)
 
 
 def verify_user_deleted(user_id, include_delete_at_end_models=False):

@@ -51,6 +51,7 @@ from core.storage.exploration import gae_models as exp_models
 from core.storage.feedback import gae_models as feedback_models
 from core.storage.improvements import gae_models as improvements_models
 from core.storage.job import gae_models as job_models
+from core.storage.learner_group import gae_models as learner_group_models
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.question import gae_models as question_models
 from core.storage.recommendations import gae_models as recommendations_models
@@ -82,6 +83,7 @@ __all__ = [
     'feedback_models',
     'improvements_models',
     'job_models',
+    'learner_group_models',
     'memory_cache_services',
     'opportunity_models',
     'question_models',

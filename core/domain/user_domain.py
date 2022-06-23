@@ -1481,3 +1481,117 @@ class ExplorationUserData:
             'most_recently_reached_checkpoint_state_name': (
                 self.most_recently_reached_checkpoint_state_name)
         }
+
+
+class LearnerGroupsUserDict(TypedDict):
+    """Dictionary for LearnerGroupsUser domain object."""
+
+    user_id: str
+    invited_to_learner_groups_ids: List[str]
+    learner_groups_user_details: List[LearnerGroupUserDetailsDict]
+    learner_groups_user_details_schema_version: int
+
+
+class LearnerGroupUserDetailsDict(TypedDict):
+    """Dictionary for user details of a particular learner group."""
+
+    group_id: str
+    progress_sharing_is_turned_on: bool
+
+
+class LearnerGroupUserDetails:
+    """Domain object for user details of a particular learner group."""
+
+    def __init__(
+        self,
+        group_id: str,
+        progress_sharing_is_turned_on: bool
+    ) -> None:
+        """Constructs a LearnerGroupUserDetails domain object.
+
+        Attributes:
+            group_id: str. The id of the learner group.
+            progress_sharing_is_turned_on: bool. Whether progress sharing is
+                turned on for the learner group.
+        """
+        self.group_id = group_id
+        self.progress_sharing_is_turned_on = progress_sharing_is_turned_on
+
+    def to_dict(self) -> LearnerGroupUserDetailsDict:
+        """Convert the LearnerGroupUserDetails domain instance into a
+        dictionary form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the LearnerGroupUserDetails class
+            information in a dictionary form.
+        """
+        return {
+            'group_id': self.group_id,
+            'progress_sharing_is_turned_on': self.progress_sharing_is_turned_on
+        }
+
+
+class LearnerGroupsUser:
+    """Domain object for learner groups user."""
+
+    def __init__(
+        self,
+        user_id: str,
+        invited_to_learner_groups_ids: List[str],
+        learner_groups_user_details: List[LearnerGroupUserDetails],
+        learner_groups_user_details_schema_version: int
+    ) -> None:
+        """Constructs a LearnerGroupsUser domain object.
+
+        Attributes:
+            user_id: str. The user id.
+            invited_to_learner_groups_ids: list(str). List of learner group ids
+                that the user has been invited to join as student.
+            learner_groups_user_details:
+                list(LearnerGroupUserDetails). List of user details of
+                all learner groups that the user is student of.
+            learner_groups_user_details_schema_version: int. The version
+                of the learner groups user details schema blob.
+        """
+        self.user_id = user_id
+        self.invited_to_learner_groups_ids = invited_to_learner_groups_ids
+        self.learner_groups_user_details = learner_groups_user_details
+        self.learner_groups_user_details_schema_version = (
+            learner_groups_user_details_schema_version)
+
+    def to_dict(self) -> LearnerGroupsUserDict:
+        """Convert the LearnerGroupsUser domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the LearnerGroupsUser class
+            information in a dictionary form.
+        """
+        learner_groups_user_details_dict = [
+            learner_group_details.to_dict()
+            for learner_group_details in self.learner_groups_user_details
+        ]
+
+        return {
+            'user_id': self.user_id,
+            'invited_to_learner_groups_ids':
+                self.invited_to_learner_groups_ids,
+            'learner_groups_user_details': learner_groups_user_details_dict,
+            'learner_groups_user_details_schema_version': (
+                self.learner_groups_user_details_schema_version)
+        }
+
+    def validate(self) -> None:
+        """Validates the LearnerGroupsUser domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the LearnerGroupsUser
+                are invalid.
+        """
+        for learner_group_details in self.learner_groups_user_details:
+            if learner_group_details.group_id in (
+                    self.invited_to_learner_groups_ids):
+                raise utils.ValidationError(
+                    'Learner cannot be invited to join learner group '
+                    '%s since they are already its student.' % (
+                        learner_group_details.group_id))

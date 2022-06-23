@@ -171,6 +171,8 @@
         "scripts.extend_index_yaml_test"
     ],
     "4": [
+        "core.storage.learner_group.gae_models_test",
+        "core.domain.learner_group_domain_test",
         "core.domain.question_fetchers_test",
         "core.domain.exp_domain_test",
         "core.domain.customization_args_util_test",

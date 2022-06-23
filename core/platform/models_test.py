@@ -133,6 +133,15 @@ class RegistryUnitTest(test_utils.TestBase):
             expected_feedback_models,
             self.registry_instance.import_models([models.NAMES.feedback]))
 
+    def test_import_models_learner_group(self) -> None:
+        """Tests import_models function with learner group option."""
+        from core.storage.learner_group import (
+            gae_models as learner_group_models)
+        expected_learner_group_models = (learner_group_models,)
+        self.assertEqual(
+            expected_learner_group_models,
+            self.registry_instance.import_models([models.NAMES.learner_group]))
+
     def test_import_models_job(self) -> None:
         """Tests import_models function with job option."""
         from core.storage.job import gae_models as job_models

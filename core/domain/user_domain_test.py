@@ -1501,3 +1501,108 @@ class ExplorationUserDataTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_user_data.to_dict(),
             expected_exploration_user_data_dict)
+
+
+class LearnerGroupUserDetailsTests(test_utils.GenericTestBase):
+    """Tests for LearnerGroupUserDetails domain object."""
+
+    def test_initialization(self) -> None:
+        learner_group_user_details = (
+            user_domain.LearnerGroupUserDetails(
+                'group_id_1', True))
+
+        expected_learner_grp_user_details_dict = {
+            'group_id': 'group_id_1',
+            'progress_sharing_is_turned_on': True
+        }
+
+        self.assertEqual(
+            learner_group_user_details.group_id, 'group_id_1')
+        self.assertEqual(
+            learner_group_user_details.progress_sharing_is_turned_on, True)
+        self.assertEqual(
+            learner_group_user_details.to_dict(),
+            expected_learner_grp_user_details_dict)
+
+    def test_to_dict(self) -> None:
+        learner_group_user_details = (
+            user_domain.LearnerGroupUserDetails(
+                'group_id_1', True))
+        expected_learner_grp_user_details_dict = {
+            'group_id': 'group_id_1',
+            'progress_sharing_is_turned_on': True
+        }
+
+        self.assertEqual(
+            learner_group_user_details.to_dict(),
+            expected_learner_grp_user_details_dict)
+
+
+class LearnerGroupsUserTest(test_utils.GenericTestBase):
+    """Tests for LearnerGroupsUser domain object."""
+
+    def test_initialization(self) -> None:
+        learner_group_user_details = (
+            user_domain.LearnerGroupUserDetails(
+                'group_id_1', False))
+        learner_group_user = user_domain.LearnerGroupsUser(
+            'user1', ['group_id_2', 'group_id_3'],
+            [learner_group_user_details], 1)
+
+        expected_learner_group_user_dict = {
+            'user_id': 'user1',
+            'invited_to_learner_groups_ids': ['group_id_2', 'group_id_3'],
+            'learner_groups_user_details': [
+                {
+                    'group_id': 'group_id_1',
+                    'progress_sharing_is_turned_on': False
+                }
+            ],
+            'learner_groups_user_details_schema_version': 1
+        }
+
+        self.assertEqual(learner_group_user.user_id, 'user1')
+        self.assertEqual(
+            learner_group_user.invited_to_learner_groups_ids,
+            ['group_id_2', 'group_id_3'])
+        self.assertEqual(
+            learner_group_user.learner_groups_user_details,
+            [learner_group_user_details])
+        self.assertEqual(
+            learner_group_user.learner_groups_user_details_schema_version, 1)
+        self.assertEqual(
+            learner_group_user.to_dict(),
+            expected_learner_group_user_dict)
+
+    def test_to_dict(self) -> None:
+        learner_group_user_details = (
+            user_domain.LearnerGroupUserDetails('group_id_1', False))
+        learner_group_user = user_domain.LearnerGroupsUser(
+            'user1', ['group_id_2', 'group_id_3'],
+            [learner_group_user_details], 1)
+
+        expected_learner_group_user_dict = {
+            'user_id': 'user1',
+            'invited_to_learner_groups_ids': ['group_id_2', 'group_id_3'],
+            'learner_groups_user_details': [
+                {
+                    'group_id': 'group_id_1',
+                    'progress_sharing_is_turned_on': False
+                }
+            ],
+            'learner_groups_user_details_schema_version': 1
+        }
+
+        self.assertEqual(
+            learner_group_user.to_dict(),
+            expected_learner_group_user_dict)
+
+    def test_validation(self) -> None:
+        learner_group_user_details = (
+            user_domain.LearnerGroupUserDetails('group_id_1', True))
+
+        self._assert_validation_error( # type: ignore[no-untyped-call]
+            user_domain.LearnerGroupsUser(
+                'user1', ['group_id_1'], [learner_group_user_details], 1),
+            'Learner cannot be invited to join learner group group_id_1 since '
+            'they are already its student.')
