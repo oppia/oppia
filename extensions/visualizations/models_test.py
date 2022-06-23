@@ -18,8 +18,9 @@
 
 from __future__ import annotations
 
-from core.tests import test_utils
 from core import utils
+from core.tests import test_utils
+
 from . import models
 
 
