@@ -270,15 +270,15 @@
     <div ng-if="!isVoiceoverModeActive()" class="oppia-state-content-header">Translated content</div>
     <div class="translated-state-contents">
       <div class="oppia-translated-content-display oppia-transition-200"
-          ng-class="{'oppia-prevent-selection': isEditable()}"
-          title="Translated Content">
+           ng-class="{'oppia-prevent-selection': isEditable()}"
+           title="Translated Content">
         <span class="oppia-placeholder" ng-if="!activeTranslatedContent || activeTranslatedContent.translation === ''">
           This section has not been translated yet.
         </span>
         <span ng-if="activeTranslatedContent">
           <angular-html-bind ng-if="activeTranslatedContent.isHtml()"
-                              html-data="activeTranslatedContent.getTranslation()"
-                              class="oppia-rte-editor protractor-test-translation-display">
+                             html-data="activeTranslatedContent.getTranslation()"
+                             class="oppia-rte-editor protractor-test-translation-display">
           </angular-html-bind>
           <p ng-if="activeTranslatedContent.isUnicode()">
             {{activeTranslatedContent.getTranslation()}}

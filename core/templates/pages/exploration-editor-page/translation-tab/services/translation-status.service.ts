@@ -144,12 +144,14 @@ angular.module('oppia').factory('TranslationStatusService', [
             INTERACTION_SPECS[interactionId].is_terminal) {
             var contentIdToRemove = _getContentIdListRelatedToComponent(
               COMPONENT_NAME_HINT, allContentIds);
-            // Excluding default_outcome content status as default outcome's
-            // content is left empty so the translation or voiceover is not
-            // required.
-            contentIdToRemove.push('default_outcome');
             allContentIds = allContentIds.filter(function(contentId) {
-              return contentIdToRemove.indexOf(contentId) < 0;
+              return !(
+                // Excluding default_outcome content status as default outcome's
+                // content is left empty so the translation or voiceover is not
+                // required.
+                contentId.startsWith('default_outcome_') ||
+                contentIdToRemove.indexOf(contentId) > 0
+              );
             });
           }
 
