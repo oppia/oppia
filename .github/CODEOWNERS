@@ -699,7 +699,7 @@
 # Data stability.
 /core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers
 /core/controllers/payload_validator*.py @oppia/data-and-stability-reviewers
-/core/handler_schema_constants.py @oppia/data-and-stability-reviewers
+/core/handler_schema_constants*.py @oppia/data-and-stability-reviewers
 
 
 # QA team.
