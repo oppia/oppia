@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import DragAndDropSortInput
+from . import DragAndDropSortInput # pylint: disable=unused-import
 
 
 class DragAndDropSortInputTests(test_utils.GenericTestBase):

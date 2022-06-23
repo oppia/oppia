@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import CodeRepl
+from . import CodeRepl # pylint: disable=unused-import
 
 
 class CodeReplTests(test_utils.GenericTestBase):

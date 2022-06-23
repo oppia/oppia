@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import app_feedback_report_constants
+from . import app_feedback_report_constants # pylint: disable=unused-import
 
 
 class AppFeedbackReportConstantsTests(test_utils.GenericTestBase):

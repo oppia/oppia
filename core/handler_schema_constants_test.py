@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import handler_schema_constants
+from . import handler_schema_constants # pylint: disable=unused-import
 
 
 class HandlerSchemaConstantsTests(test_utils.GenericTestBase):

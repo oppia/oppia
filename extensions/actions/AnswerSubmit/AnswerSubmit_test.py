@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import AnswerSubmit
+from . import AnswerSubmit # pylint: disable=unused-import
 
 
 class AnswerSubmitTests(test_utils.GenericTestBase):

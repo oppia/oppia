@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import AlgebraicExpressionInput
+from . import AlgebraicExpressionInput # pylint: disable=unused-import
 
 
 class AlgebraicExpressionInputTests(test_utils.GenericTestBase):

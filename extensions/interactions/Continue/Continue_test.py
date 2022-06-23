@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import Continue
+from . import Continue # pylint: disable=unused-import
 
 
 class ContinueTests(test_utils.GenericTestBase):
