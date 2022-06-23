@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.rtl.css" as="style">
+
 <div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" *ngIf="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
        [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
@@ -10,7 +13,8 @@
       <oppia-tutor-card [displayedCard]="displayedCard"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
-                        [startCardChangeAnimation]="startCardChangeAnimation">
+                        [startCardChangeAnimation]="startCardChangeAnimation"
+                        [inStoryMode]="inStoryMode">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -96,3 +100,17 @@
     </div>
   </div>
 </div>
+
+<div *ngIf="isProgressClearanceMessageShown()" class="oppia-exploration-checkpoints-message">
+  <div id="toast-container" class="toast-top-center toast-container">
+    <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
+      <div aria-live="polite" role="alertdialog" class="toast-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate}}">
+        {{ 'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.rtl.css">

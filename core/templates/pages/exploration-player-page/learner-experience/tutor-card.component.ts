@@ -16,7 +16,7 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, Input, SimpleChanges, ViewChild, Renderer2 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
@@ -43,6 +43,14 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
+import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
+const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;
+const CONFETTI_ANIMATION_DELAY_IN_MSECS = 2000;
+const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
 
 import './tutor-card.component.css';
 
@@ -70,7 +78,7 @@ import './tutor-card.component.css';
     trigger('fadeInOut', [
       transition('void => *', []),
       transition('* <=> *', [
-        style({ opacity: 1 }),
+        style({ opacity: 0 }),
         animate('1s ease', keyframes([
           style({ opacity: 0 }),
           style({ opacity: 1 })
@@ -80,10 +88,13 @@ import './tutor-card.component.css';
   ]
 })
 export class TutorCardComponent {
+  @ViewChild('checkMark') checkMarkComponent: EndChapterCheckMarkComponent;
+  @ViewChild('confetti') confettiComponent: EndChapterConfettiComponent;
   @Input() displayedCard: StateCard;
   @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
+  @Input() inStoryMode: boolean;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;
@@ -98,6 +109,11 @@ export class TutorCardComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   OPPIA_AVATAR_LINK_URL: string;
   profilePicture: string;
+  checkMarkHidden: boolean = true;
+  animationHasPlayedOnce: boolean = false;
+  checkMarkSkipped: boolean = false;
+  confettiAnimationTimeout: NodeJS.Timeout | null = null;
+  skipClickListener: Function | null = null;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -116,7 +132,9 @@ export class TutorCardComponent {
     private urlService: UrlService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
@@ -171,6 +189,49 @@ export class TutorCardComponent {
         changes.displayedCard.previousValue,
         changes.displayedCard.currentValue)) {
       this.updateDisplayedCard();
+    }
+    if (
+      this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
+      this.isOnTerminalCard() &&
+      !this.animationHasPlayedOnce &&
+      this.inStoryMode
+    ) {
+      this.triggerCelebratoryAnimation();
+    }
+  }
+
+  triggerCelebratoryAnimation(): void {
+    this.checkMarkHidden = false;
+    this.checkMarkComponent.animateCheckMark();
+    this.skipClickListener = this.renderer.listen(
+      'document', 'click', () => {
+        clearTimeout(this.confettiAnimationTimeout);
+        this.checkMarkSkipped = true;
+        setTimeout(() => {
+          this.checkMarkHidden = true;
+        }, CHECK_MARK_HIDE_DELAY_IN_MSECS);
+      });
+    this.animationHasPlayedOnce = true;
+    let mediaQuery =
+      this.windowRef.nativeWindow.matchMedia('(prefers-reduced-motion)');
+    if (mediaQuery.matches) {
+      setTimeout(() => {
+        this.checkMarkSkipped = true;
+        setTimeout(() => {
+          this.checkMarkHidden = true;
+          this.skipClickListener();
+          this.skipClickListener = null;
+        }, CHECK_MARK_HIDE_DELAY_IN_MSECS);
+      }, REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS);
+    } else {
+      this.confettiAnimationTimeout = setTimeout(() => {
+        this.confettiComponent.animateConfetti();
+      }, CONFETTI_ANIMATION_DELAY_IN_MSECS);
+      setTimeout(() => {
+        this.checkMarkHidden = true;
+        this.skipClickListener();
+        this.skipClickListener = null;
+      }, STANDARD_ANIMATION_DURATION_IN_MSECS);
     }
   }
 
