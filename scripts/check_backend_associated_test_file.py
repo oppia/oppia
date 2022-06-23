@@ -75,6 +75,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
 
 def main() -> None:
     """Finds the non-empty backend files that lack an associated test file."""
+
     all_backend_files = []
     for (root, _, files) in os.walk(TOPMOST_LEVEL_PATH):
         for file in files:
@@ -89,7 +90,12 @@ def main() -> None:
     files_without_test = []
     for file in all_backend_files:
         if not file.endswith('_test.py'):
-            test_file = file.replace(file[len(file) - 3:], '_test.py')
+            # Replace last occurance of '.py' with '_test.py' to get the
+            # associated test file.
+            to_be_replaced = '.py'
+            to_replace_with = '_test.py'
+            test_file = file[::-1].replace(
+                to_be_replaced[::-1], to_replace_with[::-1], 1)[::-1] 
             if test_file not in all_backend_files:
                 files_without_test.append(file)
 
