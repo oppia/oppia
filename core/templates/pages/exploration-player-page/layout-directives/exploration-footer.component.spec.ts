@@ -444,8 +444,8 @@ describe('ExplorationFooterComponent', () => {
       correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'Mid',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'Mid',
       most_recently_reached_checkpoint_state_name: 'Mid',
       most_recently_reached_checkpoint_exp_version: 1
     };
@@ -648,8 +648,8 @@ describe('ExplorationFooterComponent', () => {
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     };
@@ -725,8 +725,8 @@ describe('ExplorationFooterComponent', () => {
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     };

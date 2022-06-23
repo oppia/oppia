@@ -220,9 +220,9 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
-    // User clicks on Oppia logo to leave exploration.
+    // User clicks on Oppia logo to leave exploration, user should be
+    // able to leave the page directly without getting any alert message.
     await action.click('Oppia logo', oppiaLogo);
-    await general.acceptAlert();
 
     // Go to 'Test Exploration'.
     await libraryPage.get();
@@ -362,9 +362,9 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
-    // User clicks on Oppia logo to leave collection.
+    // User clicks on Oppia logo to leave collection, user should be
+    // able to leave the page directly without getting any alert message.
     await action.click('Oppia logo', oppiaLogo);
-    await general.acceptAlert();
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.

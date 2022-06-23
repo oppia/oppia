@@ -52,8 +52,8 @@ export interface FetchExplorationBackendResponse {
   'record_playthrough_probability': number;
   'draft_change_list_id': number;
   'has_viewed_lesson_info_modal_once': boolean;
-  'furthest_completed_checkpoint_exp_version': number;
-  'furthest_completed_checkpoint_state_name': string;
+  'furthest_reached_checkpoint_exp_version': number;
+  'furthest_reached_checkpoint_state_name': string;
   'most_recently_reached_checkpoint_state_name': string;
   'most_recently_reached_checkpoint_exp_version': number;
 }

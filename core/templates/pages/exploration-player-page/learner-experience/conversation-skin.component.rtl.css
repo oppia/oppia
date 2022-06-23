@@ -132,6 +132,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 .oppia-exploration-checkpoints-message .checkpoints-toast-info {
   background-color: #337ab7;
+  width: 330px;
 }
 
 @media screen and (max-width: 959px) {

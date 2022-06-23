@@ -143,6 +143,7 @@ export class ConversationSkinComponent {
   completedStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
+  showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
 
   constructor(
@@ -298,17 +299,6 @@ export class ConversationSkinComponent {
           this.statsReportingService.recordMaybeLeaveEvent(
             this.playerTranscriptService.getLastStateName(),
             this.learnerParamsService.getAllParams());
-          let confirmationMessage = (
-            'If you navigate away from this page, your progress on the ' +
-            'exploration will be lost.');
-          if (!this.isIframed && this.isLoggedIn) {
-            confirmationMessage = (
-              'If you navigate away from this page, your progress after the ' +
-              'last completed checkpoint will be lost.');
-          }
-          (e || this.windowRef.nativeWindow.event).returnValue = (
-            confirmationMessage);
-          return confirmationMessage;
         }
       });
 
@@ -892,6 +882,19 @@ export class ConversationSkinComponent {
             this.recommendedExplorationSummaries = summaries;
           });
       }
+
+      if (!this.showProgressClearanceMessage) {
+        this.showProgressClearanceMessage = true;
+        setTimeout(() => {
+          let alertInfoElement = document.querySelector(
+            '.oppia-exploration-checkpoints-message');
+
+          // Remove the alert message after 6 sec.
+          if (alertInfoElement) {
+            alertInfoElement.remove();
+          }
+        }, this.alertMessageTimeout);
+      }
     }
   }
 
@@ -1349,6 +1352,10 @@ export class ConversationSkinComponent {
         this.displayedCard.getStateName()) !== -1
       )
     );
+  }
+
+  isProgressClearanceMessageShown(): boolean {
+    return this.showProgressClearanceMessage;
   }
 }
 

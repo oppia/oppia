@@ -83,8 +83,8 @@ describe('Read only exploration backend API service', () => {
     correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
-    furthest_completed_checkpoint_exp_version: 1,
-    furthest_completed_checkpoint_state_name: 'State B',
+    furthest_reached_checkpoint_exp_version: 1,
+    furthest_reached_checkpoint_state_name: 'State B',
     most_recently_reached_checkpoint_state_name: 'State A',
     most_recently_reached_checkpoint_exp_version: 1
   };
@@ -233,8 +233,8 @@ describe('Read only exploration backend API service', () => {
       draft_change_list_id: 0,
       preferred_language_codes: [],
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     });
@@ -261,8 +261,8 @@ describe('Read only exploration backend API service', () => {
       draft_change_list_id: 0,
       preferred_language_codes: [],
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     });
@@ -286,8 +286,8 @@ describe('Read only exploration backend API service', () => {
       draft_change_list_id: 0,
       preferred_language_codes: [],
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     });
