@@ -32,7 +32,7 @@ var customizeInteraction = async function(elem, placeholderText) {
 
 var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
   await waitFor.presenceOf(
-   elem.$('<oppia-interactive-numeric-expression-input>'),
+    elem.$('<oppia-interactive-numeric-expression-input>'),
     'The numeric expression input editor took too long to load.');
   if (placeholderText) {
     expect(

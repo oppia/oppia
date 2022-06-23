@@ -66,7 +66,7 @@ var ProfilePage = function() {
     var interestTexts = await interests.map(async function(interestElem) {
       await waitFor.visibilityOf(
         interestElem,
-        'InterestElem is taking too long to appear'); 
+        'InterestElem is taking too long to appear');
       return await interestElem.getText();
     });
     for (var index = 0; index < interestTexts.length; index++) {
