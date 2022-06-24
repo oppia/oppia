@@ -7915,3 +7915,26 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             old_model.metadata_version_history,
             new_model.metadata_version_history)
         self.assertEqual(old_model.committer_ids, new_model.committer_ids)
+
+    def test_version_history_on_cancelled_add_state(self):
+        # In this case, the version history for that state should not be
+        # recorded because it was added and deleted in the same commit.
+        old_model = self.version_history_model_class.get(
+            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+        change_list = [
+          exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+          }), exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_DELETE_STATE,
+              'state_name': 'New state'
+          })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list,
+            'Added and deleted state')
+        new_model = self.version_history_model_class.get(
+            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+
+        self.assertIsNone(old_model.state_version_history.get('New state'))
+        self.assertIsNone(new_model.state_version_history.get('New state'))
