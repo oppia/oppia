@@ -356,6 +356,9 @@ describe('Exploration editor page component', function() {
 
       expect(ctrl.startEditorTutorial).toHaveBeenCalled();
       expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
+
+      flush();
+      discardPeriodicTasks();
     }));
 
     it('should start editor tutorial when not on main page', () => {
