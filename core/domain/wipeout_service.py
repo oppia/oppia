@@ -1458,6 +1458,8 @@ def _pseudonymize_version_history_models(pending_deletion_request):
         Args:
             version_history_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
+            pseudonymized_id: str. New pseudonymized user ID to be used for
+                the models.
         """
         for model in version_history_models:
             # Pseudonymize user id from state_version_history.
