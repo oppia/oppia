@@ -41,7 +41,7 @@ from core.constants import constants
 from typing import ( # isort:skip
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
-from typing_extensions import Literal
+from typing_extensions import Literal # isort:skip
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
