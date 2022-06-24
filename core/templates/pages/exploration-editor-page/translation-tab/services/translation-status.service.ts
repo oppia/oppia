@@ -263,14 +263,11 @@ export class TranslationStatusService implements OnInit {
       contentIdList.forEach((contentId) => {
         let availabilityStatus = this._getActiveStateContentAvailabilityStatus(
           contentId);
-        console.error('availabilityStatus');
-        console.error(availabilityStatus);
         if (availabilityStatus.available) {
           availableAudioCount++;
         }
       });
       if (contentIdList.length === availableAudioCount) {
-        console.error('this is called' + this.ALL_ASSETS_AVAILABLE_COLOR);
         return this.ALL_ASSETS_AVAILABLE_COLOR;
       } else if (availableAudioCount === 0) {
         return this.NO_ASSETS_AVAILABLE_COLOR;
