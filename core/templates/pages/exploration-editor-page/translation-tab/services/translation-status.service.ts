@@ -37,11 +37,11 @@ interface AvailabilityStatus {
   providedIn: 'root'
 })
 export class TranslationStatusService implements OnInit {
-  AUDIO_NEEDS_UPDATE_MESSAGE: string[];
-  TRANSLATION_NEEDS_UPDATE_MESSAGE: string[];
-  ALL_ASSETS_AVAILABLE_COLOR: string;
-  FEW_ASSETS_AVAILABLE_COLOR: string;
-  NO_ASSETS_AVAILABLE_COLOR: string;
+  AUDIO_NEEDS_UPDATE_MESSAGE: string[] = ['Audio needs update!'];
+  TRANSLATION_NEEDS_UPDATE_MESSAGE: string[] = ['Translation needs update!'];
+  ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
+  FEW_ASSETS_AVAILABLE_COLOR: string = '#E9B330';
+  NO_ASSETS_AVAILABLE_COLOR: string = '#D14836';
   langCode: string;
   stateNeedsUpdateWarnings: object;
   stateWiseStatusColor: object;
@@ -60,12 +60,6 @@ export class TranslationStatusService implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
-    this.TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
-    this.ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
-    this.FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
-    this.NO_ASSETS_AVAILABLE_COLOR = '#D14836';
-
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     this.stateNeedsUpdateWarnings = {};
     this.stateWiseStatusColor = {};
@@ -269,11 +263,14 @@ export class TranslationStatusService implements OnInit {
       contentIdList.forEach((contentId) => {
         let availabilityStatus = this._getActiveStateContentAvailabilityStatus(
           contentId);
+        console.error('availabilityStatus');
+        console.error(availabilityStatus);
         if (availabilityStatus.available) {
           availableAudioCount++;
         }
       });
       if (contentIdList.length === availableAudioCount) {
+        console.error('this is called' + this.ALL_ASSETS_AVAILABLE_COLOR);
         return this.ALL_ASSETS_AVAILABLE_COLOR;
       } else if (availableAudioCount === 0) {
         return this.NO_ASSETS_AVAILABLE_COLOR;
