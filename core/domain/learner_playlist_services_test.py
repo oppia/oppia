@@ -96,6 +96,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if learner_playlist_model:
             exp_ids: List[str] = learner_playlist_model.exploration_ids
             return exp_ids
@@ -111,6 +114,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
         if learner_playlist_model:
             collection_ids: List[str] = learner_playlist_model.collection_ids
             return collection_ids
