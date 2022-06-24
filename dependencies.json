@@ -175,9 +175,7 @@
         "bundle": {
           "css": [
             "css/fontawesome.min.css",
-            "css/brands.min.css",
-            "css/regular.min.css",
-            "css/solid.min.css"
+            "css/brands.min.css"
           ],
           "fontsPath": "webfonts"
         }
