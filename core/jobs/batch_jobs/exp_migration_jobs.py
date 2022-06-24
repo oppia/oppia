@@ -25,6 +25,7 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -42,8 +43,10 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import user_models
 
-(base_models, exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
+(base_models, exp_models, user_models) = (
+    models.Registry.import_models(
+        [models.NAMES.base_model, models.NAMES.exploration,
+         models.NAMES.user, models.NAMES.opportunity]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -163,7 +166,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
     def _update_exploration(
         exp_model: exp_models.ExplorationModel,
         exp_rights_model: exp_models.ExplorationRightsModel,
-        exp_context_models: list(exp_models.ExplorationContextModel),
         migrated_exp: exp_domain.Exploration,
         exp_changes: Sequence[exp_domain.ExplorationChange]
     ) -> Sequence[base_models.BaseModel]:
@@ -174,8 +176,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 updated.
             exp_rights_model: ExplorationRightsModel. The exploration rights
                 model which is to be updated.
-            exp_context_models: list(ExplorationContextModel). The list of
-                exploration context models relevant to the exploration.
             migrated_exp: Exploration. The migrated exploration domain
                 object.
             exp_changes: sequence(ExplorationChange). The exploration changes
@@ -188,10 +188,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         updated_exp_model = (
             exp_services.populate_exp_model_fields(
                 exp_model, migrated_exp))
-        if (
-            len(exp_context_models) > 0 and
-                exp_context_models[0] is not None):
-            exp_services.validate_exploration_for_story(migrated_exp, True)
 
         commit_message = (
             'Update exploration states schema version to %d.'
@@ -200,6 +196,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
         change_dicts = [change.to_dict() for change in exp_changes]
         with datastore_services.get_ndb_context():
+            if exp_services.get_story_id_linked_to_exploration(
+                migrated_exp.id) is not None:
+                exp_services.validate_exploration_for_story(migrated_exp, True)
+
             models_to_put = updated_exp_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USERNAME,
                 feconf.COMMIT_TYPE_EDIT,
@@ -207,6 +207,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 change_dicts,
                 additional_models={'rights_model': exp_rights_model}
             ).values()
+
+            if opportunity_services.is_exploration_available_for_contribution(
+                migrated_exp.id):
+                (
+                    opportunity_services
+                    .update_opportunity_with_updated_exploration(
+                        migrated_exp.id))
         datastore_services.update_timestamps_multi(list(models_to_put))
 
         return models_to_put
@@ -268,14 +275,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 lambda exp_summary_model: exp_summary_model.id)
         )
 
-        exp_context_models = (
-            self.pipeline
-            | 'Get all non-deleted exploration context models' >> (
-                ndb_io.GetModels(exp_models.ExplorationContextModel.get_all()))
-            | 'Add exploration context ID' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
-                lambda exp_context_model: exp_context_model.id)
-        )
-
         exp_user_data_models = (
             self.pipeline
             | 'Get all non-deleted exploration user data models' >> (
@@ -317,7 +316,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exp_summary_model': exp_summary_models,
                 'exp_rights_model': exp_rights_models,
                 'exploration': migrated_exp,
-                'exp_context_model': exp_context_models,
                 'exp_changes': exp_changes
             }
             | 'Merge objects' >> beam.CoGroupByKey()
@@ -330,7 +328,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exploration': objects['exploration'][0],
                 'exp_rights_model': objects['exp_rights_model'][0],
                 'exp_summary_model': objects['exp_summary_model'][0],
-                'exp_context_model': objects['exp_context_model'],
                 'exp_changes': objects['exp_changes']
             })
         )
@@ -357,7 +354,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 lambda exp_objects: self._update_exploration(
                     exp_objects['exp_model'],
                     exp_objects['exp_rights_model'],
-                    exp_objects['exp_context_model'],
                     exp_objects['exploration'],
                     exp_objects['exp_changes'],
                 ))
