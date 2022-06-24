@@ -76,7 +76,6 @@ describe('Exploration editor page component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
   let as: AlertsService = null;
   var cs = null;
@@ -255,7 +254,6 @@ describe('Exploration editor page component', function() {
       }
     });
 
-    aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
