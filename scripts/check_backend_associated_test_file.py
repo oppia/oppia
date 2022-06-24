@@ -67,7 +67,6 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/third_party_size_check.py',
     'scripts/linters/warranted_angular_security_bypasses.py',
     'core/feconf.py',
-    'core/domain/cron_services.py',
     'core/platform/datastore/cloud_datastore_services.py',
     'core/platform/transactions/cloud_transaction_services.py',
 ]
@@ -112,19 +111,19 @@ def main() -> None:
         if file not in FILES_WITHOUT_ASSOCIATED_TEST_FILES:
             errors += (
                 '\033[1m{}\033[0m does not have an associated test file.'
-                ' Make sure it\'s fully tested by it\'s associated test'
+                ' Make sure it\'s fully tested by its associated test'
                 ' file.\n'.format(file))
 
     if errors:
-        print('------------------------------------------------')
-        print('Some backend files lack an associated test file.')
-        print('------------------------------------------------')
+        print('-------------------------------------------')
+        print('Backend associated test file checks failed.')
+        print('-------------------------------------------')
         logging.error(errors)
         sys.exit(1)
     else:
-        print('-----------------------------------------------')
-        print('All backend files have an associated test file.')
-        print('-----------------------------------------------')
+        print('-------------------------------------------')
+        print('Backend associated test file checks passed.')
+        print('-------------------------------------------')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
