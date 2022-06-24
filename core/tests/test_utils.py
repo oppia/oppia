@@ -60,6 +60,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import translation_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -2514,7 +2515,8 @@ title: Title
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
-    def set_interaction_for_state(self, state, interaction_id):
+    def set_interaction_for_state(
+            self, state, interaction_id, content_id_generator):
         """Sets the interaction_id, sets the fully populated default interaction
         customization arguments, and increments next_content_id_index as needed.
 
@@ -2522,13 +2524,10 @@ title: Title
             state: State. The state domain object to set the interaction for.
             interaction_id: str. The interaction id to set. Also sets the
                 default customization args for the given interaction id.
+            content_id_generator: ContentIdGenerator. A ContentIdGenerator
+                object to be used for generating content Ids.
         """
-
-        # We wrap next_content_id_index in a dict so that modifying it in the
-        # inner function modifies the value.
-        next_content_id_index_dict = {'value': 0} #Here 0 is written by @Nik-09
-
-        def traverse_schema_and_assign_content_ids(value, schema, contentId):
+        def traverse_schema_and_assign_content_ids(value, schema, ca_name):
             """Generates content_id from recursively traversing the schema, and
             assigning to the current value.
 
@@ -2536,7 +2535,8 @@ title: Title
                 value: *. The current traversed value in customization
                     arguments.
                 schema: dict. The current traversed schema.
-                contentId: str. The content_id generated so far.
+                ca_name: str. The arg name which will be used for generating
+                    content_id.
             """
             is_subtitled_html_spec = (
                 schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
@@ -2548,19 +2548,19 @@ title: Title
                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
-                value['content_id'] = '%s_%i' % (
-                    contentId, next_content_id_index_dict['value'])
-                next_content_id_index_dict['value'] += 1
+                value['content_id'] = content_id_generator.generate(
+                    translation_domain.ContentType.CUSTOMIZATION_ARG,
+                    extra_prefix=ca_name)
             elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
                     traverse_schema_and_assign_content_ids(
-                        x, schema['items'], contentId)
+                        x, schema['items'], ca_name)
             elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     traverse_schema_and_assign_content_ids(
                         schema['properties'][schema_property.name],
                         schema_property['schema'],
-                        '%s_%s' % (contentId, schema_property.name))
+                        '%s_%s' % (ca_name, schema_property.name))
 
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(interaction_id))
@@ -2571,7 +2571,7 @@ title: Title
             ca_name = ca_spec.name
             ca_value = ca_spec.default_value
             traverse_schema_and_assign_content_ids(
-                ca_value, ca_spec.schema, 'ca_%s' % ca_name)
+                ca_value, ca_spec.schema, ca_name)
             customization_args[ca_name] = {'value': ca_value}
 
         state.update_interaction_id(interaction_id)
@@ -2609,17 +2609,26 @@ title: Title
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
             language_code=language_code)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], interaction_id)
+            exploration.states[exploration.init_state_name], interaction_id,
+            content_id_generator)
 
         exploration.objective = objective
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
-            exploration.add_states([end_state_name])
+            exploration.add_state(
+                end_state_name,
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME))
             end_state = exploration.states[end_state_name]
-            self.set_interaction_for_state(end_state, 'EndExploration')
+            self.set_interaction_for_state(
+                end_state, 'EndExploration', content_id_generator)
             end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
@@ -2628,6 +2637,8 @@ title: Title
             init_interaction.default_outcome.dest = end_state_name
             if correctness_feedback_enabled:
                 init_interaction.default_outcome.labelled_as_correct = True
+            exploration.next_content_id_index = (
+                content_id_generator.next_content_id_index)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
@@ -2672,70 +2683,35 @@ title: Title
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
 
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
-        exploration.add_states(state_names[1:])
+        for state_name in state_names[1:]:
+            exploration.add_state(
+                state_name,
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME))
         for from_state_name, dest_state_name in (
                 zip(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
-                from_state, next(interaction_ids))
+                from_state, next(interaction_ids), content_id_generator)
             from_state.interaction.default_outcome.dest = dest_state_name
             if correctness_feedback_enabled:
                 from_state.interaction.default_outcome.labelled_as_correct = (
                     True)
         end_state = exploration.states[state_names[-1]]
-        self.set_interaction_for_state(end_state, 'EndExploration')
+        self.set_interaction_for_state(
+            end_state, 'EndExploration', content_id_generator)
         end_state.update_interaction_default_outcome(None)
 
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
-
-    def save_new_exp_with_custom_states_schema_version(
-            self, exp_id, user_id, states_dict, version):
-        """Saves a new default exploration with the given version of state dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            states_dict: dict. The dict representation of all the states.
-            version: int. Custom states schema version.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title='title',
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=version,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME, states=states_dict,
-            param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'title\'.'
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title='title', category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
 
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.

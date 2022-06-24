@@ -1522,10 +1522,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.next_content_id_index = next_content_id_index
 
+    # DubeySandeep: Should we generate the new content_id internally?
     def add_state(
         self, state_name, content_id_for_state_content,
         content_id_for_default_outcome):
-        """TODO
+        """Adds new state in the exploration with the given state name.
+
+        Args:
+            state_name: The new state name.
+            content_id_for_state_content: The content_id for the new state
+                content.
+            content_id_for_default_outcome: The content_id for the default
+                outcome of the new state.
         """
         self.states[state_name] = state_domain.State.create_default_state(
                 state_name, content_id_for_state_content,

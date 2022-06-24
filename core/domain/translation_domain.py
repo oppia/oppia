@@ -58,8 +58,8 @@ class TranslatableContentFormat(enum.Enum):
             bool. Whether the content of translation is a list.
         """
         return data_format in (
-            cls.SET_OF_NORMALIZED_STRING,
-            cls.SET_OF_UNICODE_STRING
+            cls.SET_OF_NORMALIZED_STRING.value,
+            cls.SET_OF_UNICODE_STRING.value
         )
 
 
@@ -984,12 +984,16 @@ class ContentIdGenerator:
     """Class to generate the content-id for a translatable content based on the
     next_content_id_index variable.
     """
-    def __init__(self, start_index=0):
+    def __init__(self, start_index: int = 0) -> None:
         """Constructs an ContentIdGenerator object."""
         self.next_content_id_index = start_index
 
-    def generate(self, content_type):
+    def generate(self, content_type: ContentType, extra_prefix='') -> str:
         """Generates the new content-id from the next content id."""
-        content_id = content_type.value + '_' + str(self.next_content_id_index)
+        content_id = content_type.value + '_'
+        if extra_prefix:
+            content_id += extra_prefix + '_'
+        content_id += str(self.next_content_id_index)
+
         self.next_content_id_index += 1
         return content_id

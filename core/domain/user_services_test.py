@@ -2083,7 +2083,13 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: New state
         feedback:
@@ -2094,7 +2100,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: null
+      id: TextInput
       solution: null
     linked_skill_id: null
     next_content_id_index: 0
@@ -2103,6 +2109,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+        ca_placeholder_2: {}
     solicit_answer_details: false
     card_is_checkpoint: false
     written_translations:
