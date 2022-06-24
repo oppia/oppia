@@ -15,32 +15,16 @@
 /**
  * @fileoverview Unit tests for the csrf service
  */
-
-// This needs to be imported first instead of using the global definition
-// because Angular doesn't support global definitions and every library used
-// needs to be imported explicitly.
-import $ from 'jquery';
-
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService;
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
-    // TODO(#8035): Remove the use of $.ajax in csrf-token.service
-    // and hence this ts-ignore once all the services are migrated.
-
-    // This throws "Argument of type '(options: any)' is not
-    // assignable to parameter of type 'jqXHR<any>'.". We need to suppress
-    // this error because we need to mock $.ajax to this function for
-    // testing purposes.
-    // @ts-expect-error
-    spyOn($, 'ajax').and.callFake((options: Promise) => {
-      let d = $.Deferred();
-      d.resolve(
-        options.dataFilter('12345{"token": "sample-csrf-token"}')
+    spyOn(window, 'fetch').and.callFake((reqInfo: RequestInfo) => {
+      return Promise.resolve(
+        new Response('12345{"token": "sample-csrf-token"}')
       );
-      return d.promise();
     });
   });
 

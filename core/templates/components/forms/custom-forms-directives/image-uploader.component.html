@@ -9,7 +9,7 @@
   </span>
   <span class="image-uploader-license-warning" *ngIf="!isBlogPostThumbnailUploader">
     Before uploading images, please ensure that they are<br>
-    compatible with the <a href="/license" [routerLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site.<br>
+    compatible with the <a href="/license" [smartRouterLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site.<br>
     Please do not upload watermarked images.
   </span>
   <label for="image-file-input" class="image-uploader-upload-label-button" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>

@@ -186,7 +186,7 @@ export class SpeechSynthesisChunkerService {
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
       .replaceWith(function() {
-        var element = this as HTMLElement;
+        var element = this as unknown as HTMLElement;
         const _newTextAttr = element.attributes[
           'text-with-value' as keyof NamedNodeMap] as Attr;
         // 'Node.textContent' only returns 'null' if the Node is a
@@ -205,7 +205,7 @@ export class SpeechSynthesisChunkerService {
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
-        var element = this as HTMLElement;
+        var element = this as unknown as HTMLElement;
         const _mathContentAttr = element.attributes[
           'math_content-with-value' as keyof NamedNodeMap] as Attr;
         var mathContent = (

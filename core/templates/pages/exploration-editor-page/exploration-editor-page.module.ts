@@ -21,6 +21,9 @@ import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser'
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -58,6 +61,7 @@ import { TranslationTabBusyModalComponent } from './translation-tab/modal-templa
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -65,6 +69,10 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -144,6 +152,10 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })

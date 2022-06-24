@@ -57,7 +57,7 @@
       <div class="navbar-header protractor-test-navbar-header float-left">
         <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
            href="/community-library"
-           [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
+           [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
@@ -195,7 +195,7 @@
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        href="/preferences"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+                       [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
@@ -222,7 +222,7 @@
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        [href]="logoutUrl"
-                       [routerLink]="logoutUrl"
+                       [smartRouterLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>

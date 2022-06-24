@@ -938,9 +938,17 @@ for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
-        URLS.append(
-            get_redirect_route(
-                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+        if 'LIGHTWEIGHT' in page:
+            URLS.append(
+                get_redirect_route(
+                    r'/%s' % page['ROUTE'],
+                    oppia_root.OppiaLightweightRootPage
+                )
+            )
+        else:
+            URLS.append(
+                get_redirect_route(
+                    r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend((
@@ -949,7 +957,9 @@ URLS.extend((
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage),
     get_redirect_route(
-        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage),
+        r'/learn/<classroom_url_fragment>',
+        oppia_root.OppiaLightweightRootPage
+    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work

@@ -26,12 +26,16 @@ import { ProfilePageRootComponent } from './profile-page-root.component';
 import { CommonModule } from '@angular/common';
 import { ProfilePageRoutingModule } from './profile-page-routing.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
     CommonModule,
     NgbPopoverModule,
     SharedComponentsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
     ProfilePageRoutingModule,
     Error404PageModule
   ],

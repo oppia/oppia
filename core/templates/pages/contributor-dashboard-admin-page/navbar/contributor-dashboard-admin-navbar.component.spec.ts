@@ -18,11 +18,14 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { APP_BASE_HREF } from '@angular/common';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { RouterModule } from '@angular/router';
 
 import { UserService } from 'services/user.service';
 
 import { ContributorDashboardAdminNavbarComponent } from './contributor-dashboard-admin-navbar.component';
+
 
 describe('Contributor dashboard admin navbar component', () => {
   let component: ContributorDashboardAdminNavbarComponent;
@@ -40,9 +43,16 @@ describe('Contributor dashboard admin navbar component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule,
+        RouterModule.forRoot([])
       ],
-      declarations: [ContributorDashboardAdminNavbarComponent]
+      declarations: [ContributorDashboardAdminNavbarComponent],
+      providers: [{
+        provide: APP_BASE_HREF,
+        useValue: '/'
+      }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ContributorDashboardAdminNavbarComponent);

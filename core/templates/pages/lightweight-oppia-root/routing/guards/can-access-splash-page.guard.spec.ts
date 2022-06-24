@@ -18,6 +18,8 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { Route } from '@angular/router';
+
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
@@ -58,10 +60,10 @@ describe('Can access splash page guard', () => {
     let defaultDashboard = 'learner';
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
-        null, false, false, false, false, false, '', '', '', true)));
+        [], false, false, false, false, false, '', '', '', true)));
     spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
       Promise.resolve('learner'));
-    caspg.canLoad(null, null);
+    caspg.canLoad({} as Route, []);
     tick();
     tick();
     expect(windowRef.nativeWindow.location.href).toEqual(
@@ -71,8 +73,8 @@ describe('Can access splash page guard', () => {
   it('should allow user to access page if not logged in', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
-        null, false, false, false, false, false, '', '', '', false)));
-    caspg.canLoad(null, null).then((value) => {
+        [], false, false, false, false, false, '', '', '', false)));
+    caspg.canLoad({} as Route, []).then((value) => {
       expect(value).toEqual(true);
     });
     tick();
@@ -82,7 +84,7 @@ describe('Can access splash page guard', () => {
     fakeAsync(() => {
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.reject());
-      caspg.canLoad(null, null).then((value) => {
+      caspg.canLoad({} as Route, []).then((value) => {
         expect(value).toEqual(true);
       });
       tick();

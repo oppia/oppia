@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,34 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the terms page.
+ * @fileoverview Routing module for error page.
  */
 
 import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TermsPageComponent } from
-  'pages/terms-page/terms-page.component';
-import { TermsPageRootComponent } from './terms-page-root.component';
-import { CommonModule } from '@angular/common';
-import { TermsPageRoutingModule } from './terms-page-routing.module';
+import { Route, RouterModule } from '@angular/router';
+
+import { ErrorPageRootComponent } from 'pages/error-pages/error-page-root.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+
+const routes: Route[] = [
+  {
+    path: '**',
+    component: ErrorPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
-    TermsPageRoutingModule
+    RouterModule.forRoot(routes)
   ],
-  declarations: [
-    TermsPageComponent,
-    TermsPageRootComponent
-  ],
-  entryComponents: [
-    TermsPageComponent,
-    TermsPageRootComponent
+  exports: [
+    RouterModule
   ]
 })
-export class TermsPageModule {}
+
+export class ErrorPageRoutingModule {}

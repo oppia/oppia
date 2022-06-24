@@ -25,6 +25,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
@@ -40,6 +42,7 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 import { ToastrModule } from 'ngx-toastr';
@@ -50,6 +53,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     DynamicContentModule,
     FormsModule,
@@ -98,6 +105,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })
