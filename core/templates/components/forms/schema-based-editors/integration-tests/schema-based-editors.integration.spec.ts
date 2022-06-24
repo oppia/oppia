@@ -176,7 +176,7 @@ describe('Schema based editor', () => {
       schemaBasedEditorFixture, 'schema-based-unicode-editor'
     ).query(By.css('input')).injector.get(NgModel);
     expect(schemaBasedUnicodeEditorInput.value).toBe('');
-    expect(schemaBasedFloatEditorInput.value).toBe('0');
+    expect(schemaBasedFloatEditorInput.value).toBe('');
 
     // Change the values in the UI.
     changeValuesInUI('SomeName', 4);

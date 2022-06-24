@@ -1,11 +1,11 @@
 <div class="schema-based-float-editor">
   <form #floatform="ngForm">
     <span *ngIf="!expressionMode">
-      <input type="number"
+      <input type="text"
              step="any"
              ngControl="floatValue"
              autocomplete="off"
-             [ngModel]="localValue"
+             [ngModel]="localStringValue"
              (ngModelChange)="updateLocalValue($event)"
              class="form-control display-inline oppia-float-form-input protractor-test-float-form-input"
              name="floatValue"
