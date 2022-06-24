@@ -440,22 +440,26 @@ describe('Exploration editor page component', function() {
         'Introduction');
     });
 
-    it('should load change list by draft changes successfully', () => {
-      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
-      ctrl.initExplorationPage();
-      $scope.$apply();
+    it('should load change list by draft changes successfully',
+      fakeAsync(() => {
+        const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
+        ctrl.initExplorationPage();
+        $scope.$apply();
+        tick();
 
-      expect(loadSpy).toHaveBeenCalledWith(
-        explorationData.draft_changes);
-    });
+        expect(loadSpy).toHaveBeenCalledWith(
+          explorationData.draft_changes);
+      }));
 
-    it('should show mismatch version modal when draft change exists', () => {
-      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
-      $scope.$apply();
+    it('should show mismatch version modal when draft change exists',
+      fakeAsync(() => {
+        spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
+        $scope.$apply();
+        tick();
 
-      expect(aims.showVersionMismatchModal)
-        .toHaveBeenCalled();
-    });
+        expect(aims.showVersionMismatchModal)
+          .toHaveBeenCalled();
+      }));
 
     it('should navigate to main tab', () => {
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
@@ -717,6 +721,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
+      tick();
 
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
       expect(successCallback).toHaveBeenCalled();
