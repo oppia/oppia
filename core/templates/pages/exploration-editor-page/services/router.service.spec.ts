@@ -314,4 +314,14 @@ describe('Router Service', () => {
       flush();
       discardPeriodicTasks();
     }));
+
+  it('should not navigate to main tab', () => {
+    spyOn(routerService, '_getCurrentStateFromLocationPath')
+      .and.returnValue('/main');
+
+    routerService.navigateToMainTab('main');
+
+    expect(routerService._getCurrentStateFromLocationPath)
+      .toHaveBeenCalled();
+  });
 });
