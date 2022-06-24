@@ -546,6 +546,20 @@ describe('Exploration editor page component', function() {
 
       expect(ngbModal.open).toHaveBeenCalled();
     });
+
+    it('should show the user help modal for editor tutorial', () => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.reject()
+        } as NgbModalRef
+      );
+
+      ctrl.showUserHelpModal();
+      $rootScope.$apply();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    });
   });
 
   describe('Checking internet Connection', () => {
