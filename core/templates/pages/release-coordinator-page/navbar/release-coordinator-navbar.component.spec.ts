@@ -18,7 +18,9 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 import { ReleaseCoordinatorPageConstants } from '../release-coordinator-page.constants';
@@ -40,9 +42,16 @@ describe('Release coordinator navbar component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule,
+        RouterModule.forRoot([])
       ],
-      declarations: [ReleaseCoordinatorNavbarComponent]
+      declarations: [ReleaseCoordinatorNavbarComponent],
+      providers: [{
+        provide: APP_BASE_HREF,
+        useValue: '/'
+      }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReleaseCoordinatorNavbarComponent);
