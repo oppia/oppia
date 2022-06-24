@@ -279,7 +279,7 @@ def main() -> None:
     if set(protractor_test_suites).union(set(webdriverio_test_suites)) != (
         set(ci_suite_names)):
         raise Exception(
-            'Protractor amd WebdriverIO test suites and CI test suites are '
+            'Protractor and WebdriverIO test suites and CI test suites are '
             'not in sync. '
             'Following suites are not in sync: {}'.format(
                 utils.compute_list_difference(

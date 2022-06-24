@@ -449,7 +449,7 @@ def managed_webpack_compiler(
 
 
 def get_chrome_verison():
-    """Download and install node to Oppia tools directory."""
+    """Returns the version of Chrome installed on the system."""
 
     # Although there are spaces between Google and Chrome in the path, we
     # don't need to escape them for Popen (as opposed to on the terminal, in

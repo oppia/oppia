@@ -26,6 +26,8 @@ from typing import List
 
 from . import check_e2e_tests_are_captured_in_ci
 
+DUMMY_TEST_SUITES_PROTRACTOR = ['oneword', 'twoWords']
+DUMMY_TEST_SUITES_WEBDRIVERIO = ['dummySuite1', 'dummySuite2']
 DUMMY_TEST_SUITES = ['oneword', 'twoWords']
 
 DUMMY_CONF_FILES = os.path.join(
@@ -62,6 +64,19 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         self.assertEqual(
             EXPECTED_PROTRACTOR_CONF_FILE, actual_protractor_config_file)
 
+    def test_read_webdriverio_file(self) -> None:
+        webdriverio_config_file = os.path.join(
+            DUMMY_CONF_FILES, 'dummy_webdriverio.conf.js')
+
+        webdriverio_config_file_swap = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'WEBDRIVERIO_CONF_FILE_PATH',
+            webdriverio_config_file)
+        with webdriverio_config_file_swap:
+            actual_webdriverio_config_file = (
+                check_e2e_tests_are_captured_in_ci.read_webdriverio_conf_file())
+        self.assertEqual(
+            EXPECTED_WEBDRIVERIO_CONF_FILE, actual_webdriverio_config_file)
+
     def test_get_e2e_suite_names_from_script_ci_files(self) -> None:
         def mock_read_ci_config_file() -> List[str]:
             return EXPECTED_CI_LIST
@@ -90,7 +105,23 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             actual_protractor_suites = (
                 check_e2e_tests_are_captured_in_ci
                 .get_e2e_suite_names_from_protractor_file())
-        self.assertEqual(DUMMY_TEST_SUITES, actual_protractor_suites)
+        self.assertEqual(DUMMY_TEST_SUITES_PROTRACTOR, actual_protractor_suites)
+
+    def test_get_e2e_suite_names_from_webdriverio_file(self) -> None:
+        def mock_read_webdriverio_conf_file() -> str:
+            webdriverio_config_file = utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, 'dummy_webdriverio.conf.js'), 'r').read()
+            return webdriverio_config_file
+
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_webdriverio_conf_file',
+            mock_read_webdriverio_conf_file)
+        with dummy_path:
+            actual_webdriverio_suites = (
+                check_e2e_tests_are_captured_in_ci
+                .get_e2e_suite_names_from_webdriverio_file())
+        self.assertEqual(DUMMY_TEST_SUITES_WEBDRIVERIO, actual_webdriverio_suites)
 
     def test_main_with_invalid_test_suites(self) -> None:
         def mock_get_e2e_suite_names_from_protractor_file() -> List[str]:
@@ -258,6 +289,15 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                     DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
             return protractor_config_file
 
+        def mock_get_e2e_test_filenames_from_webdriverio_dir() -> List[str]:
+            return ['dummySuite1.js', 'dummySuite2.js']
+
+        def mock_read_webdriverio_conf_file() -> str:
+            webdriverio_config_file = utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, 'dummy_webdriverio.conf.js'), 'r').read()
+            return webdriverio_config_file
+
         def mock_read_ci_config() -> List[str]:
             return EXPECTED_CI_LIST
 
@@ -296,6 +336,12 @@ jobs:
       - name: Run Additional Player E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_e2e_tests --suite="twoWords" --prod_env
+     - name: Run Additional Editor E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_e2e_tests --suite="dummySuite1" --prod_env
+      - name: Run Additional Player E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_e2e_tests --suite="dummySuite2" --prod_env
 """]
 
 EXPECTED_PROTRACTOR_CONF_FILE = """var path = require('path')
@@ -306,6 +352,17 @@ var suites = {
 
   twoWords: [
     'protractor_desktop/twoWords.js'
+  ]
+};
+"""
+EXPECTED_WEBDRIVERIO_CONF_FILE = """var path = require('path')
+var suites = {
+  dummySuite1: [
+    'webdriverio/dummySuite1.js'
+  ],
+
+  dummySuite2: [
+    'webdriverio_desktop/dummySuite2.js'
   ]
 };
 """
