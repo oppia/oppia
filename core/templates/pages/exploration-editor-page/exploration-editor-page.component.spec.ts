@@ -72,7 +72,7 @@ describe('Exploration editor page component', function() {
   importAllAngularServices();
 
   var ctrl = null;
-
+  let $location = null;
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -273,6 +273,7 @@ describe('Exploration editor page component', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
+    $location = $injector.get('$location');
     $rootScope = $injector.get('$rootScope');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
@@ -346,6 +347,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should start editor tutorial when on main page', fakeAsync(() => {
+      $location.path('');
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
 
