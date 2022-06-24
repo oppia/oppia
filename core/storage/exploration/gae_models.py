@@ -1163,18 +1163,27 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     exploration_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The details of the previous commit on each state at a particular
-    # version of the exploration. For each state, the structure of the version
-    # history data looks like the following:
-    #   previously_edited_in_version: int.
-    #   state_name_in_previous_version: string.
-    #   committer_id: string.
+    # version of the exploration. The json structure will look like the
+    # following:
+    # {
+    #   [state_name: str]: {
+    #     "previously_edited_in_version": int,
+    #     "state_name_in_previous_version": str,
+    #     "committer_id": str
+    #   }
+    # }
+    # The json object can have multiple keys in this case depending on
+    # the number of states.
     state_version_history = datastore_services.JsonProperty(
         default={}, indexed=False)
     # The details of the previous commit on the exploration metadata at a
-    # particular version of the exploration. The structure of the metadata
-    # version history looks like the following:
-    #   previously_edited_in_version: int.
-    #   committer_id: string.
+    # particular version of the exploration. The json structure will look
+    # like the following:
+    # {
+    #   "previously_edited_in_version": str,
+    #   "committer_id": str.
+    # }
+    # The json object will have only two keys in this case.
     metadata_version_history = datastore_services.JsonProperty(
         default={}, indexed=False)
     # The user ids of the users who did the 'previous commit' on each state
