@@ -439,6 +439,7 @@ describe('Exploration editor page component', function() {
 
     it('should load change list by draft changes successfully', () => {
       const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
+      ctrl.initExplorationPage();
       $scope.$apply();
 
       expect(loadSpy).toHaveBeenCalledWith(
