@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.domain import config_domain
 from core.domain import learner_group_domain
+from core.domain import story_domain
 from core.domain import story_fetchers
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
@@ -109,9 +111,6 @@ def is_user_a_facilitator(user_id, group_id) -> bool:
 
     Returns:
         bool. Whether the user is a facilitator of the learner group.
-
-    Raises:
-        Exception. The learner group does not exist.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
         group_id)
@@ -177,17 +176,17 @@ def get_filtered_learner_group_syllabus(
     group_subtopic_page_ids = learner_group_model.subtopic_page_ids
     group_story_ids = learner_group_model.story_ids
 
-    all_topics = topic_fetchers.get_all_topics()
+    all_topics: List[topic_domain.Topic] = topic_fetchers.get_all_topics()
 
-    filtered_topics = []
+    filtered_topics: List[topic_domain.Topic] = []
 
-    filtered_topic_ids = []
+    filtered_topic_ids: List[str] = []
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
-    possible_story_ids = []
-    filtered_story_ids = []
-    filtered_subtopics = []
-    filtered_stories = []
+    possible_story_ids: List[str] = []
+    filtered_story_ids: List[str] = []
+    filtered_subtopics: List[topic_domain.Subtopic] = []
+    filtered_stories: List[story_domain.StorySummary] = []
 
     if category != 'All':
         for classroom in all_classrooms_dict:
@@ -229,7 +228,7 @@ def get_filtered_learner_group_syllabus(
                     if subtopic.id not in group_subtopic_page_ids:
                         filtered_subtopics.append(subtopic)
 
-        # If the keyword does not matches a topic name
+        # If the keyword does not matches a topic name.
         else:
             # If type filter is not set or type filter is set to 'Skill',
             # add the subtopics which have the keyword in their title to the

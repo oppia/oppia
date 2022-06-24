@@ -21,11 +21,13 @@ from __future__ import annotations
 from core.domain import learner_group_domain
 from core.platform import models
 
+from typing import List, Optional
+
 (learner_group_models, user_models) = models.Registry.import_models(
     [models.NAMES.learner_group, models.NAMES.user])
 
 
-def get_new_learner_group_id():
+def get_new_learner_group_id() -> str:
     """Returns a new learner group id.
 
     Returns:
@@ -34,7 +36,9 @@ def get_new_learner_group_id():
     return learner_group_models.LearnerGroupModel.get_new_id()
 
 
-def get_learner_group_by_id(group_id):
+def get_learner_group_by_id(
+        group_id
+    ) -> Optional(learner_group_domain.LearnerGroup):
     """Returns the learner group domain object given the learner group id.
 
     Args:
@@ -61,7 +65,9 @@ def get_learner_group_by_id(group_id):
         learner_group_model.story_ids)
 
 
-def get_learner_groups_of_facilitator(user_id: str):
+def get_learner_groups_of_facilitator(
+        user_id: str
+    ) -> List[learner_group_domain.LearnerGroup]:
     """Returns a list of learner groups of the given facilitator.
 
     Args:
@@ -89,7 +95,7 @@ def get_learner_groups_of_facilitator(user_id: str):
     return learner_groups
 
 
-def get_progress_sharing_permission(user_id, group_id):
+def get_progress_sharing_permission(user_id, group_id) -> bool:
     """Returns the progress sharing permission of the given user in the given
     group.
 
