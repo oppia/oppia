@@ -1,5 +1,5 @@
-<mat-form-field appearance="fill">
-    <mat-label>Select an choice:</mat-label>
+<mat-form-field appearance="fill" class="rule-type-selector">
+    <mat-label>Rule:</mat-label>
     <mat-select [(value)]="localValue" disableRipple>
         <mat-option *ngFor="let choice of choices; index as index"
                     value="{{choice.id}}"
@@ -7,3 +7,9 @@
         </mat-option>
     </mat-select>
 </mat-form-field>
+
+<style>
+ .rule-type-selector {
+   width: 100%;
+ }
+</style>
