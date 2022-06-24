@@ -256,7 +256,8 @@ class LearnerGroupModel(base_models.BaseModel):
         for learner_group_model in found_models:
             # If the user is the facilitator of the group and there is
             # only one facilitator_user_id, delete the group.
-            if user_id in learner_group_model.facilitator_user_ids and (
+            if (
+                user_id in learner_group_model.facilitator_user_ids and
                 len(learner_group_model.facilitator_user_ids) == 1
             ):
                 learner_group_model.delete()
@@ -265,7 +266,8 @@ class LearnerGroupModel(base_models.BaseModel):
             # If the user is the facilitator of the group and there are
             # more then one facilitator_user_ids, delete the user from the
             # facilitator_user_ids list.
-            if user_id in learner_group_model.facilitator_user_ids and (
+            if (
+                user_id in learner_group_model.facilitator_user_ids and
                 len(learner_group_model.facilitator_user_ids) > 1
             ):
                 learner_group_model.facilitator_user_ids.remove(user_id)
