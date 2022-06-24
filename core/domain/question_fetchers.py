@@ -29,7 +29,7 @@ from typing import List, Optional, Tuple
 from typing_extensions import TypedDict
 
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     from mypy_imports import question_models
     from mypy_imports import skill_models
 
