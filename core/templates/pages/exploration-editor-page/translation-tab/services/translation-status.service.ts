@@ -259,6 +259,7 @@ export class TranslationStatusService implements OnInit {
     let contentIdList = this._getContentIdListRelatedToComponent(
       componentName, this._getAvailableContentIds());
     let availableAudioCount = 0;
+
     if (contentIdList) {
       contentIdList.forEach((contentId) => {
         let availabilityStatus = this._getActiveStateContentAvailabilityStatus(
