@@ -364,7 +364,7 @@ class AdminHandler(base.BaseHandler):
 
         state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml(
-            'content_1', question_content))
+            'content_0', question_content))
 
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(

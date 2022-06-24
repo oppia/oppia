@@ -315,7 +315,6 @@ export class QuestionPlayerEngineService {
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
-        this.getNextStateData().writtenTranslations,
         this.getNextStateData().content.contentId,
         this.audioTranslationLanguageService
       );

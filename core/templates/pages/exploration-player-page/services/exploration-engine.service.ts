@@ -593,7 +593,6 @@ export class ExplorationEngineService {
       stateName, contentHtml, interactionHtml,
       this.exploration.getInteraction(stateName),
       this.exploration.getState(stateName).recordedVoiceovers,
-      this.exploration.getState(stateName).writtenTranslations,
       this.exploration.getState(stateName).content.contentId,
       this.audioTranslationLanguageService);
   }
