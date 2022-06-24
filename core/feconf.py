@@ -148,6 +148,7 @@ class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
     feedback = 'feedback' # pylint: disable=invalid-name
     improvements = 'improvements' # pylint: disable=invalid-name
     job = 'job' # pylint: disable=invalid-name
+    learner_group = 'learner_group' # pylint: disable=invalid-name
     opportunity = 'opportunity' # pylint: disable=invalid-name
     question = 'question' # pylint: disable=invalid-name
     recommendations = 'recommendations' # pylint: disable=invalid-name
