@@ -61,7 +61,7 @@
     <div class="oppia-login-required" ng-if="!$ctrl.userDetailsLoading && !$ctrl.userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
-    <div class="oppia-login-required opportunities-list" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
+    <div class="oppia-login-required oppia-opportunities-list" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
       <oppia-opportunities-list ng-if="$ctrl.activeExplorationId === null && $ctrl.isReviewTranslationsTab()"
                                 [load-opportunities]="$ctrl.loadReviewableTranslationOpportunities"
                                 (click-action-button)="$ctrl.onClickReviewableTranslations($event)"
@@ -259,7 +259,7 @@
   }
 
   @media only screen and (max-width: 700px) {
-    .opportunities-list {
+    .oppia-opportunities-list {
       background-color: #e8e7e3;
     }
     contributions-and-review .oppia-contributions-dropdown-section {
