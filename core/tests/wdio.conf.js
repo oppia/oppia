@@ -39,12 +39,24 @@ var suites = {
     './core/tests/webdriverio_desktop/collections.js'
   ],
 
+  creatorDashboard: [
+    './core/tests/webdriverio_desktop/creatorDashboard.js'
+  ],
+
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
+  preferences: [
+    './core/tests/webdriverio_desktop/preferences.js'
+  ],
+
   profileFeatures: [
     './core/tests/webdriverio_desktop/profileFeatures.js'
+  ],
+
+  subscriptions: [
+    './core/tests/webdriverio/subscriptionsFlow.js'
   ],
 
   users: [

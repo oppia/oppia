@@ -19,13 +19,18 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
   var waitingForResponseElem = $(
     '.e2e-test-input-response-loading-dots');
+  var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
+  var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
+  var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
   var explorationHeader = $('.e2e-test-exploration-header');
   var conversationInput = $('.e2e-test-conversation-input');
+  var feedbackCloseButton = $('.e2e-test-exploration-feedback-close-button');
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
@@ -69,6 +74,18 @@ var ExplorationPlayerPage = function() {
     ).toBe(name);
   };
 
+  this.rateExploration = async function(ratingValue) {
+    var ratingStars = await $$('.e2e-test-rating-star');
+    await waitFor.elementToBeClickable(ratingStars[ratingValue - 1]);
+    await action.click('Submit Button', ratingStars[ratingValue - 1]);
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for rating takes too long to appear.');
+    await waitFor.elementToBeClickable(feedbackCloseButton);
+    await action.click('Feedback Close Button', feedbackCloseButton);
+    await waitFor.invisibilityOf(
+      feedbackCloseButton, 'Close Feedback button does not disappear');
+  };
+
   this.expectExplorationToNotBeOver = async function() {
     var conversationContent = await $$(
       '.e2e-test-conversation-content');
@@ -78,6 +95,16 @@ var ExplorationPlayerPage = function() {
     expect(
       await conversationContent[lastElement].getText()
     ).not.toEqual('Congratulations, you have finished!');
+  };
+
+  this.submitFeedback = async function(feedback) {
+    await waitFor.elementToBeClickable(feedbackPopupLink);
+    await action.click('Feedback Popup Link', feedbackPopupLink);
+    await action.keys('Feedback Text Area', feedbackTextArea, feedback);
+    await waitFor.elementToBeClickable(feedbackSubmitButton);
+    await action.click('Feedback Submit Button', feedbackSubmitButton);
+    await waitFor.invisibilityOf(
+      feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 };
 

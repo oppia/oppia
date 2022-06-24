@@ -90,6 +90,14 @@ var keys = async function(
   await inputElement.setValue(keys);
 };
 
+var addValue = async function(
+    inputName, inputElement, keys, clickInputElement = true) {
+  if (clickInputElement) {
+    await click(inputName, inputElement);
+  }
+  await inputElement.addValue(keys);
+};
+
 exports.clear = clear;
 exports.click = click;
 exports.getText = getText;
@@ -98,4 +106,5 @@ exports.select = select;
 exports.select2 = select2;
 exports.matSelect = matSelect;
 exports.keys = keys;
+exports.addValue = addValue;
 exports.waitForAutosave = waitForAutosave;

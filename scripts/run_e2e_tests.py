@@ -153,8 +153,11 @@ RERUN_POLICIES = {
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'collections',
+    'creatorDashboard',
     'learner',
+    'preferences',
     'profileFeatures',
+    'subscriptions',
     'users',
 ]
 
@@ -169,7 +172,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'classroomPageFileUploadFeatures',
     'contributorDashboard',
     'coreEditorAndPlayerFeatures',
-    'creatorDashboard',
     'embedding',
     'explorationImprovementsTab',
     'explorationFeedbackTab',
@@ -185,10 +187,8 @@ SUITES_STILL_IN_PROTRACTOR = [
     'library',
     'navigation',
     'playVoiceovers',
-    'preferences',
     'profileMenu',
     'publication',
-    'subscriptions',
     'topicAndStoryEditor',
     'topicAndStoryEditorFileUploadFeatures',
     'topicsAndSkillsDashboard',
