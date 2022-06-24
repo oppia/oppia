@@ -442,16 +442,6 @@ describe('Exploration editor page component', function() {
         'Introduction');
     });
 
-    it('should show mismatch version modal when draft change exists',
-      fakeAsync(() => {
-        spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
-        $scope.$apply();
-        tick();
-
-        expect(aims.showVersionMismatchModal)
-          .toHaveBeenCalled();
-      }));
-
     it('should navigate to main tab', () => {
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
