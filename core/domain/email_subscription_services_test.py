@@ -68,11 +68,11 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
 
     def test_inform_subscribers(self) -> None:
-        subscription_services.subscribe_to_creator(  # type: ignore[no-untyped-call]
+        subscription_services.subscribe_to_creator(
             self.user_id_2, self.editor_id)
-        subscription_services.subscribe_to_creator(  # type: ignore[no-untyped-call]
+        subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id)
-        subscription_services.subscribe_to_creator(  # type: ignore[no-untyped-call]
+        subscription_services.subscribe_to_creator(
             self.user_id, self.editor_id)
 
         email_preferences_model = user_models.UserEmailPreferencesModel.get(
