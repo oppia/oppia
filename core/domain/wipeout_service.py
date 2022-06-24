@@ -1448,7 +1448,8 @@ def _pseudonymize_version_history_models(pending_deletion_request):
     save_pending_deletion_requests([pending_deletion_request])
 
     @transaction_services.run_in_transaction_wrapper
-    def _pseudonymize_models_transactional(version_history_models):
+    def _pseudonymize_models_transactional(
+        version_history_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1463,32 +1464,29 @@ def _pseudonymize_version_history_models(pending_deletion_request):
             for state_name in model.state_version_history:
                 if model.state_version_history[state_name][
                     'committer_id'] == user_id:
-                    model.state_version_history[state_name]['committer_id'] = (
-                        version_history_ids_to_pids[model.id])
+                    model.state_version_history[state_name][
+                        'committer_id'] = pseudonymized_id
 
             # Pseudonymize user id from metadata_version_history.
             if model.metadata_version_history['committer_id'] == user_id:
-                model.metadata_version_history['committer_id'] = (
-                    version_history_ids_to_pids[model.id])
+                model.metadata_version_history[
+                    'committer_id'] = pseudonymized_id
 
             # Pseudonymize user id from committer_ids.
             for idx, committer_id in enumerate(model.committer_ids):
                 if committer_id == user_id:
-                    model.committer_ids[idx] = (
-                        version_history_ids_to_pids[model.id])
+                    model.committer_ids[idx] = pseudonymized_id
 
         version_history_model_class.update_timestamps_multi(
             version_history_models)
         version_history_model_class.put_multi(version_history_models)
 
-    version_history_ids_to_pids = (
-        pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.exploration.value])
     for i in range(
             0,
             len(version_history_models),
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         _pseudonymize_models_transactional(
             version_history_models[
-                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+            pseudonymized_id
         )
