@@ -442,17 +442,6 @@ describe('Exploration editor page component', function() {
         'Introduction');
     });
 
-    it('should load change list by draft changes successfully',
-      fakeAsync(() => {
-        const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
-        ctrl.initExplorationPage();
-        $scope.$apply();
-        tick();
-
-        expect(loadSpy).toHaveBeenCalledWith(
-          explorationData.draft_changes);
-      }));
-
     it('should show mismatch version modal when draft change exists',
       fakeAsync(() => {
         spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
@@ -731,6 +720,7 @@ describe('Exploration editor page component', function() {
       var successCallback = jasmine.createSpy('success');
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
       mockInitExplorationPageEmitter.emit(successCallback);
+
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
       flushMicrotasks();
@@ -739,7 +729,6 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       tick();
 
-      expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
       expect(successCallback).toHaveBeenCalled();
 
       flush();
