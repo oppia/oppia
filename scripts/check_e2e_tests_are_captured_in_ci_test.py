@@ -121,7 +121,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             actual_webdriverio_suites = (
                 check_e2e_tests_are_captured_in_ci
                 .get_e2e_suite_names_from_webdriverio_file())
-        self.assertEqual(DUMMY_TEST_SUITES_WEBDRIVERIO, actual_webdriverio_suites)
+        self.assertEqual(
+            DUMMY_TEST_SUITES_WEBDRIVERIO, actual_webdriverio_suites)
 
     def test_main_with_invalid_test_suites(self) -> None:
         def mock_get_e2e_suite_names_from_protractor_file() -> List[str]:
@@ -308,6 +309,13 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         protractor_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
             mock_read_protractor_conf_file)
+        webdriverio_test_suite_files_swap = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'get_e2e_test_filenames_from_webdriverio_dir',
+            mock_get_e2e_test_filenames_from_webdriverio_dir)
+        webdriverio_path_swap = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_webdriverio_conf_file',
+            mock_read_webdriverio_conf_file)
         ci_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_ci_config_files', mock_read_ci_config)
@@ -322,7 +330,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with protractor_path_swap, ci_path_swap, mock_tests_to_remove:
             with common_test_swap, protractor_test_suite_files_swap:
-                check_e2e_tests_are_captured_in_ci.main()
+                with webdriverio_path_swap, webdriverio_test_suite_files_swap:
+                    check_e2e_tests_are_captured_in_ci.main()
 
 
 EXPECTED_CI_LIST = [
@@ -355,6 +364,7 @@ var suites = {
   ]
 };
 """
+
 EXPECTED_WEBDRIVERIO_CONF_FILE = """var path = require('path')
 var suites = {
   dummySuite1: [
