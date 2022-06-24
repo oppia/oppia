@@ -55,6 +55,7 @@
 /core/templates/pages/common-imports.ts @srijanreddy98 @ashutoshc8101
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @ashutoshc8101
 /core/templates/pages/oppia-root/ @srijanreddy98 @ashutoshc8101
+/core/templates/pages/lightweight-oppia-root/ @srijanreddy98 @ashutoshc8101
 /core/templates/i18n/ @srijanreddy98 @ashutoshc8101
 /core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @ashutoshc8101
 /core/templates/base-components/oppia-root.directive.html @srijanreddy98 @ashutoshc8101
