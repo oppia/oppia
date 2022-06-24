@@ -26,6 +26,7 @@ from core.domain import subtopic_page_domain
 from core.platform import models
 
 from typing import List, Optional, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -36,7 +37,8 @@ if MYPY: # pragma: no cover
 
 def _migrate_page_contents_to_latest_schema(
     versioned_page_contents: (
-        subtopic_page_domain.VersionedSubtopicPageContentsDict)
+        subtopic_page_domain.VersionedSubtopicPageContentsDict
+    )
 ) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the page contents structure based on the schema version of the input
@@ -104,6 +106,22 @@ def get_subtopic_page_by_id(
     topic_id: str,
     subtopic_id: int,
 ) -> subtopic_page_domain.SubtopicPage: ...
+
+
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: Literal[True]
+) -> subtopic_page_domain.SubtopicPage: ...
+
+
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: Literal[False]
+) -> Optional[subtopic_page_domain.SubtopicPage]: ...
 
 
 @overload
@@ -178,6 +196,22 @@ def get_subtopic_page_contents_by_id(
     topic_id: str,
     subtopic_id: int
 ) -> subtopic_page_domain.SubtopicPageContents: ...
+
+
+@overload
+def get_subtopic_page_contents_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: Literal[True]
+) -> subtopic_page_domain.SubtopicPageContents: ...
+
+
+@overload
+def get_subtopic_page_contents_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: Literal[False]
+) -> Optional[subtopic_page_domain.SubtopicPageContents]: ...
 
 
 @overload

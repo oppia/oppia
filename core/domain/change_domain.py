@@ -125,9 +125,9 @@ class BaseChange:
         'user_id_attribute_names': []
     }]
 
-    # Here, Argument `change_dict` can accept arbitrary number of keys with
-    # different types of values. So, to make the argument generalized for every
-    # type of values, we used Dict[str, Any] type here.
+    # Here, Argument `change_dict` can accept dictionaries which have arbitrary
+    # number of keys with different types of values. So, to make the argument
+    # generalized for every type of dictionaries, we used Any type here.
     def __init__(self, change_dict: Dict[str, Any]) -> None:
         """Initializes a BaseChange object from a dict.
 
@@ -156,9 +156,9 @@ class BaseChange:
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
 
-    # Here, Argument `change_dict` can accept arbitrary number of keys with
-    # different types of values. So, to make the argument generalized for every
-    # type of values, we used Dict[str, Any] type here.
+    # Here, Argument `change_dict` can accept dictionaries which have arbitrary
+    # number of keys with different types of values. So, to make the argument
+    # generalized for every type of dictionaries, we used Any type here.
     def validate_dict(self, change_dict: Dict[str, Any]) -> None:
         """Checks that the command in change dict is valid for the domain
         object.

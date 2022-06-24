@@ -160,6 +160,14 @@ def get_story_by_id(
 @overload
 def get_story_by_id(
     story_id: str,
+    *,
+    version: Optional[int] = None
+) -> story_domain.Story: ...
+
+
+@overload
+def get_story_by_id(
+    story_id: str,
     strict: Literal[True],
     version: Optional[int] = None
 ) -> story_domain.Story: ...
@@ -245,6 +253,20 @@ def get_story_by_url_fragment(
 def get_story_summary_by_id(
     story_id: str,
 ) -> story_domain.StorySummary: ...
+
+
+@overload
+def get_story_summary_by_id(
+    story_id: str,
+    strict: Literal[True]
+) -> story_domain.StorySummary: ...
+
+
+@overload
+def get_story_summary_by_id(
+    story_id: str,
+    strict: Literal[False]
+) -> Optional[story_domain.StorySummary]: ...
 
 
 @overload
@@ -413,6 +435,9 @@ def get_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)
 
+    # TODO(#15621): The explicit declaration of type for ndb properties should
+    # be removed. Currently, these ndb properties are annotated with Any return
+    # type. Once we have proper return type we can remove this.
     if progress_model:
         completed_node_ids: List[str] = progress_model.completed_node_ids
         return completed_node_ids

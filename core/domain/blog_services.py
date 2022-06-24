@@ -736,14 +736,14 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
 
 def get_published_blog_post_summaries(
     offset: int = 0
-) -> Optional[List[Optional[blog_domain.BlogPostSummary]]]:
+) -> Optional[List[blog_domain.BlogPostSummary]]:
     """Returns published BlogPostSummaries list.
 
     Args:
         offset: int. Number of query results to skip from top.
 
     Returns:
-        list(BlogPostSummaries | None) | None . These are sorted in order of the
+        list(BlogPostSummaries) | None . These are sorted in order of the
         date published. None if no blog post is published.
     """
     max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
@@ -763,8 +763,9 @@ def get_published_blog_post_summaries(
         blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
     blog_post_summaries = []
     blog_post_summaries = [
-        get_blog_post_summary_from_model(model) if model is not None else None
-        for model in blog_post_summary_models]
+        get_blog_post_summary_from_model(model)
+        for model in blog_post_summary_models if model is not None
+    ]
     return blog_post_summaries
 
 
