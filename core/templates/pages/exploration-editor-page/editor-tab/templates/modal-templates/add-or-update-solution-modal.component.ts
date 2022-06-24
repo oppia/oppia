@@ -62,7 +62,7 @@ export class AddOrUpdateSolutionModalComponent
   answerIsValid!: boolean;
   correctAnswerEditorHtml!: string;
   data!: SolutionInterface;
-  savedMemento!: InteractionAnswer;
+  savedMemento!: InteractionAnswer | null;
   solutionType!: Solution | null;
   tempAnsOption!: string;
   EMPTY_SOLUTION_DATA!: SolutionInterface;
@@ -143,35 +143,37 @@ export class AddOrUpdateSolutionModalComponent
     if (this.solutionType) {
       this.savedMemento = (
         this.solutionType?.correctAnswer);
-      this.correctAnswerEditorHtml = (
-        this.explorationHtmlFormatterService.getInteractionHtml(
-          this.stateInteractionIdService.savedMemento,
-          this.stateCustomizationArgsService.savedMemento,
-          false,
-          this.SOLUTION_EDITOR_FOCUS_LABEL,
-          this.savedMemento ? 'savedMemento()' : null)
-      );
-      this.answerIsValid = false;
-      this.EMPTY_SOLUTION_DATA = {
-        answerIsExclusive: false,
-        correctAnswer: undefined,
-        explanationHtml: '',
-        explanationContentId: this.COMPONENT_NAME_SOLUTION
-      };
-      this.data = this.solutionType ? {
-        answerIsExclusive: (
-          this.solutionType.answerIsExclusive),
-        correctAnswer: undefined,
-        explanationHtml: (
-          this.solutionType.explanation.html),
-        explanationContentId: (
-          this.solutionType.explanation.contentId)
-      } : cloneDeep(this.EMPTY_SOLUTION_DATA);
-      this.currentInteractionService.setOnSubmitFn(
-        (answer: InteractionAnswer) => {
-          this.data.correctAnswer = answer;
-        });
+    } else {
+      this.savedMemento = null;
     }
+    this.correctAnswerEditorHtml = (
+      this.explorationHtmlFormatterService.getInteractionHtml(
+        this.stateInteractionIdService.savedMemento,
+        this.stateCustomizationArgsService.savedMemento,
+        false,
+        this.SOLUTION_EDITOR_FOCUS_LABEL,
+        this.savedMemento ? 'savedMemento()' : null)
+    );
+    this.answerIsValid = false;
+    this.EMPTY_SOLUTION_DATA = {
+      answerIsExclusive: false,
+      correctAnswer: undefined,
+      explanationHtml: '',
+      explanationContentId: this.COMPONENT_NAME_SOLUTION
+    };
+    this.data = this.solutionType ? {
+      answerIsExclusive: (
+        this.solutionType.answerIsExclusive),
+      correctAnswer: undefined,
+      explanationHtml: (
+        this.solutionType.explanation.html),
+      explanationContentId: (
+        this.solutionType.explanation.contentId)
+    } : cloneDeep(this.EMPTY_SOLUTION_DATA);
+    this.currentInteractionService.setOnSubmitFn(
+      (answer: InteractionAnswer) => {
+        this.data.correctAnswer = answer;
+      });
     this.ansOptions = ['The only', 'One'];
     this.tempAnsOption = this.ansOptions[1];
   }
