@@ -30,28 +30,27 @@ var ExplorationEditorPage = function() {
   /*
   * Interactive elements
   */
-  var expTitle = $(
-    '.e2e-test-exploration-title-input');
-  var expObjective = $(
-    '.e2e-test-exploration-objective-input');
+  var expTitle = $('.e2e-test-exploration-title-input');
+  var expObjective = $('.e2e-test-exploration-objective-input');
   var expTags = $('.e2e-test-tags');
-  var expCategoryDropdownElement = $(
-    '.e2e-test-exploration-category-dropdown');
-  var expLanguageSelectorElement = $(
-    '.e2e-test-exploration-language-select');
+  var expCategoryDropdownElement = $('.e2e-test-exploration-category-dropdown');
+  var expLanguageSelectorElement = $('.e2e-test-exploration-language-select');
   var explorationMetadataModalHeaderElement = $(
     '.e2e-test-metadata-modal-header');
   var confirmPublish = $('.e2e-test-confirm-publish');
   var modalContentElement = $('.modal-content');
+  var commitMessageInput = $('.e2e-test-commit-message-input');
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
 
   /*
    * Buttons
    */
   var publishExplorationButton = $('.e2e-test-publish-exploration');
-  var prePublicationConfirmButton = $(
-    '.e2e-test-confirm-pre-publication');
+  var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
   var closeButton = $('.e2e-test-share-publish-close');
+  var saveChangesButton = $('.e2e-test-save-changes');
+  var saveDraftButtonTextContainer = $('.e2e-test-save-draft-message');
+  var commitChangesButton = $('.e2e-test-save-draft-button');
 
   /*
    * Workflows
@@ -126,22 +125,15 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     await action.waitForAutosave();
-    var saveChangesButton = $('.e2e-test-save-changes');
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
-      var commitMessageInput = $(
-        '.e2e-test-commit-message-input');
       await action.keys(
         'Commit message input', commitMessageInput, commitMessage);
     }
-    var commitChangesButton = $(
-      '.e2e-test-save-draft-button');
     await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.pause from e2e files.
     // eslint-disable-next-line wdio/no-pause
     await browser.pause(2500);
-    var saveDraftButtonTextContainer = $(
-      '.e2e-test-save-draft-message');
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
       'Changes could not be saved');
