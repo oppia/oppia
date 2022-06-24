@@ -77,14 +77,26 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 # RTE image validations for caption, alt and filepath.
                 if rte_component['id'] == 'oppia-noninteractive-image':
                     # Validates if caption value is <= 160.
-                    cap_with_value = rte_component['customization_args'][
-                        'caption-with-value']
-                    alt_with_value = rte_component['customization_args'][
-                        'alt-with-value']
-                    file_with_value = rte_component['customization_args'][
-                        'filepath-with-value']
+                    try:
+                        cap_with_value = rte_component['customization_args'][
+                            'caption-with-value']
+                    except:
+                        cap_with_value = 'Not found'
+                    try:
+                        alt_with_value = rte_component['customization_args'][
+                            'alt-with-value']
+                    except:
+                        alt_with_value = 'Not found'
+                    try:
+                        file_with_value = rte_component['customization_args'][
+                            'filepath-with-value']
+                    except:
+                        file_with_value = 'Not found'
 
-                    if len(cap_with_value) > 160:
+                    if (
+                        cap_with_value != 'Not found' and
+                        len(cap_with_value) > 160
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Image tag caption value '
                             f'is greater than 160 '
@@ -92,7 +104,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         )
 
                     # Validates if alt value is greater than 5.
-                    if len(alt_with_value) < 5:
+                    if (
+                        alt_with_value != 'Not found' and
+                        len(alt_with_value) < 5
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Image tag alt value '
                             f'is less than 5 '
@@ -101,6 +116,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     # Validates if filepath extension is svg.
                     if (
+                        file_with_value != 'Not found' and
                         len(file_with_value) > 0 and
                         file_with_value[-3:] != 'svg'
                     ):
@@ -112,20 +128,32 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                 # Validates if math tag filepath extension is svg.
                 elif rte_component['id'] == 'oppia-noninteractive-math':
-                    svg_filename = rte_component['customization_args'][
-                        'math_content-with-value']['svg_filename']
+                    try:
+                        svg_filename = rte_component['customization_args'][
+                            'math_content-with-value']['svg_filename']
+                    except:
+                        svg_filename = 'Not found'
 
-                    raw_latex = rte_component['customization_args'][
-                        'math_content-with-value']['raw_latex']
+                    try:
+                        raw_latex = rte_component['customization_args'][
+                            'math_content-with-value']['raw_latex']
+                    except:
+                        raw_latex = 'Not found'
 
-                    if svg_filename[-3:] != 'svg':
+                    if (
+                        svg_filename != 'Not found' and
+                        svg_filename[-3:] != 'svg'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Math tag svg_filename '
                             f'value has a non svg extension '
                             f'having value {svg_filename}.'
                         )
 
-                    if raw_latex == '' or raw_latex is None:
+                    if (
+                        raw_latex != 'Not found' and
+                        (raw_latex == '' or raw_latex is None)
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Math tag raw_latex '
                             f'value is either empty or None '
@@ -134,13 +162,19 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                 # Validates if skillreview text value is non empty.
                 elif (
-                        rte_component['id'] ==
-                        'oppia-noninteractive-skillreview'
+                    rte_component['id'] ==
+                    'oppia-noninteractive-skillreview'
                 ):
-                    text_with_value = rte_component['customization_args'][
-                        'text-with-value']
+                    try:
+                        text_with_value = rte_component['customization_args'][
+                            'text-with-value']
+                    except:
+                        text_with_value = 'Not found'
 
-                    if text_with_value == '' or text_with_value is None:
+                    if (
+                        text_with_value != 'Not found' and
+                        (text_with_value == '' or text_with_value is None)
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Skill review tag text '
                             f'value is either empty or None.'
@@ -148,21 +182,42 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                 # Validation for oppia-noninteractive-video.
                 elif rte_component['id'] == 'oppia-noninteractive-video':
-                    start_value = (
-                        rte_component['customization_args']
-                        ['start-with-value'])
-                    end_value = (
-                        rte_component['customization_args']
-                        ['end-with-value'])
-                    video_id = (
-                        rte_component['customization_args']
-                        ['video_id-with-value'])
-                    autoplay = (
-                        rte_component['customization_args']
-                        ['autoplay-with-value'])
+                    try:
+                        start_value = (
+                            rte_component['customization_args']
+                            ['start-with-value'])
+                    except:
+                        start_value = 'Not found'
+
+                    try:
+                        end_value = (
+                            rte_component['customization_args']
+                            ['end-with-value'])
+                    except:
+                        end_value = 'Not found'
+
+                    try:
+                        video_id = (
+                            rte_component['customization_args']
+                            ['video_id-with-value'])
+                    except:
+                        video_id = 'Not found'
+
+                    try:
+                        autoplay = (
+                            rte_component['customization_args']
+                            ['autoplay-with-value'])
+                    except:
+                        autoplay = 'Not found'
 
                     # Validates if video start value is lesser than end value.
-                    if int(start_value) > int(end_value):
+                    if (
+                        (
+                            start_value != 'Not found' and
+                            end_value != 'Not found'
+                        )
+                        and int(start_value) > int(end_value)
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Video tag start '
                             f'value is greater than end value '
@@ -170,14 +225,20 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         )
 
                     # Validates if video tag video_id is valid.
-                    if video_id == '' or video_id is None:
+                    if (
+                        video_id != 'Not found' and
+                        video_id == '' or video_id is None
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Video tag does '
                             f'not have a video_id.'
                         )
 
                     # Validates if video tag autoplay is valid.
-                    if not isinstance(autoplay, bool):
+                    if (
+                        autoplay != 'Not found' and
+                        not isinstance(autoplay, bool)
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Video tag autoplay '
                             f'value is not boolean.'
@@ -185,12 +246,22 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                 # Validates if link text value is not empty.
                 elif rte_component['id'] == 'oppia-noninteractive-link':
-                    text_with_value = rte_component['customization_args'][
-                        'text-with-value']
-                    url_with_value = rte_component['customization_args'][
-                        'url-with-value']
+                    try:
+                        text_with_value = rte_component['customization_args'][
+                            'text-with-value']
+                    except:
+                        text_with_value = 'Not found'
 
-                    if text_with_value == '' or text_with_value is None:
+                    try:
+                        url_with_value = rte_component['customization_args'][
+                            'url-with-value']
+                    except:
+                        url_with_value = 'Not found'
+
+                    if (
+                        text_with_value != 'Not found' and
+                        (text_with_value == '' or text_with_value is None)
+                    ):
                         rte_components_errors.append(
                             f'State - {key} Link tag text '
                             f'value is either empty or None '
@@ -260,7 +331,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     fraction_interaction_invalid_values.append(
                         f'The rule {rule_spec_index} of answer '
                         f'group {ans_group_index} has '
-                        f'denominator equals to zero.'
+                        f'denominator less than or equal to zero.'
                     )
 
                 # Validates if the solution in simplest form.
@@ -295,11 +366,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
             # Validates if the frac den is > 0.
             if rule_spec.rule_type == 'HasDenominatorEqualTo':
-                if rule_spec.inputs['x'] == 0:
+                if rule_spec.inputs['x'] <= 0:
                     fraction_interaction_invalid_values.append(
                         f'The rule {rule_spec_index} of answer '
                         f'group {ans_group_index} has '
-                        f'denominator equals to zero '
+                        f'denominator less than or equal to zero '
                         f'having rule type HasDenominatorEqualTo.'
                     )
 
@@ -443,7 +514,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
     def _validate_multi_choice_interaction(state) -> List[str]:
         """Returns the errored state interaction values for
         MultipleChoiceInput
-            - All MC inputs should have at least 4 options
             - Answer choices should be non-empty and unique
             - No answer choice should appear in more than one answer group
             - If all MC options have feedbacks, do not ask for
@@ -480,12 +550,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         choices = (
             state.interaction.customization_args['choices'].value)
-        # Validates all inputs should have atleast 4 choices.
-        if len(choices) < 4:
-            mc_interaction_invalid_values.append(
-                f'There should be atleast 4 choices '
-                f'found {str(len(choices))}'
-            )
         # Validates answer choices should be non-empty and unique.
         seen_choices = []
         choice_empty = False
@@ -523,7 +587,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         """Returns the errored state interaction values for
         ItemSelectionInput
             - Min number of selections should be no greater than max num
-            - There should be enough choices to have max num of selections
+            - There should be enough choices to have min num of selections
             - All items should be unique and non-empty
             - `==` should have between min and max number of selections
 
@@ -577,12 +641,12 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 f'is greater than max value '
                 f'which is {str(max_value)}'
             )
-        # Validates there should be enough choice to have max num of selec.
-        if len(choices) < max_value:
+        # Validates there should be enough choice to have min num of selec.
+        if len(choices) < min_value:
             item_selec_interaction_values.append(
                 f'Number of choices which is {str(len(choices))} '
                 f'is lesser than the '
-                f'max value selection which is {str(max_value)}'
+                f'min value selection which is {str(min_value)}'
             )
         # Validates all items should be unique and non-empty.
         seen_choices = []
