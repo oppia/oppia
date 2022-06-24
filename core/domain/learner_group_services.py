@@ -20,12 +20,14 @@ from __future__ import annotations
 
 from core.domain import config_domain
 from core.domain import learner_group_domain
+from core.domain import story_fetchers
+from core.domain import topic_fetchers
 from core.platform import models
 
 from typing import List
 
 (learner_group_models, user_models) = models.Registry.import_models(
-    [models.NAMES.learner_group], [models.NAMES.user])
+    [models.NAMES.learner_group, models.NAMES.user])
 
 
 def is_learner_group_feature_enabled() -> bool:
@@ -62,7 +64,7 @@ def update_learner_group(
 
     Returns:
         learner_group: learner_group_domain.LearnerGroup. The domain object
-            of the updated or the newly created learner group.
+        of the updated or the newly created learner group.
     """
 
     learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
@@ -152,18 +154,19 @@ def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
 
 
 def get_filtered_learner_group_syllabus(
-        learner_group_id, filter_keyword,
-        filter_type, filter_category,
-        filter_language
+        learner_group_id, keyword,
+        filter_type, category,
+        language_code
     ):
     """Returns the syllabus of the learner group filtered by the given
     filter arguments.
 
     Args:
         learner_group_id: str. The id of the learner group.
-        filter_keyword: str. The keyword to filter the syllabus.
+        keyword: str. The keyword to filter the syllabus.
         filter_type: str. The type of the syllabus item to filter.
-        filter_category: str. The category of the syllabus items.
+        category: str. The category of the syllabus items.
+        language_code: str. The language of the syllabus items.
 
     Returns:
         list(dict). The filtered syllabus of the learner group.
@@ -171,12 +174,99 @@ def get_filtered_learner_group_syllabus(
     learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
         learner_group_id)
 
-    subtopic_page_ids = learner_group_model.subtopic_page_ids
-    story_ids = learner_group_model.story_ids
+    group_subtopic_page_ids = learner_group_model.subtopic_page_ids
+    group_story_ids = learner_group_model.story_ids
 
-    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
+    all_topics = topic_fetchers.get_all_topics()
+
+    filtered_topics = []
+
+    filtered_topic_ids = []
+    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+
+    possible_story_ids = []
+    filtered_story_ids = []
+    filtered_subtopics = []
+    filtered_stories = []
+
+    if category != 'All':
+        for classroom in all_classrooms_dict:
+            if category and classroom['name'] != category:
+                continue
+            filtered_topic_ids.extend(classroom['topic_ids'])
+
+        filtered_topics = (
+            [topic.id for topic in all_topics if (
+                topic.id in filtered_topic_ids)]
+        )
+    else:
+        filtered_topics = all_topics
+
+    for topic in filtered_topics:
+        if language_code and language_code != topic.language_code:
+            continue
+
+        # If the keyword matches a topic name.
+        if topic.canonical_name.find(keyword) != -1:
+            # If type filter is not set or type filter is set to 'Story',
+            # add all story ids of this topic to the filtered story ids.
+            if filter_type is None or filter_type == 'Story':
+                story_ids = (
+                    [
+                        story.id for story in topic.canonical_story_references
+                        and story.id not in group_story_ids
+                    ]
+                )
+                filtered_story_ids.extend(story_ids)
+
+            # If type filter is not set or type filter is set to 'Skill',
+            # add all subtopics of this topic to the filtered subtopics.
+            if filter_type is None or filter_type == 'Skill':
+                for subtopic in topic.subtopics:
+                    # If the subtopic is not already in the group syllabus,
+                    # add it to the filtered subtopics.
+                    subtopic_page_id = topic.id + ':' + subtopic.id
+                    if subtopic.id not in group_subtopic_page_ids:
+                        filtered_subtopics.append(subtopic)
+
+        # If the keyword does not matches a topic name
+        else:
+            # If type filter is not set or type filter is set to 'Skill',
+            # add the subtopics which have the keyword in their title to the
+            # filtered subtopics.
+            if filter_type is None or filter_type == 'Skill':
+                for subtopic in topic.subtopics:
+                    if subtopic.title.find(keyword) != -1:
+                        # If the subtopic is not already in the group syllabus,
+                        # add it to the filtered subtopics.
+                        subtopic_page_id = topic.id + ':' + subtopic.id
+                        if subtopic_page_id not in group_subtopic_page_ids:
+                            filtered_subtopics.append(subtopic)
+
+            # If type filter is not set or type filter is set to 'Story',
+            # add all story ids of this topic to the possible story ids.
+            if filter_type is None or filter_type == 'Story':
+                possible_story_ids = (
+                    [
+                        story.id for story in topic.canonical_story_references
+                        and story.id not in group_story_ids
+                    ]
+                )
+
+    if len(filtered_story_ids) > 0:
+        filtered_stories = story_fetchers.get_story_summaries_by_ids(
+            filtered_story_ids
+        )
+
+    if len(possible_story_ids) > 0:
+        possible_stories = story_fetchers.get_story_summaries_by_ids(
+            possible_story_ids
+        )
+        for story in possible_stories:
+            if story.title.find(keyword) != -1:
+                filtered_stories.append(story)
 
     return {
-        'story_summaries': '',
-        'subtopic_summaries': ''
+        'story_summaries': filtered_stories,
+        'subtopic_summaries': filtered_subtopics
     }

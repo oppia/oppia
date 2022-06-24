@@ -110,9 +110,9 @@ def get_multi_user_ids_from_usernames(usernames):
     Args:
         usernames: list(str). Identifiable usernames to display in the UI.
 
-        Returns:
-            list(str). Return the list of user ids corresponding to given
-            usernames.
+    Returns:
+        list(str). Return the list of user ids corresponding to given
+        usernames.
         """
     user_ids: List[str] = []
     for username in usernames:

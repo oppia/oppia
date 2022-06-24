@@ -22,7 +22,7 @@ from core.domain import learner_group_domain
 from core.platform import models
 
 (learner_group_models, user_models) = models.Registry.import_models(
-    [models.NAMES.learner_group], [models.NAMES.user])
+    [models.NAMES.learner_group, models.NAMES.user])
 
 
 def get_new_learner_group_id():

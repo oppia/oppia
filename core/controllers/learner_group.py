@@ -414,8 +414,8 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
 
         self.render_json({
             'learner_group_id': learner_group_id,
-            'subtopic_summaries': filtered_syllabus.subtopic_summaries,
-            'story_summaries': filtered_syllabus.story_summaries
+            'story_summaries': filtered_syllabus.story_summaries,
+            'subtopic_summaries': filtered_syllabus.subtopic_summaries
         })
 
 
