@@ -66,7 +66,6 @@
                                 [load-opportunities]="$ctrl.loadReviewableTranslationOpportunities"
                                 (click-action-button)="$ctrl.onClickReviewableTranslations($event)"
                                 [label-required]="!$ctrl.activeReviewTab"
-                                [show-description]="true"
                                 [show-opportunity-button]="true">
       </oppia-opportunities-list>
       <div ng-if="$ctrl.activeExplorationId !== null || !$ctrl.isReviewTranslationsTab()">
@@ -77,13 +76,12 @@
             <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
           </md-button>
           <div class="oppia-contributions-back-button-label">Back to lessons</div>
-        </div>        
+        </div>
         <oppia-opportunities-list [load-opportunities]="$ctrl.loadOpportunities"
                                   [load-more-opportunities]="$ctrl.loadMoreOpportunities"
                                   (click-action-button)="$ctrl.onClickViewSuggestion($event)"
                                   [label-required]="!$ctrl.activeReviewTab"
                                   [opportunity-heading-truncation-length]="30"
-                                  [show-description]="false"
                                   [show-opportunity-button]="false">
         </oppia-opportunities-list>
       </div>
@@ -91,7 +89,7 @@
   </div>
 </div>
 
-<style>  
+<style>
   contributions-and-review .oppia-contributions-show-review {
     display: flex;
     justify-content: center;

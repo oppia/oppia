@@ -151,14 +151,19 @@
   <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
     <contributions-and-review></contributions-and-review>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'">
+  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'"
+       class="oppia-opportunities">
     <question-opportunities></question-opportunities>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'translateTextTab'">
+  <div ng-if="$ctrl.activeTabName === 'translateTextTab'"
+       class="oppia-opportunities">
     <oppia-translation-opportunities></oppia-translation-opportunities>
   </div>
 </div>
 <style>
+  .oppia-opportunities {
+    margin: 20px 10px 0 10px;
+  }
   button.oppia-autofocus:focus {
     outline: 0;
   }

@@ -20,6 +20,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
+import { floor } from 'mathjs';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 export interface ExplorationOpportunity {
@@ -50,7 +51,6 @@ export class OpportunitiesListItemComponent {
   @Input() progressBarRequired: boolean = false;
 
   @Input() showOpportunityButton: boolean = true;
-  @Input() showDescription: boolean = true;
 
   labelText!: string;
   labelStyle!: { 'background-color': string };
@@ -83,7 +83,8 @@ export class OpportunitiesListItemComponent {
     if (this.opportunity) {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage = (
-          this.opportunity.progressPercentage + '%');
+          String((floor(this.opportunity.progressPercentage))) + '%'
+        );
         if (this.opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
           this.translationProgressBar = true;
           const translatedPercentage = (
