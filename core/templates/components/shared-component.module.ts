@@ -143,6 +143,7 @@ import { AuthService } from 'services/auth.service';
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
+import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 
 @NgModule({
   imports: [
@@ -173,6 +174,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
 
   providers: [
     AngularFireAuth,
+    ReplaceInputsWithEllipsesPipe,
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig

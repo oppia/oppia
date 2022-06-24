@@ -16,12 +16,11 @@
  * @fileoverview Directive for the rule type selector.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { ReplaceInputsWithEllipsesPipe } from "filters/string-utility-filters/replace-inputs-with-ellipses.pipe";
-import { TruncateAtFirstEllipsisPipe } from 'filters/string-utility-filters/truncate-at-first-ellipsis.pipe';
-import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 @Component({
   selector: 'oppia-rule-type-selector',
@@ -30,20 +29,47 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 export class RuleTypeSelector implements OnInit {
   @Input() localValue;
   @Output() onSelectionChange = new EventEmitter();
+  choices = [];
 
-  constructor() {}
+  constructor(
+    private stateInteractionIdService: StateInteractionIdService,
+    private replaceInputsWithEllipsesPipe: ReplaceInputsWithEllipsesPipe,
+  ) {}
 
-  shivam($event: Event): void {
-    console.error('event' + $event);
+  selectedRule($event: Event): void {
+    console.error('choices');
+    console.error(this.choices);
 
-    console.error('local value:' + this.localValue);
+    console.error('localValue');
     console.error(this.localValue);
-    console.error('onSelectionChange:');
-    this.onSelectionChange.emit(this.localValue);
   }
 
   ngOnInit(): void {
-    console.error('error' + this.localValue);
+    let ruleTypesToDescriptions = INTERACTION_SPECS[
+      this.stateInteractionIdService.savedMemento].rule_descriptions;
+
+    let equalToIndex = null;
+    let idx = 0;
+    for (let ruleType in ruleTypesToDescriptions) {
+      if (ruleType.includes('Equal') || ruleType.includes('Exactly')) {
+        equalToIndex = idx;
+      }
+
+      this.choices.push({
+        id: ruleType,
+        text: this.replaceInputsWithEllipsesPipe.transform(
+          ruleTypesToDescriptions[ruleType])
+      });
+      idx++;
+    }
+    // If the 'Equals' rule is not the first one, swap it with the first
+    // rule, so the equals rule is always the default one selected in the
+    // editor.
+    if (equalToIndex) {
+      [this.choices[0], this.choices[equalToIndex]] = [
+        this.choices[equalToIndex], this.choices[0]];
+    }
+    this.localValue = this.choices[0].id;
   }
 }
 
@@ -53,7 +79,7 @@ angular.module('oppia').directive('oppiaRuleTypeSelector',
     component: RuleTypeSelector
   }) as angular.IDirectiveFactory);
 
-// angular.module('oppia').directive('ruleTypeSelector', [function() {
+// Angular.module('oppia').directive('ruleTypeSelector', [function() {
 //   return {
 //     restrict: 'E',
 //     scope: {},
@@ -69,15 +95,15 @@ angular.module('oppia').directive('oppiaRuleTypeSelector',
 //       function(
 //           $element, $filter, $scope,
 //           StateInteractionIdService, INTERACTION_SPECS) {
-//         var ctrl = this;
+//         let ctrl = this;
 //         ctrl.$onInit = function() {
-//           var choices = [];
+//           let choices = [];
 
-//           var ruleTypesToDescriptions = INTERACTION_SPECS[
+//           let ruleTypesToDescriptions = INTERACTION_SPECS[
 //             StateInteractionIdService.savedMemento].rule_descriptions;
-//           var equalToIndex = null;
-//           var idx = 0;
-//           for (var ruleType in ruleTypesToDescriptions) {
+//           let equalToIndex = null;
+//           let idx = 0;
+//           for (let ruleType in ruleTypesToDescriptions) {
 //             if (ruleType.includes('Equal') || ruleType.includes('Exactly')) {
 //               equalToIndex = idx;
 //             }
@@ -95,7 +121,7 @@ angular.module('oppia').directive('oppiaRuleTypeSelector',
 //             [choices[0], choices[equalToIndex]] = [
 //               choices[equalToIndex], choices[0]];
 //           }
-//           var select2Node = $element[0].firstChild;
+//           let select2Node = $element[0].firstChild;
 //           $(select2Node).select2({
 //             allowClear: false,
 //             data: choices,

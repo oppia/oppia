@@ -1,8 +1,9 @@
 <mat-form-field appearance="fill">
-    <mat-label>Select an option</mat-label>
-    <mat-select disableRipple>
-        <mat-option value="1" (click)="shivam($event)">Option 1</mat-option>
-        <mat-option value="2">Option 2</mat-option>
-        <mat-option value="3">Option 3</mat-option>
+    <mat-label>Select an choice:</mat-label>
+    <mat-select [(value)]="localValue" disableRipple>
+        <mat-option *ngFor="let choice of choices; index as index"
+                    value="{{choice.id}}"
+                    (click)="selectedRule($event)">{{choice.text}}
+        </mat-option>
     </mat-select>
 </mat-form-field>
