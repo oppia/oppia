@@ -21,8 +21,8 @@ from __future__ import annotations
 import math
 
 from core.domain import exp_fetchers
-from core.domain import html_cleaner
 from core.domain import state_domain
+from core.domain import rte_component_registry
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -30,6 +30,9 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+import bs4
+import html
+import json
 from typing import Dict, List
 
 MYPY = False
@@ -43,6 +46,46 @@ datastore_services = models.Registry.import_datastore_services()
 
 class ExpStateValidationJob(base_jobs.JobBase):
     """Job that tests the general state, rte and interaction validation"""
+
+    @staticmethod
+    def _get_rte_components(html_string: str):
+        """Extracts the RTE components from an HTML string.
+
+        Args:
+            html_string: str. An HTML string.
+
+        Returns:
+            list(dict). A list of dictionaries, each representing an
+            RTE component.
+            Each dict in the list contains:
+            - id: str. The name of the component, i.e.
+            'oppia-noninteractive-link'.
+            - customization_args: dict. Customization arg specs for
+            the component.
+        """
+        components = []
+        soup = bs4.BeautifulSoup(html_string, 'html.parser')
+        oppia_custom_tag_attrs = (
+            rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
+        for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
+            component_tags = soup.find_all(name=tag_name)
+            for component_tag in component_tags:
+                customization_args = {}
+                for attr in tag_attrs:
+                    try:
+                        component_tag[attr]
+                        # Unescape special HTML characters such as '&quot;'.
+                        attr_val = html.unescape(component_tag[attr])
+                        customization_args[attr] = json.loads(attr_val)
+                    except:
+                        continue
+
+                component = {
+                    'id': tag_name,
+                    'customization_args': customization_args
+                }
+                components.append(component)
+        return components
 
     @staticmethod
     def filter_invalid_state_rte_values(
@@ -71,7 +114,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         states_with_values = []
         for key, value in states_dict.items():
             rte_components_errors = []
-            rte_components = html_cleaner.get_rte_components(
+            rte_components = ExpStateValidationJob._get_rte_components(
                 value.content.html)
             for rte_component in rte_components:
                 # RTE image validations for caption, alt and filepath.
