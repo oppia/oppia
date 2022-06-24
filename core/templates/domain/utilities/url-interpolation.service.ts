@@ -47,7 +47,8 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} resourcePath - A resource path relative to a subfolder in /.
+   * @param {string} resourcePath - A resource path relative to a subfolder
+   * in /.
    */
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
@@ -63,7 +64,8 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} resourcePath - A resource path relative to a subfolder in /.
+   * @param {string} resourcePath - A resource path relative to a subfolder
+   * in /.
    * @return {string} The resource path with cache slug.
    */
   _getUrlWithSlug(resourcePath: string): string {
@@ -93,7 +95,8 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} resourcePath - A resource path relative to extensions folder.
+   * @param {string} resourcePath - A resource path relative to extensions
+   * folder.
    * @return {string} The complete url path to that resource.
    */
   getExtensionResourceUrl(resourcePath: string): string {
@@ -102,17 +105,17 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Interpolate a URL by inserting values the URL needs using an object. If a 
-   * URL requires a value which is not keyed within the object, the function 
+   * Interpolate a URL by inserting values the URL needs using an object. If a
+   * URL requires a value which is not keyed within the object, the function
    * execution will stop after throwing an error.
    * @param {string} urlTemplate - A formatted URL. For example, urlTemplate
    * might be:
    *    /createhandler/resolved_answers/<exploration_id>/<escaped_state_name>
    * @param {InterpolationValuesType} interpolationValues - An object whose keys
-   * are variables within the URL. For the above example, interpolationValues 
+   * are variables within the URL. For the above example, interpolationValues
    * may look something like:
    *    { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
-   * @return {string} The URL interpolated with the interpolationValues object. 
+   * @return {string} The URL interpolated with the interpolationValues object.
    */
   interpolateUrl(
       urlTemplate: string,
@@ -179,7 +182,8 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} imagePath - An image path relative to /assets/images folder.
+   * @param {string} imagePath - An image path relative to /assets/images
+   * folder.
    * @return {string} The complete url path to that image.
    */
   getStaticImageUrl(imagePath: string): string {
@@ -216,7 +220,7 @@ export class UrlInterpolationService {
 
   /**
    * @param {string} path - A complete url path to an asset.
-   * @return {string} The url including the current url origin and the complete 
+   * @return {string} The url including the current url origin and the complete
    * url path.
    */
   getFullStaticAssetUrl(path: string): string {
