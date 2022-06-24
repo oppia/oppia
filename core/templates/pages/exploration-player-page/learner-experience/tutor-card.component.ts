@@ -48,6 +48,7 @@ import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-su
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { QuestionPlayerConfig } from './ratings-and-recommendations.component';
 
 const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
 const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;
@@ -95,7 +96,7 @@ export class TutorCardComponent {
   @Input() avatarImageIsShown: boolean;
   @Input() userIsLoggedIn: boolean;
   @Input() explorationIsInPreviewMode: boolean;
-  @Input() questionPlayerConfig;
+  @Input() questionPlayerConfig: QuestionPlayerConfig;
   @Input() collectionSummary: CollectionSummary;
   @Input() isRefresherExploration: boolean;
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];

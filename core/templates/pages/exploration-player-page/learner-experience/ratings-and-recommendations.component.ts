@@ -39,7 +39,7 @@ interface ResultActionButton {
   url: string;
 }
 
-interface QuestionPlayerConfig {
+export interface QuestionPlayerConfig {
   resultActionButtons: ResultActionButton[];
   skillList: string[];
   skillDescriptions: string[];
@@ -64,7 +64,7 @@ export class RatingsAndRecommendationsComponent {
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
   inStoryMode: boolean;
-  storyViewerUrl!: string;
+  storyViewerUrl: string | undefined;
   collectionId: string;
   userRating: number;
   directiveSubscriptions = new Subscription();
@@ -92,8 +92,8 @@ export class RatingsAndRecommendationsComponent {
   ) {}
 
   ngOnInit(): void {
-    this.inStoryMode =
-      this.explorationPlayerStateService.isInStoryChapterMode();
+    this.inStoryMode = (
+      this.explorationPlayerStateService.isInStoryChapterMode());
     if (this.inStoryMode) {
       this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
         TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {

@@ -111,9 +111,12 @@ describe('Ratings and recommendations component', () => {
 
   it('should populate internal properties and subscribe to event' +
     ' listeners on initialize', fakeAsync(() => {
-    let collectionId = 'collection_id';
-    let userRating = 5;
-    let mockOnRatingUpdated = new EventEmitter<void>();
+    const collectionId = 'collection_id';
+    const userRating = 5;
+    const mockOnRatingUpdated = new EventEmitter<void>();
+
+    expect(componentInstance.inStoryMode).toBe(undefined);
+    expect(componentInstance.storyViewerUrl).toBe(undefined);
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       collectionId);
@@ -151,6 +154,9 @@ describe('Ratings and recommendations component', () => {
 
   it('should not generate story page url if not in story mode',
     fakeAsync(() => {
+      expect(componentInstance.inStoryMode).toBe(undefined);
+      expect(componentInstance.storyViewerUrl).toBe(undefined);
+
       spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
         .and.returnValue(false);
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
@@ -163,6 +169,7 @@ describe('Ratings and recommendations component', () => {
         .toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(false);
       expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
+      expect(componentInstance.storyViewerUrl).toBe(undefined);
     }));
 
   it('should toggle popover when user clicks on rating stars', () => {
@@ -231,8 +238,8 @@ describe('Ratings and recommendations component', () => {
   });
 
   it('should get user\'s sign up section preference from localStorage', () => {
-    let getItemSpy =
-      spyOn(componentInstance.localStorage, 'getItem').and.returnValue('true');
+    const getItemSpy = (
+      spyOn(componentInstance.localStorage, 'getItem').and.returnValue('true'));
 
     expect(componentInstance.isSignUpSectionHidden()).toBe(true);
     expect(componentInstance.localStorage.getItem).toHaveBeenCalledWith(
@@ -251,8 +258,8 @@ describe('Ratings and recommendations component', () => {
     });
 
   it('should correctly determine if the feature is enabled or not', () => {
-    let featureSpy =
-      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough();
+    const featureSpy = (
+      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough());
 
     expect(componentInstance.isEndChapterFeatureEnabled()).toBe(true);
 
