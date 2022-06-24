@@ -46,7 +46,7 @@ if MYPY: # pragma: no cover
 (base_models, exp_models, user_models) = (
     models.Registry.import_models(
         [models.NAMES.base_model, models.NAMES.exploration,
-         models.NAMES.user, models.NAMES.opportunity]))
+         models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 
