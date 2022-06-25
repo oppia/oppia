@@ -21,6 +21,7 @@ states:
       answer_groups:
       - outcome:
           dest: radio button
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -52,6 +53,7 @@ states:
           value: false
       default_outcome:
         dest: Fraction
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: <p>That answer isn't correct. Try again.</p>
@@ -124,6 +126,7 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: Fraction
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -158,6 +161,7 @@ states:
       answer_groups:
       - outcome:
           dest: drag and drop
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -182,8 +186,11 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Text
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: <p>Not quite. Try again (or maybe use a search engine).</p>
@@ -222,6 +229,7 @@ states:
       answer_groups:
       - outcome:
           dest: integer input
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_6
             html: <p><strong>Correct!</strong></p>
@@ -240,6 +248,7 @@ states:
         training_data: []
       - outcome:
           dest: check box
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_7
             html: <p>'Yellow' is considered a primary color in the RYB spectrum, but
@@ -277,6 +286,7 @@ states:
           value: 1
       default_outcome:
         dest: check box
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: <p>That's not quite right. Try again.</p>
@@ -325,6 +335,7 @@ states:
       answer_groups:
       - outcome:
           dest: drag and drop sort
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_4
             html: <p>That's correct</p>
@@ -358,6 +369,7 @@ states:
             html: <p>0.46</p>
       default_outcome:
         dest: drag and drop
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: <p>Not quite. Try again.</p>
@@ -401,6 +413,7 @@ states:
       answer_groups:
       - outcome:
           dest: image region
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_4
             html: <p>That's correct</p>
@@ -420,6 +433,7 @@ states:
         training_data: []
       - outcome:
           dest: drag and drop sort
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_5
             html: <p>Seems like you did the ascending order</p>
@@ -450,6 +464,7 @@ states:
             html: <p>0.46</p>
       default_outcome:
         dest: drag and drop sort
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: <p>Not quite. Try again.</p>
@@ -520,6 +535,7 @@ states:
       answer_groups:
       - outcome:
           dest: end
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Continue</p>
@@ -583,6 +599,7 @@ states:
                 regionType: Rectangle
       default_outcome:
         dest: image region
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: <p>Select the left most letter</p>
@@ -617,6 +634,7 @@ states:
       answer_groups:
       - outcome:
           dest: ratio
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_0
             html: <p>Correct!</p>

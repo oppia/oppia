@@ -258,7 +258,10 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
         })
 
         state.update_next_content_id_index(1)
