@@ -18,11 +18,13 @@
 
 from __future__ import annotations
 
+import html
+import json
 import math
 
 from core.domain import exp_fetchers
-from core.domain import state_domain
 from core.domain import rte_component_registry
+from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -31,8 +33,6 @@ from core.platform import models
 
 import apache_beam as beam
 import bs4
-import html
-import json
 from typing import Dict, List
 
 MYPY = False
@@ -73,11 +73,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 customization_args = {}
                 for attr in tag_attrs:
                     try:
-                        component_tag[attr]
                         # Unescape special HTML characters such as '&quot;'.
                         attr_val = html.unescape(component_tag[attr])
                         customization_args[attr] = json.loads(attr_val)
-                    except:
+                    except Exception:
                         continue
 
                 component = {
@@ -123,17 +122,17 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     try:
                         cap_with_value = rte_component['customization_args'][
                             'caption-with-value']
-                    except:
+                    except Exception:
                         cap_with_value = 'Not found'
                     try:
                         alt_with_value = rte_component['customization_args'][
                             'alt-with-value']
-                    except:
+                    except Exception:
                         alt_with_value = 'Not found'
                     try:
                         file_with_value = rte_component['customization_args'][
                             'filepath-with-value']
-                    except:
+                    except Exception:
                         file_with_value = 'Not found'
 
                     if (
@@ -174,13 +173,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     try:
                         svg_filename = rte_component['customization_args'][
                             'math_content-with-value']['svg_filename']
-                    except:
+                    except Exception:
                         svg_filename = 'Not found'
 
                     try:
                         raw_latex = rte_component['customization_args'][
                             'math_content-with-value']['raw_latex']
-                    except:
+                    except Exception:
                         raw_latex = 'Not found'
 
                     if (
@@ -211,7 +210,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     try:
                         text_with_value = rte_component['customization_args'][
                             'text-with-value']
-                    except:
+                    except Exception:
                         text_with_value = 'Not found'
 
                     if (
@@ -229,28 +228,28 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         start_value = (
                             rte_component['customization_args']
                             ['start-with-value'])
-                    except:
+                    except Exception:
                         start_value = 'Not found'
 
                     try:
                         end_value = (
                             rte_component['customization_args']
                             ['end-with-value'])
-                    except:
+                    except Exception:
                         end_value = 'Not found'
 
                     try:
                         video_id = (
                             rte_component['customization_args']
                             ['video_id-with-value'])
-                    except:
+                    except Exception:
                         video_id = 'Not found'
 
                     try:
                         autoplay = (
                             rte_component['customization_args']
                             ['autoplay-with-value'])
-                    except:
+                    except Exception:
                         autoplay = 'Not found'
 
                     # Validates if video start value is lesser than end value.
@@ -292,13 +291,13 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     try:
                         text_with_value = rte_component['customization_args'][
                             'text-with-value']
-                    except:
+                    except Exception:
                         text_with_value = 'Not found'
 
                     try:
                         url_with_value = rte_component['customization_args'][
                             'url-with-value']
-                    except:
+                    except Exception:
                         url_with_value = 'Not found'
 
                     if (
