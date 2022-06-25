@@ -23,7 +23,7 @@ import string
 
 from core.platform import models
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Sequence
 from typing_extensions import Literal, TypedDict
 
 MYPY = False
@@ -290,7 +290,7 @@ class LearnerGroupModel(base_models.BaseModel):
     @classmethod
     def get_by_facilitator_id(
             cls, facilitator_id: str
-        ) -> Optional[List[LearnerGroupModel]]:
+        ) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels that have the given
         facilitator id.
 
@@ -302,9 +302,9 @@ class LearnerGroupModel(base_models.BaseModel):
             have the given facilitator id or None if no such learner group
             models exist.
         """
-        found_models = cls.get_all().filter(
+        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
             datastore_services.any_of(
                 cls.facilitator_user_ids == facilitator_id
-        )).get()
+        )).fetch()
 
         return found_models

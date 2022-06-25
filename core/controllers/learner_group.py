@@ -121,7 +121,7 @@ class CreateLearnerGroupHandler(base.BaseHandler):
         )
 
         self.render_json({
-            'learner_group_id': learner_group.id,
+            'learner_group_id': learner_group.group_id,
             'title': learner_group.title,
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(
@@ -190,7 +190,7 @@ class LearnerGroupHandler(base.BaseHandler):
         )
 
         self.render_json({
-            'learner_group_id': learner_group.id,
+            'learner_group_id': learner_group.group_id,
             'title': learner_group.title,
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(
@@ -448,10 +448,10 @@ class TeacherDashboardHandler(base.BaseHandler):
         learner_groups_data = []
         for learner_group in learner_groups:
             learner_groups_data.append({
-                'id': learner_group.id,
+                'id': learner_group.group_id,
                 'title': learner_group.title,
                 'description': learner_group.description,
-                'member_count': len(learner_group.member_ids)
+                'students_count': len(learner_group.student_user_ids)
             })
 
         self.render_json({
@@ -492,7 +492,7 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
                 learner_group_id)
 
         self.render_json({
-            'learner_group_id': learner_group.id,
+            'learner_group_id': learner_group.group_id,
             'title': learner_group.title,
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(

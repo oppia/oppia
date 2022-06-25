@@ -45,5 +45,51 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.STUDENT_ID], [], ['subtopic_id_1'],
+            [self.FACILITATOR_ID], [], [self.STUDENT_ID], ['subtopic_id_1'],
             ['story_id_1'])
+
+    def test_get_new_learner_group_id(self):
+        self.assertIsNotNone(learner_group_fetchers.get_new_learner_group_id())
+
+    def test_get_learner_group_by_id(self):
+        fake_learner_group_id = 'fake_learner_group_id'
+        fake_learner_group = learner_group_fetchers.get_learner_group_by_id(
+            fake_learner_group_id)
+        self.assertIsNone(fake_learner_group)
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID
+        )
+        self.assertIsNotNone(learner_group)
+        self.assertEqual(learner_group.group_id, self.LEARNER_GROUP_ID)
+
+    def test_get_learner_groups_of_facilitator(self):
+        fake_facilitator_id = 'fake_facilitator_id'
+        fake_learner_groups = (
+            learner_group_fetchers.get_learner_groups_of_facilitator(
+                fake_facilitator_id
+            )
+        )
+        self.assertEqual(len(fake_learner_groups), 0)
+
+        learner_groups = (
+            learner_group_fetchers.get_learner_groups_of_facilitator(
+                self.FACILITATOR_ID
+            )
+        )
+        self.assertEqual(len(learner_groups), 1)
+        self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)
+
+    def test_get_progress_sharing_permission(self):
+        learner_group_services.add_student_to_learner_group(
+            self.STUDENT_ID, self.LEARNER_GROUP_ID, True)
+
+        self.assertEqual(
+            learner_group_fetchers.get_progress_sharing_permission(
+                self.STUDENT_ID, self.LEARNER_GROUP_ID
+            ), True)
+
+        self.assertEqual(
+            learner_group_fetchers.get_progress_sharing_permission(
+                self.STUDENT_ID, 'fake_learner_group_id'
+            ), False)

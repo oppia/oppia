@@ -70,8 +70,14 @@ def create_learner_group(
     """
 
     learner_group_model = learner_group_models.LearnerGroupModel(
-        group_id, title, description, facilitator_user_ids, student_ids,
-        invited_student_ids, subtopic_page_ids, story_ids
+        id=group_id,
+        title=title,
+        description=description,
+        facilitator_user_ids=facilitator_user_ids,
+        student_user_ids=student_ids,
+        invited_student_user_ids=invited_student_ids,
+        subtopic_page_ids=subtopic_page_ids,
+        story_ids=story_ids
     )
 
     learner_group_model.update_timestamps()
@@ -83,7 +89,7 @@ def create_learner_group(
         learner_group_model.description,
         learner_group_model.facilitator_user_ids,
         learner_group_model.student_user_ids,
-        learner_group_model.invited_user_ids,
+        learner_group_model.invited_student_user_ids,
         learner_group_model.subtopic_page_ids,
         learner_group_model.story_ids
     )
@@ -160,7 +166,7 @@ def update_learner_group(
         learner_group_model.description,
         learner_group_model.facilitator_user_ids,
         learner_group_model.student_user_ids,
-        learner_group_model.invited_user_ids,
+        learner_group_model.invited_student_user_ids,
         learner_group_model.subtopic_page_ids,
         learner_group_model.story_ids
     )
@@ -401,7 +407,7 @@ def invite_students_to_learner_group(group_id, invited_student_ids) -> None:
     learner_groups_user_models = (
         user_models.LearnerGroupsUserModel.get_multi(invited_student_ids))
 
-    for index, student_id in invited_student_ids:
+    for index, student_id in enumerate(invited_student_ids):
         if learner_groups_user_models[index]:
             (
                 learner_groups_user_models[index].invited_to_learner_groups_ids
@@ -415,8 +421,9 @@ def invite_students_to_learner_group(group_id, invited_student_ids) -> None:
             )
             learner_groups_user_models[index] = learner_grps_user_model
 
-    learner_groups_user_models.update_timestamps_multi()
-    learner_groups_user_models.put_multi()
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(
+        learner_groups_user_models)
+    user_models.LearnerGroupsUserModel.put_multi(learner_groups_user_models)
 
 
 def remove_invited_students_from_learner_group(group_id, student_ids) -> None:
@@ -429,9 +436,9 @@ def remove_invited_students_from_learner_group(group_id, student_ids) -> None:
     found_models = (
         user_models.LearnerGroupsUserModel.get_multi(student_ids))
 
-    for index, model in found_models:
+    for index, model in enumerate(found_models):
         if group_id in model.invited_to_learner_groups_ids:
             found_models[index].invited_to_learner_groups_ids.remove(group_id)
 
-    found_models.update_timestamps_multi()
-    found_models.put_multi()
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(found_models)
+    user_models.LearnerGroupsUserModel.put_multi(found_models)

@@ -60,7 +60,7 @@ def get_learner_group_by_id(
         learner_group_model.description,
         learner_group_model.facilitator_user_ids,
         learner_group_model.student_user_ids,
-        learner_group_model.invited_user_ids,
+        learner_group_model.invited_student_user_ids,
         learner_group_model.subtopic_page_ids,
         learner_group_model.story_ids)
 
@@ -79,6 +79,9 @@ def get_learner_groups_of_facilitator(
     learner_grp_models = (
         learner_group_models.LearnerGroupModel.get_by_facilitator_id(user_id))
 
+    if not learner_grp_models:
+        return []
+
     learner_groups = []
     for learner_grp_model in learner_grp_models:
         learner_groups.append(
@@ -88,7 +91,7 @@ def get_learner_groups_of_facilitator(
                 learner_grp_model.description,
                 learner_grp_model.facilitator_user_ids,
                 learner_grp_model.student_user_ids,
-                learner_grp_model.invited_user_ids,
+                learner_grp_model.invited_student_user_ids,
                 learner_grp_model.subtopic_page_ids,
                 learner_grp_model.story_ids))
 
@@ -111,7 +114,7 @@ def get_progress_sharing_permission(user_id, group_id) -> bool:
         user_id)
 
     for group_details in learner_group_user_model.learner_groups_user_details:
-        if group_details.group_id == group_id:
-            return group_details.progress_sharing_is_turned_on
+        if group_details['group_id'] == group_id:
+            return group_details['progress_sharing_is_turned_on']
 
     return False
