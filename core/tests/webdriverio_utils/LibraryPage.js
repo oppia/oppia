@@ -25,10 +25,9 @@ var LibraryPage = function() {
 
   var searchButton = $('.e2e-test-search-button');
   var mainHeader = $('.e2e-test-library-main-header');
-  var allCollectionSummaryTile = $(
-    '.e2e-test-collection-summary-tile');
-  var allExplorationSummaryTile = $(
-    '.e2e-test-exp-summary-tile');
+  var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
+  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
+  var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
   var allExplorationsTitled = function(explorationName) {
     return $$(
       `.e2e-test-exp-summary-tile-title=${explorationName}`);
@@ -63,6 +62,16 @@ var LibraryPage = function() {
   this.get = async function() {
     await browser.url(LIBRARY_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.addSelectedExplorationToPlaylist = async function() {
+    await expHoverElement.moveTo();
+
+    await waitFor.elementToBeClickable(
+      addToPlayLaterListButton,
+      'Add to \'Play Later\' list Icon taking too long to load');
+    await action.click(
+      'Add to play later list button', addToPlayLaterListButton);
   };
 
   this.findExploration = async function(explorationTitle) {

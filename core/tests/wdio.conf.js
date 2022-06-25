@@ -47,6 +47,10 @@ var suites = {
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
+  learnerDashboard: [
+    './core/tests/webdriverio_desktop/learnerDashboard.js'
+  ],
+
   preferences: [
     './core/tests/webdriverio_desktop/preferences.js'
   ],
