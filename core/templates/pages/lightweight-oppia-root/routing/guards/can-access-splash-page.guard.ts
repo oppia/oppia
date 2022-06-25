@@ -39,8 +39,9 @@ export class CanAccessSplashPageGuard implements CanLoad {
           // creator dashboard page are migrated to angular router.
             this.windowRef.nativeWindow.location.href = (
               '/' + preferredDashboard + '-dashboard');
-            return false;
-          });
+          }
+        );
+        return false;
       } else {
         return true;
       }

@@ -16,21 +16,24 @@
  * @fileoverview Module for the error page.
  */
 
-import { ErrorPageComponent } from './error-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ErrorPageRootComponent } from './error-page-root.component';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { APP_BASE_HREF } from '@angular/common';
+
+import { ErrorPageComponent } from './error-page.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { ErrorPageRootComponent } from './error-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
-
+import { ErrorPageRoutingModule } from 'pages/error-pages/error-page-routing.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
+    ErrorPageRoutingModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
@@ -43,6 +46,12 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
   ],
   bootstrap: [
     ErrorPageRootComponent
+  ],
+  providers: [
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
+    }
   ]
 })
 export class ErrorPageModule {}
