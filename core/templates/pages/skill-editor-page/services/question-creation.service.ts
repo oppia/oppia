@@ -55,19 +55,19 @@ require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').factory('QuestionCreationService', [
-  '$location', '$rootScope', '$uibModal', 'AlertsService',
+  '$location', '$rootScope', 'AlertsService',
   'EditableQuestionBackendApiService', 'ImageLocalStorageService',
   'NgbModal', 'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
-  'SkillEditorStateService', 'UrlInterpolationService',
+  'SkillEditorStateService',
   'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $location, $rootScope, $uibModal, AlertsService,
+      $location, $rootScope, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
       NgbModal, QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
-      SkillEditorStateService, UrlInterpolationService,
+      SkillEditorStateService,
       DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
       SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     var newQuestionSkillDifficulties = [];
@@ -219,36 +219,6 @@ angular.module('oppia').factory('QuestionCreationService', [
       var rubric = skillIdToRubricsObject[selectedSkillId].find(
         rubric => skillDifficultyMapping[rubric.getDifficulty()] === parseFloat(
           questionDifficulty));
-
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/components/question-directives/modal-templates/' +
-            'question-editor-modal.directive.html'),
-        backdrop: 'static',
-        keyboard: false,
-        resolve: {
-          associatedSkillSummaries: () => [],
-          untriagedSkillSummaries: () => [],
-          canEditQuestion: () => canEditQuestion,
-          categorizedSkills: () => [],
-          groupedSkillSummaries: () => groupedSkillSummaries,
-          misconceptionsBySkill: () => misconceptionsBySkill,
-          newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
-          question: () => question,
-          questionId: () => questionId,
-          questionStateData: () => questionStateData,
-          rubric: () => rubric,
-          skillName: () => skillName
-        },
-        controller: 'QuestionEditorModalController',
-      }).result.then(function() {
-        $location.hash(null);
-        saveAndPublishQuestion();
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
     };
     return {
       createQuestion: createQuestion,
