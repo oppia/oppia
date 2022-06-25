@@ -755,7 +755,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.main(args=['--install'])
 
     def test_main_without_install_arg_and_errors(self):
-        def mock_run_script_and_get_returncode(script):
+        def mock_run_script_and_get_returncode(unused_script):
             return 0
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
