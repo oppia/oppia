@@ -843,8 +843,10 @@ var ExplorationEditorMainTab = function() {
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     await action.click('Answer Description', answerDescription);
+
     var ruleDropdownElement = element.all(by.cssContainingText(
-      '.select2-results__option', ruleDescriptionInDropdown)).first();
+      '.protractor-rule-type-selector', ruleDescriptionInDropdown)).first();
+
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 
