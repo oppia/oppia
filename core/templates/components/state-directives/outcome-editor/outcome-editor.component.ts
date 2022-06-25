@@ -159,6 +159,7 @@ export class OutcomeEditorComponent implements OnInit {
       this.outcome.feedback);
 
     if (
+      !this.stateEditorService.isInQuestionMode() &&
       this.savedOutcome.dest === this.outcome.dest &&
         !this.stateEditorService.getStateNames().includes(
           this.outcome.dest)) {
