@@ -34,7 +34,6 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     LEARNER_GROUP_ID = None
     FACILITATOR_ID = 'facilitator_user_1'
     STUDENT_ID = 'student_user_1'
-    MISCONCEPTION_ID_1 = 1
 
     def setUp(self):
         super(LearnerGroupFetchersUnitTests, self).setUp()
