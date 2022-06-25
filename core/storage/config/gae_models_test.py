@@ -152,11 +152,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    # Here, we are providing 'value' key but there is no key
-                    # defined in PlatformParameterRuleDict as 'value'. Due
-                    # to this MyPy throws an 'Extra key 'value' for TypedDict'
-                    # error. So, to silent the error, we used ignore here.
-                    {'type': 'app_version', 'value': '>1.2.3'}  # type: ignore[typeddict-item]
+                    {'type': 'app_version', 'conditions': [('>', '1.2.3')]}
                 ],
                 'value_when_matched': True
             },
@@ -211,11 +207,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    # Here, we are providing 'value' key but there is no key
-                    # defined in PlatformParameterRuleDict as 'value'. Due
-                    # to this MyPy throws an 'Extra key 'value' for TypedDict'
-                    # error. So, to silent the error, we used ignore here.
-                    {'type': 'app_version', 'value': '>1.2.3'}  # type: ignore[typeddict-item]
+                    {'type': 'app_version', 'conditions': [('>', '1.2.3')]}
                 ],
                 'value_when_matched': True
             },

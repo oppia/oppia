@@ -161,8 +161,10 @@ class PlatformParameterModel(base_models.VersionedModel):
                         PlatformParameterFilter objects, having the following
                         structure:
                             - type: str. The type of the filter.
-                            - value: *. The value of the filter to match
-                                against.
+                            - conditions: list((str, str)). Each element of the
+                                list is a 2-tuple (op, value), where op is the
+                                operator for comparison and value is the value
+                                used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
 
         Returns:

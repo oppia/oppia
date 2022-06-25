@@ -1790,7 +1790,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'feature_stage': None
         }
         parameter = parameter_domain.PlatformParameter.from_dict(param_dict)
-        self.assertEqual(parameter.to_dict(), param_dict)
+        self.assertDictEqual(parameter.to_dict(), param_dict)
 
     def test_set_rules_correctly_changes_rules(self) -> None:
         param = parameter_domain.PlatformParameter.from_dict({
