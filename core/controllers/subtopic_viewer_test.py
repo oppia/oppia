@@ -48,7 +48,8 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': self.subtopic_id_1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         subtopic_page_services.save_subtopic_page(
@@ -56,7 +57,8 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': self.subtopic_id_2,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
             })]
         )
         subtopic_page_private_topic = (
@@ -67,7 +69,8 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': self.subtopic_id_1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment-one'
             })]
         )
         subtopic = topic_domain.Subtopic.create_default_subtopic(

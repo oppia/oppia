@@ -499,6 +499,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'than or equal to %d characters' %
             android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
 
+        self.topic.subtopics[0].url_fragment = ''
+        self._assert_validation_error(
+            'Expected subtopic url fragment to be non '
+            'empty')
+
         self.topic.subtopics[0].url_fragment = 'invalidFragment'
         self._assert_validation_error(
             'Invalid url fragment: %s' % self.topic.subtopics[0].url_fragment)

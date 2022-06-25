@@ -204,7 +204,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Dummy Subtopic Title'
+                'title': 'Dummy Subtopic Title',
+                'url_fragment': 'dummy-fragment'
             })]
         )
 

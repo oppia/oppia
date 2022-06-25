@@ -149,7 +149,7 @@ class TopicChange(change_domain.BaseChange):
         'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_SUBTOPIC,
-        'required_attribute_names': ['title', 'subtopic_id'],
+        'required_attribute_names': ['title', 'subtopic_id', 'url_fragment'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
@@ -507,12 +507,14 @@ class Subtopic:
                 'than or equal to %d characters, received %s'
                 % (url_fragment_limit, self.url_fragment))
 
-        if len(self.url_fragment):
+        if len(self.url_fragment) > 0:
             if not bool(re.match(regex, self.url_fragment)):
                 raise utils.ValidationError(
                     'Invalid url fragment: %s' % self.url_fragment)
         else:
-            
+            raise utils.ValidationError(
+                'Expected subtopic url fragment to be non '
+                'empty')
 
         if len(self.skill_ids) > len(set(self.skill_ids)):
             raise utils.ValidationError(
@@ -1515,7 +1517,12 @@ class Topic:
         raise Exception(
             'The subtopic with id %s does not exist.' % subtopic_id)
 
-    def add_subtopic(self, new_subtopic_id: int, title: str) -> None:
+    def add_subtopic(
+        self,
+        new_subtopic_id: int,
+        title: str,
+        url_frag: str
+    ) -> None:
         """Adds a subtopic with the given id and title.
 
         Args:
