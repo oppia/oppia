@@ -672,13 +672,14 @@ def update_states_version_history(
         state_name: False
         for state_name in states_which_were_not_renamed
     }
+    state_property_ignore_list = [
+        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS,
+        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+    ]
     for change in change_list:
         if (
             change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-            change.property_name != (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS) and
-            change.property_name != (
-                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS)
+            change.property_name not in state_property_ignore_list
         ):
             state_name = change.state_name
             if state_property_changed_data.get(state_name) is False:
@@ -690,13 +691,11 @@ def update_states_version_history(
             old_state_dict = copy.deepcopy(old_states_dict[state_name])
             new_state_dict = copy.deepcopy(new_states_dict[state_name])
 
-            # Deleting the attributes written_translations and
-            # recorded_voiceovers because we don't want to consider diff
-            # in these properties as they are related to translations.
-            del old_state_dict['written_translations']
-            del old_state_dict['recorded_voiceovers']
-            del new_state_dict['written_translations']
-            del new_state_dict['recorded_voiceovers']
+            # Deleting the attributes from the state dicts which are present
+            # in the ignore list.
+            for property_name in state_property_ignore_list:
+                del new_state_dict[property_name]
+                del old_state_dict[property_name]
 
             # The purpose of checking the diff_dict between the two state
             # dicts ensure that we do not change the version history of that
@@ -704,7 +703,7 @@ def update_states_version_history(
             # get cancelled by each other and there is no 'net change'.
             diff_dict = deepdiff.DeepDiff(
                 old_states_dict[state_name], new_states_dict[state_name])
-            if diff_dict:
+            if diff_dict != {}:
                 states_version_history[state_name] = (
                     state_domain.StateVersionHistory(
                         prev_version, state_name, committer_id
@@ -777,14 +776,11 @@ def get_updated_committer_ids(
         list[str]. A list of user ids who made the 'previous commit' on each
         state and the exploration metadata.
     """
-    committer_ids = []
+    committer_ids = set()
     for version_history in states_version_history.values():
-        if version_history.committer_id not in committer_ids:
-            committer_ids.append(version_history.committer_id)
-    if metadata_version_history.committer_id not in committer_ids:
-        committer_ids.append(metadata_version_history.committer_id)
-
-    return committer_ids
+        committer_ids.add(version_history.committer_id)
+    committer_ids.add(metadata_version_history.committer_id)
+    return list(committer_ids)
 
 
 def update_version_history(

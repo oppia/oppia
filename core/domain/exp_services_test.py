@@ -7994,3 +7994,24 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             new_model.state_version_history['first'],
             state_domain.StateVersionHistory(
                 2, 'second', self.owner_id).to_dict())
+
+    def test_new_committer_id_is_added_to_committer_ids_list(self):
+        old_model = self.version_history_model_class.get(
+            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+
+        self.assertNotIn(self.editor_id, old_model.committer_ids)
+
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+            })], 'Added a state')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'Another state'
+            })], 'Added a state')
+        new_model = self.version_history_model_class.get(
+            'version-history-%s-%s' % (self.EXP_0_ID, 3))
+
+        self.assertIn(self.editor_id, new_model.committer_ids)
