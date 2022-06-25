@@ -755,13 +755,19 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.main(args=['--install'])
 
     def test_main_without_install_arg_and_errors(self):
+        def mock_run_script_and_get_returncode(script):
+            return 0
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.js_or_ts_swap:
-                        with self.execute_mypy_checks_swap:
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+                    with run_script_and_get_returncode_swap:
+                        with self.js_or_ts_swap:
+                            with self.execute_mypy_checks_swap:
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
 
     def test_main_exits_when_mismatches_exist_in_backend_python_libs(self):
         """Test that main exits with correct error message when mismatches are
