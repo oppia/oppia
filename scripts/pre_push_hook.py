@@ -520,15 +520,6 @@ def main(args=None):
             if not modified_files and not files_to_lint:
                 continue
 
-            backend_associated_test_file_check_status = (
-                run_script_and_get_returncode(
-                    BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD))
-            if backend_associated_test_file_check_status != 0:
-                print(
-                    'Push failed due to some backend files lacking an '
-                    'associated test file.')
-                sys.exit(1)
-
             if files_to_lint:
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
@@ -542,6 +533,15 @@ def main(args=None):
                     'Push failed, please correct the mypy type annotation '
                     'issues above.')
                 sys.exit(mypy_check_status)
+            
+            backend_associated_test_file_check_status = (
+                run_script_and_get_returncode(
+                    BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD))
+            if backend_associated_test_file_check_status != 0:
+                print(
+                    'Push failed due to some backend files lacking an '
+                    'associated test file.')
+                sys.exit(1)
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
