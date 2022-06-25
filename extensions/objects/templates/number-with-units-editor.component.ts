@@ -47,6 +47,15 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.value === undefined) {
+      this.value = {
+        type: null,
+        real: null,
+        fraction: null,
+        units: [],
+      };
+    }
+
     if (this.value !== null) {
       const defaultNumberWithUnits =
         this.numberWithUnitsObjectFactory.fromDict(this.value);
