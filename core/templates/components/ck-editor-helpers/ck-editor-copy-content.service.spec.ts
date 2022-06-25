@@ -127,7 +127,8 @@ describe('Ck editor copy content service', () => {
         startupData: {
           alt: '',
           caption: 'Banana',
-          filepath: 'img_20200630_114637_c2ek92uvb8_height_326_width_490.png'
+          filepath: 'img_20200630_114637_c2ek92uvb8_height_326_width_490.png',
+          isCopied: true
         }
       }
     );
@@ -179,7 +180,8 @@ describe('Ck editor copy content service', () => {
         startupData: {
           math_content: {
             raw_latex: '\\frac{x}{y}', svg_filename: ''
-          }
+          },
+          isCopied: true
         }
       }
     );
@@ -205,7 +207,8 @@ describe('Ck editor copy content service', () => {
         startupData: {
           math_content: {
             raw_latex: '\\frac{x}{y}', svg_filename: ''
-          }
+          },
+          isCopied: true
         }
       }
     );

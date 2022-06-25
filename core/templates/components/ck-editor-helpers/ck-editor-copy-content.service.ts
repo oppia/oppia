@@ -164,8 +164,7 @@ export class CkEditorCopyContentService {
         startupData[key] = JSON.parse(
           this.htmlEscaperService.escapedStrToUnescapedStr(value));
       }
-
-      startupData.isFirst = true;
+      startupData.isCopied = true;
 
       editor.execCommand(widgetName, { startupData });
     }
