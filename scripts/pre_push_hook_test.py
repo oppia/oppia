@@ -700,6 +700,27 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'Push aborted due to failing typescript checks in '
             'strict mode.' in self.print_arr)
 
+    def test_backend_associated_test_file_check_failure(self):
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD:
+                return 1
+            return 0
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
+
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+            with self.collect_files_swap, self.uncommitted_files_swap:
+                with self.check_output_swap, self.start_linter_swap:
+                    with self.ts_swap, run_script_and_get_returncode_swap:
+                        with self.execute_mypy_checks_swap:
+                            with self.assertRaisesRegex(SystemExit, '1'):
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
+        self.assertTrue(
+            'Push failed due to some backend files lacking an '
+            'associated test file.' in self.print_arr)
+
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
         def mock_run_script_and_get_returncode(script):
