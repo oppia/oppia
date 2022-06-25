@@ -141,6 +141,10 @@ class _Gae(Platform):
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
+            elif name == NAMES.learner_group:
+                from core.storage.learner_group import (
+                    gae_models as learner_group_models)
+                returned_models.append(learner_group_models)
             elif name == NAMES.opportunity:
                 from core.storage.opportunity import (
                     gae_models as opportunity_models)
@@ -186,8 +190,8 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[NAMES]
-    ) -> List[base_models.BaseModel]:
+        cls, model_names: List[NAMES]
+    ) -> List[Type[base_models.BaseModel]]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -211,7 +215,7 @@ class _Gae(Platform):
         return model_classes
 
     @classmethod
-    def get_all_storage_model_classes(cls) -> List[base_models.BaseModel]:
+    def get_all_storage_model_classes(cls) -> List[Type[base_models.BaseModel]]:
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).
@@ -417,8 +421,8 @@ class Registry:
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[NAMES]
-    ) -> List[base_models.BaseModel]:
+        cls, model_names: List[NAMES]
+    ) -> List[Type[base_models.BaseModel]]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -431,7 +435,7 @@ class Registry:
         return cls._get().get_storage_model_classes(model_names)
 
     @classmethod
-    def get_all_storage_model_classes(cls) -> List[base_models.BaseModel]:
+    def get_all_storage_model_classes(cls) -> List[Type[base_models.BaseModel]]:
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).

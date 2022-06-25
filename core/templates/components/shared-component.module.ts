@@ -62,6 +62,7 @@ import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { OutcomeEditorComponent } from './state-directives/outcome-editor/outcome-editor.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
@@ -102,6 +103,8 @@ import { SavePendingChangesModalComponent } from './save-pending-changes/save-pe
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
+import { EndChapterCheckMarkComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-confetti.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
 import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
@@ -134,7 +137,9 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
+import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 
 @NgModule({
   imports: [
@@ -145,9 +150,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
@@ -182,6 +187,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -210,6 +217,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -260,7 +268,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
-    StateInteractionEditorComponent
+    StateInteractionEditorComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent
   ],
 
   entryComponents: [
@@ -274,6 +284,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -307,6 +319,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -352,7 +365,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
-    StateInteractionEditorComponent
+    StateInteractionEditorComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent
   ],
 
   exports: [
@@ -383,6 +398,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -415,6 +432,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RubricsEditorComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     StateContentEditorComponent,
