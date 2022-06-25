@@ -243,7 +243,7 @@ class BaseChange:
 
     # Here, Argument `base_change_dict` can accept dictionaries which have
     # arbitrary number of keys with different types of values. So, to make the
-    # argument generalized for every type of dictionaries, we used Any type here.
+    # argument generalized for every type of dictionaries, we used Any here.
     @classmethod
     def from_dict(cls, base_change_dict: Dict[str, Any]) -> BaseChange:
         """Returns a BaseChange domain object from a dict.
