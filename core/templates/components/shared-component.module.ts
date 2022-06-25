@@ -140,7 +140,7 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
@@ -154,9 +154,9 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
