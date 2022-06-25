@@ -259,6 +259,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webdriverio_server', mock_managed_process,
+            expected_kwargs=[
+                {
+                    'dev_mode': True,
+                    'suite_name': 'full',
+                    'sharding_instances': 3,
+                    'debug_mode': False,
+                    'stdout': subprocess.PIPE,
+                },
+            ]))
         self.exit_stack.enter_context(self.swap(
             flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -271,6 +282,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_work_with_non_ascii_chars(self):
         def mock_managed_protractor_server(**unused_kwargs):  # pylint: disable=unused-argument
+            return contextlib.nullcontext(
+                enter_result=scripts_test_utils.PopenStub(
+                    stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),
+                    alive=False))
+        def mock_managed_webdriverio_server(**unused_kwargs):  # pylint: disable=unused-argument
             return contextlib.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
                     stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),
@@ -299,6 +315,18 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_protractor_server',
             mock_managed_protractor_server,
+            expected_kwargs=[
+                {
+                    'dev_mode': True,
+                    'suite_name': 'full',
+                    'sharding_instances': 3,
+                    'debug_mode': False,
+                    'stdout': subprocess.PIPE,
+                },
+            ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webdriverio_server',
+            mock_managed_webdriverio_server,
             expected_kwargs=[
                 {
                     'dev_mode': True,
@@ -600,6 +628,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webdriverio_server', mock_managed_process,
+            expected_kwargs=[
+                {
+                    'dev_mode': True,
+                    'suite_name': 'full',
+                    'sharding_instances': 3,
+                    'debug_mode': False,
+                    'stdout': subprocess.PIPE,
+                },
+            ]))
         self.exit_stack.enter_context(self.swap(
             flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -644,6 +683,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webdriverio_server', mock_managed_process,
+            expected_kwargs=[
+                {
+                    'dev_mode': True,
+                    'suite_name': 'full',
+                    'sharding_instances': 3,
+                    'debug_mode': False,
+                    'stdout': subprocess.PIPE,
+                },
+            ]))
         self.exit_stack.enter_context(self.swap(
             flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -680,6 +730,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_cloud_datastore_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_protractor_server', mock_managed_process,
+            expected_kwargs=[
+                {
+                    'dev_mode': True,
+                    'suite_name': 'full',
+                    'sharding_instances': 3,
+                    'debug_mode': False,
+                    'stdout': subprocess.PIPE,
+                },
+            ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webdriverio_server', mock_managed_process,
             expected_kwargs=[
                 {
                     'dev_mode': True,
