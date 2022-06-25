@@ -303,7 +303,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_html_file(self):
         with self.print_swap, self.sys_swap, self.install_swap:
             pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
-        self.assert_same_list_elements('All linter checks Passed.', self.linter_stdout)
+        self.assert_same_list_elements(
+            'All linter checks Passed.', self.linter_stdout)
 
     def test_get_changed_filepaths(self):
         def mock_check_output(unused_list):
