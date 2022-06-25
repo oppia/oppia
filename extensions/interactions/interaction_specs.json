@@ -747,6 +747,14 @@
           ]
         },
         "default_value": 1
+      },
+      {
+        "description": "Catch Misspellings",
+        "name": "catchMisspellings",
+        "schema": {
+            "type": "bool"
+        },
+        "default_value": "False"
       }
     ],
     "is_terminal": false,
