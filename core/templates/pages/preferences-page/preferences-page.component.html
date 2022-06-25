@@ -17,7 +17,7 @@
         <div class="col-lg-8 col-md-8 col-sm-8">
           <a *ngIf="username"
              href="/profile/{{ username }}"
-             [routerLink]="'/profile/' + username">
+             [smartRouterLink]="'/profile/' + username">
              {{ username }}
           </a>
           <em *ngIf="!username">
@@ -136,7 +136,7 @@
             <mat-card class="oppia-subscription-card oppia-subscription-list-container">
               <a class="oppia-subscription-profile-link"
                  href="/profile/{{ subscription.creator_username }}"
-                 [routerLink]="'/profile/' + subscription.creator_username"
+                 [smartRouterLink]="'/profile/' + subscription.creator_username"
                  rel="noopener"
                  target="_blank">
                 <img [src]="subscription.creator_picture_data_url" class="oppia-subscription-card-profile-picture rounded-circle">
@@ -316,7 +316,7 @@
         {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
+        <a href="/delete-account" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
           <button type="button" class="btn btn-danger protractor-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>
