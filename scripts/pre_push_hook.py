@@ -533,7 +533,7 @@ def main(args=None):
                     'Push failed, please correct the mypy type annotation '
                     'issues above.')
                 sys.exit(mypy_check_status)
-            
+
             backend_associated_test_file_check_status = (
                 run_script_and_get_returncode(
                     BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD))
