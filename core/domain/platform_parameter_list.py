@@ -41,19 +41,19 @@ class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
 
 # Platform parameters should all be defined below.
 
-Registry.create_feature_flag(
+Registry.create_feature_flag(  # type: ignore[no-untyped-call]
     PARAM_NAMES.dummy_feature,
     'This is a dummy feature flag.',
     platform_parameter_domain.FeatureStages.DEV,
 )
 
-Registry.create_platform_parameter(
+Registry.create_platform_parameter(  # type: ignore[no-untyped-call]
     PARAM_NAMES.dummy_parameter,
     'This is a dummy platform parameter.',
     platform_parameter_domain.DataTypes.STRING
 )
 
-Registry.create_feature_flag(
+Registry.create_feature_flag(  # type: ignore[no-untyped-call]
     PARAM_NAMES.end_chapter_celebration,
     'This flag is for the end chapter celebration feature.',
     platform_parameter_domain.FeatureStages.DEV,
