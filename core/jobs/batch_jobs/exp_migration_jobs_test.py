@@ -29,7 +29,6 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
-from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.jobs import job_test_utils
@@ -150,11 +149,11 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
     def create_story_linked_to_exploration(self):
         """Creates a new story linked to the test exploration."""
-        topic_id = topic_fetchers.get_new_topic_id()
-        story_id = story_services.get_new_story_id()
+        topic_id = 'topic_id_1'
+        story_id = 'story_id_1'
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic', 'abbrev', 'description', 'fragm')
+            topic_id, 'topic', 'abbrev', 'description', 'fragment')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -178,7 +177,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
         topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
 
         story = story_domain.Story.create_default_story(
-            story_id, 'A story', 'description', topic_id,
+            story_id, 'A story title', 'description', topic_id,
             'story-one')
         story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
         topic_services.add_canonical_story(
@@ -224,7 +223,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
                 id=self.NEW_EXP_ID,
                 topic_id='topic_id1',
                 topic_name='a_topic name',
-                story_id='story_id1',
+                story_id='story_id_1',
                 story_title='A story title',
                 chapter_title='A chapter title',
                 content_count=20,
