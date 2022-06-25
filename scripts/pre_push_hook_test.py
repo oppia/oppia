@@ -660,8 +660,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_typescript_check_failiure(self):
         self.does_diff_include_ts_files = True
-        def mock_run_script_and_get_returncode(unused_script):
-            return 1
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.TYPESCRIPT_CHECKS_CMDS:
+                return 1
+            return 0
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
@@ -700,8 +702,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
-        def mock_run_script_and_get_returncode(unused_script):
-            return 1
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.FRONTEND_TEST_CMDS:
+                return 1
+            return 0
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
@@ -719,8 +723,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_invalid_ci_e2e_test_suites_failure(self):
         self.does_diff_include_ci_config_or_js_files = True
 
-        def mock_run_script_and_get_returncode(unused_script):
-            return 1
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.CI_PROTRACTOR_CHECK_CMDS:
+                return 1
+            return 0
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
