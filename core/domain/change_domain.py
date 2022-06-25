@@ -23,12 +23,14 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict, Sequence, TypeVar
-
-ChangeDictValueTypes = TypeVar('ChangeDictValueTypes', str, Sequence[str])
+from typing import Any, Dict, List, cast
 
 
-def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
+def validate_cmd(
+    cmd_name: str,
+    valid_cmd_attribute_specs: feconf.ValidCmdDict,
+    actual_cmd_attributes: Dict[str, str]
+) -> None:
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
@@ -110,24 +112,29 @@ class BaseChange:
     # dict with key as attribute name and value as deprecated values
     # for the attribute.
     # This list can be overriden by subclasses, if needed.
-    ALLOWED_COMMANDS = []
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = []
 
     # The list of deprecated commands of a change domain object. Each item
     # is a command that has been deprecated but these commands are yet to be
     # removed from the server data. Thus, once these commands are removed using
     # a migration job, we can remove the command from this list.
-    DEPRECATED_COMMANDS = []
+    DEPRECATED_COMMANDS: List[str] = []
 
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
-    COMMON_ALLOWED_COMMANDS = [{
+    COMMON_ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
 
-    def __init__(self, change_dict: Dict[str, ChangeDictValueTypes]) -> None:
+    # Here, Argument `change_dict` can accept dictionaries which have arbitrary
+    # number of keys with different types of values. So, to make the argument
+    # generalized for every type of dictionaries, we used Any type here.
+    def __init__(self, change_dict: Dict[str, Any]) -> None:
         """Initializes a BaseChange object from a dict.
 
         Args:
@@ -155,9 +162,10 @@ class BaseChange:
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
 
-    def validate_dict(
-        self, change_dict: Dict[str, ChangeDictValueTypes]
-    ) -> None:
+    # Here, Argument `change_dict` can accept dictionaries which have arbitrary
+    # number of keys with different types of values. So, to make the argument
+    # generalized for every type of dictionaries, we used Any type here.
+    def validate_dict(self, change_dict: Dict[str, Any]) -> None:
         """Checks that the command in change dict is valid for the domain
         object.
 
@@ -193,7 +201,10 @@ class BaseChange:
         if not valid_cmd_attribute_specs:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
 
-        valid_cmd_attribute_specs.pop('name', None)
+        # Here we are deleting the 'name' key which cause MyPy to throw error,
+        # because MyPy does not allow key deletion from TypedDict. So to silent
+        # the error, we added an ignore here.
+        valid_cmd_attribute_specs.pop('name', None)  # type: ignore[misc]
 
         actual_cmd_attributes = copy.deepcopy(change_dict)
         actual_cmd_attributes.pop('cmd', None)
@@ -201,7 +212,10 @@ class BaseChange:
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
-    def to_dict(self) -> Dict[str, ChangeDictValueTypes]:
+    # Here, method `to_dict()` can return dictionaries which have arbitrary
+    # number of keys with different types of values. So, to make the return
+    # type generalized for every type of dictionaries, we used Any type here.
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
@@ -227,8 +241,11 @@ class BaseChange:
 
         return base_change_dict
 
+    # Here, Argument `base_change_dict` can accept dictionaries which have
+    # arbitrary number of keys with different types of values. So, to make the
+    # argument generalized for every type of dictionaries, we used Any type here.
     @classmethod
-    def from_dict(cls, base_change_dict):
+    def from_dict(cls, base_change_dict: Dict[str, Any]) -> BaseChange:
         """Returns a BaseChange domain object from a dict.
 
         Args:
@@ -240,7 +257,7 @@ class BaseChange:
         """
         return cls(base_change_dict)
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the BaseChange object.
 
         Raises:
@@ -256,7 +273,15 @@ class BaseChange:
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
+        # In method to_dict(), we are calling getattr() but if for some reason
+        # getattr() is not able to fetch the attribute, it calls `__getattr__`
+        # so that an AttributeError is raised, and in __getattr__ we are doing
+        # self.__dict__[name] to raise and catch the exception. But the return
+        # value of `self.__dict__[name]` is Any type which causes MyPy to throw
+        # error. Thus to avoid the error, we used cast here. We have not used
+        # assert here because that will be written after `self.__dict__[name]`
+        # and never be executed, which causes backend coverage to throw error.
         try:
-            return self.__dict__[name]
+            return cast(str, self.__dict__[name])
         except KeyError as e:
             raise AttributeError(name) from e

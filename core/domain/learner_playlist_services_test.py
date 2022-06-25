@@ -125,7 +125,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_subscribed_exploration_cannot_be_added_to_playlist(self) -> None:
         # Subscribe to exploration.
-        subscription_services.subscribe_to_exploration(  # type: ignore[no-untyped-call]
+        subscription_services.subscribe_to_exploration(
             self.user_id, self.EXP_ID_0)
 
         self.assertEqual(
@@ -244,7 +244,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_subscribed_collection_cannot_be_added_to_playlist(self) -> None:
         # Subscribe to collection.
-        subscription_services.subscribe_to_collection(  # type: ignore[no-untyped-call]
+        subscription_services.subscribe_to_collection(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(

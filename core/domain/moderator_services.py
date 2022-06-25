@@ -35,5 +35,5 @@ def enqueue_flag_exploration_email_task(
     }
 
     # Emails about flagged explorations are sent immediately to moderators.
-    taskqueue_services.enqueue_task(  # type: ignore[no-untyped-call]
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)

@@ -117,7 +117,7 @@ def mark_exploration_to_be_played_later(
             user_models.LearnerPlaylistModel(id=user_id))
 
     subscribed_exploration_ids = (
-        subscription_services.get_exploration_ids_subscribed_to(user_id))  # type: ignore[no-untyped-call]
+        subscription_services.get_exploration_ids_subscribed_to(user_id))
 
     learner_playlist = get_learner_playlist_from_model(
         learner_playlist_model)
@@ -184,7 +184,7 @@ def mark_collection_to_be_played_later(
             user_models.LearnerPlaylistModel(id=user_id))
 
     subscribed_collection_ids = (
-        subscription_services.get_collection_ids_subscribed_to(user_id))  # type: ignore[no-untyped-call]
+        subscription_services.get_collection_ids_subscribed_to(user_id))
 
     learner_playlist = get_learner_playlist_from_model(
         learner_playlist_model)
