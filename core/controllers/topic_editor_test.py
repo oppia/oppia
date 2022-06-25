@@ -576,7 +576,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-fragment-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
@@ -799,7 +800,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-frag-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
