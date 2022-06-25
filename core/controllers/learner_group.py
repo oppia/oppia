@@ -115,7 +115,7 @@ class CreateLearnerGroupHandler(base.BaseHandler):
         # Create a new learner group ID.
         new_learner_grp_id = learner_group_fetchers.get_new_learner_group_id()
 
-        learner_group = learner_group_services.update_learner_group(
+        learner_group = learner_group_services.create_learner_group(
             new_learner_grp_id, title, description, [self.user_id],
             student_ids, invited_student_ids, subtopic_page_ids, story_ids
         )
@@ -124,7 +124,7 @@ class CreateLearnerGroupHandler(base.BaseHandler):
             'learner_group_id': learner_group.id,
             'title': learner_group.title,
             'description': learner_group.description,
-            'facilitator_username': user_services.get_usernames(
+            'facilitator_usernames': user_services.get_usernames(
                 learner_group.facilitator_user_ids),
             'student_usernames': user_services.get_usernames(
                 learner_group.student_user_ids),
@@ -167,6 +167,8 @@ class LearnerGroupHandler(base.BaseHandler):
         subtopic_page_ids = self.payload.get('subtopic_page_ids')
         story_ids = self.payload.get('story_ids')
 
+        # Check if user is the facilitator of the learner group, as only
+        # facilitators have the right to update a learner group.
         is_valid_request = learner_group_services.is_user_a_facilitator(
             self.user_id, learner_group_id
         )
@@ -191,7 +193,7 @@ class LearnerGroupHandler(base.BaseHandler):
             'learner_group_id': learner_group.id,
             'title': learner_group.title,
             'description': learner_group.description,
-            'facilitator_username': user_services.get_usernames(
+            'facilitator_usernames': user_services.get_usernames(
                 learner_group.facilitator_user_ids),
             'student_usernames': user_services.get_usernames(
                 learner_group.student_user_ids),
@@ -351,7 +353,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupSyllabusHandler(base.BaseHandler):
+class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
     """Handles operations related to the learner group syllabus."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -457,8 +459,8 @@ class TeacherDashboardHandler(base.BaseHandler):
         })
 
 
-class FacilitatorGroupPreferencesHandler(base.BaseHandler):
-    """Handles operations related to the facilitator group preferences."""
+class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
+    """Handles operations related to the facilitators view of learner group."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
@@ -493,10 +495,12 @@ class FacilitatorGroupPreferencesHandler(base.BaseHandler):
             'learner_group_id': learner_group.id,
             'title': learner_group.title,
             'description': learner_group.description,
-            'facilitator_username': learner_group.facilitator_username,
-            'student_usernames': learner_group.student_usernames,
-            'invited_student_usernames':
-                learner_group.invited_student_usernames,
+            'facilitator_usernames': user_services.get_usernames(
+                learner_group.facilitator_user_ids),
+            'student_usernames': user_services.get_usernames(
+                learner_group.student_user_ids),
+            'invited_student_usernames': user_services.get_usernames(
+                learner_group.invited_student_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'stoty_ids': learner_group.story_ids
         })

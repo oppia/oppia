@@ -4045,7 +4045,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
-class AccessTeacherDashboardDecoratorTests(test_utils.GenericTestBase):
+class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_learner_groups."""
 
     user = 'user'
@@ -4063,7 +4063,7 @@ class AccessTeacherDashboardDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': True})
 
     def setUp(self):
-        super(AccessTeacherDashboardDecoratorTests, self).setUp()
+        super(AccessLearnerGroupsDecoratorTests, self).setUp()
         self.signup(self.user_email, self.user)
         self.signup(self.banned_user_email, self.banned_user)
         self.mark_user_banned(self.banned_user)

@@ -926,10 +926,10 @@ URLS = [
         learner_group.LearnerGroupHandler),
     get_redirect_route(
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
-        learner_group.LearnerGroupHandler),
+        learner_group.FacilitatorLearnerGroupViewHandler),
     get_redirect_route(
-        r'/learner_group_syllabus_handler/<learner_group_id>',
-        learner_group.LearnerGroupSyllabusHandler),
+        r'/filter_learner_group_syllabus_handler/<learner_group_id>',
+        learner_group.FilterLearnerGroupSyllabusHandler),
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupStudentProgressHandler)

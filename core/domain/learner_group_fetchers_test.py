@@ -17,3 +17,33 @@
 """Tests for methods defined in learner group fetchers."""
 
 from __future__ import annotations
+
+from core.domain import learner_group_fetchers
+from core.domain import learner_group_services
+
+from core.platform import models
+from core.tests import test_utils
+
+(learner_group_models,) = models.Registry.import_models(
+    [models.NAMES.learner_group])
+
+
+class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
+    """Tests for skill fetchers."""
+
+    LEARNER_GROUP_ID = None
+    FACILITATOR_ID = 'facilitator_user_1'
+    STUDENT_ID = 'student_user_1'
+    MISCONCEPTION_ID_1 = 1
+
+    def setUp(self):
+        super(LearnerGroupFetchersUnitTests, self).setUp()
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+
+        self.learner_group = learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.FACILITATOR_ID], [self.STUDENT_ID], [], ['subtopic_id_1'],
+            ['story_id_1'])

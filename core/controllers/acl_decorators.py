@@ -2229,7 +2229,7 @@ def can_access_learner_groups(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_TEACHER_DASHBOARD in self.user.actions:
+        if role_services.ACTION_ACCESS_LEARNER_GROUPS in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
