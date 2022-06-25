@@ -8,6 +8,8 @@ var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
 var chromeVersion = '89.0.4389.90';
 
+// When tests is running in debug mode, the chrome version number
+// is passed as 7th argument else it is passed as 6th argument.
 if (args[0] == 'DEBUG=true') {
   chromeVersion = args[6];
 } else {
@@ -24,7 +26,7 @@ var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
 // To enable video recording of the failed tests cases change it to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
 
 var suites = {
   // The tests on Travis are run individually to parallelize

@@ -712,11 +712,16 @@ def managed_webdriverio_server(
 
     webdriverio_args = [
         common.NPX_BIN_PATH,
+        # This flag ensures tests fail if the `waitFor()` calls time out.
+        '--unhandled-rejections=strict',
         common.NODEMODULES_WDIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
         '--suite', suite_name, chrome_version,
         '--params.devMode=%s' % dev_mode,
     ]
 
+    # Capabilities in wdio.conf.js are added as an array of object,
+    # so to set the maxmium instance of chrome we need to provide the
+    # index at which chrome is present, i.e. 0.
     if sharding_instances > 1:
         webdriverio_args.extend([
            '--capabilities[0].maxInstances=%d' % sharding_instances,
@@ -727,9 +732,9 @@ def managed_webdriverio_server(
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    managed_webdribverio_proc = managed_process(
+    managed_webdriverio_proc = managed_process(
         webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
         **kwargs)
 
-    with managed_webdribverio_proc as proc:
+    with managed_webdriverio_proc as proc:
         yield proc

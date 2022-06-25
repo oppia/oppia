@@ -315,13 +315,15 @@ def run_tests(args):
             stack.enter_context(servers.managed_webdriver_server(
                 chrome_version=args.chrome_driver_version))
 
+            print('Protractor suites are starting to run')
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
-
+            
+            print('WebdriverIO suites are starting to run')
             proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
@@ -362,7 +364,7 @@ def run_tests(args):
 
         else:
             print(
-                'The suite requested to run does not exists'
+                'The suite requested to run does not exist'
                 'Please provide a valid suite name')
             sys.exit(1)
 
