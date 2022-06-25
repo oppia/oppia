@@ -322,7 +322,7 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
-            
+
             print('WebdriverIO suites are starting to run')
             proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
