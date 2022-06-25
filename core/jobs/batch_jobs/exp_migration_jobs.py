@@ -41,12 +41,10 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
-    from mypy_imports import user_models
 
-(base_models, exp_models, user_models) = (
+(base_models, exp_models) = (
     models.Registry.import_models(
-        [models.NAMES.base_model, models.NAMES.exploration,
-         models.NAMES.user]))
+        [models.NAMES.base_model, models.NAMES.exploration]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -208,6 +206,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 additional_models={'rights_model': exp_rights_model}
             ).values()
 
+            exp_services.discard_draft(
+                exp_model.id, feconf.MIGRATION_BOT_USERNAME)
+
             if opportunity_services.is_exploration_available_for_contribution(
                 migrated_exp.id):
                 (
@@ -217,27 +218,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         datastore_services.update_timestamps_multi(list(models_to_put))
 
         return models_to_put
-
-    @staticmethod
-    def _update_exp_user_data(
-        exp_user_data_model: user_models.ExplorationUserDataModel
-    ) -> Sequence[base_models.BaseModel]:
-        """Generates newly updated exploration user data models.
-
-        Args:
-            exp_user_data_model: ExplorationUserDataModel. The user data which
-                should be updated.
-
-        Returns:
-            sequence(BaseModel). Sequence of models which should be put into
-            the datastore.
-        """
-        if exp_user_data_model:
-            exp_user_data_model.draft_change_list = None
-            exp_user_data_model.draft_change_list_last_updated = None
-            exp_user_data_model.draft_change_list_exp_version = None
-
-        datastore_services.update_timestamps_multi(list(exp_user_data_model))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration migration.
@@ -273,15 +253,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
             | 'Add exploration summary ID' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
                 lambda exp_summary_model: exp_summary_model.id)
-        )
-
-        exp_user_data_models = (
-            self.pipeline
-            | 'Get all non-deleted exploration user data models' >> (
-                ndb_io.GetModels(
-                    user_models.ExplorationUserDataModel.get_all()))
-            | 'Add exploration ID as keys' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
-                lambda exp_user_data_model: exp_user_data_model.exploration_id)
         )
 
         migrated_exp_results = (
@@ -369,17 +340,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
-        exp_user_data_models_to_put = (
-            exp_user_data_models
-            | 'Discard drafts and update user models' >> beam.FlatMapTuple(
-                self._update_exp_user_data)
-        )
-
         unused_put_results = (
             (
                 exp_models_to_put,
-                exp_summary_models_to_put,
-                exp_user_data_models_to_put)
+                exp_summary_models_to_put)
             | 'Merge models' >> beam.Flatten()
             | 'Put models into datastore' >> ndb_io.PutModels()
         )

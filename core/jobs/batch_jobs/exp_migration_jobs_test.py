@@ -19,10 +19,19 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_domain
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
+from core.domain import topic_services
+from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
 from core.jobs.types import job_run_result
@@ -31,8 +40,10 @@ from core.platform import models
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
 
-(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, opportunity_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.opportunity])
 
 
 class MigrateExplorationJobTests(job_test_utils.JobTestBase):
@@ -74,7 +85,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         with swap_states_schema_48, swap_exp_schema_53:
             exploration = exp_domain.Exploration.create_default_exploration(
-                self.NEW_EXP_ID, title=self.EXP_TITLE, category='category')
+                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
@@ -137,6 +148,62 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
         migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
         self.assertEqual(migrated_exp_model.version, 1)
 
+    def create_story_linked_to_exploration(self):
+        """Creates a new story linked to the test exploration."""
+        topic_id = topic_fetchers.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id))
+        subtopic_page_services.save_subtopic_page(
+            feconf.SYSTEM_COMMITTER_ID, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+        topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
+
+        story = story_domain.Story.create_default_story(
+            story_id, 'A story', 'description', topic_id,
+            'story-one')
+        story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
+        topic_services.add_canonical_story(
+            feconf.SYSTEM_COMMITTER_ID, topic_id, story_id)
+        topic_services.publish_story(
+            topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'old_value': None,
+                'new_value': self.NEW_EXP_ID
+            })
+        ]
+        story_services.update_story(
+            feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
+            'Added node.')
+
     def test_unmigrated_exp_is_migrated(self) -> None:
         swap_states_schema_48 = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
@@ -145,9 +212,28 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         with swap_states_schema_48, swap_exp_schema_53:
             exploration = exp_domain.Exploration.create_default_exploration(
-                self.NEW_EXP_ID, title=self.EXP_TITLE, category='category')
+                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
+
+            owner_action = user_services.get_user_actions_info(
+                feconf.SYSTEM_COMMITTER_ID)
+            exp_services.publish_exploration_and_update_user_profiles(
+                owner_action, self.NEW_EXP_ID)
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='a_topic name',
+                story_id='story_id1',
+                story_title='A story title',
+                chapter_title='A chapter title',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[]
+            ).put()
+            self.create_story_linked_to_exploration()
 
             self.assertEqual(exploration.states_schema_version, 48)
 
