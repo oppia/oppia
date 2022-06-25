@@ -105,7 +105,7 @@ describe('Schema based float editor component', function() {
     component.registerOnChange(mockFunction);
     component.writeValue(2);
     component.registerOnTouched(null);
-    component.updateLocalValue(13);
+    component.updateLocalValue('13');
 
     expect(component.localValue).toBe(13);
     expect(component.onChange).toEqual(mockFunction);
