@@ -645,12 +645,13 @@ def update_states_version_history(
         exp_versions_diff.old_to_new_state_names.items()):
         if old_state_name != new_state_name:
             effective_old_to_new_state_names[old_state_name] = new_state_name
+    for old_state_name in effective_old_to_new_state_names:
+        del states_version_history[old_state_name]
     for old_state_name, new_state_name in (
         effective_old_to_new_state_names.items()):
         states_version_history[new_state_name] = (
             state_domain.StateVersionHistory(
                 prev_version, old_state_name, committer_id))
-        del states_version_history[old_state_name]
 
     # The following list includes states which exist in both the old states
     # and new states and were not renamed.

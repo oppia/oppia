@@ -7938,3 +7938,59 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         self.assertIsNone(old_model.state_version_history.get('New state'))
         self.assertIsNone(new_model.state_version_history.get('New state'))
+
+    def test_version_history_on_state_name_interchange(self):
+        change_list_from_v1_to_v2 = [
+          exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'first'
+          }), exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_ADD_STATE,
+              'state_name': 'second'
+          })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_from_v1_to_v2,
+            'Added two new states')
+        old_model = self.version_history_model_class.get(
+            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            old_model.state_version_history['first'],
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+        self.assertEqual(
+            old_model.state_version_history['second'],
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+        # Correctly interchanging the state names.
+        change_list_from_v2_to_v3 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'first',
+                'new_state_name': 'temporary'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'second',
+                'new_state_name': 'first'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'temporary',
+                'new_state_name': 'second'
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_from_v2_to_v3,
+            'Added two new states')
+        new_model = self.version_history_model_class.get(
+            'version-history-%s-%s' % (self.EXP_0_ID, 3))
+
+        self.assertEqual(
+            new_model.state_version_history['second'],
+            state_domain.StateVersionHistory(
+                2, 'first', self.owner_id).to_dict())
+        self.assertEqual(
+            new_model.state_version_history['first'],
+            state_domain.StateVersionHistory(
+                2, 'second', self.owner_id).to_dict())
