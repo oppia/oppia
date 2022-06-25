@@ -750,7 +750,7 @@ def update_metadata_version_history(
         # overall changes (by EDIT_EXPLORATION_PROPERTY) get cancelled by
         # each other and there is no 'net change'.
         diff_dict = deepdiff.DeepDiff(old_metadata_dict, new_metadata_dict)
-        if diff_dict:
+        if diff_dict != {}:
             metadata_version_history.previously_edited_in_version = (
                 prev_version)
             metadata_version_history.committer_id = committer_id
