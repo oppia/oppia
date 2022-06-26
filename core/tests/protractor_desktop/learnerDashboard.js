@@ -356,7 +356,7 @@ describe('Learner dashboard functionality', function() {
       await explorationEditorMainTab.setContent(
         await forms.toRichText('Question 1'));
       await explorationEditorMainTab.setInteraction(
-        'TextInput', 'Placeholder', 5);
+        'TextInput', 'Placeholder', 5, false);
       await explorationEditorMainTab.addResponse(
         'TextInput', await forms.toRichText('Correct Answer'), null, false,
         'FuzzyEquals', ['correct']);
