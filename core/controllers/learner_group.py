@@ -51,7 +51,7 @@ LEARNER_GROUP_SCHEMA = {
                 }]
             }
         },
-        'default_value': None
+        'default_value': []
     },
     'invited_student_usernames': {
         'schema': {
@@ -64,7 +64,7 @@ LEARNER_GROUP_SCHEMA = {
                 }]
             }
         },
-        'default_value': None
+        'default_value': []
     },
     'subtopic_page_ids': {
         'schema': {
@@ -73,7 +73,7 @@ LEARNER_GROUP_SCHEMA = {
                 'type': 'basestring'
             }
         },
-        'default_value': None
+        'default_value': []
     },
     'story_ids': {
         'schema': {
@@ -82,7 +82,7 @@ LEARNER_GROUP_SCHEMA = {
                 'type': 'basestring'
             }
         },
-        'default_value': None
+        'default_value': []
     }
 }
 
@@ -99,17 +99,17 @@ class CreateLearnerGroupHandler(base.BaseHandler):
     def post(self):
         """Creates a new learner group."""
 
-        title = self.payload.get('group_title')
-        description = self.payload.get('group_description')
-        student_usernames = self.payload.get('student_usernames')
-        invited_student_usernames = self.payload.get(
+        title = self.normalized_payload.get('group_title')
+        description = self.normalized_payload.get('group_description')
+        student_usernames = self.normalized_payload.get('student_usernames')
+        invited_student_usernames = self.normalized_payload.get(
             'invited_student_usernames')
-        subtopic_page_ids = self.payload.get('subtopic_page_ids')
-        story_ids = self.payload.get('story_ids')
+        subtopic_page_ids = self.normalized_payload.get('subtopic_page_ids')
+        story_ids = self.normalized_payload.get('story_ids')
 
-        student_ids: user_services.get_multi_user_ids_from_usernames(
+        student_ids = user_services.get_multi_user_ids_from_usernames(
             student_usernames)
-        invited_student_ids: user_services.get_multi_user_ids_from_usernames(
+        invited_student_ids = user_services.get_multi_user_ids_from_usernames(
             invited_student_usernames)
 
         # Create a new learner group ID.
@@ -131,7 +131,7 @@ class CreateLearnerGroupHandler(base.BaseHandler):
             'invited_student_usernames': user_services.get_usernames(
                 learner_group.invited_student_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
-            'stoty_ids': learner_group.story_ids
+            'story_ids': learner_group.story_ids
         })
 
 
@@ -152,20 +152,21 @@ class LearnerGroupHandler(base.BaseHandler):
     }
 
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': LEARNER_GROUP_SCHEMA
+        'PUT': LEARNER_GROUP_SCHEMA,
+        'DELETE': {}
     }
 
     @acl_decorators.can_access_learner_groups
     def put(self, learner_group_id):
         """Updates an existing learner group."""
 
-        title = self.payload.get('group_title')
-        description = self.payload.get('group_description')
-        student_usernames = self.payload.get('student_usernames')
-        invited_student_usernames = self.payload.get(
+        title = self.normalized_payload.get('group_title')
+        description = self.normalized_payload.get('group_description')
+        student_usernames = self.normalized_payload.get('student_usernames')
+        invited_student_usernames = self.normalized_payload.get(
             'invited_student_usernames')
-        subtopic_page_ids = self.payload.get('subtopic_page_ids')
-        story_ids = self.payload.get('story_ids')
+        subtopic_page_ids = self.normalized_payload.get('subtopic_page_ids')
+        story_ids = self.normalized_payload.get('story_ids')
 
         # Check if user is the facilitator of the learner group, as only
         # facilitators have the right to update a learner group.
@@ -177,10 +178,10 @@ class LearnerGroupHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'You are not a facilitator of this learner group.')
 
-        student_ids: user_services.get_multi_user_ids_from_usernames(
+        student_ids = user_services.get_multi_user_ids_from_usernames(
             student_usernames
         )
-        invited_student_ids: user_services.get_multi_user_ids_from_usernames(
+        invited_student_ids = user_services.get_multi_user_ids_from_usernames(
             invited_student_usernames
         )
 
@@ -200,7 +201,7 @@ class LearnerGroupHandler(base.BaseHandler):
             'invited_student_usernames': user_services.get_usernames(
                 learner_group.invited_student_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
-            'stoty_ids': learner_group.story_ids
+            'story_ids': learner_group.story_ids
         })
 
     @acl_decorators.can_access_learner_groups
@@ -213,7 +214,8 @@ class LearnerGroupHandler(base.BaseHandler):
 
         if not is_valid_request:
             raise self.UnauthorizedUserException(
-                'You are not a facilitator of this learner group.')
+                'You do not have the rights to delete this learner group '
+                'as you are its facilitator.')
 
         learner_group_services.remove_learner_group(learner_group_id)
 
@@ -265,9 +267,9 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         group syllabus.
         """
 
-        student_usernames = self.payload.get('student_usernames')
+        student_usernames = self.normalized_payload.get('student_usernames')
 
-        student_user_ids: user_services.get_multi_user_ids_from_usernames(
+        student_user_ids = user_services.get_multi_user_ids_from_usernames(
             student_usernames)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
@@ -402,10 +404,10 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
     def get(self, learner_group_id):
         """Handles GET requests for learner group syllabus views."""
 
-        filter_keyword = self.payload.get('filter_keyword')
-        filter_type = self.payload.get('filter_type')
-        filter_category = self.payload.get('filter_category')
-        filter_language = self.payload.get('filter_language')
+        filter_keyword = self.normalized_payload.get('filter_keyword')
+        filter_type = self.normalized_payload.get('filter_type')
+        filter_category = self.normalized_payload.get('filter_category')
+        filter_language = self.normalized_payload.get('filter_language')
 
         filtered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
@@ -502,5 +504,5 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
             'invited_student_usernames': user_services.get_usernames(
                 learner_group.invited_student_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
-            'stoty_ids': learner_group.story_ids
+            'story_ids': learner_group.story_ids
         })

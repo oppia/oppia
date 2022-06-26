@@ -916,13 +916,13 @@ URLS = [
             .CategorizedAndUntriagedSkillsDataHandler),
 
     get_redirect_route(
-        r'/create_learner_group_handler/',
+        r'/create_learner_group_handler',
         learner_group.CreateLearnerGroupHandler),
     get_redirect_route(
-        r'/update_learner_group_handler/',
+        r'/update_learner_group_handler/<learner_group_id>',
         learner_group.LearnerGroupHandler),
     get_redirect_route(
-        r'/delete_learner_group_handler/',
+        r'/delete_learner_group_handler/<learner_group_id>',
         learner_group.LearnerGroupHandler),
     get_redirect_route(
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
