@@ -658,6 +658,8 @@ def _get_user_settings_from_model(user_settings_model):
             user_settings_model.preferred_site_language_code),
         preferred_audio_language_code=(
             user_settings_model.preferred_audio_language_code),
+        preferred_translation_language_code=(
+            user_settings_model.preferred_translation_language_code),
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
@@ -1233,6 +1235,23 @@ def update_preferred_audio_language_code(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_audio_language_code = (
         preferred_audio_language_code)
+    _save_user_settings(user_settings)
+
+
+def update_preferred_translation_language_code(
+    user_id, preferred_translation_language_code
+):
+    """Updates preferred_translation_language_code of user with
+    given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        preferred_translation_language_code: str. New text translation
+            language preference to set.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_translation_language_code = (
+        preferred_translation_language_code)
     _save_user_settings(user_settings)
 
 

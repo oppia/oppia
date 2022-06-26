@@ -199,6 +199,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': self.user_1_id,
         }
         new_user_data_dict = {
@@ -208,6 +209,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -4375,6 +4377,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': self.user_1_id,
         }
         new_user_data_dict = {
@@ -4384,6 +4387,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -4688,6 +4692,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': self.user_1_id,
         }
         new_user_data_dict = {
@@ -4697,6 +4702,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (

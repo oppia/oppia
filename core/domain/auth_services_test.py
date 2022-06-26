@@ -46,14 +46,14 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         self.modifiable_full_user_data = user_domain.ModifiableUserData(
             'full_user_1', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, user_id=self.full_user_id)
+            None, None, None, user_id=self.full_user_id)
         self.modifiable_profile_user_data = [
             user_domain.ModifiableUserData(
                 'profile_user_1', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-                None, None),
+                None, None, None),
             user_domain.ModifiableUserData(
                 'profile_user_2', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-                None, None),
+                None, None, None),
         ]
 
         user_services.update_multiple_users_data(  # type: ignore[no-untyped-call]

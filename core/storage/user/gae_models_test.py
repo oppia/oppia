@@ -107,6 +107,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
             preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_translation_language_code=self.GENERIC_LANGUAGE_CODES[0],
             display_alias=self.GENERIC_DISPLAY_ALIAS,
             pin=self.GENERIC_PIN
         ).put()
@@ -156,6 +157,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 'preferred_site_language_code':
                     base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_audio_language_code':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'preferred_translation_language_code':
                     base_models.EXPORT_POLICY.EXPORTED,
                 'username': base_models.EXPORT_POLICY.EXPORTED,
                 'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
@@ -299,6 +302,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False
         }
@@ -330,6 +334,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'preferred_translation_language_code': (
+                self.GENERIC_LANGUAGE_CODES[0]),
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
             'has_viewed_lesson_info_modal_once': False
         }

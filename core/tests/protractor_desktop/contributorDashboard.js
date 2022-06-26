@@ -121,6 +121,25 @@ describe('Contributor dashboard page', function() {
       GERMAN_LANGUAGE);
   });
 
+  it('should persist user\'s preferred translation language across sessions',
+    async function() {
+      await users.login(USER_EMAILS[0]);
+      await contributorDashboardPage.get();
+      await contributorDashboardPage.navigateToTranslateTextTab();
+      await contributorDashboardTranslateTextTab.changeLanguage(
+        GERMAN_LANGUAGE);
+      await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
+        GERMAN_LANGUAGE);
+      await users.logout();
+
+      await users.login(USER_EMAILS[0]);
+      await contributorDashboardPage.get();
+      await contributorDashboardPage.navigateToTranslateTextTab();
+      await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
+        GERMAN_LANGUAGE);
+      await users.logout();
+    });
+
   it('should allow reviewer to accept question suggestions', async function() {
     // Baseline verification.
     await users.login(USER_EMAILS[0]);

@@ -49,6 +49,7 @@ class MockModifiableUserDataDict(TypedDict):
     preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
+    preferred_translation_language_code: Optional[str]
     user_id: Optional[str]
     fake_field: Optional[str]
 
@@ -69,6 +70,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
         preferred_language_codes: List[str],
         preferred_site_language_code: Optional[str],
         preferred_audio_language_code: Optional[str],
+        preferred_translation_language_code: Optional[str],
         user_id: Optional[str]=None,
         fake_field: Optional[str]=None
     ) -> None:
@@ -78,6 +80,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
             preferred_language_codes,
             preferred_site_language_code,
             preferred_audio_language_code,
+            preferred_translation_language_code,
             user_id=None
         )
         self.fake_field = fake_field
@@ -97,6 +100,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
             modifiable_user_data_dict['preferred_language_codes'],
             modifiable_user_data_dict['preferred_site_language_code'],
             modifiable_user_data_dict['preferred_audio_language_code'],
+            modifiable_user_data_dict['preferred_translation_language_code'],
             modifiable_user_data_dict['user_id'],
             modifiable_user_data_dict['fake_field']
         )
@@ -147,6 +151,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': 'user_id',
         }
         self.modifiable_user_data = (
@@ -158,6 +163,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_new_user_data = (
@@ -1267,6 +1273,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
+            'preferred_translation_language_code': (
+                'preferred_translation_language_code'),
             'user_id': None,
         }
         modifiable_user_data = (
@@ -1288,6 +1296,10 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             modifiable_user_data.preferred_audio_language_code,
             'preferred_audio_language_code'
         )
+        self.assertEqual(
+            modifiable_user_data.preferred_translation_language_code,
+            'preferred_translation_language_code'
+        )
         self.assertIsNone(modifiable_user_data.user_id)
 
     def test_initialization_with_valid_user_id_is_successful(self) -> None:
@@ -1299,6 +1311,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
+            'preferred_translation_language_code': (
+                'preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         modifiable_user_data = (
@@ -1320,6 +1334,10 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             modifiable_user_data.preferred_audio_language_code,
             'preferred_audio_language_code'
         )
+        self.assertEqual(
+            modifiable_user_data.preferred_translation_language_code,
+            'preferred_translation_language_code'
+        )
         self.assertEqual(modifiable_user_data.user_id, 'user_id')
 
     def test_from_raw_dict_with_none_schema_version_raises_error(
@@ -1335,6 +1353,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
+            'preferred_translation_language_code': (
+                'preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         error_msg = 'Invalid modifiable user data: no schema version specified.'
@@ -1351,6 +1371,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
+            'preferred_translation_language_code': (
+                'preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         current_version_plus_one = (
@@ -1374,6 +1396,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
+            'preferred_translation_language_code': (
+                'preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         invalid_schema_versions: List[Any] = [
@@ -1400,6 +1424,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['en', 'es'],
             'preferred_site_language_code': 'es',
             'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
             'fake_field': 'set_value'
         }
@@ -1413,6 +1438,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             modifiable_user_data.preferred_site_language_code, 'es')
         self.assertEqual(
             modifiable_user_data.preferred_audio_language_code, 'en')
+        self.assertEqual(
+            modifiable_user_data.preferred_translation_language_code, 'en')
         self.assertEqual(modifiable_user_data.fake_field, 'set_value')
         self.assertEqual(modifiable_user_data.user_id, None)
 
@@ -1428,6 +1455,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['en', 'es'],
             'preferred_site_language_code': 'es',
             'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
             'fake_field': None
         }
@@ -1441,6 +1469,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             modifiable_user_data.preferred_site_language_code, 'es')
         self.assertEqual(
             modifiable_user_data.preferred_audio_language_code, 'en')
+        self.assertEqual(
+            modifiable_user_data.preferred_translation_language_code, 'en')
         self.assertEqual(modifiable_user_data.fake_field, 'default_value')
         self.assertEqual(modifiable_user_data.user_id, None)
 
