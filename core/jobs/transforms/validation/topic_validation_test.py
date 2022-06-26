@@ -194,6 +194,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 'cmd': 'add_subtopic',
                 'title': 'title',
                 'subtopic_id': 'subtopic_id',
+                'url_fragment': 'url-fragment',
                 'invalid': 'invalid'
             }])
 

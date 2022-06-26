@@ -866,6 +866,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
                 'cmd': 'add_subtopic',
                 'title': 'title',
                 'subtopic_id': 'subtopic_id',
+                'url_fragment': 'url-fragment',
                 'invalid': 'invalid'
             })
 
@@ -913,12 +914,14 @@ class TopicChangeTests(test_utils.GenericTestBase):
         topic_change_object = topic_domain.TopicChange({
             'cmd': 'add_subtopic',
             'subtopic_id': 'subtopic_id',
-            'title': 'title'
+            'title': 'title',
+            'url_fragment': 'url-fragment'
         })
 
         self.assertEqual(topic_change_object.cmd, 'add_subtopic')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
         self.assertEqual(topic_change_object.title, 'title')
+        self.assertEqual(topic_change_object.url_fragment, 'url-fragment')
 
     def test_topic_change_object_with_delete_subtopic(self) -> None:
         topic_change_object = topic_domain.TopicChange({
