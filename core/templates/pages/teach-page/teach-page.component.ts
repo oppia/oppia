@@ -52,7 +52,7 @@ export class TeachPageComponent implements OnInit {
   displayedTestimonialId!: number;
   libraryUrl!: string;
   testimonialCount!: number;
-  testimonials!: Testimonial[];
+  testimonials: Testimonial[] = [];
   isWindowNarrow: boolean = false;
   userIsLoggedIn: boolean = false;
   directiveSubscriptions = new Subscription();

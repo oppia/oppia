@@ -38,6 +38,8 @@ interface DestinationChoice {
   templateUrl: './outcome-destination-editor.component.html'
 })
 export class OutcomeDestinationEditorComponent implements OnInit {
+  @Output() addState: EventEmitter<string> = new EventEmitter<string>();
+  @Output() getChanges: EventEmitter<void> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -47,10 +49,8 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   newStateNamePattern!: RegExp;
   destinationChoices!: DestinationChoice[];
   maxLen!: number;
-  outcomeNewStateName!: string | null;
+  outcomeNewStateName!: string;
   currentStateName!: string;
-  @Output() addState: EventEmitter<string> = new EventEmitter<string>();
-  @Output() getChanges: EventEmitter<void> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean = false;
   canEditRefresherExplorationId: boolean = false;
@@ -186,12 +186,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
             .registerFirstCreateSecondStateEvent();
 
           let newStateName = this.outcomeNewStateName;
-          if (newStateName === null) {
-            throw new Error('New state name is null');
-          }
           this.outcome.dest = newStateName;
-
-          this.outcomeNewStateName = null;
 
           this.addState.emit(newStateName);
         }

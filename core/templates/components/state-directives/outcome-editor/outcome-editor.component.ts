@@ -33,6 +33,12 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
   templateUrl: './outcome-editor.component.html'
 })
 export class OutcomeEditorComponent implements OnInit {
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+  EventEmitter<string[]> = new EventEmitter();
+
+  @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -42,12 +48,6 @@ export class OutcomeEditorComponent implements OnInit {
   @Input() outcome!: Outcome;
   @Input() addState!: (value: string) => void;
   savedOutcome!: Outcome;
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
-  EventEmitter<string[]> = new EventEmitter();
-
-  @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
-  @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
-  @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
   canAddPrerequisiteSkill: boolean = false;

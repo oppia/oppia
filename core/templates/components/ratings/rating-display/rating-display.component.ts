@@ -36,17 +36,14 @@ export class RatingDisplayComponent {
   //    that will be supplied with the new rating when the rating is
   //    changed.
   //  - ratingValue: an integer 1-5 giving the rating.
+  @Output() edit = new EventEmitter<number>();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() isEditable!: boolean;
   @Input() ratingValue!: number;
   status!: string;
-
-  @Output() edit = new EventEmitter<number>();
-
   stars: StarDict[] = [];
-
   POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
   STATUS_ACTIVE = 'active';
   STATUS_INACTIVE = 'inactive';

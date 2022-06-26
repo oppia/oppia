@@ -51,6 +51,7 @@ interface DeleteValue {
   templateUrl: './state-solution-editor.component.html'
 })
 export class StateSolutionEditorComponent implements OnInit {
+  // The state property is null until a solution is specified or removed.
   @Output() saveSolution: EventEmitter<Solution | null> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();

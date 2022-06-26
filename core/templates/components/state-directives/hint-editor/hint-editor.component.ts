@@ -36,6 +36,10 @@ interface HintFormSchema {
   templateUrl: './hint-editor.component.html'
 })
 export class HintEditorComponent implements OnInit, OnDestroy {
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
+    new EventEmitter<string[]>();
+
+  @Output() saveHint = new EventEmitter<void>();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -46,12 +50,6 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   isEditable!: boolean;
   editHintForm!: FormGroup;
   HINT_FORM_SCHEMA!: HintFormSchema;
-
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
-    new EventEmitter<string[]>();
-
-  @Output() saveHint = new EventEmitter<void>();
-
   directiveSubscriptions = new Subscription();
 
   constructor(

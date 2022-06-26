@@ -34,6 +34,9 @@ import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
   templateUrl: './thumbnail-uploader.component.html'
 })
 export class ThumbnailUploaderComponent implements OnInit, OnChanges {
+  @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
+  @Output() updateFilename: EventEmitter<string> = new EventEmitter();
+  @Output() imageSave: EventEmitter<void> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -59,16 +62,17 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   editableThumbnailDataUrl!: string;
   transformedData!: string;
   encodedImageURI!: string;
-
-  @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
-  @Output() updateFilename: EventEmitter<string> = new EventEmitter();
-  @Output() imageSave: EventEmitter<void> = new EventEmitter();
-
   openInUploadMode: boolean = false;
-  hidePlaceholder = true;
-  placeholderImageUrl = (
+  hidePlaceholder: boolean = true;
+  thumbnailIsLoading: boolean = true;
+  placeholderImageUrl: string = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
+
+  placeholderImageDataUrl: string = (
+    this.urlInterpolationService.getStaticImageUrl(
+      '/icons/story-image-icon.png'));
+
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -79,12 +83,6 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
-
-  placeholderImageDataUrl = (
-    this.urlInterpolationService.getStaticImageUrl(
-      '/icons/story-image-icon.png'));
-
-  thumbnailIsLoading = true;
 
   ngOnInit(): void {
     if (this.filename !== null &&

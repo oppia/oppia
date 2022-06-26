@@ -40,18 +40,18 @@ export class ProgressTabComponent implements OnInit {
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() activeSubsection!: string;
   @Input() learntTopicsList!: LearnerTopicSummary[];
-  width!: number;
   displaySkills!: boolean[];
-  goldBadgeImageUrl!: string;
-  bronzeBadgeImageUrl!: string;
-  silverBadgeImageUrl!: string;
-  emptyBadgeImageUrl!: string;
-  topicsInSkillProficiency!: LearnerTopicSummary[];
-  subtopicMastery!: Record<string, SubtopicMasterySummaryBackendDict>;
-  topicIdsInSkillProficiency!: string[];
-  topicMastery!: [number, LearnerTopicSummary][];
+  width!: number;
+  topicsInSkillProficiency: LearnerTopicSummary[] = [];
   emptySkillProficiency: boolean = true;
   widthConst: number = 233;
+  subtopicMastery: Record<string, SubtopicMasterySummaryBackendDict> = {};
+  topicIdsInSkillProficiency: string[] = [];
+  goldBadgeImageUrl: string = '';
+  bronzeBadgeImageUrl: string = '';
+  silverBadgeImageUrl: string = '';
+  emptyBadgeImageUrl: string = '';
+  topicMastery: [number, LearnerTopicSummary][] = [];
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
 
