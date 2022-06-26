@@ -258,6 +258,9 @@ describe('ExplorationFooterComponent', () => {
                     unicode_str: '',
                     content_id: 'ca_placeholder_0'
                   }
+                },
+                catchMisspellings: {
+                  value: false
                 }
               },
               answer_groups: [
@@ -271,6 +274,7 @@ describe('ExplorationFooterComponent', () => {
                       html: '<p>Good Job</p>'
                     },
                     param_changes: [],
+                    dest_if_really_stuck: null,
                     dest: 'Mid'
                   },
                   training_data: [],
@@ -299,6 +303,7 @@ describe('ExplorationFooterComponent', () => {
                   html: '<p>Try again.</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Start'
               }
             },
@@ -381,6 +386,9 @@ describe('ExplorationFooterComponent', () => {
                     unicode_str: '',
                     content_id: 'ca_placeholder_0'
                   }
+                },
+                catchMisspellings: {
+                  value: false
                 }
               },
               answer_groups: [
@@ -394,6 +402,7 @@ describe('ExplorationFooterComponent', () => {
                       html: ' <p>Good Job</p>'
                     },
                     param_changes: [],
+                    dest_if_really_stuck: null,
                     dest: 'End'
                   },
                   training_data: [],
@@ -422,6 +431,7 @@ describe('ExplorationFooterComponent', () => {
                   html: '<p>try again.</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Mid'
               }
             },
@@ -534,6 +544,7 @@ describe('ExplorationFooterComponent', () => {
             answer_groups: [],
             default_outcome: {
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: ''
@@ -624,6 +635,7 @@ describe('ExplorationFooterComponent', () => {
               hints: [],
               default_outcome: {
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Introduction',
                 feedback: {
                   html: '',
@@ -702,6 +714,7 @@ describe('ExplorationFooterComponent', () => {
               default_outcome: {
                 param_changes: [],
                 dest: 'Introduction',
+                dest_if_really_stuck: null,
                 feedback: {
                   html: '',
                   content_id: 'content'
