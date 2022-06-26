@@ -849,7 +849,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'ACCESS_TOPICS_AND_SKILLS_DASHBOARD', 'EDIT_SKILL',
             'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
             'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
-            'CAN_MANAGE_VOICE_ARTIST'])
+            'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS'])
         expected_roles = set(
             ['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
             'VOICEOVER_ADMIN'])

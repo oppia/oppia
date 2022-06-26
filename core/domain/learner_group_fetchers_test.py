@@ -81,7 +81,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_progress_sharing_permission(self):
         learner_group_services.add_student_to_learner_group(
-            self.STUDENT_ID, self.LEARNER_GROUP_ID, True)
+            self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
 
         self.assertEqual(
             learner_group_fetchers.get_progress_sharing_permission(

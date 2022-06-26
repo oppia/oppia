@@ -925,6 +925,9 @@ URLS = [
         r'/delete_learner_group_handler/<learner_group_id>',
         learner_group.LearnerGroupHandler),
     get_redirect_route(
+        r'%s' % feconf.TEACHER_DASHBOARD_HANDLER,
+        learner_group.TeacherDashboardHandler),
+    get_redirect_route(
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
         learner_group.FacilitatorLearnerGroupViewHandler),
     get_redirect_route(

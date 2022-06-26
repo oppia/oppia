@@ -261,13 +261,13 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         }
     }
 
-    @acl_decorators.can_access_learner_dashboard
+    @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id):
         """Handles GET requests for users progress through learner
         group syllabus.
         """
 
-        student_usernames = self.normalized_payload.get('student_usernames')
+        student_usernames = self.normalized_request.get('student_usernames')
 
         student_user_ids = user_services.get_multi_user_ids_from_usernames(
             student_usernames)
@@ -377,7 +377,7 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                 },
-                'default_value': None
+                'default_value': ''
             },
             'filter_type': {
                 'schema': {
@@ -400,14 +400,14 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
         }
     }
 
-    @acl_decorators.can_access_learner_dashboard
+    @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id):
         """Handles GET requests for learner group syllabus views."""
 
-        filter_keyword = self.normalized_payload.get('filter_keyword')
-        filter_type = self.normalized_payload.get('filter_type')
-        filter_category = self.normalized_payload.get('filter_category')
-        filter_language = self.normalized_payload.get('filter_language')
+        filter_keyword = self.normalized_request.get('filter_keyword')
+        filter_type = self.normalized_request.get('filter_type')
+        filter_category = self.normalized_request.get('filter_category')
+        filter_language = self.normalized_request.get('filter_language')
 
         filtered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
@@ -418,8 +418,8 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
 
         self.render_json({
             'learner_group_id': learner_group_id,
-            'story_summaries': filtered_syllabus.story_summaries,
-            'subtopic_summaries': filtered_syllabus.subtopic_summaries
+            'story_summaries': filtered_syllabus['story_summaries'],
+            'subtopic_summaries': filtered_syllabus['subtopic_summaries']
         })
 
 
@@ -434,13 +434,6 @@ class TeacherDashboardHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests for the teacher dashboard."""
-
-        is_valid_request = (
-            learner_group_services.is_learner_group_feature_enabled()
-        )
-
-        if not is_valid_request:
-            raise self.PageNotFoundException
 
         learner_groups = (
             learner_group_fetchers.get_learner_groups_of_facilitator(
