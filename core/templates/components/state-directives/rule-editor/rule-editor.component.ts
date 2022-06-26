@@ -296,4 +296,3 @@ angular.module('oppia').directive('oppiaRuleEditor',
  downgradeComponent({
    component: RuleEditorComponent
  }) as angular.IDirectiveFactory);
-

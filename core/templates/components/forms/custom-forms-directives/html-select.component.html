@@ -9,7 +9,7 @@
   <ul ngbDropdownMenu class="oppia-dropdown-menu">
     <li *ngFor="let choice of options" class="dropdown-item float-left">
       <a (click)="select(choice.id)">
-        <angular-html-bind-wrapper classStr="oppia-html-select-option protractor-test-html-multiple-select-option" 
+        <angular-html-bind-wrapper classStr="oppia-html-select-option protractor-test-html-multiple-select-option"
                                    [htmlData]="choice.val">
         </angular-html-bind-wrapper>
       </a>
