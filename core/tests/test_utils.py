@@ -1363,8 +1363,8 @@ class TestBase(unittest.TestCase):
     # make this method generalized for all test cases, we used Any here.
     def assertDictEqual(
         self,
-        dict_one: Mapping[Any, Any],
-        dict_two: Mapping[Any, Any],
+        dict_one: Mapping[str, Any],
+        dict_two: Mapping[str, Any],
         msg: Optional[str] = None
     ) -> None:
         """Checks whether the given two dictionaries are populated with same

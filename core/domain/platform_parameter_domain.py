@@ -231,10 +231,10 @@ class EvaluationContext:
             EvaluationContext. The corresponding EvaluationContext domain
             object.
         """
-        # TODO(#15633): Refactor all the places in the codebase where either
-        # `browser_type` or `app_version` key is not provided, So that once
-        # all the places are refactored and all keys are provided. we can
-        # convert .get() to [].
+        # TODO(#11208): After `app version` and `browser type` are set properly
+        # in the codebase as a part of the server & client context. Please
+        # convert `.get()` method to `[]`, so that we have a more strict method
+        # to fetch dictionary keys.
         return cls(
             client_context_dict['platform_type'],
             client_context_dict.get('browser_type'),

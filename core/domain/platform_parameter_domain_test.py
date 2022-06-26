@@ -25,7 +25,7 @@ from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 from typing_extensions import Final
 
 ServerModes = parameter_domain.ServerModes
@@ -87,7 +87,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             param_change_object.new_rules, [])
 
     def test_to_dict_returns_correct_dict(self) -> None:
-        param_change_dict = {
+        param_change_dict: Dict[str, Union[str, List[str]]] = {
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': []
         }
