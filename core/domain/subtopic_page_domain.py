@@ -25,6 +25,8 @@ from core.domain import change_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
+from typing import List
+
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -51,10 +53,10 @@ class SubtopicPageChange(change_domain.BaseChange):
 
     # The allowed list of subtopic page properties which can be used in
     # update_subtopic_page_property command.
-    SUBTOPIC_PAGE_PROPERTIES = (
+    SUBTOPIC_PAGE_PROPERTIES: List[str] = [
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
-        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS)
+        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS]
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
