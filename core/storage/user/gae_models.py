@@ -91,6 +91,10 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = datastore_services.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+    # Language preference when submitting text translations in the
+    # contributor dashboard.
+    preferred_translation_language_code = datastore_services.StringProperty(
+        default=None)
 
     # Attributes used for full users only.
 
@@ -185,6 +189,8 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code':
                 base_models.EXPORT_POLICY.EXPORTED,
             'preferred_audio_language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_translation_language_code':
                 base_models.EXPORT_POLICY.EXPORTED,
             'username': base_models.EXPORT_POLICY.EXPORTED,
             'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
@@ -293,6 +299,8 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
+            'preferred_translation_language_code': (
+                user.preferred_translation_language_code),
             'display_alias': user.display_alias,
             'has_viewed_lesson_info_modal_once': (
                 user.has_viewed_lesson_info_modal_once)
