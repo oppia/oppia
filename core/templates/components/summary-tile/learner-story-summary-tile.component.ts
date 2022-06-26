@@ -64,24 +64,24 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     if (this.isDisplayAreaHome()) {
       var allNodes = this.storySummary.getAllNodes();
       var node = allNodes[this.completedNodeCount];
-      let nodeExplorationId = node.getExplorationId();
-      if (node && nodeExplorationId) {
-        let result = this.urlInterpolationService.interpolateUrl(
-          '/explore/<exp_id>', {
-            exp_id: nodeExplorationId
-          });
-        result = this.urlService.addField(
-          result, 'topic_url_fragment',
-          topicUrlFragment);
-        result = this.urlService.addField(
-          result, 'classroom_url_fragment',
-          classroomUrlFragment);
-        result = this.urlService.addField(
-          result, 'story_url_fragment',
-          this.storySummary.getUrlFragment());
-        result = this.urlService.addField(
-          result, 'node_id', node.getId());
-        return result;
+      if (node && node.getExplorationId()) {
+        let explorationId = node.getExplorationId();
+        if (explorationId) {
+          let result = this.urlInterpolationService.interpolateUrl(
+            '/explore/<exp_id>', {
+              exp_id: explorationId
+            });
+          result = this.urlService.addField(
+            result, 'topic_url_fragment', topicUrlFragment);
+          result = this.urlService.addField(
+            result, 'classroom_url_fragment', classroomUrlFragment);
+          result = this.urlService.addField(
+            result, 'story_url_fragment',
+            this.storySummary.getUrlFragment());
+          result = this.urlService.addField(
+            result, 'node_id', node.getId());
+          return result;
+        }
       }
     }
     return this.urlInterpolationService.interpolateUrl(
@@ -116,11 +116,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.nextIncompleteNodeTitle = (
         `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
     }
-    let topicName = this.storySummary.getTopicName();
-    if (topicName === undefined) {
-      throw new Error('Topic name is not defined.');
-    }
-    this.topicName = topicName;
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
 
