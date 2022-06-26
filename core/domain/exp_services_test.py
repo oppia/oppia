@@ -134,6 +134,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -1495,6 +1496,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                         'name': 'invalid_handler_name',
                         'rule_specs': [{
                             'dest': 'END',
+                            'dest_if_really_stuck': None,
                             'feedback': [],
                             'param_changes': [],
                             'definition': {'rule_type': 'default'}
@@ -3025,6 +3027,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': self.init_state_name,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -3040,6 +3043,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
+            'dest_if_really_stuck': None,
             'feedback': {
                 'content_id': 'default_outcome',
                 'html': '<p><strong>Incorrect</strong></p>'
@@ -3528,6 +3532,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     }],
                     'outcome': {
                         'dest': 'State 2',
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': 'feedback_3',
                             'html': '<p>Try again</p>'
@@ -3545,6 +3550,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                 {
                     'dest': 'State 2',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'default_outcome',
                         'html': '<p><strong>Incorrect</strong></p>'
