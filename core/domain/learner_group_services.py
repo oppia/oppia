@@ -139,11 +139,13 @@ def update_learner_group(
         raise Exception(
             'The learner group with the given group id does not exist.')
 
-    invited_student_ids = set(learner_group_model.invited_student_user_ids)
+    old_invited_student_ids = set(learner_group_model.invited_student_user_ids)
     new_invited_student_ids = set(invited_student_ids)
-    if new_invited_student_ids != invited_student_ids:
-        newly_added_invites = new_invited_student_ids - invited_student_ids
-        newly_removed_invites = invited_student_ids - new_invited_student_ids
+    if new_invited_student_ids != old_invited_student_ids:
+        newly_added_invites = new_invited_student_ids - old_invited_student_ids
+        newly_removed_invites = (
+            old_invited_student_ids - new_invited_student_ids
+        )
         invite_students_to_learner_group(
             group_id, newly_added_invites)
         remove_invited_students_from_learner_group(
@@ -219,7 +221,9 @@ def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
     topic_ids: List[str] = []
 
     for subtopic_page_id in subtopic_page_ids:
-        topic_ids.append(subtopic_page_id.split(':')[0])
+        topic_id = subtopic_page_id.split(':')[0]
+        if topic_id not in topic_ids:
+            topic_ids.append(topic_id)
 
     return topic_ids
 
@@ -246,6 +250,7 @@ def get_filtered_learner_group_syllabus(
     Returns:
         list(dict). The filtered syllabus of the learner group.
     """
+    keyword = keyword.lower()
     learner_group = learner_group_fetchers.get_learner_group_by_id(
         learner_group_id)
 
@@ -266,9 +271,8 @@ def get_filtered_learner_group_syllabus(
 
     if category != 'All':
         for classroom in all_classrooms_dict:
-            if category and classroom['name'] != category:
-                continue
-            filtered_topic_ids.extend(classroom['topic_ids'])
+            if category and classroom['name'] == category:
+                filtered_topic_ids.extend(classroom['topic_ids'])
 
         filtered_topics = (
             [topic.id for topic in all_topics if (
@@ -288,9 +292,10 @@ def get_filtered_learner_group_syllabus(
             if filter_type is None or filter_type == 'Story':
                 story_ids = (
                     [
-                        story.id for story in topic.canonical_story_references
-                        and story.id not in group_story_ids
-                        and story.story_is_published is True
+                        story.story_id for story in
+                        topic.canonical_story_references
+                        if (story.story_id not in group_story_ids
+                            and story.story_is_published is True)
                     ]
                 )
                 filtered_story_ids.extend(story_ids)
@@ -301,7 +306,7 @@ def get_filtered_learner_group_syllabus(
                 for subtopic in topic.subtopics:
                     # If the subtopic is not already in the group syllabus,
                     # add it to the filtered subtopics.
-                    subtopic_page_id = topic.id + ':' + subtopic.id
+                    subtopic_page_id = topic.id + ':' + str(subtopic.id)
                     if subtopic.id not in group_subtopic_page_ids:
                         filtered_subtopics.append(subtopic)
 
@@ -312,23 +317,25 @@ def get_filtered_learner_group_syllabus(
             # filtered subtopics.
             if filter_type is None or filter_type == 'Skill':
                 for subtopic in topic.subtopics:
-                    if subtopic.title.find(keyword) != -1:
+                    if subtopic.title.lower().find(keyword) != -1:
                         # If the subtopic is not already in the group syllabus,
                         # add it to the filtered subtopics.
-                        subtopic_page_id = topic.id + ':' + subtopic.id
+                        subtopic_page_id = topic.id + ':' + str(subtopic.id)
                         if subtopic_page_id not in group_subtopic_page_ids:
                             filtered_subtopics.append(subtopic)
 
             # If type filter is not set or type filter is set to 'Story',
             # add all story ids of this topic to the possible story ids.
             if filter_type is None or filter_type == 'Story':
-                possible_story_ids = (
+                story_ids = (
                     [
-                        story.id for story in topic.canonical_story_references
-                        and story.id not in group_story_ids
-                        and story.story_is_published is True
+                        story.story_id for story in
+                        topic.canonical_story_references
+                        if (story.story_id not in group_story_ids
+                            and story.story_is_published is True)
                     ]
                 )
+                possible_story_ids.extend(story_ids)
 
     if len(filtered_story_ids) > 0:
         filtered_stories = story_fetchers.get_story_summaries_by_ids(
@@ -340,7 +347,7 @@ def get_filtered_learner_group_syllabus(
             possible_story_ids
         )
         for story in possible_stories:
-            if story.title.find(keyword) != -1:
+            if story.title.lower().find(keyword) != -1:
                 filtered_stories.append(story)
 
     return {
@@ -350,13 +357,13 @@ def get_filtered_learner_group_syllabus(
 
 
 def add_student_to_learner_group(
-        user_id, group_id, progress_sharing_permission
+        group_id, user_id, progress_sharing_permission
     ) -> None:
     """Adds the given student to the given learner group.
 
     Args:
-        user_id: str. The id of the student.
         group_id: str. The id of the learner group.
+        user_id: str. The id of the student.
         progress_sharing_permission: bool. The progress sharing permission of
             the learner group. True if progress sharing is allowed, False
             otherwise.
@@ -371,11 +378,6 @@ def add_student_to_learner_group(
         user_id)
 
     if user_id not in learner_group_model.invited_student_user_ids:
-        raise Exception('Student was not invited to join the learner group.')
-
-    if (not learner_grps_user_model or group_id not in
-        learner_grps_user_model.invited_to_learner_groups_ids
-    ):
         raise Exception('Student was not invited to join the learner group.')
 
     learner_group_model.invited_student_user_ids.remove(user_id)

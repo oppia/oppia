@@ -172,6 +172,7 @@
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
+        "core.controllers.learner_group_test",
         "core.domain.learner_group_domain_test",
         "core.domain.learner_group_services_test",
         "core.domain.learner_group_fetchers_test",
