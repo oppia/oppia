@@ -1355,10 +1355,10 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
-    # Here we used Mapping[Any, Any] because, in oppia codebase TypedDict is
+    # Here we used Mapping[str, Any] because, in oppia codebase TypedDict is
     # used to define strict dictionaries and those strict dictionaries are not
-    # compatible with Dict[str, Any] type because of invariance property of
-    # Dict type. Also, here key and value both are annotated as Any because this
+    # compatible with Dict[str, Any] type because of the invariant property of
+    # Dict type. Also, here value of `Mapping` is annotated as Any because this
     # method can accept any kind of dictionaries for testing purposes. So, to
     # make this method generalized for all test cases, we used Any here.
     def assertDictEqual(
