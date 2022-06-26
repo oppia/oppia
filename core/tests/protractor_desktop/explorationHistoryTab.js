@@ -462,6 +462,7 @@ describe('Exploration history', function() {
       '        unicode_str: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
+      '    dest_if_really_stuck\n' +
       '    feedback:\n' +
       '      content_id: default_outcome\n' +
       '      html: \'\'\n' +
