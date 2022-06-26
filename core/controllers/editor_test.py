@@ -582,7 +582,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -610,7 +613,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -638,7 +644,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
