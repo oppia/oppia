@@ -64,11 +64,11 @@ export class StateEditorService {
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
   private _updateAnswerChoicesEventEmitter =
-    new EventEmitter<AnswerChoice[] | null>();
+    new EventEmitter<AnswerChoice[]>();
 
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
-    new EventEmitter<AnswerChoice[] | null>();
+    new EventEmitter<AnswerChoice[]>();
 
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
@@ -215,7 +215,7 @@ export class StateEditorService {
   // equivalent to 'MultipleChoiceInput', 'ItemSelectionInput',
   // 'DragAndDropSortInput'.
   getAnswerChoices(
-      interactionId: string | null,
+      interactionId: string,
       customizationArgs: InteractionCustomizationArgs
   ): AnswerChoice[] | null {
     if (!interactionId) {
@@ -342,7 +342,7 @@ export class StateEditorService {
     return this._refreshStateTranslationEventEmitter;
   }
 
-  get onUpdateAnswerChoices(): EventEmitter<AnswerChoice[] | null> {
+  get onUpdateAnswerChoices(): EventEmitter<AnswerChoice[]> {
     return this._updateAnswerChoicesEventEmitter;
   }
 
@@ -350,7 +350,7 @@ export class StateEditorService {
     return this._saveOutcomeDestDetailsEventEmitter;
   }
 
-  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[] | null> {
+  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
     return this._handleCustomArgsUpdateEventEmitter;
   }
 
