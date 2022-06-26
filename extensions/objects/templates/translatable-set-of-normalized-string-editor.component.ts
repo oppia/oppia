@@ -50,7 +50,7 @@ export class TranslatableSetOfNormalizedStringEditorComponent
   ngOnInit(): void {
     if (this.value === undefined) {
       this.value = {
-        normalizedStrSet: null
+        normalizedStrSet: ''
       };
     }
   }

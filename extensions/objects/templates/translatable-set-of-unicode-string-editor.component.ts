@@ -46,7 +46,7 @@ export class TranslatableSetOfUnicodeStringEditorComponent implements OnInit {
   ngOnInit(): void {
     if (this.value === undefined) {
       this.value = {
-        unicodeStrSet: null
+        unicodeStrSet: ''
       };
     }
   }

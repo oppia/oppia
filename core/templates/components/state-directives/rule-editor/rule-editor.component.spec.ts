@@ -48,57 +48,6 @@ describe('RuleEditorComponent', () => {
   let responsesService: ResponsesService;
   let populateRuleContentIdsService: PopulateRuleContentIdsService;
 
-  const INTERACTION_SPECS = {
-    TextInput: {
-      rule_descriptions: {
-        StartsWith: 'starts with at least one of' +
-          ' {{x|TranslatableSetOfNormalizedString}}',
-        Contains: 'contains at least one of' +
-          ' {{x|TranslatableSetOfNormalizedString}}',
-        Equals: 'is equal to at least one of' +
-          ' {{x|TranslatableSetOfNormalizedString}},' +
-          ' without taking case into account',
-        FuzzyEquals: 'is equal to at least one of {{x|TranslatableSetOf' +
-          'NormalizedString}}, misspelled by at most one character'
-      }
-    },
-    AlgebraicExpressionInput: {
-      rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with {{x|AlgebraicExpression}}',
-        IsEquivalentTo: 'is equivalent to {{x|AlgebraicExpression}}',
-        ContainsSomeOf: 'contains at least one of the terms present in' +
-          ' {{x|AlgebraicExpression}}',
-        OmitsSomeOf: 'omits at least one of the terms present in' +
-          ' {{x|AlgebraicExpression}}',
-        MatchesWithGeneralForm: 'matches the form of {{x|Algebraic' +
-          'Expression}} with placeholders {{y|SetOfAlgebraicIdentifier}}'
-      }
-    },
-    DummyInteraction1: {
-      rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with' +
-          ' {{x|SetOfTranslatableHtmlContentIds}}'
-      }
-    },
-    DummyInteraction2: {
-      rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with' +
-          ' {{x|ListOfSetsOfTranslatableHtmlContentIds}}'
-      }
-    },
-    DummyInteraction3: {
-      rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with' +
-          ' {{x|TranslatableHtmlContentId}}'
-      }
-    },
-    DummyInteraction4: {
-      rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with {{x|DragAndDropPositiveInt}}'
-      }
-    }
-  };
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -126,8 +75,6 @@ describe('RuleEditorComponent', () => {
     responsesService = TestBed.inject(ResponsesService);
     populateRuleContentIdsService = TestBed.inject(
       PopulateRuleContentIdsService);
-
-    component.interactionSpecs = INTERACTION_SPECS;
   });
 
   afterEach(() => {

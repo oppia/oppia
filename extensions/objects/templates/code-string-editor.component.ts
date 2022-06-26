@@ -39,7 +39,7 @@ export class CodeStringEditorComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.value === undefined) {
-      this.value = null;
+      this.value = '';
     }
 
     this._checkForWarnings();

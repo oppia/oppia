@@ -159,7 +159,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/state-directives/response-header/response-header.component.ts',
     'core/templates/components/state-directives/rule-editor/rule-editor.component.spec.ts',
     'core/templates/components/state-directives/rule-editor/rule-editor.component.ts',
-    'core/templates/components/state-directives/rule-editor/rule-type-selector.directive.ts',
+    'core/templates/components/state-directives/rule-editor/rule-type-selector.component.ts',
     'core/templates/components/state-directives/solution-editor/solution-editor.component.spec.ts',
     'core/templates/components/state-directives/solution-editor/solution-editor.component.ts',
     'core/templates/components/state-directives/solution-editor/solution-explanation-editor.component.ts',

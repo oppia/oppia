@@ -47,19 +47,11 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.value === undefined) {
-      this.value = {
-        type: null,
-        real: null,
-        fraction: null,
-        units: [],
-      };
-    }
-
-    if (this.value !== null) {
+    if (this.value !== null || this.value !== undefined) {
       const defaultNumberWithUnits =
-        this.numberWithUnitsObjectFactory.fromDict(this.value);
-      this.numberWithUnitsString = defaultNumberWithUnits.toString();
+        this.numberWithUnitsObjectFactory.fromDict(
+          this.value as NumberWithUnitsAnswer);
+      this.numberWithUnitsString = defaultNumberWithUnits?.toString();
       this.valueChanged.emit(this.value);
     }
   }

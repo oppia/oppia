@@ -271,6 +271,10 @@ export class NumberWithUnitsObjectFactory {
   }
 
   fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
+    if (numberWithUnitsDict === undefined) {
+      return;
+    }
+
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
