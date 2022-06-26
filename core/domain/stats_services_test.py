@@ -1427,10 +1427,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
                             'unicode_str': 'Enter here'
                         }
                     },
-                    'rows': {'value': 1},
-                    'catchMisspellings': {
-                        'value': False
-                    }
+                    'rows': {'value': 1}
                 }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

@@ -365,7 +365,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         answer_group_dict = {
             'outcome': {
                 'dest': 'Introduction',
-                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'

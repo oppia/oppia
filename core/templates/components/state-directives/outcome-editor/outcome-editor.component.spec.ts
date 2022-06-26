@@ -67,7 +67,6 @@ describe('Outcome Editor Component', () => {
   it('should set component properties on initialization', () => {
     let outcome = new Outcome(
       'Introduction',
-      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
@@ -122,7 +121,6 @@ describe('Outcome Editor Component', () => {
     component.feedbackEditorIsOpen = true;
     component.savedOutcome = new Outcome(
       'Introduction',
-      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       true,
       [],
@@ -131,7 +129,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Introduction',
-      null,
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
@@ -179,7 +176,6 @@ describe('Outcome Editor Component', () => {
     component.destinationEditorIsOpen = true;
     component.savedOutcome = new Outcome(
       'Introduction',
-      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       true,
       [],
@@ -188,7 +184,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Saved Outcome',
-      null,
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
@@ -234,7 +229,6 @@ describe('Outcome Editor Component', () => {
   it('should check if a state is in self loop', () => {
     let outcome = new Outcome(
       'Hola',
-      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
@@ -249,7 +243,6 @@ describe('Outcome Editor Component', () => {
 
     outcome = new Outcome(
       'Introduction',
-      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
@@ -319,7 +312,6 @@ describe('Outcome Editor Component', () => {
   it('should save correctness label when it is changed', () => {
     component.savedOutcome = new Outcome(
       'Introduction',
-      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       false,
       [],
@@ -328,7 +320,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Introduction',
-      null,
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
@@ -345,7 +336,6 @@ describe('Outcome Editor Component', () => {
     ' question mode', () => {
     component.savedOutcome = new Outcome(
       'Saved Dest',
-      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
       [],
@@ -354,7 +344,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Dest',
-      null,
       new SubtitledHtml('<p>Outcome</p>', 'contentId'),
       true,
       [],
@@ -374,7 +363,6 @@ describe('Outcome Editor Component', () => {
   it('should set destination when saving feedback not in question mode', () => {
     component.savedOutcome = new Outcome(
       'Dest',
-      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
       [],
@@ -383,7 +371,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Dest',
-      null,
       new SubtitledHtml('<p>Outcome</p>', 'contentId'),
       true,
       [],
@@ -402,7 +389,6 @@ describe('Outcome Editor Component', () => {
     ' when state is not in self loop', () => {
     component.savedOutcome = new Outcome(
       'Saved Dest',
-      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
       [],
@@ -411,7 +397,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Dest',
-      null,
       new SubtitledHtml('<p>Outcome</p>', 'contentId'),
       true,
       [],
@@ -430,7 +415,6 @@ describe('Outcome Editor Component', () => {
   it('should check if outcome feedback exceeds 10000 characters', () => {
     component.outcome = new Outcome(
       'Dest',
-      null,
       new SubtitledHtml('a'.repeat(10000), 'contentId'),
       true,
       [],
@@ -441,7 +425,6 @@ describe('Outcome Editor Component', () => {
 
     component.outcome = new Outcome(
       'Dest',
-      null,
       new SubtitledHtml('a'.repeat(10001), 'contentId'),
       true,
       [],

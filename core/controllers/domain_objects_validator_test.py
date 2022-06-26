@@ -165,7 +165,6 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                         'html': ''
                     },
                     'dest': 'State A',
-                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -179,9 +178,6 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                             'unicode_str': '',
                             'content_id': 'ca_placeholder_0'
                         }
-                    },
-                    'catchMisspellings': {
-                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],

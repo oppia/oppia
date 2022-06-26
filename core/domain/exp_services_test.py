@@ -134,7 +134,6 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -2448,10 +2447,7 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1},
-                        'catchMisspellings': {
-                            'value': False
-                        }
+                        'rows': {'value': 1}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2542,10 +2538,7 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1},
-                        'catchMisspellings': {
-                            'value': False
-                        }
+                        'rows': {'value': 1}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2631,10 +2624,7 @@ title: A title
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1},
-                'catchMisspellings': {
-                    'value': False
-                }
+                'rows': {'value': 1}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2890,10 +2880,7 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1},
-                        'catchMisspellings': {
-                            'value': False
-                        }
+                        'rows': {'value': 1}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2945,10 +2932,7 @@ written_translations:
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1},
-                'catchMisspellings': {
-                    'value': False
-                }
+                'rows': {'value': 1}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3026,7 +3010,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': self.init_state_name,
-                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -3042,7 +3025,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
-            'dest_if_really_stuck': None,
             'feedback': {
                 'content_id': 'default_outcome',
                 'html': '<p><strong>Incorrect</strong></p>'
@@ -3400,10 +3382,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1},
-                    'catchMisspellings': {
-                        'value': False
-                    }
+                    'rows': {'value': 1}
                 }),
             'Add state name')
 
@@ -3448,10 +3427,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1},
-                    'catchMisspellings': {
-                        'value': False
-                    }
+                    'rows': {'value': 1}
                 }),
             'Add state name')
 
@@ -3727,10 +3703,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1},
-                    'catchMisspellings': {
-                        'value': False
-                    }
+                    'rows': {'value': 1}
                 }),
             'Add Customization Args')
 
@@ -3888,10 +3861,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1},
-                    'catchMisspellings': {
-                        'value': False
-                    }
+                    'rows': {'value': 1}
                 }),
             'Add Customization Args')
 
@@ -4065,10 +4035,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1},
-                    'catchMisspellings': {
-                        'value': False
-                    }
+                    'rows': {'value': 1}
                 }),
             'Add Customization Args')
 
@@ -4752,10 +4719,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1},
-                'catchMisspellings': {
-                    'value': False
-                }
+                'rows': {'value': 1}
             }
         })]
         exp_services.update_exploration(
@@ -4848,10 +4812,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1},
-                'catchMisspellings': {
-                    'value': False
-                }
+                'rows': {'value': 1}
             }
         })]
         exp_services.update_exploration(
@@ -4926,10 +4887,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1},
-                'catchMisspellings': {
-                    'value': False
-                }
+                'rows': {'value': 1}
             }
         })]
         exp_services.update_exploration(

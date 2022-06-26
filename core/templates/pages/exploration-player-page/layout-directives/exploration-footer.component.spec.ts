@@ -271,7 +271,6 @@ describe('ExplorationFooterComponent', () => {
                       html: '<p>Good Job</p>'
                     },
                     param_changes: [],
-                    dest_if_really_stuck: null,
                     dest: 'Mid'
                   },
                   training_data: [],
@@ -300,7 +299,6 @@ describe('ExplorationFooterComponent', () => {
                   html: '<p>Try again.</p>'
                 },
                 param_changes: [],
-                dest_if_really_stuck: null,
                 dest: 'Start'
               }
             },
@@ -396,7 +394,6 @@ describe('ExplorationFooterComponent', () => {
                       html: ' <p>Good Job</p>'
                     },
                     param_changes: [],
-                    dest_if_really_stuck: null,
                     dest: 'End'
                   },
                   training_data: [],
@@ -425,7 +422,6 @@ describe('ExplorationFooterComponent', () => {
                   html: '<p>try again.</p>'
                 },
                 param_changes: [],
-                dest_if_really_stuck: null,
                 dest: 'Mid'
               }
             },
@@ -538,7 +534,6 @@ describe('ExplorationFooterComponent', () => {
             answer_groups: [],
             default_outcome: {
               dest: 'Introduction',
-              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: ''
@@ -636,7 +631,6 @@ describe('ExplorationFooterComponent', () => {
                 },
                 labelled_as_correct: true,
                 refresher_exploration_id: 'exp',
-                dest_if_really_stuck: null,
                 missing_prerequisite_skill_id: null
               },
               confirmed_unclassified_answers: [],
@@ -708,7 +702,6 @@ describe('ExplorationFooterComponent', () => {
               default_outcome: {
                 param_changes: [],
                 dest: 'Introduction',
-                dest_if_really_stuck: null,
                 feedback: {
                   html: '',
                   content_id: 'content'

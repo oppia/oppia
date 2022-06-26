@@ -108,7 +108,7 @@ describe('Topic editor functionality', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction(
-      'TextInput', 'Placeholder', 5, false);
+      'TextInput', 'Placeholder', 5);
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', ['correct']);
