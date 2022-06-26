@@ -197,6 +197,15 @@ export class UrlInterpolationService {
   }
 
   /**
+   * Given an audio path relative to /assets/audio folder,
+   * returns the complete url path to that audio.
+   */
+  getStaticAudioUrl(audioPath: string): string {
+    this.validateResourcePath(audioPath);
+    return this._getCompleteUrl('/assets', '/audio' + audioPath);
+  }
+
+  /**
    * Given a path relative to /assets folder, returns the complete url path
    * to that asset.
    */
