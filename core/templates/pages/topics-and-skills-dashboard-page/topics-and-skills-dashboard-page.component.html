@@ -21,7 +21,7 @@
       <i class="fa fa-plus-circle" aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
     </div>
     <div *ngIf="activeTab === TAB_NAME_SKILLS">
-      <i class="fa fa-plus-circle protractor-test-create-skill-button-secondary-mobile" aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
+      <i class="fa fa-plus-circle protractor-test-mobile-create-skill-button-secondary" aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
     </div>
   </div>
   <div *ngIf="totalTopicSummaries.length > 0 || untriagedSkillSummaries.length > 0">

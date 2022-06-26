@@ -17,7 +17,6 @@
  * tests.
  */
 
-const { element, browser } = require('protractor');
 var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');

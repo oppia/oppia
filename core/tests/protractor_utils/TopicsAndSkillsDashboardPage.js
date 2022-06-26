@@ -21,7 +21,6 @@ var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('./workflow.js');
 var general = require('../protractor_utils/general.js');
-const { browser } = require('protractor');
 
 var TopicsAndSkillsDashboardPage = function() {
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
@@ -34,13 +33,13 @@ var TopicsAndSkillsDashboardPage = function() {
   var createSkillButtonSecondary = element(
     by.css('.protractor-test-create-skill-button-circle'));
   var createSkillButtonSecondaryMobile = element(
-    by.css('.protractor-test-create-skill-button-secondary-mobile'));
+    by.css('.protractor-test-mobile-create-skill-button-secondary'));
   var deleteSkillButton = element(
     by.css('.protractor-test-delete-skill-button'));
   var topicsTable = element(by.css('.protractor-test-topics-table'));
   var skillsTable = element(by.css('.protractor-test-skills-table'));
   var skillsTableMobile = element(
-    by.css('.protractor-test-skills-table-mobile'));
+    by.css('.protractor-test-mobile-skills-table'));
   var topicsListItems = element.all(
     by.css('.protractor-test-topics-list-item'));
   var topicNamesClass = '.protractor-test-topic-name-in-topic-select-modal';
@@ -92,7 +91,7 @@ var TopicsAndSkillsDashboardPage = function() {
   var assignSkillToTopicButtons = element.all(
     by.css('.protractor-test-assign-skill-to-topic-button'));
   var assignSkillToTopicButtonsMobile = element(
-    by.css('.protractor-test-assign-skill-to-topic-button-mobile'));
+    by.css('.protractor-test-mobile-assign-skill-to-topic-button'));
   var confirmMoveButton = element(
     by.css('.protractor-test-confirm-move-button'));
   var mergeSkillsButton = element(
@@ -225,6 +224,7 @@ var TopicsAndSkillsDashboardPage = function() {
     let width = (await browser.manage().window().getSize()).width;
     if (width < 831) {
       await action.click('Skill Options', skillOptions);
+      expect(await assignSkillToTopicButtonsMobile.count()).toEqual(1);
       await action.click(
         'Assign skill to topic button', assignSkillToTopicButtonsMobile);
     } else {

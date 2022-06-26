@@ -28,9 +28,6 @@ var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var exitCode = 0;
 
 var suites = {
-    // The tests on Travis are run individually to parallelize
-    // them. Therefore, we mention the complete directory
-    // in 'full'.
     full: [
       'protractor/*.js',
       'protractor_desktop/*.js'
@@ -49,7 +46,6 @@ var suites = {
     additionalEditorFeaturesModals: [
       'protractor_desktop/additionalEditorFeaturesModals.js'
     ],
-
 
     additionalPlayerFeatures: [
       'protractor_desktop/additionalPlayerFeatures.js'
