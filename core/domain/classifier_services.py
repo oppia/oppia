@@ -112,7 +112,7 @@ def handle_trainable_states(
     exp_version = exploration.version
     for state_name in state_names:
         state = exploration.states[state_name]
-        training_data = state.get_training_data()
+        training_data = state.get_training_data()  # type: ignore[no-untyped-call]
         interaction_id = state.interaction.id
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']

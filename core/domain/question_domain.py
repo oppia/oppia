@@ -35,6 +35,8 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from extensions import domain
 
+from typing_extensions import TypedDict
+
 from pylatexenc import latex2text
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -129,6 +131,13 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'user_id_attribute_names': []
         }
     ]
+
+
+class VersionedQuestionStateDict(TypedDict):
+    """Dictionary representing the versioned State object for Question."""
+
+    state_schema_version: int
+    state: state_domain.StateDict
 
 
 class Question(translation_domain.BaseTranslatableObject):
