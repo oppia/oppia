@@ -126,6 +126,20 @@ describe('LocalStorageService', () => {
         .toBeNull();
     });
 
+    it('should correctly save and retrieve sign up section preference', () => {
+      localStorageService.updateEndChapterSignUpSectionHiddenPreference('true');
+      expect(localStorageService.getEndChapterSignUpSectionHiddenPreference())
+        .toBe('true');
+    });
+
+    it('should not save sign up section preference when local storage isn\'t ' +
+    'available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+      localStorageService.updateEndChapterSignUpSectionHiddenPreference('true');
+      expect(localStorageService.getEndChapterSignUpSectionHiddenPreference())
+        .toBeNull();
+    });
+
     it('should not get entity editor browser tabs info from local ' +
     'storage when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);

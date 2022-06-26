@@ -32,6 +32,7 @@ import { ExplorationPlayerStateService } from './../services/exploration-player-
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LocalStorageService } from 'services/local-storage.service';
 
 interface ResultActionButton {
   type: string;
@@ -69,16 +70,6 @@ export class RatingsAndRecommendationsComponent {
   userRating: number;
   directiveSubscriptions = new Subscription();
   @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;
-  localStorage = (function() {
-    let test = 'test';
-    let result;
-    try {
-      localStorage.setItem(test, test);
-      result = localStorage.getItem(test) === test;
-      localStorage.removeItem(test);
-      return result && localStorage;
-    } catch (exception) {}
-  }());
 
   constructor(
     private alertsService: AlertsService,
@@ -88,7 +79,8 @@ export class RatingsAndRecommendationsComponent {
     private windowRef: WindowRef,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private urlInterpolationService: UrlInterpolationService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private localStorageService: LocalStorageService
   ) {}
 
   ngOnInit(): void {
@@ -142,17 +134,13 @@ export class RatingsAndRecommendationsComponent {
   }
 
   hideSignUpSection(): void {
-    if (this.localStorage) {
-      (this.localStorage as Storage).setItem(
-        'hide_sign_up_section', 'true');
-    }
+    this.localStorageService
+      .updateEndChapterSignUpSectionHiddenPreference('true');
   }
 
   isSignUpSectionHidden(): boolean {
-    if (this.localStorage) {
-      return this.localStorage.getItem('hide_sign_up_section') === 'true';
-    }
-    return false;
+    return this.localStorageService
+      .getEndChapterSignUpSectionHiddenPreference() === 'true';
   }
 
   isEndChapterFeatureEnabled(): boolean {

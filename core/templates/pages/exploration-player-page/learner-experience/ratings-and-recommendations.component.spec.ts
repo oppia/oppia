@@ -30,6 +30,7 @@ import { RatingsAndRecommendationsComponent } from './ratings-and-recommendation
 import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LocalStorageService } from 'services/local-storage.service';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -51,6 +52,7 @@ describe('Ratings and recommendations component', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let urlInterpolationService: UrlInterpolationService;
   let platformFeatureService: PlatformFeatureService;
+  let localStorageService: LocalStorageService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -83,6 +85,7 @@ describe('Ratings and recommendations component', () => {
         UserService,
         ExplorationPlayerStateService,
         UrlInterpolationService,
+        LocalStorageService,
         {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService
@@ -107,6 +110,7 @@ describe('Ratings and recommendations component', () => {
       ExplorationPlayerStateService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    localStorageService = TestBed.inject(LocalStorageService);
   });
 
   it('should populate internal properties and subscribe to event' +
@@ -229,33 +233,27 @@ describe('Ratings and recommendations component', () => {
   }));
 
   it('should save user\'s sign up section preference to localStorage', () => {
-    spyOn(componentInstance.localStorage, 'setItem');
+    spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');
 
     componentInstance.hideSignUpSection();
 
-    expect(componentInstance.localStorage.setItem).toHaveBeenCalledWith(
-      'hide_sign_up_section', 'true');
+    expect(localStorageService.updateEndChapterSignUpSectionHiddenPreference)
+      .toHaveBeenCalledWith('true');
   });
 
   it('should get user\'s sign up section preference from localStorage', () => {
-    const getItemSpy = (
-      spyOn(componentInstance.localStorage, 'getItem').and.returnValue('true'));
+    const getPreferenceSpy = (
+      spyOn(localStorageService, 'getEndChapterSignUpSectionHiddenPreference')
+        .and.returnValue('true'));
 
     expect(componentInstance.isSignUpSectionHidden()).toBe(true);
-    expect(componentInstance.localStorage.getItem).toHaveBeenCalledWith(
-      'hide_sign_up_section');
+    expect(localStorageService.getEndChapterSignUpSectionHiddenPreference)
+      .toHaveBeenCalled();
 
-    getItemSpy.and.returnValue(null);
+    getPreferenceSpy.and.returnValue(null);
 
     expect(componentInstance.isSignUpSectionHidden()).toBe(false);
   });
-
-  it('should not get user\'s preference if localStorage isn\'t accessible',
-    () => {
-      componentInstance.localStorage = null;
-
-      expect(componentInstance.isSignUpSectionHidden()).toBe(false);
-    });
 
   it('should correctly determine if the feature is enabled or not', () => {
     const featureSpy = (
