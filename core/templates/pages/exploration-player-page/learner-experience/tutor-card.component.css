@@ -141,6 +141,7 @@
   border-bottom-right-radius: 2px;
   padding: 8px 20px 25px;
   position: relative;
+  word-break: break-word;
 }
 
 .conversation-skin-inline-interaction .conversation-skin-user-avatar {
