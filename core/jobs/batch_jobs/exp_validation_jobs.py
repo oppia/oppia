@@ -228,8 +228,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         start_value = (
                             rte_component['customization_args']
                             ['start-with-value'])
-                        if start_value == '':
-                            start_value = '0'
                     except Exception:
                         start_value = 'Not found'
 
@@ -237,8 +235,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         end_value = (
                             rte_component['customization_args']
                             ['end-with-value'])
-                        if end_value == '':
-                            end_value = '0'
                     except Exception:
                         end_value = 'Not found'
 
@@ -262,7 +258,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                             start_value != 'Not found' and
                             end_value != 'Not found'
                         )
-                        and int(start_value) > int(end_value)
+                        and (start_value != '' and end_value != '') and
+                        int(start_value) > int(end_value)
                     ):
                         rte_components_errors.append(
                             f'State - {key} Video tag start '
