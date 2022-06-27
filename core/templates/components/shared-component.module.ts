@@ -129,7 +129,7 @@ import { StateSolutionEditorComponent } from './state-editor/state-solution-edit
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 import { RuleEditorComponent } from './state-directives/rule-editor/rule-editor.component';
 import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
-import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selector.component';
+import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selector.directive';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';

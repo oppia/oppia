@@ -209,18 +209,16 @@ describe('RuleEditorComponent', () => {
     };
     component.currentInteractionId = 'AlgebraicExpressionInput';
 
-    component.onSelectNewRuleType('MatchesWithGeneralForm');
+    component.onSelectNewRuleType('MatchesExactlyWith');
     flush(10);
 
     expect(component.rule).toEqual({
-      type: 'MatchesWithGeneralForm',
+      type: 'MatchesExactlyWith',
       inputTypes: {
-        x: 'AlgebraicExpression',
-        y: 'SetOfAlgebraicIdentifier'
+        x: 'AlgebraicExpression'
       },
       inputs: {
-        x: { contentId: null, normalizedStrSet: [] },
-        y: []
+        x: { contentId: null, normalizedStrSet: [] }
       }
     });
   }));
@@ -255,11 +253,11 @@ describe('RuleEditorComponent', () => {
       ]
     );
     component.rule = {
-      type: 'MatchesExactlyWith'
+      type: 'Equals'
     };
-    component.currentInteractionId = 'DummyInteraction1';
+    component.currentInteractionId = 'ItemSelectionInput';
 
-    component.onSelectNewRuleType('MatchesExactlyWith');
+    component.onSelectNewRuleType('Equals');
     flush();
 
     expect(component.ruleDescriptionFragments).toEqual([{
@@ -285,11 +283,12 @@ describe('RuleEditorComponent', () => {
       ]
     );
     component.rule = {
-      type: 'MatchesExactlyWith'
+      type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
     };
-    component.currentInteractionId = 'DummyInteraction2';
+    component.currentInteractionId = 'DragAndDropSortInput';
 
-    component.onSelectNewRuleType('MatchesExactlyWith');
+    component.onSelectNewRuleType(
+      'IsEqualToOrderingWithOneItemAtIncorrectPosition');
     flush();
 
     expect(component.ruleDescriptionFragments).toEqual([{
@@ -315,18 +314,17 @@ describe('RuleEditorComponent', () => {
       ]
     );
     component.rule = {
-      type: 'MatchesExactlyWith'
+      type: 'IsEqualToOrdering'
     };
-    component.currentInteractionId = 'DummyInteraction3';
-
-    component.onSelectNewRuleType('MatchesExactlyWith');
+    component.currentInteractionId = 'DragAndDropSortInput';
+    component.onSelectNewRuleType('IsEqualToOrdering');
     flush();
 
     expect(component.ruleDescriptionFragments).toEqual([{
       text: '',
       type: 'noneditable'
     }, {
-      type: 'dragAndDropHtmlStringSelect',
+      type: 'dropdown',
       varName: 'x'
     }, {
       text: '',
@@ -345,23 +343,14 @@ describe('RuleEditorComponent', () => {
       ]
     );
     component.rule = {
-      type: 'MatchesExactlyWith'
+      type: 'HasElementXAtPositionY'
     };
-    component.currentInteractionId = 'DummyInteraction4';
+    component.currentInteractionId = 'DragAndDropSortInput';
 
-    component.onSelectNewRuleType('MatchesExactlyWith');
+    component.onSelectNewRuleType('HasElementXAtPositionY');
     flush();
 
-    expect(component.ruleDescriptionFragments).toEqual([{
-      text: '',
-      type: 'noneditable'
-    }, {
-      type: 'dragAndDropPositiveIntSelect',
-      varName: 'x'
-    }, {
-      text: '',
-      type: 'noneditable'
-    }]);
+    expect(component.ruleDescriptionFragments.length).toEqual(5);
   }));
 
   it('should set ruleDescriptionFragments as noneditable when answer' +
@@ -370,7 +359,7 @@ describe('RuleEditorComponent', () => {
     component.rule = {
       type: 'MatchesExactlyWith'
     };
-    component.currentInteractionId = 'DummyInteraction4';
+    component.currentInteractionId = 'AlgebraicExpressionInput';
 
     component.onSelectNewRuleType('MatchesExactlyWith');
     flush();
