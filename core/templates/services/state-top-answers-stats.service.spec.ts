@@ -101,10 +101,7 @@ describe('StateTopAnswersStatsService', () => {
             unicode_str: ''
           }
         },
-        rows: { value: 1 },
-        catchMisspellings: {
-          value: false
-        }
+        rows: { value: 1 }
       },
       solution: null,
     },

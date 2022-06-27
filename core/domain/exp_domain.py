@@ -2105,15 +2105,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'TextInput':
-                customization_args = state_dict['interaction'][
-                    'customization_args']
-                customization_args.update({
-                    'catchMisspellings': {
-                        'value': False
-                    }
-                })
-
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['outcome']['dest_if_really_stuck'] = None

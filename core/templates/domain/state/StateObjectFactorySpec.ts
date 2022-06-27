@@ -40,9 +40,6 @@ describe('State Object Factory', () => {
             unicode_str: 'Type your answer here.',
             content_id: ''
           }
-        },
-        catchMisspellings: {
-          value: false
         }
       },
       answer_groups: [],
@@ -119,9 +116,6 @@ describe('State Object Factory', () => {
               unicode_str: 'Type your answer here.',
               content_id: ''
             }
-          },
-          catchMisspellings: {
-            value: false
           }
         },
         default_outcome: {

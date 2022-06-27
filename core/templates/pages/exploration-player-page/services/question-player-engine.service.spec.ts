@@ -132,9 +132,6 @@ describe('Question player engine service ', () => {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
-            },
-            catchMisspellings: {
-              value: false
             }
           },
           confirmed_unclassified_answers: [],
@@ -218,9 +215,6 @@ describe('Question player engine service ', () => {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
-            },
-            catchMisspellings: {
-              value: false
             }
           },
           confirmed_unclassified_answers: [],
@@ -303,9 +297,6 @@ describe('Question player engine service ', () => {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
-            },
-            catchMisspellings: {
-              value: false
             }
           },
           confirmed_unclassified_answers: [],
@@ -388,9 +379,6 @@ describe('Question player engine service ', () => {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
-            },
-            catchMisspellings: {
-              value: false
             }
           },
           confirmed_unclassified_answers: [],

@@ -348,8 +348,6 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
-    catchMisspellings:
-      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -394,8 +392,6 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
-    catchMisspellings:
-      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -440,8 +436,6 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
-    catchMisspellings:
-      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -488,8 +482,6 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
-    catchMisspellings:
-      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -582,10 +574,7 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1},
-                        'catchMisspellings': {
-                            'value': False
-                        }
+                        'rows': {'value': 1}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -613,10 +602,7 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1},
-                        'catchMisspellings': {
-                            'value': False
-                        }
+                        'rows': {'value': 1}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -644,10 +630,7 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1},
-                        'catchMisspellings': {
-                            'value': False
-                        }
+                        'rows': {'value': 1}
                     }
                 }),
                 exp_domain.ExplorationChange({

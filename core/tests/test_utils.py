@@ -1623,10 +1623,7 @@ class GenericTestBase(AppEngineTestBase):
             },
             'customization_args': {
                 'rows': {'value': 1},
-                'placeholder': {'value': 'Enter text here'},
-                'catchMisspellings': {
-                    'value': False
-                }
+                'placeholder': {'value': 'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': 'TextInput',
@@ -3464,10 +3461,7 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1},
-            'catchMisspellings': {
-                'value': False
-            }
+            'rows': {'value': 1}
         })
         state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True

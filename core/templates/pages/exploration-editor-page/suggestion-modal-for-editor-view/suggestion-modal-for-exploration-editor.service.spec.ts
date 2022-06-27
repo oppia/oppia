@@ -53,10 +53,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
             unicode_str: ''
           }
         },
-        rows: { value: 1 },
-        catchMisspellings: {
-          value: false
-        }
+        rows: { value: 1 }
       },
       answer_groups: [{
         outcome: {

@@ -1252,14 +1252,6 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] == 'TextInput':
-            customization_args = question_state_dict[
-                'interaction']['customization_args']
-            customization_args.update({
-                'catchMisspellings': {
-                    'value': False
-                }
-            })
 
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:

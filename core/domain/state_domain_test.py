@@ -458,10 +458,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1},
-            'catchMisspellings': {
-                'value': False
-            }
+            'rows': {'value': 1}
         }
 
         state.update_next_content_id_index(3)

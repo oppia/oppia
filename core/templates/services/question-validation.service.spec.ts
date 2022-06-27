@@ -90,10 +90,7 @@ describe('Question Validation Service', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 },
-            catchMisspellings: {
-              value: false
-            }
+            rows: { value: 1 }
           },
           default_outcome: {
             dest: null,

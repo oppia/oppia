@@ -71,9 +71,6 @@ describe('State card object factory', () => {
             unicode_str: 'Type your answer here.',
             content_id: ''
           }
-        },
-        catchMisspellings: {
-          value: false
         }
       },
       default_outcome: {
@@ -183,8 +180,7 @@ describe('State card object factory', () => {
     expect(_sampleCard2.getInteractionInstructions()).toBeNull();
     expect(_sampleCard1.getInteractionCustomizationArgs()).toEqual({
       rows: {value: 1},
-      placeholder: {value: new SubtitledUnicode('Type your answer here.', '')},
-      catchMisspellings: { value: false }
+      placeholder: {value: new SubtitledUnicode('Type your answer here.', '')}
     });
     expect(_sampleCard2.getInteractionCustomizationArgs()).toBeNull();
     expect(_sampleCard1.getInteractionHtml()).toEqual(
@@ -270,9 +266,6 @@ describe('State card object factory', () => {
       placeholder: {
         value: new SubtitledUnicode(
           'Type your answer here.', '')
-      },
-      catchMisspellings: {
-        value: false
       }
     } as InteractionCustomizationArgs;
     expect(_sampleCard1.getInteractionCustomizationArgs())

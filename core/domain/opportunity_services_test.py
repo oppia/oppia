@@ -424,10 +424,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1},
-                        'catchMisspellings': {
-                            'value': False
-                        }
+                        'rows': {'value': 1}
                     }
                 }),
                 exp_domain.ExplorationChange({

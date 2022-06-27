@@ -344,14 +344,13 @@ export class InteractionObjectFactory {
   _createFromTextInputCustomizationArgsBackendDict(
       caBackendDict: TextInputCustomizationArgsBackendDict
   ): TextInputCustomizationArgs {
-    const { rows, placeholder, catchMisspellings } = caBackendDict;
+    const { rows, placeholder } = caBackendDict;
     return {
       rows,
       placeholder: {
         value: this.subtitledUnicodeFactory.createFromBackendDict(
           placeholder.value)
-      },
-      catchMisspellings
+      }
     };
   }
 
