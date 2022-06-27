@@ -17,7 +17,7 @@
  * in WebdriverIO tests.
  */
 
-var action = require('../webdri_utils/action.js');
+var action = require('../webdriverio_utils/action.js');
 var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function() {

@@ -37,7 +37,7 @@ var TopicAndStoryViewerPage = require(
 var forms = require('../webdriverio_utils/forms.js');
 var ExplorationEditorPage =
   require('../webdriverio_utils/ExplorationEditorPage.js');
-var Constants = require('../webdriverio_utils/ProtractorConstants.js');
+var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
