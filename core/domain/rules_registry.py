@@ -96,8 +96,7 @@ class Registry:
             try:
                 specs_from_json = json.loads(
                     constants.get_package_file_contents(
-                        'extensions',
-                        spec_file
+                        'extensions', spec_file
                     )
                 )
             except Exception as e:

@@ -148,8 +148,7 @@ class Registry:
 
     @classmethod
     def get_platform_parameter(
-        cls,
-        name: str
+        cls, name: str
     ) -> platform_parameter_domain.PlatformParameter:
         """Returns the instance of the specified name of the platform
         parameter.

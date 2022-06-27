@@ -62,7 +62,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
     def _is_camel_cased(self, name: str) -> bool:
         """Check whether a name is in CamelCase."""
-        return bool(name and (name[0] in string.ascii_uppercase))
+        return bool(name and name[0] in string.ascii_uppercase)
 
     def _is_alphanumeric_string(self, input_string: str) -> bool:
         """Check whether a string is alphanumeric."""
