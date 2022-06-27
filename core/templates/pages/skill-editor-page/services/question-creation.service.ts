@@ -31,9 +31,6 @@ require(
   'components/question-directives/question-editor/' +
     'question-editor.component.ts');
 
-require(
-  'components/question-directives/modal-templates/' +
-    'question-editor-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');

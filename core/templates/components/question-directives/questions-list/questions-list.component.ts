@@ -37,10 +37,6 @@ require(
 require(
   'components/skill-selector/skill-selector.component.ts');
 
-require(
-  'components/question-directives/modal-templates/' +
-  'question-editor-modal.controller.ts');
-
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
