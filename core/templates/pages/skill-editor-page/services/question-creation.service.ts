@@ -218,34 +218,34 @@ angular.module('oppia').factory('QuestionCreationService', [
         rubric => skillDifficultyMapping[rubric.getDifficulty()] === parseFloat(
           questionDifficulty));
 
-      // let modalRef: NgbModalRef = NgbModal.open(
-      //   QuestionEditorModalComponent, {
-      //     backdrop: 'static',
-      //     keyboard: false,
-      //   });
+      let modalRef: NgbModalRef = NgbModal.open(
+        QuestionEditorModalComponent, {
+          backdrop: 'static',
+          keyboard: false,
+        });
 
-      // modalRef.componentInstance.associatedSkillSummaries = [];
-      // modalRef.componentInstance.untriagedSkillSummaries = [];
-      // modalRef.componentInstance.canEditQuestion = canEditQuestion;
-      // modalRef.componentInstance.categorizedSkills = [];
-      // modalRef.componentInstance.groupedSkillSummaries = groupedSkillSummaries;
-      // modalRef.componentInstance.misconceptionsBySkill = misconceptionsBySkill;
-      // modalRef.componentInstance.newQuestionIsBeingCreated =
-      //   newQuestionIsBeingCreated;
-      // modalRef.componentInstance.question = question;
-      // modalRef.componentInstance.questionId = questionId;
-      // modalRef.componentInstance.questionStateData = questionStateData;
-      // modalRef.componentInstance.rubric = rubric;
-      // modalRef.componentInstance.skillName = skillName;
+      modalRef.componentInstance.associatedSkillSummaries = [];
+      modalRef.componentInstance.untriagedSkillSummaries = [];
+      modalRef.componentInstance.canEditQuestion = canEditQuestion;
+      modalRef.componentInstance.categorizedSkills = [];
+      modalRef.componentInstance.groupedSkillSummaries = groupedSkillSummaries;
+      modalRef.componentInstance.misconceptionsBySkill = misconceptionsBySkill;
+      modalRef.componentInstance.newQuestionIsBeingCreated =
+        newQuestionIsBeingCreated;
+      modalRef.componentInstance.question = question;
+      modalRef.componentInstance.questionId = questionId;
+      modalRef.componentInstance.questionStateData = questionStateData;
+      modalRef.componentInstance.rubric = rubric;
+      modalRef.componentInstance.skillName = skillName;
 
-      // modalRef.result.then(() => {
-      //   $location.hash(null);
-      //   saveAndPublishQuestion();
-      // }, () => {
-      //   // Note to developers:
-      //   // This callback is triggered when the Cancel button is clicked.
-      //   // No further action is needed.
-      // });
+      modalRef.result.then(() => {
+        $location.hash(null);
+        saveAndPublishQuestion();
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
     };
     return {
       createQuestion: createQuestion,

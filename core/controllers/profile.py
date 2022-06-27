@@ -185,6 +185,8 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_site_language_code),
             'preferred_audio_language_code': (
                 user_settings.preferred_audio_language_code),
+            'preferred_translation_language_code': (
+                user_settings.preferred_translation_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
@@ -223,6 +225,9 @@ class PreferencesHandler(base.BaseHandler):
                 self.user_id, data)
         elif update_type == 'preferred_audio_language_code':
             user_services.update_preferred_audio_language_code(
+                self.user_id, data)
+        elif update_type == 'preferred_translation_language_code':
+            user_services.update_preferred_translation_language_code(
                 self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)

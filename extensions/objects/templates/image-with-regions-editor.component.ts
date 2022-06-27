@@ -25,7 +25,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { CustomSchema } from 'services/schema-default-value.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { UtilsService } from 'services/utils.service';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
 
@@ -87,8 +89,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     private contextService: ContextService,
     private changeDetectorDef: ChangeDetectorRef,
     private el: ElementRef,
+    private imageLocalStorageService: ImageLocalStorageService,
     private utilsService: UtilsService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   // Calculates the dimensions of the image, assuming that the width
@@ -344,17 +348,46 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   getPreviewUrl(imageUrl: string): string {
     const entityType: string = this.contextService.getEntityType() as string;
     if (
-      entityType !== (AppConstants.ENTITY_TYPE.EXPLORATION)
+      this.contextService.getImageSaveDestination() ===
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+      this.imageLocalStorageService.isInStorage(imageUrl)
     ) {
+      const base64Url = this.imageLocalStorageService.getRawImageData(
+        imageUrl);
+      // This throws "TS2322: Type 'string | null' is not assignable to type
+      // 'string'" We need to suppress this error because the method
+      // 'getRawImageData' will return null only when an
+      // image is not in local storage. This scenario is explicitly checked
+      // above, before accessing the image data. So, the typescript check can
+      // be ignored here.
+      // @ts-ignore
+      const mimeType = base64Url.split(';')[0];
+      if (mimeType === AppConstants.SVG_MIME_TYPE) {
+        return this.svgSanitizerService.removeAllInvalidTagsAndAttributes(
+          // This throws "TS2322: Type 'string | null' is not assignable to type
+          // 'string'" We need to suppress this error because the method
+          // 'getRawImageData' will return null only when an
+          // image is not in local storage. This scenario is explicitly checked
+          // above, before accessing the image data. So, the typescript check
+          // can be ignored here.
+          // @ts-ignore
+          base64Url);
+      } else {
+        // This throws "TS2322: Type 'string | null' is not assignable to type
+        // 'string'" We need to suppress this error because the method
+        // 'getRawImageData' will return null only when an
+        // image is not in local storage. This scenario is explicitly checked
+        // above, before accessing the image data. So, the typescript check can
+        // be ignored here.
+        // @ts-ignore
+        return base64Url;
+      }
+    } else {
       return this.assetsBackendApiService.getImageUrlForPreview(
         entityType,
         this.contextService.getEntityId(),
         encodeURIComponent(imageUrl));
     }
-    return this.assetsBackendApiService.getImageUrlForPreview(
-      AppConstants.ENTITY_TYPE.EXPLORATION,
-      this.contextService.getExplorationId(),
-      encodeURIComponent(imageUrl));
   }
 
   regionLabelSetter(label: string): void {
@@ -659,7 +692,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       img.onload = function() {
         setHeightAndWidth(this as HTMLCanvasElement);
       };
-      img.src = this.getPreviewUrl(newVal);
+      img.src = this.getPreviewUrl(newVal) as string;
     }
     this.valueChanged.emit(this.value);
   }
