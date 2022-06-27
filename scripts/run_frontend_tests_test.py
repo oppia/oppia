@@ -63,7 +63,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return 1
 
         self.cmd_token_list: list[list[str]] = []
-        def mock_success_check_call(cmd_tokens: list[str], **unsued_kwargs) -> MockTask:  # pylint: disable=unused-argument
+        def mock_success_check_call(
+            cmd_tokens: list[str], **unsued_kwargs) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
         def mock_failed_check_call(
