@@ -20,7 +20,7 @@
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgModule } from '@angular/core';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { InteractiveDragAndDropSortInputComponent } from './directives/oppia-interactive-drag-and-drop-sort-input.component';

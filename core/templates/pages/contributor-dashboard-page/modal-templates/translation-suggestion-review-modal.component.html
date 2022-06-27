@@ -25,9 +25,9 @@
             {{ item }}
           </li>
         </ul>
-        <angular-html-bind *ngIf="!isSetOfStringsContent"
-                           [htmlData]="displayExplorationContent()">
-        </angular-html-bind>
+        <oppia-interaction-display *ngIf="!isSetOfStringsContent"
+                                   [htmlData]="displayExplorationContent()">
+        </oppia-interaction-display>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
@@ -37,8 +37,8 @@
       </div>
       <div class="oppia-suggestion-review-panel">
         <div>
-          <angular-html-bind [htmlData]="translationHtml" *ngIf="!startedEditing">
-          </angular-html-bind>
+          <oppia-interaction-display [htmlData]="translationHtml" *ngIf="!startedEditing">
+          </oppia-interaction-display>
           <ul *ngIf="isSetOfStringsContent">
             <li *ngFor="let item of translationHtml; index as idx">
               {{ item }}
@@ -79,9 +79,9 @@
           {{ item }}
         </li>
       </ul>
-      <angular-html-bind *ngIf="!isSetOfStringsContent"
-                         [htmlData]="contentHtml">
-      </angular-html-bind>
+      <oppia-interaction-display *ngIf="!isSetOfStringsContent"
+                                 [htmlData]="contentHtml">
+      </oppia-interaction-display>
     </div>
   </section>
   <div [hidden]="!reviewable" class="oppia-suggestion-review-message">

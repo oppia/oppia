@@ -1,13 +1,13 @@
 <div class="skill-preview-modal">
   <h3 class="skill-preview-modal-title">{{ skillDescription }}</h3>
   <div class="skill-preview-modal-content">
-    <angular-html-bind [htmlData]="skillExplanation"></angular-html-bind>
+    <oppia-interaction-display [htmlData]="skillExplanation"></oppia-interaction-display>
   </div>
   <div *ngIf="skillWorkedExamples.length">
     <h3>Worked Examples: </h3>
     <div *ngFor="let example of skillWorkedExamples" class="skill-preview-examples">
-      <angular-html-bind classStr="worked-example-question" [htmlData]="example.getQuestion().html"></angular-html-bind>
-      <angular-html-bind [htmlData]="example.getExplanation().html"></angular-html-bind>
+      <oppia-interaction-display classStr="worked-example-question" [htmlData]="example.getQuestion().html"></oppia-interaction-display>
+      <oppia-interaction-display [htmlData]="example.getExplanation().html"></oppia-interaction-display>
     </div>
   </div>
 </div>

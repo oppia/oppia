@@ -84,9 +84,9 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind classStr="protractor-test-conversation-input"
-                             [htmlData]="displayedCard.getInteractionHtml()">
-          </angular-html-bind>
+          <oppia-interaction-display classStr="protractor-test-conversation-input"
+                                     [htmlData]="displayedCard.getInteractionHtml()">
+          </oppia-interaction-display>
         </div>
       </div>
     </div>

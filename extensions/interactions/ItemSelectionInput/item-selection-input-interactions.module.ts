@@ -18,7 +18,7 @@
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { InteractiveItemSelectionInputComponent } from './directives/oppia-interactive-item-selection-input.component';

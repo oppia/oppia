@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,27 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the dynamic content rendering components.
+ * @fileoverview Utility functions for strings.
  */
-import 'core-js/es7/reflect';
-import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { AngularHtmlBindComponent } from './angular-html-bind.component';
-
-@NgModule({
-  imports: [
-    CommonModule,
-  ],
-  declarations: [
-    AngularHtmlBindComponent
-  ],
-  entryComponents: [
-  ],
-  exports: [
-    AngularHtmlBindComponent
-  ],
-})
-
-export class DynamicContentModule { }
+export default function camelCaseFromHyphen(str: string): string {
+  const newStr = str.replace(/[\])}[{(]/g, '');
+  return newStr.replace(
+    /-([a-z])/g,
+    function(g) {
+      return g[1].toUpperCase();
+    });
+}

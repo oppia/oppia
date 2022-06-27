@@ -23,7 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
 import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
 import { ApplyValidationDirective } from 'components/forms/custom-forms-directives/apply-validation.directive';

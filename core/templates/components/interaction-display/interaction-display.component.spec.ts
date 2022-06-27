@@ -13,51 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for angular html bind components.
+ * @fileoverview Unit tests for interaction display component.
  */
 
 import { ComponentFactoryResolver, ComponentRef, ViewContainerRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AngularHtmlBindComponent } from './angular-html-bind.component';
+import { InteractionDisplayComponent } from './interaction-display.component';
 
-describe('Angular html bind', () => {
-  let fixture: ComponentFixture<AngularHtmlBindComponent>;
-  let componentInstance: AngularHtmlBindComponent;
+describe('Interaction display', () => {
+  let fixture: ComponentFixture<InteractionDisplayComponent>;
+  let componentInstance: InteractionDisplayComponent;
   let componentFactoryResolver: ComponentFactoryResolver;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AngularHtmlBindComponent]
+      declarations: [InteractionDisplayComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AngularHtmlBindComponent);
+    fixture = TestBed.createComponent(InteractionDisplayComponent);
     componentInstance = fixture.componentInstance;
     componentFactoryResolver = TestBed.inject(ComponentFactoryResolver);
   }));
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
-  });
-
-  it('should obtain camel case property from hyphen', () => {
-    expect(componentInstance.camelCaseFromHyphen('[last-answer]')).toEqual(
-      'lastAnswer');
-    expect(componentInstance.camelCaseFromHyphen('placeholder-value')).toEqual(
-      'placeholderValue');
-  });
-
-  it('should replace trailing \' &nbsp; &nbsp;' +
-  ' %nbsp;</p>\' with just \'</p>\'. with </p>', () => {
-    componentInstance.ngOnChanges({
-      htmlData: {
-        previousValue: null,
-        currentValue: '<p>\&nbsp\;<\/p>\n\n',
-        isFirstChange: () => true,
-        firstChange: true
-      }
-    });
-
-    expect(componentInstance.htmlData).toEqual('');
   });
 
   it('should create interaction using htmlData', () => {

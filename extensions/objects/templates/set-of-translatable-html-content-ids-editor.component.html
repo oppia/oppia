@@ -15,8 +15,8 @@
                     [(ngModel)]="selections[idx]"
                     class="oppia-check-box fx-row" aria-label="choice">
         <span>
-          <angular-html-bind classStr="protractor-test-html-item-select-option" [htmlData]="choice.id">
-          </angular-html-bind>
+          <oppia-interaction-display classStr="protractor-test-html-item-select-option" [htmlData]="choice.id">
+          </oppia-interaction-display>
         </span>
       </mat-checkbox>
     </div>

@@ -99,9 +99,9 @@
       <div class="d-block flex-grow-1">
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="protractor-test-content-button blog-post-content-button">
           <div class="oppia-editable-section-mask">
-            <angular-html-bind [htmlData]="this.blogPostData.content"
-                               classStr="protractor-test-content-display">
-            </angular-html-bind>
+            <oppia-interaction-display [htmlData]="this.blogPostData.content"
+                                       classStr="protractor-test-content-display">
+            </oppia-interaction-display>
           </div>
         </div>
         <div *ngIf="contentEditorIsActive"  class="protractor-test-content-editor">
