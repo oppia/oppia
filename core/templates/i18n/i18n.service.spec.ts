@@ -164,13 +164,17 @@ describe('I18n service', () => {
       {}, '', 'http://localhost/about');
   });
 
-  it('should update user preferred language', fakeAsync(() => {
+  fit('should update user preferred language', fakeAsync(() => {
     spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
     let userInfo = new UserInfo(
       [], true, true, true, true, true, 'es', '', '', true);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo));
-    spyOn(userBackendApiService, 'updatePreferredSiteLanguageAsync');
+    spyOn(
+      userBackendApiService, 'updatePreferredSiteLanguageAsync'
+    ).and.returnValue(Promise.resolve({
+      site_language_code: 'es'
+    }));
     spyOn(i18nService, 'removeUrlLangParam');
 
     let newLangCode = 'en';
