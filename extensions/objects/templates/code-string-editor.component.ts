@@ -38,7 +38,7 @@ export class CodeStringEditorComponent implements OnInit {
   warningText: string = '';
 
   ngOnInit(): void {
-    if (!this.value) {
+    if (this.value === undefined) {
       this.value = '';
     }
 
