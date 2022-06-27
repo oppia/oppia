@@ -458,19 +458,18 @@ class PlatformParameterFilter:
         is_client_version_larger = self._is_first_version_smaller(
             value, client_version_without_hash
         )
-        matched = False
         if op == '=':
-            matched = is_equal
+            return is_equal
         elif op == '<':
-            matched = is_client_version_smaller
+            return is_client_version_smaller
         elif op == '<=':
-            matched = is_equal or is_client_version_smaller
+            return is_equal or is_client_version_smaller
         elif op == '>':
-            matched = is_client_version_larger
+            return is_client_version_larger
         elif op == '>=':
-            matched = is_equal or is_client_version_larger
+            return is_equal or is_client_version_larger
 
-        return matched
+        return False
 
     def _is_first_version_smaller(
         self,
@@ -537,19 +536,18 @@ class PlatformParameterFilter:
         is_client_flavor_larger = self._is_first_flavor_smaller(
             flavor, client_flavor)
 
-        matched = False
         if op == '=':
-            matched = is_equal
+            return is_equal
         elif op == '<':
-            matched = is_client_flavor_smaller
+            return is_client_flavor_smaller
         elif op == '<=':
-            matched = is_equal or is_client_flavor_smaller
+            return is_equal or is_client_flavor_smaller
         elif op == '>':
-            matched = is_client_flavor_larger
+            return is_client_flavor_larger
         elif op == '>=':
-            matched = is_equal or is_client_flavor_larger
+            return is_equal or is_client_flavor_larger
 
-        return matched
+        return False
 
     def _is_first_flavor_smaller(
         self,
