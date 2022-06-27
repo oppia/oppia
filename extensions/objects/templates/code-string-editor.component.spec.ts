@@ -34,7 +34,7 @@ describe('CodeStringEditorComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should initialise when user adds response', () => {
+  it('should initialise then value', () => {
     component.ngOnInit();
 
     expect(component.value).toEqual('');
@@ -44,7 +44,7 @@ describe('CodeStringEditorComponent', () => {
     component.value = 'test';
     component.ngOnInit();
 
-    expect(component.value).toEqual('');
+    expect(component.value).toEqual('test');
     expect(component.warningText).toBe('');
   });
 
