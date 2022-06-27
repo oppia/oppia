@@ -32,7 +32,7 @@ from typing_extensions import TypedDict
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, we are importing 'components' from rich_text_components only
-    # for type checking
+    # for type checking.
     from extensions.rich_text_components import components
 
 
