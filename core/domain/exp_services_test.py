@@ -2204,14 +2204,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: %s
         dest_if_really_stuck: null
@@ -2249,14 +2249,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: New state
         dest_if_really_stuck: null
@@ -2319,14 +2319,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: %s
         dest_if_really_stuck: null
@@ -2364,14 +2364,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: Renamed state
         dest_if_really_stuck: null
@@ -2716,14 +2716,14 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
-    catchMisspellings:
-        value: false
   default_outcome:
     dest: %s
     dest_if_really_stuck: null
@@ -2765,14 +2765,14 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
-    catchMisspellings:
-        value: false
   default_outcome:
     dest: New state
     dest_if_really_stuck: null
@@ -2815,14 +2815,14 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
-    catchMisspellings:
-        value: false
   default_outcome:
     dest: Renamed state
     dest_if_really_stuck: null

@@ -214,7 +214,8 @@ class DraftUpgradeUtil:
         adds a new customization arg to TextInput interaction which allows
         creators to fill a catch misspellings checkbox. Also adds
         a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts.
+        the learners to a state for strengthening concepts.. This should
+        not affect drafts.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

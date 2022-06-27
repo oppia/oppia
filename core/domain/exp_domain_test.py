@@ -4141,11 +4141,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
-        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4559,14 +4556,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
-        catchMisspellings:
-          value: false
       default_outcome:
         dest: END
         dest_if_really_stuck: null
