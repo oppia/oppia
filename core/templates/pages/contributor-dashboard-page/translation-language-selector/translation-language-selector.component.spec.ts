@@ -48,18 +48,18 @@ describe('Translation language selector', () => {
   let preferredLanguageCode = 'en';
 
   let contributionOpportunitiesBackendApiServiceStub:
-     Partial<ContributionOpportunitiesBackendApiService> = {
-       fetchFeaturedTranslationLanguagesAsync: async() =>
-         Promise.resolve(featuredLanguages),
-       getPreferredTranslationLanguageAsync: async() => {
-         if (preferredLanguageCode) {
-           component.populateLanguageSelection(preferredLanguageCode);
-         }
-         return Promise.resolve(preferredLanguageCode);
-       },
-       savePreferredTranslationLanguageAsync: async() =>
-         Promise.resolve()
-     };
+    Partial<ContributionOpportunitiesBackendApiService> = {
+      fetchFeaturedTranslationLanguagesAsync: async() =>
+        Promise.resolve(featuredLanguages),
+      getPreferredTranslationLanguageAsync: async() => {
+        if (preferredLanguageCode) {
+          component.populateLanguageSelection(preferredLanguageCode);
+        }
+        return Promise.resolve(preferredLanguageCode);
+      },
+      savePreferredTranslationLanguageAsync: async() =>
+        Promise.resolve()
+    };
 
   let clickDropdown: () => void;
   let getDropdownOptionsContainer: () => HTMLElement;
@@ -179,7 +179,7 @@ describe('Translation language selector', () => {
   }));
 
   it('should display the selected language when the language is already' +
-     ' selected', () => {
+    ' selected', () => {
     component.activeLanguageCode = 'en';
 
     component.ngOnInit();
@@ -189,7 +189,7 @@ describe('Translation language selector', () => {
   });
 
   it('should display the preferred language when the preferred' +
-     ' language is defined', async(() => {
+    ' language is defined', async(() => {
     component.activeLanguageCode = null;
     component.languageSelection = '';
     preferredLanguageCode = 'en';
@@ -213,7 +213,7 @@ describe('Translation language selector', () => {
   }));
 
   it('should ask user to select a language when the preferred' +
-     ' language is not defined', async(() => {
+    ' language is not defined', async(() => {
     preferredLanguageCode = '';
     component.activeLanguageCode = null;
     component.languageSelection = '';
@@ -239,12 +239,12 @@ describe('Translation language selector', () => {
     });
 
   it('should indicate selection and save the language' +
-     ' on selecting a new language', () => {
+    ' on selecting a new language', () => {
     const selectedLanguage = 'fr';
     spyOn(component.setActiveLanguageCode, 'emit');
     spyOn(
       contributionOpportunitiesBackendApiServiceStub,
-       'savePreferredTranslationLanguageAsync' as never);
+      'savePreferredTranslationLanguageAsync' as never);
 
     component.selectOption(selectedLanguage);
 
