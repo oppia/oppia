@@ -288,14 +288,4 @@ exports.config = {
         exitCode = 1;
       }
     },
-    /**
-    * Gets executed when a refresh happens.
-    * @param {String} oldSessionId session ID of the old session
-    * @param {String} newSessionId session ID of the new session
-    */
-    onReload: function(oldSessionId, newSessionId) {
-      if (exitCode !== 0){
-        process.exit(exitCode);
-      }
-    }
 }

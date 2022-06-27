@@ -235,6 +235,8 @@ def main() -> None:
         get_e2e_test_filenames_from_webdriverio_conf_file())
 
     if not webdriverio_test_suite_files == webdriverio_conf_test_suites:
+        print(webdriverio_test_suite_files)
+        print(webdriverio_conf_test_suites)
         raise Exception(
             'One or more test file from webdriverio or webdriverio_desktop '
             'directory is missing from wdio.conf.js')
