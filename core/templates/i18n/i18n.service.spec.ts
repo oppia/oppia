@@ -164,7 +164,7 @@ describe('I18n service', () => {
       {}, '', 'http://localhost/about');
   });
 
-  fit('should update user preferred language', fakeAsync(() => {
+  it('should update user preferred language', fakeAsync(() => {
     spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
     let userInfo = new UserInfo(
       [], true, true, true, true, true, 'es', '', '', true);
