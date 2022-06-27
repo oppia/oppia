@@ -22,9 +22,10 @@ import subprocess
 import sys
 
 from core.tests import test_utils
+
 from . import build
-from . import common
 from . import check_frontend_test_coverage
+from . import common
 from . import install_third_party_libs
 from . import run_frontend_tests
 
@@ -34,9 +35,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(RunFrontendTestsTests, self).setUp()
-        
+
         self.print_arr = []
-        def mock_print(msg, end='\n'):
+        def mock_print(msg, end='\n'):  # pylint: disable=unused-argument
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
@@ -44,17 +45,17 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             counter = 0
             def readline(self) -> bytes: # pylint: disable=missing-docstring
                 self.counter += 1
-                if(self.counter > 1):
+                if self.counter > 1:
                     self.counter = 0
                     return b''
                 return b'Readline output: Trying to get the Angular injector..'
-            
+
         class MockTask:
             returncode = 0
             stdout = MockFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
-        
+
         class MockFailedTask:
             returncode = 1
             stdout = MockFile()
@@ -105,7 +106,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Running dtslint type tests.', self.print_arr)
         self.assertNotIn(
             'The dtslint (type tests) failed.', self.sys_exit_message)
-    
+
     def test_run_dtslint_type_tests_failed(self) -> None:
         with self.swap_failed_Popen, self.print_swap:
             with self.swap_sys_exit:
@@ -125,13 +126,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Running dtslint type tests.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
-    
+
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--check_coverage'])
-        
+
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
@@ -144,13 +145,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             ' for details on how to fix it.', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(len(self.sys_exit_message), 0)
-    
+
     def test_frontend_tests_failed(self) -> None:
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(args=['--verbose'])
-        
+
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
@@ -160,7 +161,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(self.print_arr.count('Done!'), 2)
         self.assertFalse(self.frontend_coverage_checks_called)
         self.assertIn(1, self.sys_exit_message)
-        
+
     def test_frontend_tests_are_run_correctly_on_production(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
@@ -183,12 +184,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(args=['--check_coverage'])
-        
+
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertFalse(self.frontend_coverage_checks_called)
-        self.assertIn('The frontend tests failed. Please fix it before running'
+        self.assertIn(
+            'The frontend tests failed. Please fix it before running'
             ' the test coverage check.', self.sys_exit_message)

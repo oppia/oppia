@@ -20,9 +20,10 @@ import os
 import subprocess
 
 from core.tests import test_utils
+
 from . import common
-from . import setup
 from . import create_expression_parser
+from . import setup
 
 
 class CreateExpressionParserTests(test_utils.GenericTestBase):
@@ -33,10 +34,10 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
             cmd_token_list.append(cmd_tokens)
 
-        setup_script_args =  []
+        setup_script_args = []
         def mock_setup(args):
             setup_script_args.append(args)
-        
+
         libraries_installed = []
         def mock_install_npm_library(library_name, library_version, path):
             libraries_installed.append([library_name, library_version, path])
