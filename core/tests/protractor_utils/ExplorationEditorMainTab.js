@@ -36,11 +36,6 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
-  var multipleChoiceAnswerOptions = function(optionNum) {
-    return element(
-      by.cssContainingText(
-        '.protractor-test-html-multiple-select-option', optionNum));
-  };
   var itemSelectionAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText(
@@ -113,6 +108,8 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-explanation-textarea'));
   var stateEditorTag = element(
     by.css('.protractor-test-state-content-editor'));
+  var parameterElementButton = element(
+    by.css('.protractor-test-main-html-select-selector'));
 
   /*
    * Buttons
@@ -777,14 +774,15 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        var parameterElementButton = parameterElement.element(
-          by.tagName('button'));
-        await action.click('Parameter Element Button', parameterElementButton);
-        var multipleChoiceAnswerOption =
-          multipleChoiceAnswerOptions(parameterValues[i]);
+        await action.click(
+          'Parameter Element Button', parameterElementButton, true);
+
+        var multipleChoiceAnswerOption = element.all(by.cssContainingText(
+          '.protractor-test-html-select-selector', parameterValues[i])).first();
+
         await action.click(
           'Multiple Choice Answer Option: ' + i,
-          multipleChoiceAnswerOption);
+          multipleChoiceAnswerOption, true);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var j = 0; j < answerArray.length; j++) {

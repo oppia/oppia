@@ -35,16 +35,13 @@ describe('HTML Select Component', () => {
     fixture = TestBed.createComponent(
       HtmlSelectComponent);
     component = fixture.componentInstance;
-  });
-
-  it('should set selection ID', () => {
-    expect(component.selection).toBe(undefined);
-    component.select('12');
-    expect(component.selection).toBe('12');
+    component.ngOnInit();
   });
 
   it('should get selection index', () => {
-    component.options = [{ id: '12' }, { id: '21' }];
+    component.options = [
+      { id: '12', val: 'string' },
+      { id: '21', val: 'string' }];
     component.selection = '21';
 
     expect(component.getSelectionIndex()).toBe(1);
