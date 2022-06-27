@@ -127,7 +127,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
     def test_main_with_invalid_test_suites(self) -> None:
         def mock_get_e2e_suite_names_from_protractor_file() -> List[str]:
             return ['oneword', 'fourWord', 'invalid', 'notPresent']
-        
+
         def mock_get_e2e_suite_names_from_webdriverio_file() -> List[str]:
             return ['oneword', 'fourWord', 'invalid', 'notPresent']
 
@@ -137,7 +137,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_protractor_file',
             mock_get_e2e_suite_names_from_protractor_file)
-        
+
         mock_webdriverio_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_webdriverio_file',
@@ -164,8 +164,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                             Exception,
                             re.escape(
-                                'Protractor and WebdriverIO test suites and CI test suites are '
-                                'not in sync. '
+                                'Protractor and WebdriverIO test suites and CI '
+                                'test suites are not in sync. '
                                 'Following suites are not in sync: '
                                 '[\'invalid\', \'notPresent\']'
                             )

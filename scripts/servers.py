@@ -720,8 +720,8 @@ def managed_webdriverio_server(
     ]
 
     # Capabilities in wdio.conf.js are added as an array of object,
-    # so in order to set the value of maxmium instances of chrome 
-    # in wdio.conf.js, we need to provide the index of the capability 
+    # so in order to set the value of maxmium instances of chrome
+    # in wdio.conf.js, we need to provide the index of the capability
     # at which chrome is present, i.e. 0.
     if sharding_instances > 1:
         webdriverio_args.extend([
