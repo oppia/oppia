@@ -90,7 +90,7 @@ var TopicsAndSkillsDashboardPage = function() {
   );
   var assignSkillToTopicButtons = element.all(
     by.css('.protractor-test-assign-skill-to-topic-button'));
-  var assignSkillToTopicButtonsMobile = element(
+  var assignSkillToTopicButtonsMobile = element.all(
     by.css('.protractor-test-mobile-assign-skill-to-topic-button'));
   var confirmMoveButton = element(
     by.css('.protractor-test-confirm-move-button'));
