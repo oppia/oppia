@@ -132,6 +132,7 @@ import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab
 import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
 import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component';
 
+import { QuestionEditorModalComponent } from './question-directives/modal-templates/question-editor-modal.component';
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
@@ -278,7 +279,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingPanelComponent,
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
-    TestInteractionPanel
+    TestInteractionPanel,
+    QuestionEditorModalComponent
   ],
 
   entryComponents: [
@@ -379,7 +381,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingPanelComponent,
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
-    TestInteractionPanel
+    TestInteractionPanel,
+    QuestionEditorModalComponent
   ],
 
   exports: [
@@ -489,7 +492,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingPanelComponent,
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
-    TestInteractionPanel
+    TestInteractionPanel,
+    QuestionEditorModalComponent
   ],
 })
 

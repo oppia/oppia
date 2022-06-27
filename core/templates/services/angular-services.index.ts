@@ -415,6 +415,8 @@ import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/t
 import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
+import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
@@ -865,6 +867,10 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
   ['NumberConversionService', NumberConversionService],
+<<<<<<< HEAD
   ['ParameterMetadataService', ParameterMetadataService],
   ['ExplorationWarningsService', ExplorationWarningsService],
+=======
+  ['QuestionUndoRedoService', QuestionUndoRedoService],
+>>>>>>> skill-routing
 ];
