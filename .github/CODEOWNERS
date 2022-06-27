@@ -40,6 +40,7 @@
 /core/templates/pages/ @srijanreddy98
 # TODO(#15381): Add @nithusha21 as owner after 2022-05-01
 /core/templates/services/ @aks681
+/core/templates/utility/ @srijanreddy98
 /extensions/ @vojtechjelinek
 /scripts/ @oppia/dev-workflow-reviewers
 
@@ -264,7 +265,7 @@
 
 
 # Global components and filters.
-/core/templates/components/angular-html-bind/ @srijanreddy98
+/core/templates/components/interaction-display/ @srijanreddy98
 /core/templates/components/button-directives/* @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
