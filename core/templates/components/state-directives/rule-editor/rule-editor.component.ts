@@ -190,7 +190,7 @@ export class RuleEditorComponent implements OnInit {
      return ruleDescription;
    }
 
-   onSelectNewRuleType(newRuleType): void {
+   onSelectNewRuleType(newRuleType: unknown): void {
      let oldRuleInputs = cloneDeep(this.rule.inputs) || {};
      let oldRuleInputTypes = cloneDeep(this.rule.inputTypes) || {};
 
