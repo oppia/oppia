@@ -24,6 +24,7 @@ from core.tests import test_utils
 from . import common
 from . import create_expression_parser
 from . import setup
+from typing import Any
 
 
 class CreateExpressionParserTests(test_utils.GenericTestBase):
@@ -31,7 +32,8 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
 
     def test_expression_parser_is_produced_correctly(self) -> None:
         cmd_token_list = []
-        def mock_check_call(cmd_tokens: list[str], **unsued_kwargs) -> None:  # pylint: disable=unused-argument
+        def mock_check_call(
+            cmd_tokens: list[str], **unsued_kwargs: Any) -> None:  # pylint: disable=unused-argument
             cmd_token_list.append(cmd_tokens)
 
         setup_script_args = []
