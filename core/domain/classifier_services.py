@@ -575,7 +575,7 @@ def migrate_state_training_jobs(
     exp_version = state_training_jobs_mapping.exp_version
     state_name = state_training_jobs_mapping.state_name
 
-    exploration = exp_fetchers.get_exploration_by_id(  # type: ignore[no-untyped-call]
+    exploration = exp_fetchers.get_exploration_by_id(
         exp_id, version=exp_version)
     interaction_id = exploration.states[state_name].interaction.id
 
@@ -610,7 +610,7 @@ def migrate_state_training_jobs(
 
         for algorithm_id in algorithm_ids_to_add:
             next_scheduled_check_time = datetime.datetime.utcnow()
-            training_data = exploration.states[state_name].get_training_data()
+            training_data = exploration.states[state_name].get_training_data()  # type: ignore[no-untyped-call]
 
             classifier_domain.ClassifierTrainingJob(
                 'job_id_dummy', algorithm_id, interaction_id, exp_id,

@@ -25,12 +25,19 @@ from core import utils
 
 from typing import List, Mapping, Union, cast
 
-# Union type defined from allowed types that a
-# Dict can contain for its values.
-AcceptableChangeDictTypes = Union[
-    str,
-    List[str]
-]
+MYPY = False
+if MYPY: # pragma: no cover
+    # Here, we are importing `state_domain` only for typing purpose.
+    from core.domain import state_domain
+
+# Union type defined from allowed types that a Dict can contain for its values.
+if MYPY:
+    AcceptableChangeDictTypes = Union[
+        str,
+        List[str],
+        List[state_domain.AnswerGroupDict],
+        state_domain.RecordedVoiceoversDict
+    ]
 
 
 def validate_cmd(

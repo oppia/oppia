@@ -72,7 +72,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         self.exp_id = exploration_id
         self.exp_state = (
-            exp_fetchers.get_exploration_by_id(exploration_id).states['Home'])  # type: ignore[no-untyped-call]
+            exp_fetchers.get_exploration_by_id(exploration_id).states['Home'])
 
     def _create_classifier_training_job(
         self,
@@ -104,7 +104,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         handle_non_retrainable_states method by triggering
         update_exploration() method.
         """
-        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
 
         # There is one job and one mapping in the data store now as a result of
@@ -193,7 +193,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         """Test ensures that classifier models for state are retrained if
         they are not available.
         """
-        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
 
         # There is one job and one mapping in the data store now as a result of
@@ -280,7 +280,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
     def test_handle_trainable_states(self) -> None:
         """Test the handle_trainable_states method."""
-        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
         classifier_services.handle_trainable_states(
             exploration, state_names)
@@ -300,7 +300,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
     def test_handle_non_retrainable_states(self) -> None:
         """Test the handle_non_retrainable_states method."""
-        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
         change_list = [exp_domain.ExplorationChange({
@@ -803,7 +803,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         """
 
         state_name = 'Home'
-        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         interaction_id = exploration.states[
             state_name].interaction.id
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
@@ -819,7 +819,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             exp_services.update_exploration(  # type: ignore[no-untyped-call]
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
-        current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)  # type: ignore[no-untyped-call]
+        current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         # Store the job before reverting the exploration.
         old_job = classifier_services.get_classifier_training_job(
             self.exp_id, current_exploration.version, state_name,
@@ -836,7 +836,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
                 current_exploration.version - 1
             )
         # Verify if classifier model mapping is maintained using the job ID.
-        reverted_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)  # type: ignore[no-untyped-call]
+        reverted_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         self.assertEqual(
             reverted_exploration.version, current_exploration.version + 1)
         new_job = classifier_services.get_classifier_training_job(
