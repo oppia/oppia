@@ -16,52 +16,56 @@
  * @fileoverview Unit tests for SkillEditorRoutingService.
  */
 
-require('pages/skill-editor-page/services/skill-editor-routing.service');
+import { TestBed } from '@angular/core/testing';
+import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 
-describe('Skill Editor Routing Service', function() {
-  var sers = null;
-  var $rootScope = null;
-  var $location = null;
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    sers = $injector.get('SkillEditorRoutingService');
-    $rootScope = $injector.get('$rootScope');
-    $location = $injector.get('$location');
-  }));
+describe('Skill Editor Routing Service', () => {
+  let sers: SkillEditorRoutingService;
 
-  it('should handler calls with unexpect paths', function() {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        SkillEditorRoutingService
+      ]
+    });
+
+    sers = TestBed.inject(SkillEditorRoutingService);
+  });
+
+  it('should handler calls with unexpect paths', () => {
     expect(sers.getActiveTabName()).toBe('main');
     expect(sers.getTabStatuses()).toBe('main');
-    $location.path();
-    $rootScope.$apply();
+
+    sers._changeTab('');
+
     expect(sers.getActiveTabName()).toBe('main');
     expect(sers.getTabStatuses()).toBe('main');
-    $location.path('');
-    $rootScope.$apply();
+
+    sers._changeTab('');
+
     expect(sers.getActiveTabName()).toBe('main');
     expect(sers.getTabStatuses()).toBe('main');
   });
 
-  it('should toggle between main tab, questions and preview tab', function() {
+  it('should toggle between main tab, questions and preview tab', () => {
     sers.navigateToQuestionsTab();
-    $rootScope.$apply();
+
     expect(sers.getActiveTabName()).toBe('questions');
     expect(sers.getTabStatuses()).toBe('questions');
 
     sers.navigateToPreviewTab();
-    $rootScope.$apply();
     expect(sers.getActiveTabName()).toBe('preview');
     expect(sers.getTabStatuses()).toBe('preview');
 
     sers.navigateToMainTab();
-    $rootScope.$apply();
     expect(sers.getActiveTabName()).toBe('main');
     expect(sers.getTabStatuses()).toBe('main');
   });
 
-  it('should open the question-editor directly', function() {
+  it('should open the question-editor directly', () => {
     sers.creatingNewQuestion(true);
     expect(sers.navigateToQuestionEditor()).toBe(true);
+
     sers.creatingNewQuestion(false);
     expect(sers.navigateToQuestionEditor()).toBe(false);
   });
