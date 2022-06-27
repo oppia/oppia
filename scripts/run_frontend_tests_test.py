@@ -37,7 +37,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         super(RunFrontendTestsTests, self).setUp()
 
         self.print_arr: list[str] = []
-        def mock_print(msg, end='\n') -> None:  # pylint: disable=unused-argument
+        def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
@@ -63,11 +63,11 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return 1
 
         self.cmd_token_list: list[list[str]] = []
-        def mock_success_check_call(cmd_tokens, **unsued_kwargs) -> MockTask:  # pylint: disable=unused-argument
+        def mock_success_check_call(cmd_tokens: list[str], **unsued_kwargs) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
         def mock_failed_check_call(
-            cmd_tokens, **unsued_kwargs) -> MockFailedTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unsued_kwargs) -> MockFailedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockFailedTask()
 
@@ -75,8 +75,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_sys_exit(error_message: str) -> None:
             self.sys_exit_message.append(error_message)
 
-        self.build_args: list[str] = []
-        def mock_build(args) -> None:
+        self.build_args: list[list[str]] = []
+        def mock_build(args: list[str]) -> None:
             self.build_args.append(args)
 
         self.frontend_coverage_checks_called = False

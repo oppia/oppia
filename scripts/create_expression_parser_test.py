@@ -31,16 +31,16 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
 
     def test_expression_parser_is_produced_correctly(self) -> None:
         cmd_token_list = []
-        def mock_check_call(cmd_tokens, **unsued_kwargs) -> None:  # pylint: disable=unused-argument
+        def mock_check_call(cmd_tokens: list[str], **unsued_kwargs) -> None:  # pylint: disable=unused-argument
             cmd_token_list.append(cmd_tokens)
 
         setup_script_args = []
-        def mock_setup(args) -> None:
+        def mock_setup(args: list[str]) -> None:
             setup_script_args.append(args)
 
         libraries_installed = []
         def mock_install_npm_library(
-            library_name, library_version, path) -> None:
+            library_name: str, library_version: str, path: str) -> None:
             libraries_installed.append([library_name, library_version, path])
 
         swap_check_call = self.swap(
