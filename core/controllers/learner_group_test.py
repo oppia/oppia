@@ -16,12 +16,19 @@
 
 from __future__ import annotations
 
+import json
+
 from core import feconf
 from core.constants import constants
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import skill_services
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import summary_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_services
 from core.tests import test_utils
 
 
@@ -227,7 +234,6 @@ class FilterLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     TOPIC_ID_1 = 'topic_id_1'
     STORY_ID_0 = 'story_id_0'
     STORY_ID_1 = 'story_id_1'
-    STORY_ID_2 = 'story_id_2'
 
     def setUp(self):
         super(FilterLearnerGroupSyllabusHandlerTests, self).setUp()
@@ -324,5 +330,293 @@ class FilterLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_summaries[0]['id'], 1)
         self.assertEqual(subtopic_summaries[0]['title'], 'Naming Numbers')
         self.assertEqual(subtopic_summaries[0]['topic_id'], self.TOPIC_ID_0)
+
+        self.logout()
+
+
+class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
+
+    USER1_EMAIL = 'user1@example.com'
+    USER1_USERNAME = 'user1'
+    USER2_EMAIL = 'user2@example.com'
+    USER2_USERNAME = 'user2'
+    LEARNER_GROUP_ID = None
+
+    def setUp(self):
+        super(FacilitatorLearnerGroupViewHandlerTests, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.USER1_EMAIL, self.USER1_USERNAME)
+        self.signup(self.USER2_EMAIL, self.USER2_USERNAME)
+
+        self.user_id_1 = self.get_user_id_from_email(self.USER1_EMAIL)
+        self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+
+        self.learner_group = learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Title', 'Description',
+            [self.facilitator_id], [], [self.user_id_1],
+            ['subtopic_id_1'], ['story_id_1'])
+
+    def test_facilitators_view_details_as_facilitator(self):
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.get_json(
+            '/facilitator_view_of_learner_group_handler/%s' % (
+                self.LEARNER_GROUP_ID))
+
+        self.assertEqual(response['learner_group_id'], self.LEARNER_GROUP_ID)
+        self.assertEqual(response['title'], self.learner_group.title)
+        self.assertEqual(
+            response['description'], self.learner_group.description)
+        self.assertEqual(
+            response['facilitator_usernames'], [self.NEW_USER_USERNAME])
+        self.assertEqual(response['student_usernames'], [])
+        self.assertEqual(
+            response['invited_student_usernames'], [self.USER1_USERNAME])
+        self.assertEqual(response['subtopic_page_ids'], ['subtopic_id_1'])
+        self.assertEqual(response['story_ids'], ['story_id_1'])
+
+        self.logout()
+
+    def test_facilitators_view_details_as_invalid_facilitator(self):
+        self.login(self.USER2_EMAIL)
+
+        self.get_html_response(
+            '/facilitator_view_of_learner_group_handler/%s' % (
+                self.LEARNER_GROUP_ID), expected_status_int=404)
+
+        self.logout()
+
+
+class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
+
+    LEARNER_GROUP_ID = None
+    STUDENT_1_EMAIL = 'user1@example.com'
+    STUDENT_1_USERNAME = 'user1'
+    STUDENT_2_EMAIL = 'user2@example.com'
+    STUDENT_2_USERNAME = 'user2'
+    STUDENT_ID_1 = None
+    STUDENT_ID_2 = None
+    TOPIC_ID_1 = 'topic_id_1'
+    STORY_ID_1 = 'story_id_1'
+    SUBTOPIC_PAGE_ID_1 = TOPIC_ID_1 + ':1'
+    STORY_URL_FRAGMENT = 'title-one'
+    STORY_URL_FRAGMENT_TWO = 'story-two'
+    NODE_ID_1 = 'node_1'
+    NODE_ID_2 = 'node_2'
+    NODE_ID_3 = 'node_3'
+    EXP_ID_0 = '0'
+    EXP_ID_1 = '1'
+    EXP_ID_3 = 'exp_3'
+    EXP_ID_7 = '7'
+    SKILL_ID_1 = None
+    SKILL_ID_2 = None
+    DEGREE_OF_MASTERY_1 = 0.5
+    DEGREE_OF_MASTERY_2 = 0.0
+
+    def setUp(self):
+        super(LearnerGroupStudentProgressHandlerTests, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.STUDENT_1_EMAIL, self.STUDENT_1_USERNAME)
+        self.signup(self.STUDENT_2_EMAIL, self.STUDENT_2_USERNAME)
+
+        self.STUDENT_ID_1 = self.get_user_id_from_email(self.STUDENT_1_EMAIL)
+        self.STUDENT_ID_2 = self.get_user_id_from_email(self.STUDENT_2_EMAIL)
+        self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+
+        learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.facilitator_id], [], [self.STUDENT_ID_1, self.STUDENT_ID_2],
+            [self.SUBTOPIC_PAGE_ID_1], [self.STORY_ID_1])
+
+        # Set up topics, subtopics and stories for learner group syllabus.
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.admin_id, title='Title 1',
+            end_state_name='End', correctness_feedback_enabled=True)
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.admin_id, title='Title 2',
+            end_state_name='End', correctness_feedback_enabled=True)
+        self.save_new_valid_exploration(
+            self.EXP_ID_7, self.admin_id, title='Title 3',
+            end_state_name='End', correctness_feedback_enabled=True)
+        self.publish_exploration(self.admin_id, self.EXP_ID_0)
+        self.publish_exploration(self.admin_id, self.EXP_ID_1)
+        self.publish_exploration(self.admin_id, self.EXP_ID_7)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID_1, 'Title', 'Description', self.TOPIC_ID_1,
+            self.STORY_URL_FRAGMENT)
+        story.meta_tag_content = 'story meta content'
+
+        exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_7], user=self.admin
+            )
+        )
+        self.node_1 = {
+            'id': self.NODE_ID_1,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_1,
+            'exp_summary_dict': exp_summary_dicts[1],
+            'completed': False
+        }
+        self.node_2 = {
+            'id': self.NODE_ID_2,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'thumbnail_filename': 'image_2.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_0,
+            'exp_summary_dict': exp_summary_dicts[0],
+            'completed': True
+        }
+        self.node_3 = {
+            'id': self.NODE_ID_3,
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'thumbnail_filename': 'image_3.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_7,
+            'exp_summary_dict': exp_summary_dicts[2],
+            'completed': False
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1),
+            story_domain.StoryNode.from_dict(self.node_2),
+            story_domain.StoryNode.from_dict(self.node_3)
+        ]
+        self.nodes = story.story_contents.nodes
+        story.story_contents.initial_node_id = 'node_2'
+        story.story_contents.next_node_id = 'node_4'
+        story_services.save_new_story(self.admin_id, story)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Subtopic Title 2')
+        self.SKILL_ID_1 = skill_services.get_new_skill_id()
+        self.SKILL_ID_2 = skill_services.get_new_skill_id()
+        subtopic_1.skill_ids = [self.SKILL_ID_1]
+        subtopic_1.url_fragment = 'sub-one-frag'
+        subtopic_2.skill_ids = [self.SKILL_ID_2]
+        subtopic_2.url_fragment = 'sub-two-frag'
+        self.save_new_topic(
+            self.TOPIC_ID_1, 'user', name='Topic',
+            description='A new topic', canonical_story_ids=[story.id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1, subtopic_2], next_subtopic_id=3)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+
+        # Add the invited students to the learner group.
+        learner_group_services.add_student_to_learner_group(
+            self.LEARNER_GROUP_ID, self.STUDENT_ID_1, True)
+
+        learner_group_services.add_student_to_learner_group(
+            self.LEARNER_GROUP_ID, self.STUDENT_ID_2, False)
+
+        # Add some progress for the students.
+        story_services.record_completed_node_in_story_context(
+            self.STUDENT_ID_1, self.STORY_ID_1, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.STUDENT_ID_1, self.STORY_ID_1, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.STUDENT_ID_2, self.STORY_ID_1, self.NODE_ID_3)
+
+        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
+        skill_services.create_user_skill_mastery(
+            self.STUDENT_ID_1, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
+        skill_services.create_user_skill_mastery(
+            self.STUDENT_ID_2, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
+
+    def test_get_progress_of_students(self):
+        self.login(self.NEW_USER_EMAIL)
+
+        params = {
+            'student_usernames': json.dumps([
+                self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
+        }
+
+        response = self.get_json(
+            '/learner_group_user_progress_handler/%s' % (
+                self.LEARNER_GROUP_ID), params=params)
+
+        students_prog = response['students_progress']
+        student1_stories_prog = students_prog[0]['stories']
+        student2_stories_prog = students_prog[1]['stories']
+        student1_subtopics_prog = students_prog[0]['subtopics']
+        student2_subtopics_prog = students_prog[1]['subtopics']
+        expected_student1_stories_prog = [{
+            'story_id': self.STORY_ID_1,
+            'completed_node_ids': [self.NODE_ID_1, self.NODE_ID_2],
+            'all_node_ids': [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3]
+        }]
+        expected_student1_subtopics_prog = [{
+            self.SUBTOPIC_PAGE_ID_1: self.DEGREE_OF_MASTERY_1
+        }]
+
+        self.assertEqual(len(students_prog), 2)
+        self.assertEqual(students_prog[0]['username'], self.STUDENT_1_USERNAME)
+        self.assertEqual(students_prog[1]['username'], self.STUDENT_2_USERNAME)
+        self.assertEqual(
+            students_prog[0]['progress_sharing_is_turned_on'], True)
+        self.assertEqual(
+            students_prog[1]['progress_sharing_is_turned_on'], False)
+        self.assertEqual(len(student1_stories_prog), 1)
+        self.assertEqual(student1_stories_prog, expected_student1_stories_prog)
+        self.assertEqual(len(student2_stories_prog), 0)
+        self.assertEqual(len(student1_subtopics_prog), 1)
+        self.assertEqual(
+            student1_subtopics_prog, expected_student1_subtopics_prog)
+        self.assertEqual(len(student2_subtopics_prog), 0)
+
+    def test_get_progress_of_students_with_invalid_group_id(self):
+        self.login(self.NEW_USER_EMAIL)
+
+        params = {
+            'student_usernames': json.dumps([
+                self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
+        }
+
+        self.get_html_response(
+            '/learner_group_user_progress_handler/%s' % (
+                'invalidId'), params=params, expected_status_int=404)
 
         self.logout()

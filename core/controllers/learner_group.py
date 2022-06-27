@@ -244,18 +244,8 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         'GET': {
             'student_usernames': {
                 'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'basestring',
-                        'validators': [{
-                            'id': 'has_length_at_most',
-                            'max_value': constants.MAX_USERNAME_LENGTH
-                        }]
-                    },
-                    'validators': [{
-                        'id': 'has_length_at_least',
-                        'min_value': 1
-                    }]
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 }
             }
         }
@@ -276,7 +266,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             learner_group_id)
 
         if learner_group is None:
-            raise self.PageNotFoundException
+            raise self.PageNotFoundException()
 
         subtopic_page_ids = learner_group.subtopic_page_ids
         story_ids = learner_group.story_ids
@@ -286,7 +276,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
         all_skill_ids = []
 
-        for topic in enumerate(topics):
+        for topic in topics:
             if topic:
                 all_skill_ids.extend(topic.get_all_skill_ids())
 
@@ -301,8 +291,8 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
             student_progress = {
                 'username': user_services.get_username(user_id),
-                'stories': {},
-                'subtopics': {},
+                'stories': [],
+                'subtopics': [],
                 'progress_sharing_is_turned_on': progress_sharing_permission
             }
 
@@ -314,9 +304,12 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
             # Fetch the progress of the student in all the stories assigned
             # in the group syllabus.
-            student_progress['stories'] = (
-                story_fetchers.get_progress_in_stories(user_id, story_ids)
-            )
+            stories_progress = story_fetchers.get_progress_in_stories(
+                    user_id, story_ids)
+
+            student_progress['stories'] = ([
+                story_progress.to_dict() for story_progress in stories_progress
+            ])
 
             # Fetch the progress of the student in all the subtopics assigned
             # in the group syllabus.
@@ -325,11 +318,9 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                     user_id, all_skill_ids
                 )
             )
-            subtopic_prog_dict = {}
             for topic in topics:
-                subtopic_prog_dict[topic.id] = {}
                 for subtopic in topic.subtopics:
-                    subtopic_page_id = topic.id + ':' + subtopic.id
+                    subtopic_page_id = topic.id + ':' + str(subtopic.id)
                     if not subtopic_page_id in subtopic_page_ids:
                         continue
                     skill_mastery_dict = {
@@ -341,14 +332,17 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                     }
                     if skill_mastery_dict:
                         # Subtopic mastery is average of skill masteries.
-                        subtopic_prog_dict[topic.id][subtopic.id] = (
-                            sum(skill_mastery_dict.values()) /
-                            len(skill_mastery_dict))
-
-            student_progress['subtopics'] = subtopic_prog_dict
+                        subtopic_prog_dict = {
+                            subtopic_page_id: (
+                                sum(skill_mastery_dict.values()) /
+                                len(skill_mastery_dict)
+                            )
+                        }
+                        student_progress['subtopics'].append(
+                            subtopic_prog_dict)
 
             # Add current student's progress to all students progress.
-            all_students_progress[user_id] = student_progress
+            all_students_progress.append(student_progress)
 
         self.render_json({
             'students_progress': all_students_progress
@@ -481,7 +475,7 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
             self.user_id, learner_group_id)
 
         if not is_valid_request:
-            raise self.PageNotFoundException
+            raise self.PageNotFoundException()
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
                 learner_group_id)
