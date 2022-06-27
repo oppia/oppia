@@ -26,6 +26,7 @@ from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'platform_parameter_domain' only for type checking.
     from core.domain import platform_parameter_domain
     from mypy_imports import base_models
     from mypy_imports import config_models
