@@ -46,7 +46,6 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
   });
 
   it('should initialize the schema property value', () => {
-    component.value = undefined;
     component.ngOnInit();
 
     expect(component.value.normalizedStrSet).toBe('');

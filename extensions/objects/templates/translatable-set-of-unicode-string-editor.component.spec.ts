@@ -48,7 +48,6 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
   });
 
   it('should initialize the schema property value', () => {
-    component.value = undefined;
     component.ngOnInit();
 
     expect(component.value.unicodeStrSet).toBe('');

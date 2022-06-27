@@ -48,7 +48,7 @@ export class TranslatableSetOfNormalizedStringEditorComponent
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    if (this.value === undefined) {
+    if (!this.value) {
       this.value = {
         normalizedStrSet: ''
       };

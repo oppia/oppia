@@ -37,7 +37,6 @@ describe('CodeStringEditorComponent', () => {
   });
 
   it('should initialise when user adds response', () => {
-    component.value = undefined;
     component.ngOnInit();
 
     expect(component.value).toEqual('');
