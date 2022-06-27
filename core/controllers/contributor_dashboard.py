@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from core import feconf
 from core.constants import constants
@@ -302,25 +303,40 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topics = [topic]
+        logging.info(
+            'Fetching reviewable opportunity summaries for topic: %s',
+            topic_name)
         topic_stories = story_fetchers.get_stories_by_ids([
             reference.story_id
             for topic in topics
             for reference in topic.get_all_story_references()
             if reference.story_is_published])
+        logging.info(
+            'Fetching reviewable opportunity summaries for stories: %s',
+            topic_stories)
         in_review_suggestions = (
             suggestion_services.get_reviewable_translation_suggestions(user_id))
+        logging.info(
+            'Fetching reviewable opportunity summaries for suggestions: %s',
+            in_review_suggestions)
         in_review_suggestion_target_ids = [
             suggestion.target_id
             for suggestion in
             suggestion_services.get_suggestions_with_translatable_explorations(
                 in_review_suggestions)
         ]
+        logging.info(
+            'Fetching reviewable opportunity summaries for target IDs: %s',
+            in_review_suggestion_target_ids)
         exp_ids = [
             node.exploration_id
             for story in topic_stories
             for node in story.story_contents.get_ordered_nodes()
             if node.exploration_id in in_review_suggestion_target_ids
         ]
+        logging.info(
+            'Fetching reviewable opportunity summaries for exp IDs: %s',
+            exp_ids)
         return (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 exp_ids).values())
