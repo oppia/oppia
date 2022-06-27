@@ -224,9 +224,13 @@ var TopicsAndSkillsDashboardPage = function() {
     let width = (await browser.manage().window().getSize()).width;
     if (width < 831) {
       await action.click('Skill Options', skillOptions);
+      await waitFor.visibilityOf(
+        assignSkillToTopicButtonsMobile.first(),
+        'Assign skill to topic buttons taking too long to appear');
       expect(await assignSkillToTopicButtonsMobile.count()).toEqual(1);
       await action.click(
-        'Assign skill to topic button', assignSkillToTopicButtonsMobile);
+        'Assign skill to topic button',
+        assignSkillToTopicButtonsMobile.first());
     } else {
       await waitFor.visibilityOf(
         assignSkillToTopicButtons.first(),
