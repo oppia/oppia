@@ -1,0 +1,64 @@
+<div class="post-chapter-recommendations-container">
+  <p class="post-chapter-recommendation-text">Here's what you could do next!</p>
+  <div class="post-chapter-recommendation-cards-container">
+    <div class="recommendation-card">
+      <svg width="192" height="150" class="recommendation-card-svg">
+        <a [attr.href]="nextLessonLink">
+          <rect width="192"
+                  height="150"
+                  [attr.fill]="">
+          </rect>
+          <image x="0"
+                 y="0"
+                 height="180"
+                 width="240"
+                 class="next-story-node-image"
+                 [attr.xlink:href]="">
+          </image>
+        </a>
+      </svg>
+    </div>
+    <p>Or</p>
+    <div class="recommendation-card">
+      <svg width="192" height="150" class="recommendation-card-svg">
+        <a [attr.href]="nextLessonLink">
+          <rect width="192"
+                  height="150"
+                  [attr.fill]="">
+          </rect>
+          <image x="0"
+                 y="0"
+                 height="180"
+                 width="240"
+                 class="next-story-node-image"
+                 [attr.xlink:href]="">
+          </image>
+        </a>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<style>
+  .post-chapter-recommendation-text {
+    margin: auto;
+  }
+  .post-chapter-recommendation-cards-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .recommendation-card {
+    width: 192px;
+    height: 150px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  }
+  .recommendation-card-svg {
+    border-radius: 4px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  }
+  .next-story-node-image {
+    scale: 0.8;
+  }
+</style>
