@@ -413,7 +413,8 @@ class SubtopicPage:
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 
     def update_page_contents_written_translations(
-        self, new_page_written_translations_dict: state_domain.WrittenTranslationsDict
+        self,
+        new_page_written_translations_dict: state_domain.WrittenTranslationsDict
     ) -> None:
         """The new value for the written_translations data field.
 

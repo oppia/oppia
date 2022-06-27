@@ -784,7 +784,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'INTERACTION_CLASSIFIER_MAPPING',
             mock_interaction_classifier_mapping):
             classifier_services.migrate_state_training_jobs(
-                expected_state_training_jobs   
+                expected_state_training_jobs
             )
         next_job = classifier_services.fetch_next_job()
         # Ruling out the possibility of None for mypy type checking.

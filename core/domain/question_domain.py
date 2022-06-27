@@ -35,9 +35,9 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from extensions import domain
 
-from typing_extensions import TypedDict
 
 from pylatexenc import latex2text
+from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
