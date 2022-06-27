@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for question editor modal.
+ * @fileoverview Component for question editor modal.
  */
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
