@@ -22,6 +22,7 @@ from core import feconf
 from core.tests import test_utils
 from . import change_domain
 
+
 # TODO (#14219): Update these tests to fully cover file change_domain.py.
 class ChangeDomainTests(test_utils.GenericTestBase):
 
