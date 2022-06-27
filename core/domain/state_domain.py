@@ -1998,7 +1998,7 @@ class WrittenTranslations:
             self.translations_mapping[content_id][language_code] = (
                 written_translation)
 
-    def validate(self, expected_content_id_list):
+    def validate(self, expected_content_id_list: List[str]) -> None:
         """Validates properties of the WrittenTranslations.
 
         Args:
@@ -2242,7 +2242,7 @@ class RecordedVoiceovers:
 
         return cls(voiceovers_mapping)
 
-    def validate(self, expected_content_id_list):
+    def validate(self, expected_content_id_list: List[str]) -> None:
         """Validates properties of the RecordedVoiceovers.
 
         Args:
@@ -2642,7 +2642,7 @@ class SubtitledHtml:
         return cls(
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates properties of the SubtitledHtml, and cleans the html.
 
         Raises:
