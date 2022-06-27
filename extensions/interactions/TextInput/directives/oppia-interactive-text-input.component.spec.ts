@@ -90,13 +90,13 @@ describe('InteractiveTextInputComponent', () => {
     component.ngOnInit();
 
     expect(component.placeholder).toBe('Placeholder text');
-    expect(component.rows).toBe(2);
+    expect(component.rows).toBe('2');
     expect(component.answer).toBe('');
     expect(component.labelForFocusTarget).toBe('label');
     expect(component.schema).toEqual({
       type: 'unicode',
       ui_config: {
-        rows: 2,
+        rows: '2',
         placeholder: 'Placeholder text',
       }
     });

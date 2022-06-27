@@ -84,7 +84,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     let topicUrlFragment = this.storySummaryToDisplay.getTopicUrlFragment();
     let explorationId = this.storyNodeToDisplay.getExplorationId();
     if (classroomUrlFragment === undefined || topicUrlFragment === undefined ||
-      explorationId === null || !this.storyNodeToDisplay) {
+      explorationId === null) {
       return '#';
     }
     let result = this.urlInterpolationService.interpolateUrl(

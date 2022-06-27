@@ -41,7 +41,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() allowMultipleItemsInSamePositionWithValue!: string;
   @Input() choicesWithValue!: string;
-  @Input() savedSolution!: InteractionAnswer;
+  // Save solution is undefined until the solution is set.
+  @Input() savedSolution!: InteractionAnswer | undefined;
   choices!: string[];
   choicesValue!: SubtitledHtml[];
   multipleItemsInSamePositionArray!: string[][];

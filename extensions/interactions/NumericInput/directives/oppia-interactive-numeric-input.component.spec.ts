@@ -110,7 +110,7 @@ describe('InteractiveNumericInput', () => {
     component.requireNonnegativeInput = false;
 
     expect(component.answer).toBe('');
-    expect(component.labelForFocusTarget).toBeNull();
+    expect(component.labelForFocusTarget).toBeUndefined();
     expect(component.requireNonnegativeInput).toEqual(false);
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',

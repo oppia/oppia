@@ -270,6 +270,7 @@ describe('State Solution Editor Component', () => {
     spyOn(solutionValidityService, 'updateValidity').and.stub();
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(true, false);
     spyOn(alertsService, 'addInfoMessage');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State 1');
 
     // In question mode.
     component.openAddOrUpdateSolutionModal();

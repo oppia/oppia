@@ -206,6 +206,7 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list of lists when user did not save a solution',
       () => {
+        component.savedSolution = undefined;
         component.ngOnInit();
 
         expect(component.allowMultipleItemsInSamePosition).toBe(true);
@@ -497,6 +498,7 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list when user did not save a solution',
       () => {
+        component.savedSolution = undefined;
         component.ngOnInit();
 
         expect(component.allowMultipleItemsInSamePosition).toBe(false);

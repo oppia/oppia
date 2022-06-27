@@ -125,7 +125,9 @@ describe('State card object factory', () => {
       'content', audioTranslationLanguageService);
     _sampleCard2 = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '',
-      {} as Interaction, {} as RecordedVoiceovers,
+      // Use unknown type conversion to test that the interaction is not
+      // required to be a string.
+      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
   });

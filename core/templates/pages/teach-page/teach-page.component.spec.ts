@@ -92,17 +92,6 @@ describe('Teach Page', () => {
         },
         SiteAnalyticsService,
         UrlInterpolationService,
-        {
-          provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              },
-              gtag: () => {}
-            }
-          }
-        }
       ]
     }).compileComponents();
   });

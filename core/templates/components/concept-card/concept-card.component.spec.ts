@@ -23,6 +23,7 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
 import { ConceptCardComponent } from './concept-card.component';
 
 describe('Concept card component', () => {
@@ -30,7 +31,9 @@ describe('Concept card component', () => {
   let componentInstance: ConceptCardComponent;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let conceptCard = new ConceptCard(
-    new SubtitledHtml('', '1'), [], RecordedVoiceovers.createEmpty());
+    new SubtitledHtml('', '1'),
+    [new WorkedExample({} as SubtitledHtml, {} as SubtitledHtml)],
+    RecordedVoiceovers.createEmpty());
   let conceptCardObjects = [conceptCard];
 
   beforeEach(waitForAsync(() => {

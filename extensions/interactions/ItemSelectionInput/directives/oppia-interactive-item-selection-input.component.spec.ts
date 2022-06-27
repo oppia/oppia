@@ -310,7 +310,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         'choice 3': false
       };
       expect(component.selectionCount).toBeUndefined();
-      expect(component.newQuestion).toBeUndefined();
+      expect(component.newQuestion).toBeFalse();
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeTrue();
 
