@@ -867,10 +867,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
   ['NumberConversionService', NumberConversionService],
-<<<<<<< HEAD
   ['ParameterMetadataService', ParameterMetadataService],
   ['ExplorationWarningsService', ExplorationWarningsService],
-=======
   ['QuestionUndoRedoService', QuestionUndoRedoService],
->>>>>>> skill-routing
 ];
