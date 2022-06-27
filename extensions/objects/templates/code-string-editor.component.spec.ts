@@ -32,11 +32,16 @@ describe('CodeStringEditorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CodeStringEditorComponent);
     component = fixture.componentInstance;
-
-    component.value = 'test';
   });
 
   it('should initialise when user adds response', () => {
+    component.ngOnInit();
+
+    expect(component.value).toEqual('');
+  });
+
+  it('should initialise when user adds response', () => {
+    component.value = 'test';
     component.ngOnInit();
 
     expect(component.value).toEqual('');
@@ -46,6 +51,7 @@ describe('CodeStringEditorComponent', () => {
   it('should update value when user types in the text input box',
     fakeAsync(() => {
       spyOn(component.valueChanged, 'emit');
+      component.value = 'test';
       component.ngOnInit();
 
       component.onEdit({
@@ -63,6 +69,7 @@ describe('CodeStringEditorComponent', () => {
 
   it('should warn user when user inserts a tab character', fakeAsync(() => {
     spyOn(component.valueChanged, 'emit');
+    component.value = 'test';
     component.ngOnInit();
 
     component.onEdit({
