@@ -20,21 +20,10 @@
 import { Component, Directive } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { InteractionDisplayComponent } from 'components/interaction-display/interaction-display.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
-
-// TODO(#9749): Call original AngularHtmlBindWrapperDirective
-// after migration of that directive.
-let MockAngularHtmlBindWrapperDirective = function(
-    options: Component) {
-  const metadata: Directive = {
-    selector: options.selector,
-    inputs: options.inputs,
-    outputs: options.outputs
-  };
-  return Directive(metadata)(class _ { });
-};
 
 class MockActiveModal {
   close(): void {
@@ -61,9 +50,7 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
       declarations: [
         LearnerDashboardSuggestionModalComponent,
         MockTranslatePipe,
-        MockAngularHtmlBindWrapperDirective({
-          selector: 'angular-html-bind',
-          inputs: ['htmlData'] })
+        InteractionDisplayComponent
       ],
       providers: [
         {

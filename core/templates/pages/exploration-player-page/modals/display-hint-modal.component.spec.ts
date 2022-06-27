@@ -31,17 +31,8 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplayHintModalComponent } from './display-hint-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { InteractionDisplayComponent } from 'components/interaction-display/interaction-display.component';
 
-
-let MockAngularHtmlBindWrapperDirective = function(
-    options: Component): Directive {
-  const metadata: Directive = {
-    selector: options.selector,
-    inputs: options.inputs,
-    outputs: options.outputs
-  };
-  return Directive(metadata)(class _ { }) as undefined;
-};
 
 describe('Display hint modal', () => {
   let fixture: ComponentFixture<DisplayHintModalComponent>;
@@ -59,9 +50,7 @@ describe('Display hint modal', () => {
       declarations: [
         DisplayHintModalComponent,
         MockTranslatePipe,
-        MockAngularHtmlBindWrapperDirective({
-          selector: 'angular-html-bind',
-          inputs: ['htmlData'] })
+        InteractionDisplayComponent
       ],
       providers: [
         NgbActiveModal,

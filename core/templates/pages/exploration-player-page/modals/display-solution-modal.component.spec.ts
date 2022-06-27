@@ -33,16 +33,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
-
-let MockAngularHtmlBindWrapperDirective = function(
-    options: Component): Directive {
-  const metadata: Directive = {
-    selector: options.selector,
-    inputs: options.inputs,
-    outputs: options.outputs
-  };
-  return Directive(metadata)(class _ { }) as Directive;
-};
+import { InteractionDisplayComponent } from 'components/interaction-display/interaction-display.component';
 
 describe('Display Solution Modal', () => {
   let fixture: ComponentFixture<DisplaySolutionModalComponent>;
@@ -79,9 +70,7 @@ describe('Display Solution Modal', () => {
       declarations: [
         DisplaySolutionModalComponent,
         MockTranslatePipe,
-        MockAngularHtmlBindWrapperDirective({
-          selector: 'angular-html-bind',
-          inputs: ['htmlData'] })
+        InteractionDisplayComponent
       ],
       providers: [
         NgbActiveModal,

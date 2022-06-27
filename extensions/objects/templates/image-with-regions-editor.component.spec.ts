@@ -151,6 +151,7 @@ describe('ImageWithRegionsEditorComponent', () => {
       AppConstants.ENTITY_TYPE.EXPLORATION);
     spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     spyOn(component.valueChanged, 'emit');
+    spyOn(component, 'getPreviewUrl');
 
     component.ngOnInit();
 

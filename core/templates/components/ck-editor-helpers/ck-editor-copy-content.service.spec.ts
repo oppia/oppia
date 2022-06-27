@@ -22,13 +22,13 @@ import { LoggerService } from 'services/contextual/logger.service';
 
 /**
  * Returns a HTMLElement containing the element to copy.
- * @param {string} html The hmtl to place in oppia-interaction-display element.
+ * @param {string} html The hmtl to place in angular-html-bind element.
  * @returns {HTMLElement} The element created by param html.
  */
 const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
   container.innerHTML = (
-    `<oppia-interaction-display>${html.trim()}</oppia-interaction-display>`);
+    `<angular-html-bind>${html.trim()}</angular-html-bind>`);
   // Return element inside <oppia-interaction-display />
   if (container.content.firstChild === null ||
     container.content.firstChild.firstChild === null) {
