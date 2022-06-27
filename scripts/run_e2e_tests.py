@@ -341,9 +341,9 @@ def run_tests(args):
                 stdout=subprocess.PIPE))
 
             print(
-            'Servers have come up.\n'
-            'Note: You can view screenshots of failed tests '
-            'in ../webdriverio-screenshots/')
+                'Servers have come up.\n'
+                'Note: You can view screenshots of failed tests '
+                'in ../webdriverio-screenshots/')
 
         elif args.suite in SUITES_STILL_IN_PROTRACTOR:
             stack.enter_context(servers.managed_webdriver_server(
@@ -357,10 +357,9 @@ def run_tests(args):
                 stdout=subprocess.PIPE))
 
             print(
-            'Servers have come up.\n'
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots of the '
-            'failed tests in ../protractor-screenshots/')
+                'Servers have come up.\n'
+                'Note: You can view screenshots of the failed tests '
+                'in ../protractor-screenshots/')
 
         else:
             print(
