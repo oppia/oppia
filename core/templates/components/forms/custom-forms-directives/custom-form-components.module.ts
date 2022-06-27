@@ -27,16 +27,16 @@ import { MaterialModule } from 'modules/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ImageUploaderComponent } from './image-uploader.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
     CommonModule,
     MaterialModule,
     DynamicContentModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
