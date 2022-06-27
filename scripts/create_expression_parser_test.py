@@ -20,11 +20,11 @@ import os
 import subprocess
 
 from core.tests import test_utils
+from typing import Any
 
 from . import common
 from . import create_expression_parser
 from . import setup
-from typing import Any
 
 
 class CreateExpressionParserTests(test_utils.GenericTestBase):

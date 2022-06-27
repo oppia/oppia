@@ -22,13 +22,13 @@ import subprocess
 import sys
 
 from core.tests import test_utils
+from typing import Any
 
 from . import build
 from . import check_frontend_test_coverage
 from . import common
 from . import install_third_party_libs
 from . import run_frontend_tests
-from typing import Any
 
 
 class RunFrontendTestsTests(test_utils.GenericTestBase):
