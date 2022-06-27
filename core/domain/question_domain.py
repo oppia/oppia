@@ -1265,7 +1265,8 @@ class Question(translation_domain.BaseTranslatableObject):
         for answer_group in answer_groups:
             answer_group['outcome']['dest_if_really_stuck'] = None
 
-        question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
+        if question_state_dict['interaction']['default_outcome'] is not None:
+            question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
 
     @classmethod
     def update_state_from_model(
