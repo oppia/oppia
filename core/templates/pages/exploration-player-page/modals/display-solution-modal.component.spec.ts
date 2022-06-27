@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for DisplaySolutionModalComponent.
  */
 
-import { Component, Directive } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
