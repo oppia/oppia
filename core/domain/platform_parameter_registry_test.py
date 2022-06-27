@@ -68,7 +68,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', FeatureStages.DEV.value)]
+                            'conditions': [['=', FeatureStages.DEV.value]]
                         }
                     ],
                     'value_when_matched': '222'
@@ -177,7 +177,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', FeatureStages.DEV.value)]
+                            'conditions': [['=', FeatureStages.DEV.value]]
                         }
                     ],
                     'value_when_matched': 'updated'
@@ -205,7 +205,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', FeatureStages.DEV.value)]
+                            'conditions': [['=', FeatureStages.DEV.value]]
                         }
                     ],
                     'value_when_matched': 'updated'
@@ -234,7 +234,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'filters': [
                             {
                                 'type': 'server_mode',
-                                'conditions': [('=', FeatureStages.DEV.value)]
+                                'conditions': [['=', FeatureStages.DEV.value]]
                             }
                         ],
                         'value_when_matched': True
@@ -262,7 +262,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'filters': [
                             {
                                 'type': 'server_mode',
-                                'conditions': [('=', FeatureStages.TEST.value)]
+                                'conditions': [['=', FeatureStages.TEST.value]]
                             }
                         ],
                         'value_when_matched': True
@@ -290,7 +290,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'filters': [
                             {
                                 'type': 'server_mode',
-                                'conditions': [('=', FeatureStages.PROD.value)]
+                                'conditions': [['=', FeatureStages.PROD.value]]
                             }
                         ],
                         'value_when_matched': True
@@ -318,7 +318,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'filters': [
                             {
                                 'type': 'server_mode',
-                                'conditions': [('=', FeatureStages.PROD.value)]
+                                'conditions': [['=', FeatureStages.PROD.value]]
                             }
                         ],
                         'value_when_matched': True
@@ -342,7 +342,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', FeatureStages.DEV.value)]
+                            'conditions': [['=', FeatureStages.DEV.value]]
                         }
                     ],
                     'value_when_matched': 'updated'
@@ -376,7 +376,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', FeatureStages.DEV.value)]
+                            'conditions': [['=', FeatureStages.DEV.value]]
                         }
                     ],
                     'value_when_matched': '222'

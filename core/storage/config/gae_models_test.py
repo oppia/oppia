@@ -153,7 +153,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    {'type': 'app_version', 'conditions': [('>', '1.2.3')]}
+                    {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
                 ],
                 'value_when_matched': True
             },
@@ -208,7 +208,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    {'type': 'app_version', 'conditions': [('>', '1.2.3')]}
+                    {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
                 ],
                 'value_when_matched': True
             },

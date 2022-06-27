@@ -943,12 +943,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        # The expected type of 'conditions' key is
-                        # List[Tuple[str, str]], but for testing purposes
-                        # we are providing value of type List[List[str]].
-                        # Which causes MyPy to throw error, Thus to silent
-                        # the error we used ignore here.
-                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],  # type: ignore[list-item]
+                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
                     'value_when_matched': True
                 }
             ],

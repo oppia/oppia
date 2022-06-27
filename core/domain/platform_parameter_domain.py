@@ -27,7 +27,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Callable, Dict, List, Optional, Pattern, Tuple, Union
+from typing import Callable, Dict, List, Optional, Pattern, Union
 from typing_extensions import Final, TypedDict
 
 
@@ -40,6 +40,10 @@ class ServerModes(enum.Enum):
 
 
 FeatureStages = ServerModes
+
+# Union type defined from allowed types that a platform can contain
+# for it's data types.
+PlatformDataTypes = Union[str, int, bool]
 
 
 class DataTypes(enum.Enum):
@@ -247,7 +251,7 @@ class PlatformParameterFilterDict(TypedDict):
     """Dictionary representing the PlatformParameterFilter object."""
 
     type: str
-    conditions: List[Tuple[str, str]]
+    conditions: List[List[str]]
 
 
 class PlatformParameterFilter:
@@ -269,7 +273,7 @@ class PlatformParameterFilter:
     def __init__(
         self,
         filter_type: str,
-        conditions: List[Tuple[str, str]]
+        conditions: List[List[str]]
     ) -> None:
         self._type = filter_type
         self._conditions = conditions
@@ -284,13 +288,13 @@ class PlatformParameterFilter:
         return self._type
 
     @property
-    def conditions(self) -> List[Tuple[str, str]]:
+    def conditions(self) -> List[List[str]]:
         """Returns filter conditions.
 
         Returns:
-            list((str, str)). The filter conditions. Each element of the list
-            is a 2-tuple (op, value), where op is the operator for comparison,
-            value is the value used for comparison.
+            list(list(str)). The filter conditions. Each element of the list
+            contain a list with 2-elements [op, value], where op is the operator
+            for comparison, value is the value used for comparison.
         """
         return self._conditions
 
@@ -573,7 +577,7 @@ class PlatformParameterRuleDict(TypedDict):
     """Dictionary representing the PlatformParameterRule object."""
 
     filters: List[PlatformParameterFilterDict]
-    value_when_matched: Union[str, bool, int]
+    value_when_matched: PlatformDataTypes
 
 
 class PlatformParameterRule:
@@ -582,7 +586,7 @@ class PlatformParameterRule:
     def __init__(
         self,
         filters: List[PlatformParameterFilter],
-        value_when_matched: Union[str, bool, int]
+        value_when_matched: PlatformDataTypes
     ) -> None:
         self._filters = filters
         self._value_when_matched = value_when_matched
@@ -597,7 +601,7 @@ class PlatformParameterRule:
         return self._filters
 
     @property
-    def value_when_matched(self) -> Union[str, bool, int]:
+    def value_when_matched(self) -> PlatformDataTypes:
         """Returns the value outcome if this rule is matched.
 
         Returns:
@@ -678,7 +682,7 @@ class PlatformParameterDict(TypedDict):
     data_type: str
     rules: List[PlatformParameterRuleDict]
     rule_schema_version: int
-    default_value: Union[str, bool, int]
+    default_value: PlatformDataTypes
     is_feature: bool
     feature_stage: Optional[str]
 
@@ -687,7 +691,7 @@ class PlatformParameter:
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT: (
-        Dict[str, Callable[[Union[str, int, bool]], bool]]
+        Dict[str, Callable[[PlatformDataTypes], bool]]
     ) = {
         DataTypes.BOOL.value: lambda x: isinstance(x, bool),
         DataTypes.STRING.value: lambda x: isinstance(x, str),
@@ -703,7 +707,7 @@ class PlatformParameter:
         data_type: str,
         rules: List[PlatformParameterRule],
         rule_schema_version: int,
-        default_value: Union[str, bool, int],
+        default_value: PlatformDataTypes,
         is_feature: bool,
         feature_stage: Optional[str]
     ) -> None:
@@ -771,7 +775,7 @@ class PlatformParameter:
         return self._rule_schema_version
 
     @property
-    def default_value(self) -> Union[str, bool, int]:
+    def default_value(self) -> PlatformDataTypes:
         """Returns the default value of the platform parameter.
 
         Returns:
@@ -829,7 +833,7 @@ class PlatformParameter:
 
     def evaluate(
         self, context: EvaluationContext
-    ) -> Union[str, bool, int]:
+    ) -> PlatformDataTypes:
         """Evaluates the value of the platform parameter in the given context.
         The value of first matched rule is returned as the result.
 

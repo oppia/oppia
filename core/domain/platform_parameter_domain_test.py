@@ -322,7 +322,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [(op, flavor_b)]}
+                {'type': 'app_version_flavor', 'conditions': [[op, flavor_b]]}
             )
         )
         self.assertTrue(filter_domain.evaluate(
@@ -341,7 +341,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [(op, flavor_b)]}
+                {'type': 'app_version_flavor', 'conditions': [[op, flavor_b]]}
             )
         )
         self.assertFalse(filter_domain.evaluate(
@@ -351,19 +351,19 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_create_from_dict_returns_correct_instance(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('=', '1.2.3')]
+            'conditions': [['=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
         self.assertEqual(filter_domain.type, 'app_version')
-        self.assertEqual(filter_domain.conditions, [('=', '1.2.3')])
+        self.assertEqual(filter_domain.conditions, [['=', '1.2.3']])
 
     def test_to_dict_returns_correct_dict(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('=', '1.2.3')]
+            'conditions': [['=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -376,7 +376,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'server_mode',
-            'conditions': [('=', 'dev')]
+            'conditions': [['=', 'dev']]
         }
         filter_domain = (
             parameter_domain
@@ -390,7 +390,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'server_mode',
-            'conditions': [('=', 'dev')]
+            'conditions': [['=', 'dev']]
         }
         filter_domain = (
             parameter_domain
@@ -404,7 +404,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'platform_type',
-            'conditions': [('=', 'Backend')]
+            'conditions': [['=', 'Backend']]
         }
         filter_domain = (
             parameter_domain
@@ -418,7 +418,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'platform_type',
-            'conditions': [('=', 'Web')]
+            'conditions': [['=', 'Web']]
         }
         filter_domain = (
             parameter_domain
@@ -432,7 +432,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'platform_type',
-            'conditions': [('=', 'Web')]
+            'conditions': [['=', 'Web']]
         }
         filter_domain = (
             parameter_domain
@@ -446,7 +446,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'browser_type',
-            'conditions': [('=', 'Chrome')]
+            'conditions': [['=', 'Chrome']]
         }
         filter_domain = (
             parameter_domain
@@ -460,7 +460,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'browser_type',
-            'conditions': [('=', 'Chrome')]
+            'conditions': [['=', 'Chrome']]
         }
         filter_domain = (
             parameter_domain
@@ -474,7 +474,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('=', '1.2.3')]
+            'conditions': [['=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -487,7 +487,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('=', '1.2.3')]
+            'conditions': [['=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -500,7 +500,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('>', '1.2.3')]
+            'conditions': [['>', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -515,7 +515,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('>', '1.2.3')]
+            'conditions': [['>', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -528,7 +528,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('>', '1.2.3')]
+            'conditions': [['>', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -545,7 +545,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('>=', '1.2.3')]
+            'conditions': [['>=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -560,7 +560,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('>=', '1.2.3')]
+            'conditions': [['>=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -573,7 +573,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('>=', '1.2.3')]
+            'conditions': [['>=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -590,7 +590,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('<', '1.2.3')]
+            'conditions': [['<', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -609,7 +609,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('<', '1.2.3')]
+            'conditions': [['<', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -622,7 +622,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('<', '1.2.3')]
+            'conditions': [['<', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -641,7 +641,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('<=', '1.2.3')]
+            'conditions': [['<=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -658,7 +658,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('<=', '1.2.3')]
+            'conditions': [['<=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -671,7 +671,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('<=', '1.2.3')]
+            'conditions': [['<=', '1.2.3']]
         }
         filter_domain = (
             parameter_domain
@@ -1288,7 +1288,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'server_mode',
-            'conditions': [('=', 'dev'), ('=', 'prod')]
+            'conditions': [['=', 'dev'], ['=', 'prod']]
         }
         filter_domain = (
             parameter_domain
@@ -1302,7 +1302,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'server_mode',
-            'conditions': [('=', 'dev'), ('=', 'prod')]
+            'conditions': [['=', 'dev'], ['=', 'prod']]
         }
         filter_domain = (
             parameter_domain
@@ -1316,7 +1316,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
-            'conditions': [('=', '1.2.3'), ('=', '1.2.4')]
+            'conditions': [['=', '1.2.3'], ['=', '1.2.4']]
         }
         filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
             filter_dict)
@@ -1330,7 +1330,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'server_mode', 'conditions': [('!=', 'dev')]}
+                {'type': 'server_mode', 'conditions': [['!=', 'dev']]}
             ))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Unsupported comparison operator \'!=\''):
@@ -1339,7 +1339,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_validate_filter_passes_without_exception(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'server_mode',
-            'conditions': [('=', 'dev'), ('=', 'prod')]
+            'conditions': [['=', 'dev'], ['=', 'prod']]
         }
         filter_domain = (
             parameter_domain
@@ -1350,7 +1350,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'invalid', 'conditions': [('=', 'value1')]}
+                {'type': 'invalid', 'conditions': [['=', 'value1']]}
             ))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Unsupported filter type \'invalid\''):
@@ -1362,7 +1362,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'server_mode', 'conditions': [('!=', 'dev')]}
+                {'type': 'server_mode', 'conditions': [['!=', 'dev']]}
             ))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Unsupported comparison operator \'!=\''):
@@ -1374,7 +1374,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'server_mode', 'conditions': [('=', 'invalid')]}
+                {'type': 'server_mode', 'conditions': [['=', 'invalid']]}
             ))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid server mode \'invalid\''):
@@ -1386,7 +1386,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'platform_type', 'conditions': [('=', 'invalid')]}
+                {'type': 'platform_type', 'conditions': [['=', 'invalid']]}
             ))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid platform type \'invalid\''):
@@ -1398,7 +1398,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version', 'conditions': [('=', '1.a.2')]}
+                {'type': 'app_version', 'conditions': [['=', '1.a.2']]}
             ))
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -1411,7 +1411,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'invalid')]}
+                {'type': 'app_version_flavor', 'conditions': [['=', 'invalid']]}
             ))
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -1426,11 +1426,11 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         filters: List[parameter_domain.PlatformParameterFilterDict] = [
             {
                 'type': 'app_version',
-                'conditions': [('=', '1.2.3')]
+                'conditions': [['=', '1.2.3']]
             },
             {
                 'type': 'server_mode',
-                'conditions': [('=', 'dev'), ('=', 'test')]
+                'conditions': [['=', 'dev'], ['=', 'test']]
             }
         ]
         rule = parameter_domain.PlatformParameterRule.from_dict(
@@ -1446,7 +1446,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
             filter_domain, parameter_domain.PlatformParameterFilter)
         self.assertEqual(len(rule.filters), 2)
         self.assertEqual(filter_domain.type, 'app_version')
-        self.assertEqual(filter_domain.conditions, [('=', '1.2.3')])
+        self.assertEqual(filter_domain.conditions, [['=', '1.2.3']])
         self.assertEqual(rule.value_when_matched, False)
 
     def test_to_dict_returns_correct_dict(self) -> None:
@@ -1454,7 +1454,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
             'filters': [
                 {
                     'type': 'app_version',
-                    'conditions': [('=', '1.2.3')]
+                    'conditions': [['=', '1.2.3']]
                 }
             ],
             'value_when_matched': False,
@@ -1466,7 +1466,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
-                    {'type': 'server_mode', 'conditions': [('=', 'dev')]}
+                    {'type': 'server_mode', 'conditions': [['=', 'dev']]}
                 ],
                 'value_when_matched': False,
             },
@@ -1479,7 +1479,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
-                    {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
+                    {'type': 'app_version', 'conditions': [['=', '1.2.3']]}
                 ],
                 'value_when_matched': False,
             },
@@ -1490,8 +1490,8 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
-                    {'type': 'app_version', 'conditions': [('=', '1.2.3')]},
-                    {'type': 'platform_type', 'conditions': [('=', 'Android')]},
+                    {'type': 'app_version', 'conditions': [['=', '1.2.3']]},
+                    {'type': 'platform_type', 'conditions': [['=', 'Android']]},
                 ],
                 'value_when_matched': 'matched_val',
             },
@@ -1512,8 +1512,8 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
-                    {'type': 'app_version', 'conditions': [('=', '1.2.3')]},
-                    {'type': 'platform_type', 'conditions': [('=', 'Web')]},
+                    {'type': 'app_version', 'conditions': [['=', '1.2.3']]},
+                    {'type': 'platform_type', 'conditions': [['=', 'Web']]},
                 ],
                 'value_when_matched': 'matched_val',
             },
@@ -1532,8 +1532,8 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
 
     def test_validate_with_invalid_filter_raises_exception(self) -> None:
         filters: List[parameter_domain.PlatformParameterFilterDict] = [
-            {'type': 'app_version', 'conditions': [('=', '1.2.3')]},
-            {'type': 'invalid', 'conditions': [('=', '1.2.3')]},
+            {'type': 'app_version', 'conditions': [['=', '1.2.3']]},
+            {'type': 'invalid', 'conditions': [['=', '1.2.3']]},
         ]
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
@@ -1559,7 +1559,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1594,7 +1594,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1620,7 +1620,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1648,7 +1648,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1675,7 +1675,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1703,7 +1703,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1755,7 +1755,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                             'filters': [
                                 {
                                     'type': 'server_mode',
-                                    'conditions': [('=', 'dev')]
+                                    'conditions': [['=', 'dev']]
                                 }
                             ],
                             'value_when_matched': '222'
@@ -1777,7 +1777,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1802,7 +1802,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1811,7 +1811,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'test')]
+                            'conditions': [['=', 'test']]
                         }
                     ],
                     'value_when_matched': '555'
@@ -1825,7 +1825,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         })
         new_rule_dict: parameter_domain.PlatformParameterRuleDict = {
             'filters': [
-                {'type': 'server_mode', 'conditions': [('=', 'test')]}
+                {'type': 'server_mode', 'conditions': [['=', 'test']]}
             ],
             'value_when_matched': 'new rule value',
         }
@@ -1846,7 +1846,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1881,7 +1881,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1918,7 +1918,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1955,7 +1955,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [['=', 'dev']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1988,7 +1988,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [('=', 'dev')]}
+                        {'type': 'server_mode', 'conditions': [['=', 'dev']]}
                     ],
                     'value_when_matched': False
                 }
@@ -2065,7 +2065,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [('=', 'test')]}],
+                        {'type': 'server_mode', 'conditions': [['=', 'test']]}],
                     'value_when_matched': True
                 }
             ],
@@ -2087,7 +2087,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [('=', 'prod')]}],
+                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
                     'value_when_matched': True
                 }
             ],
@@ -2111,7 +2111,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [('=', 'prod')]}],
+                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
                     'value_when_matched': True
                 }
             ],
@@ -2139,13 +2139,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            # The expected type of 'conditions' key is
-                            # List[Tuple[str, str]], but for testing purposes
-                            # we are providing value of type List[List[str]].
-                            # Which causes MyPy to throw error, Thus to silent
-                            # the error we used ignore here.
-                            'conditions': [['=', 'prod']]  # type: ignore[list-item]
+                            'type': 'server_mode', 'conditions': [['=', 'prod']]
                         }
                     ],
                     'value_when_matched': True
