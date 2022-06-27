@@ -122,7 +122,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_no_tests_are_run_when_dtslint_flag_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
-            run_frontend_tests.main(args=['--dtslint_only',])
+            run_frontend_tests.main(args=['--dtslint_only'])
         self.assertIn('Running dtslint type tests.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
