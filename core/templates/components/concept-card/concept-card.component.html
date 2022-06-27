@@ -2,7 +2,7 @@
   <div class="concept-card-explanation">
     <div class="oppia-concept-card-explanation-container">
       <oppia-interaction-display classStr="protractor-test-concept-card-explanation"
-                         [htmlData]="currentConceptCard.getExplanation().html">
+                                 [htmlData]="currentConceptCard.getExplanation().html">
       </oppia-interaction-display>
       <div *ngIf="skillDeletedMessage">
         <div class="oppia-align-center">{{ skillDeletedMessage }}</div>
@@ -16,7 +16,7 @@
            *ngIf="idx < numberOfWorkedExamplesShown">
         <strong> Question: </strong>
         <oppia-interaction-display classStr="example-content"
-                           [htmlData]="example.getQuestion().html">
+                                   [htmlData]="example.getQuestion().html">
         </oppia-interaction-display>
 
         <button class="btn btn-secondary show-example-explanation-button"
@@ -27,7 +27,7 @@
         <div *ngIf="explanationIsShown || idx < numberOfWorkedExamplesShown - 1">
           <strong> Explanation: </strong>
           <oppia-interaction-display classStr="example-content"
-                             [htmlData]="example.getExplanation().html">
+                                     [htmlData]="example.getExplanation().html">
           </oppia-interaction-display>
         </div>
       </div>
