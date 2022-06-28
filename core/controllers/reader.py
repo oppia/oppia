@@ -752,7 +752,8 @@ class ReaderFeedbackHandler(base.BaseHandler):
             'include_author': {
                 'schema': {
                     'type': 'bool'
-                }
+                },
+                'default_value': True
             },
             'state_name': {
                 'schema': {
@@ -761,7 +762,8 @@ class ReaderFeedbackHandler(base.BaseHandler):
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_STATE_NAME_LENGTH
                     }]
-                }
+                },
+                'default_value': None
             }
         }
     }
