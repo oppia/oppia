@@ -5432,6 +5432,7 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
     EXPLORATION_ID_0 = 'An_exploration_0_id'
     EXPLORATION_ID_1 = 'An_exploration_1_id'
+    EXPLORATION_ID_2 = 'An_exploration_2_id'
     VERSION_1 = 1
     VERSION_2 = 2
     VERSION_3 = 3
@@ -5444,29 +5445,14 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.version_history_model_class = (
             exp_models.ExplorationVersionHistoryModel)
-
-        # wipeout_service.pre_delete_user(self.user_1_id)
-        # wipeout_service.pre_delete_user(self.user_2_id)
+        self.save_new_valid_exploration(self.EXPLORATION_ID_0, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_0)
+        self.save_new_valid_exploration(self.EXPLORATION_ID_1, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_1)
+        self.save_new_valid_exploration(self.EXPLORATION_ID_2, self.user_2_id)
+        self.publish_exploration(self.user_2_id, self.EXPLORATION_ID_2)
 
     def test_one_version_history_model_is_pseudonymized(self):
-        exp_0 = exp_domain.Exploration.create_default_exploration(
-            self.EXPLORATION_ID_0)
-        exp_1 = exp_domain.Exploration.create_default_exploration(
-            self.EXPLORATION_ID_1)
-        exp_services.save_new_exploration(self.user_1_id, exp_0)
-        exp_services.save_new_exploration(self.user_1_id, exp_1)
-        exp_services.update_exploration(
-            self.user_2_id, self.EXPLORATION_ID_0, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state'
-                }), exp_domain.ExplorationChange({
-                  'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                  'property_name': 'title',
-                  'new_value': 'New title'
-                })
-            ], 'Some changes.')
-
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
@@ -5477,45 +5463,17 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                 self.user_2_id).pseudonymizable_entity_mappings[
                     models.NAMES.exploration.value])
         pseudonymized_id = pseudonymizable_user_id_mapping[
-            self.EXPLORATION_ID_0]
+            self.EXPLORATION_ID_2]
         pseudonymized_model = exp_models.ExplorationVersionHistoryModel.get(
             self.version_history_model_class.get_instance_id(
-                self.EXPLORATION_ID_0, self.VERSION_2))
+                self.EXPLORATION_ID_2, self.VERSION_1))
 
         self.assertNotIn(
             self.user_2_id, pseudonymized_model.committer_ids)
         self.assertIn(
             pseudonymized_id, pseudonymized_model.committer_ids)
-        self.assertEqual(pseudonymized_model.state_version_history, {
-            feconf.DEFAULT_INIT_STATE_NAME: (
-                state_domain.StateVersionHistory(
-                    None, None, self.user_1_id).to_dict()),
-            'New state': state_domain.StateVersionHistory(
-                None, None, pseudonymized_id).to_dict()
-        })
-        self.assertEqual(
-            pseudonymized_model.metadata_last_edited_committer_id,
-            pseudonymized_id)
 
     def test_multiple_version_history_models_are_pseudonymized(self):
-        exp_0 = exp_domain.Exploration.create_default_exploration(
-            self.EXPLORATION_ID_0)
-        exp_1 = exp_domain.Exploration.create_default_exploration(
-            self.EXPLORATION_ID_1)
-        exp_services.save_new_exploration(self.user_1_id, exp_0)
-        exp_services.save_new_exploration(self.user_1_id, exp_1)
-        exp_services.update_exploration(
-            self.user_2_id, self.EXPLORATION_ID_0, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state'
-                }), exp_domain.ExplorationChange({
-                  'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                  'property_name': 'title',
-                  'new_value': 'New title'
-                })
-            ], 'Some changes.')
-
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
@@ -5524,19 +5482,16 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
         pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id).pseudonymizable_entity_mappings[
-                    models.NAMES.exploration.value])
+                  models.NAMES.exploration.value])
         version_history_ids = [
             self.version_history_model_class.get_instance_id(
                 self.EXPLORATION_ID_0, self.VERSION_1),
-            self.version_history_model_class.get_instance_id(
-                self.EXPLORATION_ID_0, self.VERSION_2),
             self.version_history_model_class.get_instance_id(
                 self.EXPLORATION_ID_1, self.VERSION_1)
         ]
         pseudonymized_models = (
             exp_models.ExplorationVersionHistoryModel.get_multi(
                 version_history_ids))
-        print(pseudonymizable_user_id_mapping)
 
         for model in pseudonymized_models:
             pseudonymized_id = pseudonymizable_user_id_mapping[
