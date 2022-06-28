@@ -30,7 +30,6 @@ from core.domain import story_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, overload
-from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover

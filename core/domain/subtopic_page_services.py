@@ -26,7 +26,6 @@ from core.domain import subtopic_page_domain
 from core.platform import models
 
 from typing import List, Optional, overload
-from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
