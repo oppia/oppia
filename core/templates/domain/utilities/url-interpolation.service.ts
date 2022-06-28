@@ -81,8 +81,8 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} prefix - A path to a subfolder in /.
-   * @param {string} path - A resource path relative to that subfolder.
+   * @param {string} prefix - The url prefix.
+   * @param {string} path - A resource path relative to a subfolder.
    * @return {string} The complete url path with cache slug and prefix
    * depending on dev/prod mode.
    */
