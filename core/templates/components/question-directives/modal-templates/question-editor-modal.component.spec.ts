@@ -369,6 +369,7 @@ describe('Question Editor Modal Component', () => {
       const openModalSpy = spyOn(ngbModal, 'open');
       spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
 
+      spyOn(component, 'isQuestionValid').and.returnValue(true);
       expect(component.isSaveAndCommitButtonDisabled()).toBe(false);
 
       openModalSpy.and.returnValue({
