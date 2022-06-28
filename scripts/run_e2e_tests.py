@@ -194,7 +194,7 @@ SUITES_STILL_IN_PROTRACTOR = [
     'topicsAndSkillsDashboard',
     'skillEditor',
     'topicAndStoryViewer',
-    'wipeout'
+    'wipeout',
 ]
 
 
