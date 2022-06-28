@@ -1176,16 +1176,16 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     # the number of states.
     state_version_history = datastore_services.JsonProperty(
         default={}, indexed=False)
-    # The details of the previous commit on the exploration metadata in
-    # this version of the exploration. The json structure will look
-    # like the following:
-    # {
-    #   "previously_edited_in_version": str,
-    #   "committer_id": str.
-    # }
-    # The json object will have only two keys in this case.
-    metadata_version_history = datastore_services.JsonProperty(
-        default={}, indexed=False)
+    # The exploration version on which the metadata was previously edited.
+    # If its value is v, then it will indicate that the metadata was modified
+    # when the exploration was updated from version v -> v + 1.
+    # During the creation of a new exploration, its value will be 0.
+    metadata_last_edited_version_number = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The user id of the user who committed the latest changes on the
+    # exploration metadata.
+    metadata_last_edited_committer_id = datastore_services.StringProperty(
+        required=True, indexed=True)
     # The user ids of the users who did the 'previous commit' on each state
     # in this version of the exploration. It is required during the
     # wipeout process to query for the models efficiently.
@@ -1224,8 +1224,8 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize corresponding to a user:
-        committer_ids field and the user ids stored in state_version_history
-        or metadata_version_history.
+        committer_ids field, metadata_last_edited_committer_id field and the
+        user ids stored in state_version_history field.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -1249,7 +1249,9 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'metadata_version_history': (
+            'metadata_last_edited_version_number': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'metadata_last_edited_committer_id': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

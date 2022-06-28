@@ -713,14 +713,16 @@ def update_states_version_history(
 
 
 def update_metadata_version_history(
-    metadata_version_history, change_list, old_metadata, new_metadata,
-    current_version, committer_id):
+    metadata_last_edited_version_number, metadata_last_edited_committer_id,
+    change_list, old_metadata, new_metadata, current_version, committer_id):
     """Updates the version history of the exploration at a particular version
     of an exploration.
 
     Args:
-        metadata_version_history: ExplorationMetadataVersionHistory. The
-            exploration metadata version history data to be updated.
+        metadata_last_edited_version_number: int. Version number of the
+            exploration on which the metadata was last updated.
+        metadata_last_edited_committer_id: str. User id of the user who
+            committed the last change in the exploration metadata.
         change_list: list(ExplorationChange). A list of changes introduced in
             this commit.
         old_metadata: ExplorationMetadata. The exploration metadata at the
@@ -731,8 +733,7 @@ def update_metadata_version_history(
         committer_id: str. The id of the user who made the commit.
 
     Returns:
-        metadata_version_history: ExplorationMetadataVersionHistory. The
-        updated version history of the exploration metadata.
+        tuple[int, str]. The updated version number and the committer id.
     """
     old_metadata_dict = copy.deepcopy(old_metadata.to_dict())
     new_metadata_dict = copy.deepcopy(new_metadata.to_dict())
@@ -751,15 +752,16 @@ def update_metadata_version_history(
         # each other and there is no 'net change'.
         diff_dict = deepdiff.DeepDiff(old_metadata_dict, new_metadata_dict)
         if diff_dict != {}:
-            metadata_version_history.previously_edited_in_version = (
-                prev_version)
-            metadata_version_history.committer_id = committer_id
+            metadata_last_edited_version_number = prev_version
+            metadata_last_edited_committer_id = committer_id
 
-    return metadata_version_history
+    return (
+        metadata_last_edited_version_number,
+        metadata_last_edited_committer_id)
 
 
 def get_updated_committer_ids(
-    states_version_history, metadata_version_history):
+    states_version_history, metadata_last_edited_committer_id):
     """Extracts a list of user ids who made the 'previous commit' on each state
     and the exploration metadata from the exploration states and metadata
     version history data.
@@ -768,9 +770,8 @@ def get_updated_committer_ids(
         states_version_history: dict(str, StateVersionHistory). The version
             history data of each state at a particular version of an
             exploration.
-        metadata_version_history: ExplorationMetadataVersionHistory. The
-            exploration metadata version history at a particular version of
-            an exploration.
+        metadata_last_edited_committer_id: str. User id of the user who
+            committed the last change in the exploration metadata.
 
     Returns:
         list[str]. A list of user ids who made the 'previous commit' on each
@@ -779,7 +780,7 @@ def get_updated_committer_ids(
     committer_ids = set()
     for version_history in states_version_history.values():
         committer_ids.add(version_history.committer_id)
-    committer_ids.add(metadata_version_history.committer_id)
+    committer_ids.add(metadata_last_edited_committer_id)
     return list(committer_ids)
 
 
@@ -813,20 +814,27 @@ def update_version_history(
             for state_name, state_version_history_dict in (
                 version_history_model.state_version_history.items())
         }
-        metadata_version_history = (
-            exp_domain.ExplorationMetadataVersionHistory.from_dict(
-                version_history_model.metadata_version_history))
+        metadata_last_edited_version_number=(
+            version_history_model.metadata_last_edited_version_number)
+        metadata_last_edited_committer_id=(
+            version_history_model.metadata_last_edited_committer_id)
 
         updated_states_version_history = update_states_version_history(
             states_version_history, change_list, old_states, new_states,
             exploration.version, committer_id
         )
-        updated_metadata_version_history = update_metadata_version_history(
-            metadata_version_history, change_list, old_metadata, new_metadata,
-            exploration.version, committer_id
-        )
+
+        (
+            updated_metadata_last_edited_version_number,
+            updated_metadata_last_edited_committer_id
+        ) = update_metadata_version_history(
+            metadata_last_edited_version_number,
+            metadata_last_edited_committer_id, change_list, old_metadata,
+            new_metadata, exploration.version, committer_id)
+
         updated_committer_ids = get_updated_committer_ids(
-            updated_states_version_history, updated_metadata_version_history)
+            updated_states_version_history,
+            updated_metadata_last_edited_committer_id)
 
         updated_version_history_model_id = (
             exp_models.ExplorationVersionHistoryModel.get_instance_id(
@@ -841,8 +849,10 @@ def update_version_history(
                     for state_name, version_history in (
                         updated_states_version_history.items())
                 },
-                metadata_version_history=(
-                    updated_metadata_version_history.to_dict()),
+                metadata_last_edited_version_number=(
+                    updated_metadata_last_edited_version_number),
+                metadata_last_edited_committer_id=(
+                    updated_metadata_last_edited_committer_id),
                 committer_ids=updated_committer_ids
             ))
         updated_version_history_model.update_timestamps()
@@ -1010,9 +1020,8 @@ def _create_exploration(
             ).to_dict()
             for state_name in exploration.states
         },
-        metadata_version_history=(
-            exp_domain.ExplorationMetadataVersionHistory(
-                None, committer_id).to_dict()),
+        metadata_last_edited_version_number=0,
+        metadata_last_edited_committer_id=committer_id,
         committer_ids=[committer_id]
     )
     version_history_model.update_timestamps()
@@ -1694,8 +1703,10 @@ def revert_version_history(
             exploration_id=exploration_id,
             exploration_version=current_version + 1,
             state_version_history=version_history_model.state_version_history,
-            metadata_version_history=(
-                version_history_model.metadata_version_history),
+            metadata_last_edited_version_number=(
+                version_history_model.metadata_last_edited_version_number),
+            metadata_last_edited_committer_id=(
+                version_history_model.metadata_last_edited_committer_id),
             committer_ids=version_history_model.committer_ids
         )
         new_version_history_model.update_timestamps()

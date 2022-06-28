@@ -11217,33 +11217,3 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(actual_metadata_dict, expected_metadata_dict)
-
-
-class ExplorationMetadataVersionHistoryDomainUnitTests(
-    test_utils.GenericTestBase):
-
-    def test_metadata_version_history_gets_created(self):
-        expected_dict = {
-            'previously_edited_in_version': 1,
-            'committer_id': 'user_1'
-        }
-        actual_dict = exp_domain.ExplorationMetadataVersionHistory(
-            1, 'user_1').to_dict()
-
-        self.assertEqual(
-            expected_dict, actual_dict)
-
-    def test_metadata_version_history_gets_created_from_dict(self):
-        metadata_version_history_dict = {
-            'previously_edited_in_version': 1,
-            'committer_id': 'user_1'
-        }
-        metadata_version_history = (
-            exp_domain.ExplorationMetadataVersionHistory.from_dict(
-                metadata_version_history_dict))
-
-        self.assertEqual(
-            metadata_version_history.previously_edited_in_version,
-            metadata_version_history_dict['previously_edited_in_version'])
-        self.assertEqual(
-            metadata_version_history.to_dict(), metadata_version_history_dict)

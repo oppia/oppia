@@ -1469,10 +1469,9 @@ def _pseudonymize_version_history_models(pending_deletion_request):
                     model.state_version_history[state_name][
                         'committer_id'] = pseudonymized_id
 
-            # Pseudonymize user id from metadata_version_history.
-            if model.metadata_version_history['committer_id'] == user_id:
-                model.metadata_version_history[
-                    'committer_id'] = pseudonymized_id
+            # Pseudonymize user id metadata_last_edited_committer_id.
+            if model.metadata_last_edited_committer_id == user_id:
+                model.metadata_last_edited_committer_id = pseudonymized_id
 
             # Pseudonymize user id from committer_ids.
             for idx, committer_id in enumerate(model.committer_ids):

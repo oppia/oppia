@@ -912,7 +912,9 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'metadata_version_history': (
+            'metadata_last_edited_version_number': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'metadata_last_edited_committer_id': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -947,10 +949,8 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
                     'committer_id': 'user_1'
                 }
             },
-            metadata_version_history={
-                'previously_edited_in_version': 1,
-                'committer_id': 'user_1'
-            },
+            metadata_last_edited_version_number=1,
+            metadata_last_edited_committer_id='user_1',
             committer_ids=['user_1']
         ).put()
 

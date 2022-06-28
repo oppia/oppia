@@ -5458,9 +5458,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                     state_domain.StateVersionHistory(
                         None, None, self.user_1_id).to_dict())
             },
-            metadata_version_history=(
-                exp_domain.ExplorationMetadataVersionHistory(
-                    None, self.user_1_id).to_dict()),
+            metadata_last_edited_version_number=0,
+            metadata_last_edited_committer_id=self.user_1_id,
             committer_ids=[self.user_1_id]
         )
         model_1.update_timestamps()
@@ -5478,9 +5477,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                 self.STATE_1: state_domain.StateVersionHistory(
                     None, None, self.user_2_id).to_dict()
             },
-            metadata_version_history=(
-                exp_domain.ExplorationMetadataVersionHistory(
-                    self.VERSION_1, self.user_2_id).to_dict()),
+            metadata_last_edited_version_number=self.VERSION_1,
+            metadata_last_edited_committer_id=self.user_2_id,
             committer_ids=[self.user_1_id, self.user_2_id]
         )
         model_2.update_timestamps()
@@ -5496,9 +5494,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                     state_domain.StateVersionHistory(
                         None, None, self.user_1_id).to_dict())
             },
-            metadata_version_history=(
-                exp_domain.ExplorationMetadataVersionHistory(
-                    None, self.user_1_id).to_dict()),
+            metadata_last_edited_version_number=0,
+            metadata_last_edited_committer_id=self.user_1_id,
             committer_ids=[self.user_1_id]
         )
         model_3.update_timestamps()
@@ -5534,9 +5531,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                 None, None, pseudonymized_id).to_dict()
         })
         self.assertEqual(
-            pseudonymized_model.metadata_version_history,
-            exp_domain.ExplorationMetadataVersionHistory(
-                self.VERSION_1, pseudonymized_id).to_dict())
+            pseudonymized_model.metadata_last_edited_committer_id,
+            pseudonymized_id)
 
     def test_multiple_version_history_models_are_pseudonymized(self):
         wipeout_service.delete_user(

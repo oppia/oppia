@@ -7559,18 +7559,14 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                 None, None, self.owner_id
             ).to_dict()
         }
-        expected_metadata_version_history_dict = (
-            exp_domain.ExplorationMetadataVersionHistory(
-                None, self.owner_id).to_dict())
 
         self.assertEqual(
             version_history_model.state_version_history,
-            expected_state_version_history_dict
-        )
+            expected_state_version_history_dict)
+        self.assertEqual(version_history_model.metadata_last_edited_version_number, 0)
         self.assertEqual(
-            version_history_model.metadata_version_history,
-            expected_metadata_version_history_dict
-        )
+            version_history_model.metadata_last_edited_committer_id,
+            self.owner_id)
         self.assertIn(self.owner_id, version_history_model.committer_ids)
 
     def test_soft_deletion_does_not_delete_version_history_models(self):
@@ -7839,10 +7835,9 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
+        self.assertEqual(old_model.metadata_last_edited_version_number, 0)
         self.assertEqual(
-            old_model.metadata_version_history,
-            exp_domain.ExplorationMetadataVersionHistory(
-                None, self.owner_id).to_dict())
+            old_model.metadata_last_edited_committer_id, self.owner_id)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
@@ -7853,19 +7848,17 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         new_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
+        self.assertEqual(new_model.metadata_last_edited_version_number, 1)
         self.assertEqual(
-            new_model.metadata_version_history,
-            exp_domain.ExplorationMetadataVersionHistory(
-                1, self.owner_id).to_dict())
+            new_model.metadata_last_edited_committer_id, self.owner_id)
 
     def test_version_history_on_cancelled_edit_exploration_property(self):
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
-        expected_dict = exp_domain.ExplorationMetadataVersionHistory(
-            None, self.owner_id).to_dict()
 
+        self.assertEqual(old_model.metadata_last_edited_version_number, 0)
         self.assertEqual(
-            old_model.metadata_version_history, expected_dict)
+            old_model.metadata_last_edited_committer_id, self.owner_id)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
@@ -7883,8 +7876,9 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         new_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
+        self.assertEqual(new_model.metadata_last_edited_version_number, 0)
         self.assertEqual(
-            new_model.metadata_version_history, expected_dict)
+            new_model.metadata_last_edited_committer_id, self.owner_id)
 
     def test_version_history_on_revert_exploration(self):
         old_model = self.version_history_model_class.get(
@@ -7912,8 +7906,11 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             old_model.state_version_history,
             new_model.state_version_history)
         self.assertEqual(
-            old_model.metadata_version_history,
-            new_model.metadata_version_history)
+            old_model.metadata_last_edited_version_number,
+            new_model.metadata_last_edited_version_number)
+        self.assertEqual(
+            old_model.metadata_last_edited_committer_id,
+            new_model.metadata_last_edited_committer_id)
         self.assertEqual(old_model.committer_ids, new_model.committer_ids)
 
     def test_version_history_on_cancelled_add_state(self):
