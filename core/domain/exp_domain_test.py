@@ -4556,8 +4556,6 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        catchMisspellings:
-          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -5448,10 +5446,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                     'unicode_str': 'Enter here.'
                 }
             },
-            'rows': {'value': 1},
-            'catchMisspellings': {
-                'value': False
-            }
+            'rows': {'value': 1}
         }
         customization_args_dict2 = {
             'choices': {'value': [
@@ -6060,9 +6055,6 @@ class ExplorationChangesMergeabilityUnitTests(
                         'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -6118,9 +6110,6 @@ class ExplorationChangesMergeabilityUnitTests(
                         'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -6264,9 +6253,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6283,9 +6269,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'cmd': 'edit_state_property'
@@ -6310,9 +6293,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6566,9 +6546,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6585,9 +6562,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'cmd': 'edit_state_property'
@@ -6612,9 +6586,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -6712,9 +6683,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -8452,9 +8420,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'new_value': {}
@@ -8888,9 +8853,6 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': '',
                         'content_id': 'ca_placeholder_0'
                     }
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9308,9 +9270,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9324,9 +9283,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9565,9 +9521,6 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': 'Placeholder',
                         'content_id': 'ca_placeholder_0'
                     }
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9582,9 +9535,6 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': 'Placeholder Changed.',
                         'content_id': 'ca_placeholder_0'
                     }
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9692,9 +9642,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9708,9 +9655,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -9971,9 +9915,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -9987,9 +9928,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -10318,9 +10256,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -10334,9 +10269,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -10562,9 +10494,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -10874,9 +10803,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -11000,9 +10926,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'rows': {
                         'value': 1
-                    },
-                    'catchMisspellings': {
-                        'value': False
                     }
                 },
                 'cmd': 'edit_state_property',

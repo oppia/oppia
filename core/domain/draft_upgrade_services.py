@@ -210,10 +210,8 @@ class DraftUpgradeUtil:
     @classmethod
     def _convert_states_v50_dict_to_v51_dict(cls, draft_change_list):
         """Converts draft change list from state version 49 to 50. Version 50
-        adds a new customization arg to TextInput interaction which allows
-        creators to fill a catch misspellings checkbox. Also adds
-        a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts.. This should
+        adds a new dest_if_really_stuck field to the Outcome class to redirect
+        the learners to a state for strengthening concepts. This should
         not affect drafts.
 
         Args:

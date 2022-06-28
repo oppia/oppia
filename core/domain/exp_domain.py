@@ -2090,9 +2090,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_states_v50_dict_to_v51_dict(cls, states_dict):
-        """Converts from version 50 to 51. Version 51 adds a new
-        customization arg to TextInput interaction which allows
-        creators to fill a catch misspellings checkbox. Also adds
+        """Converts from version 50 to 51. Version 51 adds
         a new dest_if_really_stuck field to the Outcome class to redirect
         the learners to a state for strengthening concepts.
 
