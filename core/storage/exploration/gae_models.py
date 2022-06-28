@@ -375,7 +375,7 @@ class ExplorationModel(base_models.VersionedModel):
                 from storage, otherwise there are only marked as deleted.
                 Default is False.
         """
-        versioned_models = cls.get_multi(entity_ids, include_deleted=True)
+        versioned_exp_models = cls.get_multi(entity_ids, include_deleted=True)
 
         super(ExplorationModel, cls).delete_multi(
             entity_ids, committer_id,
@@ -387,7 +387,7 @@ class ExplorationModel(base_models.VersionedModel):
                 entity_ids, include_deleted=True)
 
             versioned_and_exp_rights_models = zip(
-                versioned_models, exp_rights_models)
+                versioned_exp_models, exp_rights_models)
             for model, rights_model in versioned_and_exp_rights_models:
                 # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
@@ -407,10 +407,12 @@ class ExplorationModel(base_models.VersionedModel):
             # Delete the ExplorationVersionHistoryModels if force_deletion is
             # True.
             if force_deletion:
-                versioned_models_without_none = [
-                    model for model in versioned_models if model is not None]
+                versioned_exp_models_without_none = [
+                    model for model in versioned_exp_models
+                    if model is not None
+                ]
                 version_history_ids = []
-                for model in versioned_models_without_none:
+                for model in versioned_exp_models_without_none:
                     for version in range(1, model.version + 1):
                         version_history_ids.append(
                             ExplorationVersionHistoryModel.get_instance_id(
