@@ -1041,7 +1041,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.exit_stack.enter_context(servers.managed_protractor_server(
             suite_name='abc', sharding_instances=3, debug_mode=True,
-            dev_mode=False, mobile=True, stdout=subprocess.PIPE))
+            dev_mode=False, stdout=subprocess.PIPE))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
