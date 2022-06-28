@@ -31,6 +31,14 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+
+interface ExplorationTagSummary {
+  tagsToShow: string[];
+  tagsInTooltip: string[];
+}
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
@@ -64,7 +72,13 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   separatorArray: number[] = [];
   userIsLoggedIn: boolean = false;
   lessonAuthorsSubmenuIsShown: boolean = false;
-
+  infoCardBackgroundCss!: {'background-color': string};
+  infoCardBackgroundImageUrl!: string;
+  averageRating: number | null;
+  numViews!: number;
+  lastUpdatedString: string;
+  explorationIsPrivate!: boolean;
+  explorationTags!: ExplorationTagSummary;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -74,15 +88,29 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private windowRef: WindowRef,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
-    private explorationPlayerStateService: ExplorationPlayerStateService
+    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private urlInterpolationService: UrlInterpolationService,
+    private ratingComputationService: RatingComputationService,
+    private dateTimeFormatService: DateTimeFormatService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
+    this.averageRating = this.ratingComputationService.computeAverageRating(
+      this.expInfo.ratings);
+    this.numViews = this.expInfo.num_views;
+    this.lastUpdatedString = this.getLastUpdatedString(
+      this.expInfo.last_updated_msec);
+    this.explorationIsPrivate = (this.expInfo.status === 'private');
+    this.explorationTags = this.getExplorationTagsSummary(this.expInfo.tags);
     this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
     this.expDesc = this.expInfo.objective;
+    this.infoCardBackgroundCss = {
+      'background-color': this.expInfo.thumbnail_bg_color
+    };
+    this.infoCardBackgroundImageUrl = this.expInfo.thumbnail_icon_url;
     this.storyTitleIsPresent = (
       this.explorationPlayerStateService.isInStoryChapterMode()
     );
@@ -133,6 +161,46 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       // Required for the put operation to deliver data to backend.
       this.windowRef.nativeWindow.location.reload();
     });
+  }
+
+  getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {
+    let tagsToShow = [];
+    let tagsInTooltip = [];
+    let MAX_CHARS_TO_SHOW = 45;
+
+    for (let i = 0; i < arrayOfTags.length; i++) {
+      let newLength = (tagsToShow.toString() + arrayOfTags[i]).length;
+
+      if (newLength < MAX_CHARS_TO_SHOW) {
+        tagsToShow.push(arrayOfTags[i]);
+      } else {
+        tagsInTooltip.push(arrayOfTags[i]);
+      }
+    }
+
+    return {
+      tagsToShow: tagsToShow,
+      tagsInTooltip: tagsInTooltip
+    };
+  }
+
+  getLastUpdatedString(millisSinceEpoch: number): string {
+    return this.dateTimeFormatService
+      .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+  }
+
+  getStaticImageUrl(imageUrl: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imageUrl);
+  }
+
+  titleWrapper(): object {
+    let titleHeight = document.querySelectorAll(
+      '.oppia-info-card-logo-thumbnail')[0].clientWidth - 20;
+    let titleCss = {
+      'word-wrap': 'break-word',
+      width: titleHeight.toString()
+    };
+    return titleCss;
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {
