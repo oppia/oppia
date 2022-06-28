@@ -13,31 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StoryReferenceObjectFactory.
+ * @fileoverview Tests for StoryReference.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { StoryReference } from
+  'domain/topic/story-reference-object.model';
 
-import { StoryReference, StoryReferenceObjectFactory } from
-  'domain/topic/StoryReferenceObjectFactory';
+describe('Story reference model', () => {
 
-describe('Story reference object factory', () => {
-  let storyReferenceObjectFactory: StoryReferenceObjectFactory;
   let _sampleStoryReference: StoryReference;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [StoryReferenceObjectFactory]
-    });
-
-    storyReferenceObjectFactory = TestBed.inject(StoryReferenceObjectFactory);
-
     var sampleStoryReferenceBackendObject = {
       story_id: 'story_id',
       story_is_published: true
     };
 
-    _sampleStoryReference = storyReferenceObjectFactory.createFromBackendDict(
+    _sampleStoryReference = StoryReference.createFromBackendDict(
       sampleStoryReferenceBackendObject);
   });
 
@@ -47,7 +39,7 @@ describe('Story reference object factory', () => {
   });
 
   it('should correctly create default story reference', () => {
-    var storyReference = storyReferenceObjectFactory.createFromStoryId(
+    var storyReference = StoryReference.createFromStoryId(
       'story_id_2');
     expect(storyReference.getStoryId()).toEqual('story_id_2');
     expect(storyReference.isStoryPublished()).toEqual(false);
