@@ -28,6 +28,13 @@ import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjec
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
@@ -73,6 +80,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
           provide: CurrentInteractionService,
           useClass: MockCurrentInteractionService
         },
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
         BrowserCheckerService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -115,6 +126,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       '}' +
   ']';
     component.showChoicesInShuffledOrderWithValue = 'false';
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should initalise component when user selects multiple choice ' +

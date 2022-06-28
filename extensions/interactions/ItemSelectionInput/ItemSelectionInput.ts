@@ -16,8 +16,6 @@
  * @fileoverview Requires for ItemSelectionInput interaction.
  */
 
-require('interactions/ItemSelectionInput/static/item_selection_input.css');
-
 require(
   'interactions/ItemSelectionInput/directives/' +
   'item-selection-input-rules.service.ts');

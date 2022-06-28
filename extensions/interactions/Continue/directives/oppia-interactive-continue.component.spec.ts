@@ -22,6 +22,14 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { ContextService } from 'services/context.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContinueRulesService } from './continue-rules.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
+  }
+}
+
 
 describe('OppiaInteractiveContinue', () => {
   let component: OppiaInteractiveContinue;
@@ -69,6 +77,10 @@ describe('OppiaInteractiveContinue', () => {
           {
             provide: CurrentInteractionService,
             useValue: mockCurrentInteractionService
+          },
+          {
+            provide: I18nLanguageCodeService,
+            useClass: MockI18nLanguageCodeService
           }
         ]
       }).compileComponents();
@@ -81,6 +93,10 @@ describe('OppiaInteractiveContinue', () => {
       fixture = TestBed.createComponent(OppiaInteractiveContinue);
       component = fixture.componentInstance;
       component.buttonTextWithValue = 'Continue';
+    });
+
+    it('should get RTL language status correctly', () => {
+      expect(component.isLanguageRTL()).toBeTrue();
     });
 
     it('should initialise component when component is played' +

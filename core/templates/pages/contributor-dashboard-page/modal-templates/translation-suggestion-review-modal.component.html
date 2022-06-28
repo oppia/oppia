@@ -36,7 +36,7 @@
         <button class="btn btn-sm btn-secondary float-right" *ngIf="!startedEditing && status === 'review' && canEditTranslation" (click)="editSuggestion()">Edit</button>
       </div>
       <div class="oppia-suggestion-review-panel">
-        <div>
+        <div dir="auto">
           <angular-html-bind-wrapper [htmlData]="translationHtml" *ngIf="!startedEditing">
           </angular-html-bind-wrapper>
           <ul *ngIf="isSetOfStringsContent">
@@ -123,7 +123,7 @@
   .oppia-suggestion-review-panel {
     border: 1px solid #ccc;
     height: 88%;
-    padding: 10px 0 10px 10px;
+    padding: 10px 10px 10px 10px;
     position: relative;
   }
   .oppia-suggestion-review-message {

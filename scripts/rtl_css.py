@@ -104,7 +104,14 @@ css_files_list = [
     'practice-tab.component.css',
     'core/templates/pages/topic-viewer-page/subtopics-list/'
     'subtopics-list.component.css',
-    'core/templates/pages/topic-viewer-page/topic-viewer-page.component.css'
+    'core/templates/pages/topic-viewer-page/topic-viewer-page.component.css',
+    'core/templates/components/summary-tile/'
+    'exploration-summary-tile.component.css',
+    'core/templates/pages/preferences-page/preferences-page.component.css',
+    'extensions/interactions/MultipleChoiceInput/static/'
+    'multiple_choice_input.css',
+    'extensions/interactions/ItemSelectionInput/static/'
+    'item_selection_input.css'
 ]
 
 

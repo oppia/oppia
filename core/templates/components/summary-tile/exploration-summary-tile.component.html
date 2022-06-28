@@ -1,3 +1,7 @@
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/exploration-summary-tile.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/exploration-summary-tile.component.rtl.css" as="style">
+
 <div *ngIf="!mobileCardToBeShown">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                 [activityType]="activityType"
@@ -119,63 +123,7 @@
     </a>
   </mat-card>
 </div>
-<style>
-  .oppia-exploration-dashboard-card {
-    position: relative;
-    z-index: 5;
-  }
 
-  .oppia-play-exploration-button {
-    display: block;
-    margin: auto;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    touch-action: pan-y;
-    -webkit-user-drag: none;
-    user-select: none;
-  }
-
-  .oppia-return-to-parent-button {
-    margin-top: 12px;
-  }
-
-  .oppia-arrow-icon {
-    font-size: 19px;
-    padding-top: 1.5px;
-  }
-
-  .oppia-learner-confirm-button {
-    background: #0d48a1;
-    color: #fff;
-    font-size: 16px;
-    line-height: 22px;
-    padding: 6px 12px;
-  }
-
-  .mobile-activity-summary-card {
-    box-shadow: slategrey 2px 4px 4px 0;
-    padding: 0 0 0 0;
-  }
-
-  .mobile-exploration-card-image-container {
-    align-self: center;
-    width: 63px;
-  }
-
-  .mobile-exploration-card-image {
-    height: 100%;
-    width: auto;
-  }
-
-  .views-text {
-    margin-left: 6px;
-  }
-
-  .protractor-test-exp-summary-tile-title {
-    font-size: 1.7rem;
-  }
-
-  .thumbnail-image {
-    display: block;
-  }
-
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/exploration-summary-tile.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/exploration-summary-tile.component.rtl.css">

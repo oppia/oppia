@@ -157,6 +157,10 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   checkIfMobileCardToBeShown(): void {
     let currentPageUrl = this.urlService.getPathname();
     this.mobileCardToBeShown = (

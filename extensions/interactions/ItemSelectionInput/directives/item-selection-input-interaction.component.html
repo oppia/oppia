@@ -1,3 +1,7 @@
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/extensions/interactions/ItemSelectionInput/static/item_selection_input.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/extensions/interactions/ItemSelectionInput/static/item_selection_input.rtl.css" as="style">
+
 <div class="item-selection-input-form-container">
   <form>
     <small class="item-selection-info-text" *ngIf="displayCheckboxes">
@@ -21,7 +25,7 @@
     </small>
     <div class="protractor-test-item-selection-input-container" *ngFor="let choice of choices; index as idx">
       <div *ngIf="displayCheckboxes">
-        <label dir="auto" class="item-selection-input-item protractor-test-item-selection-input-item">
+        <label class="item-selection-input-item protractor-test-item-selection-input-item">
           <mat-checkbox class="item-selection-input-checkbox protractor-test-item-selection-input-checkbox"
                         [(ngModel)]="userSelections[choice]"
                         [checked]="userSelections[choice]"
@@ -29,7 +33,7 @@
                         [disabled]="preventAdditionalSelections && !userSelections[choice]"
                         tabindex="0"
                         [ngModelOptions]="{standalone: true}">
-            <span dir="auto">
+            <span>
               <angular-html-bind-wrapper classStr="protractor-test-item-selection-option" [htmlData]="choice">
               </angular-html-bind-wrapper>
             </span>
@@ -37,7 +41,7 @@
         </label>
       </div>
 
-      <div dir="auto" *ngIf="!displayCheckboxes">
+      <div *ngIf="!displayCheckboxes">
         <button class="multiple-choice-option" (click)="submitMultipleChoiceAnswer($event, idx)">
           <div class="multiple-choice-radio-button-container">
             <span class="multiple-choice-outer-radio-button">
@@ -46,7 +50,8 @@
           </div>
           <div class="multiple-choice-content-container">
             <span>
-              <angular-html-bind-wrapper classStr="protractor-test-multiple-choice-option" [htmlData]="choice">
+              <angular-html-bind-wrapper class="protractor-test-multiple-choice-option"
+                                        [htmlData]="choice">
               </angular-html-bind-wrapper>
             </span>
           </div>
@@ -55,3 +60,7 @@
     </div>
   </form>
 </div>
+
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/extensions/interactions/ItemSelectionInput/static/item_selection_input.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/extensions/interactions/ItemSelectionInput/static/item_selection_input.rtl.css">

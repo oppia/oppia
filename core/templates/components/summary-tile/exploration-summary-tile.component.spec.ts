@@ -223,6 +223,12 @@ describe('Exploration Summary Tile Component', () => {
     fixture.detectChanges();
   });
 
+  it('should get RTL language status correctly', () => {
+    spyOn(
+      i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(true);
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
+
   it('should intialize the component and set values', fakeAsync(() => {
     const userServiceSpy = spyOn(
       userService, 'getUserInfoAsync')

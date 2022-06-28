@@ -11,7 +11,8 @@
               aria-label="Previous Card"
               (click)="validateIndexAndChangeCard(displayedCardIndex-1)"
               class="protractor-test-back-button oppia-back-button oppia-nav-button oppia-nav-left-button">
-        <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+        <i *ngIf="!isLanguageRTL()" class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+        <i *ngIf="isLanguageRTL()" class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
       </button>
     </div>
   </div>
@@ -20,7 +21,8 @@
             (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
             aria-label="Next Card"
             class="oppia-next-button protractor-test-next-button oppia-nav-button">
-      <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
+      <i *ngIf="isLanguageRTL()" class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+      <i *ngIf="!isLanguageRTL()" class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
     </button>
   </div>
   <div *ngIf="!hasNext">
@@ -32,7 +34,8 @@
               class="oppia-learner-confirm-button protractor-test-continue-button oppia-autofocus"
               oppiaFocusOn="continue-btn">
         {{ interactionCustomizationArgs.buttonText.value.unicode }}
-        <i class="fas fa-arrow-right oppia-arrow-right"></i>
+        <i *ngIf="!isLanguageRTL()" class="fas fa-arrow-right oppia-arrow"></i>
+        <i *ngIf="isLanguageRTL()" class="fas fa-arrow-left oppia-arrow"></i>
       </button>
       <button mat-button
               *ngIf="shouldGenericSubmitButtonBeShown()"

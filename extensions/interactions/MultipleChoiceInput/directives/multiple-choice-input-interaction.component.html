@@ -1,3 +1,7 @@
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/extensions/interactions/MultipleChoiceInput/static/multiple_choice_input.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/extensions/interactions/MultipleChoiceInput/static/multiple_choice_input.rtl.css" as="style">
+
 <form>
   <div *ngFor="let choice of choices"
        dir="auto" class="multiple-choice-option-container protractor-test-multiple-choice-option-container">
@@ -18,3 +22,7 @@
     </button>
   </div>
 </form>
+
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/extensions/interactions/MultipleChoiceInput/static/multiple_choice_input.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/extensions/interactions/MultipleChoiceInput/static/multiple_choice_input.rtl.css">
