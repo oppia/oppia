@@ -108,8 +108,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_all_the_e2e_test_suites_are_present(self):
         test_in_protractor = run_e2e_tests.SUITES_STILL_IN_PROTRACTOR
         test_in_webdriverio = run_e2e_tests.SUITES_MIGRATED_TO_WEBDRIVERIO
-
-        all_suites_present =  test_in_protractor + test_in_webdriverio
+        all_suites_present = test_in_protractor + test_in_webdriverio
 
         self.assertEqual(set(all_suites_present), set(TOTAL_E2E_SUITES))
 
@@ -903,36 +902,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         run_e2e_tests.main(
             args=['--suite', 'collections'])
-        
-    def test_do_not_run_with_invalid_test_suite(self):
-        self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'install_third_party_libraries', lambda _: None,
-            expected_args=[(False,)]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
-            expected_args=[(True,)]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_firebase_auth_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_dev_appserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_redis_server', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
-        self.exit_stack.enter_context(self.swap(
-            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        with self.assertRaisesRegex(SystemExit, '1'):
-            run_e2e_tests.main(args=['--suite', 'never'])
-    
     def test_do_not_run_with_invalid_test_suite(self):
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
@@ -962,3 +932,31 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(SystemExit, '1'):
             run_e2e_tests.main(args=['--suite', 'never'])
 
+    def test_do_not_run_with_test_suite_not_present_in_suites_list(self):
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'install_third_party_libraries', lambda _: None,
+            expected_args=[(False,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            expected_args=[(True,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_dev_appserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap(
+            flake_checker, 'check_if_on_ci', lambda: True))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
+
+        with self.assertRaisesRegex(SystemExit, '1'):
+            run_e2e_tests.main(args=['--suite', 'never'])
