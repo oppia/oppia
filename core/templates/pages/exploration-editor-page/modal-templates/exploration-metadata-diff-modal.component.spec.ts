@@ -110,28 +110,13 @@ describe('Exploration Metadata Diff Modal Component', () => {
     component.oldMetadata = oldMetadata;
   });
 
-  it('should initialize component properties after component is initialized',
-    fakeAsync(() => {
-      spyOn(
-        historyTabYamlConversionService, 'getYamlStringFromStateOrMetadata'
-      ).and.resolveTo('Yaml data');
-
-      component.ngOnInit();
-      tick(201);
-
-      expect(component.headers).toEqual(headers);
-      expect(component.newMetadata).not.toBeNull();
-      expect(component.oldMetadata).not.toBeNull();
-      expect(component.newMetadata?.toBackendDict()).toEqual(
-        newExplorationMetadataBackendDict);
-      expect(component.oldMetadata?.toBackendDict()).toEqual(
-        oldExplorationMetadataBackendDict);
-    }));
-
   it('should evaluate yaml strings object', fakeAsync(() => {
     spyOn(
       historyTabYamlConversionService, 'getYamlStringFromStateOrMetadata'
     ).and.resolveTo('Yaml data');
+
+    expect(component.yamlStrs.leftPane).toBe('');
+    expect(component.yamlStrs.rightPane).toBe('');
 
     component.ngOnInit();
     tick(201);

@@ -125,10 +125,16 @@ angular.module('oppia').factory('CompareVersionsService', [
             }]
           );
 
-          var v1Metadata = ExplorationMetadataObjectFactory
-            .createFromBackendDict(v1MetadataDict);
-          var v2Metadata = ExplorationMetadataObjectFactory
-            .createFromBackendDict(v2MetadataDict);
+          var v1Metadata = (
+            ExplorationMetadataObjectFactory.createFromBackendDict(
+              v1MetadataDict
+            )
+          );
+          var v2Metadata = (
+            ExplorationMetadataObjectFactory.createFromBackendDict(
+              v2MetadataDict
+            )
+          );
 
           return {
             nodes: diffGraphData.nodes,

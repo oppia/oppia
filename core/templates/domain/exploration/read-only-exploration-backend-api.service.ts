@@ -82,8 +82,9 @@ export class ReadOnlyExplorationBackendApiService {
       const explorationDataUrl = this._getExplorationUrl(
         explorationId, version);
 
-      // If version is not null, then check whether the data is already cached.
-      // If so, then resolve the Promise with the cached data.
+      // If version is not null, then check whether the exploration data for
+      // the given version is already cached. If so, then resolve the Promise
+      // with the cached exploration data.
       if (
         version && this.versionedExplorationCachingService.isCached(
           explorationId, version
@@ -94,7 +95,8 @@ export class ReadOnlyExplorationBackendApiService {
       } else {
         this.http.get<FetchExplorationBackendResponse>(
           explorationDataUrl).toPromise().then(response => {
-          // If version if not null, then cache the fetched data.
+          // If version is not null, then cache the fetched
+          // exploration data (response) for the given version.
           if (version) {
             this.versionedExplorationCachingService
               .cacheVersionedExplorationData(explorationId, version, response);

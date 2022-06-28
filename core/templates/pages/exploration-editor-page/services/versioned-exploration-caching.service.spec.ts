@@ -132,9 +132,12 @@ describe('Versioned exploration caching service', () => {
   });
 
   it('should retrieve cached exploration data', () => {
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
+
     versionedExplorationCachingService.cacheVersionedExplorationData(
       'exp_1', 2, testVersionedExplorationData);
 
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeTrue();
     expect(
       versionedExplorationCachingService
         .retrieveCachedVersionedExplorationData('exp_1', 2)
@@ -142,6 +145,8 @@ describe('Versioned exploration caching service', () => {
   });
 
   it('should remove cached exploration data', () => {
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
+
     versionedExplorationCachingService.cacheVersionedExplorationData(
       'exp_1', 2, testVersionedExplorationData);
 
