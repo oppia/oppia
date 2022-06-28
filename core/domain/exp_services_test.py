@@ -7563,7 +7563,8 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             version_history_model.state_version_history,
             expected_state_version_history_dict)
-        self.assertEqual(version_history_model.metadata_last_edited_version_number, 0)
+        self.assertEqual(
+            version_history_model.metadata_last_edited_version_number, 0)
         self.assertEqual(
             version_history_model.metadata_last_edited_committer_id,
             self.owner_id)
