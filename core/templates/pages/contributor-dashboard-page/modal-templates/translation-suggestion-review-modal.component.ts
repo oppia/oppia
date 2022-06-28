@@ -111,6 +111,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   userCanReviewTranslationSuggestionsInLanguages!: string[];
   username!: string;
   resolvedSuggestionIds: string[] = [];
+  skippedSuggestionIds: string[] = [];
   errorFound: boolean = false;
   contentTypeIsHtml: boolean = false;
   contentTypeIsSetOfStrings: boolean = false;
@@ -120,6 +121,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   reviewable: boolean = false;
   canEditTranslation: boolean = false;
   userIsCurriculumAdmin: boolean = false;
+  isContentExpanded: boolean = false;
+  isTranslationExpanded: boolean = false;
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
   MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
@@ -232,6 +235,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
+  toggleExpansionState(tab: string): void {
+    if (tab === 'content') {
+      this.isContentExpanded = !this.isContentExpanded;
+    } else if (tab === 'translation') {
+      this.isTranslationExpanded = !this.isTranslationExpanded;
+    }
+  }
+
   updateSuggestion(): void {
     const updatedTranslation = this.editedContent.html;
     const suggestionId = this.activeSuggestion.suggestion_id;
@@ -265,8 +276,46 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       threadId);
     const threadMessageBackendDicts = response.messages;
     this.reviewMessage = threadMessageBackendDicts.map(
-      m => ThreadMessage.createFromBackendDict(m))[1].text;
+      m => ThreadMessage.createFromBackendDict(m))[1]?.text ?? '';
   }
+
+  gotoNextItem(): void {
+    this.skippedSuggestionIds.push(this.activeSuggestionId);
+    if (this.lastSuggestionToReview) {
+      this.activeModal.close(this.skippedSuggestionIds);
+      return;
+    }
+    let lastContribution = (
+      Object.keys(this.remainingContributions)[
+        Object.keys(this.remainingContributions).length - 1]);
+
+    this.activeSuggestionId = lastContribution;
+    this.activeContribution = this.remainingContributions[
+      lastContribution];
+
+    delete this.remainingContributions[this.activeSuggestionId];
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
+    if (!this.activeContribution.details) {
+      this.activeModal.close(this.skippedSuggestionIds);
+      return;
+    }
+
+    this.activeSuggestion = this.activeContribution.suggestion;
+    this.activeContributionDetails = this.activeContribution.details;
+    this.contextService.setCustomEntityContext(
+      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      this.activeSuggestion.target_id);
+    this.subheading = (
+      this.activeContributionDetails.topic_name + ' / ' +
+        this.activeContributionDetails.story_title +
+        ' / ' + this.activeContributionDetails.chapter_title);
+    this.init();
+  }
+
+  // gotoPreviousItem(): void {
+
+  // }
 
   showNextItemToReview(suggestionId: string): void {
     this.resolvedSuggestionIds.push(this.activeSuggestionId);
