@@ -136,8 +136,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         number_of_published_blogs = (
             blog_services.get_published_blog_post_summaries()
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert number_of_published_blogs is not None
         self.assertEqual(
             len(number_of_published_blogs),
             1
@@ -159,8 +157,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 20
             )
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert no_of_published_blog_post is not None
         self.assertEqual(
             len(no_of_published_blog_post), 1
         )
@@ -189,8 +185,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_blog_post_summary_by_id(self) -> None:
         blog_post_summary = (
-            blog_services.get_blog_post_summary_by_id(
-                self.blog_post_a_id, strict=True))
+            blog_services.get_blog_post_summary_by_id(self.blog_post_a_id)
+        )
         expected_blog_post_summary = (
             blog_domain.BlogPostSummary(
                 self.blog_post_a_id,
@@ -349,14 +345,14 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_blog_post_summary(self) -> None:
         blog_post_summary = (
-            blog_services.get_blog_post_summary_by_id(
-                self.blog_post_a_id, strict=True))
+            blog_services.get_blog_post_summary_by_id(self.blog_post_a_id)
+        )
         self.assertEqual(blog_post_summary.title, '')
         blog_services.update_blog_post(
             self.blog_post_a_id, self.change_dict_one)
         updated_blog_post_summary = (
-            blog_services.get_blog_post_summary_by_id(
-                self.blog_post_a_id, strict=True))
+            blog_services.get_blog_post_summary_by_id(self.blog_post_a_id)
+        )
         self.assertEqual(
             updated_blog_post_summary.thumbnail_filename, 'thummbnail.svg')
         self.assertEqual(updated_blog_post_summary.summary, 'Hello')

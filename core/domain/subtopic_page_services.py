@@ -112,22 +112,6 @@ def get_subtopic_page_by_id(
 def get_subtopic_page_by_id(
     topic_id: str,
     subtopic_id: int,
-    strict: Literal[True]
-) -> subtopic_page_domain.SubtopicPage: ...
-
-
-@overload
-def get_subtopic_page_by_id(
-    topic_id: str,
-    subtopic_id: int,
-    strict: Literal[False]
-) -> Optional[subtopic_page_domain.SubtopicPage]: ...
-
-
-@overload
-def get_subtopic_page_by_id(
-    topic_id: str,
-    subtopic_id: int,
     strict: bool = False
 ) -> Optional[subtopic_page_domain.SubtopicPage]: ...
 
@@ -196,22 +180,6 @@ def get_subtopic_page_contents_by_id(
     topic_id: str,
     subtopic_id: int
 ) -> subtopic_page_domain.SubtopicPageContents: ...
-
-
-@overload
-def get_subtopic_page_contents_by_id(
-    topic_id: str,
-    subtopic_id: int,
-    strict: Literal[True]
-) -> subtopic_page_domain.SubtopicPageContents: ...
-
-
-@overload
-def get_subtopic_page_contents_by_id(
-    topic_id: str,
-    subtopic_id: int,
-    strict: Literal[False]
-) -> Optional[subtopic_page_domain.SubtopicPageContents]: ...
 
 
 @overload

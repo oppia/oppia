@@ -168,22 +168,6 @@ def get_story_by_id(
 @overload
 def get_story_by_id(
     story_id: str,
-    strict: Literal[True],
-    version: Optional[int] = None
-) -> story_domain.Story: ...
-
-
-@overload
-def get_story_by_id(
-    story_id: str,
-    strict: Literal[False],
-    version: Optional[int] = None
-) -> Optional[story_domain.Story]: ...
-
-
-@overload
-def get_story_by_id(
-    story_id: str,
     strict: bool = False,
     version: Optional[int] = None
 ) -> Optional[story_domain.Story]: ...
@@ -253,20 +237,6 @@ def get_story_by_url_fragment(
 def get_story_summary_by_id(
     story_id: str,
 ) -> story_domain.StorySummary: ...
-
-
-@overload
-def get_story_summary_by_id(
-    story_id: str,
-    strict: Literal[True]
-) -> story_domain.StorySummary: ...
-
-
-@overload
-def get_story_summary_by_id(
-    story_id: str,
-    strict: Literal[False]
-) -> Optional[story_domain.StorySummary]: ...
 
 
 @overload

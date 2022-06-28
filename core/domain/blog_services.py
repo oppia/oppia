@@ -82,18 +82,6 @@ def get_blog_post_by_id(
 
 @overload
 def get_blog_post_by_id(
-    blog_post_id: str, strict: Literal[True]
-) -> blog_domain.BlogPost: ...
-
-
-@overload
-def get_blog_post_by_id(
-    blog_post_id: str, strict: Literal[False]
-) -> Optional[blog_domain.BlogPost]: ...
-
-
-@overload
-def get_blog_post_by_id(
     blog_post_id: str, strict: bool = False
 ) -> Optional[blog_domain.BlogPost]: ...
 
@@ -168,18 +156,6 @@ def get_blog_post_summary_from_model(
 def get_blog_post_summary_by_id(
     blog_post_id: str
 ) -> blog_domain.BlogPostSummary: ...
-
-
-@overload
-def get_blog_post_summary_by_id(
-    blog_post_id: str, strict: Literal[True]
-) -> blog_domain.BlogPostSummary: ...
-
-
-@overload
-def get_blog_post_summary_by_id(
-    blog_post_id: str, strict: Literal[False]
-) -> Optional[blog_domain.BlogPostSummary]: ...
 
 
 @overload
@@ -339,18 +315,6 @@ def get_blog_post_rights(
 
 @overload
 def get_blog_post_rights(
-    blog_post_id: str, strict: Literal[True]
-) -> blog_domain.BlogPostRights: ...
-
-
-@overload
-def get_blog_post_rights(
-    blog_post_id: str, strict: Literal[False]
-) -> Optional[blog_domain.BlogPostRights]: ...
-
-
-@overload
-def get_blog_post_rights(
     blog_post_id: str, strict: bool = False
 ) -> Optional[blog_domain.BlogPostRights]: ...
 
@@ -383,7 +347,7 @@ def get_blog_post_rights(
 
 def get_published_blog_post_summaries_by_user_id(
     user_id: str, max_limit: int
-) -> Optional[List[blog_domain.BlogPostSummary]]:
+) -> List[blog_domain.BlogPostSummary]:
     """Retrieves the summary objects for given number of published blog posts
     for which the given user is an editor.
 
@@ -392,14 +356,14 @@ def get_published_blog_post_summaries_by_user_id(
         max_limit: int. The number of models to be fetched.
 
     Returns:
-        list(BlogPostSummary) or None. The summary objects associated with the
-        blog posts assigned to given user. None, if no BlogRights model exists.
+        list(BlogPostSummary). The summary objects associated with the
+        blog posts assigned to given user.
     """
     blog_rights_models = (
         blog_models.BlogPostRightsModel.get_published_models_by_user(
             user_id, max_limit))
     if not blog_rights_models:
-        return None
+        return []
     blog_post_ids = [model.id for model in blog_rights_models]
     blog_summary_models = (
         blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
@@ -461,9 +425,9 @@ def publish_blog_post(blog_post_id: str) -> None:
     blog_post_rights = get_blog_post_rights(blog_post_id, strict=False)
     if blog_post_rights is None:
         raise Exception('The given blog post does not exist')
-    blog_post = get_blog_post_by_id(blog_post_id, strict=True)
+    blog_post = get_blog_post_by_id(blog_post_id)
     blog_post.validate(strict=True)
-    blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
+    blog_post_summary = get_blog_post_summary_by_id(blog_post_id)
     blog_post_summary.validate(strict=True)
     blog_post_rights.blog_post_is_published = True
 
@@ -736,15 +700,15 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
 
 def get_published_blog_post_summaries(
     offset: int = 0
-) -> Optional[List[blog_domain.BlogPostSummary]]:
+) -> List[blog_domain.BlogPostSummary]:
     """Returns published BlogPostSummaries list.
 
     Args:
         offset: int. Number of query results to skip from top.
 
     Returns:
-        list(BlogPostSummaries) | None . These are sorted in order of the
-        date published. None if no blog post is published.
+        list(BlogPostSummaries). These are sorted in order of the
+        date published.
     """
     max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     blog_post_rights_models: Sequence[blog_models.BlogPostRightsModel] = (
@@ -757,7 +721,7 @@ def get_published_blog_post_summaries(
         )
     )
     if len(blog_post_rights_models) == 0:
-        return None
+        return []
     blog_post_ids = [model.id for model in blog_post_rights_models]
     blog_post_summary_models = (
         blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
@@ -782,9 +746,8 @@ def update_blog_models_author_and_published_on_date(
         author_id: str. User ID of the author.
         date: str. The date of publishing the blog post.
     """
-    blog_post = get_blog_post_by_id(blog_post_id, True)
-    blog_post_rights = get_blog_post_rights(
-        blog_post_id, strict=True)
+    blog_post = get_blog_post_by_id(blog_post_id)
+    blog_post_rights = get_blog_post_rights(blog_post_id)
 
     blog_post.author_id = author_id
     supported_date_string = date + ', 00:00:00:00'
