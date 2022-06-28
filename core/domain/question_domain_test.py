@@ -290,17 +290,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, create a question."""
         super(QuestionDomainTest, self).setUp()
-        question_state_data = self._create_valid_question_data('ABC')
+        self.content_id_generator = translation_domain.ContentIdGenerator()
+        question_state_data = self._create_valid_question_data(
+            'ABC', self.content_id_generator)
         self.question = question_domain.Question(
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
-            ['skillId12345-123'])
+            ['skillId12345-123'], content_id_generator.next_content_id_index)
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.', True)
         }
         self.dummy_entity_translations = translation_domain.EntityTranslation(
-            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            'question_id', feconf.TranslatableEntityType.QUESTION, 1, 'hi',
             translation_dict)
 
     def test_to_and_from_dict(self):
@@ -536,9 +538,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
-        question_state_data = self._create_valid_question_data('Test')
+        question_state_data = self._create_valid_question_data(
+            'Test', self.content_id_generator)
 
         self.question.update_question_state_data(question_state_data)
+        self.question.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
 
         self.assertEqual(
             question_state_data.to_dict(),
@@ -1785,7 +1790,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_get_all_translatable_content_for_question(self):
-        """Get all translatable fields from exploration."""
+        """Get all translatable fields from question."""
         translatable_contents = [
             translatable_content.content_value
             for translatable_content in

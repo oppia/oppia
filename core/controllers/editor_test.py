@@ -38,6 +38,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
@@ -3112,9 +3113,13 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
     def test_get_learner_answer_details_of_question_states(self):
         self.login(self.OWNER_EMAIL)
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data(
+                'ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            inapplicable_skill_misconception_ids=['skill_1'])
         self.assertIsNotNone(question)
         interaction_id = question.question_state_data.interaction.id
         customization_args = (
@@ -3189,9 +3194,13 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
     def test_delete_learner_answer_info_of_question_states(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data(
+                'ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            inapplicable_skill_misconception_ids=['skill_1'])
         self.assertIsNotNone(question)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))

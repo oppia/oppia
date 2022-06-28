@@ -481,6 +481,16 @@ class EntityTranslation:
                         'content_value must be a string, but got %r' %
                         content_value)
 
+    def add_translation(
+        content_id: str,
+        content_value: feconf.ContentValueType,
+        content_format: TranslatableContentFormat,
+        needs_update: boolean):
+        """Adds new TranslatedContent in the object."""
+        self.translations[content_id] = TranslatedContent(
+            content_value, content_format, needs_update)
+
+
     @classmethod
     def create_empty(
             cls, entity_type, entity_id, language_code, entity_version=0):

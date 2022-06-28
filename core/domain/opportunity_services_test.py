@@ -36,6 +36,7 @@ from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -559,9 +560,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.skill_description, 'skill_description')
 
     def test_create_skill_opportunity_counts_existing_linked_questions(self):
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.SKILL_ID])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
@@ -696,10 +700,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_add_question_increments_skill_opportunity_question_count(self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.SKILL_ID])
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -710,9 +716,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_create_question_skill_link_increments_question_count(self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.SKILL_ID])
 
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
@@ -725,9 +734,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_link_multiple_skills_for_question_increments_question_count(self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_2'])
 
         question_services.link_multiple_skills_for_question(
             self.USER_ID, self.QUESTION_ID, [self.SKILL_ID], [0.3])
@@ -740,9 +752,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_delete_question_decrements_question_count(self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.SKILL_ID])
 
         question_services.delete_question(self.USER_ID, self.QUESTION_ID)
 
@@ -755,9 +770,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_delete_question_skill_link_decrements_question_count(self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_2'])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 

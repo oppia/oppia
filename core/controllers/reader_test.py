@@ -40,6 +40,7 @@ from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -251,13 +252,19 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         story_services.update_story(
             'user', story_id, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id, 'user',
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.skill_id])
         question_id_2 = question_services.get_new_question_id()
+        content_id_generator =translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, 'user',
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
@@ -301,16 +308,21 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.save_new_skill(self.skill_id, 'user', description='Description')
 
         self.question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, 'user',
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, 'user',
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, self.skill_id, 0.5)
 
@@ -333,9 +345,12 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.save_new_skill(skill_id_2, 'user', description='Description')
 
         question_id_3 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, 'user',
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
         url = '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s' % (
@@ -356,9 +371,12 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
             question_id = question_services.get_new_question_id()
+            content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
                 question_id, 'user',
-                self._create_valid_question_data('ABC'), [skill_id])
+                self._create_valid_question_data('ABC', content_id_generator),
+                content_id_generator.next_content_id_index,
+                [skill_id])
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id, skill_id, 0.5)
 
@@ -2736,9 +2754,12 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id, editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             state_reference = (

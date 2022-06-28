@@ -30,6 +30,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -85,21 +86,32 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skill_3', self.admin_id, description='Skill Description 3')
 
         self.question_id = question_services.get_new_question_id()
+        self.content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'],
+            self._create_valid_question_data('ABC', self.content_id_generator),
+            self.content_id_generator.next_content_id_index,
+            ['skill_1'],
             inapplicable_skill_misconception_ids=[
                 'skillid12345-1', 'skillid12345-2'])
 
         self.question_id_1 = question_services.get_new_question_id()
+        self.content_id_generator_1 = translation_domain.ContentIdGenerator()
         self.question_1 = self.save_new_question(
             self.question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data(
+                'ABC', self.content_id_generator_1),
+            self.content_id_generator_1.next_content_id_index,
+            ['skill_2'])
 
         self.question_id_2 = question_services.get_new_question_id()
+        self.content_id_generator_2 = translation_domain.ContentIdGenerator()
         self.question_2 = self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data(
+                'ABC', self.content_id_generator_2),
+            self.content_id_generator_2.next_content_id_index,
+            ['skill_2'])
 
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(self.question_id)
@@ -213,9 +225,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 25, ['skill_1', 'skill_2'], False)
 
     def test_create_multi_question_skill_links_for_question(self):
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
 
         with self.assertRaisesRegex(
             Exception, 'Skill difficulties and skill ids should match. '
@@ -252,9 +267,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_linking_same_skill_to_question_twice(self):
         question_id_2 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
         skill_ids = [skill.id for skill in
                      question_services.get_skills_linked_to_question(
                          question_id_2)]
@@ -285,14 +303,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id_2, 'skill_1', 0.5)
 
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_2'])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -362,9 +386,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_displayable_question_skill_link_details_with_no_skill_ids(
             self):
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
 
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, 'skill_1', 0.5)
@@ -390,14 +417,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 0)
 
         question_id_2 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_2'])
         # Setting skill difficulty for self.question_id.
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
@@ -485,15 +518,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id, strict=False), None)
 
     def test_update_question(self):
-        new_question_data = self._create_valid_question_data('DEF')
-        change_dict = {
+        content_id_generator = translation_domain.ContentIdGenerator()
+        new_question_data = self._create_valid_question_data(
+            'DEF', self.content_id_generator)
+        change_list = [question_domain.QuestionChange({
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
-        }
-        change_list = [question_domain.QuestionChange(change_dict)]
-
+        }), question_domain.QuestionChange({
+            'cmd': 'update_question_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index,
+        })]
         question_services.update_question(
             self.editor_id, self.question_id, change_list,
             'updated question data')
@@ -504,14 +541,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question.version, 2)
 
     def test_cannot_update_question_with_no_commit_message(self):
-        new_question_data = self._create_valid_question_data('DEF')
-        change_dict = {
+
+        new_question_data = self._create_valid_question_data(
+            'DEF', self.content_id_generator)
+        change_list = [question_domain.QuestionChange({
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
-        }
-        change_list = [question_domain.QuestionChange(change_dict)]
+        }), question_domain.QuestionChange({
+            'cmd': 'update_question_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index,
+        })]
 
         with self.assertRaisesRegex(
             Exception, 'Expected a commit message, received none.'):
@@ -590,14 +632,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_replace_skill_id_for_all_questions(self):
         question_id_2 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_2'])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -663,14 +711,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_skills_linked_to_question(
                 'non_existent_question_id')
         question_id_2 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_2'])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -721,13 +775,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             misconceptions=misconceptions)
 
         self.question_id = question_services.get_new_question_id()
-        question_state_data = self._create_valid_question_data('state name')
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question_state_data = self._create_valid_question_data(
+            'state name', content_id_generator)
         question_state_data.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK
+                        ),
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -738,7 +796,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': 'rule_input_3',
+                            'contentId': content_id_generator.generate(
+                                translation_domain.ContentType.RULE,
+                                extra_prefix='input'
+                            ),
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -751,7 +812,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': 'feedback_2',
+                        'content_id': content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK
+                        ),
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -762,7 +825,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': 'rule_input_4',
+                            'contentId': content_id_generator.generate(
+                            translation_domain.ContentType.RULE,
+                            extra_prefix='input'
+                        ),
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -775,7 +841,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': 'feedback_0',
+                        'content_id': content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK
+                        ),
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -786,7 +854,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': 'rule_input_5',
+                            'contentId': content_id_generator.generate(
+                                translation_domain.ContentType.RULE,
+                                extra_prefix='input'
+                            ),
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -796,14 +867,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': 'skillid12345-2'
             })
         ]
-        question_state_data.written_translations.translations_mapping.update({
-            'feedback_0': {},
-            'feedback_1': {},
-            'feedback_2': {},
-            'rule_input_3': {},
-            'rule_input_4': {},
-            'rule_input_5': {}
-        })
         question_state_data.recorded_voiceovers.voiceovers_mapping.update({
             'feedback_0': {},
             'feedback_1': {},
@@ -812,7 +875,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'rule_input_4': {},
             'rule_input_5': {}
         })
-        question_state_data.next_content_id_index = 5
         inapplicable_skill_misconception_ids = [
             'skillid12345-3',
             'skillid12345-4'
@@ -876,7 +938,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             misconceptions=misconceptions)
 
         self.question_id = question_services.get_new_question_id()
-        question_state_data = self._create_valid_question_data('state name')
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question_state_data = self._create_valid_question_data(
+            'state name', content_id_generator)
         question_state_data.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {

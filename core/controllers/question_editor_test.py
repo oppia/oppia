@@ -76,11 +76,13 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
             self.skill_id, self.admin_id, description='Skill Description')
 
         self.question_id = question_services.get_new_question_id()
+        self.content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id,
             self.editor_id,
-            self._create_valid_question_data('ABC'),
-            [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            inapplicable_skill_misconception_ids=[self.skill_id])
 
 
 class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
@@ -395,9 +397,13 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.question_id_2 = question_services.get_new_question_id()
+        self.content_id_generator_2 = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data(
+                'ABC', self.content_id_generator_2),
+            self.content_id_generator_2.next_content_id_index,
+            inapplicable_skill_misconception_ids=[self.skill_id])
 
     def test_put_with_non_admin_or_topic_manager_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
@@ -654,12 +660,18 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_put_with_long_commit_message_fails(self):
         payload = {}
-        new_question_data = self._create_valid_question_data('DEF')
+        content_id_generator = translation_domain.ContentIdGenerator()
+        new_question_data = self._create_valid_question_data(
+            'DEF', self.content_id_generator)
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
+        }, {
+            'cmd': 'update_question_property',
+            'property_name': 'next_content_id_index',
+            'new_value': self.content_id_generator.next_content_id_index,
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = (
@@ -678,12 +690,17 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_put_with_admin_email_allows_question_editing(self):
         payload = {}
-        new_question_data = self._create_valid_question_data('DEF')
+        new_question_data = self._create_valid_question_data(
+            'DEF', self.content_id_generator)
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
+        }, {
+            'cmd': 'update_question_property',
+            'property_name': 'next_content_id_index',
+            'new_value': self.content_id_generator.next_content_id_index,
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = 'update question data'
@@ -722,26 +739,20 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_topic_manager_email_allows_question_editing(self):
-        payload = {}
-        new_question_data = self._create_valid_question_data('DEF')
-        change_list = [{
-            'cmd': 'update_question_property',
-            'property_name': 'question_state_data',
-            'new_value': new_question_data.to_dict(),
-            'old_value': self.question.question_state_data.to_dict()
-        }]
-        payload['change_list'] = change_list
-        payload['commit_message'] = 'update question data'
-
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {}
-        new_question_data = self._create_valid_question_data('GHI')
+        new_question_data = self._create_valid_question_data(
+            'GHI', self.content_id_generator)
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
+        }, {
+            'cmd': 'update_question_property',
+            'property_name': 'next_content_id_index',
+            'new_value': self.content_id_generator.next_content_id_index,
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = 'update question data'
@@ -761,7 +772,6 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_put_with_creating_new_fully_specified_question_returns_400(self):
         payload = {}
-        self._create_valid_question_data('XXX')
         change_list = [{
             'cmd': 'create_new_fully_specified_question',
             'question_dict': {},

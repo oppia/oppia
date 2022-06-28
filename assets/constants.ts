@@ -4895,6 +4895,7 @@ export default {
     "Mathematics": "#cd672b",
     "Algebra": "#cd672b",
     "Arithmetic": "#d68453",
+
     "Calculus": "#b86330",
     "Logic": "#d68453",
     "Combinatorics": "#cf5935",

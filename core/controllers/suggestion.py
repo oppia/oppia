@@ -584,6 +584,11 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 'The parameter \'question_state_data\' is missing.'
             )
 
+        if self.payload.get('next_content_id_index') is None:
+            raise self.InvalidInputException(
+                'The parameter \'next_content_id_index\' is missing.'
+            )
+
         question_state_data_obj = state_domain.State.from_dict(
             self.payload.get('question_state_data'))
         question_state_data_obj.validate(None, False)
@@ -591,7 +596,9 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
         suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
-            self.payload.get('question_state_data'))
+            self.payload.get('question_state_data'),
+            self.payload.get('next_content_id_index')
+        )
 
         self.render_json(self.values)
 

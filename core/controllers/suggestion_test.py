@@ -41,6 +41,7 @@ from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -241,15 +242,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_suggestion_to_exploration_handler_with_invalid_target_type(self):
         self.login(self.EDITOR_EMAIL)
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_dict = {
             'question_state_data': self._create_valid_question_data(
-                'default_state').to_dict(),
+                'default_state', content_id_generator).to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id'],
-            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': content_id_generator.next_content_id_index
         }
 
         exp_id = 'new_exp_id'
@@ -928,16 +930,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_update_suggestion_updates_question_suggestion_content(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1007,16 +1012,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_question_with_invalid_skill_difficulty(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1063,16 +1071,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_question_without_state_data(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1119,16 +1130,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1174,16 +1188,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1237,16 +1254,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1447,14 +1467,16 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_skill(
             self.SKILL_ID, self.admin_id, description=self.SKILL_DESCRIPTION)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
-                'default_state').to_dict(),
+                'default_state', content_id_generator).to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': content_id_generator.next_content_id_index
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1763,8 +1785,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
     def test_suggestion_creation_with_valid_images(self):
         self.save_new_skill(
             'skill_id2', self.admin_id, description='description')
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data_dict = self._create_valid_question_data(
-            'default_state').to_dict()
+            'default_state', content_id_generator).to_dict()
         valid_html = (
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'
             'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
@@ -1779,7 +1802,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
-            'inapplicable_skill_misconception_ids': []
+            'inapplicable_skill_misconception_ids': [],
+            'next_content_id_index': (
+                content_id_generator.next_content_id_index)
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1834,15 +1859,16 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Description')
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
-                'default_state').to_dict(),
+                'default_state', content_id_generator).to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.skill_id],
-            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': content_id_generator.next_content_id_index
         }
 
         self.login(self.AUTHOR_EMAIL)
@@ -2181,15 +2207,17 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
-                'default_state').to_dict(),
+                'default_state', content_id_generator).to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': (
+                content_id_generator.next_content_id_index)
         }
 
         self.post_json(
@@ -2494,15 +2522,17 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'description': 'Adds translation',
             }, csrf_token=csrf_token
         )
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
-                'default_state').to_dict(),
+                'default_state', content_id_generator).to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
             'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'next_content_id_index': (
+                content_id_generator.next_content_id_index)
         }
         self.translate_question_change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,

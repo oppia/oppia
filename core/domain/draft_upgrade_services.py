@@ -208,6 +208,22 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v50_dict_to_v51_dict(cls, draft_change_list):
+        """Converts draft change list from state version 50 to 51. Version 51
+        changes content ids for content and removes written_translation property
+        form the state, converting draft to anew version won't be possible.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
+        """
+        raise InvalidDraftConversionException('Conversion cannot be completed.')
+
+    @classmethod
     def _convert_states_v49_dict_to_v50_dict(cls, draft_change_list):
         """Converts draft change list from state version 49 to 50. State
         version 50 removes rules from explorations that use one of the following

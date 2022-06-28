@@ -38,6 +38,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_domain
@@ -2525,10 +2526,12 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_1_ID,
             self.user_1_id,
-            self._create_valid_question_data('ABC'),
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
             [self.SKILL_1_ID]
         )
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -2649,10 +2652,12 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, question_mappings[self.QUESTION_1_ID])
 
     def test_multiple_questions_are_pseudonymized(self):
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_1_id,
-            self._create_valid_question_data('ABC'),
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
             [self.SKILL_1_ID]
         )
 
@@ -2694,10 +2699,12 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, question_mappings[self.QUESTION_2_ID])
 
     def test_multiple_questions_with_multiple_users_are_pseudonymized(self):
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
-            self._create_valid_question_data('ABC'),
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
             [self.SKILL_1_ID]
         )
 
@@ -2867,16 +2874,20 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_1_ID,
             self.user_1_id,
-            self._create_valid_question_data('ABC'),
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
             [self.SKILL_1_ID]
         )
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
-            self._create_valid_question_data('ABC'),
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
             [self.SKILL_1_ID]
         )
         wipeout_service.pre_delete_user(self.user_1_id)

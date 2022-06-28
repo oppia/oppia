@@ -29,6 +29,7 @@ from core.domain import exp_services
 from core.domain import question_services
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -2115,9 +2116,12 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             question_id, editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
         self.assertNotEqual(question, None)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))

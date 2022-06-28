@@ -1534,7 +1534,8 @@ def update_translation_suggestion(suggestion_id, translation_html):
 
 
 def update_question_suggestion(
-        suggestion_id, skill_difficulty, question_state_data):
+        suggestion_id, skill_difficulty, question_state_data,
+        next_content_id_index):
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
 
@@ -1562,7 +1563,8 @@ def update_question_suggestion(
                     'linked_skill_ids'],
                 'inapplicable_skill_misconception_ids': (
                     suggestion.change.question_dict[
-                        'inapplicable_skill_misconception_ids'])
+                        'inapplicable_skill_misconception_ids']),
+                'next_content_id_index': next_content_id_index
             },
             'skill_id': suggestion.change.skill_id,
             'skill_difficulty': skill_difficulty

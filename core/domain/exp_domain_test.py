@@ -4900,7 +4900,6 @@ states_schema_version: 50
 tags: []
 title: Title
 """)
-            'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
 

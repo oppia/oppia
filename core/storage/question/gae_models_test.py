@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -125,15 +126,19 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             inapplicable_skill_misconception_ids)
 
     def test_put_multi_questions(self) -> None:
-        question_state_data = self._create_valid_question_data('ABC') # type: ignore[no-untyped-call]
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question_state_data = self._create_valid_question_data(
+            'ABC', content_id_generator) # type: ignore[no-untyped-call]
         linked_skill_ids = ['skill_id1', 'skill_id2']
         self.save_new_question( # type: ignore[no-untyped-call]
             'question_id1', 'owner_id',
             question_state_data,
+            content_id_generator.next_content_id_index,
             linked_skill_ids)
         self.save_new_question( # type: ignore[no-untyped-call]
             'question_id2', 'owner_id',
             question_state_data,
+            content_id_generator.next_content_id_index,
             linked_skill_ids)
         question_ids = ['question_id1', 'question_id2']
 

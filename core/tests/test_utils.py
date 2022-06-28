@@ -3178,7 +3178,8 @@ title: Title
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
-            linked_skill_ids, inapplicable_skill_misconception_ids=None,
+            linked_skill_ids, next_content_id_index,
+            inapplicable_skill_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -3201,7 +3202,8 @@ title: Title
         question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
-            linked_skill_ids, inapplicable_skill_misconception_ids or [])
+            linked_skill_ids, inapplicable_skill_misconception_ids or [],
+            next_content_id_index)
         question_services.add_question(owner_id, question)
         return question
 
@@ -3389,7 +3391,11 @@ title: Title
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
-    def _create_valid_question_data(self, default_dest_state_name):
+    def _create_valid_question_data(
+            self,
+            default_dest_state_name,
+            content_id_generator
+        ):
         """Creates a valid question_data dict.
 
         Args:
@@ -3399,19 +3405,28 @@ title: Title
             dict. The default question_data dict.
         """
         state = state_domain.State.create_default_state(
-            default_dest_state_name, is_initial_state=True)
+            default_dest_state_name,
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
         state.update_interaction_id('TextInput')
         solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.SOLUTION),
                 'html': '<p>This is a solution.</p>',
             },
         }
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')),
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>This is a hint.</p>')),
         ]
         solution = state_domain.Solution.from_dict(
             state.interaction.id, solution_dict)
@@ -3420,7 +3435,9 @@ title: Title
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': 'ca_placeholder',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        extra_prefix='placeholder'),
                     'unicode_str': 'Enter text here',
                 },
             },

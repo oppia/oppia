@@ -1522,6 +1522,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.next_content_id_index = next_content_id_index
 
+    def add_states(self, state_names):
+        """
+        """
+        content_id_generator = translation_domain.ContentIdGenerator(
+            self.next_content_id_index)
+        for state_name in state_names:
+            self.add_state(
+                state_name,
+                content_id_generator.generate(
+                    translation_domain.ContentType.Content),
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME))
+        self.next_content_id_index = content_id_generator.next_content_id_index
+
     # DubeySandeep: Should we generate the new content_id internally?
     def add_state(
         self, state_name, content_id_for_state_content,

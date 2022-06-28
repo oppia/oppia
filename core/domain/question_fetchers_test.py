@@ -22,6 +22,7 @@ from core import feconf
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -52,9 +53,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             'skill_2', self.admin_id, description='Skill Description 2')
 
         self.question_id = question_services.get_new_question_id()
+        self.content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC', self.content_id_generator),
+            self.content_id_generator.next_content_id_index,
+            ['skill_1'])
 
     def test_get_questions_and_skill_descriptions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
@@ -76,9 +80,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_questions_with_multi_skill_ids(self):
         question_id_1 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_1 = self.save_new_question(
             question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1', 'skill_2'])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -94,9 +101,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_questions_by_ids(self):
         question_id_2 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, self.editor_id,
-            self._create_valid_question_data('DEF'), ['skill_1'])
+            self._create_valid_question_data('DEF', content_id_generator),
+            content_id_generator.next_content_id_index,
+            ['skill_1'])
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)
@@ -115,13 +125,15 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(all_question_models.count(), 0)
 
         question_id = question_services.get_new_question_id()
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data('ABC').to_dict()),
+                self._create_valid_question_data(
+                    'ABC', content_id_generator).to_dict()),
             language_code='en',
             version=0,
+            next_content_id_index=content_id_generator.next_content_id_index,
             question_state_data_schema_version=0)
 
         question_model.commit(
@@ -149,13 +161,15 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(all_question_models.count(), 0)
 
         question_id = question_services.get_new_question_id()
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data('ABC').to_dict()),
+                self._create_valid_question_data(
+                    'ABC', content_id_generator).to_dict()),
             language_code='en',
             version=0,
+            next_content_id_index=content_id_generator.next_content_id_index,
             question_state_data_schema_version=48)
 
         question_model.commit(
