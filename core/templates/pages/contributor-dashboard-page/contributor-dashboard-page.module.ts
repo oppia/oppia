@@ -25,6 +25,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
@@ -34,6 +36,7 @@ import { TranslationTopicSelectorComponent } from
   './translation-topic-selector/translation-topic-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
 import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
@@ -52,6 +55,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     NgbModalModule,
     SharedFormsModule,
@@ -96,6 +103,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })
