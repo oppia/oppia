@@ -156,9 +156,9 @@ angular.module('oppia').factory('QuestionCreationService', [
           linkedSkillsWithDifficulty);
         modalRef.componentInstance.skillIdToRubricsObject = (
           skillIdToRubricsObject);
-        modalRef.result.then(function(linkedSkillsWithDifficulty) {
+        modalRef.result.then((linkedSkillsWithDifficulty) => {
           continueQuestionEditing(linkedSkillsWithDifficulty);
-        }, function() {
+        }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

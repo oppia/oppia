@@ -26,6 +26,18 @@ import { fakeAsync, tick } from '@angular/core/testing';
 
 class MockNgbModalRef {
   componentInstance: {
+    associatedSkillSummaries: null;
+    untriagedSkillSummaries: null;
+    canEditQuestion: null;
+    categorizedSkills: null;
+    groupedSkillSummaries: null;
+    misconceptionsBySkill: null;
+    newQuestionIsBeingCreated: null;
+    question: null;
+    questionId: null;
+    questionStateData: null;
+    rubric: null;
+    skillName: null;
     allSkillSummaries: null;
     countOfSkillsToPrioritize: null;
     currentMode: null;
@@ -42,7 +54,6 @@ describe('Question Creation Service', function() {
   var QuestionObjectFactory = null;
   var EditableQuestionBackendApiService = null;
   var SkillBackendApiService = null;
-  var $uibModal = null;
   let ngbModal: NgbModal;
   var linkedSkillsWithDifficulty = null;
 
@@ -80,7 +91,6 @@ describe('Question Creation Service', function() {
       SkillBackendApiService = $injector.get('SkillBackendApiService');
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
-      $uibModal = $injector.get('$uibModal');
       var misconceptionDict = {
         feedback: 'feedback',
         id: 'id1',
@@ -269,12 +279,10 @@ describe('Question Creation Service', function() {
       qcs.createQuestion();
       qcs.initializeNewQuestionCreation();
 
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: Promise.resolve()});
       qcs.openQuestionEditor(0.3);
       tick();
 
-      expect(modalSpy).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     }));
 
     it('should call question backend api service to create the question',
@@ -306,9 +314,10 @@ describe('Question Creation Service', function() {
       AlertsService = $injector.get('AlertsService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
+      ngbModal = $injector.get(
+        'NgbModal');
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
-      $uibModal = $injector.get('$uibModal');
       var misconceptionDict = {
         feedback: 'feedback',
         id: 'id1',
@@ -446,6 +455,11 @@ describe('Question Creation Service', function() {
 
     it('should not call question backend api service to create the question',
       function() {
+        spyOn(ngbModal, 'open').and.returnValue({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
+
         qcs.createQuestion();
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
@@ -461,12 +475,12 @@ describe('Question Creation Service', function() {
     beforeEach(angular.mock.inject(function($injector) {
       qcs = $injector.get('QuestionCreationService');
       $q = $injector.get('$q');
+      ngbModal = $injector.get('NgbModal');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
-      $uibModal = $injector.get('$uibModal');
       var misconceptionDict = {
         feedback: 'feedback',
         id: 'id1',
@@ -617,6 +631,11 @@ describe('Question Creation Service', function() {
 
     it('should not call question backend api service to create the question',
       function() {
+        spyOn(ngbModal, 'open').and.returnValue({
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject()
+        } as NgbModalRef);
+
         qcs.createQuestion();
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
