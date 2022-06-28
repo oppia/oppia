@@ -123,13 +123,13 @@ var TopicsAndSkillsDashboardPage = function() {
   var openSkillEditorButtons = element.all(
     by.css('.protractor-test-open-skill-editor'));
   var openFilter = element(
-    by.css('.protractor-test-toggle-filter')
+    by.css('.protractor-test-mobile-toggle-filter')
   );
   var closeSkillFilter = element(
-    by.css('.protractor-test-filter-close')
+    by.css('.protractor-test-mobile-filter-close')
   );
   var skillOptions = element(
-    by.css('.protractor-test-skills-option')
+    by.css('.protractor-test-mobile-skills-option')
   );
 
   this.get = async function() {

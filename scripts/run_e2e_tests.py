@@ -98,7 +98,7 @@ _PARSER.add_argument(
     help='Build webpack with source maps.',
     action='store_true')
 _PARSER.add_argument(
-    '--use_mobile_config',
+    '--mobile',
     help='Run e2e test in mobile viewport.',
     action='store_true')
 
@@ -277,7 +277,7 @@ def run_tests(args):
             dev_mode=dev_mode,
             debug_mode=args.debug_mode,
             sharding_instances=args.sharding_instances,
-            mobile=args.use_mobile_config,
+            mobile=args.mobile,
             stdout=subprocess.PIPE))
 
         print(

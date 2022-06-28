@@ -44,7 +44,7 @@
           </ul>
         </div>
         <div class="filter-mobile-box">
-          <button class="btn btn-default protractor-test-toggle-filter" (click)="toggleFilterBox()">
+          <button class="btn btn-default protractor-test-mobile-toggle-filter" (click)="toggleFilterBox()">
             <span *ngIf="activeTab === TAB_NAME_TOPICS">TOPIC FILTERS</span>
             <span *ngIf="activeTab === TAB_NAME_SKILLS">SKILL FILTERS</span>
           </button>
@@ -169,7 +169,7 @@
                 <span>Filter</span>
               </div>
               <div class="topic-skill-filter-action-box">
-                <i class="fa fa-times dashboard-cross-icon protractor-test-filter-close" (click)="toggleFilterBox()"></i>
+                <i class="fa fa-times dashboard-cross-icon protractor-test-mobile-filter-close" (click)="toggleFilterBox()"></i>
                 <div class="topic-skill-filter-action-reset">
                   <span (click)="resetFilters()">Reset</span>
                 </div>
