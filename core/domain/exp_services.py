@@ -814,9 +814,9 @@ def update_version_history(
             for state_name, state_version_history_dict in (
                 version_history_model.state_version_history.items())
         }
-        metadata_last_edited_version_number=(
+        metadata_last_edited_version_number = (
             version_history_model.metadata_last_edited_version_number)
-        metadata_last_edited_committer_id=(
+        metadata_last_edited_committer_id = (
             version_history_model.metadata_last_edited_committer_id)
 
         updated_states_version_history = update_states_version_history(
