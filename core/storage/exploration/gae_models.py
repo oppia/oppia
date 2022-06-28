@@ -1232,18 +1232,19 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """The version history of states or exploration metadata is not
-        relevant for the purposes of Takeout since they don't contain relevant
-        data corresponding to users.
+        """All the noteworthy data in this model which are related to a
+        user's contributions to an exploration is already contained in various
+        user models such as UserContributionsModel which fall under Takeout.
+        Hence, this model will not export any data.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
-        because the version history of states or exploration metadata is not
-        relevant for the purposes of exporting since they don't contain
-        relevant data corresponding to users.
+        because the all the noteworthy data related to a user's contributions
+        to an exploration is already contained in various user models such
+        as UserContributionsModel which fall under Takeout.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
