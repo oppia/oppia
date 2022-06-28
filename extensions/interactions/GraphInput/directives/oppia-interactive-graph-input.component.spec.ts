@@ -395,7 +395,7 @@ describe('InteractiveGraphInput', () => {
   });
 
   it('should return false when a invalid graph is passed', () => {
-    // Use unknown type conversion to check for invalid graph.
+    // Using unknown type conversion to check for an invalid graph.
     component.graph = null as unknown as GraphAnswer;
 
     expect(component.validityCheckFn()).toBe(false);

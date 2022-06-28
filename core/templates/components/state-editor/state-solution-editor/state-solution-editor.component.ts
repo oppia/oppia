@@ -146,6 +146,11 @@ export class StateSolutionEditorComponent implements OnInit {
     return solutionAsPlainText;
   }
 
+  // Returns null if solution is not yet specified or removed.
+  savedMemento(): Solution | null {
+    return this.stateSolutionService.savedMemento;
+  }
+
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     if (this.stateInteractionIdService.savedMemento) {

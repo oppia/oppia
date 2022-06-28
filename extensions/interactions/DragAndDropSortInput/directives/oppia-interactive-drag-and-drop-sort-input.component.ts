@@ -213,6 +213,10 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
             let htmlContent = this.getHtmlOfContentId(savedSolution[i][j]);
             if (htmlContent) {
               items.push(htmlContent);
+            } else {
+              throw new Error(
+                'Invalid content id in the saved solution: ' +
+                savedSolution[i][j]);
             }
           }
           this.multipleItemsInSamePositionArray.push([]);
@@ -235,6 +239,10 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
           let htmlContent = this.getHtmlOfContentId(savedSolution[i][0]);
           if (htmlContent) {
             this.singleItemInSamePositionArray.push(htmlContent);
+          } else {
+            throw new Error(
+              'Invalid content id in the saved solution: ' +
+              savedSolution[i][0]);
           }
         }
       } else {
@@ -260,7 +268,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     return contentId;
   }
 
-  // Returns undefined if the content id is not found.
+  // Returns undefined if the content id is not mapped to a content. Returns
+  // the html of the content if it is mapped to a content.
   getHtmlOfContentId(contentId: string): string | undefined {
     // Return the html of the content id.
     for (let choice of this.choicesValue) {
@@ -296,9 +305,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       }
     }
     this.currentInteractionService.onSubmit(
-      answer as unknown as string,
-      this.dragAndDropSortInputRulesService as unknown as
-      InteractionRulesService);
+      answer, this.dragAndDropSortInputRulesService);
   }
 }
 

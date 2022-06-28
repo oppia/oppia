@@ -25,7 +25,6 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { RatioExpressionInputRulesService } from './ratio-expression-input-rules.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -124,9 +123,8 @@ export class InteractiveRatioExpressionInputComponent
       this.isValid = true;
       // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit(
-        ratioExpression.getComponents() as unknown as string,
-        this.ratioExpressionInputRulesService as unknown as
-        InteractionRulesService);
+        ratioExpression.getComponents(),
+        this.ratioExpressionInputRulesService);
     } catch (parsingError) {
       let error = parsingError as Error;
       this.errorMessageI18nKey = error.message;

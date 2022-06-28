@@ -31,13 +31,6 @@ describe('Testing filters', function() {
 
   it('should truncate a string when it first sees a \'...\'', () => {
     expect(truncateAtFirstEllipsisPipe.transform('')).toEqual('');
-    expect(truncateAtFirstEllipsisPipe.transform(
-      // Use unknown type conversion to check input invalidity.
-      null as unknown as string)).toEqual('');
-    expect(truncateAtFirstEllipsisPipe.transform(
-      // Use unknown type conversion to check input invalidity.
-      undefined as unknown as string)).toEqual('');
-
     expect(truncateAtFirstEllipsisPipe.transform('hello')).toEqual('hello');
     expect(truncateAtFirstEllipsisPipe.transform('...'))
       .toEqual('');

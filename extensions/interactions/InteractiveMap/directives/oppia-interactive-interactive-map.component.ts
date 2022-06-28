@@ -32,6 +32,18 @@ import { InteractiveMapRulesService } from './interactive-map-rules.service';
 import { icon, LatLng, latLng, LeafletMouseEvent, Marker, marker, TileLayer, tileLayer } from 'leaflet';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+interface OverlayStyle {
+  'background-color'?: string;
+  opacity?: number;
+  'z-index'?: number;
+}
+
+interface MapOptions {
+  center: LatLng;
+  layers: TileLayer[];
+  zoom: number;
+}
+
 @Component({
   selector: 'oppia-interactive-interactive-map',
   templateUrl: './interactive-map-interaction.component.html'
@@ -49,14 +61,10 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   // Class Marker is of type Marker<P=any> therefore type
   // cannot be determined.
   mapMarkers!: Marker<unknown>;
-  mapOptions!: {center: LatLng; layers: TileLayer[]; zoom: number};
+  mapOptions!: MapOptions;
   coords!: [number, number];
   zoomLevel!: number;
-  overlayStyle!: {
-    'background-color'?: string;
-    opacity?: number;
-    'z-index'?: number;
-  };
+  overlayStyle!: OverlayStyle;
 
   zoom!: number;
   private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';

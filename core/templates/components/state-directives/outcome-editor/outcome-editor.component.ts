@@ -116,7 +116,7 @@ export class OutcomeEditorComponent implements OnInit {
       outcome.dest === this.stateEditorService.getActiveStateName());
   }
 
-  getCurrentInteractionId(): string | null {
+  getCurrentInteractionId(): string {
     return this.stateInteractionIdService.savedMemento;
   }
 

@@ -47,9 +47,9 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   @Input() indexPlusOne!: number;
   hintEditorIsOpen!: boolean;
   hintMemento!: Hint;
-  isEditable!: boolean;
   editHintForm!: FormGroup;
   HINT_FORM_SCHEMA!: HintFormSchema;
+  isEditable: boolean = false;
   directiveSubscriptions = new Subscription();
 
   constructor(

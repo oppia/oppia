@@ -55,7 +55,9 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   uploadedImage!: string;
   uploadedImageMimeType!: string;
   dimensions!: { height: number; width: number };
-  resampledFile!: Blob;
+  // Set resampled file returned to null when blob is not of type
+  // 'image', blob size is zero or dataURI is null.
+  resampledFile!: Blob | null;
   newThumbnailDataUrl!: string;
   localStorageBgcolor!: string;
   imageUploadUrlTemplate!: string;
@@ -149,13 +151,15 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   }
 
   saveThumbnailImageData(imageURI: string, callback: () => void): void {
-    let imageFile = this.imageUploadHelperService.convertImageDataToImageFile(
-      imageURI);
-    if (imageFile === null) {
-      throw new Error('Invalid image data');
-    }
-    this.resampledFile = imageFile;
+    this.resampledFile = null;
+    this.resampledFile = (
+      this.imageUploadHelperService.convertImageDataToImageFile(
+        imageURI));
     this.encodedImageURI = imageURI;
+    if (this.resampledFile === null) {
+      this.alertsService.addWarning('Could not get resampled file.');
+      return;
+    }
     this.postImageToServer(this.resampledFile, callback);
   }
 

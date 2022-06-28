@@ -20,6 +20,7 @@ import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { of } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
@@ -35,6 +36,7 @@ describe('ThumbnailUploaderComponent', () => {
   let imageUploadHelperService: ImageUploadHelperService;
   let assetsBackendApiService: AssetsBackendApiService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let alertsService: AlertsService;
   let ngbModal: NgbModal;
 
   beforeEach(waitForAsync(() => {
@@ -57,6 +59,7 @@ describe('ThumbnailUploaderComponent', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
 
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
@@ -354,4 +357,15 @@ describe('ThumbnailUploaderComponent', () => {
       {backdrop: 'static'}
     );
   }));
+
+  it('should raise an alert if an empty file is uploaded', () => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
+      .and.returnValue(null);
+
+    component.saveThumbnailImageData('imageUrl', () => {});
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not get resampled file.');
+  });
 });

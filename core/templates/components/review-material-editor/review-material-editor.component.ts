@@ -44,8 +44,8 @@ export class ReviewMaterialEditorComponent implements OnInit {
   @Input() bindableDict!: BindableDict;
   explanationMemento!: string;
   editableExplanation!: string;
-  conceptCardExplanationEditorIsShown!: boolean;
   COMPONENT_NAME_EXPLANATION!: string;
+  conceptCardExplanationEditorIsShown: boolean = false;
   HTML_SCHEMA: HtmlSchema = {
     type: 'html'
   };

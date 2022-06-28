@@ -16,7 +16,7 @@
  * @fileoverview Constants for the Oppia contributors' library page.
  */
 
-const libraryPathToModes = {
+export const libraryPathToModes = {
   '/community-library': 'index',
   '/community-library/top-rated': 'group',
   '/community-library/recently-published': 'group',
@@ -39,5 +39,3 @@ export const LibraryPageConstants = {
   SEARCH_EXPLORATION_URL_TEMPLATE:
     '/exploration/metadata_search?q=<query>'
 } as const;
-
-export type libraryPathToModesKeys = keyof typeof libraryPathToModes;

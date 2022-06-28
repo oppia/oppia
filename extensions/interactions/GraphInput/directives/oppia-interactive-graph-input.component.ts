@@ -49,6 +49,7 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
   @Input() canAddEdgeWithValue!: string;
   @Input() canDeleteEdgeWithValue!: string;
   @Input() canEditEdgeWeightWithValue!: string;
+  // Last answer is null if graph is submitted for the first time.
   @Input() lastAnswer!: null | GraphAnswer;
 
   graph!: GraphAnswer;

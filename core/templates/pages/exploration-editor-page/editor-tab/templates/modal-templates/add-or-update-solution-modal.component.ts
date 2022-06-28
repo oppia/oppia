@@ -62,6 +62,7 @@ export class AddOrUpdateSolutionModalComponent
   answerIsValid!: boolean;
   correctAnswerEditorHtml!: string;
   data!: SolutionInterface;
+  // These properties are null until a solution is specified or removed.
   savedMemento!: InteractionAnswer | null;
   solutionType!: Solution | null;
   tempAnsOption!: string;

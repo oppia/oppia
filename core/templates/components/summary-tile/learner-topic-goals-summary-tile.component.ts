@@ -43,7 +43,8 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   storyName!: string;
   storyProgress!: number;
   storyNodeToDisplay!: StoryNode;
-  thumbnailUrl!: string;
+  // Set thumbnail url to null if the thumbnail file is not available.
+  thumbnailUrl!: string | null;
   thumbnailBgColor!: string;
   storyNodeLink!: string;
   storyNodeTitle!: string;
@@ -112,6 +113,8 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
           this.assetsBackendApiService.getThumbnailUrlForPreview(
             AppConstants.ENTITY_TYPE.STORY, this.storySummaryToDisplay.getId(),
             thumbnailFilename));
+      } else {
+        this.thumbnailUrl = null;
       }
 
       this.storyNodeTitle = this.storyNodeToDisplay.getTitle();

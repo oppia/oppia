@@ -46,10 +46,12 @@ export class InteractiveNumericInput implements OnInit {
   @Input() requireNonnegativeInputWithValue: string = '';
   @Input() savedSolution!: NumericInputAnswer;
   @Input() labelForFocusTarget!: string;
+  // Answer is null if the user has not yet entered an answer. This is the case
+  // when the user has not yet clicked the submit button.
+  answer!: number | null;
+  NUMERIC_INPUT_FORM_SCHEMA!: NumericInputFormSchema;
   errorString: string = '';
   requireNonnegativeInput: boolean = false;
-  answer!: string | number;
-  NUMERIC_INPUT_FORM_SCHEMA!: NumericInputFormSchema;
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -71,10 +73,12 @@ export class InteractiveNumericInput implements OnInit {
           this.answer, this.requireNonnegativeInput)));
   }
 
-  submitAnswer(answer: string | number): void {
+  submitAnswer(answer: number | null): void {
     if (this.isAnswerValid()) {
-      this.currentInteractionService.onSubmit(
-        answer, this.numericInputRulesService);
+      if (answer) {
+        this.currentInteractionService.onSubmit(
+          answer, this.numericInputRulesService);
+      }
     }
   }
 
@@ -85,7 +89,7 @@ export class InteractiveNumericInput implements OnInit {
     };
   }
 
-  onAnswerChange(answer: string | number): void {
+  onAnswerChange(answer: number | null): void {
     if (this.answer === answer) {
       return;
     }
@@ -111,7 +115,7 @@ export class InteractiveNumericInput implements OnInit {
     this.requireNonnegativeInput = requireNonnegativeInput.value;
     this.answer = (
       this.savedSolution !== undefined ?
-      this.savedSolution : ''
+      this.savedSolution : null
     );
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {

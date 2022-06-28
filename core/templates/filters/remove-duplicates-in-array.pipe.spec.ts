@@ -42,7 +42,7 @@ describe('Testing RemoveDuplicatesInArrayPipe', () => {
 
   it('should throw error when the input is invalid', () => {
     expect(() => {
-      // Use unknown type conversion to check input is invalid.
+      // Using unknown type conversion to check if the input is invalid.
       pipe.transform({
         filter: undefined
       } as unknown as string[]);

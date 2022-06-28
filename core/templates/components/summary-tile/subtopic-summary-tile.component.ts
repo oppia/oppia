@@ -38,9 +38,12 @@ export class SubtopicSummaryTileComponent implements OnInit {
   @Input() subtopic!: Subtopic;
   @Input() topicId!: string;
   @Input() topicUrlFragment!: string;
-  thumbnailUrl!: string;
+  // Set thumbnail url to null if the thumbnail file is not available.
+  thumbnailUrl!: string | null;
   subtopicTitle!: string;
   subtopicTitleTranslationKey!: string;
+  // Set to null if there is no thumbnail background color.
+  thumbnailBgColor!: string | null;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -68,22 +71,23 @@ export class SubtopicSummaryTileComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.thumbnailBgColor = this.subtopic.getThumbnailBgColor();
     this.subtopicTitle = this.subtopic.getTitle();
     let thumbnailFileName = this.subtopic.getThumbnailFilename();
-    if (thumbnailFileName === null) {
-      throw new Error('Expected subtopic to have a thumbnail file name');
+    if (thumbnailFileName) {
+      this.thumbnailUrl = (
+        this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.TOPIC, this.topicId, thumbnailFileName));
+    } else {
+      this.thumbnailUrl = null;
     }
-    this.thumbnailUrl = (
-      this.assetsBackendApiService.getThumbnailUrlForPreview(
-        AppConstants.ENTITY_TYPE.TOPIC, this.topicId, thumbnailFileName));
     let urlFragment = this.subtopic.getUrlFragment();
     if (urlFragment === null) {
       throw new Error('Expected subtopic to have a URL fragment');
     }
     this.subtopicTitleTranslationKey = this.i18nLanguageCodeService.
       getSubtopicTranslationKey(
-        this.topicId, urlFragment,
-        TranslationKeyType.TITLE);
+        this.topicId, urlFragment, TranslationKeyType.TITLE);
   }
 
   isHackySubtopicTitleTranslationDisplayed(): boolean {
