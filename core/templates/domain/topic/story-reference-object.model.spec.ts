@@ -20,7 +20,6 @@ import { StoryReference } from
   'domain/topic/story-reference-object.model';
 
 describe('Story reference model', () => {
-
   let _sampleStoryReference: StoryReference;
 
   beforeEach(() => {
