@@ -263,8 +263,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_webdriverio_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'dev_mode': True,
                     'suite_name': 'full',
+                    'dev_mode': True,
+                    'chrome_version': None,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -329,8 +330,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_managed_webdriverio_server,
             expected_kwargs=[
                 {
-                    'dev_mode': True,
                     'suite_name': 'full',
+                    'dev_mode': True,
+                    'chrome_version': None,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -632,8 +634,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_webdriverio_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'dev_mode': True,
                     'suite_name': 'full',
+                    'dev_mode': True,
+                    'chrome_version': None,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
@@ -687,10 +690,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_webdriverio_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'dev_mode': True,
                     'suite_name': 'full',
+                    'dev_mode': True,
+                    'chrome_version': None,
                     'sharding_instances': 3,
-                    'debug_mode': False,
+                    'debug_mode': True,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -743,8 +747,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_webdriverio_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'dev_mode': True,
                     'suite_name': 'full',
+                    'dev_mode': True,
+                    'chrome_version': '77.0.3865.40',
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,
