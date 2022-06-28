@@ -1029,7 +1029,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn(
             '%s --unhandled-rejections=strict %s %s' % (
                 common.NODE_BIN_PATH, common.PROTRACTOR_BIN_PATH,
-                common.PROTRACTOR_MOBILE_CONFIG_FILE_PATH),
+                common.PROTRACTOR_CONFIG_FILE_PATH),
             program_args)
         self.assertNotIn('--inspect-brk', program_args)
         self.assertIn('--params.devMode=True', program_args)
