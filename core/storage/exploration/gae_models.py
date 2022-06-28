@@ -1142,11 +1142,11 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
 
     Version history means some information about the previous commit on each
     state and the exploration metadata at a particular version of the
-    exploration. The information about each state comprises of the version
+    exploration. The information about each state includes the version
     number of the exploration on which the state was previously edited,
     the name of the state at the previous version and the id of the user who
-    committed those changes. For metadata, the information comprises of the
-    version number of the explortion on which the metadata was previously
+    committed those changes. For metadata, the information includes the
+    version number of the exploration on which the metadata was previously
     edited and the id of the user who committed those changes.
 
     A new instance of this model is created each time a new exploration
@@ -1176,8 +1176,8 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     # the number of states.
     state_version_history = datastore_services.JsonProperty(
         default={}, indexed=False)
-    # The details of the previous commit on the exploration metadata at a
-    # particular version of the exploration. The json structure will look
+    # The details of the previous commit on the exploration metadata in
+    # this version of the exploration. The json structure will look
     # like the following:
     # {
     #   "previously_edited_in_version": str,
@@ -1187,7 +1187,7 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     metadata_version_history = datastore_services.JsonProperty(
         default={}, indexed=False)
     # The user ids of the users who did the 'previous commit' on each state
-    # in a particular version of the exploration. It is required during the
+    # in this version of the exploration. It is required during the
     # wipeout process to query for the models efficiently.
     committer_ids = datastore_services.StringProperty(
         indexed=True, repeated=True)
@@ -1204,7 +1204,7 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
             str. A string containing exploration ID and
             exploration version.
         """
-        return 'version-history-%s-%s' % (exp_id, exp_version)
+        return 'version-history-%s.%s' % (exp_id, exp_version)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:

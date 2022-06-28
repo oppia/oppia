@@ -7610,7 +7610,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_version_history_on_add_state(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
         self.assertEqual(
             old_model.state_version_history.get('New state'), None)
@@ -7622,7 +7622,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             })], 'Added state')
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.state_version_history.get('New state'),
@@ -7636,7 +7636,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                 'state_name': 'New state'
             })], 'Added state')
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             old_model.state_version_history.get('New state'),
@@ -7649,14 +7649,14 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                 'state_name': 'New state',
             })], 'Deleted state')
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 3))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
 
         self.assertEqual(
             new_model.state_version_history.get('New state'), None)
 
     def test_version_history_on_rename_state(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
         new_state_name = 'Another name'
 
         self.assertEqual(
@@ -7675,7 +7675,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             })], 'Renamed state')
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.state_version_history.get(
@@ -7687,7 +7687,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_version_history_on_cancelled_rename_state(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
         new_state_name = 'Another name'
         expected_dict = state_domain.StateVersionHistory(
             None, None, self.owner_id).to_dict()
@@ -7710,7 +7710,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             ], 'Renamed state')
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.state_version_history.get(
@@ -7718,7 +7718,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_version_history_on_edit_state_property(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
         self.assertEqual(
             old_model.state_version_history.get(
@@ -7753,7 +7753,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         )
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.state_version_history.get(
@@ -7763,7 +7763,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_version_history_on_cancelled_edit_state_property(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
         expected_dict = state_domain.StateVersionHistory(
             None, None, self.owner_id).to_dict()
 
@@ -7789,7 +7789,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         )
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.state_version_history.get(
@@ -7797,7 +7797,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_version_history_on_only_translation_commits(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
         expected_dict = state_domain.StateVersionHistory(
             None, None, self.owner_id).to_dict()
 
@@ -7829,7 +7829,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list, 'Translation commits')
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.state_version_history.get(
@@ -7837,7 +7837,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_version_history_on_edit_exploration_property(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
         self.assertEqual(
             old_model.metadata_version_history,
@@ -7851,7 +7851,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
               'new_value': 'New title'})], 'Changed title')
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.metadata_version_history,
@@ -7860,7 +7860,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_version_history_on_cancelled_edit_exploration_property(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
         expected_dict = exp_domain.ExplorationMetadataVersionHistory(
             None, self.owner_id).to_dict()
 
@@ -7881,14 +7881,14 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             ], 'Changed title')
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             new_model.metadata_version_history, expected_dict)
 
     def test_version_history_on_revert_exploration(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
@@ -7906,7 +7906,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         exp_services.revert_exploration(self.owner_id, self.EXP_0_ID, 3, 1)
 
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 4))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 4))
 
         self.assertEqual(
             old_model.state_version_history,
@@ -7920,7 +7920,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         # In this case, the version history for that state should not be
         # recorded because it was added and deleted in the same commit.
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
         change_list = [
           exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -7934,7 +7934,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Added and deleted state')
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertIsNone(old_model.state_version_history.get('New state'))
         self.assertIsNone(new_model.state_version_history.get('New state'))
@@ -7953,7 +7953,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_from_v1_to_v2,
             'Added two new states')
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 2))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
         self.assertEqual(
             old_model.state_version_history['first'],
@@ -7984,7 +7984,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_from_v2_to_v3,
             'Added two new states')
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 3))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
 
         self.assertEqual(
             new_model.state_version_history['second'],
@@ -7997,7 +7997,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     def test_new_committer_id_is_added_to_committer_ids_list(self):
         old_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 1))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
         self.assertNotIn(self.editor_id, old_model.committer_ids)
 
@@ -8012,6 +8012,6 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                 'state_name': 'Another state'
             })], 'Added a state')
         new_model = self.version_history_model_class.get(
-            'version-history-%s-%s' % (self.EXP_0_ID, 3))
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
 
         self.assertIn(self.editor_id, new_model.committer_ids)
