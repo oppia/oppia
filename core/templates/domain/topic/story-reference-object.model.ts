@@ -41,10 +41,10 @@ export class StoryReference {
   }
 
   static createFromBackendDict(
-    storyReferenceBackendDict: StoryReferenceBackendDict): StoryReference {
-  return new StoryReference(
-    storyReferenceBackendDict.story_id,
-    storyReferenceBackendDict.story_is_published);
+      storyReferenceBackendDict: StoryReferenceBackendDict): StoryReference {
+    return new StoryReference(
+      storyReferenceBackendDict.story_id,
+      storyReferenceBackendDict.story_is_published);
   }
 
   static createFromStoryId(storyId: string): StoryReference {
