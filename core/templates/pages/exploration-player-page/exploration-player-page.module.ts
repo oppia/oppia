@@ -37,7 +37,6 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
-import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -62,7 +61,6 @@ import { ToastrModule } from 'ngx-toastr';
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
     LessonInformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
@@ -73,7 +71,6 @@ import { ToastrModule } from 'ngx-toastr';
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
     LessonInformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
