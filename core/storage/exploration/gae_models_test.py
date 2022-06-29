@@ -946,7 +946,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         exp_models.TransientCheckpointUrlModel.create(
             'exp_id', 'progress_id')
         transient_checkpoint_url_model = (
-            exp_models.TransientCheckpointUrlModel.get_by_id(
+            exp_models.TransientCheckpointUrlModel.get(
                 'progress_id', strict=True))
 
         # Ruling out the possibility of None for mypy type checking.
