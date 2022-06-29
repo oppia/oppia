@@ -306,15 +306,19 @@ def get_progress_in_stories(user_id, story_ids):
     """
     all_stories_progress = []
     all_stories = get_stories_by_ids(story_ids)
+
     for story in all_stories:
         story_progress = {}
         completed_node_ids = get_completed_node_ids(user_id, story.id)
-        all_node_ids = [node.id for node in story.story_contents.nodes]
+        completed_node_titles = []
+        for node in story.story_contents.nodes:
+            if node.id in completed_node_ids:
+                completed_node_titles.append(node.title)
 
         story_progress = story_domain.StoryProgress(
             story.id,
-            completed_node_ids,
-            all_node_ids
+            completed_node_titles,
+            story.story_contents.nodes
         )
 
         all_stories_progress.append(story_progress)

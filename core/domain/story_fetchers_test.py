@@ -179,6 +179,29 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stories[0].to_dict(), expected_story)
         self.assertEqual(stories[1], None)
 
+    def test_get_progress_in_stories(self):
+        all_stories_progress = story_fetchers.get_progress_in_stories(
+            self.USER_ID, [self.STORY_ID])
+        all_stories = story_fetchers.get_stories_by_ids([self.STORY_ID])
+
+        self.assertEqual(len(all_stories_progress), 1)
+        self.assertEqual(all_stories_progress[0].story_id, self.STORY_ID)
+        self.assertEqual(all_stories_progress[0].completed_node_titles, [])
+        self.assertEqual(
+            len(all_stories_progress[0].all_nodes),
+            len(all_stories[0].story_contents.nodes)
+        )
+
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.STORY_ID, self.NODE_ID_1)
+
+        all_stories_progress = story_fetchers.get_progress_in_stories(
+            self.USER_ID, [self.STORY_ID])
+        self.assertEqual(len(all_stories_progress), 1)
+        self.assertEqual(all_stories_progress[0].story_id, self.STORY_ID)
+        self.assertEqual(
+            all_stories_progress[0].completed_node_titles, ['Title 1'])
+
     def test_get_story_summary_by_id(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.id, self.STORY_ID)

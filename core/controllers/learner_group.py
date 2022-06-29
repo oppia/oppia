@@ -121,7 +121,7 @@ class CreateLearnerGroupHandler(base.BaseHandler):
         )
 
         self.render_json({
-            'learner_group_id': learner_group.group_id,
+            'id': learner_group.group_id,
             'title': learner_group.title,
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(
@@ -191,7 +191,7 @@ class LearnerGroupHandler(base.BaseHandler):
         )
 
         self.render_json({
-            'learner_group_id': learner_group.group_id,
+            'id': learner_group.group_id,
             'title': learner_group.title,
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(
@@ -266,7 +266,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             learner_group_id)
 
         if learner_group is None:
-            raise self.PageNotFoundException()
+            raise self.InvalidInputException('No such learner group exists.')
 
         subtopic_page_ids = learner_group.subtopic_page_ids
         story_ids = learner_group.story_ids
@@ -291,9 +291,9 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
             student_progress = {
                 'username': user_services.get_username(user_id),
-                'stories': [],
-                'subtopics': [],
-                'progress_sharing_is_turned_on': progress_sharing_permission
+                'progress_sharing_is_turned_on': progress_sharing_permission,
+                'stories_progress': [],
+                'subtopic_page_progress': []
             }
 
             # If progress sharing is turned off, then we don't need to
@@ -306,10 +306,18 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             # in the group syllabus.
             stories_progress = story_fetchers.get_progress_in_stories(
                     user_id, story_ids)
+            story_summaries = story_fetchers.get_story_summaries_by_ids(
+                story_ids)
 
-            student_progress['stories'] = ([
-                story_progress.to_dict() for story_progress in stories_progress
-            ])
+            for index, summary in enumerate(story_summaries):
+                progress_dict = stories_progress[index].to_dict()
+                story_prog_dict = summary.to_dict()
+                story_prog_dict['story_is_published'] = True
+                story_prog_dict['completed_node_titles'] = (
+                    progress_dict['completed_node_titles'])
+                story_prog_dict['all_node_dicts'] = (
+                    progress_dict['all_node_dicts'])
+                student_progress['stories_progress'].append(story_prog_dict)
 
             # Fetch the progress of the student in all the subtopics assigned
             # in the group syllabus.
@@ -333,12 +341,18 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                     if skill_mastery_dict:
                         # Subtopic mastery is average of skill masteries.
                         subtopic_prog_dict = {
-                            subtopic_page_id: (
+                            'subtopic_id': subtopic.id,
+                            'subtopic_title': subtopic.title,
+                            'parent_topic_id': topic.id,
+                            'parent_topic_name': topic.name,
+                            'thumbnail_filename': subtopic.thumbnail_filename,
+                            'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                            'subtopic_mastery': (
                                 sum(skill_mastery_dict.values()) /
                                 len(skill_mastery_dict)
                             )
                         }
-                        student_progress['subtopics'].append(
+                        student_progress['subtopic_page_progress'].append(
                             subtopic_prog_dict)
 
             # Add current student's progress to all students progress.
@@ -440,11 +454,13 @@ class TeacherDashboardHandler(base.BaseHandler):
                 'id': learner_group.group_id,
                 'title': learner_group.title,
                 'description': learner_group.description,
+                'facilitator_usernames': user_services.get_usernames(
+                    self.user_id),
                 'students_count': len(learner_group.student_user_ids)
             })
 
         self.render_json({
-            'learner_groups': learner_groups_data
+            'learner_groups_list': learner_groups_data
         })
 
 
@@ -475,13 +491,14 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
             self.user_id, learner_group_id)
 
         if not is_valid_request:
-            raise self.PageNotFoundException()
+            raise self.UnauthorizedUserException(
+                'You are not a facilitator of this learner group.')
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
                 learner_group_id)
 
         self.render_json({
-            'learner_group_id': learner_group.group_id,
+            'id': learner_group.group_id,
             'title': learner_group.title,
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(

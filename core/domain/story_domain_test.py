@@ -1570,3 +1570,37 @@ class StorySummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid language code: invalid'):
             self.story_summary.validate()
+
+
+class StoryProgressTests(test_utils.GenericTestBase):
+
+    NODE_ID_1 = 'node_1'
+    NODE_ID_2 = 'node_2'
+    NODE_ID_3 = 'node_3'
+
+    def setUp(self) -> None:
+        super(StoryProgressTests, self).setUp()
+
+        self.node1 = story_domain.StoryNode.create_default_story_node(
+            self.NODE_ID_1, 'Title 1')
+        self.node2 = story_domain.StoryNode.create_default_story_node(
+            self.NODE_ID_2, 'Title 2')
+        self.node3 = story_domain.StoryNode.create_default_story_node(
+            self.NODE_ID_3, 'Title 3')
+
+        self.story_progress = story_domain.StoryProgress(
+            'story_id', ['Title 1', 'Title 2'],
+            [self.node1, self.node2, self.node3])
+
+    def test_to_dict(self) -> None:
+        story_progress_dict = self.story_progress.to_dict()
+
+        self.assertEqual(story_progress_dict['story_id'], 'story_id')
+        self.assertEqual(
+            story_progress_dict['completed_node_titles'],
+            ['Title 1', 'Title 2']
+        )
+        self.assertEqual(
+            story_progress_dict['all_node_dicts'],
+            [self.node1.to_dict(), self.node2.to_dict(), self.node3.to_dict()]
+        )

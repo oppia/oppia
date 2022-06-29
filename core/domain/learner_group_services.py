@@ -347,11 +347,14 @@ def get_filtered_subtopic_syllabus_item_dicts(
         subtopic_page_id = topic.id + ':' + str(subtopic.id)
         if subtopic_page_id not in group_subtopic_page_ids:
             if keyword is None or subtopic.title.lower().find(keyword) != -1:
-                syllabus_subtopic_dict = subtopic.to_dict()
-                syllabus_subtopic_dict['topic_id'] = topic.id
-                syllabus_subtopic_dict['topic_name'] = topic.name
-                syllabus_subtopic_dict['topic_url_fragment'] = (
-                    topic.url_fragment)
+                syllabus_subtopic_dict = {
+                    'subtopic_id': subtopic.id,
+                    'subtopic_title': subtopic.title,
+                    'parent_topic_id': topic.id,
+                    'parent_topic_name': topic.name,
+                    'thumbnail_filename': subtopic.thumbnail_filename,
+                    'thumbnail_bg_color': subtopic.thumbnail_bg_color
+                }
                 filtered_subtopic_syllabus_item_dicts.append(
                     syllabus_subtopic_dict)
 
@@ -384,13 +387,18 @@ def get_filtered_story_syllabus_item_dicts(
     )
 
     filtered_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
+    stories = story_fetchers.get_stories_by_ids(story_ids)
 
     filtered_story_syllabus_item_dicts = []
 
-    for story in filtered_stories:
+    for ind, story in enumerate(filtered_stories):
         if keyword is None or story.title.lower().find(keyword) != -1:
             syllabus_story_dict = story.to_dict()
-            syllabus_story_dict['topic_id'] = topic.id
+            syllabus_story_dict['story_is_published'] = True
+            syllabus_story_dict['completed_node_titles'] = []
+            syllabus_story_dict['all_node_dicts'] = [
+                node.to_dict() for node in stories[ind].story_contents.nodes
+            ]
             syllabus_story_dict['topic_name'] = topic.name
             syllabus_story_dict['topic_url_fragment'] = topic.url_fragment
             filtered_story_syllabus_item_dicts.append(syllabus_story_dict)

@@ -198,8 +198,9 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         subtopic_summaries = fltered_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 1)
-        self.assertEqual(subtopic_summaries[0]['id'], 1)
-        self.assertEqual(subtopic_summaries[0]['title'], 'Naming Numbers')
+        self.assertEqual(subtopic_summaries[0]['subtopic_id'], 1)
+        self.assertEqual(
+            subtopic_summaries[0]['subtopic_title'], 'Naming Numbers')
 
         # Test 2: Skill type filter with subtopic name matching.
         fltered_syllabus = (
@@ -214,8 +215,9 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         subtopic_summaries = fltered_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 1)
-        self.assertEqual(subtopic_summaries[0]['id'], 1)
-        self.assertEqual(subtopic_summaries[0]['title'], 'Naming Numbers')
+        self.assertEqual(subtopic_summaries[0]['subtopic_id'], 1)
+        self.assertEqual(subtopic_summaries[0][
+            'subtopic_title'], 'Naming Numbers')
 
         # Test 3: Story type filter with story name matching.
         fltered_syllabus = (
