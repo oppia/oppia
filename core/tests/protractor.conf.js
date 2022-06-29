@@ -100,6 +100,10 @@ var suites = {
       'protractor_desktop/fileUploadExtensions.js'
     ],
 
+    learnerDashboard: [
+      'protractor_desktop/learnerDashboard.js'
+    ],
+
     library: [
       'protractor/libraryFlow.js'
     ],
