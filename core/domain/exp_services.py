@@ -2082,8 +2082,8 @@ def update_logged_out_user_progress(
             checkpoint was most recently reached.
     """
     # Fetch the model associated with the unique_progress_url_id.
-    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get_by_id(
-        unique_progress_url_id)
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+        unique_progress_url_id, strict=False)
 
     # Create a model if it doesn't already exist.
     if checkpoint_url_model is None:
@@ -2168,8 +2168,8 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
         TransientCheckpointUrlModel.
     """
     # Fetch the model associated with the unique_progress_url_id.
-    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get_by_id(
-        unique_progress_url_id)
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+        unique_progress_url_id, strict=False)
 
     if checkpoint_url_model is None:
         return None
@@ -2291,7 +2291,8 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
                 current_exploration.states
             ).index(
                 exp_user_data.most_recently_reached_checkpoint_state_name
-                ))
+            )
+        )
 
         most_recently_reached_checkpoint_index_in_logged_out_progress = (
             user_services.get_checkpoints_in_order(
@@ -2299,7 +2300,8 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
                 current_exploration.states
             ).index(
                 logged_out_user_data.most_recently_reached_checkpoint_state_name
-                ))
+            )
+        )
 
         if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
             logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
@@ -2317,7 +2319,10 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
             logged_in_user_model.update_timestamps()
             logged_in_user_model.put()
 
-    elif logged_in_user_model.most_recently_reached_checkpoint_exp_version < logged_out_user_data.most_recently_reached_checkpoint_exp_version: # pylint: disable=line-too-long
+    elif (
+        logged_in_user_model.most_recently_reached_checkpoint_exp_version <
+        logged_out_user_data.most_recently_reached_checkpoint_exp_version
+    ):
 
         most_recently_interacted_exploration = (
             exp_fetchers.get_exploration_by_id(

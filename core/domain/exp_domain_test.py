@@ -513,7 +513,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             self.transient_checkpoint_url.validate()
 
     def test_furthest_reached_checkpoint_exp_version_incorrect_type(
-        self) -> None:
+        self
+    ) -> None:
         self.transient_checkpoint_url.furthest_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -521,7 +522,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             self.transient_checkpoint_url.validate()
 
     def test_most_recently_reached_checkpoint_state_name_incorrect_type(
-        self) -> None:
+        self
+    ) -> None:
         self.transient_checkpoint_url.most_recently_reached_checkpoint_state_name = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -529,7 +531,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             self.transient_checkpoint_url.validate()
 
     def test_most_recently_reached_checkpoint_exp_version_incorrect_type(
-        self) -> None:
+        self
+    ) -> None:
         self.transient_checkpoint_url.most_recently_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,

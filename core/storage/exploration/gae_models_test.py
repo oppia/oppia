@@ -947,7 +947,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             'exp_id', 'progress_id')
         transient_checkpoint_url_model = (
             exp_models.TransientCheckpointUrlModel.get_by_id(
-                'progress_id'))
+                'progress_id', strict=True))
 
         # Ruling out the possibility of None for mypy type checking.
         assert transient_checkpoint_url_model is not None
@@ -979,12 +979,9 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         )
 
         actual_model = (
-            exp_models.TransientCheckpointUrlModel.get_by_id(
-                'progress_id'))
+            exp_models.TransientCheckpointUrlModel.get(
+                'progress_id', strict=True))
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert expected_model is not None
-        assert actual_model is not None
         self.assertEqual(
             actual_model.exploration_id,
             expected_model.exploration_id)
@@ -1009,11 +1006,14 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
         # Test get_new_progress_id method.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'New id generator is producing too many collisions.'):
+            'New id generator is producing too many collisions.'
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 transient_checkpoint_progress_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
-                    transient_checkpoint_progress_model_cls)):
+                    transient_checkpoint_progress_model_cls
+                )
+            ):
                 transient_checkpoint_progress_model_cls.get_new_progress_id()
