@@ -55,9 +55,15 @@ class JobRunResultTests(test_utils.TestBase):
         with self.assertRaisesRegex(ValueError, 'must not be empty'):  # type: ignore[no-untyped-call]
             job_run_result.JobRunResult()
 
-    def test_enormous_result_raises_value_error(self) -> None:
-        with self.assertRaisesRegex(ValueError, r'must not exceed \d+ bytes'):  # type: ignore[no-untyped-call]
-            job_run_result.JobRunResult(stdout='a' * 1501)
+    def test_enormous_stdout_result_is_truncated(self) -> None:
+        run_result = job_run_result.JobRunResult(stdout='a' * 5010)
+        self.assertEqual(run_result.stdout, '%s[TRUNCATED]' % ('a' * 5000))
+        self.assertEqual(run_result.stderr, '')
+
+    def test_enormous_stderr_result_is_truncated(self) -> None:
+        run_result = job_run_result.JobRunResult(stderr='a' * 5010)
+        self.assertEqual(run_result.stderr, '%s[TRUNCATED]' % ('a' * 5000))
+        self.assertEqual(run_result.stdout, '')
 
     def test_accumulate(self) -> None:
         single_job_run_result = job_run_result.JobRunResult.accumulate([
@@ -74,15 +80,15 @@ class JobRunResultTests(test_utils.TestBase):
     def test_accumulate_with_enormous_outputs(self) -> None:
         accumulated_results = job_run_result.JobRunResult.accumulate([
             job_run_result.JobRunResult(
-                stdout='a' * 750, stderr='b' * 750),
+                stdout='a' * 5002, stderr='b' * 5002),
             job_run_result.JobRunResult(
-                stdout='a' * 500, stderr='b' * 500),
+                stdout='a' * 2000, stderr='b' * 2000),
             job_run_result.JobRunResult(
-                stdout='a' * 250, stderr='b' * 250),
+                stdout='a' * 1000, stderr='b' * 1000),
             job_run_result.JobRunResult(
-                stdout='a' * 100, stderr='b' * 100),
+                stdout='a' * 1000, stderr='b' * 1000),
             job_run_result.JobRunResult(
-                stdout='a' * 50, stderr='b' * 50),
+                stdout='a' * 2000, stderr='b' * 2000),
         ])
 
         # 100000 and 200000 are small enough ot fit as one, but the others will
@@ -91,14 +97,6 @@ class JobRunResultTests(test_utils.TestBase):
 
     def test_accumulate_with_empty_list(self) -> None:
         self.assertEqual(job_run_result.JobRunResult.accumulate([]), [])
-
-    def test_len_in_bytes(self) -> None:
-        result = job_run_result.JobRunResult(stdout='123', stderr='123')
-        self.assertEqual(result.len_in_bytes(), 6)
-
-    def test_len_in_bytes_of_unicode(self) -> None:
-        result = job_run_result.JobRunResult(stdout='😀', stderr='😀')
-        self.assertEqual(result.len_in_bytes(), 8)
 
     def test_equality(self) -> None:
         a_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
