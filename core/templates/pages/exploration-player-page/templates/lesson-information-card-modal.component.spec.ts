@@ -124,9 +124,9 @@ describe('Lesson Information card modal component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValues(true, true, false);
+      .and.returnValues(true, false);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValues(false, false, true);
+      .and.returnValues(false, true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
   });
