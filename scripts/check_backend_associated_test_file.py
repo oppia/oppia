@@ -32,7 +32,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/linters/test_files/invalid_docstring.py',
     'scripts/linters/test_files/invalid_import_order.py',
     'scripts/linters/test_files/invalid_merge_conflict.py',
-    'scripts/linters/test_files/invalid_ndb.py',
+    'scripts/linters/test_files/invalid_datastore.py',
     'scripts/linters/test_files/invalid_no_newline.py',
     'scripts/linters/test_files/invalid_pycodestyle_error.py',
     'scripts/linters/test_files/invalid_pylint_id.py',
