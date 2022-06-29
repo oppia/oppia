@@ -17,9 +17,7 @@
  * in WebdriverIO tests.
  */
 
-var dragAndDropScript = require('html-dnd').code;
 var action = require('../webdriverio_utils/action.js');
-var forms = require('./forms.js');
 var general = require('../webdriverio_utils/general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');

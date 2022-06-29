@@ -18,7 +18,6 @@
  */
 
 var action = require('./action.js');
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
