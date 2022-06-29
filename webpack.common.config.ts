@@ -487,6 +487,10 @@ module.exports = {
         },
       },
     }),
+    // Here we insert the CSS files depending on key-value stored on
+    // the local storage. This only works for dynamically inserted bundles.
+    // For statically inserted bundles we handle this logic in
+    // core/templates/pages/footer_js_libs.html.
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css',
@@ -498,6 +502,7 @@ module.exports = {
         document.head.appendChild(linkTag);
       }
     }),
+    // This generates the RTL version for all CSS bundles.
     new WebpackRTLPlugin({
       minify: {
         zindex: false

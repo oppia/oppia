@@ -165,7 +165,6 @@ describe('I18n service', () => {
   });
 
   it('should update user preferred language', fakeAsync(() => {
-    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
     let userInfo = new UserInfo(
       [], true, true, true, true, true, 'es', '', '', true);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
@@ -184,8 +183,6 @@ describe('I18n service', () => {
     i18nService.updateUserPreferredLanguage(newLangCode);
     tick();
 
-    expect(i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
-      newLangCode);
     expect(userBackendApiService.updatePreferredSiteLanguageAsync)
       .toHaveBeenCalledWith(newLangCode);
     expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
