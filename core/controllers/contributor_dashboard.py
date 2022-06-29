@@ -311,23 +311,14 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             for topic in topics
             for reference in topic.get_all_story_references()
             if reference.story_is_published])
-        logging.info(
-            'Fetching reviewable opportunity summaries for stories: %s',
-            topic_stories)
         in_review_suggestions = (
             suggestion_services.get_reviewable_translation_suggestions(user_id))
-        logging.info(
-            'Fetching reviewable opportunity summaries for suggestions: %s',
-            in_review_suggestions)
         in_review_suggestion_target_ids = [
             suggestion.target_id
             for suggestion in
             suggestion_services.get_suggestions_with_translatable_explorations(
                 in_review_suggestions)
         ]
-        logging.info(
-            'Fetching reviewable opportunity summaries for target IDs: %s',
-            in_review_suggestion_target_ids)
         exp_ids = [
             node.exploration_id
             for story in topic_stories
