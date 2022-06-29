@@ -19,15 +19,6 @@
   padding: 0 20px 20px 20px;
 }
 
-.oppia-lesson-info-card .oppia-story-title {
-  color: #3b3b3b;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 13px;
-  margin-bottom: -10px;
-  padding: 20px 20px 0;
-  text-align: right;
-}
-
 .oppia-lesson-info-card .oppia-lesson-info-content {
   padding-bottom: 0;
 }

@@ -19,18 +19,11 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { EditableExplorationBackendApiService } from
-  'domain/exploration/editable-exploration-backend-api.service';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
-import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -48,13 +41,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  storyTitleTranslationKey!: string;
-  storyPlaythroughObject!: StoryPlaythrough;
-  storyId!: string;
-  storyTitle: string = '';
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  storyUrlFragment: string;
   expTitleTranslationKey!: string;
   expDescTranslationKey!: string;
   displayedCard!: StateCard;
@@ -62,16 +48,11 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expTitle!: string;
   expDesc!: string;
   contributorNames!: string[];
-  storyTitleIsPresent!: boolean;
-  chapterTitle!: string;
-  chapterDesc!: string;
-  chapterNumber!: string;
   checkpointCount!: number;
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth!: number;
   separatorArray: number[] = [];
   userIsLoggedIn: boolean = false;
-  lessonAuthorsSubmenuIsShown: boolean = false;
   infoCardBackgroundCss!: {'background-color': string};
   infoCardBackgroundImageUrl!: string;
   averageRating: number | null;
@@ -82,13 +63,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private storyViewerBackendApiService: StoryViewerBackendApiService,
-    private windowRef: WindowRef,
-    private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private urlInterpolationService: UrlInterpolationService,
     private ratingComputationService: RatingComputationService,
     private dateTimeFormatService: DateTimeFormatService
@@ -111,9 +86,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       'background-color': this.expInfo.thumbnail_bg_color
     };
     this.infoCardBackgroundImageUrl = this.expInfo.thumbnail_icon_url;
-    this.storyTitleIsPresent = (
-      this.explorationPlayerStateService.isInStoryChapterMode()
-    );
 
     this.expTitleTranslationKey = (
       this.i18nLanguageCodeService.
@@ -126,41 +98,10 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
 
-    if (this.storyTitleIsPresent) {
-      this.topicUrlFragment = (
-        this.urlService.getTopicUrlFragmentFromLearnerUrl());
-      this.classroomUrlFragment = (
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-      this.storyUrlFragment = (
-        this.urlService.getStoryUrlFragmentFromLearnerUrl());
-
-      this.storyViewerBackendApiService.fetchStoryDataAsync(
-        this.topicUrlFragment,
-        this.classroomUrlFragment,
-        this.storyUrlFragment).then(
-        (storyDataDict) => {
-          this.storyTitle = storyDataDict.title;
-          this.storyId = storyDataDict.id;
-          this.storyTitleTranslationKey = (
-            this.i18nLanguageCodeService
-              .getStoryTranslationKey(
-                this.storyId, TranslationKeyType.TITLE));
-        });
-    }
-
     // Rendering the separators in the progress bar requires
     // the number of separators.The purpose of separatorArray
     // is to provide the number of checkpoints in the template file.
     this.separatorArray = new Array(this.checkpointCount);
-  }
-
-  restartExploration(): void {
-    this.editableExplorationBackendApiService.resetExplorationProgressAsync(
-      this.explorationId
-    ).then(() => {
-      // Required for the put operation to deliver data to backend.
-      this.windowRef.nativeWindow.location.reload();
-    });
   }
 
   getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {
@@ -203,14 +144,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return titleCss;
   }
 
-  isHackyStoryTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.storyTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
-  }
-
   isHackyExpTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
@@ -225,10 +158,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         this.expDescTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
-  }
-
-  toggleLessonAuthorsSubmenu(): void {
-    this.lessonAuthorsSubmenuIsShown = !this.lessonAuthorsSubmenuIsShown;
   }
 
   isLanguageRTL(): boolean {
