@@ -194,7 +194,7 @@ export class RuleEditorComponent implements OnInit {
     return ruleDescription;
   }
 
-  onSelectionChangeHtmlSelect(selection: Event, item: SelectItem): void {
+  onSelectionChangeHtmlSelect(selection: number, item: SelectItem): void {
     this.rule.inputs[item.varName] = selection;
   }
 
@@ -257,6 +257,7 @@ export class RuleEditorComponent implements OnInit {
   saveThisRule(): void {
     this.populateRuleContentIdsService.populateNullRuleContentIds(this.rule);
     this.onSaveRule.emit();
+    this.changeDetectorRef.detectChanges();
   }
 
   ngOnInit(): void {

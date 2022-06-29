@@ -23,7 +23,7 @@ import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 @Pipe({ name: 'truncate' })
@@ -40,7 +40,11 @@ class MockConvertToPlainTextPipe {
   }
 }
 
-describe('RuleEditorComponent', () => {
+class MockChangeDetectorRef {
+  detectChanges() {}
+}
+
+describe('Rule Editor Component', () => {
   let fixture: ComponentFixture<RuleEditorComponent>;
   let component: RuleEditorComponent;
   let eventBusService: EventBusService;
@@ -60,6 +64,10 @@ describe('RuleEditorComponent', () => {
         EventBusService,
         StateInteractionIdService,
         ResponsesService,
+        {
+          provide: ChangeDetectorRef,
+          useClass: MockChangeDetectorRef
+        },
         PopulateRuleContentIdsService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -224,16 +232,29 @@ describe('RuleEditorComponent', () => {
   }));
 
   it('should cancel edit when user clicks cancel button', () => {
+    const item = {
+      type: null,
+      varName: 'varName'
+    };
+    component.rule = {
+      inputs: {varName: 2}
+    };
+
     spyOn(component.onCancelRuleEdit, 'emit');
 
     component.cancelThisEdit();
+    component.onSelectionChangeHtmlSelect(1, item);
 
     expect(component.onCancelRuleEdit.emit).toHaveBeenCalled();
   });
 
   it('should save rule when user clicks save button', () => {
-    spyOn(component.onSaveRule, 'emit');
-    spyOn(populateRuleContentIdsService, 'populateNullRuleContentIds');
+    component.rule = {
+      type: null
+    };
+    spyOn(component.onSaveRule, 'emit').and.stub();
+    spyOn(populateRuleContentIdsService, 'populateNullRuleContentIds')
+      .and.stub();
 
     component.saveThisRule();
 
