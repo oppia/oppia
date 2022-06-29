@@ -69,13 +69,10 @@ export class OutcomeEditorComponent implements OnInit {
     return this.stateEditorService.getCorrectnessFeedbackEnabled();
   }
 
-  // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    if (interactionId) {
-      return INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear;
-    }
-    return false;
+    return interactionId !== null && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear;
   }
 
   onExternalSave(): void {

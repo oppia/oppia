@@ -38,12 +38,12 @@ export class SubtopicSummaryTileComponent implements OnInit {
   @Input() subtopic!: Subtopic;
   @Input() topicId!: string;
   @Input() topicUrlFragment!: string;
-  // Set thumbnail url to null if the thumbnail file is not available.
-  thumbnailUrl!: string | null;
   subtopicTitle!: string;
   subtopicTitleTranslationKey!: string;
   // Set to null if there is no thumbnail background color.
   thumbnailBgColor!: string | null;
+  // Set thumbnail url to null if the thumbnail file is not available.
+  thumbnailUrl: string | null = null;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -78,8 +78,6 @@ export class SubtopicSummaryTileComponent implements OnInit {
       this.thumbnailUrl = (
         this.assetsBackendApiService.getThumbnailUrlForPreview(
           AppConstants.ENTITY_TYPE.TOPIC, this.topicId, thumbnailFileName));
-    } else {
-      this.thumbnailUrl = null;
     }
     let urlFragment = this.subtopic.getUrlFragment();
     if (urlFragment === null) {

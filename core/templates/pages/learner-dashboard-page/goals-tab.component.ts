@@ -52,7 +52,8 @@ export class GoalsTabComponent implements OnInit {
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics!: string[];
-  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
+
+  @ViewChild('dropdown', {'static': false}) dropdownRef?: ElementRef;
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];

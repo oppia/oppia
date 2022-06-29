@@ -24,7 +24,6 @@ import { DragAndDropSortInputCustomizationArgs } from 'interactions/customizatio
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -211,13 +210,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
           let items = [];
           for (let j = 0; j < savedSolution[i].length; j++) {
             let htmlContent = this.getHtmlOfContentId(savedSolution[i][j]);
-            if (htmlContent) {
-              items.push(htmlContent);
-            } else {
-              throw new Error(
-                'Invalid content id in the saved solution: ' +
-                savedSolution[i][j]);
-            }
+            items.push(htmlContent);
           }
           this.multipleItemsInSamePositionArray.push([]);
           this.multipleItemsInSamePositionArray.push(items);
@@ -237,13 +230,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         // Pre populate with the saved solution, if present.
         for (let i = 0; i < savedSolution.length; i++) {
           let htmlContent = this.getHtmlOfContentId(savedSolution[i][0]);
-          if (htmlContent) {
-            this.singleItemInSamePositionArray.push(htmlContent);
-          } else {
-            throw new Error(
-              'Invalid content id in the saved solution: ' +
-              savedSolution[i][0]);
-          }
+          this.singleItemInSamePositionArray.push(htmlContent);
         }
       } else {
         // Pre populate with the choices, if no saved solution is present.
@@ -268,15 +255,16 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     return contentId;
   }
 
-  // Returns undefined if the content id is not mapped to a content. Returns
-  // the html of the content if it is mapped to a content.
-  getHtmlOfContentId(contentId: string): string | undefined {
+  getHtmlOfContentId(contentId: string): string {
     // Return the html of the content id.
+    let contentHtml = '';
     for (let choice of this.choicesValue) {
       if (choice.contentId === contentId) {
-        return choice.html;
+        contentHtml = choice.html;
+        break;
       }
     }
+    return contentHtml;
   }
 
   submitAnswer(): void {

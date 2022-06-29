@@ -239,6 +239,15 @@ describe('Outcome Destination Editor', () => {
     }]);
   }));
 
+  it('should throw error if active state name is null', fakeAsync(() => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+
+    expect(() => {
+      component.updateOptionNames();
+      tick(10);
+    }).toThrowError('Active state name is null');
+  }));
+
   it('should set focus to new state name input field on destination' +
     ' selector change', () => {
     component.outcome = new Outcome(
@@ -307,4 +316,19 @@ describe('Outcome Destination Editor', () => {
 
     expect(component.outcomeNewStateName).toBe('New State');
   });
+
+  it('should return true if outcome destination is a current state name',
+    () => {
+      component.outcome = new Outcome(
+        'Introduction',
+        new SubtitledHtml('<p> HTML string </p>', 'Id'),
+        false,
+        [],
+        null,
+        null,
+      );
+      component.currentStateName = 'Introduction';
+
+      expect(component.isSelfLoop()).toBeTrue();
+    });
 });

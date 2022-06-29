@@ -79,9 +79,6 @@ export class InteractiveSetInputComponent implements OnInit {
   }
 
   updateAnswer(answer: SetInputAnswer): void {
-    if (this.answer === answer) {
-      return;
-    }
     this.answer = answer;
   }
 

@@ -153,13 +153,9 @@ export class StateSolutionEditorComponent implements OnInit {
 
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
-    if (this.stateInteractionIdService.savedMemento) {
-      return (
-        INTERACTION_SPECS[
-          this.stateInteractionIdService.savedMemento as InteractionSpecsKey
-        ].is_linear);
-    }
-    return false;
+    let savedMemento = this.stateInteractionIdService.savedMemento;
+    return (savedMemento !== null && INTERACTION_SPECS[
+      savedMemento as InteractionSpecsKey].is_linear);
   }
 
   onSaveSolution(value: Solution | null): void {
@@ -184,13 +180,10 @@ export class StateSolutionEditorComponent implements OnInit {
       if (activeStateName === null) {
         throw new Error('Expected active state name to be non-null.');
       }
-      if (this.stateSolutionService.savedMemento === null) {
-        throw new Error('Expected solution to be non-null.');
-      }
       let solutionIsValid = this.solutionVerificationService.verifySolution(
         activeStateName,
         this.stateEditorService.getInteraction(),
-        this.stateSolutionService.savedMemento.correctAnswer
+        result.solution.correctAnswer
       );
 
       this.solutionValidityService.updateValidity(

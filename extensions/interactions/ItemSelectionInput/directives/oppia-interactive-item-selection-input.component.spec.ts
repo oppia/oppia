@@ -31,6 +31,7 @@ import { AudioTranslationLanguageService } from 'pages/exploration-player-page/s
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ItemSelectionAnswer } from 'interactions/answer-defs';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('oppiaInteractiveItemSelectionInput', function() {
   let component: InteractiveItemSelectionInputComponent;
@@ -144,6 +145,19 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       expect(component.displayCheckboxes).toBeFalse();
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeTrue();
+    });
+
+    it('should throw error if content id is null', () => {
+      component.choicesValue = [
+        {
+          html: 'choice 1',
+          _contentId: null
+        },
+      ] as SubtitledHtml[];
+
+      expect(() => {
+        component.getContentId();
+      }).toThrowError('Content id is null');
     });
 
     it('should deselect previously selected option and select the option' +

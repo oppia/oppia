@@ -24,6 +24,7 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { CdkDragDrop, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { DragAndDropAnswer } from 'interactions/answer-defs';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 interface ContainerModel<T> {
   id: string;
@@ -249,6 +250,38 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
       expect(component.dragStarted).toBeFalse();
+    });
+
+    it('should throw error if story url fragment is not present', () => {
+      component.choicesValue = [
+        {
+          html: '<p>choice 1</p>',
+          contentId: null
+        },
+        {
+          html: '<p>choice 2</p>',
+          contentId: 'ca_choices_2'
+        },
+        {
+          html: '<p>choice 3</p>',
+          contentId: 'ca_choices_3'
+        },
+        {
+          html: '<p>choice 4</p>',
+          contentId: 'ca_choices_4'
+        },
+      ] as SubtitledHtml[];
+
+      component.choices = [
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+        '<p>choice 3</p>',
+        '<p>choice 4</p>'
+      ];
+
+      expect(() => {
+        component.getContentIdOfHtml('<p>choice 1</p>');
+      }).toThrowError('contentId cannot be null');
     });
 
     it('should move items between lists', () => {

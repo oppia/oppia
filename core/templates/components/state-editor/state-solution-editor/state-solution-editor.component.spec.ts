@@ -230,6 +230,12 @@ describe('State Solution Editor Component', () => {
     expect(component.isEditable()).toBeTrue();
   });
 
+  it('should return the saved solution', () => {
+    stateSolutionService.savedMemento = solution;
+
+    expect(component.savedMemento()).toEqual(solution);
+  });
+
   it('should toggle activity of inline solution editor', () => {
     component.inlineSolutionEditorIsActive = true;
 
@@ -251,6 +257,14 @@ describe('State Solution Editor Component', () => {
     expect(component.getSolutionSummary()).toBe(
       'One solution is "&quot;This is a correct answer!&quot;".' +
       ' This is the explanation to the answer.');
+  });
+
+  it('should throw error if solution is not saved yet', () => {
+    stateSolutionService.savedMemento = null;
+
+    expect(() => {
+      component.getSolutionSummary();
+    }).toThrowError('Expected solution to be non-null.');
   });
 
   it('should check if current interaction is linear or not', () => {
@@ -287,6 +301,30 @@ describe('State Solution Editor Component', () => {
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'The current solution does not lead to another card.', 4000
     );
+  }));
+
+  it('should throw error if active state name is invalid', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: {
+        then: (successCallback: (
+          arg: {solution: Solution}
+        ) => void, errorCallback) => {
+          successCallback({
+            solution: solution
+          });
+        }
+      }
+    } as NgbModalRef);
+    spyOn(solutionVerificationService, 'verifySolution').and.returnValue(false);
+    spyOn(solutionValidityService, 'updateValidity').and.stub();
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(true, false);
+    spyOn(alertsService, 'addInfoMessage');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+
+    expect(function() {
+      component.openAddOrUpdateSolutionModal();
+      tick();
+    }).toThrowError('Expected active state name to be non-null.');
   }));
 
   it('should close add or update solution modal if user clicks cancel',

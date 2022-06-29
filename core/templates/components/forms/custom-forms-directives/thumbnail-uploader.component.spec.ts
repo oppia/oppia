@@ -61,12 +61,11 @@ describe('ThumbnailUploaderComponent', () => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
-
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
   });
 
   it('should set uploaded and editable thumbnail on initialization', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     component.filename = 'thumbnail-1';
 
     expect(component.thumbnailIsLoading).toBeTrue();
@@ -80,8 +79,20 @@ describe('ThumbnailUploaderComponent', () => {
     expect(component.thumbnailIsLoading).toBeFalse();
   });
 
+  it('should throw error if no image is present for a preview during file' +
+    ' changed', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue(undefined);
+    component.filename = 'thumbnail-1';
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('No image present for preview');
+  });
+
   it('should update the thumbnail image when thumbnail filename' +
     ' changes', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     component.filename = 'thumbnail-1';
     let changes: SimpleChanges = {
       filename: {
@@ -105,6 +116,8 @@ describe('ThumbnailUploaderComponent', () => {
 
   it('should not update the thumbnail image when new thumbnail is same as' +
     ' the old one', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     spyOn(
       imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename');
     component.filename = 'thumbnail-1';
@@ -125,8 +138,19 @@ describe('ThumbnailUploaderComponent', () => {
     expect(component.thumbnailIsLoading).toBeFalse();
   });
 
+  it('should throw error if no image is present for a preview during file' +
+    ' changed', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue(undefined);
+
+    expect(() => {
+      component.filenameChanges('newFile', 'oldFile');
+    }).toThrowError('No image present for preview');
+  });
+
   it('should not show edit thumbnail modal if editing thumbnail is' +
     ' disabled', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     component.disabled = true;
     spyOn(ngbModal, 'open');
 
@@ -143,6 +167,8 @@ describe('ThumbnailUploaderComponent', () => {
   it('should show edit thumbnail modal when user clicks on edit button and' +
     ' post thumbnail to server if local storage is not used and modal is' +
     ' opened in upload mode', fakeAsync(() => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     class MockNgbModalRef {
       result = Promise.resolve({
         dimensions: {
@@ -208,6 +234,8 @@ describe('ThumbnailUploaderComponent', () => {
 
   it('should show edit thumbnail modal when user clicks on edit button and' +
     ' save background color if not opened in upload mode', fakeAsync(() => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     // Modal is not opened in upload mode.
     class MockNgbModalRef {
       result = Promise.resolve({
@@ -264,6 +292,8 @@ describe('ThumbnailUploaderComponent', () => {
   it('should show edit thumbnail modal when user clicks on edit button and' +
     ' save uploaded thumbnail to local storage if local storage' +
     ' is used', fakeAsync(() => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     class MockNgbModalRef {
       result = Promise.resolve({
         dimensions: {
@@ -323,6 +353,8 @@ describe('ThumbnailUploaderComponent', () => {
 
   it('should close edit thumbnail modal when cancel button' +
     ' is clicked', fakeAsync(() => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     class MockNgbModalRef {
       componentInstance = {
         bgColor: null,
@@ -359,6 +391,8 @@ describe('ThumbnailUploaderComponent', () => {
   }));
 
   it('should raise an alert if an empty file is uploaded', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
     spyOn(alertsService, 'addWarning');
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
       .and.returnValue(null);
@@ -367,5 +401,18 @@ describe('ThumbnailUploaderComponent', () => {
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Could not get resampled file.');
+  });
+
+  it('should throw error if no image is present for a preview', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue(undefined);
+    // This is just a mock base 64 in order to test the FileReader event.
+    let dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
+    const arrayBuffer = Uint8Array.from(
+      window.atob(dataBase64Mock), c => c.charCodeAt(0));
+    let file = new File([arrayBuffer], 'filename.mp3');
+
+    expect(() => {
+      component.postImageToServer(file, () => {});
+    }).toThrowError('No image present for preview');
   });
 });

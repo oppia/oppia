@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -29,6 +30,7 @@ describe('StorySummaryTileComponent', () => {
   let component: StorySummaryTileComponent;
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
+  let urlInterpolationService: UrlInterpolationService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
@@ -46,6 +48,7 @@ describe('StorySummaryTileComponent', () => {
     component = fixture.componentInstance;
     wds = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);

@@ -115,14 +115,9 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
           .cleanUpHTMLforVoiceover(choiceLabel);
       }
 
-      let contentId = this.choicesValue[0]._contentId;
-      if (contentId === null) {
-        throw new Error('Content id is null');
-      }
-
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(contentId),
+        this.recordedVoiceovers.getBindableVoiceovers(this.getContentId()),
         combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
       );
     }
@@ -138,6 +133,15 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.notEnoughSelections = this.minAllowableSelectionCount > 0;
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this), this.validityCheckFn.bind(this));
+  }
+
+  getContentId(): string {
+    let contentId = this.choicesValue[0]._contentId;
+    if (contentId === null) {
+      throw new Error('Content id is null');
+    } else {
+      return contentId;
+    }
   }
 
   onToggleCheckbox(): void {

@@ -109,6 +109,23 @@ describe('SubtopicSummaryTileComponent', () => {
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
   });
 
+  it('should throw error if subtopic url is null', () => {
+    spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
+    component.subtopic = Subtopic.createFromTitle(1, 'Title');
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Expected subtopic to have a URL fragment');
+  });
+
+  it('should not open subtopic page if classroom or topic url' +
+    ' does not exist', () => {
+    component.subtopic = Subtopic.createFromTitle(1, 'Title');
+    expect(component.openSubtopicPage()).toBe(undefined);
+  });
+
   it('should open subtopic page when user clicks on subtopic card', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('/url');
     spyOn(windowRef.nativeWindow, 'open');

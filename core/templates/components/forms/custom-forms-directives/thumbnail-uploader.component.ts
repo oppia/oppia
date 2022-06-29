@@ -173,14 +173,13 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       resampledFile, this.tempImageName, entityType, entityId).toPromise();
     result.then((data) => {
       let entityType = this.contextService.getEntityType();
-      if (entityType === undefined) {
-        throw new Error('No image present for preview');
+      if (entityType) {
+        this.editableThumbnailDataUrl = (
+          this.imageUploadHelperService
+            .getTrustedResourceUrlForThumbnailFilename(
+              data.filename, entityType,
+              this.contextService.getEntityId()));
       }
-      this.editableThumbnailDataUrl = (
-        this.imageUploadHelperService
-          .getTrustedResourceUrlForThumbnailFilename(
-            data.filename, entityType,
-            this.contextService.getEntityId()));
       callback();
     });
   }

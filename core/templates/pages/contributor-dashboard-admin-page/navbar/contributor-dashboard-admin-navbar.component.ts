@@ -67,7 +67,7 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
 
     let userName = userInfo.getUsername();
     if (userName === null) {
-      throw new Error('User name is null');
+      throw new Error('User name is null.');
     }
     this.username = userName;
     this.profileUrl = (

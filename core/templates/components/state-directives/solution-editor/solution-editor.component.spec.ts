@@ -57,6 +57,7 @@ describe('Solution editor component', () => {
   let fixture: ComponentFixture<SolutionEditor>;
   let editabilityService: EditabilityService;
   let solutionObjectFactory: SolutionObjectFactory;
+  let stateSolutionService: StateSolutionService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -96,7 +97,11 @@ describe('Solution editor component', () => {
 
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     editabilityService = TestBed.inject(EditabilityService);
+    stateSolutionService = TestBed.inject(StateSolutionService);
 
+    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
+      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
+    );
     fixture.detectChanges();
   });
 
@@ -151,4 +156,13 @@ describe('Solution editor component', () => {
 
     expect(component.getAnswerHtml).toHaveBeenCalled();
   });
+
+  it('should throw error during get answer html if solution is not saved yet',
+    () => {
+      stateSolutionService.savedMemento = null;
+
+      expect(() => {
+        component.getAnswerHtml();
+      }).toThrowError('Expected solution to be defined');
+    });
 });

@@ -268,6 +268,32 @@ describe('Story Viewer Page component', () => {
       expect(component.showChapters()).toBeFalse();
     });
 
+  it('should throw error if story url fragment is not present', () => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('math');
+    spyOn(
+      urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(null);
+    spyOn(
+      storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(StoryPlaythrough.createFromBackendDict({
+        story_nodes: [],
+        story_title: 'Story Title 1',
+        story_description: 'Story Description 1',
+        topic_name: 'topic_1',
+      } as StoryPlaythroughBackendDict)));
+    let node = StoryNode.createFromIdAndTitle('1', 'Story node title');
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Story url fragment is null');
+
+    expect(() => {
+      component.getExplorationUrl(node);
+    }).toThrowError('Story url fragment is null');
+  });
+
   it('should show story\'s chapters when story has chapters',
     () => {
       component.storyPlaythroughObject = {

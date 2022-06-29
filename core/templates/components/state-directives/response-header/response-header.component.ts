@@ -74,13 +74,10 @@ export class ResponseHeaderComponent {
     return this.stateEditorService.getCorrectnessFeedbackEnabled();
   }
 
-  // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
-    const interactionId = this.getCurrentInteractionId();
-    if (interactionId) {
-      return INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear;
-    }
-    return false;
+    let interactionId = this.getCurrentInteractionId();
+    return interactionId !== null && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear;
   }
 
   isCorrect(): boolean {
