@@ -410,21 +410,17 @@ class ExplorationModel(base_models.VersionedModel):
                 model for model in versioned_exp_models
                 if model is not None
             ]
-            version_history_ids = []
+            version_history_keys = []
             for model in versioned_exp_models_without_none:
                 for version in range(1, model.version + 1):
-                    version_history_ids.append(
+                    version_history_id = (
                         ExplorationVersionHistoryModel.get_instance_id(
-                            model.id, version))
-            version_history_models_with_none = (
-                ExplorationVersionHistoryModel.get_multi(
-                    version_history_ids))
-            version_history_models = [
-                model for model in version_history_models_with_none
-                if model is not None
-            ]
-            ExplorationVersionHistoryModel.delete_multi(
-                version_history_models)
+                            model.id, version
+                        )
+                    )
+                    version_history_keys.append(datastore_services.Key(
+                        ExplorationVersionHistoryModel, version_history_id))
+            datastore_services.delete_multi(version_history_keys)
 
     # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
     # to remove Any used below.
