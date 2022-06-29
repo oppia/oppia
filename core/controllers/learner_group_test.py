@@ -387,14 +387,9 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
     def test_facilitators_view_details_as_invalid_facilitator(self):
         self.login(self.USER2_EMAIL)
 
-        response = self.get_json(
+        self.get_html_response(
             '/facilitator_view_of_learner_group_handler/%s' % (
                 self.LEARNER_GROUP_ID), expected_status_int=401)
-
-        self.assertEqual(
-            response['error'],
-            'You are not a facilitator of this learner group.'
-        )
 
         self.logout()
 
@@ -634,8 +629,8 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
                 self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
         }
 
-        self.get_json(
+        self.get_html_response(
             '/learner_group_user_progress_handler/%s' % (
-                'invalidId'), params=params, expected_status_int=401)
+                'invalidId'), params=params, expected_status_int=400)
 
         self.logout()
