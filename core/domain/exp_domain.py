@@ -3397,6 +3397,7 @@ class ExplorationMetadata:
 class MetadataVersionHistory:
     """Class to represent an element of the version history list of the
     exploration metadata.
+
     Attributes:
         last_edited_version_number: int. The version number of the
             exploration in which the metadata was last edited.
@@ -3435,6 +3436,7 @@ class MetadataVersionHistory:
         Args:
             metadata_version_history_dict: dict. The dict representation of
                 MetadataVersionHistory object.
+
         Returns:
             MetadataVersionHistory. The corresponding MetadataVersionHistory
             domain object.
