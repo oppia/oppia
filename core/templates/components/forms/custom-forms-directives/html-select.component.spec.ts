@@ -43,9 +43,12 @@ describe('HTML Select Component', () => {
     component.ngOnInit();
   });
 
-  it('should get selection index', () => {
-    component.selection = '21';
+  it('should update Selection', () => {
+    component.selection = 1;
+    component.selectionAsString = '2';
 
-    expect(component.getSelectionIndex()).toBe(1);
+    component.updatedSelection();
+
+    expect(component.selection).toBe(2);
   });
 });

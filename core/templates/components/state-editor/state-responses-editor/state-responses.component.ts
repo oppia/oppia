@@ -343,6 +343,8 @@ angular.module('oppia').component('stateResponses', {
           if (result.reopen) {
             $scope.openAddAnswerGroupModal();
           }
+
+          $rootScope.$applyAsync();
         }, () => {
           AlertsService.clearWarnings();
         });
