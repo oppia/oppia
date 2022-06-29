@@ -11,6 +11,7 @@ on:
 
 jobs:
   run_tests:
+    name: Run backend associated test file checks
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
