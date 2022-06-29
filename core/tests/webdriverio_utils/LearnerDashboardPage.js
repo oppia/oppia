@@ -33,8 +33,6 @@ var LearnerDashboardPage = function() {
     $('.e2e-test-feedback-section');
   var feedbackThread =
     $('.e2e-test-feedback-thread');
-  var feedbackMessage =
-   $$('.e2e-test-feedback-message');
   var addToLearnerGoalsButton =
     $('.e2e-test-add-topic-to-current-goals-button');
   var currentGoalsTopicName =
@@ -190,7 +188,9 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
+    waitFor.pageToFullyLoad();
     var subscriptionName = await $$('.e2e-test-subscription-name');
+    await subscriptionName[0].scrollIntoView();
     await waitFor.visibilityOf(
       subscriptionName[0],
       'Subscription First Name takes too long to appear');
@@ -216,6 +216,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectFeedbackMessageToMatch = async function(message) {
+    waitFor.pageToFullyLoad();
+    var feedbackMessage = await $$('.e2e-test-feedback-message');
     await waitFor.visibilityOf(
       feedbackMessage[0], 'Feedback Message takes too long to appear');
     expect(await feedbackMessage[0].getText()).toMatch(message);
