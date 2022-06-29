@@ -36,6 +36,16 @@ var alertToBePresent = async() => {
     });
 };
 
+var urlToBe = async function(url) {
+  await browser.waitUntil(async function() {
+    return await browser.getUrl() === url;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: 'Url takes too long to change'
+  });
+};
+
 /**
  * @param {Object} element - Clickable element such as button, link or tab.
  * @param {string} errorMessage - Error message when element is not clickable.
@@ -211,6 +221,7 @@ var clientSideRedirection = async function(
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
+exports.urlToBe = urlToBe;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;

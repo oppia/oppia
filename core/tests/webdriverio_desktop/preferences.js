@@ -149,13 +149,11 @@ describe('Preferences', function() {
       await preferencesPage.get();
       await preferencesPage.selectCreatorDashboard();
       await general.goToHomePage();
-      expect(await browser.getUrl()).toEqual(
-        'http://localhost:9001/creator-dashboard');
+      await waitFor.urlToBe('http://localhost:9001/creator-dashboard');
       await preferencesPage.get();
       await preferencesPage.selectLearnerDashboard();
       await general.goToHomePage();
-      expect(await browser.getUrl()).toEqual(
-        'http://localhost:9001/learner-dashboard');
+      await waitFor.urlToBe('http://localhost:9001/learner-dashboard');
     });
 
   it('should navigate to account deletion page',
@@ -164,8 +162,7 @@ describe('Preferences', function() {
       await users.login('delete@page.com');
       await preferencesPage.get();
       await preferencesPage.clickDeleteAccountButton();
-      expect(await browser.getUrl()).toEqual(
-        'http://localhost:9001/delete-account');
+      await waitFor.urlToBe('http://localhost:9001/delete-account');
     });
 
   it('should export account data',
