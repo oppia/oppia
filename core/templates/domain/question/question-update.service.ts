@@ -25,6 +25,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { State, StateBackendDict } from 'domain/state/StateObjectFactory';
 import { Question } from './QuestionObjectFactory';
+import { i } from 'mathjs';
 
 interface ApplyParams {
   property_name: string;
@@ -91,8 +92,10 @@ export class QuestionUpdateService {
           // All rules input types which are translatable are subclasses of
           // BaseTranslatableObject having dict structure with contentId
           // as a key.
-          if (ruleInput && 'contentId' in ruleInput) {
-            allContentIdsSet.add(ruleInput.contentId);
+          if (ruleInput.hasOwnProperty('contentId')) {
+            if (ruleInput && 'contentId' in ruleInput) {
+              allContentIdsSet.add(ruleInput.contentId);
+            }
           }
         });
       });
