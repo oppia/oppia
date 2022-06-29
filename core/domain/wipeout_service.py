@@ -1436,8 +1436,6 @@ def _pseudonymize_version_history_models(pending_deletion_request):
         user_id == version_history_model_class.committer_ids
     ).fetch()
 
-    save_pending_deletion_requests([pending_deletion_request])
-
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
         version_history_models, exp_ids_to_pids):
