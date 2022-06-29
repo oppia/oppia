@@ -29,7 +29,7 @@ from extensions.issues.MultipleIncorrectSubmissions import (
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the issue registry."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(IssueRegistryUnitTests, self).setUp()
         self.issues_dict = {
             'EarlyQuit': EarlyQuit.EarlyQuit,
@@ -40,16 +40,16 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         }
         self.invalid_issue_type = 'InvalidIssueType'
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         playthrough_issue_registry.Registry._issues = {} # pylint: disable=protected-access
         super(IssueRegistryUnitTests, self).tearDown()
 
-    def test_issue_registry(self):
+    def test_issue_registry(self) -> None:
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
             len(playthrough_issue_registry.Registry.get_all_issues()), 3)
 
-    def test_correct_issue_registry_types(self):
+    def test_correct_issue_registry_types(self) -> None:
         """Tests issue registry for fetching of issue instances of correct
         issue types.
         """
@@ -58,10 +58,10 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
                 playthrough_issue_registry.Registry.get_issue_by_type(
                     issue_type), _class)
 
-    def test_incorrect_issue_registry_types(self):
+    def test_incorrect_issue_registry_types(self) -> None:
         """Tests that an error is raised when fetching an incorrect issue
         type.
         """
-        with self.assertRaisesRegex(KeyError, self.invalid_issue_type):
+        with self.assertRaisesRegex(KeyError, self.invalid_issue_type):  # type: ignore[no-untyped-call]
             playthrough_issue_registry.Registry.get_issue_by_type(
                 self.invalid_issue_type)
