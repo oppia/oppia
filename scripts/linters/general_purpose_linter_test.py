@@ -65,7 +65,8 @@ INVALID_NO_NEWLINE_FILEPATH = os.path.join(
 INVALID_URLOPEN_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlopen.py')
 INVALID_AUTHOR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_author.py')
-INVALID_DATASTORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_datastore.py')
+INVALID_DATASTORE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_datastore.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pylint_id.py')
 INVALID_TABS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_tabs.py')
