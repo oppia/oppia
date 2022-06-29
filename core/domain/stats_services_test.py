@@ -2120,8 +2120,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         question = self.save_new_question(
             question_id, editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.assertNotEqual(question, None)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))

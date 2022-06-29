@@ -77,7 +77,7 @@ class EntityTranslationModelGenerationOneOffJob(base_jobs.JobBase):
                         (
                             language_code_to_translation[language_code]
                             .translations.add_translation(
-                                new_content_id
+                                new_content_id,
                                 translation_dict['translation'],
                                 translation_dict['data_format'],
                                 translation_dict['needs_update'])

@@ -449,8 +449,8 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.save_new_question(
             'question_1', self.admin_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.admin_id, 'question_1', 'skill_1', 0.3)
         changelist = [

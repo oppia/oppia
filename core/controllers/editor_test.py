@@ -3116,10 +3116,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             question_id, self.owner_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.assertIsNotNone(question)
         interaction_id = question.question_state_data.interaction.id
         customization_args = (
@@ -3197,10 +3196,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             question_id, self.owner_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.assertIsNotNone(question)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))

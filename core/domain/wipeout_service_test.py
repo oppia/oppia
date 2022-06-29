@@ -2531,8 +2531,8 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_1_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
@@ -2657,8 +2657,8 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_2_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
 
         wipeout_service.delete_user(
@@ -2704,8 +2704,8 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_2_ID,
             self.user_2_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
 
         wipeout_service.delete_user(
@@ -2879,16 +2879,16 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_1_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)

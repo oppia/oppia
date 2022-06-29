@@ -26,6 +26,7 @@ from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -77,12 +78,13 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
 
         self.question_id = question_services.get_new_question_id()
         self.content_id_generator = translation_domain.ContentIdGenerator()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id,
             self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=[self.skill_id])
+            [self.skill_id],
+            content_id_generator.next_content_id_index)
 
 
 class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
@@ -402,8 +404,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.question_id_2, self.editor_id,
             self._create_valid_question_data(
                 'ABC', self.content_id_generator_2),
-            self.content_id_generator_2.next_content_id_index,
-            inapplicable_skill_misconception_ids=[self.skill_id])
+            [self.skill_id],
+            self.content_id_generator_2.next_content_id_index)
 
     def test_put_with_non_admin_or_topic_manager_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)

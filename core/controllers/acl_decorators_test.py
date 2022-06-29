@@ -5270,10 +5270,9 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id, self.admin_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=[self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            self.skill_id],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.admin_id, self.question_id, self.skill_id, 0.5)
 
@@ -5762,10 +5761,9 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.set_topic_managers([self.user_a], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -5857,10 +5855,9 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.set_topic_managers([self.user_a], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -6037,10 +6034,9 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
     def test_can_play_question_with_valid_question_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -6096,10 +6092,9 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -6209,10 +6204,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            inapplicable_skill_misconception_ids=['skill_1'])
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(

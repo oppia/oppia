@@ -133,13 +133,13 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.save_new_question( # type: ignore[no-untyped-call]
             'question_id1', 'owner_id',
             question_state_data,
-            content_id_generator.next_content_id_index,
-            linked_skill_ids)
+            linked_skill_ids,
+            content_id_generator.next_content_id_index)
         self.save_new_question( # type: ignore[no-untyped-call]
             'question_id2', 'owner_id',
             question_state_data,
-            content_id_generator.next_content_id_index,
-            linked_skill_ids)
+            linked_skill_ids,
+            content_id_generator.next_content_id_index)
         question_ids = ['question_id1', 'question_id2']
 
         question_model1 = question_models.QuestionModel.get(question_ids[0])

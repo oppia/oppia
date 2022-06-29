@@ -322,8 +322,8 @@ class TopicPageDataHandlerTests(
             self.save_new_question(
                 question_id, self.admin_id,
                 self._create_valid_question_data(index, content_id_generator),
-                content_id_generator.next_content_id_index,
-                [self.skill_id_1])
+                [self.skill_id_1],
+                content_id_generator.next_content_id_index)
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         json_response = self.get_json(
@@ -377,8 +377,8 @@ class TopicPageDataHandlerTests(
             self.save_new_question(
                 question_id, self.admin_id,
                 self._create_valid_question_data(index, content_id_generator),
-                content_id_generator.next_content_id_index,
-                [self.skill_id_1])
+                [self.skill_id_1],
+                content_id_generator.next_content_id_index)
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         json_response = self.get_json(
@@ -437,8 +437,8 @@ class TopicPageDataHandlerTests(
                 self.save_new_question(
                     question_id, self.admin_id,
                     self._create_valid_question_data(j, content_id_generator),
-                    content_id_generator.next_content_id_index,
-                    [skill_ids[i]])
+                    [skill_ids[i]],
+                    content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 
@@ -488,9 +488,9 @@ class TopicPageDataHandlerTests(
                 content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j content_id_generator),
-                    content_id_generator.next_content_id_index,
-                    [skill_ids[i]])
+                    self._create_valid_question_data(j, content_id_generator),
+                    [skill_ids[i]],
+                    content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 
@@ -543,8 +543,8 @@ class TopicPageDataHandlerTests(
                 self.save_new_question(
                     question_id, self.admin_id,
                     self._create_valid_question_data(j, content_id_generator),
-                    content_id_generator.next_content_id_index,
-                    [skill_ids[i]])
+                    [skill_ids[i]],
+                    content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 

@@ -2345,7 +2345,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '',
             'translation_html': 'translation2',
@@ -2492,7 +2492,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'Introduction',
                     'new_value': {
-                        'content_id': 'content',
+                        'content_id': 'content_0',
                         'html': '<p>new content html</p>'
                     }
                 })], 'Add content')
@@ -2505,7 +2505,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.translate_suggestion_change = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>new content html</p>',
             'translation_html': '<p>new content html in Hindi</p>',
@@ -2530,7 +2530,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
             'next_content_id_index': (
                 content_id_generator.next_content_id_index)
         }

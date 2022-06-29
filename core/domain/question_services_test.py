@@ -90,8 +90,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC', self.content_id_generator),
-            self.content_id_generator.next_content_id_index,
             ['skill_1'],
+            self.content_id_generator.next_content_id_index,
             inapplicable_skill_misconception_ids=[
                 'skillid12345-1', 'skillid12345-2'])
 
@@ -101,8 +101,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id_1, self.editor_id,
             self._create_valid_question_data(
                 'ABC', self.content_id_generator_1),
-            self.content_id_generator_1.next_content_id_index,
-            ['skill_2'])
+            ['skill_2'],
+            self.content_id_generator_1.next_content_id_index)
 
         self.question_id_2 = question_services.get_new_question_id()
         self.content_id_generator_2 = translation_domain.ContentIdGenerator()
@@ -110,8 +110,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id_2, self.editor_id,
             self._create_valid_question_data(
                 'ABC', self.content_id_generator_2),
-            self.content_id_generator_2.next_content_id_index,
-            ['skill_2'])
+            ['skill_2'],
+            self.content_id_generator_2.next_content_id_index)
 
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(self.question_id)
@@ -229,8 +229,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
         with self.assertRaisesRegex(
             Exception, 'Skill difficulties and skill ids should match. '
@@ -271,8 +271,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         skill_ids = [skill.id for skill in
                      question_services.get_skills_linked_to_question(
                          question_id_2)]
@@ -307,16 +307,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
         question_id_3 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_2'])
+            ['skill_2'],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -390,8 +390,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.save_new_question(
             question_id, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, 'skill_1', 0.5)
@@ -421,16 +421,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
         question_id_3 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_2'])
+            ['skill_2'],
+            content_id_generator.next_content_id_index)
         # Setting skill difficulty for self.question_id.
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
@@ -636,16 +636,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
         question_id_3 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_2'])
+            ['skill_2'],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -715,16 +715,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
 
         question_id_3 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_2'])
+            ['skill_2'],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -778,14 +778,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data = self._create_valid_question_data(
             'state name', content_id_generator)
+        feedback_content_ids = [
+            content_id_generator.generate(
+                translation_domain.ContentType.FEEDBACK)
+            for _ in range(3)]
+        rule_content_ids = [
+            content_id_generator.generate(
+                translation_domain.ContentType.RULE, extra_prefix='input')
+            for _ in range(3)]
         question_state_data.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK
-                        ),
+                        'content_id': feedback_content_ids[0],
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -796,8 +802,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': content_id_generator.generate(
-                                translation_domain.ContentType.RULE,
+                            'contentId': rule_content_ids[0],
                                 extra_prefix='input'
                             ),
                             'normalizedStrSet': ['Test']
@@ -812,9 +817,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK
-                        ),
+                        'content_id': feedback_content_ids[1],
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -825,10 +828,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': content_id_generator.generate(
-                            translation_domain.ContentType.RULE,
-                            extra_prefix='input'
-                        ),
+                            'contentId': rule_content_ids[1],
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -841,9 +841,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK
-                        ),
+                        'content_id': feedback_content_ids[2],
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -854,10 +852,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': content_id_generator.generate(
-                                translation_domain.ContentType.RULE,
-                                extra_prefix='input'
-                            ),
+                            'contentId': rule_content_ids[2],
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -868,13 +863,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             })
         ]
         question_state_data.recorded_voiceovers.voiceovers_mapping.update({
-            'feedback_0': {},
-            'feedback_1': {},
-            'feedback_2': {},
-            'rule_input_3': {},
-            'rule_input_4': {},
-            'rule_input_5': {}
+            content_id: {} for content_id in (
+                feedback_content_ids + rule_content_ids)
         })
+
         inapplicable_skill_misconception_ids = [
             'skillid12345-3',
             'skillid12345-4'
@@ -941,12 +933,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data = self._create_valid_question_data(
             'state name', content_id_generator)
+        feedback_content_ids = [
+            content_id_generator.generate(
+                translation_domain.ContentType.FEEDBACK)
+            for _ in range(3)]
+        rule_content_ids = [
+            content_id_generator.generate(
+                translation_domain.ContentType.RULE, extra_prefix='input')
+            for _ in range(3)]
         question_state_data.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': 'feedback_1',
+                        'content_id': feedback_content_ids[0],
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -957,7 +957,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': 'rule_input_3',
+                            'contentId': rule_content_ids[0],
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -970,7 +970,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': 'feedback_2',
+                        'content_id': feedback_content_ids[1],
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -981,7 +981,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': 'rule_input_4',
+                            'contentId': rule_content_ids[1],
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -994,7 +994,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'outcome': {
                     'dest': None,
                     'feedback': {
-                        'content_id': 'feedback_0',
+                        'content_id': feedback_content_ids[2],
                         'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
@@ -1005,7 +1005,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'contentId': 'rule_input_5',
+                            'contentId': rule_content_ids[2],
                             'normalizedStrSet': ['Test']
                         }
                     },
@@ -1015,23 +1015,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': 'skillid12345-2'
             })
         ]
-        question_state_data.written_translations.translations_mapping.update({
-            'feedback_0': {},
-            'feedback_1': {},
-            'feedback_2': {},
-            'rule_input_3': {},
-            'rule_input_4': {},
-            'rule_input_5': {}
-        })
         question_state_data.recorded_voiceovers.voiceovers_mapping.update({
-            'feedback_0': {},
-            'feedback_1': {},
-            'feedback_2': {},
-            'rule_input_3': {},
-            'rule_input_4': {},
-            'rule_input_5': {}
+            content_id: {} for content_id in (
+                feedback_content_ids + rule_content_ids)
         })
-        question_state_data.next_content_id_index = 5
         inapplicable_skill_misconception_ids = [
             'skillid12345-3',
             'skillid12345-4'
@@ -1039,6 +1026,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             question_state_data, ['skillid12345'],
+            content_id_generator.next_content_id_index,
             inapplicable_skill_misconception_ids=(
                 inapplicable_skill_misconception_ids))
         question_services.create_new_question_skill_link(

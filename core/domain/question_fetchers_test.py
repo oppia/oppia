@@ -57,8 +57,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC', self.content_id_generator),
-            self.content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            self.content_id_generator.next_content_id_index)
 
     def test_get_questions_and_skill_descriptions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
@@ -84,8 +84,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_1 = self.save_new_question(
             question_id_1, self.editor_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1', 'skill_2'])
+            ['skill_1', 'skill_2'],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -105,8 +105,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('DEF', content_id_generator),
-            content_id_generator.next_content_id_index,
-            ['skill_1'])
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)

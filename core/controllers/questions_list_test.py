@@ -71,8 +71,8 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             self.save_new_question(
                 question_id, self.admin_id,
                 self._create_valid_question_data('ABC', content_id_generator),
-                content_id_generator.next_content_id_index,
-                [self.skill_id, self.skill_id_2])
+                [self.skill_id, self.skill_id_2],
+                content_id_generator.next_content_id_index)
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id, 0.5)
             question_services.create_new_question_skill_link(
@@ -173,15 +173,15 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
         self.save_new_question(
             question_id, self.admin_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            content_id_generator.next_content_id_index,
-            [self.skill_id])
+            [self.skill_id],
+            content_id_generator.next_content_id_index)
 
         content_id_generator_2 = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_1, self.admin_id,
             self._create_valid_question_data('ABC2', content_id_generator_2),
-            content_id_generator_2.next_content_id_index,
-            [self.skill_id_2])
+            [self.skill_id_2],
+            content_id_generator_2.next_content_id_index)
 
         question_services.create_new_question_skill_link(
             self.admin_id, question_id, self.skill_id, 0.5)
