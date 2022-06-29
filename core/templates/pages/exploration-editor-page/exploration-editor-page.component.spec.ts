@@ -57,6 +57,7 @@ import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
+import { HelpModalComponent } from './modal-templates/help-modal.component';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -75,7 +76,6 @@ describe('Exploration editor page component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
   let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
   let as: AlertsService = null;
@@ -189,6 +189,7 @@ describe('Exploration editor page component', function() {
     param_changes: [],
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
+    edits_allowed: true,
     state_classifier_mapping: [],
     user: {},
     version: '1',
@@ -207,7 +208,8 @@ describe('Exploration editor page component', function() {
       ],
       declarations: [
         LostChangesModalComponent,
-        WelcomeModalComponent
+        WelcomeModalComponent,
+        HelpModalComponent,
       ],
       providers: [
         AlertsService,
@@ -246,7 +248,10 @@ describe('Exploration editor page component', function() {
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [LostChangesModalComponent, WelcomeModalComponent]
+        entryComponents: [
+          LostChangesModalComponent,
+          WelcomeModalComponent,
+          HelpModalComponent]
       }
     });
 
@@ -269,7 +274,6 @@ describe('Exploration editor page component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
     ics = $injector.get('InternetConnectivityService');
@@ -320,7 +324,7 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
       spyOn(userService, 'getUserInfoAsync')
@@ -505,21 +509,31 @@ describe('Exploration editor page component', function() {
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('editor')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('editor')
+        } as NgbModalRef
+      );
+
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+
+      expect(ngbModal.open).toHaveBeenCalled();
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('translation')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('translation')
+        } as NgbModalRef
+      );
+
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+
+      expect(ngbModal.open).toHaveBeenCalled();
     });
   });
 
@@ -538,7 +552,8 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
@@ -600,7 +615,8 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
       spyOn(userService, 'getUserInfoAsync')
@@ -686,6 +702,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
+      expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
       mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
@@ -694,6 +711,7 @@ describe('Exploration editor page component', function() {
       flushMicrotasks();
       $scope.$apply();
 
+      expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
       expect(successCallback).toHaveBeenCalled();
     }));
 
@@ -776,8 +794,8 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCountAsync')
-        .and.returnValue(Promise.resolve(1));
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve({canEdit: true}));
       spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(

@@ -25,13 +25,14 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export interface Testimonial {
-  quote: string,
-  studentDetails: string,
-  imageUrl: string,
-  imageUrlWebp: string,
-  borderPresent: boolean
+  quote: string;
+  studentDetails: string;
+  imageUrl: string;
+  imageUrlWebp: string;
+  borderPresent: boolean;
 }
 
 @Component({
@@ -49,6 +50,7 @@ export class SplashPageComponent implements OnInit {
   userIsLoggedIn: boolean = null;
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
@@ -59,6 +61,18 @@ export class SplashPageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getImageSet(imageName: string, imageExt: string): string {
+    return (
+      this.getStaticImageUrl(imageName + '1x.' + imageExt) + ' 1x, ' +
+      this.getStaticImageUrl(imageName + '15x.' + imageExt) + ' 1.5x, ' +
+      this.getStaticImageUrl(imageName + '2x.' + imageExt) + ' 2x'
+    );
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   onClickBrowseLessonsButton(): void {
@@ -75,6 +89,7 @@ export class SplashPageComponent implements OnInit {
     this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
     this.windowRef.nativeWindow.location.href = ('/creator-guidelines');
   }
+
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.
@@ -99,27 +114,27 @@ export class SplashPageComponent implements OnInit {
     return [{
       quote: 'I18N_SPLASH_TESTIMONIAL_1',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_1',
-      imageUrl: this.getStaticImageUrl('/splash/mira.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/mira.webp'),
+      imageUrl: this.getImageSet('/splash/mira', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/mira', 'webp'),
       borderPresent: false
     },
     {
       quote: 'I18N_SPLASH_TESTIMONIAL_2',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_2',
-      imageUrl: this.getStaticImageUrl('/splash/Dheeraj_3.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/Dheeraj_3.webp'),
+      imageUrl: this.getImageSet('/splash/Dheeraj', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/Dheeraj', 'webp'),
       borderPresent: true
     }, {
       quote: 'I18N_SPLASH_TESTIMONIAL_3',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_3',
-      imageUrl: this.getStaticImageUrl('/splash/sama.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/sama.webp'),
+      imageUrl: this.getImageSet('/splash/sama', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/sama', 'webp'),
       borderPresent: false
     }, {
       quote: 'I18N_SPLASH_TESTIMONIAL_4',
       studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_4',
-      imageUrl: this.getStaticImageUrl('/splash/Gaurav_2.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/Gaurav_2.webp'),
+      imageUrl: this.getImageSet('/splash/Gaurav', 'png'),
+      imageUrlWebp: this.getImageSet('/splash/Gaurav', 'webp'),
       borderPresent: true
     }];
   }

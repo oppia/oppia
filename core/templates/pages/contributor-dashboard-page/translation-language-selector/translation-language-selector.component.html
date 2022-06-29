@@ -6,8 +6,10 @@
       {{explanationPopupContent}}
     </span>
   </div>
-  <div class="oppia-translation-language-selector-inner-container protractor-test-language-selector-selected" (click)="toggleDropdown()">
-    {{languageSelection}}
+  <div class="oppia-translation-language-selector-inner-container" (click)="toggleDropdown()">
+    <span class="protractor-test-language-selector-selected">
+      {{languageSelection}}
+    </span>
     <span class="material-icons oppia-translation-language-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
       arrow_drop_down
     </span>
@@ -47,10 +49,12 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     padding: 10px 20px;
     position: relative;
+    width: 220px;
   }
 
   .oppia-translation-language-selector-inner-container {
@@ -61,6 +65,7 @@
 
   .oppia-translation-language-selector-inner-container-arrow {
     color: #009688;
+    cursor: pointer;
   }
 
   .oppia-translation-language-selector-dropdown-container {
@@ -108,10 +113,15 @@
 
   .oppia-translation-language-selector-dropdown-option {
     color: rgb(104, 104, 104);
+    cursor: pointer;
     display: flex;
     flex: 1;
     margin-left: 16px;
     padding: 8px;
+  }
+
+  .oppia-translation-language-selector-dropdown-option:hover {
+    background-color: rgb(238, 238, 238);
   }
 
   .oppia-translation-language-selector-dropdown-option-selected {

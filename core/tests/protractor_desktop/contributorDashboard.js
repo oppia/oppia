@@ -45,7 +45,7 @@ describe('Contributor dashboard page', function() {
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
   const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
   const QUESTION_ADMIN_USERNAME = 'user4321';
-  const HINDI_LANGUAGE = 'Hindi';
+  const GERMAN_LANGUAGE = 'Deutsch (German)';
   let contributorDashboardPage = null;
   let contributorDashboardTranslateTextTab = null;
   let topicsAndSkillsDashboardPage = null;
@@ -75,12 +75,6 @@ describe('Contributor dashboard page', function() {
     await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
 
     await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
-    await adminPage.editConfigProperty(
-      'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
-
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
@@ -122,10 +116,29 @@ describe('Contributor dashboard page', function() {
   it('should allow user to switch to translate text tab', async function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
-    await contributorDashboardTranslateTextTab.changeLanguage(HINDI_LANGUAGE);
+    await contributorDashboardTranslateTextTab.changeLanguage(GERMAN_LANGUAGE);
     await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
-      HINDI_LANGUAGE);
+      GERMAN_LANGUAGE);
   });
+
+  it('should persist user\'s preferred translation language across sessions',
+    async function() {
+      await users.login(USER_EMAILS[0]);
+      await contributorDashboardPage.get();
+      await contributorDashboardPage.navigateToTranslateTextTab();
+      await contributorDashboardTranslateTextTab.changeLanguage(
+        GERMAN_LANGUAGE);
+      await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
+        GERMAN_LANGUAGE);
+      await users.logout();
+
+      await users.login(USER_EMAILS[0]);
+      await contributorDashboardPage.get();
+      await contributorDashboardPage.navigateToTranslateTextTab();
+      await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
+        GERMAN_LANGUAGE);
+      await users.logout();
+    });
 
   it('should allow reviewer to accept question suggestions', async function() {
     // Baseline verification.
@@ -177,7 +190,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     // After acceptance, progress percentage should be 1/50 = 2%.
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
     await users.logout();
 
     // Validate the contribution status changed.
@@ -197,7 +210,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
 
     // Submit suggestion as user0.
     await contributorDashboardPage.clickOpportunityActionButton(
@@ -240,7 +253,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
     await users.logout();
 
     // Validate the contribution status changed.
@@ -259,7 +272,7 @@ describe('Contributor dashboard page', function() {
 });
 
 describe('Contributor dashboard admin page contribution rights form', () => {
-  const HINDI_LANGUAGE = 'Hindi';
+  const GERMAN_LANGUAGE = 'Deutsch (German)';
   const QUESTION_ADMIN_EMAIL = 'userX@contributor.com';
   const QUESTION_ADMIN_USERNAME = 'user1234';
   const TRANSLATION_ADMIN_EMAIL = 'userY@contributor.com';
@@ -293,11 +306,6 @@ describe('Contributor dashboard admin page contribution rights form', () => {
 
     await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     await adminPage.addRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
-    await adminPage.editConfigProperty(
-      'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
     await users.logout();
   });
 
@@ -306,15 +314,15 @@ describe('Contributor dashboard admin page contribution rights form', () => {
       await users.login(TRANSLATION_ADMIN_EMAIL);
       await contributorDashboardAdminPage.get();
       await contributorDashboardAdminPage.assignTranslationReviewer(
-        translationReviewerUsername, HINDI_LANGUAGE);
+        translationReviewerUsername, GERMAN_LANGUAGE);
       await contributorDashboardAdminPage.expectUserToBeTranslationReviewer(
-        translationReviewerUsername, HINDI_LANGUAGE);
+        translationReviewerUsername, GERMAN_LANGUAGE);
       await users.logout();
 
       await users.login(translationReviewerEmail);
       await contributorDashboardPage.get();
       await contributorDashboardPage.expectUserToBeTranslationReviewer(
-        HINDI_LANGUAGE);
+        GERMAN_LANGUAGE);
       await users.logout();
     });
 
@@ -370,7 +378,7 @@ describe('Translation contribution featured languages', () => {
       'List',
       async function(elem) {
         var featured = await elem.addItem('Dictionary');
-        await (await featured.editEntry(0, 'Unicode')).setValue('fr');
+        await (await featured.editEntry(0, 'Unicode')).setValue('de');
         await (await featured.editEntry(1, 'Unicode'))
           .setValue('Partnership with ABC');
       });
@@ -384,7 +392,7 @@ describe('Translation contribution featured languages', () => {
 
   it('should show correct featured languages', async function() {
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguagesToBe(['French']);
+      .expectFeaturedLanguagesToBe(['Deutsch (German)']);
   });
 
   it('should show correct explanation', async function() {

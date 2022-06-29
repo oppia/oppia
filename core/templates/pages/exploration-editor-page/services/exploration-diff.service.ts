@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 import {
   ExplorationChangeAddState,
@@ -42,7 +42,7 @@ interface StateData {
     newestStateName: string;
     originalStateName: string;
     stateProperty: string;
-  }
+  };
 }
 
 interface StateIds {
@@ -65,7 +65,12 @@ interface ProcessedStateIdsAndData {
 interface AdjMatrix {
   [state1: number]: {
     [state2: number]: boolean;
-  }
+  };
+}
+
+interface ResultInterface {
+  stateIds: StateIds;
+  stateData: StateData;
 }
 
 interface StateLink {
@@ -88,6 +93,7 @@ export class ExplorationDiffService {
   _resetMaxId(): void {
     this._maxId = 0;
   }
+
   _generateNewId(): number {
     this._maxId++;
     return this._maxId;
@@ -95,7 +101,7 @@ export class ExplorationDiffService {
 
   _generateInitialStateIdsAndData(
       statesDict: StateObjectsDict): StateIdsAndData {
-    let result = {
+    let result: ResultInterface = {
       stateIds: {},
       stateData: {}
     };
@@ -149,16 +155,18 @@ export class ExplorationDiffService {
       let oldStateIsTerminal = false;
       let newStateIsTerminal = false;
       if (oldState) {
-        oldStateIsTerminal = (
-          oldState.interaction.id &&
-            InteractionSpecsConstants.INTERACTION_SPECS[
-              oldState.interaction.id].is_terminal);
+        let interactionId = oldState.interaction.id as InteractionSpecsKey;
+        const interactionSpec = (
+          InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
+        oldStateIsTerminal = Boolean(
+          oldState.interaction.id && interactionSpec.is_terminal);
       }
       if (newState) {
-        newStateIsTerminal = (
-          newState.interaction.id &&
-            InteractionSpecsConstants.INTERACTION_SPECS[
-              newState.interaction.id].is_terminal);
+        let interactionId = newState.interaction.id as InteractionSpecsKey;
+        const interactionSpec = (
+          InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
+        newStateIsTerminal = Boolean(
+          newState.interaction.id && interactionSpec.is_terminal);
       }
       if (oldStateIsTerminal || newStateIsTerminal) {
         finalStateIds.push(stateId);
@@ -304,7 +312,7 @@ export class ExplorationDiffService {
   _getAdjMatrix(
       states: StateObjectsDict,
       stateIds: StateIds, maxId: number): AdjMatrix {
-    let adjMatrix = {};
+    let adjMatrix: AdjMatrix = {};
     for (let stateId = 1; stateId <= maxId; stateId++) {
       adjMatrix[stateId] = {};
     }

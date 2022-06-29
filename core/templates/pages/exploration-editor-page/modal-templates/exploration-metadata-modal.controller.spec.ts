@@ -35,6 +35,15 @@ describe('Exploration Metadata Modal Controller', function() {
   var ExplorationTagsService = null;
   var ExplorationTitleService = null;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(() => {

@@ -22,7 +22,6 @@ import datetime
 import threading
 import time
 import traceback
-from core import python_utils
 
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -37,10 +36,9 @@ def log(message, show_time=False):
     """
     with LOG_LOCK:
         if show_time:
-            python_utils.PRINT(
-                datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
+            print(datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
         else:
-            python_utils.PRINT(message)
+            print(message)
 
 
 class TaskResult:

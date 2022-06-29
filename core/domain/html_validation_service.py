@@ -24,7 +24,6 @@ import logging
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
 from extensions.objects.models import objects
@@ -666,9 +665,7 @@ def validate_svg_filenames_in_math_rich_text(
         if svg_filename == '':
             error_list.append(str(math_tag))
         else:
-            file_system_class = fs_services.get_entity_file_system_class()
-            fs = fs_domain.AbstractFileSystem(
-                file_system_class(entity_type, entity_id))
+            fs = fs_services.GcsFileSystem(entity_type, entity_id)
             filepath = 'image/%s' % svg_filename
             if not fs.isfile(filepath):
                 error_list.append(str(math_tag))
@@ -814,6 +811,10 @@ def add_math_content_to_math_rte_components(html_string):
     Returns:
         str. Updated HTML string with all Math component tags having the new
         attribute.
+
+    Raises:
+        Exception. Invalid latex string found while parsing the given
+            HTML string.
     """
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):

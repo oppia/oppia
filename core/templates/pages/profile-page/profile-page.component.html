@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/profile-page/profile-page.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/profile-page/profile-page.component.rtl.css" as="style">
+
 <background-banner></background-banner>
 <div class="oppia-profile-container">
   <mat-card class="oppia-profile-user-card">
@@ -7,7 +10,7 @@
           <h1>{{ profileIsOfCurrentUsers }}</h1>
           <a *ngIf="profileIsOfCurrentUser"
              href="/preferences"
-             [routerLink]="preferencesUrl"
+             [smartRouterLink]="preferencesUrl"
              class="oppia-profile-preferences">
             <div class="oppia-profile-picture-mask">
               <div class="oppia-profile-picture-edit-prompt">
@@ -72,7 +75,7 @@
 
     <p class="oppia-profile-subject-interest-container">
       Interests:
-      <span *ngIf="subjectInterests.length > 0"><br>
+      <span class="oppia-profile-subject-interest-blocks" *ngIf="subjectInterests.length > 0">
         <span *ngFor="let interest of subjectInterests; index as index">
           <span class="oppia-profile-subject-interest protractor-test-profile-interest">
             {{ interest }}
@@ -156,17 +159,6 @@
   </mat-card>
 </div>
 
-<style>
-  .oppia-profile-container .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
-    background-color: #808080;
-    border-radius: 50%;
-    color: #FFF;
-    cursor: pointer;
-  }
-  .oppia-profile-container .oppia-stats-value-text {
-    font-size: 16px;
-  }
-  .oppia-profile-container .oppia-user-bio-text {
-    white-space: pre-wrap;
-  }
-</style>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page.component.rtl.css">

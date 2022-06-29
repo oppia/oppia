@@ -21,6 +21,50 @@ from __future__ import annotations
 from core import utils
 from core.constants import constants
 
+from typing import Dict, List
+from typing_extensions import TypedDict
+
+
+class PartialExplorationOpportunitySummaryDict(TypedDict):
+    """A dictionary representing partial fields of
+    ExplorationOpportunitySummary object.
+
+    This dict has only required fields to represent
+    an opportunity to a contributor.
+    """
+
+    id: str
+    topic_name: str
+    story_title: str
+    chapter_title: str
+    content_count: int
+    translation_counts: Dict[str, int]
+    translation_in_review_counts: Dict[str, int]
+
+
+class ExplorationOpportunitySummaryDict(
+    PartialExplorationOpportunitySummaryDict
+):
+    """A dictionary representing ExplorationOpportunitySummary object.
+
+    Contains all fields of an ExplorationOpportunitySummary object.
+    It gets the required fields from PartialExplorationOpportunitySummaryDict.
+    """
+
+    topic_id: str
+    story_id: str
+    incomplete_translation_language_codes: List[str]
+    language_codes_needing_voice_artists: List[str]
+    language_codes_with_assigned_voice_artists: List[str]
+
+
+class SkillOpportunityDict(TypedDict):
+    """A dictionary representing SkillOpportunity object."""
+
+    id: str
+    skill_description: str
+    question_count: int
+
 
 class ExplorationOpportunitySummary:
     """The domain object for the translation and voiceover opportunities summary
@@ -28,11 +72,20 @@ class ExplorationOpportunitySummary:
     """
 
     def __init__(
-            self, exp_id, topic_id, topic_name, story_id, story_title,
-            chapter_title, content_count, incomplete_translation_language_codes,
-            translation_counts, language_codes_needing_voice_artists,
-            language_codes_with_assigned_voice_artists,
-            translation_in_review_counts):
+        self,
+        exp_id: str,
+        topic_id: str,
+        topic_name: str,
+        story_id: str,
+        story_title: str,
+        chapter_title: str,
+        content_count: int,
+        incomplete_translation_language_codes: List[str],
+        translation_counts: Dict[str, int],
+        language_codes_needing_voice_artists: List[str],
+        language_codes_with_assigned_voice_artists: List[str],
+        translation_in_review_counts: Dict[str, int]
+    ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
@@ -75,7 +128,10 @@ class ExplorationOpportunitySummary:
         self.validate()
 
     @classmethod
-    def from_dict(cls, exploration_opportunity_summary_dict):
+    def from_dict(
+        cls,
+        exploration_opportunity_summary_dict: ExplorationOpportunitySummaryDict,
+    ) -> 'ExplorationOpportunitySummary':
         """Return a ExplorationOpportunitySummary domain object from a dict.
 
         Args:
@@ -104,7 +160,7 @@ class ExplorationOpportunitySummary:
             exploration_opportunity_summary_dict[
                 'translation_in_review_counts'])
 
-    def to_dict(self):
+    def to_dict(self) -> PartialExplorationOpportunitySummaryDict:
         """Return a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
 
@@ -126,34 +182,12 @@ class ExplorationOpportunitySummary:
             'translation_in_review_counts': self.translation_in_review_counts
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the object.
 
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.topic_id, str):
-            raise utils.ValidationError(
-                'Expected topic_id to be a string, received %s' % self.topic_id)
-        if not isinstance(self.topic_name, str):
-            raise utils.ValidationError(
-                'Expected topic_name to be a string, received %s' %
-                self.topic_name)
-        if not isinstance(self.story_id, str):
-            raise utils.ValidationError(
-                'Expected story_id to be a string, received %s' % self.story_id)
-        if not isinstance(self.story_title, str):
-            raise utils.ValidationError(
-                'Expected story_title to be a string, received %s' %
-                self.story_title)
-        if not isinstance(self.chapter_title, str):
-            raise utils.ValidationError(
-                'Expected chapter_title to be a string, received %s' %
-                self.chapter_title)
-        if not isinstance(self.content_count, int):
-            raise utils.ValidationError(
-                'Expected content_count to be an integer, received %s' %
-                self.content_count)
 
         if self.content_count < 0:
             raise utils.ValidationError(
@@ -191,7 +225,9 @@ class ExplorationOpportunitySummary:
                 ' to be the same as the supported audio languages, '
                 'received %s' % list(sorted(expected_set_of_all_languages)))
 
-    def _validate_translation_counts(self, translation_counts):
+    def _validate_translation_counts(
+        self, translation_counts: Dict[str, int]
+    ) -> None:
         """Validates per-language counts of translations.
 
         Args:
@@ -206,10 +242,7 @@ class ExplorationOpportunitySummary:
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)
-            if not isinstance(count, int):
-                raise utils.ValidationError(
-                    'Expected count for language_code %s to be an integer, '
-                    'received %s' % (language_code, count))
+
             if count < 0:
                 raise utils.ValidationError(
                     'Expected count for language_code %s to be a non-negative '
@@ -226,7 +259,11 @@ class SkillOpportunity:
     """The domain object for skill opportunities."""
 
     def __init__(
-            self, skill_id, skill_description, question_count):
+        self,
+        skill_id: str,
+        skill_description: str,
+        question_count: int
+    ) -> None:
         """Constructs a SkillOpportunity domain object.
 
         Args:
@@ -239,20 +276,12 @@ class SkillOpportunity:
         self.question_count = question_count
         self.validate()
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the object.
 
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-        if not isinstance(self.skill_description, str):
-            raise utils.ValidationError(
-                'Expected skill_description to be a string, received %s' %
-                self.skill_description)
-        if not isinstance(self.question_count, int):
-            raise utils.ValidationError(
-                'Expected question_count to be an integer, received %s' %
-                self.question_count)
 
         if self.question_count < 0:
             raise utils.ValidationError(
@@ -260,7 +289,9 @@ class SkillOpportunity:
                 'received %s' % self.question_count)
 
     @classmethod
-    def from_dict(cls, skill_opportunity_dict):
+    def from_dict(
+        cls, skill_opportunity_dict: SkillOpportunityDict
+    ) -> 'SkillOpportunity':
         """Return a SkillOpportunity domain object from a dict.
 
         Args:
@@ -275,7 +306,7 @@ class SkillOpportunity:
             skill_opportunity_dict['skill_description'],
             skill_opportunity_dict['question_count'])
 
-    def to_dict(self):
+    def to_dict(self) -> SkillOpportunityDict:
         """Returns a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
 

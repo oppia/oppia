@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
@@ -25,24 +26,31 @@ describe('Editor Navbar Breadcrumb directive', function() {
   var $rootScope = null;
   var $scope = null;
   var ExplorationTitleService = null;
-  var ExplorationPropertyService = null;
   var FocusManagerService = null;
   var RouterService = null;
 
   var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
-    ExplorationPropertyService = $injector.get('ExplorationPropertyService');
     FocusManagerService = $injector.get('FocusManagerService');
     RouterService = $injector.get('RouterService');
 
     ExplorationTitleService.init('Exploration Title Example Very Long');
 
     spyOnProperty(
-      ExplorationPropertyService,
+      ExplorationTitleService,
       'onExplorationPropertyChanged').and.returnValue(
       mockExplorationPropertyChangedEventEmitter);
 
@@ -86,9 +94,10 @@ describe('Editor Navbar Breadcrumb directive', function() {
   });
 
   it('should update nav bar title when exploration property changes',
-    function() {
+    fakeAsync(() => {
       mockExplorationPropertyChangedEventEmitter.emit('title');
+      tick();
 
       expect($scope.navbarTitle).toBe('Exploration Title...');
-    });
+    }));
 });

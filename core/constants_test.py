@@ -17,10 +17,11 @@
 from __future__ import annotations
 
 import os
+import pkgutil
 
 from core import constants
 from core import feconf
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 
@@ -33,12 +34,44 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_file_contains_valid_json(self) -> None:
         """Test if the constants file is valid json file."""
-        with python_utils.open_file( # type: ignore[no-untyped-call]
+        with utils.open_file(
             os.path.join('assets', 'constants.ts'), 'r'
         ) as f:
             json = constants.parse_json_from_ts(f.read())
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
+
+    def test_loading_non_existing_file_throws_error(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.swap_to_always_raise(
+            pkgutil,
+            'get_data',
+            FileNotFoundError(
+                'No such file or directory: \'assets/non_exist.xy\''
+            )
+        ):
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+                FileNotFoundError,
+                'No such file or directory: \'assets/non_exist.xy\''
+            ):
+                constants.get_package_file_contents('assets', 'non_exist.xy')
+
+    def test_loading_file_in_package_returns_the_content(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.swap_to_always_return(pkgutil, 'get_data', b'File data'):
+            self.assertEqual(
+                constants.get_package_file_contents('assets', 'non_exist.xy'),
+                'File data'
+            )
+
+    def test_loading_file_in_non_existent_package_throws_error(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.swap_to_always_return(pkgutil, 'get_data', None):
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+                FileNotFoundError,
+                'No such file or directory: \'assets/non_exist.xy\''
+            ):
+                constants.get_package_file_contents('assets', 'non_exist.xy')
 
     def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the
@@ -71,7 +104,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         """Tests if comments are removed from json text."""
         dummy_constants_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'dummy_constants.js')
-        with python_utils.open_file(dummy_constants_filepath, 'r') as f: # type: ignore[no-untyped-call]
+        with utils.open_file(dummy_constants_filepath, 'r') as f:
             actual_text_without_comments = constants.remove_comments(f.read())
             expected_text_without_comments = (
                 'var dummy_constants = {\n'
@@ -122,3 +155,8 @@ class ConstantsTests(test_utils.GenericTestBase):
             set(rtl_audio_languages) & set(ltr_content_languages)
         )
         self.assertFalse(conflicts)
+
+    def test_constants_can_be_set(self) -> None:
+        """Test __setattr__ to see if constants can be set as needed."""
+        with self.swap(constants.constants, 'TESTING_CONSTANT', 'test_2'):
+            self.assertEqual(constants.constants.TESTING_CONSTANT, 'test_2')

@@ -152,19 +152,16 @@ def search(
         index_name: str,
         categories: List[str],
         language_codes: List[str],
-        offset: Optional[str] = None,
+        offset: Optional[int] = None,
         size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
         ids_only: bool = False
-) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[str]]:
+) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[int]]:
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
     is greater that 10,000, use the elasticsearch scroll API instead.
 
     This function also creates the index if it does not exist yet.
-
-    TODO(#11314): Change the offset argument to an int once the dependency
-    on gae_search_services.py is removed from the codebase.
 
     Args:
         query_string: str. The terms that the user is searching for.
@@ -178,7 +175,7 @@ def search(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str|None. The offset into the index. Pass this in to start at
+        offset: int|None. The offset into the index. Pass this in to start at
             the 'offset' when searching through a list of results of max length
             'size'. Leave as None to start at the beginning.
         size: int. The maximum number of documents to return.
@@ -192,12 +189,12 @@ def search(
                 dictionaries representing each document retrieved from the
                 elastic search instance will be returned. The document id will
                 be contained as the '_id' attribute in each document.
-            resulting_offset: str. The resulting offset to start at for the next
+            resulting_offset: int. The resulting offset to start at for the next
                 section of the results. Returns None if there are no more
                 results.
     """
     if offset is None:
-        offset = '0'
+        offset = 0
 
     # Convert the query into a Query DSL object. See
     # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
@@ -249,7 +246,7 @@ def search(
             body=query_definition, index=index_name,
             params={
                 'size': num_docs_to_fetch,
-                'from': int(offset)
+                'from': offset
             })
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
@@ -259,14 +256,12 @@ def search(
 
     matched_search_docs = response['hits']['hits']
 
-    # TODO(#11314): Convert all offsets in this function to ints once the
-    # elasticsearch migration is fully complete.
     resulting_offset = None
     if len(matched_search_docs) == num_docs_to_fetch:
         # There is at least one more page of results to fetch. Trim the results
         # in this call to the desired size.
         matched_search_docs = matched_search_docs[:size]
-        resulting_offset = str(int(offset) + size)
+        resulting_offset = int(offset) + size
 
     if ids_only:
         result_docs = [doc['_id'] for doc in matched_search_docs]

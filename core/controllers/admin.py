@@ -91,7 +91,8 @@ class AdminHandler(base.BaseHandler):
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
-                        'update_feature_flag_rules'
+                        'update_feature_flag_rules',
+                        'rollback_exploration_to_safe_state'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -170,6 +171,12 @@ class AdminHandler(base.BaseHandler):
                     }
                 },
                 'default_value': None
+            },
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -186,7 +193,7 @@ class AdminHandler(base.BaseHandler):
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-        # Removes promo-bar related configs as promo-bar is handlded by
+        # Removes promo-bar related configs as promo-bar is handled by
         # release coordinators in /release-coordinator page.
         del config_properties['promo_bar_enabled']
         del config_properties['promo_bar_message']
@@ -230,9 +237,9 @@ class AdminHandler(base.BaseHandler):
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
                         'Generate count cannot be less than publish count')
-                else:
-                    self._generate_dummy_explorations(
-                        num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+
+                self._generate_dummy_explorations(
+                    num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
@@ -268,19 +275,28 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
+            elif action == 'rollback_exploration_to_safe_state':
+                exp_id = self.normalized_payload.get('exp_id')
+                version = (
+                    exp_services.rollback_exploration_to_safe_state(exp_id))
+                result = {
+                    'version': version
+                }
             elif action == 'update_feature_flag_rules':
                 feature_name = self.normalized_payload.get('feature_name')
-                new_rule_dicts = self.normalized_payload.get('new_rules')
+                new_rules = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
 
                 try:
                     feature_services.update_feature_flag_rules(
                         feature_name, self.user_id, commit_message,
-                        new_rule_dicts)
+                        new_rules)
                 except (
                         utils.ValidationError,
                         feature_services.FeatureFlagNotFoundException) as e:
                     raise self.InvalidInputException(e)
+
+                new_rule_dicts = [rules.to_dict() for rules in new_rules]
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
@@ -445,9 +461,11 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
+                'fragm')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'empty-topic', 'description')
+                topic_id_2, 'Empty Topic', 'empty-topic', 'description',
+                'fragm')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -753,8 +771,8 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        username = self.payload.get('username')
-        role = self.payload.get('role')
+        username = self.normalized_payload.get('username')
+        role = self.normalized_payload.get('role')
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -773,8 +791,8 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self):
-        username = self.request.get('username')
-        role = self.request.get('role')
+        username = self.normalized_request.get('username')
+        role = self.normalized_request.get('role')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:

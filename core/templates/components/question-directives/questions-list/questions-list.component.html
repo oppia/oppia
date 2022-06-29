@@ -15,7 +15,7 @@
       <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.difficultyCardIsShown">
         <div class="list-group">
           <h4>Select Difficulty</h4>
-          <div ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index">
+          <div ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index" class="difficulty-selection-container">
             <label class="list-group-item-heading"><[skillWithDifficulty.getDescription()]></label>
             <oppia-question-difficulty-selector [skill-id-to-rubrics-object]="$ctrl.skillIdToRubricsObject"
                                                 [skill-with-difficulty]="skillWithDifficulty"
@@ -213,7 +213,7 @@
   }
   questions-list .add-question-btn {
     background-color: #008098;
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     text-align: center;
   }
@@ -224,16 +224,18 @@
     width: 60%;
   }
   questions-list .question-editor-open-container {
-    position: fixed;
-    right: 13%;
-    width: 26%;
+    margin-right: -29px;
+    padding-bottom: 10px;
+    position: sticky;
+    top: 27%;
+    width: 38%;
   }
   questions-list .checklist-item {
     display: flex;
   }
   questions-list .checklist-item-number {
     align-items: center;
-    background-color: #FFF;
+    background-color: #fff;
     border: 1.5px solid #419889;
     border-radius: 50%;
     color: #419889;
@@ -246,13 +248,17 @@
   }
   questions-list .checklist-item-number-active {
     background-color: #419889;
-    color: #FFF;
+    color: #fff;
   }
   questions-list .checklist-item-separator {
     background-color: #419889;
     height: 20px;
     margin: 2px 10px;
     width: 2px;
+  }
+  questions-list .difficulty-selection-container {
+    display: flex;
+    flex-direction: column;
   }
   questions-list .new-question-header {
     border-bottom: 2px solid #000;
@@ -268,7 +274,6 @@
     background-color: #e0e0e0;
   }
   questions-list .skill-description-card {
-    height: 2.5em;
     padding-left: 10px;
     padding-top: 10px;
   }
@@ -286,7 +291,7 @@
     padding-top: 20px;
   }
   questions-list .oppia-cross-icon {
-    color: #F00;
+    color: #f00;
   }
   questions-list .linked-skills-container {
     margin-top: 40px;
@@ -300,6 +305,9 @@
   }
   questions-list .question-interaction-id {
     color: #707070;
+  }
+  questions-list .list-group {
+    gap: 10px;
   }
   @media screen and (max-width: 768px) {
     questions-list .question-editor-container {

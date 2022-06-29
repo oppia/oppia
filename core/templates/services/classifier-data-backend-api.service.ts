@@ -29,15 +29,15 @@ import { Classifier } from 'domain/classifier/classifier.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 interface ClassifierMetaDataBackendDict {
-  'algorithm_id': string,
-  'algorithm_version': number,
+  'algorithm_id': string;
+  'algorithm_version': number;
   'gcs_filename': string;
 }
 
 export interface ClassifierMetaData {
-  algorithmId: string,
-  algorithmVersion: number,
-  filename: string,
+  algorithmId: string;
+  algorithmVersion: number;
+  filename: string;
 }
 
 @Injectable({

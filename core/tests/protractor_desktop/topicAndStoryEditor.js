@@ -137,7 +137,7 @@ describe('Topic editor functionality', function() {
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'topic-and-story-editor-one', 'Story description',
+      'Story Title', 'topicandstoryeditorone', 'Story description',
       Constants.TEST_SVG_PATH);
     await storyEditorPage.returnToTopic();
 
@@ -243,7 +243,7 @@ describe('Chapter editor functionality', function() {
   var explorationEditorPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
-    'Dummy exploration', 'Algorithm', 'Learn more about oppia', 'English'];
+    'Dummy exploration', 'Algorithms', 'Learn more about oppia', 'English'];
   var dummySkills = [];
   var allowedErrors = [];
   var topicName = 'Topic 0';
@@ -297,7 +297,7 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       topicName, topicUrlFragment, 'Description', false);
     await topicEditorPage.createStory(
-      storyName, 'topic-and-story-editor-two', 'Story description',
+      storyName, 'topicandstoryeditortwo', 'Story description',
       Constants.TEST_SVG_PATH);
     await general.closeCurrentTabAndSwitchTo(handle);
     dummySkills = await createDummySkills(2);

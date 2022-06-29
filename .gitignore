@@ -48,6 +48,8 @@ yarn-error.log
 .lighthouseci
 .direnv/*
 .envrc
+portserver.socket
+temp-tsconfig-strict.json
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated
@@ -63,4 +65,3 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
-.python-version

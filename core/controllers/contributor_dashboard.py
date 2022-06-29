@@ -25,6 +25,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
+from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
@@ -99,7 +100,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            topic_name = self.request.get('topic_name', None)
+            topic_name = self.normalized_request.get('topic_name')
             if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
@@ -150,7 +151,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             classroom_topic_ids.extend(classroom_dict['topic_ids'])
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
-        # TODO(#8912): Associate each skill/skill opportunity with  all linked
+        # TODO(#8912): Associate each skill/skill opportunity with all linked
         # topics.
         classroom_topic_skill_id_to_topic_name = {}
         for topic in classroom_topics:
@@ -238,6 +239,91 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                 language_code, search_cursor))
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
         return opportunity_dicts, next_cursor, more
+
+
+class ReviewableOpportunitiesHandler(base.BaseHandler):
+    """Provides opportunities that have translation suggestions in review."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        topic_name = self.normalized_request.get('topic_name')
+        opportunity_dicts = [
+            opp.to_dict()
+            for opp in self
+                ._get_reviewable_exploration_opportunity_summaries(
+                    self.user_id, topic_name)]
+        self.values = {
+            'opportunities': opportunity_dicts,
+        }
+        self.render_json(self.values)
+
+    def _get_reviewable_exploration_opportunity_summaries(
+        self, user_id, topic_name
+    ):
+        """Returns exploration opportunity summaries that have translation
+        suggestions that are reviewable by the supplied user. The result is
+        sorted in descending order by topic, story, and story node order.
+
+        Args:
+            user_id: str. The user ID of the user for which to filter
+                translation suggestions.
+            topic_name: str. A topic name for which to filter the exploration
+                opportunity summaries. If 'All' is supplied, all available
+                exploration opportunity summaries will be returned.
+
+        Returns:
+            list(ExplorationOpportunitySummary). A list of the matching
+            exploration opportunity summaries.
+        """
+        # 1. Fetch the eligible topics.
+        # 2. Fetch the stories for the topics.
+        # 3. Get the reviewable translation suggestion target IDs for the user.
+        # 4. Get story exploration nodes in order, filtering for explorations
+        # that have in review translation suggestions.
+        if topic_name is None:
+            topics = topic_fetchers.get_all_topics()
+        else:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if topic is None:
+                raise self.InvalidInputException(
+                    'The supplied input topic: %s is not valid' % topic_name)
+            topics = [topic]
+        topic_stories = story_fetchers.get_stories_by_ids([
+            reference.story_id
+            for topic in topics
+            for reference in topic.get_all_story_references()
+            if reference.story_is_published])
+        in_review_suggestions = (
+            suggestion_services.get_reviewable_translation_suggestions(user_id))
+        in_review_suggestion_target_ids = [
+            suggestion.target_id
+            for suggestion in
+            suggestion_services.get_suggestions_with_translatable_explorations(
+                in_review_suggestions)
+        ]
+        exp_ids = [
+            node.exploration_id
+            for story in topic_stories
+            for node in story.story_contents.get_ordered_nodes()
+            if node.exploration_id in in_review_suggestion_target_ids
+        ]
+        return (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                exp_ids).values())
 
 
 class TranslatableTextHandler(base.BaseHandler):
@@ -420,9 +506,10 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
         content_ids = []
         try:
             content_ids = json.loads(content_ids_string)
-        except:
+        except Exception as e:
             raise self.InvalidInputException(
-                'Improperly formatted content_ids: %s' % content_ids_string)
+                'Improperly formatted content_ids: %s' % content_ids_string
+            ) from e
 
         target_language_code = self.normalized_request.get(
             'target_language_code')
@@ -482,7 +569,6 @@ class UserContributionRightsDataHandler(base.BaseHandler):
                 contribution_rights.can_review_questions
                 if contribution_rights else False),
             'can_suggest_questions': (
-                config_domain.CONTRIBUTOR_CAN_SUGGEST_QUESTIONS.value and
                 (contribution_rights.can_submit_questions
                  if contribution_rights else False))
         })
@@ -506,8 +592,8 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
         })
 
 
-class AllTopicNamesHandler(base.BaseHandler):
-    """Provides names of all existing topics in the datastore."""
+class TranslatableTopicNamesHandler(base.BaseHandler):
+    """Provides names of all translatable topics in the datastore."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
@@ -517,9 +603,52 @@ class AllTopicNamesHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        # Only published topics are translatable.
+        topic_summaries = topic_fetchers.get_published_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
         self.values = {
             'topic_names': topic_names
         }
         self.render_json(self.values)
+
+
+class TranslationPreferenceHandler(base.BaseHandler):
+    """Provides the preferred translation language in the
+    contributor dashboard page.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    # TODO(#15559): Rename 'is_supported_audio_language_code' and
+    # 'SUPPORTED_AUDIO_LANGUAGES' constant to make sure that the name
+    # clearly defines the purpose.
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_manage_own_account
+    def get(self):
+        """Handles GET requests."""
+        user_settings = user_services.get_user_settings(self.user_id)
+        return self.render_json({
+            'preferred_translation_language_code': (
+                user_settings.preferred_translation_language_code)
+        })
+
+    @acl_decorators.can_manage_own_account
+    def post(self):
+        """Handles POST requests."""
+        language_code = self.normalized_payload.get('language_code')
+        user_services.update_preferred_translation_language_code(
+            self.user_id, language_code)
+        self.render_json({})

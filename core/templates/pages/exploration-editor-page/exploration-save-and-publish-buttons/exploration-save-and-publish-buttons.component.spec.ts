@@ -146,7 +146,7 @@ describe('Exploration save and publish buttons component', function() {
       }));
     spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
       mockConnectionServiceEmitter);
-    spyOn(explorationSaveService, 'saveChanges').and
+    spyOn(explorationSaveService, 'saveChangesAsync').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
         hideCallback();
@@ -191,6 +191,11 @@ describe('Exploration save and publish buttons component', function() {
 
     expect($scope.saveIsInProcess).toBe(false);
     expect($scope.loadingDotsAreShown).toBe(false);
+  });
+
+  it('should check if exploration is editable', function() {
+    spyOn(editabilityService, 'isLockedByAdmin').and.returnValue(true);
+    expect($scope.isLockedByAdmin()).toBe(true);
   });
 
   it('should publish exploration when show publish exploration is shown',

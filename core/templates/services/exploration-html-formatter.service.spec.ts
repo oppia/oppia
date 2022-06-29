@@ -40,18 +40,41 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML for a non migrated interaction ' +
      'when it is in editor mode', () => {
-    var interactionId = 'nonMigratedInteraction';
+    var interactionId = 'EndExploration';
     let custArgs = {
       placeholder: {value: new SubtitledUnicode('enter here', '')},
       rows: {value: 1}
     };
-    var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
+    var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
-      'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
-      '</oppia-interactive-non-migrated-interaction>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
+      'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
+      '</oppia-interactive-end-exploration>';
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null, null))
       .toBe(expectedHtmlTag);
+  });
+
+  it('should fail for unknown interaction', () => {
+    expect(() => {
+      ehfs.getInteractionHtml('UnknownInteraction', {}, true, null, null);
+    }).toThrowError('Invalid interaction id: UnknownInteraction.');
+  });
+
+  it('should fail for saved solution other than savedMemento()', () => {
+    expect(() => {
+      // This throws "Argument of type '"other"' is not assignable to parameter
+      // of type '"savedMemento()"'.". We need to suppress this error because
+      // we want to test if error is thrown.
+      // @ts-expect-error
+      ehfs.getInteractionHtml('GraphInput', {}, true, null, 'other');
+    }).toThrowError('Unexpected saved solution: other.');
+  });
+
+  it('should fail for non-alphabetic label for focus target', () => {
+    expect(() => {
+      ehfs.getInteractionHtml(
+        'GraphInput', {}, true, '<tag></tag>', 'savedMemento()');
+    }).toThrowError('Unexpected label for focus target: <tag></tag>.');
   });
 
   it('should correctly set [last-answer] for MigratedInteractions when it' +
@@ -66,8 +89,9 @@ describe('Exploration Html Formatter Service', () => {
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-graph-input>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
-      .toBe(expectedHtmlTag);
+    expect(
+      ehfs.getInteractionHtml(interactionId, custArgs, true, null, null)
+    ).toBe(expectedHtmlTag);
   });
 
   it('should correctly set [last-answer] for MigratedInteractions when it' +
@@ -83,17 +107,17 @@ describe('Exploration Html Formatter Service', () => {
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-graph-input>';
     expect(ehfs.getInteractionHtml(
-      interactionId, custArgs, true, '', null))
-      .toBe(expectedHtmlTag);
+      interactionId, custArgs, true, null, null)
+    ).toBe(expectedHtmlTag);
   });
 
   it('should correctly set interaction HTML when it is in player mode',
     () => {
-      var interactionId = 'nonMigratedInteraction';
+      var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
-        '</oppia-interactive-non-migrated-interaction>';
+      var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
+        'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
+        '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, null)
       ).toBe(expectedHtmlTag);
@@ -101,25 +125,25 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML when solution has been provided',
     () => {
-      var interactionId = 'nonMigratedInteraction';
+      var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
-        'saved-solution="solution" ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
-        '</oppia-interactive-non-migrated-interaction>';
+      var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
+        'label-for-focus-target="' + focusLabel + '" ' +
+        '[saved-solution]="savedMemento()" [last-answer]="null">' +
+        '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(
-          interactionId, {}, false, focusLabel, 'solution')
+          interactionId, {}, false, focusLabel, 'savedMemento()')
       ).toBe(expectedHtmlTag);
       interactionId = 'GraphInput';
       focusLabel = 'sampleLabel';
       expectedHtmlTag = '<oppia-interactive-graph-input ' +
-        '[saved-solution]="solution" ' +
-        'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
+        'label-for-focus-target="' + focusLabel + '" ' +
+        '[saved-solution]="savedMemento()" [last-answer]="null">' +
         '</oppia-interactive-graph-input>';
       expect(
         ehfs.getInteractionHtml(
-          interactionId, {}, false, focusLabel, 'solution')
+          interactionId, {}, false, focusLabel, 'savedMemento()')
       ).toBe(expectedHtmlTag);
     });
 
@@ -140,6 +164,12 @@ describe('Exploration Html Formatter Service', () => {
     ).toBe(expectedHtmlTag);
   });
 
+  it('should throw error when interaction id is null', () => {
+    expect(() => {
+      ehfs.getAnswerHtml('sampleAnswer', null, {});
+    }).toThrowError('InteractionId cannot be null');
+  });
+
   it('should set short answer HTML correctly', () => {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
@@ -150,8 +180,9 @@ describe('Exploration Html Formatter Service', () => {
     };
     var expectedHtmlTag = '<oppia-short-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
-      'choices="[&amp;quot;sampleChoice' +
-      '&amp;quot;]"></oppia-short-response-sample-id>';
+      'choices="[{&amp;quot;_html&amp;quot;:&amp;' +
+      'quot;sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;' +
+      'quot;&amp;quot;}]"></oppia-short-response-sample-id>';
     expect(ehfs.getShortAnswerHtml(
       answer, interactionId, interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);

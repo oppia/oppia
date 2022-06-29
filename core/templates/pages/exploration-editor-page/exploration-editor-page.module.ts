@@ -21,6 +21,9 @@ import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser'
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -43,6 +46,22 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
 import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
+import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
+import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
+import { PreviewSummaryTileModalComponent } from './settings-tab/templates/preview-summary-tile-modal.component';
+import { WelcomeTranslationModalComponent } from './translation-tab/modal-templates/welcome-translation-modal.component';
+import { DeleteExplorationModalComponent } from './settings-tab/templates/delete-exploration-modal.component';
+import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/remove-role-confirmation-modal.component';
+import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
+import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
+import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
+import { HelpModalComponent } from './modal-templates/help-modal.component';
+import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-templates/delete-audio-translation-modal.component';
+import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
+import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
+import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -50,6 +69,10 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -66,8 +89,23 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
+    ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
-    EditorReloadingModalComponent
+    EditorReloadingModalComponent,
+    CreateFeedbackThreadModalComponent,
+    PreviewSummaryTileModalComponent,
+    DeleteExplorationModalComponent,
+    RemoveRoleConfirmationModalComponent,
+    ReassignRoleConfirmationModalComponent,
+    ModeratorUnpublishExplorationModalComponent,
+    TransferExplorationOwnershipModalComponent,
+    HelpModalComponent,
+    ConfirmDeleteStateModalComponent,
+    PreviewSetParametersModalComponent,
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    DeleteAudioTranslationModalComponent,
+    TranslationTabBusyModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -81,8 +119,23 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
+    ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
-    EditorReloadingModalComponent
+    EditorReloadingModalComponent,
+    CreateFeedbackThreadModalComponent,
+    PreviewSummaryTileModalComponent,
+    DeleteExplorationModalComponent,
+    RemoveRoleConfirmationModalComponent,
+    ReassignRoleConfirmationModalComponent,
+    ModeratorUnpublishExplorationModalComponent,
+    TransferExplorationOwnershipModalComponent,
+    HelpModalComponent,
+    ConfirmDeleteStateModalComponent,
+    PreviewSetParametersModalComponent,
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    DeleteAudioTranslationModalComponent,
+    TranslationTabBusyModalComponent,
   ],
   providers: [
     {
@@ -99,6 +152,10 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })

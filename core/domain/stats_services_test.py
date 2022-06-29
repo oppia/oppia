@@ -21,7 +21,6 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import event_services
 from core.domain import exp_domain
@@ -52,6 +51,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             self.exp_id, self.exp_version, [])
         self.playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id1', 1, 'EarlyQuit', {}, [])
+        self.save_new_valid_exploration(
+            self.exp_id, 'admin', title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
 
     def test_get_exploration_stats_with_new_exp_id(self):
         exploration_stats = stats_services.get_exploration_stats(
@@ -140,7 +142,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 '🙂'].num_times_solution_viewed_v2, 1)
 
-    def test_update_stats_throws_if_model_is_missing_entirely(self):
+    def test_update_stats_throws_if_exp_version_is_not_latest(self):
         """Test the update_stats method."""
         aggregated_stats = {
             'num_starts': 1,
@@ -158,8 +160,43 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(Exception, 'id="nullid.1" does not exist'):
-            stats_services.update_stats('nullid', 1, aggregated_stats)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 2)
+        self.assertEqual(exploration_stats, None)
+
+        stats_services.update_stats('exp_id1', 2, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 2)
+        self.assertEqual(exploration_stats, None)
+
+    def test_update_stats_throws_if_stats_model_is_missing_entirely(self):
+        """Test the update_stats method."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+        stats_models.ExplorationStatsModel.get_model('exp_id1', 1).delete()
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats, None)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'ExplorationStatsModel id="exp_id1.1" does not exist'
+        ):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
         """Test the update_stats method."""
@@ -194,7 +231,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(Exception, 'does not exist'):
+        with self.assertRaisesRegex(Exception, 'does not exist'):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_returns_if_state_name_is_undefined(self):
@@ -217,13 +254,53 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
+
+    def test_update_stats_returns_if_aggregated_stats_type_is_invalid(self):
+        """Tests that the update_stats returns if a state name is undefined."""
+        aggregated_stats = {
+            'num_starts': '1',
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'undefined': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
+
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_update_stats_throws_if_model_is_using_unicode_state_name(self):
         """Test the update_stats method."""
@@ -259,7 +336,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(Exception, 'does not exist'):
+        with self.assertRaisesRegex(Exception, 'does not exist'):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_calls_to_stats_methods(self):
@@ -676,7 +753,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_get_playthrough_from_model(self):
         """Test the get_playthrough_from_model method."""
@@ -700,7 +780,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_create_stats_model(self):
         """Test the create_stats_model method."""
@@ -718,7 +801,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         # Test create method with different state_stats_mapping.
         exploration_stats.state_stats_mapping = {
@@ -873,7 +959,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
-            for state_name, dest_state_name in python_utils.ZIP(
+            for state_name, dest_state_name in zip(
                 state_names[:-1], state_names[1:]))
         actions.append({
             'action_type': 'ExplorationQuit',
@@ -1988,7 +2074,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     def test_get_state_reference_for_exp_raises_error_for_fake_exp_id(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.get_user_id_from_email(self.OWNER_EMAIL)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Entity .* not found'):
             stats_services.get_state_reference_for_exploration(
                 'fake_exp', 'state_name')
@@ -2000,7 +2086,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No state with the given state name was found'):
             stats_services.get_state_reference_for_exploration(
@@ -2018,7 +2104,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(state_reference, 'exp_id1:Introduction')
 
     def test_get_state_reference_for_question_with_invalid_question_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No question with the given question id exists'):
             stats_services.get_state_reference_for_question(
@@ -2087,7 +2173,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             len(learner_answer_details.learner_answer_info_list), 0)
 
     def test_delete_learner_answer_info_with_invalid_input(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.delete_learner_answer_info(
@@ -2109,7 +2195,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_info_id = 'id_1'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Learner answer info with the given id not found'):
             stats_services.delete_learner_answer_info(
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -2150,7 +2236,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             len(learner_answer_details.learner_answer_info_list), 1)
 
     def test_update_with_invalid_input_raises_exception(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.update_state_reference(

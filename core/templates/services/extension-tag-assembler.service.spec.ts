@@ -36,17 +36,19 @@ describe('Extension Tag Assembler Service', () => {
   });
 
   it('should not format element without customization', () => {
-    const element = $('<p>');
+    const element = document.createElement('p');
     const interactionCustomizationArgs = {};
     const expectedElement = '<p></p>';
 
-    expect(etas.formatCustomizationArgAttrs(
-      element, interactionCustomizationArgs).get(0).outerHTML).toEqual(
-      expectedElement);
+    expect(
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).outerHTML
+    ).toEqual(expectedElement);
   });
 
   it('should format element with customization', () => {
-    const element = $('<p>');
+    const element = document.createElement('p');
     const interactionCustomizationArgs = {
       choices: {value: 'sampleChoice'}
     };
@@ -54,24 +56,48 @@ describe('Extension Tag Assembler Service', () => {
       'choices-with-value="&amp;quot;sampleChoice&amp;quot;"' +
       '></p>';
 
-    expect(etas.formatCustomizationArgAttrs(
-      element, interactionCustomizationArgs).get(0).outerHTML).toEqual(
-      expectedElement);
+    expect(
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).outerHTML
+    ).toEqual(expectedElement);
   });
 
   it('should format element with complex customization', () => {
-    const element = $('<p>');
+    const element = document.createElement('p');
     const interactionCustomizationArgs = {
-      test: {value: {
-        attr: [new SubtitledHtml('html', 'ca_id')]
-      }}
+      test: {
+        value: {
+          attr: [new SubtitledHtml('html', 'ca_id')]
+        }
+      }
     };
     const expectedElement = '<p test-with-value="{&amp;quot;attr&amp;quot;:' +
       '[{&amp;quot;html&amp;quot;:&amp;quot;html&amp;quot;,&amp;quot;' +
       'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;}]}"></p>';
 
-    expect(etas.formatCustomizationArgAttrs(
-      element, interactionCustomizationArgs).get(0).outerHTML).toEqual(
-      expectedElement);
+    expect(
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).outerHTML
+    ).toEqual(expectedElement);
+  });
+
+  it('should format element with multiple customizations', () => {
+    const element = document.createElement('p');
+    const interactionCustomizationArgs = {
+      choices: {value: 'sampleChoice'},
+      test: {value: 'sampleValue'}
+    };
+    const expectedElement = '<p ' +
+      'choices-with-value="&amp;quot;sampleChoice&amp;quot;" ' +
+      'test-with-value="&amp;quot;sampleValue&amp;quot;"' +
+      '></p>';
+
+    expect(
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).outerHTML
+    ).toEqual(expectedElement);
   });
 });

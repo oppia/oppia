@@ -21,6 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferredLanguagesComponent } from './preferred-languages.component';
 
 describe('Preferred Languages Component', () => {
@@ -36,6 +37,7 @@ describe('Preferred Languages Component', () => {
         ReactiveFormsModule
       ],
       declarations: [
+        MockTranslatePipe,
         PreferredLanguagesComponent
       ]
     }).compileComponents();

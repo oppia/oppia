@@ -16,27 +16,45 @@
  * @fileoverview Unit tests for the stories list viewer.
  */
 
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
+class MockNgbModalRef {
+  componentInstance: {
+    body: 'xyz';
+  };
+}
 
 describe('topicEditorStoriesList', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
   let $q = null;
-  let $uibModal = null;
   let $window = null;
   let storySummaries = null;
   let topicUpdateService = null;
   let undoRedoService = null;
+  let ngbModal: NgbModal = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     topicUpdateService = $injector.get('TopicUpdateService');
     undoRedoService = $injector.get('UndoRedoService');
     $window = $injector.get('$window');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -114,9 +132,11 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should delete story when user deletes story', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
     spyOn(topicUpdateService, 'removeCanonicalStory');
     ctrl.storySummaries = storySummaries;
 
@@ -125,21 +145,22 @@ describe('topicEditorStoriesList', () => {
     $scope.deleteCanonicalStory('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
     expect(topicUpdateService.removeCanonicalStory).toHaveBeenCalled();
     expect(ctrl.storySummaries.length).toBe(1);
     expect(ctrl.storySummaries[0].getId()).toBe('storyId2');
   });
 
   it('should close modal when user click cancel button', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
     $scope.deleteCanonicalStory('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should open story editor when user clicks a story', () => {
@@ -153,27 +174,33 @@ describe('topicEditorStoriesList', () => {
 
   it('should open save changes modal when user tries to open story editor' +
   ' without saving changes', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
     $scope.openStoryEditor('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should close save changes modal when closes the saves changes' +
   ' modal', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject()
+      }) as NgbModalRef;
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
     $scope.openStoryEditor('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalled();
   });
 });

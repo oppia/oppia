@@ -331,6 +331,7 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { RatioExpressionInputRulesService } from
@@ -434,8 +435,6 @@ import { StateWrittenTranslationsService } from
 import { StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -499,6 +498,7 @@ import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { QuestionValidationService } from './question-validation.service';
+import { MathInteractionsService } from './math-interactions.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -522,7 +522,9 @@ export class UpgradedServices {
     upgradedServices['AdminRouterService'] = new AdminRouterService();
     upgradedServices['AdminTaskManagerService'] = new AdminTaskManagerService();
     upgradedServices['AlgebraicExpressionInputRulesService'] =
-      new AlgebraicExpressionInputRulesService();
+      new AlgebraicExpressionInputRulesService(
+        new MathInteractionsService(),
+        new NumericExpressionInputRulesService());
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AppService'] = new AppService();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
@@ -578,7 +580,9 @@ export class UpgradedServices {
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
-      new MathEquationInputRulesService();
+      new MathEquationInputRulesService(
+        upgradedServices['AlgebraicExpressionInputRulesService']
+      );
     upgradedServices['Meta'] = new Meta({});
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
@@ -616,10 +620,7 @@ export class UpgradedServices {
       new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
-    upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory();
-    upgradedServices['StoryObjectFactory'] = new StoryObjectFactory(
-      upgradedServices['StoryContentsObjectFactory']);
+    upgradedServices['StoryObjectFactory'] = new StoryObjectFactory();
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
@@ -704,7 +705,8 @@ export class UpgradedServices {
     upgradedServices['ItemSelectionInputValidationService'] =
       new ItemSelectionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['LocalStorageService'] = new LocalStorageService();
+    upgradedServices['LocalStorageService'] = new LocalStorageService(
+      upgradedServices['WindowRef']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -766,7 +768,9 @@ export class UpgradedServices {
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['SkillCreationBackendApiService'] =
-        new SkillCreationBackendApiService(upgradedServices['HttpClient']);
+        new SkillCreationBackendApiService(
+          upgradedServices['HttpClient'],
+          upgradedServices['ImageLocalStorageService']);
     upgradedServices['StateTopAnswersStatsObjectFactory'] =
         new StateTopAnswersStatsObjectFactory();
     upgradedServices['SpeechSynthesisChunkerService'] =
@@ -781,8 +785,6 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']);
-    upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory();
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -883,7 +885,7 @@ export class UpgradedServices {
     upgradedServices['StoryEditorNavigationService'] =
         new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['StoryObjectFactory'] =
-      new StoryObjectFactory(upgradedServices['StoryContentsObjectFactory']);
+      new StoryObjectFactory();
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory();
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
@@ -968,7 +970,8 @@ export class UpgradedServices {
     upgradedServices['ContributionOpportunitiesBackendApiService'] =
       new ContributionOpportunitiesBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UserService']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
@@ -1032,10 +1035,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['PretestQuestionBackendApiService'] =
-      new PretestQuestionBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
     upgradedServices['ProfilePageBackendApiService'] =
       new ProfilePageBackendApiService(
         upgradedServices['UrlInterpolationService'],
@@ -1067,7 +1066,8 @@ export class UpgradedServices {
         upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['ImageLocalStorageService']);
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(
         upgradedServices['HttpClient']);
@@ -1240,6 +1240,8 @@ export class UpgradedServices {
     // Topological level: 9.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
+    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
+      upgradedServices['StateObjectFactory']);
 
     // Topological level: 10.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
@@ -1248,6 +1250,11 @@ export class UpgradedServices {
       upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']);
+    upgradedServices['PretestQuestionBackendApiService'] =
+      new PretestQuestionBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['QuestionObjectFactory']);
 
     /* eslint-enable dot-notation */
     return upgradedServices;

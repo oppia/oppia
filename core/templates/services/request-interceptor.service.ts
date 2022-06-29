@@ -17,8 +17,7 @@
  */
 
 import { from, Observable } from 'rxjs';
-import { HttpRequest, HttpInterceptor,
-  HttpEvent, HttpHandler } from '@angular/common/http';
+import { HttpRequest, HttpInterceptor, HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 import { CsrfTokenService } from './csrf-token.service';
@@ -80,6 +79,8 @@ export class RequestInterceptor implements HttpInterceptor {
       }
     }
 
+    RequestInterceptor.checkForNullParams(request);
+
     if (request.body) {
       return from(this.csrf.getTokenAsync())
         .pipe(
@@ -117,5 +118,19 @@ export class RequestInterceptor implements HttpInterceptor {
     } else {
       return next.handle(request);
     }
+  }
+
+  private static checkForNullParams(request: HttpRequest<FormData>): void {
+    // We only disallow null params for GET and DELETE requests.
+    if (request.method !== 'GET' && request.method !== 'DELETE') {
+      return;
+    }
+    request.params.keys().forEach((key: string) => {
+      request.params.getAll(key)?.forEach((value: string) => {
+        if (value === 'null' || value === 'None') {
+          throw new Error('Cannot supply params with value "None" or "null".');
+        }
+      });
+    });
   }
 }

@@ -12,40 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-
 /**
  * @fileoverview Controller for question editor modal.
  */
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/ngb-modal.service.ts');
 
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmQuestionExitModalComponent } from './confirm-question-exit-modal.component';
+import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+
 angular.module('oppia').controller('QuestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService', 'NgbModal', 'QuestionUndoRedoService',
-  'QuestionValidationService',
-  'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
+  '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
+  'ContextService', 'ImageLocalStorageService', 'NgbModal',
+  'QuestionUndoRedoService', 'QuestionValidationService',
+  'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   'rubric', 'skillName', 'untriagedSkillSummaries', 'MAX_COMMIT_MESSAGE_LENGTH',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
-      ImageLocalStorageService, NgbModal, QuestionUndoRedoService,
-      QuestionValidationService,
-      UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
+      $rootScope, $scope, $uibModalInstance, AlertsService,
+      ContextService, ImageLocalStorageService, NgbModal,
+      QuestionUndoRedoService, QuestionValidationService,
+      associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
       rubric, skillName, untriagedSkillSummaries, MAX_COMMIT_MESSAGE_LENGTH) {
@@ -149,17 +150,14 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       }
 
       if (QuestionUndoRedoService.hasChanges()) {
-        $uibModal.open({
-          templateUrl:
-                 UrlInterpolationService.getDirectiveTemplateUrl(
-                   '/components/question-directives' +
-                   '/modal-templates/' +
-                   'question-editor-save-modal.template.html'),
-          backdrop: 'static',
-          controller: 'ConfirmOrCancelModalController'
+        NgbModal.open(QuestionEditorSaveModalComponent, {
+          backdrop: 'static'
         }).result.then(function(commitMessage) {
           returnModalObject.commitMessage = commitMessage;
           $uibModalInstance.close(returnModalObject);
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is
@@ -192,17 +190,15 @@ angular.module('oppia').controller('QuestionEditorModalController', [
 
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
-        $uibModal.open({
-          templateUrl:
-            UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/question-directives/modal-templates/' +
-              'confirm-question-modal-exit-modal.directive.html'),
+        NgbModal.open(ConfirmQuestionExitModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           ContextService.resetImageSaveDestination();
           ImageLocalStorageService.flushStoredImagesData();
           $uibModalInstance.dismiss('cancel');
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is

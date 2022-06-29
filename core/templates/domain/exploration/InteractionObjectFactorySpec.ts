@@ -805,7 +805,7 @@ describe('Interaction object factory', () => {
         const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
           interactionId].customization_arg_specs;
         caSpecs.forEach(
-          (caSpec: { name: string; 'default_value': Object; }) => {
+          (caSpec: { name: string; 'default_value': Object }) => {
             defaultCa[caSpec.name] = {value: caSpec.default_value};
           }
         );

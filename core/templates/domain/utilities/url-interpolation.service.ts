@@ -30,7 +30,7 @@ const hashes = require('hashes.json');
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
 export interface InterpolationValuesType {
-  [param: string]: string
+  [param: string]: string;
 }
 
 @Injectable({
@@ -194,6 +194,15 @@ export class UrlInterpolationService {
   getStaticVideoUrl(videoPath: string): string {
     this.validateResourcePath(videoPath);
     return this._getCompleteUrl('/assets', '/videos' + videoPath);
+  }
+
+  /**
+   * Given an audio path relative to /assets/audio folder,
+   * returns the complete url path to that audio.
+   */
+  getStaticAudioUrl(audioPath: string): string {
+    this.validateResourcePath(audioPath);
+    return this._getCompleteUrl('/assets', '/audio' + audioPath);
   }
 
   /**

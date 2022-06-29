@@ -17,10 +17,10 @@
 from __future__ import annotations
 
 import datetime
+import enum
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
@@ -63,8 +63,14 @@ from core.tests import test_utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
+
+class ParamNames(enum.Enum):
+    """Enum for parameter names."""
+
+    TEST_FEATURE_1 = 'test_feature_1'
+
+
+FeatureStages = platform_parameter_domain.FeatureStages
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -143,7 +149,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload an exploration in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -159,7 +165,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -171,7 +177,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_load_new_structures_data(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegexp(
+        assert_raises_regexp = self.assertRaisesRegex(
             Exception, 'User does not have enough rights to generate data.')
         with assert_raises_regexp:
             self.post_json(
@@ -185,7 +191,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy skills in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -197,7 +203,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_generate_dummy_skill_data(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegexp(
+        assert_raises_regexp = self.assertRaisesRegex(
             Exception, 'User does not have enough rights to generate data.')
         with assert_raises_regexp:
             self.post_json(
@@ -211,7 +217,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload a collection in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -324,7 +330,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic', 'abbrev', 'description')
+            topic_id, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -384,6 +390,106 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         new_creation_time = all_opportunity_models[0].created_on
 
         self.assertLess(old_creation_time, new_creation_time)
+
+    def test_rollback_exploration_to_safe_state_action(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.save_new_valid_exploration(
+            '0', owner_id, title='title', end_state_name='End State',
+            correctness_feedback_enabled=True)
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 1')
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 2')
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 3')
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 4')
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'rollback_exploration_to_safe_state',
+                'exp_id': '0'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'version': 5
+            })
+
+        snapshot_content_model = (
+            exp_models.ExplorationSnapshotContentModel.get(
+                '0-5', strict=False))
+        snapshot_content_model.delete()
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '0-4', strict=False))
+        snapshot_metadata_model.delete()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'rollback_exploration_to_safe_state',
+                'exp_id': '0'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'version': 3
+            })
 
     def test_admin_topics_csv_download_handler(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -466,11 +572,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_feature_flags(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(PARAM_NAMES, feature.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -488,7 +594,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
         new_rule_dicts = [
             {
                 'filters': [
@@ -503,7 +609,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(PARAM_NAMES, feature.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -532,7 +638,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
         new_rule_dicts = [
             {
                 'filters': [
@@ -547,7 +653,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(PARAM_NAMES, feature.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -577,7 +683,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
         new_rule_dicts = [
             {
                 'filters': [
@@ -592,7 +698,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(PARAM_NAMES, feature.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -745,7 +851,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
         new_rule_dicts = [
             {
                 'filters': [
@@ -760,7 +866,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(PARAM_NAMES, feature.name)])
+            [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -1002,7 +1108,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy explorations in production.')
 
         with assert_raises_regexp_context_manager, prod_mode_swap:

@@ -1,0 +1,39 @@
+<div class="pencil-code-editor-container">
+  <div class="pencil-code-editor-iframe oppia-pencil-code-editor-iframe">
+    <div></div>
+  </div>
+  <div class="oppia-reset-code-button-container">
+    <button mat-button class="oppia-reset-code-text"
+            (click)="reset()"
+            [disabled]="!interactionIsActive"
+            [innerHTML]="'I18N_RESET_CODE' | translate">
+    </button>
+  </div>
+</div>
+<style>
+  .pencil-code-editor-container {
+    background: #fff;
+    max-width: 100%;
+    padding: 8px;
+    width: 100%;
+  }
+  .oppia-pencil-code-editor-iframe {
+    height: 500px;
+    position: relative;
+  }
+  .oppia-reset-code-button-container {
+    margin-top: 4px;
+  }
+  .oppia-reset-code-text {
+    color: #333;
+  }
+  .oppia-reset-code-text:hover {
+    background-color: #f5f5f5;
+  }
+
+  @media screen and (max-width: 959px) {
+    .pencil-code-editor-container {
+      width: 100vw;
+    }
+  }
+</style>

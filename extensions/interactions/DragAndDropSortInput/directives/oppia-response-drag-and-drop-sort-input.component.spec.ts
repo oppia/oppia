@@ -16,61 +16,85 @@
  * @fileoverview Unit tests for the DragAndDropSortInput response.
  */
 
-describe('oppiaResponseDragAndDropSortInput', () => {
-  let ctrl = null;
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ResponseDragAndDropSortInputComponent } from './oppia-response-drag-and-drop-sort-input.component';
 
-  let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
-      return answer;
+describe('Drag and drop sort input response component', () => {
+  let component: ResponseDragAndDropSortInputComponent;
+  let fixture: ComponentFixture<ResponseDragAndDropSortInputComponent>;
+
+  class MockHtmlEscaperService {
+    escapedJsonToObj(answer: string): string {
+      return JSON.parse(answer);
     }
-  };
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('HtmlEscaperService', mockHtmlEscaperService);
-    $provide.value('$attrs', {
-      answer: [
-        [
-          'ca_choices_1'
-        ],
-        [
-          'ca_choices_2'
-        ],
-        [
-          'ca_choices_3'
-        ]
-      ]
-    });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ResponseDragAndDropSortInputComponent],
+      providers: [
+        {
+          provide: HtmlEscaperService,
+          useClass: MockHtmlEscaperService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    ctrl = $componentController('oppiaResponseDragAndDropSortInput');
-  }));
+  beforeEach(() => {
+    fixture = (
+      TestBed.createComponent(ResponseDragAndDropSortInputComponent));
+    component = fixture.componentInstance;
+    component.answer = '[' +
+      '[' +
+        '"ca_choices_1"' +
+      '],' +
+      '[' +
+        '"ca_choices_2"' +
+      '],' +
+      '[' +
+        '"ca_choices_3"' +
+      ']' +
+    ']';
+    component.choices = '[{' +
+      '"_html": "Choice 1",' +
+      '"_contentId": "ca_choices_1"' +
+    '}, {' +
+      '"_html": "Choice 2",' +
+      '"_contentId": "ca_choices_2"' +
+    '}, {' +
+      '"_html": "Choice 3",' +
+      '"_contentId": "ca_choices_3"' +
+    '}]';
+  });
 
   it('should initialise component when user submits answer', () => {
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.answer).toEqual([
+    expect(component.responseList).toEqual([
       [
-        'ca_choices_1'
+        'Choice 1'
       ],
       [
-        'ca_choices_2'
+        'Choice 2'
       ],
       [
-        'ca_choices_3'
+        'Choice 3'
       ]
     ]);
-    expect(ctrl.isAnswerLengthGreaterThanZero).toBe(true);
+    expect(component.isAnswerLengthGreaterThanZero).toBe(true);
   });
 
   it('should display item below another item when user drags item to' +
   ' new position', () => {
-    expect(ctrl.chooseItemType(0)).toBe('drag-and-drop-response-item');
+    expect(component.chooseItemType(0)).toBe('drag-and-drop-response-item');
   });
 
   it('should display item right below another item when user puts' +
   ' 2 or more items in the same position', () => {
-    expect(ctrl.chooseItemType(1)).toBe('drag-and-drop-response-subitem');
+    expect(component.chooseItemType(1)).toBe('drag-and-drop-response-subitem');
   });
 });

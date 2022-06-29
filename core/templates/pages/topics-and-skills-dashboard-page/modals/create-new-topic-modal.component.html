@@ -48,6 +48,20 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Web Title Fragment for Web*</span></div>
+      <div>
+        <input class="protractor-test-new-page-title-fragm-field required"
+               [(ngModel)]="newlyCreatedTopic.pageTitleFragment"
+               [ngModelOptions]="{standalone: true}">
+      </div>
+      <span class="oppia-input-box-subtitle">
+        <em>
+          Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ newlyCreatedTopic.name }} | Add, Subtract, Multiply and Divide | Oppia".
+          It should be at least {{ minWebTitleFrag }} and at most {{ maxWebTitleFrag }} characters.
+        </em>
+      </span>
+    </div>
+    <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Description*</span></div>
       <textarea class="protractor-test-new-topic-description-field required"
                 rows="4" cols="50" placeholder="Enter description"
@@ -83,7 +97,7 @@
 <style>
   .create-new-topic-form .ng-touched.invalid-field,
   .create-new-topic-form .ng-touched.ng-empty.required {
-     outline: 1px solid #F00;
+     outline: 1px solid #f00;
   }
   .create-new-topic-form .create-new-topic-input-field {
      margin: 10px 0;
@@ -115,17 +129,17 @@
     }
     .create-new-topic .modal-header {
       align-items: center;
-      background-color: #00609C;
+      background-color: #00609c;
       display: flex;
     }
     .create-new-topic .modal-header h3 {
-      color: #FFF;
+      color: #fff;
     }
     .create-new-topic .create-new-topic-input-field {
       margin: 25px 0;
     }
     .create-new-topic .modal-close-button {
-      color: #FFF;
+      color: #fff;
       display: block;
       font-size: 20px;
     }

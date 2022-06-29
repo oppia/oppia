@@ -146,9 +146,9 @@ describe('Question Validation Service', () => {
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
-          '1', 'misc1', 'notes1', 'feedback1', true),
+          1, 'misc1', 'notes1', 'feedback1', true),
         misconceptionObjectFactory.create(
-          '2', 'misc2', 'notes2', 'feedback1', false)
+          2, 'misc2', 'notes2', 'feedback1', false)
       ]
     };
   });

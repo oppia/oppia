@@ -27,6 +27,14 @@
   </mat-card>
 
   <mat-dialog-content>
+
+    <div *ngIf="beamJobRun.isFailed()" class="beam-job-run-failure-message">
+      <em>
+        The job failed, for more details please check the Google Cloud Dataflow
+        dashboard or ask someone with access to the dashboard to check it.
+      </em>
+    </div>
+
     <mat-tab-group *ngIf="output !== null && !output.isEmpty()">
       <mat-tab *ngIf="output.stdout" label="Output" aria-label="Output">
         <ng-template matTabContent>
@@ -80,6 +88,10 @@
   .view-beam-job-output-dialog .beam-job-run-summary-table td,
   .view-beam-job-output-dialog .beam-job-run-summary-table th {
     padding: 10px;
+  }
+  .view-beam-job-output-dialog .beam-job-run-failure-message {
+    padding: 1em 0;
+    text-align: center;
   }
   .view-beam-job-output-dialog .beam-job-run-output {
     background-color: rgba(0, 0, 0, 0.06);

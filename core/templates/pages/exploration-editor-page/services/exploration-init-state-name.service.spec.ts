@@ -17,15 +17,21 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
 
 describe('Exploration Init State Name Service', () => {
   let eisns: ExplorationInitStateNameService = null;
 
-  importAllAngularServices();
-
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationPropertyService
+      ]
+    });
+
     eisns = TestBed.inject(ExplorationInitStateNameService);
   });
 

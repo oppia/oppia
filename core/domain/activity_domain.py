@@ -60,8 +60,10 @@ class ActivityReference:
         Raises:
             Exception. The activity type is invalid.
         """
-        if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
-                self.type != constants.ACTIVITY_TYPE_COLLECTION):
+        if (self.type not in (
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.ACTIVITY_TYPE_COLLECTION
+        )):
             raise Exception('Invalid activity type: %s' % self.type)
         if not isinstance(self.id, str):
             raise Exception(

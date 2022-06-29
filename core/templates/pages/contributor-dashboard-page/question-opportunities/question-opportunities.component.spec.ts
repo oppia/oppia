@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for questionOpportunities.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ContributionOpportunitiesBackendApiService } from
@@ -31,6 +31,13 @@ import { UserService } from 'services/user.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+class MockNgbModalRef {
+  componentInstance: {
+    skillId: null;
+  };
+}
 
 describe('Question opportunities component', function() {
   var ctrl = null;
@@ -39,6 +46,7 @@ describe('Question opportunities component', function() {
   var $uibModal = null;
   var alertsService = null;
   var contributionOpportunitiesService = null;
+  let ngbModal: NgbModal = null;
   var questionUndoRedoService = null;
   var siteAnalyticsService = null;
   var skillObjectFactory = null;
@@ -46,6 +54,16 @@ describe('Question opportunities component', function() {
 
   var opportunitiesArray = [];
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -69,6 +87,7 @@ describe('Question opportunities component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
     questionUndoRedoService = $injector.get('QuestionUndoRedoService');
@@ -134,7 +153,12 @@ describe('Question opportunities component', function() {
 
   it('should register Contributor Dashboard suggest event when clicking on' +
     ' suggest question button', function() {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef
+    );
     spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
@@ -170,7 +194,12 @@ describe('Question opportunities component', function() {
 
   it('should open select skill and skill difficulty modal when clicking' +
     ' on suggesting question button', function() {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
@@ -181,7 +210,7 @@ describe('Question opportunities component', function() {
     ctrl.onClickSuggestQuestionButton('1');
     $rootScope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should open create question modal when creating a question', function() {
@@ -211,18 +240,20 @@ describe('Question opportunities component', function() {
   });
 
   it('should create a question when closing create question modal',
-    function() {
-      var openSpy = spyOn($uibModal, 'open');
+    fakeAsync(() => {
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve({
+        Promise.resolve({
           isLoggedIn: () => true
         }));
+
       ctrl.$onInit();
-      $rootScope.$apply();
+      tick();
       alertsService.clearWarnings();
 
-      openSpy.and.returnValue({
-        result: $q.resolve({
+      spyOn(questionUndoRedoService, 'clearChanges');
+      var openSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve({
           skill: skillObjectFactory.createFromBackendDict({
             id: '1',
             description: 'test description',
@@ -243,33 +274,30 @@ describe('Question opportunities component', function() {
           }),
           skillDifficulty: 1
         })
-      });
-      ctrl.onClickSuggestQuestionButton('1');
-      openSpy.calls.reset();
+      } as NgbModalRef);
 
-      spyOn(questionUndoRedoService, 'clearChanges');
-      openSpy.and.returnValue({
-        result: $q.resolve()
-      });
-      $rootScope.$apply();
+      ctrl.onClickSuggestQuestionButton('1');
+      tick();
 
       expect(openSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
-    });
+    }));
 
   it('should suggest a question when dismissing create question modal',
-    function() {
-      var openSpy = spyOn($uibModal, 'open');
+    fakeAsync(() => {
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve({
+        Promise.resolve({
           isLoggedIn: () => true
         }));
+
       ctrl.$onInit();
-      $rootScope.$apply();
+      tick();
       alertsService.clearWarnings();
 
-      openSpy.and.returnValue({
-        result: $q.resolve({
+      spyOn(questionUndoRedoService, 'clearChanges');
+      var openSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve({
           skill: skillObjectFactory.createFromBackendDict({
             id: '1',
             description: 'test description',
@@ -290,25 +318,23 @@ describe('Question opportunities component', function() {
           }),
           skillDifficulty: 1
         })
-      });
-      ctrl.onClickSuggestQuestionButton('1');
-      openSpy.calls.reset();
+      } as NgbModalRef);
 
-      spyOn(questionUndoRedoService, 'clearChanges');
-      openSpy.and.returnValue({
-        result: $q.reject()
-      });
-      $rootScope.$apply();
+      ctrl.onClickSuggestQuestionButton('1');
+      tick();
 
       expect(openSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
-    });
+    }));
 
   it('should not create a question when dismissing select skill and skill' +
     ' difficulty modal', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject()
+      } as NgbModalRef
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
@@ -319,6 +345,6 @@ describe('Question opportunities component', function() {
     ctrl.onClickSuggestQuestionButton('1');
     $rootScope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 });

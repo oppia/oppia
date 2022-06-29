@@ -20,9 +20,9 @@
 export interface RecordedVoiceOverBackendDict {
   'voiceovers_mapping': {
     [propName: string]: {
-      [propName: string]: VoiceoverBackendDict
-    }
-  }
+      [propName: string]: VoiceoverBackendDict;
+    };
+  };
 }
 
 export interface VoiceoverMapping {

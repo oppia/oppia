@@ -26,7 +26,8 @@ describe('Exploration id validation service', () => {
   let explorationIdValidationService:
     ExplorationIdValidationService;
   let httpTestingController: HttpTestingController;
-  let validExpResults: ExplorationSummaryBackendDict;
+  let validExpResultsWithCustomCategory: ExplorationSummaryBackendDict;
+  let validExpResultsWithDefaultCategory: ExplorationSummaryBackendDict;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
 
@@ -45,7 +46,7 @@ describe('Exploration id validation service', () => {
   });
 
   beforeEach(() => {
-    validExpResults = {
+    validExpResultsWithCustomCategory = {
       summaries: [{
         id: '0',
         num_views: 0,
@@ -61,6 +62,34 @@ describe('Exploration id validation service', () => {
         last_updated_msec: 1581965806278.183,
         language_code: 'en',
         category: 'Test',
+        objective: 'Dummy exploration for testing all interactions',
+        activity_type: 'exploration',
+        status: 'public',
+        thumbnail_bg_color: '#a33f40',
+        tags: [],
+        thumbnail_icon_url: '/subjects/Lightbulb.svg',
+        community_owned: true,
+        title: 'Test of all interactions',
+        num_total_threads: 0,
+        num_open_threads: 0
+      } as ExplorationSummaryDict]
+    };
+    validExpResultsWithDefaultCategory = {
+      summaries: [{
+        id: '1',
+        num_views: 0,
+        human_readable_contributors_summary: {},
+        created_on_msec: 1581965806278.269,
+        ratings: {
+          5: 0,
+          4: 0,
+          1: 0,
+          3: 0,
+          2: 0
+        },
+        last_updated_msec: 1581965806278.183,
+        language_code: 'en',
+        category: 'Algebra',
         objective: 'Dummy exploration for testing all interactions',
         activity_type: 'exploration',
         status: 'public',
@@ -140,10 +169,78 @@ describe('Exploration id validation service', () => {
     const req = httpTestingController
       .expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(validExpResults);
+    req.flush(validExpResultsWithCustomCategory);
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(true);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should determine correctness feedback state when it is ' +
+    'enabled for the exploration', fakeAsync(() => {
+    const explorationId = '0';
+    const requestUrl = '/explorehandler/init/' + explorationId;
+
+    explorationIdValidationService.isCorrectnessFeedbackEnabled(explorationId)
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({correctness_feedback_enabled: true});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(true);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should determine correctness feedback state when it is ' +
+    'disabled for the exploration', fakeAsync(() => {
+    const explorationId = '0';
+    const requestUrl = '/explorehandler/init/' + explorationId;
+
+    explorationIdValidationService.isCorrectnessFeedbackEnabled(explorationId)
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({correctness_feedback_enabled: false});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(false);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should determine if the exploration category is ' +
+    'default for the exploration', fakeAsync(() => {
+    const explorationIds = ['0'];
+    const requestUrl = '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=false';
+
+    explorationIdValidationService.isDefaultCategoryAsync(explorationIds[0])
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(validExpResultsWithDefaultCategory);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(true);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should determine if the exploration category is ' +
+    'not default for the exploration', fakeAsync(() => {
+    const explorationIds = ['0'];
+    const requestUrl = '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=false';
+
+    explorationIdValidationService.isDefaultCategoryAsync(explorationIds[0])
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(validExpResultsWithCustomCategory);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(false);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 });

@@ -31,7 +31,7 @@ export interface GraphNodes {
   [stateName: string]: string;
 }
 
-interface GraphData {
+export interface GraphData {
   finalStateIds: string[];
   initStateId: string;
   links: GraphLink[];
@@ -44,7 +44,7 @@ interface GraphData {
 export class ComputeGraphService {
   _computeGraphData(initStateId: string, states: States): GraphData {
     let nodes: Record<string, string> = {};
-    let links: { source: string; target: string; }[] = [];
+    let links: { source: string; target: string }[] = [];
     let finalStateIds = states.getFinalStateNames();
 
     states.getStateNames().forEach(function(stateName) {

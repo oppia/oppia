@@ -38,11 +38,11 @@ class EmulatorBlob:
     """Object for storing the file data."""
 
     def __init__(
-            self,
-            name: str,
-            data: Union[bytes, str],
-            content_type: Optional[str]
-    ):
+        self,
+        name: str,
+        data: Union[bytes, str],
+        content_type: Optional[str]
+    ) -> None:
         """Initialize blob.
 
         Args:
@@ -52,6 +52,9 @@ class EmulatorBlob:
                 from Cloud Storage as bytes.
             content_type: str|None. The content type of the blob. It should
                 be in the MIME format.
+
+        Raises:
+            Exception. Content type contains unknown MIME type.
         """
         self._name = name
         # TODO(#13500): Refactor this method that only bytes are passed
@@ -78,7 +81,7 @@ class EmulatorBlob:
 
     @classmethod
     def create_copy(
-            cls, original_blob: EmulatorBlob, new_name: str
+        cls, original_blob: EmulatorBlob, new_name: str
     ) -> EmulatorBlob:
         """Create new instance of EmulatorBlob with the same values.
 

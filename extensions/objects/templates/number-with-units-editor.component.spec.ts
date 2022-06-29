@@ -19,6 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NumberWithUnitsEditorComponent } from './number-with-units-editor.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('NumberWithUnitsEditorComponent', () => {
   let component: NumberWithUnitsEditorComponent;
@@ -26,7 +27,7 @@ describe('NumberWithUnitsEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [NumberWithUnitsEditorComponent],
+      declarations: [MockTranslatePipe, NumberWithUnitsEditorComponent],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -98,13 +99,13 @@ describe('NumberWithUnitsEditorComponent', () => {
 
     expect(component.value?.real).toBe(24);
     expect(component.value?.units[0].unit).toBe('kg');
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
   });
 
   it('should display error message when user enters incorrect units', () => {
     component.updateValue('23 kf');
 
-    expect(component.errorMessage).toBe('Unit "kf" not found.');
+    expect(component.errorMessageI18nKey).toBe('Unit "kf" not found.');
   });
 });

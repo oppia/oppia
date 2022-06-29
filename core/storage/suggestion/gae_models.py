@@ -278,15 +278,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that match the given
-            query values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
-            suggestions.
+            query values, up to a maximum of
+            feconf.DEFAULT_SUGGESTION_QUERY_LIMIT suggestions.
+
+        Raises:
+            Exception. The field cannot be queried.
         """
         query = cls.query()
         for (field, value) in query_fields_and_values:
             if field not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
                 raise Exception('Not allowed to query on field %s' % field)
             query = query.filter(getattr(cls, field) == value)
-        return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return query.fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_translation_suggestions_in_review_with_exp_id(
@@ -303,14 +306,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             list(SuggestionModel). A list of translation suggestions in review
             with target_id of exp_id. The number of returned results is capped
-            by feconf.DEFAULT_QUERY_LIMIT.
+            by feconf.DEFAULT_SUGGESTION_QUERY_LIMIT.
         """
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.language_code == language_code,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.target_id == exp_id
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_multiple_suggestions_from_suggestion_ids(
@@ -374,7 +377,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         offset, more = (0, True)
         while more:
             results: Sequence[GeneralSuggestionModel] = (
-                query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset))
+                query.fetch(
+                    feconf.DEFAULT_SUGGESTION_QUERY_LIMIT, offset=offset))
             if len(results):
                 offset = offset + len(results)
                 suggestion_models.extend(results)
@@ -451,6 +455,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are in the given
             score categories, which are in review, but not created by the
             given user.
+
+        Raises:
+            Exception. Given list of score categories is empty.
         """
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
@@ -459,51 +466,195 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.status == STATUS_IN_REVIEW,
             cls.score_category.IN(score_categories),
             cls.author_id != user_id
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def get_in_review_translation_suggestions(
-        cls, user_id: str, language_codes: List[str]
+        cls,
+        user_id: str,
+        language_codes: List[str]
     ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all translation suggestions which are in review.
+        """Fetches all translation suggestions that are in-review where the
+        author_id != user_id and language_code matches one of the supplied
+        language_codes.
 
         Args:
-            user_id: str. The id of the user trying to make this query.
-                As a user cannot review their own suggestions, suggestions
-                authored by the user will be excluded.
-            language_codes: list(str). The list of language codes.
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
+            language_codes: list(str). List of language codes that the
+                suggestions should match.
 
         Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, but not created by the given user.
+            list(SuggestionModel). A list of the matching suggestions.
         """
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,
             cls.language_code.IN(language_codes)
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_question_suggestions(
-        cls, user_id: str
-    ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all question suggestions which are in review.
+    def get_in_review_translation_suggestions_by_offset(
+        cls,
+        limit: int,
+        offset: int,
+        user_id: str,
+        language_codes: List[str]
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches translation suggestions that are in-review where the
+        author_id != user_id and language_code matches one of the supplied
+        language_codes.
 
         Args:
+            limit: int. Maximum number of entities to be returned.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
+            language_codes: list(str). List of language codes that the
+                suggestions should match.
+
+        Returns:
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    in-review, not authored by the supplied user, and that match
+                    one of the supplied language codes.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
+        """
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.author_id != user_id,
+            cls.language_code.IN(language_codes)
+        ))
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
+
+    @classmethod
+    def get_in_review_translation_suggestions_with_exp_ids_by_offset(
+        cls,
+        limit: int,
+        offset: int,
+        user_id: str,
+        language_codes: List[str],
+        exp_ids: List[str]
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Gets all translation suggestions for the given language
+        codes which are in review and correspond to the
+        given exploration IDs.
+
+        Args:
+            limit: int. Maximum number of entities to be returned.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
             user_id: str. The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.
+            language_codes: list(str). The list of language codes.
+            exp_ids: list(str). Exploration IDs matching the target ID of the
+                translation suggestions.
 
         Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, but not created by the given user.
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    in-review, not authored by the supplied user, match
+                    one of the supplied language codes and correspond to the
+                    given exploration IDs.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
+        """
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.author_id != user_id,
+            cls.language_code.IN(language_codes),
+            cls.target_id.IN(exp_ids)
+        ))
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
+
+    @classmethod
+    def get_in_review_translation_suggestions_by_exp_ids(
+        cls, exp_ids: List[str], language_code: str
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all in-review translation suggestions matching the supplied
+        exp_ids and language_code.
+
+        Args:
+            exp_ids: list(str). Exploration IDs matching the target ID of the
+                translation suggestions.
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions matching the supplied
+            exp_ids and language_code.
         """
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.target_id.IN(exp_ids),
+            cls.language_code == language_code
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def get_in_review_question_suggestions_by_offset(
+        cls, limit: int, offset: int, user_id: str
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches question suggestions that are in-review and not authored by
+        the supplied user.
+
+        Args:
+            limit: int. Maximum number of entities to be returned.
+            offset: int. Number of of results to skip from the beginning of all
+                results matching the query.
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
+
+        Returns:
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    in-review, not authored by the supplied user, and that match
+                    one of the supplied language codes.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
+        """
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
             cls.author_id != user_id
-        )).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        ))
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
 
     @classmethod
     def get_question_suggestions_waiting_longest_for_review(
@@ -567,7 +718,43 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return cls.get_all().filter(datastore_services.all_of(
             cls.suggestion_type == suggestion_type,
             cls.author_id == user_id
-        )).order(-cls.created_on).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )).order(-cls.created_on).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def get_user_created_suggestions_by_offset(
+        cls, limit: int, offset: int, suggestion_type: str, user_id: str
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches suggestions of suggestion_type which the supplied user has
+        created.
+
+        Args:
+            limit: int. Maximum number of entities to be returned.
+            offset: int. The number of results to skip from the beginning of all
+                results matching the query.
+            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+
+        Returns:
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    of the supplied type which the supplied user has created.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
+        """
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.suggestion_type == suggestion_type,
+            cls.author_id == user_id
+        )).order(-cls.created_on)
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
+
+        return (
+            results,
+            next_offset
+        )
 
     @classmethod
     def get_all_score_categories(cls) -> List[str]:
@@ -832,15 +1019,14 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls) -> Optional[CommunityContributionStatsModel]: # type: ignore[override]
+    def get(cls) -> CommunityContributionStatsModel: # type: ignore[override]
         """Gets the CommunityContributionStatsModel instance. If the
         CommunityContributionStatsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
-            CommunityContributionStatsModel|None. The single model instance,
-            or None if no such model instance exists.
+            CommunityContributionStatsModel. The single model instance.
         """
         community_contribution_stats_model = cls.get_by_id(
             COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
@@ -1032,7 +1218,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.contributor_user_id == user_id
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -1103,7 +1289,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls, user_id: str
+        cls, user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
         """Exports the data from TranslationContributionStatsModel into dict
         format for Takeout.
@@ -1118,7 +1304,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         stats_models: Sequence[TranslationContributionStatsModel] = (
             cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
         for model in stats_models:
-            user_data[model.id] = {
+            splitted_id = model.id.split('.')
+            id_without_user_id = '%s.%s' % (splitted_id[0], splitted_id[2])
+            user_data[id_without_user_id] = {
                 'language_code': model.language_code,
                 'topic_id': model.topic_id,
                 'submitted_translations_count': (

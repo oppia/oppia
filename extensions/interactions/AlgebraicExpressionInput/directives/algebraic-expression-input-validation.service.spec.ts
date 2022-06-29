@@ -70,7 +70,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['x', 'y', 'a', 'b']
       }
     };
@@ -85,7 +85,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x * x'
+        x: 'x^2'
       }
     }, 'AlgebraicExpressionInput');
 
@@ -145,7 +145,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: '-1 + x*x'
+        x: 'x^2 - 1'
       }
     }, 'AlgebraicExpressionInput');
 
@@ -199,7 +199,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     ];
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['y', 'a', 'b']
       }
     };
@@ -225,7 +225,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     ];
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
       }
     };

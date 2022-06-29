@@ -109,7 +109,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'question_id', strict=False)
         self.assertIsNone(question)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Entity for class QuestionModel with id question_id '
             'not found'):
             question_services.get_question_by_id('question_id')
@@ -182,7 +182,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.9])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The given question and skill are not linked.'):
             question_services.update_question_skill_link_difficulty(
                 self.question_id, 'skill_10', 0.9)
@@ -206,7 +206,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_questions_by_skill_ids_raise_error_with_high_question_count(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Question count is too high, please limit the question '
             'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             question_services.get_questions_by_skill_ids(
@@ -217,7 +217,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Skill difficulties and skill ids should match. '
             'The lengths of the two lists are different.'):
             question_services.link_multiple_skills_for_question(
@@ -277,7 +277,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'Entity for class QuestionModel with id %s not found' % (
@@ -306,7 +306,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3'], 0))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
             question_services.get_displayable_question_skill_link_details(
@@ -350,8 +350,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2])
 
-        with self.assertRaisesRegexp(
-            Exception, 'The given question is already linked to given skill'):
+        with self.assertRaisesRegex(
+            Exception,
+            'The question with ID %s is already linked to skill skill_1' % (
+                self.question_id
+            )
+        ):
             question_services.create_new_question_skill_link(
                 self.editor_id, self.question_id, 'skill_1', 0.3)
 
@@ -436,12 +440,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_services.delete_question(self.editor_id, self.question_id)
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'Entity for class QuestionSummaryModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionSummaryModel.get(self.question_id)
@@ -509,13 +513,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         }
         change_list = [question_domain.QuestionChange(change_dict)]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected a commit message, received none.'):
             question_services.update_question(
                 self.editor_id, self.question_id, change_list, None)
 
     def test_cannot_update_question_with_no_change_list(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save question'):
@@ -570,7 +574,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaisesRegexp(
+        assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
@@ -579,7 +583,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'updated question language code')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertRegexpMatches(
+        self.assertRegex(
             observed_log_messages[0],
             'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
@@ -653,7 +657,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_skills_of_question(self):
         # If the question id doesnt exist at all, it returns an empty list.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Entity for class QuestionModel with id '
             'non_existent_question_id not found'):
             question_services.get_skills_linked_to_question(
@@ -690,7 +694,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             question_services.get_interaction_id_for_question(
                 self.question_id), 'TextInput')
-        with self.assertRaisesRegexp(Exception, 'No questions exists with'):
+        with self.assertRaisesRegex(Exception, 'No questions exists with'):
             question_services.get_interaction_id_for_question('fake_q_id')
 
     def test_untag_deleted_misconceptions_on_no_change_to_skill(self):
@@ -1723,7 +1727,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
+        self.assertEqual(len(answer_groups[0].rule_specs), 2)
         self.assertEqual(
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
@@ -1846,7 +1850,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'x+y'
+                    'x': 'x=y'
                 },
                 'rule_type': 'IsMathematicallyEquivalentTo'
             }],
@@ -1941,12 +1945,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id,
-            'AlgebraicExpressionInput')
+            'MathEquationInput')
         self.assertEqual(len(answer_groups), 1)
         self.assertEqual(
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
@@ -2444,7 +2448,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['customOskLetters'].value, ['x', 'α', 'β'])
+            cust_args['allowedVariables'].value, ['x', 'α', 'β'])
 
     def test_migrate_question_state_from_v38_to_latest(self):
         answer_group = {
@@ -3234,3 +3238,143 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
             cust_args['requireNonnegativeInput'].value, False)
+
+    def test_migrate_question_state_from_v45_to_latest(self):
+        answer_group1 = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }, {
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'OmitsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesWithGeneralForm'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        answer_group2 = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesWithGeneralForm'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group1, answer_group2],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'customOskLetters': {
+                        'value': ['a', 'b']
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'AlgebraicExpressionInput'
+            },
+            'next_content_id_index': 4,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False,
+            'linked_skill_id': None,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=45)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        answer_groups = question.question_state_data.interaction.answer_groups
+        self.assertEqual(len(answer_groups), 1)
+        rule_specs = answer_groups[0].rule_specs
+        self.assertEqual(len(rule_specs), 1)
+        self.assertEqual(rule_specs[0].rule_type, 'MatchesExactlyWith')
+
+        cust_args = question.question_state_data.interaction.customization_args
+        self.assertNotIn('customOskLetters', cust_args)
+        self.assertIn('allowedVariables', cust_args)

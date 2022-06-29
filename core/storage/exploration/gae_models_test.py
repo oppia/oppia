@@ -269,8 +269,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
-        # Ruling out the possibility of None for mypy type checking.
-        assert saved_model is not None
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
         self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
@@ -356,8 +354,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
-        # Ruling out the possibility of None for mypy type checking.
-        assert saved_model is not None
 
         snapshot_dict = saved_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['owner_id']
@@ -424,7 +420,9 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             'name': feconf.CMD_REVERT_COMMIT,
             'required_attribute_names': [],
             'optional_attribute_names': [],
-            'user_id_attribute_names': []
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
         })
         self.allowed_commands_swap = self.swap(
             feconf,
@@ -563,7 +561,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'max_age must be a datetime.timedelta instance or None.'
         ):
             # TODO(#13528): Remove this test after the backend is fully

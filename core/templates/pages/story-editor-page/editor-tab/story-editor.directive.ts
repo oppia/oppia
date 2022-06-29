@@ -16,13 +16,19 @@
  * @fileoverview Controller for the main story editor.
  */
 
+import { Subscription } from 'rxjs';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+import storyConstants from 'assets/constants';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 require(
   'pages/story-editor-page/modal-templates/' +
@@ -38,11 +44,7 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 require('services/stateful/focus-manager.service.ts');
-import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import storyConstants from 'assets/constants';
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -53,7 +55,7 @@ angular.module('oppia').directive('storyEditor', [
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'FocusManagerService',
+        'FocusManagerService', 'NgbModal',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
         'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
@@ -61,7 +63,7 @@ angular.module('oppia').directive('storyEditor', [
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
-            FocusManagerService,
+            FocusManagerService, NgbModal,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, WindowDimensionsService,
             WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
@@ -79,7 +81,9 @@ angular.module('oppia').directive('storyEditor', [
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
-            $scope.storyContents = $scope.story.getStoryContents();
+            if ($scope.story) {
+              $scope.storyContents = $scope.story.getStoryContents();
+            }
             if ($scope.storyContents) {
               $scope.setNodeToEdit($scope.storyContents.getInitialNodeId());
             }
@@ -88,32 +92,34 @@ angular.module('oppia').directive('storyEditor', [
 
           var _initEditor = function() {
             $scope.story = StoryEditorStateService.getStory();
-            $scope.storyContents = $scope.story.getStoryContents();
-            $scope.disconnectedNodes = [];
-            $scope.linearNodesList = [];
-            $scope.nodes = [];
-            $scope.allowedBgColors = (
-              storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
-            if ($scope.storyContents &&
-                $scope.storyContents.getNodes().length > 0) {
-              $scope.nodes = $scope.storyContents.getNodes();
-              $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
-              $scope.linearNodesList =
-                $scope.storyContents.getLinearNodesList();
+            if ($scope.story) {
+              $scope.storyContents = $scope.story.getStoryContents();
+              $scope.disconnectedNodes = [];
+              $scope.linearNodesList = [];
+              $scope.nodes = [];
+              $scope.allowedBgColors = (
+                storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+              if ($scope.storyContents &&
+                  $scope.storyContents.getNodes().length > 0) {
+                $scope.nodes = $scope.storyContents.getNodes();
+                $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
+                $scope.linearNodesList =
+                  $scope.storyContents.getLinearNodesList();
+              }
+              $scope.notesEditorIsShown = false;
+              $scope.storyTitleEditorIsShown = false;
+              $scope.editableTitle = $scope.story.getTitle();
+              $scope.editableUrlFragment = $scope.story.getUrlFragment();
+              $scope.editableMetaTagContent = $scope.story.getMetaTagContent();
+              $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
+              $scope.editableNotes = $scope.story.getNotes();
+              $scope.editableDescription = $scope.story.getDescription();
+              $scope.editableDescriptionIsEmpty = (
+                $scope.editableDescription === '');
+              $scope.storyDescriptionChanged = false;
+              $scope.storyUrlFragmentExists = false;
+              $scope.$applyAsync();
             }
-            $scope.notesEditorIsShown = false;
-            $scope.storyTitleEditorIsShown = false;
-            $scope.editableTitle = $scope.story.getTitle();
-            $scope.editableUrlFragment = $scope.story.getUrlFragment();
-            $scope.editableMetaTagContent = $scope.story.getMetaTagContent();
-            $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
-            $scope.editableNotes = $scope.story.getNotes();
-            $scope.editableDescription = $scope.story.getDescription();
-            $scope.editableDescriptionIsEmpty = (
-              $scope.editableDescription === '');
-            $scope.storyDescriptionChanged = false;
-            $scope.storyUrlFragmentExists = false;
-            $scope.$applyAsync();
           };
 
           $scope.setNodeToEdit = function(nodeId) {
@@ -242,13 +248,16 @@ angular.module('oppia').directive('storyEditor', [
 
           $scope.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/story-editor-page/modal-templates/' +
-                    'story-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before returning to the topic.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.

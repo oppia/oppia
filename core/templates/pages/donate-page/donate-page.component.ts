@@ -16,8 +16,10 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -33,7 +35,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   templateUrl: './donate-page.component.html',
   styleUrls: []
 })
-export class DonatePageComponent implements OnInit {
+export class DonatePageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
   constructor(
@@ -41,14 +44,25 @@ export class DonatePageComponent implements OnInit {
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private translateService: TranslateService
   ) {}
+
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/opp_donate_text.svg');
-    this.pageTitleService.setDocumentTitle(
-      'Donate | Make a Positive Impact | Oppia');
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   onDonateThroughAmazon(): boolean {
@@ -70,6 +84,10 @@ export class DonatePageComponent implements OnInit {
     // _CORS
     // for more information.
     this.siteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

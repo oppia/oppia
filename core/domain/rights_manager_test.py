@@ -76,7 +76,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationRightsModel with id '
             'this_exp_does_not_exist_id not found'
@@ -352,7 +352,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -361,7 +361,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_EDITOR)
 
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -481,10 +481,10 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
 
-        with self.assertRaisesRegexp(Exception, 'already the current value'):
+        with self.assertRaisesRegex(Exception, 'already the current value'):
             rights_manager.set_private_viewability_of_exploration(
                 self.user_a, self.EXP_ID, False)
-        with self.assertRaisesRegexp(Exception, 'cannot be changed'):
+        with self.assertRaisesRegex(Exception, 'cannot be changed'):
             rights_manager.set_private_viewability_of_exploration(
                 self.user_b, self.EXP_ID, True)
 
@@ -588,7 +588,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegexp(Exception, 'This user already owns this'):
+        with self.assertRaisesRegex(Exception, 'This user already owns this'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_a,
                 rights_domain.ROLE_OWNER)
@@ -615,7 +615,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_domain.ROLE_VOICE_ARTIST)
@@ -628,13 +628,43 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
 
         rights_manager.deassign_role_for_exploration(
             self.user_voiceover_admin, self.EXP_ID, self.user_id_b)
 
+        self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
+
+    def test_voice_artist_cannot_be_assigned_to_private_exploration(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        with self.assertRaisesRegex(
+            Exception, 'Could not assign voice artist to private activity.'
+        ):
+            rights_manager.assign_role_for_exploration(
+                self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+                rights_domain.ROLE_VOICE_ARTIST)
+
+    def test_voice_artist_can_be_unassigned_from_private_exploration(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.unpublish_exploration(self.user_moderator, self.EXP_ID)
+        rights_manager.deassign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
     def test_owner_cannot_assign_voice_artist_to_core_role(self):
@@ -648,7 +678,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_domain.ROLE_VOICE_ARTIST)
@@ -662,7 +692,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This user already can voiceover this'):
             rights_manager.assign_role_for_exploration(
                 self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
@@ -676,7 +706,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This user already can view this'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
@@ -688,7 +718,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Public explorations can be viewed by anyone.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
@@ -698,7 +728,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegexp(Exception, 'Invalid role: invalid_role'):
+        with self.assertRaisesRegex(Exception, 'Invalid role: invalid_role'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b, 'invalid_role')
 
@@ -706,7 +736,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Could not deassign role'):
             rights_manager.deassign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_a)
@@ -757,7 +787,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b)
@@ -799,7 +829,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionRightsModel with id '
             'this_collection_does_not_exist_id not found'
@@ -884,7 +914,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)
 
-        with self.assertRaisesRegexp(Exception, 'This user already owns this'):
+        with self.assertRaisesRegex(Exception, 'This user already owns this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_a,
                 rights_domain.ROLE_OWNER)
@@ -1018,7 +1048,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_EDITOR)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This user already can edit this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1033,7 +1063,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This user already can voiceover this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1048,7 +1078,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This user already can view this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1061,7 +1091,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Public collections can be viewed by anyone.'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1168,7 +1198,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -1177,7 +1207,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_EDITOR)
 
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -1249,7 +1279,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_deassign_without_rights_fails(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Could not deassign role'):
             rights_manager.deassign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_a)
@@ -1326,7 +1356,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_deassign_non_existent_fails(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b)

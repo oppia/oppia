@@ -46,10 +46,12 @@ describe('State Property Service', () => {
 
   it('should initialize class properties', () =>{
     sps.setterMethodKey = 'Some setter method key';
+    spyOn(sps.statePropertyInitializedEmitter, 'emit');
     sps.init('stateName', 'stateProperty');
     expect(sps.stateName).toEqual('stateName');
     expect(sps.displayed).toEqual('stateProperty');
     expect(sps.savedMemento).toEqual('stateProperty');
+    expect(sps.statePropertyInitializedEmitter.emit).toHaveBeenCalled();
   });
 
   it('should throw error at init method if setter key is null', () => {

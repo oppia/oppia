@@ -23,6 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
+import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ValidatorsService } from 'services/validators.service';
 
 export interface ExplorationSummaryBackendDict {
@@ -33,7 +34,7 @@ export interface ExplorationSummaryDict {
   'category': string;
   'community_owned': boolean;
   'human_readable_contributors_summary': (
-    HumanReadableContributorSummaryBackendDict);
+    HumanReadableContributorsSummary);
   'id': string;
   'language_code': string;
   'num_views': number;
@@ -43,12 +44,6 @@ export interface ExplorationSummaryDict {
   'thumbnail_bg_color': string;
   'thumbnail_icon_url': string;
   'title': string;
-}
-
-interface HumanReadableContributorSummaryBackendDict {
-  [username: string]: {
-    'num_commits': number
-  }
 }
 
 @Injectable({

@@ -22,8 +22,8 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
-from core.domain import fs_domain
+from core import utils
+from core.domain import fs_services
 from core.domain import html_validation_service
 from core.tests import test_utils
 
@@ -742,7 +742,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'e="++--"></oppia-noninteractive-math>'
             )
         }]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, re.escape('Expecting value: line 1 column 1 (char 0)')
         ):
             html_validation_service.add_math_content_to_math_rte_components(
@@ -880,13 +880,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         fs.commit('image/img2.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
@@ -908,13 +907,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
             html_validation_service.validate_svg_filenames_in_math_rich_text(
@@ -940,13 +938,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1')
         fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         self.assertEqual(
             html_validation_service.validate_svg_filenames_in_math_rich_text(
@@ -1248,3 +1245,40 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.convert_svg_diagram_tags_to_image_tags(
                     test_case['html_content']),
                 test_case['expected_output'])
+
+    def test_fix_incorrectly_encoded_chars_replaces_incorrect_encodings(self):
+        test_cases = [
+            {
+                'html_string': '<p>This is <span>testing &nbsp;</span></p>',
+                'expected_output': '<p>This is <span>testing  </span></p>'
+            },
+            {
+                'html_string': '<p>This is <span>\t testing \n</span></p>',
+                'expected_output': '<p>This is <span> testing </span></p>'
+            },
+            {
+                'html_string': '<p>Hello this is <span>testing \xa0</span></p>',
+                'expected_output': '<p>Hello this is <span>testing  </span></p>'
+            },
+            {
+                'html_string': '<p>Hello this is <span>testing \xc2</span></p>',
+                'expected_output': '<p>Hello this is <span>testing </span></p>'
+            },
+            {
+                'html_string': '<p>Hello this is <span>testing \xe2\u2020\u2019'
+                ' \xe2\u20ac\u0153 \xe2\u02c6\u2030 \xe2\u2026\u02dc '
+                '\xe2\u20ac\u2122 \xe2\u02c6\u0161 \xe2\u02c6\u02c6 '
+                '\xe2\u2026\u2022 \xe2\u2026\u2122 \xe2\u20ac\u02dc '
+                '\xe2\u20ac\u201d \xe2\u20ac\u2039 \xe2\xcb\u2020\xe2\u20ac\xb0'
+                '</span></p>',
+                'expected_output': '<p>Hello this is <span>testing \u2192 '
+                '\u201c \u2209 \u2158 \u2019 \u221a \u2208 \u2155 \u2159 '
+                '\u2018 \u2014 \u200b \u2209</span></p>'
+            }
+        ]
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.fix_incorrectly_encoded_chars(
+                    test_case['html_string']),
+                test_case['expected_output']
+            )

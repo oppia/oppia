@@ -21,6 +21,7 @@ from __future__ import annotations
 import copy
 import datetime
 import itertools
+import logging
 
 from core import feconf
 from core import utils
@@ -131,18 +132,38 @@ def _update_stats_transactional(
         exp_version: int. Version of the exploration.
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
+
+    Raises:
+        Exception. ExplorationStatsModel does not exist.
     """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if exploration.version != exp_version:
+        logging.error(
+            'Trying to update stats for version %s of exploration %s, but '
+            'the current version is %s.' % (
+                exp_version, exp_id, exploration.version))
+        return
+
     exp_stats = get_exploration_stats_by_id(exp_id, exp_version)
+
     if exp_stats is None:
         raise Exception(
             'ExplorationStatsModel id="%s.%s" does not exist' % (
                 exp_id, exp_version))
 
+    try:
+        stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+            aggregated_stats)
+    except utils.ValidationError as e:
+        logging.exception('Aggregated stats validation failed: %s', e)
+        return
+
     exp_stats.num_starts_v2 += aggregated_stats['num_starts']
     exp_stats.num_completions_v2 += aggregated_stats['num_completions']
     exp_stats.num_actual_starts_v2 += aggregated_stats['num_actual_starts']
 
-    for state_name, stats in aggregated_stats['state_stats_mapping'].items():
+    state_stats_mapping = aggregated_stats['state_stats_mapping']
+    for state_name, stats in state_stats_mapping.items():
         if state_name not in exp_stats.state_stats_mapping:
             # Some events in the past seems to have 'undefined' state names
             # passed from the frontend code. These are invalid and should be

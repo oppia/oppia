@@ -16,6 +16,9 @@
  * @fileoverview Directive for managing the state responses in the state
  * editor.
  */
+import { DeleteAnswerGroupModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -88,6 +91,7 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/ngb-modal.service.ts');
 
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
@@ -107,9 +111,9 @@ angular.module('oppia').component('stateResponses', {
   },
   template: require('./state-responses.component.html'),
   controller: [
-    '$filter', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AnswerGroupObjectFactory',
-    'EditabilityService', 'ExternalSaveService', 'ResponsesService',
+    'EditabilityService', 'ExternalSaveService', 'NgbModal', 'ResponsesService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
     'StateSolicitAnswerDetailsService',
@@ -119,9 +123,9 @@ angular.module('oppia').component('stateResponses', {
     'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
-        $filter, $scope, $uibModal, AlertsService,
+        $filter, $rootScope, $scope, $uibModal, AlertsService,
         AnswerGroupObjectFactory,
-        EditabilityService, ExternalSaveService, ResponsesService,
+        EditabilityService, ExternalSaveService, NgbModal, ResponsesService,
         StateCustomizationArgsService, StateEditorService,
         StateInteractionIdService, StateNextContentIdIndexService,
         StateSolicitAnswerDetailsService,
@@ -348,24 +352,21 @@ angular.module('oppia').component('stateResponses', {
         });
       };
 
-      $scope.deleteAnswerGroup = function(index, evt) {
+      $scope.deleteAnswerGroup = function(value) {
         // Prevent clicking on the delete button from also toggling the
         // display state of the answer group.
-        evt.stopPropagation();
+        value.evt.stopPropagation();
 
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/delete-answer-group-modal.template.html'),
+        NgbModal.open(DeleteAnswerGroupModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           ResponsesService.deleteAnswerGroup(
-            index, function(newAnswerGroups) {
+            value.index, function(newAnswerGroups) {
               ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
               ctrl.refreshWarnings()();
             });
+          $rootScope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });

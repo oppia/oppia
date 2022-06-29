@@ -81,6 +81,11 @@ describe('Navigation features on mobile', function() {
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
+      var learnButton = element(
+        by.css('.protractor-mobile-test-learn'));
+      await waitFor.elementToBeClickable(
+        learnButton, 'Could not click learn button');
+      await learnButton.click();
       var libraryLink = element(by.css('.protractor-mobile-test-library-link'));
       await waitFor.elementToBeClickable(
         libraryLink, 'Could not click library link');
@@ -97,11 +102,11 @@ describe('Navigation features on mobile', function() {
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
-      var classroomLink = element(
-        by.css('.protractor-mobile-test-classroom'));
+      var learnButton = element(
+        by.css('.protractor-mobile-test-learn'));
       await waitFor.elementToBeClickable(
-        classroomLink, 'Could not click classroom link');
-      await classroomLink.click();
+        learnButton, 'Could not click learn button');
+      await learnButton.click();
       var mathematicsLink = element(
         by.css('.protractor-mobile-test-mathematics-link'));
       await waitFor.elementToBeClickable(

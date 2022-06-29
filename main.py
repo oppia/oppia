@@ -78,6 +78,7 @@ from core.controllers import voice_artist
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
+import google.cloud.logging
 from typing import Any, Dict, Optional, Type, TypeVar, cast
 import webapp2
 from webapp2_extras import routes
@@ -90,6 +91,15 @@ T = TypeVar('T')  # pylint: disable=invalid-name
 
 cache_services = models.Registry.import_cache_services()
 datastore_services = models.Registry.import_datastore_services()
+
+# Cloud Logging is disabled in emulator mode, since it is unnecessary and
+# creates a lot of noise.
+if not constants.EMULATOR_MODE:
+    # Instantiates a client and rtrieves a Cloud Logging handler based on the
+    # environment you're running in and integrates the handler with the Python
+    # logging module.
+    client = google.cloud.logging.Client()
+    client.setup_logging()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -210,11 +220,6 @@ URLS = [
         access_validators.ProfileExistsValidationHandler),
 
     get_redirect_route(
-        r'%s/account_deletion_is_enabled' %
-        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.AccountDeletionIsEnabledValidationHandler),
-
-    get_redirect_route(
         r'%s/can_access_release_coordinator_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ReleaseCoordinatorAccessValidationHandler
@@ -278,6 +283,12 @@ URLS = [
         r'%s/<opportunity_type>' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
         contributor_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
+        r'/preferredtranslationlanguage',
+        contributor_dashboard.TranslationPreferenceHandler),
+    get_redirect_route(
+        r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+        contributor_dashboard.ReviewableOpportunitiesHandler),
+    get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
@@ -290,8 +301,8 @@ URLS = [
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
-        r'/getalltopicnames',
-        contributor_dashboard.AllTopicNamesHandler),
+        r'/gettranslatabletopicnames',
+        contributor_dashboard.TranslatableTopicNamesHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
@@ -490,6 +501,7 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL, profile.SiteLanguageHandler),
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
+    get_redirect_route(r'/userinfohandler/data', profile.UserInfoHandler),
     get_redirect_route(r'/url_handler', profile.UrlHandler),
     get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
@@ -537,6 +549,12 @@ URLS = [
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
     get_redirect_route(
+        r'/explorehandler/checkpoint_reached/<exploration_id>',
+        reader.CheckpointReachedEventHandler),
+    get_redirect_route(
+        r'/explorehandler/restart/<exploration_id>',
+        reader.ExplorationRestartEventHandler),
+    get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler),
     get_redirect_route(
@@ -572,10 +590,14 @@ URLS = [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
+        r'/editsallowedhandler/<exploration_id>',
+        editor.ExplorationEditsAllowedHandler),
+    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
-        r'/createhandler/imageupload/<entity_type>/<entity_id>',
+        r'%s/<entity_type>/<entity_id>' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX),
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
@@ -737,7 +759,7 @@ URLS = [
         topic_editor.TopicPublishSendMailHandler),
 
     get_redirect_route(
-        r'%s/<comma_separated_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        r'%s/<selected_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
         concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
@@ -889,6 +911,11 @@ URLS = [
     get_redirect_route(
         r'/voice_artist_management_handler/<entity_type>/<entity_id>',
         voice_artist.VoiceArtistManagementHandler),
+
+    get_redirect_route(
+        r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
+        topics_and_skills_dashboard
+            .CategorizedAndUntriagedSkillsDataHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -914,9 +941,17 @@ for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
-        URLS.append(
-            get_redirect_route(
-                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+        if 'LIGHTWEIGHT' in page:
+            URLS.append(
+                get_redirect_route(
+                    r'/%s' % page['ROUTE'],
+                    oppia_root.OppiaLightweightRootPage
+                )
+            )
+        else:
+            URLS.append(
+                get_redirect_route(
+                    r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend((
@@ -925,7 +960,9 @@ URLS.extend((
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage),
     get_redirect_route(
-        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage),
+        r'/learn/<classroom_url_fragment>',
+        oppia_root.OppiaLightweightRootPage
+    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work
@@ -977,8 +1014,7 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
-        r'%s' % feconf.TASK_URL_DEFERRED,
-        tasks.DeferredTasksHandler),
+        r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
 ))
 
 # 404 error handler (Needs to be at the end of the URLS list).

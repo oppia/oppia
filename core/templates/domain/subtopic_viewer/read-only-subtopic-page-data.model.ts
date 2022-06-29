@@ -27,9 +27,10 @@ import { SubtopicBackendDict, Subtopic } from
 export interface SubtopicDataBackendDict {
   'subtopic_title': string;
   'page_contents': SubtopicPageContentsBackendDict;
-  'next_subtopic_dict': SubtopicBackendDict | null,
-  'topic_id': string,
-  'topic_name': string
+  'next_subtopic_dict': SubtopicBackendDict | null;
+  'prev_subtopic_dict': SubtopicBackendDict | null;
+  'topic_id': string;
+  'topic_name': string;
 }
 
 export class ReadOnlySubtopicPageData {
@@ -38,19 +39,22 @@ export class ReadOnlySubtopicPageData {
   subtopicTitle: string;
   pageContents: SubtopicPageContents;
   nextSubtopic: Subtopic | null;
+  prevSubtopic: Subtopic | null;
 
   constructor(
       parentTopicId: string,
       parentTopicName: string,
       subtopicTitle: string,
       pageContents: SubtopicPageContents,
-      nextSubtopic: Subtopic | null
+      nextSubtopic: Subtopic | null,
+      prevSubtopic: Subtopic | null
   ) {
     this.parentTopicId = parentTopicId;
     this.parentTopicName = parentTopicName;
     this.subtopicTitle = subtopicTitle;
     this.pageContents = pageContents;
     this.nextSubtopic = nextSubtopic;
+    this.prevSubtopic = prevSubtopic;
   }
 
   getParentTopicId(): string {
@@ -73,6 +77,10 @@ export class ReadOnlySubtopicPageData {
     return this.nextSubtopic;
   }
 
+  getPrevSubtopic(): Subtopic | null {
+    return this.prevSubtopic;
+  }
+
   static createFromBackendDict(
       subtopicDataBackendDict: SubtopicDataBackendDict):
   ReadOnlySubtopicPageData {
@@ -80,7 +88,10 @@ export class ReadOnlySubtopicPageData {
     Subtopic
       .create(subtopicDataBackendDict.next_subtopic_dict, {})
   ) : null;
-
+    let prevSubtopic = subtopicDataBackendDict.prev_subtopic_dict ? (
+      Subtopic.create(
+        subtopicDataBackendDict.prev_subtopic_dict, {})
+      ) : null;
     return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.topic_name,
@@ -88,7 +99,8 @@ export class ReadOnlySubtopicPageData {
       SubtopicPageContents.createFromBackendDict(
         subtopicDataBackendDict.page_contents
       ),
-      nextSubtopic
+      nextSubtopic,
+      prevSubtopic
     );
   }
 }

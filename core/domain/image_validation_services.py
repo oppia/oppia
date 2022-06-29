@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import base64
 import imghdr
 
 from core import feconf
@@ -41,6 +42,8 @@ def validate_image_and_filename(raw_image, filename):
 
     if not raw_image:
         raise utils.ValidationError('No image supplied')
+    if utils.is_base64_encoded(raw_image):
+        raw_image = base64.decodebytes(raw_image.encode('utf-8'))
     if len(raw_image) > hundred_kb_in_bytes:
         raise utils.ValidationError(
             'Image exceeds file size limit of 100 KB.')

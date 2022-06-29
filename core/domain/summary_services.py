@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -213,7 +212,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
     Args:
         query_string: str. The search query for which the search is to be
             performed.
-        search_offset: str or None. The offset location to start the search
+        search_offset: int or None. The offset location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -223,7 +222,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
         2-tuple of (exploration_list, new_search_offset). Where:
             - exploration_list list(dict). A list of metadata dicts for
                 explorations matching the query.
-            - new_search_offset (str). New search offset location.
+            - new_search_offset (int). New search offset location.
     """
     exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(
@@ -261,8 +260,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            python_utils.ZIP(
-                exploration_summaries, exploration_rights_objects)):
+            zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
                     rights_domain.ACTIVITY_STATUS_PRIVATE):
@@ -323,8 +321,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            python_utils.ZIP(
-                exploration_summaries, exploration_rights_objects)):
+            zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
                     rights_domain.ACTIVITY_STATUS_PRIVATE):

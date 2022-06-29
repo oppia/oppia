@@ -48,7 +48,7 @@ interface ExplorationCompletedData {
 }
 
 interface ExplorationResetData {
-  stateName: string
+  stateName: string;
 }
 
 interface MessageValidatorsType {
@@ -81,11 +81,11 @@ type PayloadType = (
 
 // The 'secret' and 'tagId' sent to the parent will be 'null' if the supported
 // hash version is not '0.0.0'. They are used to ensure backwards-compatibility.
-type HashDict = {
-  version: string,
-  secret: string | null,
-  tagid: string | null
-};
+interface HashDict {
+  version: string;
+  secret: string | null;
+  tagid: string | null;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -245,10 +245,10 @@ export class MessengerService {
         this.loggerService.info(payload.toString());
 
         let objToSendToParent: {
-          title: string,
-          payload: PayloadType
-          sourceTagId: string | null,
-          secret: string | null
+          title: string;
+          payload: PayloadType;
+          sourceTagId: string | null;
+          secret: string | null;
         } = {
           title: messageTitle,
           payload: payload,

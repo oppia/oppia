@@ -17,36 +17,45 @@
  * component.
  */
 
-import { Ratio } from 'domain/objects/ratio.model';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ResponseRatioExpressionInputComponent } from './oppia-response-ratio-expression-input.component';
 
-require(
-  'interactions/RatioExpressionInput/directives/' +
-  'oppia-response-ratio-expression-input.component.ts');
+describe('ResponseRatioExpressionInput', () => {
+  let component: ResponseRatioExpressionInputComponent;
+  let fixture: ComponentFixture<ResponseRatioExpressionInputComponent>;
 
-describe('RatioExpressionInputResponse', function() {
-  let ctrl = null;
-
-  let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
-      return answer;
+  class mockHtmlEscaperService {
+    escapedJsonToObj(answer: string): string {
+      return JSON.parse(answer);
     }
-  };
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('Ratio', Ratio);
-    $provide.value('HtmlEscaperService', mockHtmlEscaperService);
-
-    $provide.value('$attrs', {
-      answer: [1, 2, 3]
-    });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ResponseRatioExpressionInputComponent],
+      providers: [
+        {
+          provide: HtmlEscaperService,
+          useClass: mockHtmlEscaperService
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaResponseRatioExpressionInput');
-  }));
 
-  it('should init the component', function() {
-    ctrl.$onInit();
-    expect(ctrl.answer).toEqual('1:2:3');
+  beforeEach(() => {
+    fixture = (
+      TestBed.createComponent(ResponseRatioExpressionInputComponent));
+    component = fixture.componentInstance;
+  });
+
+  it('should initialise component when user submits answer', () => {
+    component.answer = '["1", "2", "3"]';
+
+    component.ngOnInit();
+
+    expect(component.responses).toEqual('1:2:3');
   });
 });

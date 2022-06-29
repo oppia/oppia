@@ -23,7 +23,7 @@ import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { StateGraphLayoutService } from './graph-layout.service';
 
 describe('Graph Layout Service', () => {
-  let sgls: StateGraphLayoutService = null;
+  let sgls: StateGraphLayoutService;
 
   // Represents the nodes of a graph, with node labels as keys, and the
   // following structure:
@@ -471,8 +471,10 @@ describe('Graph Layout Service', () => {
 
     // Starting with index 1 as, links2 has first link with same source and
     // target node. So, first augmentedLink will not have a Bezier curve.
-    for (var i = 1; i < returnedAugmentedLinks.length; i++) {
-      returnedBezierCurveValues.push(returnedAugmentedLinks[i].d);
+    if (returnedAugmentedLinks) {
+      for (var i = 1; i < returnedAugmentedLinks.length; i++) {
+        returnedBezierCurveValues.push(returnedAugmentedLinks[i].d);
+      }
     }
 
     // Check if the returned augmented links have a bezier curve

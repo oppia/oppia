@@ -18,7 +18,7 @@
 
 export const SkillDomainConstants = {
   CONCEPT_CARD_DATA_URL_TEMPLATE:
-    '/concept_card_handler/<comma_separated_skill_ids>',
+    '/concept_card_handler/<selected_skill_ids>',
   EDITABLE_SKILL_DATA_URL_TEMPLATE:
     '/skill_editor_handler/data/<skill_id>',
 

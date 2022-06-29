@@ -29,14 +29,14 @@ import {
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 export interface TranslatableItem {
-  translation: string | string[],
-  status: Status,
-  text: string | string[],
-  more: boolean
-  dataFormat: string,
-  contentType: string,
-  interactionId?: string,
-  ruleType?: string
+  translation: string | string[];
+  status: Status;
+  text: string | string[];
+  more: boolean;
+  dataFormat: string;
+  contentType: string;
+  interactionId?: string;
+  ruleType?: string;
 }
 
 export type Status = 'pending' | 'submitted';
@@ -132,10 +132,10 @@ export class TranslateTextService {
       interactionId,
       ruleType
     }: {
-      dataFormat?: string,
-      contentType?: string,
-      interactionId?: string,
-      ruleType?: string
+      dataFormat?: string;
+      contentType?: string;
+      interactionId?: string;
+      ruleType?: string;
     } = this.stateAndContent[this.activeIndex] || {};
     return {
       text: text,
@@ -224,7 +224,7 @@ export class TranslateTextService {
   suggestTranslatedText(
       translation: string | string[], languageCode: string, imagesData:
       ImagesData[], dataFormat: string, successCallback: () => void,
-      errorCallback: () => void): void {
+      errorCallback: (reason: string) => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,
@@ -241,7 +241,11 @@ export class TranslateTextService {
       this.stateAndContent[this.activeIndex].translation = (
         translation);
       successCallback();
-    }, errorCallback);
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
   }
 }
 

@@ -68,6 +68,7 @@ export class UserInfo {
       data.preferred_site_language_code, data.username,
       data.email, data.user_is_logged_in);
   }
+
   static createDefault(): UserInfo {
     return new UserInfo(
       ['GUEST'], false, false, false, false, false, null, null, null, false);

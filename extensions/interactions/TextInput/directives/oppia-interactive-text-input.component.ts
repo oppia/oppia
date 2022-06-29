@@ -24,17 +24,16 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { TextInputRulesService } from './text-input-rules.service';
 
-type TextInputSchema = {
+interface TextInputSchema {
   type: string;
   'ui_config': {
     placeholder?: string;
     rows?: number;
   };
-};
+}
 
 @Component({
   selector: 'oppia-interactive-text-input',
@@ -112,8 +111,7 @@ export class InteractiveTextInputComponent implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      answer,
-      this.textInputRulesService as unknown as InteractionRulesService);
+      answer, this.textInputRulesService);
   }
 
   updateAnswer(answer: string): void {

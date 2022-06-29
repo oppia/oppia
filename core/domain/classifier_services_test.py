@@ -25,6 +25,7 @@ import os
 
 from core import feconf
 from core import utils
+from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -297,7 +298,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         # Test that Exception is raised if this method is called with version
         # number 1.
         exploration.version = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
             classifier_services.handle_non_retrainable_states(
@@ -349,7 +350,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_retrieval_of_classifier_training_jobs(self):
         """Test the get_classifier_training_job_by_id method."""
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'Entity for class ClassifierTrainingJobModel with id fake_id '
             'not found')):
             classifier_services.get_classifier_training_job_by_id('fake_id')
@@ -401,7 +402,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'Entity for class ClassifierTrainingJobModel '
             'with id %s not found' % (
                 job_id))):
@@ -434,7 +435,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_COMPLETE,
                 feconf.TRAINING_JOB_STATUS_COMPLETE))):
@@ -467,7 +468,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_PENDING)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_PENDING,
                 feconf.TRAINING_JOB_STATUS_PENDING))):
@@ -502,7 +503,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_FAILED)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_FAILED,
                 feconf.TRAINING_JOB_STATUS_FAILED))):
@@ -529,6 +530,12 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         classifier_services.fetch_next_job()
         next_job = classifier_services.fetch_next_job()
         self.assertEqual(job1_id, next_job.job_id)
+
+        # This will check if 'fetch_next_job' returns None
+        # when there are no job models to be fetched from
+        # the job queue.
+        next_job = classifier_services.fetch_next_job()
+        self.assertIsNone(next_job)
 
     def test_store_classifier_data(self):
         """Test the store_classifier_data method."""
@@ -601,25 +608,195 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         self.assertIsNone(classifier_training_job)
 
     def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_complete('invalid_job_id')
 
     def test_can_not_mark_training_jobs_failed_due_to_invalid_job_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_jobs_failed(['invalid_job_id'])
 
     def test_can_not_mark_training_jobs_pending_due_to_invalid_job_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_pending('invalid_job_id')
 
     def test_can_not_store_classifier_data_due_to_invalid_job_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.store_classifier_data('invalid_job_id', {})
+
+    def test_generate_signature(self):
+        """Test the generate_signature method."""
+
+        vm_id = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        message = 'test message'
+        signature = classifier_services.generate_signature(
+            secret.encode('utf-8'),
+            message,
+            vm_id)
+        expected_signature = (
+            '9c2f9f607c0eefc2b8ba153bad9331843a6efc71c82e690f5f0341bbc38b7fa7')
+        self.assertEqual(signature, expected_signature)
+
+    def test_verify_signature(self):
+        """Test the verify_signature method."""
+
+        vm_id = feconf.DEFAULT_VM_ID
+        message = 'test message'
+        expected_signature = (
+            '9c2f9f607c0eefc2b8ba153bad9331843a6efc71c82e690f5f0341bbc38b7fa7')
+        invalid_signature = 'invalid signature'
+        invalid_vm_id = 'invalid vm_id'
+        oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
+            message,
+            vm_id,
+            expected_signature
+        )
+        self.assertTrue(classifier_services.verify_signature(
+           oppia_ml_auth_info))
+
+        # Check if an invalid signature causes verify_signature to fail.
+        oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
+            message,
+            vm_id,
+            invalid_signature
+        )
+        self.assertFalse(classifier_services.verify_signature(
+           oppia_ml_auth_info))
+
+        # Check if an invalid vm_id causes verify_signature to fail.
+        oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
+            message,
+            invalid_vm_id,
+            expected_signature
+        )
+        self.assertFalse(classifier_services.verify_signature(
+           oppia_ml_auth_info))
+
+    def test_get_state_training_jobs_mapping(self):
+        """Test the get_state_training_jobs_mapping method."""
+
+        exp_id = u'1'
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        state_name = u'Home'
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            'TextInput']['algorithm_id']
+        algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            'TextInput']['algorithm_version']
+        job_id = self._create_classifier_training_job(
+            algorithm_id, 'TextInput', exp_id, 1, next_scheduled_check_time,
+            [], state_name, feconf.TRAINING_JOB_STATUS_NEW, {},
+            algorithm_version)
+        classifier_models.StateTrainingJobsMappingModel.create(
+            exp_id, 1, state_name, {algorithm_id: job_id})
+        state_training_jobs_mapping = (
+            classifier_services.get_state_training_jobs_mapping(
+                exp_id, 1, state_name))
+        self.assertEqual(state_training_jobs_mapping.exp_id, exp_id)
+        self.assertEqual(state_training_jobs_mapping.state_name, 'Home')
+
+        # Test that the method returns a None type for an
+        # invalid state name.
+        invalid_state_name = 'invalid name'
+        state_training_jobs_mapping = (
+            classifier_services.get_state_training_jobs_mapping(
+                exp_id, 1, invalid_state_name))
+        self.assertIsNone(state_training_jobs_mapping)
+
+    def test_migrate_state_training_jobs(self):
+        """Test the migrate_state_training_jobs method."""
+
+        state_name = 'Home'
+        mock_interaction_classifier_mapping = {
+            'TextInput': {
+                'algorithm_id': 'NewTextClassifier',
+                'algorithm_version': 1
+                },
+            }
+        with self.swap(
+            feconf,
+            'INTERACTION_CLASSIFIER_MAPPING',
+            mock_interaction_classifier_mapping):
+            classifier_services.migrate_state_training_jobs(
+                classifier_services.get_state_training_jobs_mapping(
+                    self.exp_id, 1, state_name)
+             )
+        state_training_jobs_mapping = (
+            classifier_services.get_state_training_jobs_mapping(
+                self.exp_id, 1, 'Home')
+            )
+        self.assertIn(
+            'NewTextClassifier',
+            state_training_jobs_mapping.algorithm_ids_to_job_ids)
+
+        # Check migration of an existing algorithm to a newer version.
+        mock_interaction_classifier_mapping = {
+            'TextInput': {
+                'algorithm_id': 'NewTextClassifier',
+                'algorithm_version': 2
+                },
+            }
+        with self.swap(
+            feconf,
+            'INTERACTION_CLASSIFIER_MAPPING',
+            mock_interaction_classifier_mapping):
+            classifier_services.migrate_state_training_jobs(
+                classifier_services.get_state_training_jobs_mapping(
+                    self.exp_id, 1, state_name))
+        next_job = classifier_services.fetch_next_job()
+        self.assertEqual(
+            mock_interaction_classifier_mapping[
+                'TextInput']['algorithm_version'],
+            next_job.algorithm_version
+        )
+
+    def test_reverted_exploration_maintains_classifier_model_mapping(self):
+        """Test if the classifier model mapping is maintained when an
+        exploration is reverted.
+        """
+
+        state_name = 'Home'
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        interaction_id = exploration.states[
+            state_name].interaction.id
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+
+        # Make changes to the exploration.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'A new title'
+        })]
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        # Store the job before reverting the exploration.
+        old_job_id = classifier_services.get_classifier_training_job(
+            self.exp_id, current_exploration.version, state_name,
+            algorithm_id).job_id
+        # Revert the exploration.
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.revert_exploration(
+                feconf.SYSTEM_COMMITTER_ID,
+                self.exp_id,
+                current_exploration.version,
+                current_exploration.version - 1
+            )
+        # Verify if classifier model mapping is maintained using the job ID.
+        reverted_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        self.assertEqual(
+            reverted_exploration.version, current_exploration.version + 1)
+        new_job_id = classifier_services.get_classifier_training_job(
+            self.exp_id, reverted_exploration.version, state_name,
+            algorithm_id).job_id
+        self.assertEqual(old_job_id, new_job_id)

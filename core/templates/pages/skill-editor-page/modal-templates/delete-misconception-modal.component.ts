@@ -28,8 +28,11 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
   styleUrls: []
 }) export class DeleteMisconceptionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  skill: Skill;
-  index: number;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  index!: number;
+  skill!: Skill;
 
   constructor(
     private skillEditorStateService: SkillEditorStateService,

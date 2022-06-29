@@ -22,6 +22,7 @@
 
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -58,7 +59,7 @@ const debounce = (delay: number = 5): MethodDecorator => {
 interface GraphButton {
   text: string;
   description: string;
-  mode: number
+  mode: number;
 }
 
 interface GraphOption {
@@ -92,6 +93,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     ADD_VERTEX: 2,
     DELETE: 3
   };
+
   // Styling functions.
   DELETE_COLOR = 'red';
   HOVER_COLOR = 'aqua';
@@ -122,6 +124,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     mouseDragStartX: 0,
     mouseDragStartY: 0
   };
+
   selectedEdgeWeightValue: number | string;
   buttons: GraphButton[] = [];
   private vizContainer: SVGSVGElement[];
@@ -133,6 +136,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   graphOptions: GraphOption[];
   svgViewBox: string;
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private deviceInfoService: DeviceInfoService,
     private element: ElementRef,
     private focusManagerService: FocusManagerService,
@@ -191,6 +195,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.interactionIsActive) {
       this.init();
     }
+    this.changeDetectorRef.detectChanges();
   }
 
   getEdgeColor(index: number): string {
@@ -491,6 +496,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.beginEditEdgeWeight(index);
     }
   }
+
   onClickEdgeWeight(index: number): void {
     if (this.graph.isWeighted && this.canEditEdgeWeight) {
       this.beginEditEdgeWeight(index);

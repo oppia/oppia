@@ -24,11 +24,15 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumericInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { NumericInputRulesService } from './numeric-input-rules.service';
 import { NumericInputValidationService } from './numeric-input-validation.service';
+
+interface NumericInputFormSchema {
+  type: string;
+  'ui_config': {};
+}
 
 @Component({
   selector: 'oppia-interactive-numeric-input',
@@ -41,7 +45,7 @@ export class InteractiveNumericInput implements OnInit {
   errorString = '';
   requireNonnegativeInput: boolean = false;
   answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
+  NUMERIC_INPUT_FORM_SCHEMA: NumericInputFormSchema;
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -57,15 +61,14 @@ export class InteractiveNumericInput implements OnInit {
       this.answer !== null &&
       this.answer !== '' &&
       isUndefined(
-        this.numericInputValidationService.getErrorString(
+        this.numericInputValidationService.validateNumber(
           this.answer, this.requireNonnegativeInput)));
   }
 
   submitAnswer(answer: number): void {
     if (this.isAnswerValid()) {
       this.currentInteractionService.onSubmit(
-        answer as unknown as string,
-        this.numericInputRulesService as unknown as InteractionRulesService);
+        answer, this.numericInputRulesService);
     }
   }
 
@@ -84,7 +87,7 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string; 'ui_config': {}; } {
+  getSchema(): NumericInputFormSchema {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 

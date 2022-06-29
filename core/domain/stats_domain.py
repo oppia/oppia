@@ -26,11 +26,15 @@ import sys
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
-from core.domain import interaction_registry
-from core.domain import playthrough_issue_registry
+
+from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -354,6 +358,9 @@ class StateStats:
         Args:
             other: StateStats | SessionStateStats. The other collection of stats
                 to aggregate from.
+
+        Raises:
+            TypeError. Given SessionStateStats can not be aggregated from.
         """
         if other.__class__ is self.__class__:
             self.total_answers_count_v1 += other.total_answers_count_v1
@@ -600,6 +607,66 @@ class SessionStateStats:
         }
         return session_state_stats_dict
 
+    @staticmethod
+    def validate_aggregated_stats_dict(aggregated_stats):
+        """Validates the SessionStateStats domain object.
+
+        Args:
+            aggregated_stats: dict. The aggregated stats dict to validate.
+
+        Returns:
+            aggregated_stats: dict. The validated aggregated stats dict.
+
+        Raises:
+            ValidationError. Whether the aggregated_stats dict is invalid.
+        """
+
+        exploration_stats_properties = [
+            'num_starts',
+            'num_actual_starts',
+            'num_completions'
+        ]
+        state_stats_properties = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'total_hit_count',
+            'first_hit_count',
+            'num_times_solution_viewed',
+            'num_completions'
+        ]
+        for exp_stats_property in exploration_stats_properties:
+            if exp_stats_property not in aggregated_stats:
+                raise utils.ValidationError(
+                    '%s not in aggregated stats dict.' % (exp_stats_property))
+            if not isinstance(aggregated_stats[exp_stats_property], int):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (
+                        exp_stats_property,
+                        aggregated_stats[exp_stats_property]
+                    )
+                )
+        state_stats_mapping = aggregated_stats['state_stats_mapping']
+        for state_name in state_stats_mapping:
+            for state_stats_property in state_stats_properties:
+                if state_stats_property not in state_stats_mapping[state_name]:
+                    raise utils.ValidationError(
+                        '%s not in state stats mapping of %s in aggregated '
+                        'stats dict.' % (state_stats_property, state_name))
+                if not isinstance(
+                    state_stats_mapping[state_name][state_stats_property],
+                    int
+                ):
+                    state_stats = state_stats_mapping[state_name]
+                    raise utils.ValidationError(
+                        'Expected %s to be an int, received %s' % (
+                            state_stats_property,
+                            state_stats[state_stats_property]
+                        )
+                    )
+        # The aggregated_stats parameter does not represent any domain class,
+        # hence dict form of the data is returned from here.
+        return aggregated_stats
+
     def __eq__(self, other):
         """Implements == comparison between two SessionStateStats instances,
         returning whether they hold the same values.
@@ -833,9 +900,9 @@ class Playthrough:
         try:
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type))
+                self.issue_type)) from e
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -874,6 +941,15 @@ class ExplorationIssue:
         self.playthrough_ids = playthrough_ids
         self.schema_version = schema_version
         self.is_valid = is_valid
+
+    def __eq__(self, other):
+        return (
+            self.issue_type == other.issue_type and
+            self.issue_customization_args == other.issue_customization_args and
+            self.playthrough_ids == other.playthrough_ids and
+            self.schema_version == other.schema_version and
+            self.is_valid == other.is_valid
+        )
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
@@ -961,9 +1037,9 @@ class ExplorationIssue:
         try:
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type))
+                self.issue_type)) from e
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -1068,9 +1144,9 @@ class LearnerAction:
         try:
             action = action_registry.Registry.get_action_by_type(
                 self.action_type)
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError(
-                'Invalid action type: %s' % self.action_type)
+                'Invalid action type: %s' % self.action_type) from e
         customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
@@ -1737,8 +1813,8 @@ class LearnerAnswerDetails:
                     learner_answer_info.get_learner_answer_info_dict_size())
         if self.learner_answer_info_list == new_learner_answer_info_list:
             raise Exception('Learner answer info with the given id not found.')
-        else:
-            self.learner_answer_info_list = new_learner_answer_info_list
+
+        self.learner_answer_info_list = new_learner_answer_info_list
 
     def update_state_reference(self, new_state_reference):
         """Updates the state_reference of the LearnerAnswerDetails object.

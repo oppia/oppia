@@ -53,9 +53,9 @@ describe('Topic questions tab', function() {
 
   let categorizedSkillsDictData: {
     topicName: {
-      uncategorized: [],
-      test: []
-    }
+      uncategorized: [];
+      test: [];
+    };
   };
 
   let skillIdToRubricsObject = {};

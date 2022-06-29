@@ -23,7 +23,6 @@ import io
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -74,7 +73,7 @@ class AudioUploadHandler(base.BaseHandler):
                 audio = mp3.MP3(tempbuffer)
             else:
                 audio = mutagen.File(tempbuffer)
-        except mutagen.MutagenError:
+        except mutagen.MutagenError as e:
             # The calls to mp3.MP3() versus mutagen.File() seem to behave
             # differently upon not being able to interpret the audio.
             # mp3.MP3() raises a MutagenError whereas mutagen.File()
@@ -82,7 +81,8 @@ class AudioUploadHandler(base.BaseHandler):
             # the case. Occasionally, mutagen.File() also seems to
             # raise a MutagenError.
             raise self.InvalidInputException(
-                'Audio not recognized as a %s file' % extension)
+                'Audio not recognized as a %s file' % extension
+            ) from e
         tempbuffer.close()
 
         if audio is None:
@@ -112,9 +112,8 @@ class AudioUploadHandler(base.BaseHandler):
 
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(
             '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)
@@ -136,7 +135,7 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
 class VoiceArtistManagementHandler(base.BaseHandler):
     """Handles assignment of voice artists."""
 
-    @acl_decorators.can_manage_voice_artist
+    @acl_decorators.can_add_voice_artist
     def post(self, unused_entity_type, entity_id):
         """Handles Post requests."""
         voice_artist = self.payload.get('username')
@@ -151,7 +150,7 @@ class VoiceArtistManagementHandler(base.BaseHandler):
 
         self.render_json({})
 
-    @acl_decorators.can_manage_voice_artist
+    @acl_decorators.can_remove_voice_artist
     def delete(self, unused_entity_type, entity_id):
         """Handles Delete requests."""
         voice_artist = self.request.get('voice_artist')

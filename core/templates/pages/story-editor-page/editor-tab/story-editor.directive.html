@@ -89,6 +89,7 @@
             <div class="story-thumbnail protractor-test-story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
               <oppia-thumbnail-uploader [filename]="story.getThumbnailFilename()"
+                                        [use-local-storage]="false"
                                         (update-filename)="updateStoryThumbnailFilename($event)"
                                         [bg-color]="story.getThumbnailBgColor()"
                                         (update-bg-color)="updateStoryThumbnailBgColor($event)"
@@ -102,12 +103,11 @@
               <div class="oppia-editor-card-body">
                 <label class="form-heading">Notes</label>
                 <div ng-if="!notesEditorIsShown">
-                  <div ng-class="oppia-editable-section" ng-click="openNotesEditor()" class="protractor-test-open-story-notes-editor-button">
+                  <div ng-click="openNotesEditor()" class="oppia-editable-section protractor-test-open-story-notes-editor-button">
                     <i class="material-icons oppia-editor-edit-icon float-right"
                        title="Edit Story Notes">&#xE254;
                     </i>
-                    <div class="oppia-state-content-display oppia-transition-200"
-                         ng-class="oppia-prevent-selection"
+                    <div class="oppia-state-content-display oppia-transition-200 oppia-prevent-selection"
                          title="Story notes">
                       <span class="oppia-placeholder" ng-show="editableNotes === ''">
                           Add notes about the story to help other contributors.
@@ -122,12 +122,15 @@
                 </div>
 
                 <div ng-if="notesEditorIsShown" class="protractor-test-story-notes-rte">
-                  <schema-based-editor schema="NOTES_SCHEMA" local-value="editableNotes">
+                  <schema-based-editor [schema]="NOTES_SCHEMA" ng-model="editableNotes" ng-model-change="$applyAsync()">
                   </schema-based-editor>
+                  <div ng-if="editableNotes.length > 4000" class="story-length-validation-error">
+                    The notes length is too long. Please make it under 4000 characters.
+                  </div>
                   <div class="editor-buttons">
                     <button type="button"
                             class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-story-notes-button"
-                            ng-disabled="!editableNotes"
+                            ng-disabled="!editableNotes || editableNotes.length > 4000"
                             ng-click="updateNotes(editableNotes)">
                       Save
                     </button>
@@ -228,6 +231,17 @@
 </div>
 
 <style>
+  .story-length-validation-error {
+    align-items: center;
+    background-color: #f8d7da;
+    border: 0.0625rem solid #dc3545;
+    border-radius: 0.25rem;
+    color: #dc3545;
+    display: flex;
+    justify-content: center;
+    padding: 0.25rem;
+  }
+
   story-editor .no-chapters-message {
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 18px;
@@ -272,7 +286,7 @@
   }
 
   story-editor .story-nodes-container {
-    background-color: #FFF;
+    background-color: #fff;
     text-align: left;
     white-space: initial;
   }
@@ -326,6 +340,7 @@
     width: 85%;
   }
   story-editor .content-container {
+    margin-bottom: 40px;
     margin-right: 3%;
     width: 50%;
   }
@@ -363,7 +378,7 @@
   }
   story-editor .add-chapter-btn {
     background-color: #008098;
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     margin: 15px 0 15px;
     text-align: left;
@@ -436,6 +451,10 @@
     story-editor .chapter-list-container {
       margin-right: 0;
       width: 100%;
+    }
+
+    story-editor .content-container {
+      margin-bottom: 0;
     }
 
     story-editor .topic-story-name {

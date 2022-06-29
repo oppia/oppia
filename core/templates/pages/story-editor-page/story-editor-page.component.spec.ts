@@ -19,28 +19,38 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+// ^^^ This block is to be removed.
 
 import { EventEmitter } from '@angular/core';
-
-// ^^^ This block is to be removed.
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 require('pages/story-editor-page/story-editor-page.component.ts');
 
+class MockNgbModalRef {
+  componentInstance: {
+    body: 'xyz';
+  };
+}
+
 describe('Story editor page', function() {
   var ctrl = null;
-  var $q = null;
   var $scope = null;
   var $rootScope = null;
-  var $uibModal = null;
+  let ngbModal: NgbModal = null;
   var PageTitleService = null;
   var PreventPageUnloadEventService = null;
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
+  var LocalStorageService = null;
+  var StoryEditorStalenessDetectionService = null;
   var UrlService = null;
 
   var mockedWindow = {
-    open: () => {}
+    open: () => {},
+    addEventListener: () => {}
   };
   var MockStoryEditorNavigationService = {
     activeTab: 'story_editor',
@@ -61,14 +71,21 @@ describe('Story editor page', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockedWindow);
+
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     PageTitleService = $injector.get('PageTitleService');
     PreventPageUnloadEventService = $injector.get(
       'PreventPageUnloadEventService');
@@ -76,6 +93,9 @@ describe('Story editor page', function() {
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
+    LocalStorageService = $injector.get('LocalStorageService');
+    StoryEditorStalenessDetectionService = $injector.get(
+      'StoryEditorStalenessDetectionService');
     story = StoryObjectFactory.createFromBackendDict({
       id: '2',
       title: 'Story title',
@@ -121,6 +141,9 @@ describe('Story editor page', function() {
       validateExplorationsAsync: async() => Promise.resolve([])
     };
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
+    LocalStorageService.removeOpenedEntityEditorBrowserTabsInfo(
+      EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_STORY_EDITOR_BROWSER_TABS);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('storyEditorPage', {
@@ -172,27 +195,33 @@ describe('Story editor page', function() {
   it('should return to topic editor page when closing confirmation modal',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve()
+        }) as NgbModalRef;
       });
 
       ctrl.returnToTopicEditorPage();
       $scope.$apply();
 
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
     });
 
   it('should return to topic editor page when dismissing confirmation modal',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject()
+        }) as NgbModalRef;
       });
 
       ctrl.returnToTopicEditorPage();
       $scope.$apply();
 
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
     });
 
   it('should open topic editor page when there is no change',
@@ -325,5 +354,146 @@ describe('Story editor page', function() {
     mockUndoRedoChangeEventEmitter.emit();
     expect(PageTitleService.setDocumentTitle).toHaveBeenCalled();
     ctrl.$onDestroy();
+  });
+
+  it('should create story editor browser tabs info on ' +
+  'local storage when a new tab opens', () => {
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo).toBeNull();
+
+    // Opening the first tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo).toBeDefined();
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+
+    // Opening the second tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+  });
+
+  it('should update story editor browser tabs info on local storage when ' +
+  'some new changes are saved', () => {
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo).toBeNull();
+
+    // First time opening of the tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(1);
+
+    // Save some changes on the story and increasing its version.
+    story._version = 2;
+    StoryEditorStateService.onStoryReinitialized.emit();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
+  });
+
+  it('should decrement number of opened story editor tabs when ' +
+  'a tab is closed', () => {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    // Opening of the first tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+    // Opening of the second tab.
+    StoryEditorStateService.onStoryInitialized.emit();
+
+    let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    // Making some unsaved changes on the editor page.
+    storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+    LocalStorageService.updateEntityEditorBrowserTabsInfo(
+      storyEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_STORY_EDITOR_BROWSER_TABS);
+
+    expect(
+      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeTrue();
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+
+    ctrl.onClosingStoryEditorBrowserTab();
+    storyEditorBrowserTabsInfo = (
+      LocalStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+    expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+
+    // Since the tab containing unsaved changes is closed, the value of
+    // unsaved changes status will become false.
+    expect(
+      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ).toBeFalse();
+  });
+
+  it('should emit the stale tab and presence of unsaved changes events ' +
+  'when the \'storage\' event is triggered', () => {
+    spyOn(
+      StoryEditorStalenessDetectionService.staleTabEventEmitter, 'emit'
+    ).and.callThrough();
+    spyOn(
+      StoryEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter, 'emit'
+    ).and.callThrough();
+    spyOn(LocalStorageService, 'registerNewStorageEventListener').and.callFake(
+      (callback) => {
+        document.addEventListener('storage', callback);
+      });
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setDocumentTitle');
+    ctrl.$onInit();
+
+    let storageEvent = new StorageEvent('storage', {
+      key: EntityEditorBrowserTabsInfoDomainConstants
+        .OPENED_STORY_EDITOR_BROWSER_TABS
+    });
+    document.dispatchEvent(storageEvent);
+
+    expect(
+      StoryEditorStalenessDetectionService.staleTabEventEmitter.emit
+    ).toHaveBeenCalled();
+    expect(
+      StoryEditorStalenessDetectionService
+        .presenceOfUnsavedChangesEventEmitter.emit
+    ).toHaveBeenCalled();
   });
 });

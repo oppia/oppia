@@ -27,21 +27,28 @@ require(
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
-  '$http', '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
+  '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
   'ContributionOpportunitiesService', 'SkillBackendApiService',
-  'SiteAnalyticsService', 'SuggestionModalService', 'UrlInterpolationService',
+  'SiteAnalyticsService', 'SuggestionModalService',
+  'ThreadDataBackendApiService', 'UrlInterpolationService',
   'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
   'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
-  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
-  'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'suggestion', 'suggestionId', 'editSuggestionCallback',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $http, $scope, $uibModal, $uibModalInstance, ContextService,
+      $rootScope, $scope, $uibModal, $uibModalInstance, ContextService,
       ContributionOpportunitiesService, SkillBackendApiService,
-      SiteAnalyticsService, SuggestionModalService, UrlInterpolationService,
+      SiteAnalyticsService, SuggestionModalService,
+      ThreadDataBackendApiService, UrlInterpolationService,
       authorName, contentHtml, misconceptionsBySkill, question, questionHeader,
-      reviewable, skillDifficulty, skillRubrics, suggestion, suggestionId,
+      reviewable, skillDifficulty, skillRubrics,
+      suggestion, suggestionId, editSuggestionCallback,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
       SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
@@ -85,29 +92,26 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.reviewMessage = '';
     $scope.suggestionIsRejected = suggestion.status === 'rejected';
 
-    const _getThreadHandlerUrl = function(suggestionId) {
-      return UrlInterpolationService.interpolateUrl(
-        '/threadhandler/<suggestionId>', { suggestionId });
-    };
-
     const _getThreadMessagesAsync = function(threadId) {
-      return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
-        let threadMessageBackendDicts = response.data.messages;
-        return threadMessageBackendDicts.map(
-          m => ThreadMessage.createFromBackendDict(m));
+      return ThreadDataBackendApiService.fetchMessagesAsync(
+        threadId).then((response) => {
+        const threadMessageBackendDicts = response.messages;
+        $scope.reviewMessage = threadMessageBackendDicts.map(
+          m => ThreadMessage.createFromBackendDict(m))[1].text;
+        $rootScope.$applyAsync();
       });
     };
 
-    if (reviewable) {
-      SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview(
-        'Question');
-    } else if ($scope.suggestionIsRejected) {
-      _getThreadMessagesAsync(suggestionId).then(
-        function(messageSummaries) {
-          $scope.reviewMessage = messageSummaries[1].text;
-        }
-      );
-    }
+    $scope.init = function() {
+      if (reviewable) {
+        SiteAnalyticsService
+          .registerContributorDashboardViewSuggestionForReview('Question');
+      } else if ($scope.suggestionIsRejected) {
+        _getThreadMessagesAsync(suggestionId);
+      }
+    };
+
+    $scope.init();
 
     $scope.questionChanged = function() {
       $scope.validationError = null;
@@ -141,6 +145,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.edit = function() {
+      $uibModalInstance.dismiss();
       SkillBackendApiService.fetchSkillAsync(
         suggestion.change.skill_id).then((skillDict) => {
         $uibModal.open({
@@ -159,11 +164,12 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
             skillDifficulty: () => skillDifficulty
           },
           controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function() {
+          editSuggestionCallback(
+            suggestionId, suggestion, reviewable, question);
+        }, function() {
           ContextService.resetImageSaveDestination();
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+          editSuggestionCallback(suggestionId, suggestion, reviewable);
         });
       });
     };

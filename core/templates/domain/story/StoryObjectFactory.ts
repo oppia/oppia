@@ -24,9 +24,8 @@ import constants from 'assets/constants';
 
 import {
   StoryContentsBackendDict,
-  StoryContents,
-  StoryContentsObjectFactory
-} from 'domain/story/StoryContentsObjectFactory';
+  StoryContents
+} from 'domain/story/story-contents-object.model';
 
 export interface StoryBackendDict {
   'id': string;
@@ -52,15 +51,16 @@ export class Story {
   _languageCode: string;
   _version: number;
   _correspondingTopicId: string;
-  _thumbnailFilename: string;
-  _thumbnailBgColor: string;
+  _thumbnailFilename: string | null;
+  _thumbnailBgColor: string | null;
   _urlFragment: string;
   _metaTagContent: string;
   constructor(
-      id: string, title: string, description: string, notes: string,
-      storyContents: StoryContents, languageCode: string, version: number,
-      correspondingTopicId: string, thumbnailBgColor: string,
-      thumbnailFilename: string, urlFragment: string, metaTagContent: string) {
+      id: string, title: string, description: string,
+      notes: string, storyContents: StoryContents, languageCode: string,
+      version: number, correspondingTopicId: string,
+      thumbnailBgColor: string | null, thumbnailFilename: string | null,
+      urlFragment: string, metaTagContent: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -131,19 +131,19 @@ export class Story {
     return this._correspondingTopicId;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename(thumbnailFilename: string | null): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  setThumbnailBgColor(thumbnailBgColor: string | null): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
@@ -179,7 +179,6 @@ export class Story {
           `${constants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
       }
     }
-
     issues = issues.concat(this._storyContents.validate());
     return issues;
   }
@@ -223,12 +222,12 @@ export class Story {
   providedIn: 'root'
 })
 export class StoryObjectFactory {
-  constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
+  constructor() {}
   createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,
       storyBackendDict.description, storyBackendDict.notes,
-      this.storyContentsObjectFactory.createFromBackendDict(
+      StoryContents.createFromBackendDict(
         storyBackendDict.story_contents),
       storyBackendDict.language_code,
       storyBackendDict.version, storyBackendDict.corresponding_topic_id,
@@ -236,14 +235,6 @@ export class StoryObjectFactory {
       storyBackendDict.thumbnail_filename,
       storyBackendDict.url_fragment, storyBackendDict.meta_tag_content
     );
-  }
-
-  // Create an interstitial story that would be displayed in the editor until
-  // the actual story is fetched from the backend.
-  createInterstitialStory(): Story {
-    return new Story(
-      null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null, null, null, null, '');
   }
 }
 

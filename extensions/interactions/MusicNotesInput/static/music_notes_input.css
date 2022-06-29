@@ -68,7 +68,7 @@
 }
 
 .oppia-music-input-staff div.oppia-music-staff-line {
-  background: #000000;
+  background: #000;
   height: 2px;
   position: absolute;
   width: 100%;
@@ -93,7 +93,7 @@
 }
 
 .oppia-music-input-staff .oppia-music-input-ledger-line {
-  background-color: #000000;
+  background-color: #000;
   padding-bottom: 0.35%;
   position: absolute;
   width: 8%;

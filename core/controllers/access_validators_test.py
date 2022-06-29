@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.constants import constants
 from core.domain import config_services
 from core.tests import test_utils
 
@@ -90,27 +89,6 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
         self.get_html_response( # type: ignore[no-untyped-call]
             '%s/can_access_release_coordinator_page' %
             ACCESS_VALIDATION_HANDLER_PREFIX)
-
-
-class AccountDeletionIsEnabledValidationHandlerTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self) -> None:
-        super(AccountDeletionIsEnabledValidationHandlerTests, self).setUp()
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
-
-    def test_delete_account_validation_returns_true_if_enabled(self) -> None:
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            self.get_html_response( # type: ignore[no-untyped-call]
-                '%s/account_deletion_is_enabled' %
-                ACCESS_VALIDATION_HANDLER_PREFIX)
-
-    def test_delete_account_validation_returns_false_if_disabled(self) -> None:
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_json(
-                '%s/account_deletion_is_enabled' %
-                ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=404)
 
 
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):

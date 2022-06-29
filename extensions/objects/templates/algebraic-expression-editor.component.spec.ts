@@ -22,6 +22,13 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { AlgebraicExpressionEditorComponent } from './algebraic-expression-editor.component';
+import { TranslateService } from '@ngx-translate/core';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('AlgebraicExpressionEditor', () => {
   let component: AlgebraicExpressionEditorComponent;
@@ -45,10 +52,12 @@ describe('AlgebraicExpressionEditor', () => {
     asciimath() {
       return 'Dummy value';
     }
+
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
       handler({focused: MockGuppy.focused});
     }
+
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
     static 'add_global_symbol'(name: string, symbol: Object): void {}
@@ -58,6 +67,7 @@ describe('AlgebraicExpressionEditor', () => {
     _window = {
       Guppy: MockGuppy
     };
+
     get nativeWindow() {
       return this._window;
     }
@@ -68,7 +78,15 @@ describe('AlgebraicExpressionEditor', () => {
       {
         imports: [HttpClientTestingModule],
         declarations: [AlgebraicExpressionEditorComponent],
-        providers: [{provide: windowRef, useClass: MockWindowRef}]
+        providers: [
+          {
+            provide: windowRef,
+            useClass: MockWindowRef
+          }, {
+            provide: TranslateService,
+            useClass: MockTranslateService
+          }
+        ]
       }
     ).compileComponents();
   }));
@@ -117,7 +135,7 @@ describe('AlgebraicExpressionEditor', () => {
       component.warningText).toBe('Please enter an answer before submitting.');
 
     component.currentValue = 'x/2';
-    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue(
       ['x']);
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');

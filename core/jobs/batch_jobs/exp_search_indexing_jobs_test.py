@@ -80,7 +80,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
         with add_docs_to_index_swap:
             self.assert_job_output_is([
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')
+                job_run_result.JobRunResult.as_stdout('SUCCESS: 1')
             ])
 
     def test_indexes_non_deleted_models(self) -> None:
@@ -125,11 +125,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
         with add_docs_to_index_swap, max_batch_size_swap:
             self.assert_job_output_is([
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed'),
+                job_run_result.JobRunResult.as_stdout('SUCCESS: 5')
             ])
 
     def test_reports_failed_when_indexing_fails(self) -> None:
@@ -151,7 +147,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                 unused_documents: Dict[str, Union[int, str, List[str]]],
                 unused_index_name: str
         ) -> None:
-            raise platform_search_services.SearchException
+            raise platform_search_services.SearchException('search exception')
 
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,
@@ -175,8 +171,8 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
         with add_docs_to_index_swap:
             self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stderr='FAILURE 1 models not indexed'
+                job_run_result.JobRunResult.as_stderr(
+                    'ERROR: "search exception": 1'
                 )
             ])
 
@@ -229,5 +225,5 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
         with add_docs_to_index_swap:
             self.assert_job_output_is([
-                job_run_result.JobRunResult(stdout='SUCCESS 1 models indexed')
+                job_run_result.JobRunResult.as_stdout('SUCCESS: 1')
             ])

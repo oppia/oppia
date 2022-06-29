@@ -17,7 +17,7 @@
  */
 
 export interface TranslationCountsDict {
-  [languageCode: string]: number
+  [languageCode: string]: number;
 }
 
 export interface ExplorationOpportunitySummaryBackendDict {

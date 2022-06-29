@@ -18,9 +18,8 @@
 
 from __future__ import annotations
 
+import builtins
 import os
-
-from core import python_utils
 from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import repo_specific_changes_fetcher
@@ -137,7 +136,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
 
         get_changes_swap = self.swap(
             repo_specific_changes_fetcher, 'get_changes', mock_get_changes)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
 
         with get_changes_swap, print_swap:
             repo_specific_changes_fetcher.main(args=['--release_tag', 'tag'])

@@ -16,12 +16,16 @@
  * @fileoverview Component for the skill editor page.
  */
 
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
 require('base-components/base-content.component.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-editor-main-tab.directive.ts');
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
@@ -36,24 +40,32 @@ require('pages/interaction-specs.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 require('services/prevent-page-unload-event.service.ts');
+require('services/ngb-modal.service.ts');
+require('services/local-storage.service.ts');
+require(
+  'pages/skill-editor-page/services/' +
+  'skill-editor-staleness-detection.service.ts');
 
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
-    '$rootScope', '$uibModal', 'BottomNavbarStatusService',
-    'PreventPageUnloadEventService',
-    'SkillEditorRoutingService', 'SkillEditorStateService',
-    'UndoRedoService', 'UrlInterpolationService', 'UrlService',
+    '$rootScope', 'BottomNavbarStatusService', 'LocalStorageService',
+    'NgbModal', 'PreventPageUnloadEventService',
+    'SkillEditorRoutingService',
+    'SkillEditorStalenessDetectionService', 'SkillEditorStateService',
+    'UndoRedoService', 'UrlService', 'WindowRef',
     'MAX_COMMIT_MESSAGE_LENGTH',
     function(
-        $rootScope, $uibModal, BottomNavbarStatusService,
-        PreventPageUnloadEventService,
-        SkillEditorRoutingService, SkillEditorStateService,
-        UndoRedoService, UrlInterpolationService, UrlService,
+        $rootScope, BottomNavbarStatusService, LocalStorageService,
+        NgbModal, PreventPageUnloadEventService,
+        SkillEditorRoutingService,
+        SkillEditorStalenessDetectionService, SkillEditorStateService,
+        UndoRedoService, UrlService, WindowRef,
         MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
+      let skillIsInitialized = false;
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.getActiveTabName = function() {
@@ -72,13 +84,15 @@ angular.module('oppia').component('skillEditorPage', {
         // discarded, the misconceptions won't be saved, but there will be
         // some questions with these now non-existent misconceptions.
         if (UndoRedoService.getChangeCount() > 0) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/skill-editor-page/modal-templates/' +
-              'save-pending-changes-modal.directive.html'),
-            backdrop: true,
-            controller: 'ConfirmOrCancelModalController'
-          }).result.then(null, function() {
+          const modalRef = NgbModal.open(SavePendingChangesModalComponent, {
+            backdrop: true
+          });
+
+          modalRef.componentInstance.body = (
+            'Please save all pending changes ' +
+            'before viewing the questions list.');
+
+          modalRef.result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -91,6 +105,67 @@ angular.module('oppia').component('skillEditorPage', {
         return ctrl.skill ? ctrl.skill.getValidationIssues().length : 0;
       };
 
+      ctrl.onClosingSkillEditorBrowserTab = function() {
+        const skill = SkillEditorStateService.getSkill();
+
+        const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+
+        if (skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+            UndoRedoService.getChangeCount() > 0) {
+          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        }
+        skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          skillEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_SKILL_EDITOR_BROWSER_TABS);
+      };
+
+      const createOrUpdateSkillEditorBrowserTabsInfo = function() {
+        const skill = SkillEditorStateService.getSkill();
+
+        let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+
+        if (skillIsInitialized) {
+          skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
+          skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        } else {
+          if (skillEditorBrowserTabsInfo) {
+            skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
+            skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+          } else {
+            skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+              'skill', skill.getId(), skill.getVersion(), 1, false);
+          }
+          skillIsInitialized = true;
+        }
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          skillEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_SKILL_EDITOR_BROWSER_TABS);
+      };
+
+      const onCreateOrUpdateSkillEditorBrowserTabsInfo = function(event) {
+        if (event.key === (
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_SKILL_EDITOR_BROWSER_TABS)
+        ) {
+          SkillEditorStalenessDetectionService
+            .staleTabEventEmitter.emit();
+          SkillEditorStalenessDetectionService
+            .presenceOfUnsavedChangesEventEmitter.emit();
+          $rootScope.$applyAsync();
+        }
+      };
+
       ctrl.$onInit = function() {
         BottomNavbarStatusService.markBottomNavbarStatus(true);
         PreventPageUnloadEventService.addListener(
@@ -98,8 +173,17 @@ angular.module('oppia').component('skillEditorPage', {
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
         ctrl.directiveSubscriptions.add(
-          SkillEditorStateService.onSkillChange.subscribe(
-            () => $rootScope.$applyAsync()));
+          SkillEditorStateService.onSkillChange.subscribe(() => {
+            createOrUpdateSkillEditorBrowserTabsInfo();
+            $rootScope.$applyAsync();
+          })
+        );
+        skillIsInitialized = false;
+        SkillEditorStalenessDetectionService.init();
+        WindowRef.nativeWindow.addEventListener(
+          'beforeunload', ctrl.onClosingSkillEditorBrowserTab);
+        LocalStorageService.registerNewStorageEventListener(
+          onCreateOrUpdateSkillEditorBrowserTabsInfo);
       };
     }
   ]

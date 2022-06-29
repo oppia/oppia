@@ -33,7 +33,7 @@ class AndroidConfigTest(test_utils.GenericTestBase):
 
     def test_initialize_in_production_raises_exception(self):
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(

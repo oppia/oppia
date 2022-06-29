@@ -32,7 +32,7 @@ import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
   componentInstance: {
-    bindedMessage: null
+    bindedMessage: null;
   };
 }
 
@@ -394,10 +394,11 @@ describe('Story editor navbar component', () => {
 
   it('should discard changes', () => {
     story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
 
     component.story = story;
     let clearChangesSpy = spyOn(
-      undoRedoService, 'clearChanges').and.returnValue();
+      undoRedoService, 'clearChanges').and.callThrough();
 
     component.discardChanges();
 

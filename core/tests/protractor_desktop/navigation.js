@@ -212,7 +212,7 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-partnerships-page')).isPresent()).toBe(true);
   });
 
-  it('should visit the About foundation page', async function() {
+  it('should visit the About the Oppia Foundation page', async function() {
     await browser.get('/about-foundation');
     await waitFor.pageToFullyLoad();
     expect(await element(

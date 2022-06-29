@@ -194,7 +194,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'topic_id': 'topic_id',
             'page_contents': expected_page_contents_dict,
             'subtopic_title': 'Subtopic Title',
-            'next_subtopic_dict': expected_next_subtopic_dict
+            'next_subtopic_dict': expected_next_subtopic_dict,
+            'prev_subtopic_dict': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -210,7 +211,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             },
             'written_translations': self.written_translations_dict
         }
-        expected_next_subtopic_dict = {
+        expected_prev_subtopic_dict = {
             'thumbnail_bg_color': None,
             'skill_ids': ['skill_id_1'],
             'id': 1,
@@ -224,7 +225,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'topic_id': 'topic_id',
             'page_contents': expected_page_contents_dict,
             'subtopic_title': 'Subtopic Title 2',
-            'next_subtopic_dict': expected_next_subtopic_dict
+            'next_subtopic_dict': None,
+            'prev_subtopic_dict': expected_prev_subtopic_dict
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 

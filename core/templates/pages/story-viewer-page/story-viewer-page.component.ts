@@ -16,11 +16,14 @@
  * @fileoverview Component for the main page of the story viewer.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
@@ -30,19 +33,24 @@ import { PageTitleService } from 'services/page-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 interface IconParametersArray {
-  thumbnailIconUrl: string,
-  left: string,
-  top: string,
-  thumbnailBgColor: string,
+  thumbnailIconUrl: string;
+  left: string;
+  top: string;
+  thumbnailBgColor: string;
 }
 
 @Component({
   selector: 'oppia-story-viewer-page',
   templateUrl: './story-viewer-page.component.html'
 })
-export class StoryViewerPageComponent implements OnInit {
+export class StoryViewerPageComponent implements OnInit, OnDestroy {
+  @ViewChild('overlay') overlay: ElementRef<HTMLDivElement>;
+  @ViewChild('skip') skipButton: ElementRef<HTMLButtonElement>;
+  directiveSubscriptions = new Subscription();
+  showLoginOverlay: boolean = true;
   storyPlaythroughObject: StoryPlaythrough;
   storyId: string;
   storyIsLoaded: boolean;
@@ -51,15 +59,20 @@ export class StoryViewerPageComponent implements OnInit {
   classroomUrlFragment: string;
   storyUrlFragment: string;
   storyTitle: string;
+  storyTitleTranslationKey: string;
   storyDescription: string;
+  storyDescTranslationKey: string;
   pathIconParameters: IconParametersArray[];
   topicName: string;
   thumbnailFilename: string;
   thumbnailBgColor: string;
   storyNodes: ReadOnlyStoryNode[];
+  storyNodesTitleTranslationKeys: string[] = [];
+  storyNodesDescTranslationKeys: string[] = [];
   iconUrl: string;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private assetsBackendApiService: AssetsBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
@@ -67,11 +80,27 @@ export class StoryViewerPageComponent implements OnInit {
     private loaderService: LoaderService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private translateService: TranslateService
   ) {}
+
+  focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
+    if (isLoggedIn || !this.showLoginOverlay) {
+      return;
+    }
+    const target = eventTarget;
+    if (target.closest('.story-viewer-login-container') !==
+        this.overlay.nativeElement) {
+      this.skipButton.nativeElement.focus();
+    }
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   showChapters(): boolean {
@@ -106,6 +135,10 @@ export class StoryViewerPageComponent implements OnInit {
     return iconParametersArray;
   }
 
+  hideLoginOverlay(): void {
+    this.showLoginOverlay = false;
+  }
+
   signIn(): void {
     this.userService.getLoginUrlAsync().then(
       (loginUrl) => {
@@ -132,6 +165,23 @@ export class StoryViewerPageComponent implements OnInit {
     return result;
   }
 
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_STORY_VIEWER_PAGE_TITLE', {
+        topicName: this.topicName,
+        storyTitle: this.storyTitle
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
   ngOnInit(): void {
     this.storyIsLoaded = false;
     this.isLoggedIn = false;
@@ -155,15 +205,46 @@ export class StoryViewerPageComponent implements OnInit {
         this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
         this.storyId = this.storyPlaythroughObject.getStoryId();
         this.topicName = this.storyPlaythroughObject.topicName;
-        this.pageTitleService.setDocumentTitle(
-          `Learn ${this.topicName} | ${storyDataDict.title} | Oppia`);
         this.pageTitleService.updateMetaTag(
           storyDataDict.getMetaTagContent());
         this.storyTitle = storyDataDict.title;
-        this.storyDescription = storyDataDict.description;
 
+        // The onLangChange event is initially fired before the story is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the story is loaded.
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
+        this.storyTitleTranslationKey = (
+          this.i18nLanguageCodeService
+            .getStoryTranslationKey(
+              this.storyId, TranslationKeyType.TITLE)
+        );
+        this.storyDescription = storyDataDict.description;
+        this.storyDescTranslationKey = (
+          this.i18nLanguageCodeService
+            .getStoryTranslationKey(
+              this.storyId, TranslationKeyType.DESCRIPTION)
+        );
         this.loaderService.hideLoadingScreen();
         this.pathIconParameters = this.generatePathIconParameters();
+        for (let idx in this.storyNodes) {
+          let storyNode: ReadOnlyStoryNode = this.storyNodes[idx];
+          let storyNodeTitleTranslationKey = (
+            this.i18nLanguageCodeService.
+              getExplorationTranslationKey(
+                storyNode.getExplorationId(), TranslationKeyType.TITLE)
+          );
+          let storyNodeDescTranslationKey = (
+            this.i18nLanguageCodeService.
+              getExplorationTranslationKey(
+                storyNode.getExplorationId(), TranslationKeyType.DESCRIPTION)
+          );
+          this.storyNodesTitleTranslationKeys.push(
+            storyNodeTitleTranslationKey);
+          this.storyNodesDescTranslationKeys.push(
+            storyNodeDescTranslationKey);
+        }
       },
       (errorResponse) => {
         let errorCodes = AppConstants.FATAL_ERROR_CODES;
@@ -177,6 +258,42 @@ export class StoryViewerPageComponent implements OnInit {
     // background color and icon url for the icons generated on the
     // path.
     this.pathIconParameters = [];
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  isHackyStoryTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyStoryDescTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyDescTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyStoryNodeTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyNodesTitleTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyStoryNodeDescTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyNodesDescTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

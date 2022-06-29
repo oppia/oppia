@@ -5,7 +5,11 @@ workflows:
     # Note: all end-to-end tests have now been moved off CircleCI.
 
     jobs:
-      - setup_and_typescript_tests
+      - e2e_coverage_and_typescript_tests:
+          filters:
+            branches:
+              only:
+                - develop
 
 var_for_docker_image: &docker_image circleci/python:3.7.10-browsers
 
@@ -49,7 +53,7 @@ commands:
             fi
 
 jobs:
-  setup_and_typescript_tests:
+  e2e_coverage_and_typescript_tests:
     <<: *job_defaults
     steps:
       - checkout

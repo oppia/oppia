@@ -21,8 +21,14 @@ from __future__ import annotations
 import os
 import re
 
-from core import python_utils
-from core import utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core import utils  # isort:skip
+
+from typing import List  # isort:skip
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
@@ -35,7 +41,7 @@ SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'coreEditorAndPlayerFeatures'
 CI_PATH = os.path.join(os.getcwd(), '.github', 'workflows')
 
 
-def get_e2e_suite_names_from_ci_config_file():
+def get_e2e_suite_names_from_ci_config_file() -> List[str]:
     """Extracts the script section from the CI config files.
 
     Returns:
@@ -52,7 +58,7 @@ def get_e2e_suite_names_from_ci_config_file():
     return sorted(suites_list)
 
 
-def get_e2e_suite_names_from_protractor_file():
+def get_e2e_suite_names_from_protractor_file() -> List[str]:
     """Extracts the test suites section from the protractor.conf.js file.
 
     Returns:
@@ -72,18 +78,18 @@ def get_e2e_suite_names_from_protractor_file():
     return sorted(protractor_suites)
 
 
-def read_protractor_conf_file():
+def read_protractor_conf_file() -> str:
     """Returns the contents of core/tests/protractor.conf.js file.
 
     Returns:
         str. The contents of protractor.conf.js, as a string.
     """
-    protractor_config_file_content = python_utils.open_file(
+    protractor_config_file_content = utils.open_file(
         PROTRACTOR_CONF_FILE_PATH, 'r').read()
     return protractor_config_file_content
 
 
-def read_and_parse_ci_config_files():
+def read_and_parse_ci_config_files() -> List[str]:
     """Returns the contents of CI config files.
 
     Returns:
@@ -92,13 +98,13 @@ def read_and_parse_ci_config_files():
     ci_dicts = []
     for filepath in os.listdir(CI_PATH):
         if re.search(r'e2e_.*\.yml', filepath):
-            ci_file_content = python_utils.open_file(
+            ci_file_content = utils.open_file(
                 os.path.join(CI_PATH, filepath), 'r').read()
             ci_dicts.append(ci_file_content)
     return ci_dicts
 
 
-def get_e2e_test_filenames_from_protractor_dir():
+def get_e2e_test_filenames_from_protractor_dir() -> List[str]:
     """Extracts the names of the all test files in core/tests/protractor
     and core/tests/protractor_desktop directory.
 
@@ -119,7 +125,7 @@ def get_e2e_test_filenames_from_protractor_dir():
     return sorted(protractor_test_suite_files)
 
 
-def get_e2e_test_filenames_from_protractor_conf_file():
+def get_e2e_test_filenames_from_protractor_conf_file() -> List[str]:
     """Extracts the filenames from the suites object of
     protractor.conf.js file.
 
@@ -136,13 +142,11 @@ def get_e2e_test_filenames_from_protractor_conf_file():
     return sorted(e2e_test_files)
 
 
-def main():
+def main() -> None:
     """Test the CI config files and protractor.conf.js to have same
     e2e test suites.
     """
-    python_utils.PRINT(
-        'Checking all e2e test files are captured '
-        'in protractor.conf.js...')
+    print('Checking all e2e test files are captured in protractor.conf.js...')
     protractor_test_suite_files = get_e2e_test_filenames_from_protractor_dir()
     protractor_conf_test_suites = (
         get_e2e_test_filenames_from_protractor_conf_file())
@@ -151,10 +155,9 @@ def main():
         raise Exception(
             'One or more test file from protractor or protractor_desktop '
             'directory is missing from protractor.conf.js')
-    python_utils.PRINT('Done!')
+    print('Done!')
 
-    python_utils.PRINT(
-        'Checking e2e tests are captured in CI config files...')
+    print('Checking e2e tests are captured in CI config files...')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
     ci_suite_names = get_e2e_suite_names_from_ci_config_file()
 
@@ -191,7 +194,7 @@ def main():
                 utils.compute_list_difference(
                     protractor_test_suites, ci_suite_names)))
 
-    python_utils.PRINT('Done!')
+    print('Done!')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

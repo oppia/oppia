@@ -16,7 +16,7 @@
  * @fileoverview Component for the supplemental card.
  */
 
-import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -51,6 +51,7 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_LINK_URL: string = AppConstants.OPPIA_AVATAR_LINK_URL;
   CONTINUE_BUTTON_FOCUS_LABEL: string = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+
   helpCardBottomPosition: number = 0;
 
   constructor(
@@ -97,6 +98,13 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
       )
     );
     this.updateDisplayedCard();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.displayedCard) {
+      this.displayedCard = changes.displayedCard.currentValue;
+      this.updateDisplayedCard();
+    }
   }
 
   ngOnDestroy(): void {

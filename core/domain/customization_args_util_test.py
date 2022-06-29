@@ -22,17 +22,18 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
 
+from typing import Dict, List, Optional, Union
+
 
 class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
     """Test customization args generation and validation."""
 
-    def test_get_full_customization_args(self):
+    def test_get_full_customization_args(self) -> None:
         """Test get full customization args method."""
         ca_continue_specs = interaction_registry.Registry.get_interaction_by_id(
             'Continue').customization_arg_specs
@@ -45,7 +46,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        complete_customization_args_with_extra_arg = {
+        complete_customization_args_with_extra_arg: (
+            Dict[str, Dict[str, Union[str, Dict[str, Optional[str]]]]]
+        ) = {
             'buttonText': {
                 'value': {
                     'content_id': None,
@@ -84,7 +87,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'allowNonzeroIntegerPart': {'value': False}
         }
 
-        incomplete_customization_args_with_extra_arg = {
+        incomplete_customization_args_with_extra_arg: (
+            Dict[str, Dict[str, Union[str, bool]]]
+        ) = {
             'requireSimplestForm': {'value': False},
             'allowNonzeroIntegerPart': {'value': False},
             'extraArg': {'value': ''}
@@ -134,7 +139,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_validate_customization_args_and_values(self):
+    def test_validate_customization_args_and_values(self) -> None:
         """Test validate customization args and values method."""
 
         ca_item_selection_specs = (
@@ -142,7 +147,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 'ItemSelectionInput').customization_arg_specs
         )
 
-        complete_customization_args = {
+        complete_customization_args: (
+            Dict[str, Dict[str, Union[int, List[str]]]]
+        ) = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': ['']}
@@ -155,14 +162,18 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             23: {'value': ''}
         }
 
-        complete_customization_args_with_extra_arg = {
+        complete_customization_args_with_extra_arg: (
+            Dict[str, Dict[str, Union[int, str, List[str]]]]
+        ) = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': ['']},
             'extraArg': {'value': ''}
         }
 
-        complete_customization_args_with_invalid_arg_type = {
+        complete_customization_args_with_invalid_arg_type: (
+            Dict[str, Dict[str, Union[str, int, List[str]]]]
+        ) = {
             'minAllowableSelectionCount': {'value': 'invalid'},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': ['']}
@@ -194,19 +205,22 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid customization arg name: 23'
         ):
+            # TODO(#13059): After we fully type the codebase we plan to get
+            # rid of the tests that intentionally test wrong inputs that we
+            # can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'ItemSelectionInput',
-                complete_customization_args_with_invalid_arg_name,
+                complete_customization_args_with_invalid_arg_name,  # type: ignore[arg-type]
                 ca_item_selection_specs
             )
 
         # Check if error is produced when extra args are present.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             (
                 'Interaction ItemSelectionInput does not support '
@@ -248,12 +262,6 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             False: {'value': False},
         }
 
-        incomplete_customization_args_with_invalid_arg_type = {
-            'requireSimplestForm': {'value': False},
-            'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': 12}
-        }
-
         complete_customization_args_with_invalid_arg_type = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
@@ -269,22 +277,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'extraArg': {'value': ''}
         }
 
-        expected_customization_args_after_validation = {
-            'requireSimplestForm': {'value': False},
-            'allowImproperFraction': {'value': True},
-            'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''}
-        }
-
-        expected_customization_args_after_validation_with_invalid_arg_type = (
-            incomplete_customization_args_with_invalid_arg_type
-        )
-
         # The next four checks are for cases where customization args dict
         # does not contain some of the required specs.
 
         # Check if error is produced for missing customization args.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Customization argument is missing key: allowImproperFraction'
         ):
@@ -296,19 +293,22 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid customization arg name: False'
         ):
+            # TODO(#13059): After we fully type the codebase we plan to get
+            # rid of the tests that intentionally test wrong inputs that we
+            # can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
-                incomplete_customization_args_with_invalid_arg_name,
+                incomplete_customization_args_with_invalid_arg_name,  # type: ignore[arg-type]
                 ca_fraction_input_specs
             )
 
         # Check if error is produced when extra args are present.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             (
                 'Interaction FractionInput does not support customization '
@@ -342,19 +342,24 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # A general check to see if error are produced when customization args
         # is not of type dict.
         customization_args_with_invalid_type = 23
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected customization args to be a dict, received %s'
             % customization_args_with_invalid_type
         ):
+            # TODO(#13059): After we fully type the codebase we plan to get
+            # rid of the tests that intentionally test wrong inputs that we
+            # can normally catch by typing.
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
-                customization_args_with_invalid_type,
+                customization_args_with_invalid_type,  # type: ignore[arg-type]
                 ca_fraction_input_specs
             )
 
-    def test_validate_customization_args_and_values_with_invalid_schema(self):
+    def test_validate_customization_args_and_values_with_invalid_schema(
+        self
+    ) -> None:
         """Test validate customization args and values method with
         invalid schema and errors raised on validation failure.
         """
@@ -362,12 +367,14 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_interaction_by_id(
                 'ItemSelectionInput').customization_arg_specs
         )
-        invalid_customization_args = {
+        invalid_customization_args: (
+            Dict[str, Dict[str, Union[str, int, List[str]]]]
+        ) = {
             'minAllowableSelectionCount': {'value': '1b'},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': ['']}
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Could not convert str to int: 1b'
         ):
             customization_args_util.validate_customization_args_and_values(
@@ -378,7 +385,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 fail_on_validation_errors=True
             )
 
-    def test_frontend_customization_args_defs_coverage(self):
+    def test_frontend_customization_args_defs_coverage(self) -> None:
         """Test to ensure that customization-args-defs.ts has both frontend and
         backend interfaces for each interaction's customization arguments.
 
@@ -388,7 +395,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         """
         filepath = os.path.join(
             feconf.INTERACTIONS_DIR, 'customization-args-defs.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (
@@ -436,7 +443,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             all_interaction_ids,
             interaction_ids_with_ca_frontend_interfaces)
 
-    def test_frontend_customization_args_constructor_coverage(self):
+    def test_frontend_customization_args_constructor_coverage(self) -> None:
         """Test to ensure that InteractionObjectFactory.ts covers constructing
         customization arguments for each interaction. Uses regex to confirm
         that the CustomizationArgs or CustomizationArgsBackendDict
@@ -445,7 +452,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         filepath = os.path.join(
             'core', 'templates', 'domain', 'exploration',
             'InteractionObjectFactory.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (
@@ -475,7 +482,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             all_interaction_ids,
             interaction_ids_with_used_ca_frontend_interfaces)
 
-    def test_frontend_customization_args_dtslint_test_coverage(self):
+    def test_frontend_customization_args_dtslint_test_coverage(self) -> None:
         """Test to ensure that customization-args-defs-test.ts covers testing
         customization arguments types for each interaction. Uses regex to
         confirm that there exists a test named
@@ -484,7 +491,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         """
         filepath = os.path.join(
             'typings', 'tests', 'customization-args-defs-test.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (

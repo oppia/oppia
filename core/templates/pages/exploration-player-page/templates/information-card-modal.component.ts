@@ -24,6 +24,7 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -35,27 +36,36 @@ interface ExplorationTagSummary {
   templateUrl: './information-card-modal.component.html'
 })
 export class InformationCardModalComponent extends ConfirmOrCancelModal {
-  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
+  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER: string = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-  averageRating: number;
-  contributorsSummary = {};
-  contributorNames: string[];
-  expInfo: LearnerExplorationSummaryBackendDict;
-  explorationId: string;
-  explorationTags: ExplorationTagSummary;
-  explorationTitle: string;
-  infoCardBackgroundCss: { 'background-color': string };
-  infoCardBackgroundImageUrl: string;
-  lastUpdatedString: string;
-  numViews: number;
-  objective: string;
-  explorationIsPrivate: boolean;
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
+  // Average rating will be 'null' if the ratings are less than the
+  // minimum acceptable number of ratings. The average will
+  // not be computed in this case.
+  averageRating!: number | null;
+  contributorsSummary: {[keys: string]: {num_commits: number}} = {};
+  contributorNames!: string[];
+  expInfo!: LearnerExplorationSummaryBackendDict;
+  explorationId!: string;
+  explorationTags!: ExplorationTagSummary;
+  explorationTitle!: string;
+  infoCardBackgroundCss!: { 'background-color': string };
+  infoCardBackgroundImageUrl!: string;
+  lastUpdatedString!: string;
+  numViews!: number;
+  objective!: string;
+  explorationIsPrivate!: boolean;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private dateTimeFormatService: DateTimeFormatService,
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {
     super(ngbActiveModal);
   }
@@ -67,7 +77,7 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
       .human_readable_contributors_summary || {};
     this.contributorNames = Object.keys(
       this.contributorsSummary).sort(
-      (contributorUsername1, contributorUsername2) => {
+      (contributorUsername1: string, contributorUsername2: string) => {
         let commitsOfContributor1 = this.contributorsSummary[
           contributorUsername1].num_commits;
         let commitsOfContributor2 = this.contributorsSummary[
@@ -128,5 +138,9 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }

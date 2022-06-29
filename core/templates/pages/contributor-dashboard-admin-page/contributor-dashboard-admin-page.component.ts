@@ -83,16 +83,14 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           if (ctrl.taskRunningInBackground) {
             return;
           }
-          ctrl.statusMessage = 'Adding new reviewer...';
+          ctrl.statusMessage = 'Adding contribution rights...';
           ctrl.taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .addContributionReviewerAsync(
               formResponse.category, formResponse.username,
               formResponse.languageCode
             ).then(() => {
-              ctrl.statusMessage = (
-                'Successfully added "' + formResponse.username + '" as ' +
-              formResponse.category + ' reviewer.');
+              ctrl.statusMessage = 'Success.';
               refreshFormData();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.

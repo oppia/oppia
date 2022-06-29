@@ -43,7 +43,7 @@ interface AudioLangaugeChoice {
 })
 export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   subjectInterests!: string;
   preferredLanguageCodes!: string[];
@@ -70,12 +70,10 @@ export class PreferencesPageComponent {
   canReceiveEditorRoleEmail: boolean = false;
   canReceiveSubscriptionEmail: boolean = false;
   canReceiveFeedbackMessageEmail: boolean = false;
-  userCanDeleteAccount: boolean = false;
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
-  userCanExportAccount: boolean = false;
 
   constructor(
     private ngbModal: NgbModal,
@@ -245,8 +243,6 @@ export class PreferencesPageComponent {
       this.loaderService.hideLoadingScreen();
     });
 
-    this.userCanDeleteAccount = AppConstants.ENABLE_ACCOUNT_DELETION;
-    this.userCanExportAccount = AppConstants.ENABLE_ACCOUNT_EXPORT;
     this.subjectInterestsChangeAtLeastOnce = false;
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();

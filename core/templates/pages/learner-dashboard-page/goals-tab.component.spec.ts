@@ -34,10 +34,10 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
-    sectionNameI18nId: null,
-    subsectionName: null,
-    activityId: null,
-    activityTitle: null
+    sectionNameI18nId: null;
+    subsectionName: null;
+    activityId: null;
+    activityTitle: null;
   };
 }
 
@@ -338,5 +338,33 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(urlSpy).toHaveBeenCalled();
+  });
+
+  it('should correctly show and hide the dropdown', () => {
+    expect(component.showThreeDotsDropdown).toBe(false);
+
+    component.toggleThreeDotsDropdown();
+    expect(component.showThreeDotsDropdown).toBe(true);
+
+    component.toggleThreeDotsDropdown();
+    expect(component.showThreeDotsDropdown).toBe(false);
+
+    component.toggleThreeDotsDropdown();
+    expect(component.showThreeDotsDropdown).toBe(true);
+
+    let fakeClickAwayEvent = new MouseEvent('click');
+    Object.defineProperty(
+      fakeClickAwayEvent,
+      'target',
+      {value: document.createElement('div')});
+    component.onDocumentClick(fakeClickAwayEvent);
+    fixture.detectChanges();
+    expect(component.showThreeDotsDropdown).toBe(false);
+
+    // Three dots are not shown when no goals are present.
+    component.dropdownRef = null;
+    component.onDocumentClick(fakeClickAwayEvent);
+    fixture.detectChanges();
+    expect(component.showThreeDotsDropdown).toBe(false);
   });
 });

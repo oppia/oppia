@@ -70,7 +70,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'id': correct_id
             }
         ]
-        assert_raises_ctx = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        assert_raises_ctx = self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'Failed to add document to index.')
         with assert_raises_ctx, self.swap(
@@ -142,7 +142,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         result, new_offset = (
             elastic_search_services.search(
-                '', correct_index_name, [], [], offset='0',
+                '', correct_index_name, [], [], offset=0,
                 size=50, ids_only=True))
         self.assertEqual(result, [1, 12])
         self.assertIsNone(new_offset)
@@ -164,7 +164,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         }], correct_index_name)
 
         result, new_offset = elastic_search_services.search(
-            '', correct_index_name, [], [], offset='0', size=50, ids_only=False)
+            '', correct_index_name, [], [], offset=0, size=50, ids_only=False)
         self.assertEqual(result, [{
             'id': 1,
             'source': {
@@ -182,7 +182,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
     def test_search_returns_none_when_response_is_empty(self) -> None:
         result, new_offset = elastic_search_services.search(
-            '', 'index', [], [], offset='0',
+            '', 'index', [], [], offset=0,
             size=50, ids_only=False)
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
@@ -315,10 +315,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # Letting mypy know that results[0] is a dict.
         assert isinstance(results[0], dict)
         self.assertEqual(results[0]['id'], 'doc_id1')
-        self.assertEqual(new_offset, '1')
+        self.assertEqual(new_offset, 1)
 
         results, new_offset = elastic_search_services.search(
-            'hello', 'index', [], [], offset='1', size=1)
+            'hello', 'index', [], [], offset=1, size=1)
         self.assertEqual(len(results), 1)
         # Letting mypy know that results[0] is a dict.
         assert isinstance(results[0], dict)

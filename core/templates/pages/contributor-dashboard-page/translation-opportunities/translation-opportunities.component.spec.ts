@@ -31,9 +31,8 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
-import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 
 describe('Translation opportunities component', () => {
@@ -64,12 +63,10 @@ describe('Translation opportunities component', () => {
         NgbTooltipModule
       ],
       declarations: [
-        AngularHtmlBindWrapperDirective,
         CkEditorCopyToolbarComponent,
         LazyLoadingComponent,
         OpportunitiesListComponent,
         OpportunitiesListItemComponent,
-        SchemaBasedEditorDirective,
         TranslationModalComponent,
         TranslationOpportunitiesComponent,
         WrapTextWithEllipsisPipe,
@@ -78,6 +75,7 @@ describe('Translation opportunities component', () => {
         NgbModal,
         NgbActiveModal
       ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     translationModal = TestBed.createComponent(
       TranslationModalComponent) as unknown as NgbModalRef;

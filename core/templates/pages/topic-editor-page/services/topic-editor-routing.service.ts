@@ -71,6 +71,7 @@ export class TopicEditorRoutingService {
   getLastTabVisited(): string {
     return this._lastTabVisited;
   }
+
   getLastSubtopicIdVisited(): number {
     return this._lastSubtopicId;
   }

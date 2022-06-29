@@ -26,11 +26,11 @@ import re
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import exp_fetchers
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
@@ -161,8 +161,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         user_ids, include_deleted=include_marked_deleted)
 
     if strict:
-        for user_id, user_settings_model in python_utils.ZIP(
-                user_ids, user_settings_models):
+        for user_id, user_settings_model in zip(user_ids, user_settings_models):
             if user_settings_model is None:
                 raise Exception('User with ID \'%s\' not found.' % user_id)
     result = []
@@ -174,9 +173,12 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 roles=[
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,
-                    feconf.ROLE_ID_MODERATOR],
+                    feconf.ROLE_ID_MODERATOR,
+                    feconf.ROLE_ID_VOICEOVER_ADMIN
+                ],
                 banned=False,
                 username='admin',
+                has_viewed_lesson_info_modal_once=False,
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
@@ -287,7 +289,9 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     Raises:
         Exception. The value of strict is True and given auth_id does not exist.
     """
-    user_id = auth_services.get_user_id_from_auth_id(auth_id)
+    user_id = auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=True
+    )
     user_settings_model = (
         None if user_id is None else
         user_models.UserSettingsModel.get_by_id(user_id))
@@ -654,10 +658,14 @@ def _get_user_settings_from_model(user_settings_model):
             user_settings_model.preferred_site_language_code),
         preferred_audio_language_code=(
             user_settings_model.preferred_audio_language_code),
+        preferred_translation_language_code=(
+            user_settings_model.preferred_translation_language_code),
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
-        created_on=user_settings_model.created_on
+        created_on=user_settings_model.created_on,
+        has_viewed_lesson_info_modal_once=(
+            user_settings_model.has_viewed_lesson_info_modal_once)
     )
 
 
@@ -753,7 +761,7 @@ def create_new_user(auth_id, email):
             user_settings.user_id, auth_id))
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = user_domain.UserSettings(
-        user_id, email, [feconf.ROLE_ID_FULL_USER], False,
+        user_id, email, [feconf.ROLE_ID_FULL_USER], False, False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -808,7 +816,7 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id()
         user_settings = user_domain.UserSettings(
-            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False,
+            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False, False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
@@ -857,7 +865,7 @@ def update_multiple_users_data(modifiable_user_data_list):
     user_ids = [user.user_id for user in modifiable_user_data_list]
     user_settings_list = get_users_settings(user_ids)
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
-    for modifiable_user_data, user_settings in python_utils.ZIP(
+    for modifiable_user_data, user_settings in zip(
             modifiable_user_data_list, user_settings_list):
         user_id = modifiable_user_data.user_id
         if user_id is None:
@@ -880,7 +888,7 @@ def _save_existing_users_settings(user_settings_list):
     user_ids = [user.user_id for user in user_settings_list]
     user_settings_models = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_model, user_settings in python_utils.ZIP(
+    for user_model, user_settings in zip(
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
@@ -900,7 +908,7 @@ def _save_existing_users_auth_details(user_auth_details_list):
     user_ids = [user.user_id for user in user_auth_details_list]
     user_auth_models = auth_models.UserAuthDetailsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_auth_details_model, user_auth_details in python_utils.ZIP(
+    for user_auth_details_model, user_auth_details in zip(
             user_auth_models, user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_model.populate(**user_auth_details.to_dict())
@@ -1138,18 +1146,18 @@ def update_subject_interests(user_id, subject_interests):
     """
     if not isinstance(subject_interests, list):
         raise utils.ValidationError('Expected subject_interests to be a list.')
-    else:
-        for interest in subject_interests:
-            if not isinstance(interest, str):
-                raise utils.ValidationError(
-                    'Expected each subject interest to be a string.')
-            elif not interest:
-                raise utils.ValidationError(
-                    'Expected each subject interest to be non-empty.')
-            elif not re.match(constants.TAG_REGEX, interest):
-                raise utils.ValidationError(
-                    'Expected each subject interest to consist only of '
-                    'lowercase alphabetic characters and spaces.')
+
+    for interest in subject_interests:
+        if not isinstance(interest, str):
+            raise utils.ValidationError(
+                'Expected each subject interest to be a string.')
+        if not interest:
+            raise utils.ValidationError(
+                'Expected each subject interest to be non-empty.')
+        if not re.match(constants.TAG_REGEX, interest):
+            raise utils.ValidationError(
+                'Expected each subject interest to consist only of '
+                'lowercase alphabetic characters and spaces.')
 
     if len(set(subject_interests)) != len(subject_interests):
         raise utils.ValidationError(
@@ -1227,6 +1235,23 @@ def update_preferred_audio_language_code(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_audio_language_code = (
         preferred_audio_language_code)
+    _save_user_settings(user_settings)
+
+
+def update_preferred_translation_language_code(
+    user_id, preferred_translation_language_code
+):
+    """Updates preferred_translation_language_code of user with
+    given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        preferred_translation_language_code: str. New text translation
+            language preference to set.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_translation_language_code = (
+        preferred_translation_language_code)
     _save_user_settings(user_settings)
 
 
@@ -1660,10 +1685,10 @@ def create_user_contributions(
     if user_contributions:
         raise Exception(
             'User contributions model for user %s already exists.' % user_id)
-    else:
-        user_contributions = user_domain.UserContributions(
-            user_id, created_exploration_ids, edited_exploration_ids)
-        _save_user_contributions(user_contributions)
+
+    user_contributions = user_domain.UserContributions(
+        user_id, created_exploration_ids, edited_exploration_ids)
+    _save_user_contributions(user_contributions)
     return user_contributions
 
 
@@ -2166,6 +2191,11 @@ def get_contributor_usernames(category, language_code=None):
 
     Returns:
         list(str). A list of usernames.
+
+    Raises:
+        Exception. The language code is not of None for question review
+            contribution.
+        Exception. Invalid category.
     """
     user_ids = []
     if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
@@ -2280,3 +2310,266 @@ def get_dashboard_stats(user_id):
         'num_ratings': num_ratings,
         'average_ratings': average_ratings
     }
+
+
+def _get_checkpoints_in_order(init_state_name, states):
+    """Returns the checkpoints of an exploration in sequential order by a
+    BFS traversal.
+
+    Args:
+        init_state_name: str. The name of the first state of the exploration.
+        states: dict(state). All states of the exploration.
+
+    Returns:
+        list(str). List of all checkpoints of the exploration in sequential
+        order.
+    """
+    queue = [init_state_name]
+    checkpoint_state_names = []
+    visited_state_names = []
+    while len(queue) > 0:
+        current_state_name = queue.pop()
+        if current_state_name not in visited_state_names:
+            visited_state_names.append(current_state_name)
+            current_state = states[current_state_name]
+            if (
+                current_state.card_is_checkpoint and
+                current_state_name not in checkpoint_state_names
+            ):
+                checkpoint_state_names.append(current_state_name)
+            for answer_group in current_state.interaction.answer_groups:
+                queue.append(answer_group.outcome.dest)
+
+            # Add the default outcome destination in the queue.
+            if current_state.interaction.default_outcome is not None:
+                queue.append(current_state.interaction.default_outcome.dest)
+
+    return checkpoint_state_names
+
+
+def _get_most_distant_reached_checkpoint_in_current_exploration(
+    checkpoints_in_current_exploration,
+    checkpoints_in_older_exploration,
+    most_distant_reached_checkpoint_state_name_in_older_exploration
+):
+    """Returns the most distant reached checkpoint in current exploration after
+    comparing current exploration with older exploration.
+
+    Args:
+        checkpoints_in_current_exploration: list(str). The checkpoints of
+            current exploration in sequential order.
+        checkpoints_in_older_exploration: list(str). The checkpoints
+            of older exploration in sequential order.
+        most_distant_reached_checkpoint_state_name_in_older_exploration: str.
+            The state name of the most distant reached checkpoint in the older
+            exploration.
+
+    Returns:
+        str or None. The most distant checkpoint in current exploration or
+        None if most distant reached checkpoint of older exploration is not
+        present in current exploration.
+    """
+    # Index of the most_distant_reached_checkpoint in the older exploration.
+    mdrc_index = (
+        checkpoints_in_older_exploration.index(
+            most_distant_reached_checkpoint_state_name_in_older_exploration))
+
+    # Loop through checkpoints of furthest_reached_exploration backwards until
+    # a checkpoint is found that exists in current_exploration too.
+    while mdrc_index >= 0:
+        checkpoint_in_old_exp = checkpoints_in_older_exploration[mdrc_index]
+        if checkpoint_in_old_exp in checkpoints_in_current_exploration:
+            return checkpoint_in_old_exp
+        mdrc_index -= 1
+
+    return None
+
+
+def update_learner_checkpoint_progress(
+    user_id, exploration_id, state_name, exp_version
+):
+    """Sets the furthest reached and most recently reached checkpoint in
+    an exploration by the user.
+
+    Args:
+        user_id: str. The Id of the user.
+        exploration_id: str. The Id of the exploration.
+        state_name: str. The state name of the most recently reached checkpoint.
+        exp_version: int. The exploration version of the most recently reached
+            checkpoint.
+    """
+
+    exp_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    if exp_user_model is None:
+        exp_user_model = user_models.ExplorationUserDataModel.create(
+            user_id, exploration_id)
+
+    current_exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, True, exp_version)
+
+    # If the exploration is being visited the first time.
+    if exp_user_model.furthest_reached_checkpoint_state_name is None:
+        exp_user_model.furthest_reached_checkpoint_exp_version = exp_version
+        exp_user_model.furthest_reached_checkpoint_state_name = state_name
+    elif exp_user_model.furthest_reached_checkpoint_exp_version < exp_version:
+        furthest_reached_checkpoint_exp = (
+            exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                strict=True,
+                version=exp_user_model.furthest_reached_checkpoint_exp_version
+            )
+        )
+        checkpoints_in_current_exp = _get_checkpoints_in_order(
+            current_exploration.init_state_name, current_exploration.states)
+        checkpoints_in_older_exp = _get_checkpoints_in_order(
+            furthest_reached_checkpoint_exp.init_state_name,
+            furthest_reached_checkpoint_exp.states)
+
+        # Get the furthest reached checkpoint in current exploration.
+        furthest_reached_checkpoint_in_current_exp = (
+            _get_most_distant_reached_checkpoint_in_current_exploration(
+                checkpoints_in_current_exp,
+                checkpoints_in_older_exp,
+                exp_user_model.furthest_reached_checkpoint_state_name
+            )
+        )
+
+        # If the furthest reached checkpoint doesn't exist in current
+        # exploration.
+        if furthest_reached_checkpoint_in_current_exp is None:
+            exp_user_model.furthest_reached_checkpoint_exp_version = (
+                exp_version)
+            exp_user_model.furthest_reached_checkpoint_state_name = state_name
+        else:
+            # Index of the furthest reached checkpoint.
+            frc_index = checkpoints_in_current_exp.index(
+                furthest_reached_checkpoint_in_current_exp)
+            # If furthest reached checkpoint is behind most recently
+            # reached checkpoint.
+            if frc_index <= checkpoints_in_current_exp.index(state_name):
+                exp_user_model.furthest_reached_checkpoint_exp_version = (
+                    exp_version)
+                exp_user_model.furthest_reached_checkpoint_state_name = (
+                    state_name)
+
+    exp_user_model.most_recently_reached_checkpoint_exp_version = exp_version
+    exp_user_model.most_recently_reached_checkpoint_state_name = state_name
+    exp_user_model.update_timestamps()
+    exp_user_model.put()
+
+
+def set_user_has_viewed_lesson_info_modal_once(user_id):
+    """Updates the user's settings once he has viewed the lesson info modal.
+
+    Args:
+        user_id: str. The Id of the user.
+    """
+    user_settings = get_user_settings(user_id)
+    user_settings.mark_lesson_info_modal_viewed()
+    _save_user_settings(user_settings)
+
+
+def clear_learner_checkpoint_progress(user_id, exploration_id):
+    """Clears learner's checkpoint progress through the exploration by
+    clearing the most recently reached checkpoint fields of the exploration.
+
+    Args:
+        user_id: str. The Id of the user.
+        exploration_id: str. The Id of the exploration.
+    """
+    exp_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    if exp_user_model is not None:
+        exp_user_model.most_recently_reached_checkpoint_exp_version = None
+        exp_user_model.most_recently_reached_checkpoint_state_name = None
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
+
+
+def sync_learner_checkpoint_progress_with_current_exp_version(
+    user_id,
+    exploration_id
+):
+    """Synchronizes the most recently reached checkpoint and the furthest
+    reached checkpoint with the latest exploration.
+
+    Args:
+        user_id: str. The Id of the user.
+        exploration_id: str. The Id of the exploration.
+
+    Returns:
+        ExplorationUserData. The domain object corresponding to the given user
+        and exploration.
+    """
+    exp_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+
+    if exp_user_model is None:
+        return None
+
+    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    most_recently_interacted_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            True,
+            exp_user_model.most_recently_reached_checkpoint_exp_version
+        ))
+    furthest_reached_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            True,
+            exp_user_model.furthest_reached_checkpoint_exp_version
+        ))
+
+    most_recently_reached_checkpoint_in_current_exploration = (
+        _get_most_distant_reached_checkpoint_in_current_exploration(
+            _get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states),
+            _get_checkpoints_in_order(
+                most_recently_interacted_exploration.init_state_name,
+                most_recently_interacted_exploration.states),
+            exp_user_model.most_recently_reached_checkpoint_state_name
+        )
+    )
+
+    furthest_reached_checkpoint_in_current_exploration = (
+        _get_most_distant_reached_checkpoint_in_current_exploration(
+            _get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states),
+            _get_checkpoints_in_order(
+                furthest_reached_exploration.init_state_name,
+                furthest_reached_exploration.states),
+            exp_user_model.furthest_reached_checkpoint_state_name
+        )
+    )
+
+    # If the most recently reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        most_recently_reached_checkpoint_in_current_exploration !=
+        exp_user_model.most_recently_reached_checkpoint_state_name
+    ):
+        exp_user_model.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_in_current_exploration)
+        exp_user_model.most_recently_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
+
+    # If the furthest reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        furthest_reached_checkpoint_in_current_exploration !=
+        exp_user_model.furthest_reached_checkpoint_state_name
+    ):
+        exp_user_model.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_in_current_exploration)
+        exp_user_model.furthest_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
+
+    return exp_fetchers.get_exploration_user_data(user_id, exploration_id)

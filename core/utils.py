@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import collections
 import datetime
 import hashlib
@@ -30,21 +31,28 @@ import string
 import sys
 import time
 import unicodedata
-import urllib
+import urllib.parse
+import urllib.request
 import zlib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
-from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
-    Union)
+from typing import ( # isort:skip
+    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
+    TextIO, Tuple, TypeVar, Union, overload)
+from typing_extensions import Literal # isort:skip
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
+_CERTIFI_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
+sys.path.insert(0, _CERTIFI_PATH)
+
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
+import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -54,8 +62,10 @@ SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
 
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
+
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
-# because python_utils is untyped and will be removed in python3.
 # These will be removed after python3 migration and adding stubs for new python3
 # libraries.
 
@@ -88,6 +98,48 @@ class ExplorationConversionError(Exception):
     pass
 
 
+@overload
+def open_file(
+    filename: str,
+    mode: TextModeTypes,
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None
+) -> TextIO: ...
+
+
+@overload
+def open_file(
+    filename: str,
+    mode: BinaryModeTypes,
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> BinaryIO: ...
+
+
+def open_file(
+    filename: str,
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[Any]:
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: Literal. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        IO[Any]. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    file = open(filename, mode, encoding=encoding, newline=newline)
+    return file
+
+
 def get_file_contents(
         filepath: str, raw_bytes: bool = False, mode: str = 'r'
 ) -> bytes:
@@ -109,7 +161,7 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with python_utils.open_file( # type: ignore[no-untyped-call]
+    with open(
         filepath, mode, encoding=encoding) as f:
         return f.read() # type: ignore[no-any-return]
 
@@ -156,13 +208,13 @@ def get_exploration_components_from_dir(
                         raise Exception(
                             'More than one non-asset file specified '
                             'for %s' % dir_path)
-                    elif not filepath.endswith('.yaml'):
+                    if not filepath.endswith('.yaml'):
                         raise Exception(
                             'Found invalid non-asset file %s. There '
                             'should only be a single non-asset file, '
                             'and it should have a .yaml suffix.' % filepath)
-                    else:
-                        yaml_content = get_file_contents(filepath)
+
+                    yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
@@ -220,7 +272,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         dict. Parsed dict representation of the yaml string.
 
     Raises:
-        InavlidInputException. If the yaml string sent as the
+        InvalidInputException. If the yaml string sent as the
             parameter is unable to get parsed, them this error gets
             raised.
     """
@@ -229,7 +281,25 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
     except (AssertionError, yaml.YAMLError) as e:
-        raise InvalidInputException(e)
+        raise InvalidInputException(e) from e
+
+
+def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
+    # The type ignore is needed, because typestubs define the return type
+    # of 'dump' as 'Any' which is wrong.
+    return yaml.dump( # type: ignore[no-any-return]
+        dictionary, allow_unicode=True, width=width
+    )
 
 
 # Here obj has a recursive structure. The list element or dictionary value
@@ -267,8 +337,9 @@ def get_random_int(upper_bound: int) -> int:
     Returns:
         int. Randomly generated integer less than the upper_bound.
     """
-    assert upper_bound >= 0 and isinstance(upper_bound, int)
-
+    assert upper_bound >= 0 and isinstance(upper_bound, int), (
+        'Only positive integers allowed'
+    )
     generator = random.SystemRandom()
     return generator.randrange(0, stop=upper_bound)
 
@@ -282,8 +353,9 @@ def get_random_choice(alist: List[T]) -> T:
     Returns:
         *. Random element choosen from the passed input list.
     """
-    assert isinstance(alist, list) and len(alist) > 0
-
+    assert isinstance(alist, list) and len(alist) > 0, (
+        'Only non-empty lists allowed'
+    )
     index = get_random_int(len(alist))
     return alist[index]
 
@@ -303,7 +375,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote(
+            urllib.parse.unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
@@ -327,6 +399,22 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
+
+
+def is_base64_encoded(content: str) -> bool:
+    """Checks if a string is base64 encoded.
+
+    Args:
+        content: str. String to check.
+
+    Returns:
+        bool. True if a string is base64 encoded, False otherwise.
+    """
+    try:
+        base64.b64decode(content, validate=True)
+        return True
+    except binascii.Error:
+        return False
 
 
 def convert_png_to_data_url(filepath: str) -> str:
@@ -391,12 +479,12 @@ def set_url_query_parameter(
             % param_name)
 
     scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
-    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
+    query_params = urllib.parse.parse_qs(query_string)
 
     query_params[param_name] = [param_value]
     new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
-    return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
+    return urllib.parse.urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -471,7 +559,7 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-any-return, no-untyped-call]
+    return msecs + (datetime_obj.microsecond / 1000.0)
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -525,8 +613,12 @@ def get_human_readable_time_string(time_msec: float) -> str:
     """
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
+
+    assert time_msec >= 0, (
+        'Time cannot be negative'
+    )
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[arg-type, no-untyped-call]
+        '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
 def create_string_from_largest_unit_in_timedelta(
@@ -554,7 +646,7 @@ def create_string_from_largest_unit_in_timedelta(
     if total_seconds <= 0:
         raise Exception(
             'Expected a positive timedelta, received: %s.' % total_seconds)
-    elif timedelta_obj.days != 0:
+    if timedelta_obj.days != 0:
         return '%s day%s' % (
             int(timedelta_obj.days), 's' if timedelta_obj.days > 1 else '')
     else:
@@ -678,7 +770,7 @@ def require_valid_name(
     for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
-                'Invalid character %s in %s: %s' %
+                r'Invalid character %s in %s: %s' %
                 (character, name_type, name))
 
 
@@ -818,9 +910,13 @@ def require_valid_page_title_fragment_for_web(
     Raises:
         ValidationError. Page title fragment is not a string.
         ValidationError. Page title fragment is too lengthy.
+        ValidationError. Page title fragment is too small.
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    min_chars_in_page_title_frag_for_web = (
+        constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+
     if not isinstance(page_title_fragment_for_web, str):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -829,6 +925,11 @@ def require_valid_page_title_fragment_for_web(
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    if len(page_title_fragment_for_web) < min_chars_in_page_title_frag_for_web:
+        raise ValidationError(
+            'Page title fragment should not be shorter than %s characters.'
+            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        )
 
 
 def capitalize_string(input_string: str) -> str:
@@ -974,7 +1075,7 @@ def unescape_encoded_uri_component(escaped_string: str) -> str:
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string)
+    return urllib.parse.unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str: str) -> str:
@@ -1109,7 +1210,7 @@ def grouper(
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return python_utils.zip_longest(*args, fillvalue=fillvalue) # type: ignore[no-any-return, no-untyped-call]
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 def partition(
@@ -1179,3 +1280,20 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
+
+
+def url_open(source_url: str) -> str:
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: str. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
+    # check is refactored.
+    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
+    # The type ignore is needed, because typestubs define the return type
+    # of 'urlopen' as 'Any' which is wrong.
+    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]

@@ -30,7 +30,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 })
 export class HintsAndSolutionManagerService {
   // This in initialized using the the class methods
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   solutionForLatestCard!: Solution;
   // The following are set to null when the timeouts are cleared
@@ -84,7 +84,7 @@ export class HintsAndSolutionManagerService {
   showTooltip(): void {
     this.tooltipIsOpen = true;
     this.hintsDiscovered = true;
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
   }
 
   releaseHint(): void {
@@ -95,12 +95,14 @@ export class HintsAndSolutionManagerService {
           this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     }
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
   }
+
   releaseSolution(): void {
     this.solutionReleased = true;
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
   }
+
   accelerateHintRelease(): void {
     this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
   }
@@ -108,6 +110,7 @@ export class HintsAndSolutionManagerService {
   areAllHintsExhausted(): boolean {
     return this.numHintsReleased === this.hintsForLatestCard.length;
   }
+
   isAHintWaitingToBeViewed(): boolean {
     return this.numHintsConsumed < this.numHintsReleased;
   }
@@ -160,6 +163,7 @@ export class HintsAndSolutionManagerService {
         ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
     }
   }
+
   // WARNING: This method has a side-effect. If the retrieved hint is a
   // pending hint that's being viewed, it starts the timer for the next
   // hint.

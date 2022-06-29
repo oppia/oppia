@@ -337,11 +337,11 @@
                 <select ng-model="$ctrl.newMemberRole" class="form-control oppia-role-select protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES" ng-blur="$ctrl.onRolesFormUsernameBlur()">
                 </select>
                 <span class="form-text">
-                  <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of voice artists, and voice artists also have the permissions of viewers.</p>
+                  <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of playtesters, and playtesters also have the permissions of viewers.</p>
                 </span>
               </div>
 
-              <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.rolesSaveButtonEnabled">
+              <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.rolesSaveButtonEnabled || !$ctrl.newMemberUsername">
               <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeEditRolesForm()" ng-show="$ctrl.isRolesFormOpen">
                 Cancel
               </button>
@@ -494,8 +494,8 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked ng-click="$ctrl.unmuteFeedbackNotifications()">
-              <input span ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" ng-click="$ctrl.muteFeedbackNotifications()">
+              <input span ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" ng-click="$ctrl.unmuteFeedbackNotifications()">
+              <input span ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked ng-click="$ctrl.muteFeedbackNotifications()">
               <label class="oppia-on-off-switch-label protractor-test-enable-fallbacks" for="feedback-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -518,21 +518,21 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" checked ng-click="$ctrl.unmuteSuggestionNotifications()">
-              <input span ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" ng-click="$ctrl.muteSuggestionNotifications()">
+              <input span ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" ng-click="$ctrl.unmuteSuggestionNotifications()">
+              <input span ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" checked ng-click="$ctrl.muteSuggestionNotifications()">
               <label class="oppia-on-off-switch-label" for="suggestion-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
               </label>
             </div>
           </div>
-          <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
-            You are currently receiving notifications of new suggestions for this exploration.
-          </span>
-          <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
-            You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
-          </span>
         </div>
+        <span class="form-text secondary-info-text" ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
+          You are currently receiving notifications of new suggestions for this exploration.
+        </span>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
+          You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
+        </span>
       </div>
       <hr class="oppia-feature-separator">
     </div>
@@ -589,6 +589,31 @@
         </button>
       </p>
     </div>
+    <hr class="oppia-feature-separator">
+    <div role="form" class="form-horizontal" ng-if="$ctrl.isSuperAdmin">
+      <div class="oppia-features-header">
+        <label for="LockExploration">
+          Allow Edits to Exploration
+        </label>
+        <div>
+          <div class="oppia-on-off-switch">
+            <input span ng-if="$ctrl.isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked ng-click="$ctrl.disableEdits()">
+            <input span ng-if="!$ctrl.isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" ng-click="$ctrl.enableEdits()">
+            <label class="oppia-on-off-switch-label" for="edits-switch">
+              <span class="oppia-on-off-switch-inner"></span>
+              <span class="oppia-on-off-switch-main"></span>
+            </label>
+          </div>
+        </div>
+        <span class="form-text secondary-info-text" ng-if="$ctrl.isExplorationEditable()">
+          Further edits to the exploration are currently allowed.
+        </span>
+        <span class="form-text secondary-info-text" ng-if="!$ctrl.isExplorationEditable()">
+          Further edits to the exploration are no longer allowed.
+        </span>
+      </div>
+    </div>
+    <hr class="oppia-feature-separator">
   </md-card>
 
   <md-card class="oppia-settings-card-container oppia-editor-card oppia-parameters-card" ng-if="$ctrl.areParametersUsed()">
@@ -670,7 +695,7 @@
     text-align: right;
   }
   settings-tab .oppia-edit-roles-btn {
-    color: #009C8A;
+    color: #009c8a;
     cursor: pointer;
     font-weight: bold;
   }
@@ -678,8 +703,8 @@
     color: #666;
   }
   settings-tab .oppia-delete-button {
-    background-color: #C55F45;
-    color: #FFF;
+    background-color: #c55f45;
+    color: #fff;
   }
   settings-tab .secondary-info-text {
     font-size: smaller;

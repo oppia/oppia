@@ -10,6 +10,11 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
 - kind: BlogPostRightsModel
   properties:
   - name: blog_post_is_published
@@ -175,6 +180,11 @@ indexes:
   - name: entity_type
   - name: last_updated
     direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: target_id
+  - name: author_id
 
 - kind: GeneralSuggestionModel
   properties:

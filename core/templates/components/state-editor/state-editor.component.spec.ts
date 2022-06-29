@@ -175,4 +175,12 @@ describe('StateEditorComponent', () => {
 
     expect(StateEditorService.onStateEditorInitialized.emit).toHaveBeenCalled();
   });
+
+  it('should update the changes', function() {
+    spyOn($rootScope, '$applyAsync');
+
+    $scope.getSolutionChange();
+
+    expect($rootScope.$applyAsync).toHaveBeenCalled();
+  });
 });

@@ -202,12 +202,12 @@ describe('Site language', function() {
       await users.createUser('audioPlayer@example.com', 'audioPlayer');
       await users.login('audioPlayer@example.com');
       await preferencesPage.get();
-      await preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
-      await preferencesPage.selectPreferredAudioLanguage('Chinese');
+      await preferencesPage.expectPreferredAudioLanguageNotToBe('中文 (Chinese)');
+      await preferencesPage.selectPreferredAudioLanguage('中文 (Chinese)');
       // TODO(DubeySandeep): Add the test to check preferred audio language
       // choice gets reflected to the exploration player. This can be done once
       // we will finalize a way to upload an audio file in e2e test.
-      await preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
+      await preferencesPage.expectPreferredAudioLanguageToBe('中文 (Chinese)');
       await general.ensurePageHasNoTranslationIds();
       await users.logout();
     });
@@ -262,14 +262,6 @@ describe('Site language', function() {
       expect(await element(
         by.css('.protractor-test-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
-      await general.ensurePageHasNoTranslationIds();
-
-      // Checking exploration player page.
-      await browser.get('/explore/' + firstExplorationId);
-      await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-author-profile-text')).getText())
-        .toEqual('PERFILES DE AUTORES');
       await general.ensurePageHasNoTranslationIds();
     }
   );

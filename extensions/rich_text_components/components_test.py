@@ -22,7 +22,7 @@ import inspect
 import os
 import re
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 from extensions.rich_text_components import components
 
@@ -48,7 +48,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             rte_component_class.validate(item)
 
         for item, error_msg in invalid_items_with_error_messages:
-            with self.assertRaisesRegexp(Exception, error_msg):
+            with self.assertRaisesRegex(Exception, error_msg):
                 rte_component_class.validate(item)
 
     def test_collapsible_validation(self):
@@ -264,6 +264,20 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 },
                 re.escape(
                     'Missing keys: [\'title\'], Extra keys: [\'tab-title\']')
+            ),
+            (
+                {
+                    'tab_contents-with-value': [{
+                        'content': (
+                            '<oppia-noninteractive-collapsible content-with-value=' # pylint: disable=line-too-long
+                            '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;' # pylint: disable=line-too-long
+                            'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;' # pylint: disable=line-too-long
+                            'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>' # pylint: disable=line-too-long
+                        ),
+                        'title': 'Collapsible'
+                    }]
+                },
+                'Nested tabs and collapsible'
             )
         ]
 
@@ -341,7 +355,7 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             if name != '__pycache__' and
                os.path.isdir(os.path.join(rich_text_components_dir, name))
         ]
-        with python_utils.open_file(test_file, 'r') as f:
+        with utils.open_file(test_file, 'r') as f:
             text = f.read()
             # Replace all spaces and new lines with empty space.
             text = re.sub(r' ', r'', text)

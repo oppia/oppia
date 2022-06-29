@@ -469,15 +469,15 @@ class SuggestionEditStateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
                 self.change.cmd)
-        elif self.change.property_name != change.property_name:
+        if self.change.property_name != change.property_name:
             raise utils.ValidationError(
                 'The new change property_name must be equal to %s' %
                 self.change.property_name)
-        elif self.change.state_name != change.state_name:
+        if self.change.state_name != change.state_name:
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
                 self.change.state_name)
-        elif self.change.new_value['html'] == change.new_value['html']:
+        if self.change.new_value['html'] == change.new_value['html']:
             raise utils.ValidationError(
                 'The new html must not match the old html')
 
@@ -614,15 +614,15 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
                 self.change.cmd)
-        elif self.change.state_name != change.state_name:
+        if self.change.state_name != change.state_name:
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
                 self.change.state_name)
-        elif self.change.content_html != change.content_html:
+        if self.change.content_html != change.content_html:
             raise utils.ValidationError(
                 'The new change content_html must be equal to %s' %
                 self.change.content_html)
-        elif self.change.language_code != change.language_code:
+        if self.change.language_code != change.language_code:
             raise utils.ValidationError(
                 'The language code must be equal to %s' %
                 self.change.language_code)
@@ -646,10 +646,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
         if (
-                hasattr(self.change, 'data_format') and (
-                    self.change.data_format == 'set_of_normalized_string' or
-                    self.change.data_format == 'set_of_unicode_string'
-                )
+                hasattr(self.change, 'data_format') and
+                state_domain.WrittenTranslation.is_data_format_list(
+                    self.change.data_format)
         ):
             exp_services.update_exploration(
                 self.final_reviewer_id, self.target_id, [self.change],
@@ -848,7 +847,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             self.change.question_dict['language_code'], None,
             self.change.question_dict['linked_skill_ids'],
             self.change.question_dict['inapplicable_skill_misconception_ids'])
-        question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
         if question_state_data_schema_version != (
@@ -858,6 +856,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 '%s' % (
                     feconf.CURRENT_STATE_SCHEMA_VERSION,
                     question_state_data_schema_version))
+        question.partial_validate()
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -896,6 +895,16 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Images need to be stored in the storage path corresponding to the
         # question.
         new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+
+        # Image for interaction with Image Region is not included as an html
+        # string. This image is included in the imagePath in customization args.
+        # Other interactions such as Item Selection, Multiple Choice, Drag and
+        # Drop Sort have ck editor that includes the images of the interactions
+        # so that references for those images are included as html strings.
+        if question.question_state_data.interaction.id == 'ImageClickInput':
+            new_image_filenames.append(
+                question.question_state_data.interaction.customization_args[
+                    'imageAndRegions'].value['imagePath'])
         fs_services.copy_images(
             self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
             question_dict['id'], new_image_filenames)
@@ -1250,7 +1259,7 @@ class CommunityContributionStats:
                     'an integer for %s language code, received: %s.' % (
                         language_code, reviewer_count)
                 )
-            elif reviewer_count < 0:
+            if reviewer_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation reviewer count to be '
                     'non-negative for %s language code, received: %s.' % (
@@ -1271,7 +1280,7 @@ class CommunityContributionStats:
                     'an integer for %s language code, received: %s.' % (
                         language_code, suggestion_count)
                 )
-            elif suggestion_count < 0:
+            if suggestion_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation suggestion count to be '
                     'non-negative for %s language code, received: %s.' % (

@@ -31,9 +31,11 @@ from core import feconf
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
+from core.domain import user_domain
 from core.platform import models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -178,11 +180,14 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.auto_tts_enabled,
         exploration_model.correctness_feedback_enabled,
+        exploration_model.edits_allowed,
         created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
 
-def get_exploration_summary_by_id(exploration_id):
+def get_exploration_summary_by_id(
+    exploration_id: str
+) -> exp_domain.ExplorationSummary:
     """Returns a domain object representing an exploration summary.
 
     Args:
@@ -412,3 +417,39 @@ def get_exploration_summaries_where_user_has_role(user_id):
         get_exploration_summary_from_model(exp_summary_model)
         for exp_summary_model in exp_summary_models
     ]
+
+
+def get_exploration_user_data(user_id, exp_id):
+    """Returns an ExplorationUserData domain object.
+
+    Args:
+        user_id: str. The Id of the user.
+        exp_id: str. The Id of the exploration.
+
+    Returns:
+        ExplorationUserData or None. The domain object corresponding to the
+        given user and exploration. If the model corresponsing to given user
+        and exploration is not found, return None.
+    """
+    exp_user_data_model = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id)
+
+    if exp_user_data_model is None:
+        return None
+
+    return user_domain.ExplorationUserData(
+        exp_user_data_model.user_id,
+        exp_user_data_model.exploration_id,
+        exp_user_data_model.rating,
+        exp_user_data_model.rated_on,
+        exp_user_data_model.draft_change_list,
+        exp_user_data_model.draft_change_list_last_updated,
+        exp_user_data_model.draft_change_list_exp_version,
+        exp_user_data_model.draft_change_list_id,
+        exp_user_data_model.mute_suggestion_notifications,
+        exp_user_data_model.mute_feedback_notifications,
+        exp_user_data_model.furthest_reached_checkpoint_exp_version,
+        exp_user_data_model.furthest_reached_checkpoint_state_name,
+        exp_user_data_model.most_recently_reached_checkpoint_exp_version,
+        exp_user_data_model.most_recently_reached_checkpoint_state_name
+    )

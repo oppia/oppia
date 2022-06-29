@@ -70,7 +70,7 @@ describe('MathEquationInputValidationService', () => {
 
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['x', 'y', 'm', 'x', 'c', 'a', 'b']
       }
     };
@@ -140,7 +140,7 @@ describe('MathEquationInputValidationService', () => {
     let matchesExactlyWith1 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x ^ 2 = 1',
+        x: 'x*x = 1',
         y: 'irrelevant'
       }
     }, 'MathEquationInput');
@@ -202,7 +202,7 @@ describe('MathEquationInputValidationService', () => {
     ];
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['y', 'a', 'b']
       }
     };
@@ -228,7 +228,7 @@ describe('MathEquationInputValidationService', () => {
     ];
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
       }
     };

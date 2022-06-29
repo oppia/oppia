@@ -34,6 +34,7 @@ describe('State hints service', () => {
   });
 
   it('should called the constructor', () =>{
+    expect(shs.displayed).toEqual([]);
     expect(shs.setterMethodKey).toBe('saveHints');
   });
 

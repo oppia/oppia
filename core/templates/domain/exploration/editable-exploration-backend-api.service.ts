@@ -35,6 +35,7 @@ export class EditableExplorationBackendApiService {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
+
   private async _fetchExplorationAsync(
       explorationId: string,
       applyDraft: boolean): Promise<ExplorationBackendDict> {
@@ -121,6 +122,36 @@ export class EditableExplorationBackendApiService {
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     return this._updateExplorationAsync(
       explorationId, explorationVersion, commitMessage, changeList);
+  }
+
+  async recordMostRecentlyReachedCheckpointAsync(
+      explorationId: string,
+      mostRecentlyReachedCheckpointExpVersion: number,
+      mostRecentlyReachedCheckpointStateName: string,
+  ): Promise<void> {
+    const requestUrl =
+      '/explorehandler/checkpoint_reached/' + explorationId;
+    return this.httpClient.put<void>(requestUrl, {
+      most_recently_reached_checkpoint_exp_version:
+       mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+       mostRecentlyReachedCheckpointStateName
+    }).toPromise();
+  }
+
+  async resetExplorationProgressAsync(explorationId: string): Promise<void> {
+    const requestUrl =
+      '/explorehandler/restart/' + explorationId;
+    return this.httpClient.put<void>(requestUrl, {
+      most_recently_reached_checkpoint_state_name: null
+    }).toPromise();
+  }
+
+  async recordLearnerHasViewedLessonInfoModalOnce(): Promise<void> {
+    const requestUrl = '/userinfohandler/data';
+    return this.httpClient.put<void>(requestUrl, {
+      user_has_viewed_lesson_info_modal_once: true
+    }).toPromise();
   }
 
   /**

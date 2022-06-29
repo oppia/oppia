@@ -36,7 +36,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             0)
 
     def test_get_visualization_class_with_invalid_id_raises_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, 'is not a valid visualization id.'):
             visualization_registry.Registry.get_visualization_class(
                 'invalid_visualization_id')
@@ -46,7 +46,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             'SortedTiles')
         sorted_tiles_instance = sorted_tiles('AnswerFrequencies', {}, True)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'For visualization SortedTiles, expected option names '
@@ -63,7 +63,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         sorted_tiles_instance = sorted_tiles(
             'AnswerFrequencies', option_names, True)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected bool, received invalid_value'):
             sorted_tiles_instance.validate()
 
@@ -78,7 +78,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         sorted_tiles_instance = sorted_tiles(
             'AnswerFrequencies', option_names, 'invalid_value')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'For visualization SortedTiles, expected a bool value for '
             'addressed_info_is_supported; received invalid_value'):

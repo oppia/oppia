@@ -30,8 +30,8 @@ class PencilCodeEditor(base.BaseInteraction):
     is_trainable = False
     _dependency_ids = ['pencilcode']
     answer_type = 'CodeEvaluation'
-    instructions = 'Edit the code. Click \'Play\' to check it!'
-    narrow_instructions = 'Show code editor'
+    instructions = 'I18N_INTERACTIONS_PENCILCODE_INSTRUCTION'
+    narrow_instructions = 'I18N_INTERACTIONS_PENCILCODE_NARROW_INSTRUCTION'
     needs_summary = True
     can_have_solution = True
     show_generic_submit_button = False

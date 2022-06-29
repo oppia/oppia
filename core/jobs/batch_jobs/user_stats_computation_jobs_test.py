@@ -62,7 +62,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
         self.put_multi([user_settings_model, user_stats_model])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
+            job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')
         ])
 
         new_user_stats_model = (
@@ -92,13 +92,13 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([user_settings_model, user_stats_model])
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
         ):
             self.assert_job_output_is([
-                job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
+                job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')
             ])
 
         new_user_stats_model = (
@@ -124,7 +124,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
         self.put_multi([user_settings_model, user_stats_model])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS OLD 1')
+            job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')
         ])
 
         new_user_stats_model = (
@@ -150,7 +150,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
         user_settings_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS NEW 1')
+            job_run_result.JobRunResult(stdout='NEW MODELS SUCCESS: 1')
         ])
 
         user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
@@ -182,8 +182,8 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
             user_settings_model_1, user_settings_model_2, user_stats_model_1])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS OLD 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS NEW 1')
+            job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='NEW MODELS SUCCESS: 1')
         ])
 
         user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_2)

@@ -17,27 +17,38 @@
  * exploration.
  */
 
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
-angular.module('oppia').factory('ExplorationCorrectnessFeedbackService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'correctness_feedback_enabled';
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationCorrectnessFeedbackService extends
+  ExplorationPropertyService {
+  propertyName: string = 'correctness_feedback_enabled';
+  savedMemento: string | boolean;
 
-    child._isValid = function(value) {
-      return (typeof value === 'boolean');
-    };
-
-    child.isEnabled = function() {
-      return child.savedMemento;
-    };
-
-    child.toggleCorrectnessFeedback = function() {
-      child.displayed = !child.displayed;
-      child.saveDisplayedValue();
-    };
-
-    return child;
+  constructor(
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
+  ) {
+    super(alertsService, changeListService, loggerService);
   }
-]);
+
+  isEnabled(): string | boolean {
+    return this.savedMemento;
+  }
+
+  toggleCorrectnessFeedback(): void {
+    this.displayed = !this.displayed;
+    this.saveDisplayedValue();
+  }
+}
+
+angular.module('oppia').factory('ExplorationCorrectnessFeedbackService',
+  downgradeInjectable(ExplorationCorrectnessFeedbackService));

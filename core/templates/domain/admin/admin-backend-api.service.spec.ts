@@ -109,7 +109,6 @@ describe('Admin backend api service', () => {
       url_fragment: 'mathfsad',
     },
     classroom_promos_are_enabled: false,
-    contributor_can_suggest_questions: false,
     contributor_dashboard_is_enabled: true,
     contributor_dashboard_reviewer_emails_is_enabled: true,
     email_footer: 'fsdf',
@@ -654,6 +653,52 @@ describe('Admin backend api service', () => {
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
   }
   ));
+
+  it('should successfully rollback exploration', fakeAsync(() => {
+    let action = 'rollback_exploration_to_safe_state';
+    let expId = '123';
+    let payload = {
+      action: action,
+      exp_id: expId
+    };
+
+    abas.rollbackExplorationToSafeState(expId).then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should report failure when rolling back exploration', fakeAsync(() => {
+    let action = 'rollback_exploration_to_safe_state';
+    let expId = '123';
+    let payload = {
+      action: action,
+      exp_id: expId
+    };
+
+    abas.rollbackExplorationToSafeState(expId).then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }));
 
   it('should upload topic similarities when calling' +
     'uploadTopicSimilaritiesAsync', fakeAsync(() => {

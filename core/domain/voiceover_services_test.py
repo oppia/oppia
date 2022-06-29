@@ -65,7 +65,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
         ) for i in range(2)]
@@ -74,7 +74,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -146,7 +146,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         voiceover_application_model.target_type = 'invalid_type'
         voiceover_application_model.update_timestamps()
         voiceover_application_model.put()
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Invalid target type for voiceover application: invalid_type'):
             voiceover_services.get_voiceover_application_by_id('application_id')
@@ -313,7 +313,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Applicants are not allowed to review their own '
             'voiceover application.'):
             voiceover_services.accept_voiceover_application(
@@ -361,7 +361,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Applicants are not allowed to review their own '
             'voiceover application.'):
             voiceover_services.reject_voiceover_application(
@@ -413,7 +413,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(content, '<p>Translation in Hindi</p>')
 
     def test_get_text_to_create_voiceover_application_for_invalid_type(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid target type: invalid_type'):
             voiceover_services.get_text_to_create_voiceover_application(
                 'invalid_type', '0', 'hi')

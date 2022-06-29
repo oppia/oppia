@@ -18,14 +18,28 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CurrentInteractionService } from
-  'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService, OnSubmitFn, ValidityCheckFn } from 'pages/exploration-player-page/services/current-interaction.service';
 import { UrlService } from 'services/contextual/url.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { ContextService } from 'services/context.service';
+import { InteractionRulesService } from './answer-classification.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from './audio-translation-language.service';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Current Interaction Service', () => {
-  let urlService: UrlService = null;
-  let currentInteractionService: CurrentInteractionService = null;
+  let urlService: UrlService;
+  let currentInteractionService: CurrentInteractionService;
+  let contextService: ContextService;
   let DUMMY_ANSWER = 'dummy_answer';
+  let playerTranscriptService: PlayerTranscriptService;
+  let playerPositionService: PlayerPositionService;
+  let interactionRulesService: InteractionRulesService;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   // This mock is required since ContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -33,30 +47,36 @@ describe('Current Interaction Service', () => {
   // since ContextService will error if it is used outside the context
   // of an exploration.
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getPathname').and.callFake(() => {
       return '/explore/123';
     });
-    currentInteractionService = TestBed.get(CurrentInteractionService);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    contextService = TestBed.inject(ContextService);
   });
 
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
     let answerState = null;
-    let dummyOnSubmitFn = (answer, interactionRulesService) => {
+    let dummyOnSubmitFn: OnSubmitFn = (answer: Object) => {
       answerState = answer;
+    };
+    let dummyValidityCheckFn: ValidityCheckFn = () => {
+      return false;
     };
 
     currentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
-    currentInteractionService.onSubmit(DUMMY_ANSWER, null);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
     expect(answerState).toEqual(DUMMY_ANSWER);
 
     answerState = null;
     let dummySubmitAnswerFn = () => {
-      currentInteractionService.onSubmit(DUMMY_ANSWER, null);
+      currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
     };
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, null);
+      dummySubmitAnswerFn, dummyValidityCheckFn);
     currentInteractionService.submitAnswer();
     expect(answerState).toEqual(DUMMY_ANSWER);
   });
@@ -103,15 +123,59 @@ describe('Current Interaction Service', () => {
     currentInteractionService.registerPresubmitHook(hookB);
 
     currentInteractionService.setOnSubmitFn(() => {});
-    currentInteractionService.onSubmit(null, null);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
 
     currentInteractionService.clearPresubmitHooks();
-    currentInteractionService.onSubmit(null, null);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
+  });
+
+  it('should throw error on submitting when submitAnswerFn is null', () => {
+    let interaction = new Interaction([], [], {}, null, [], null, null);
+    let recordedVoiceovers = new RecordedVoiceovers({});
+    let writtenTranslations = new WrittenTranslations(
+      {}, new WrittenTranslationObjectFactory());
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      StateCard.createNewCard(
+        'First State', 'Content HTML',
+        '<oppia-text-input-html></oppia-text-input-html>',
+        interaction, recordedVoiceovers, writtenTranslations, '',
+        audioTranslationLanguageService));
+    spyOn(contextService, 'getExplorationId').and.returnValue('abc');
+    spyOn(contextService, 'getPageContext').and.returnValue('learner');
+
+    let additionalInfo = (
+      '\nUndefined submit answer debug logs:' +
+      '\nInteraction ID: null' +
+      '\nExploration ID: abc' +
+      '\nState Name: First State' +
+      '\nContext: learner' +
+      '\nErrored at index: 1');
+
+    currentInteractionService.registerCurrentInteraction(null, null);
+
+    expect(() => currentInteractionService.submitAnswer()).toThrowError(
+      'The current interaction did not ' + 'register a _submitAnswerFn.' +
+        additionalInfo);
+  });
+
+  it('should update view with new answer', () => {
+    // Here, toBeDefined is used instead of testing with a value
+    // because currentInteractionService.onAnswerChanged$ returns
+    // observable of answerChangedSubject which is a private static
+    // member of the class CurrentInteractionService and hence cannot
+    // be accessed from outside. And the first toBeDefined is used
+    // just to verify that updateViewWithNewAnswer is a defined function.
+
+    expect(currentInteractionService.updateViewWithNewAnswer).toBeDefined();
+    currentInteractionService.updateViewWithNewAnswer();
+
+    expect(currentInteractionService.onAnswerChanged$).toBeDefined();
   });
 });

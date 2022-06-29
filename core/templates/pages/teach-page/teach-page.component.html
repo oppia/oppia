@@ -4,7 +4,9 @@
     <div class="oppia-teach-section-one-left"  *ngIf="!isWindowNarrow">
       <h1 class="oppia-teach-h1" [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
       <div class="oppia-teach-h2-container">
-        <h2 *ngIf="!isWindowNarrow" class="oppia-teach-h2 oppia-teach-h2-text" [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate"></h2>
+        <h2 *ngIf="!isWindowNarrow" class="oppia-teach-h2 oppia-teach-h2-text"
+            [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate">
+        </h2>
       </div>
       <div class="oppia-teach-button-container">
         <form action="classroomUrl">
@@ -17,8 +19,12 @@
     </div>
 
     <div class="oppia-teach-section-one-left" *ngIf="isWindowNarrow">
-      <h1 class="oppia-teach-h1 mobile-heading" [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
-      <h2  class="oppia-teach-h2 oppia-teach-h2-text mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate"></h2>
+      <h1 class="oppia-teach-h1 mobile-heading"
+          [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate">
+      </h1>
+      <h2  class="oppia-teach-h2 oppia-teach-h2-text mobile-h2"
+           [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate">
+      </h2>
       <div class="oppia-teach-button-container mobile-button">
         <form action="classroomUrl">
           <button type="submit" (click)="onClickStartLearningButton()"
@@ -32,52 +38,53 @@
     <div *ngIf="!isWindowNarrow" class="oppia-teach-section-one-right">
       <picture class="oppia-teach-main-image image-desktop">
         <source type="image/webp" [srcset]="getStaticImageUrl('/teach/student.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/teach/student.png')">
-        <img [src]="getStaticImageUrl('/teach/student.png')" alt="">
+        <source type="image/jpeg" [srcset]="getStaticImageUrl('/teach/student.jpg')">
+        <img [src]="getStaticImageUrl('/teach/student.jpg')"
+             alt="Photo of young girl in front of laptop with Oppia webpage">
       </picture>
     </div>
 
     <div *ngIf="isWindowNarrow">
       <picture class="oppia-teach-main-image image-mobile">
         <source type="image/webp" [srcset]="getStaticImageUrl('/teach/student.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/teach/student.png')">
-        <img [src]="getStaticImageUrl('/teach/student.png')" alt="">
+        <source type="image/jpeg" [srcset]="getStaticImageUrl('/teach/student.jpg')">
+        <img [src]="getStaticImageUrl('/teach/student.jpg')"
+             alt="Photo of young girl in front of laptop with Oppia webpage">
       </picture>
     </div>
   </div>
 
   <div class="oppia-teach-section-two">
-    <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-two-left" >
-      <picture class="teach-matthew-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
-        <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
-      </picture>
+    <div class="oppia-teach-section-two-left" >
+      <img class="teach-matthew-image"
+           [src]="getStaticImageUrl('/splash/matthew_fractions.svg')"
+           alt="Illustration of a young person in front of part of Oppia fraction lesson">
     </div>
-
-    <div *ngIf="isWindowNarrow" class="oppia-teach-section-two-left">
-      <picture class="teach-matthew-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
-        <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
-      </picture>
-    </div>
-
     <div class="oppia-teach-section-two-right" *ngIf="!isWindowNarrow" >
       <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <div class="teach-benefits-section">
-        <img class="bullet-one"  [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+        <img class="bullet-one"
+             [src]="getStaticImageUrl('/splash/bullet1.svg')"
+             alt="Illustration of first bullet point">
         <div  class="benefits-one">
-          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
+          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate"
+              class="teach-benefits">
+          </h2>
         </div>
       </div>
       <div class="teach-benefits-section">
-        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate" class="teach-benefits"></h2>
+        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')"
+             alt="Illustration of second bullet point">
+        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate"
+            class="teach-benefits">
+        </h2>
       </div>
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
+        <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
+             alt="Illustration of third bullet point">
+        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate"
+            class="teach-benefits">
+        </h2>
       </div>
     </div>
 
@@ -86,17 +93,20 @@
         <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       </div>
       <div class="teach-benefits-section">
-        <img class="bullet-one" [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+        <img class="bullet-one" [src]="getStaticImageUrl('/splash/bullet1.svg')"
+             alt="Illustration of first bullet point">
         <div  class="benefits-one">
           <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
         </div>
       </div>
       <div class="teach-benefits-section">
-        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
+        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')"
+             alt="Illustration of second bullet point">
         <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate" class="teach-benefits"></h2>
       </div>
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
+        <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
+             alt="Illustration of third bullet point">
         <div  class="benefits-one">
           <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
         </div>
@@ -121,14 +131,16 @@
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-flow.webp')">
         <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-flow.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-flow.png')" alt="">
+        <img [src]="getStaticImageUrl('/teach/lessons-flow.png')"
+             alt="Screenshot of Oppia lesson flow">
       </picture>
     </div>
     <div *ngIf="isWindowNarrow" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-flow.webp')">
         <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-flow.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-flow.png')" alt="">
+        <img [src]="getStaticImageUrl('/teach/lessons-flow.png')"
+             alt="Screenshot of Oppia lesson flow">
       </picture>
     </div>
     <div *ngIf="isWindowNarrow" class="oppia-teach-section-three-left mobile">
@@ -162,14 +174,16 @@
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-card.webp')">
         <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-card.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-card.png')" alt="">
+        <img [src]="getStaticImageUrl('/teach/lessons-card.png')"
+             alt="Screenshot of Oppia lesson cards">
       </picture>
     </div>
     <div class="oppia-teach-section-four-right" *ngIf="isWindowNarrow">
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-card.webp')">
         <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-card.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-card.png')" alt="">
+        <img [src]="getStaticImageUrl('/teach/lessons-card.png')"
+             alt="Screenshot of Oppia lesson cards">
       </picture>
     </div>
     <div *ngIf="isWindowNarrow" class="oppia-teach-section-four-left mobile">
@@ -203,18 +217,22 @@
     </div>
     <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
       <picture class="teach-student-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)" >
-        <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" >
-        <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+        <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
+        <source type="image/jpeg" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
+        <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)"
+             [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
+             [alt]="testimonials[displayedTestimonialId].altText">
       </picture>
     </div>
 
     <div *ngIf="isWindowNarrow">
       <div class="oppia-teach-section-five-image">
         <picture class="teach-student-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)" >
-          <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" >
-          <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+          <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
+          <source type="image/jpeg" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
+          <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)"
+               [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
+               [alt]="testimonials[displayedTestimonialId].altText">
         </picture>
       </div>
       <div class="oppia-teach-section-five-left mobile">
@@ -237,22 +255,6 @@
   <div class="oppia-teach-section-six">
     <div *ngIf="!isWindowNarrow">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
-      <!--<div class="oppia-teach-button-container-button-one">
-        <form action="/teach">
-          <button type="submit" (click)="onClickGuideParentsButton()"
-                  class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_GUIDE_FOR_TEACHERS' | translate">
-          </button>
-        </form>
-      </div>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="/teach">
-          <button type="submit" (click)="onClickTipforParentsButton()"
-                  class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
-          </button>
-        </form>
-      </div> -->
       <div class="oppia-teach-button-container-button-one">
         <form action="classroomUrl">
           <button type="submit" (click)="onClickExploreLessonsButton()"
@@ -265,23 +267,6 @@
 
     <div *ngIf="isWindowNarrow">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
-      <!--Removing these 2 buttons for now. Will add them back after Tips for parents and guide for teachers  pages are ready
-        <div class="oppia-teach-button-container-button-one">
-        <form action="/teach">
-          <button type="submit" (click)="onClickGuideParentsButton()"
-                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_GUIDE_FOR_TEACHERS' | translate">
-          </button>
-        </form>
-      </div>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="/teach">
-          <button type="submit" (click)="onClickTipforParentsButton()"
-                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
-          </button>
-        </form>
-      </div> -->
       <div class="oppia-teach-button-container-button-one">
         <form action="classroomUrl">
           <button type="submit" (click)="onClickExploreLessonsButton()"
@@ -379,7 +364,7 @@
   }
 
   .teach-page .oppia-teach-section-one {
-    background-color: #F4F4F4;
+    background-color: #f4f4f4;
     display: flex;
     height: fit-content;
     max-height: 60vw;
@@ -415,7 +400,7 @@
   }
 
   .teach-page .oppia-teach-section-two {
-    background-color: #FFF;
+    background-color: #fff;
     color: #2c4841;
     display: flex;
     padding: 50px 5vw 50px 6vw;
@@ -517,7 +502,7 @@
   }
 
   .teach-page .oppia-teach-section-three {
-    background-color: #F4F4F4;
+    background-color: #f4f4f4;
     display: flex;
     padding-bottom: 50px;
     padding-top: 40px;
@@ -525,7 +510,7 @@
   }
 
   .teach-page .oppia-teach-section-four {
-    background-color: #FFF;
+    background-color: #fff;
     display: flex;
     padding-bottom: 50px;
     padding-top: 40px;
@@ -616,7 +601,7 @@
   }
 
   .teach-page .teach-with-oppia-image img {
-    border: 4px solid #FFF;
+    border: 4px solid #fff;
     border-radius: 10px;
     max-width: 500px;
     width: 100%;
@@ -704,7 +689,7 @@
     margin-top: 50px;
   }
 
-  .teach-page .teach-matthew-image img {
+  .teach-page .teach-matthew-image {
     max-width: 600px;
     width: 100%;
   }

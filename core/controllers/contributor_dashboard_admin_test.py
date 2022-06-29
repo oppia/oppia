@@ -242,9 +242,11 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Schema validation for \'category\' failed: Received invalid which '
-            'is not in the allowed range of choices: %s' % (
-                constants.CONTRIBUTION_RIGHT_CATEGORIES))
+            'At \'http://localhost/contributionrightshandler/invalid\' these '
+            'errors are happening:\nSchema validation for \'category\' failed: '
+            'Received invalid which is not in the allowed range of '
+            'choices: %s' % constants.CONTRIBUTION_RIGHT_CATEGORIES
+        )
 
     def test_remove_reviewer_with_invalid_username_raise_error(self):
         self.login(self.QUESTION_ADMIN_EMAIL)
@@ -299,7 +301,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         self.delete_json(
             '/contributionrightshandler/question', params={
-                'username': 'question',
+                'username': 'question'
             })
 
         self.assertFalse(user_services.can_review_question_suggestions(
@@ -517,7 +519,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             topic_name: str. Topic name.
         """
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, topic_name, 'abbrev', 'description')
+            topic_id, topic_name, 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -613,7 +615,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
         expected_response = {
             'translation_contribution_stats': [
                 {
-                    'language': 'Spanish',
+                    'language': 'español (Spanish)',
                     'topic_name': published_topic_name,
                     'submitted_translations_count': (
                         submitted_translations_count),
@@ -630,7 +632,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                     'contribution_months': ['Mar 2021']
                 },
                 {
-                    'language': 'Spanish',
+                    'language': 'español (Spanish)',
                     'topic_name': 'UNKNOWN',
                     'submitted_translations_count': (
                         submitted_translations_count),

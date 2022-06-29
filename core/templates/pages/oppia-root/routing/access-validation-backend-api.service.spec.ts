@@ -99,19 +99,6 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
-  it('should validate whether account deletion is enabled', fakeAsync(() => {
-    avbas.accountDeletionIsEnabled().then(successSpy, failSpy);
-
-    const req = httpTestingController.expectOne(
-      '/access_validation_handler/account_deletion_is_enabled');
-    expect(req.request.method).toEqual('GET');
-    req.flush({});
-
-    flushMicrotasks();
-    expect(successSpy).toHaveBeenCalled();
-    expect(failSpy).not.toHaveBeenCalled();
-  }));
-
   it('should validate access to release coordinator page', fakeAsync(() => {
     avbas.validateAccessToReleaseCoordinatorPage().then(successSpy, failSpy);
 

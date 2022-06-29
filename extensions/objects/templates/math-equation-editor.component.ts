@@ -28,6 +28,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface FocusObj {
   focused: boolean;
@@ -41,7 +42,7 @@ export interface FocusObj {
 
 export class MathEquationEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: string;
@@ -57,7 +58,8 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private mathInteractionsService: MathInteractionsService,
-    private eventBusService: EventBusService
+    private eventBusService: EventBusService,
+    private translateService: TranslateService
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
@@ -71,9 +73,10 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     }
     this.currentValue = this.value;
     this.guppyConfigurationService.init();
+    let translatedPlaceholder = this.translateService.instant(
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
     this.guppyInitializationService.init(
-      'guppy-div-creator',
-      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput, this.value);
+      'guppy-div-creator', translatedPlaceholder, this.value);
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
@@ -126,7 +129,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
       this.currentValue);
     var answerIsValid = this.mathInteractionsService.validateEquation(
       this.currentValue,
-      this.guppyInitializationService.getCustomOskLetters());
+      this.guppyInitializationService.getAllowedVariables());
     if (
       this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive

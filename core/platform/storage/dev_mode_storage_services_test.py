@@ -72,7 +72,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
         )
 
     def test_copy_with_non_existing_source_blob_fails(self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 Exception, 'Source asset does not exist'
         ):
             dev_mode_storage_services.copy(

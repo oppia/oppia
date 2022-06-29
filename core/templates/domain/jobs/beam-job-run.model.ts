@@ -163,6 +163,10 @@ export class BeamJobRun {
     return !this.inTerminalState();
   }
 
+  isFailed(): boolean {
+    return this.jobState === 'FAILED';
+  }
+
   canBeCancelled(): boolean {
     return !this.inTerminalState() && this.jobState !== 'CANCELLING';
   }

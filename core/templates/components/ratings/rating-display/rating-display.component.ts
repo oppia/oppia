@@ -20,8 +20,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface StarDict {
-  cssClass: string,
-  value: number
+  cssClass: string;
+  value: number;
 }
 
 @Component({

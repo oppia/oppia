@@ -26,10 +26,10 @@ import { ExternalSaveService } from 'services/external-save.service';
 
 // The following properties are optional since there is a possibility that the
 // current and previous values have not yet been specified in the form.
-type UnicodeStringEditorArguments = {
-  currentValue?: { largeInput: string },
-  previousValue?: { largeInput: string }
-};
+interface UnicodeStringEditorArguments {
+  currentValue?: { largeInput: string };
+  previousValue?: { largeInput: string };
+}
 
 @Component({
   selector: 'unicode-string-editor',
@@ -38,7 +38,7 @@ type UnicodeStringEditorArguments = {
 export class UnicodeStringEditorComponent implements
     OnInit, OnChanges, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() initArgs!: UnicodeStringEditorArguments;
   @Input() value!: string;

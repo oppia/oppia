@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the subtopic viewer navbar breadcrumb.
  */
 
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SubtopicViewerNavbarBreadcrumbComponent } from
   './subtopic-viewer-navbar-breadcrumb.component';
@@ -27,6 +27,8 @@ import { SubtopicViewerBackendApiService } from
 import { UrlService } from 'services/contextual/url.service';
 import { ReadOnlySubtopicPageData } from
   'domain/subtopic_viewer/read-only-subtopic-page-data.model';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -44,12 +46,18 @@ class MockUrlService {
 
 let component: SubtopicViewerNavbarBreadcrumbComponent;
 let fixture: ComponentFixture<SubtopicViewerNavbarBreadcrumbComponent>;
+let i18nLanguageCodeService: I18nLanguageCodeService;
 
 describe('Subtopic viewer navbar breadcrumb component', function() {
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SubtopicViewerNavbarBreadcrumbComponent],
-      imports: [HttpClientTestingModule],
+      declarations: [
+        SubtopicViewerNavbarBreadcrumbComponent,
+        MockTranslatePipe
+      ],
+      imports: [
+        HttpClientTestingModule
+      ],
       providers: [
         {
           provide: SubtopicViewerBackendApiService,
@@ -69,6 +77,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
                       }
                     },
                     next_subtopic_dict: null,
+                    prev_subtopic_dict: null,
                     topic_id: 'topic_1',
                     topic_name: 'topic_1'
                   }));
@@ -84,21 +93,50 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SubtopicViewerNavbarBreadcrumbComponent);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should set subtopic title when component is initialized', async(() => {
-    component.ngOnInit();
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
-      expect(component.topicName).toBe('topic_1');
-      expect(component.subtopicTitle).toBe('Subtopic Title');
-    });
-  }));
+  it('should set subtopic title when component is initialized',
+    waitForAsync(() => {
+      component.ngOnInit();
+      fixture.whenStable().then(() => {
+        fixture.detectChanges();
+        expect(component.topicName).toBe('topic_1');
+        expect(component.subtopicTitle).toBe('Subtopic Title');
+      });
+    })
+  );
 
   it('should get topic url after component is initialized', () => {
     component.ngOnInit();
     expect(component.getTopicUrl()).toBe('/learn/classroom_1/topic_1/revision');
   });
+
+  it('should set topic name and subtopic title translation key and ' +
+  'check whether hacky translations are displayed or not correctly',
+  waitForAsync(() => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicNameTranslationKey)
+        .toBe('I18N_TOPIC_topic_1_TITLE');
+      expect(component.subtopicTitleTranslationKey)
+        .toBe('I18N_SUBTOPIC_topic_1_subtopic_1_TITLE');
+
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(true, false);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
+
+      let hackyTopicNameTranslationIsDisplayed =
+        component.isHackyTopicNameTranslationDisplayed();
+      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+
+      let hackySubtopicTitleTranslationIsDisplayed =
+        component.isHackySubtopicTitleTranslationDisplayed();
+      expect(hackySubtopicTitleTranslationIsDisplayed).toBe(false);
+    });
+  }));
 });

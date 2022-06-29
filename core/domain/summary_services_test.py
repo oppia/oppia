@@ -120,7 +120,7 @@ class ExplorationDisplayableSummariesTest(
 
         exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'This exploration cannot be published'
             ):
             rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
@@ -199,7 +199,7 @@ class ExplorationDisplayableSummariesTest(
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
-            'category': u'A category',
+            'category': u'Algebra',
             'community_owned': False,
             'id': self.EXP_ID_2,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -208,8 +208,8 @@ class ExplorationDisplayableSummariesTest(
             'ratings': feconf.get_empty_ratings(),
             'status': 'public',
             'tags': [],
-            'thumbnail_bg_color': '#a33f40',
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
@@ -373,13 +373,13 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.assertEqual(len(featured_activity_summaries), 1)
         self.assertDictContainsSubset({
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': 'A category',
+            'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': 'A title',
             'num_views': 0,
@@ -455,6 +455,41 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
+    def test_get_displayable_collection_summary_dicts_matching_ids(self):
+        collection_id_1 = self.COLLECTION_ID + '_1'
+        self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
+        self.save_new_valid_collection(collection_id_1, self.owner_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, collection_id_1)
+        collection_id_list = [collection_id_1, self.COLLECTION_ID]
+        collection_summaries = (
+            summary_services.
+            get_displayable_collection_summary_dicts_matching_ids(
+                collection_id_list))
+        self.assertEqual(len(collection_summaries), 2)
+        for collection_summary in collection_summaries:
+            self.assertIn(collection_summary['id'], collection_id_list)
+
+    def test_get_learner_collection_dict_by_id_without_user_id(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        mock_user = user_services.get_user_actions_info(None)
+        collection_dict = (
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, mock_user)
+            )
+        self.assertEqual(
+            len(
+                collection_dict['playthrough_dict']
+                ['completed_exploration_ids']), 0)
+        self.assertEqual(
+            collection_dict['playthrough_dict']['next_exploration_id'],
+            self.EXP_ID
+        )
+
     def test_get_learner_dict_with_deleted_exp_fails_validation(self):
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
@@ -463,7 +498,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
@@ -481,7 +516,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # A collection cannot access someone else's private exploration.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
@@ -504,7 +539,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # A public collection referencing a private exploration is bad, however.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
             'collection, exploration ID: exploration_id'):
@@ -662,13 +697,13 @@ class TopRatedExplorationDisplayableSummariesTest(
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
             'status': u'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'id': self.EXP_ID_3,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
             'title': u'A title',
             'num_views': 0,
@@ -700,13 +735,13 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         expected_summary = {
             'status': u'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
             'title': u'A title',
             'num_views': 0,
@@ -783,13 +818,13 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
                 feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         test_summary_1 = {
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': u'A title',
             'num_views': 0,
@@ -797,13 +832,13 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         }
         test_summary_2 = {
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': u'A title',
             'num_views': 0,
@@ -811,13 +846,13 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         }
         test_summary_3 = {
             'status': 'public',
-            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_bg_color': '#cd672b',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
-            'category': u'A category',
+            'category': u'Algebra',
             'ratings': feconf.get_empty_ratings(),
             'title': u'A title',
             'num_views': 0,
@@ -864,11 +899,11 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def test_requiring_nonexistent_activities_be_public_raises_exception(self):
-        with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
+        with self.assertRaisesRegex(Exception, 'non-existent exploration'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_EXPLORATION, 'fake')])
-        with self.assertRaisesRegexp(Exception, 'non-existent collection'):
+        with self.assertRaisesRegex(Exception, 'non-existent collection'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_COLLECTION, 'fake')])
@@ -879,11 +914,11 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        with self.assertRaisesRegexp(Exception, 'private exploration'):
+        with self.assertRaisesRegex(Exception, 'private exploration'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
-        with self.assertRaisesRegexp(Exception, 'private collection'):
+        with self.assertRaisesRegex(Exception, 'private collection'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])

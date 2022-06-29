@@ -36,77 +36,87 @@ export class UserService {
     private userBackendApiService: UserBackendApiService
   ) {}
 
-    // This property will be null when the user does not have
-    // enough rights to review translations, voiceover and questions.
-    private userContributionRightsInfo:
-      UserContributionRightsDataBackendDict | null = null;
-    // This property will be null when the user is not logged in.
-    private userInfo: UserInfo | null = null;
-    private returnUrl = '';
+  // This property will be null when the user does not have
+  // enough rights to review translations, voiceover and questions.
+  private userContributionRightsInfo:
+    UserContributionRightsDataBackendDict | null = null;
 
-    async getUserInfoAsync(): Promise<UserInfo> {
-      const pathname = this.urlService.getPathname();
-      if (['/logout', '/signup'].includes(pathname)) {
-        return UserInfo.createDefault();
-      }
-      if (this.userInfo === null) {
-        this.userInfo = await this.userBackendApiService.getUserInfoAsync();
-      }
-      return this.userInfo;
+  // This property will be null when the user is not logged in.
+  private userInfo: UserInfo | null = null;
+  private returnUrl = '';
+
+  async getUserInfoAsync(): Promise<UserInfo> {
+    const pathname = this.urlService.getPathname();
+    if (['/logout', '/signup'].includes(pathname)) {
+      return UserInfo.createDefault();
     }
-
-    async getProfileImageDataUrlAsync(): Promise<string> {
-      let defaultUrl = (
-        this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-      return this.getUserInfoAsync().then(
-        async(userInfo) => {
-          if (userInfo.isLoggedIn()) {
-            return this.userBackendApiService.getProfileImageDataUrlAsync(
-              defaultUrl);
-          } else {
-            return new Promise((resolve, reject) => {
-              resolve(defaultUrl);
-            });
-          }
-        });
+    if (this.userInfo === null) {
+      this.userInfo = await this.userBackendApiService.getUserInfoAsync();
     }
+    return this.userInfo;
+  }
 
-    async setProfileImageDataUrlAsync(
-        newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
-      return this.userBackendApiService.setProfileImageDataUrlAsync(
-        newProfileImageDataUrl);
-    }
+  async getProfileImageDataUrlAsync(): Promise<string> {
+    let defaultUrl = (
+      this.urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
+    return this.getUserInfoAsync().then(
+      async(userInfo) => {
+        if (userInfo.isLoggedIn()) {
+          return this.userBackendApiService.getProfileImageDataUrlAsync(
+            defaultUrl);
+        } else {
+          return new Promise((resolve, reject) => {
+            resolve(defaultUrl);
+          });
+        }
+      });
+  }
 
-    async getLoginUrlAsync(): Promise<string> {
-      return this.userBackendApiService.getLoginUrlAsync(
-        this.returnUrl ||
-        this.windowRef.nativeWindow.location.pathname);
-    }
+  async setProfileImageDataUrlAsync(
+      newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
+    return this.userBackendApiService.setProfileImageDataUrlAsync(
+      newProfileImageDataUrl);
+  }
 
-    setReturnUrl(newReturnUrl: string): void {
-      this.returnUrl = newReturnUrl;
-    }
+  async getLoginUrlAsync(): Promise<string> {
+    return this.userBackendApiService.getLoginUrlAsync(
+      this.returnUrl ||
+      this.windowRef.nativeWindow.location.pathname);
+  }
 
-    async getUserContributionRightsDataAsync():
-      Promise<UserContributionRightsDataBackendDict | null> {
-      if (this.userContributionRightsInfo) {
-        return new Promise((resolve, reject) => {
-          resolve(this.userContributionRightsInfo);
-        });
-      }
-      return this.userBackendApiService.getUserContributionRightsDataAsync()
-        .then((userContributionRightsInfo) => {
-          this.userContributionRightsInfo = userContributionRightsInfo;
-          return this.userContributionRightsInfo;
-        });
-    }
+  setReturnUrl(newReturnUrl: string): void {
+    this.returnUrl = newReturnUrl;
+  }
 
-    async getUserPreferredDashboardAsync(): Promise<string> {
-      return this.userBackendApiService.getPreferencesAsync().then((data) => {
-        return data.default_dashboard;
+  async getUserContributionRightsDataAsync():
+    Promise<UserContributionRightsDataBackendDict | null> {
+    if (this.userContributionRightsInfo) {
+      return new Promise((resolve, reject) => {
+        resolve(this.userContributionRightsInfo);
       });
     }
+    return this.userBackendApiService.getUserContributionRightsDataAsync()
+      .then((userContributionRightsInfo) => {
+        this.userContributionRightsInfo = userContributionRightsInfo;
+        return this.userContributionRightsInfo;
+      });
+  }
+
+  async getUserPreferredDashboardAsync(): Promise<string> {
+    return this.userBackendApiService.getPreferencesAsync().then((data) => {
+      return data.default_dashboard;
+    });
+  }
+
+  async canUserAccessTopicsAndSkillsDashboard(): Promise<boolean> {
+    return this.getUserInfoAsync().then((userInfo) => {
+      return (
+        userInfo.isLoggedIn() &&
+        (userInfo.isCurriculumAdmin() || userInfo.isTopicManager())
+      );
+    });
+  }
 }
 
 angular.module('oppia').factory(

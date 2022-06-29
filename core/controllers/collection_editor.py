@@ -24,7 +24,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
+from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -106,8 +106,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            domain_objects_validator.validate_collection_change)
+                        'object_class': collection_domain.CollectionChange
                     }
                 }
             }
@@ -141,7 +140,11 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         change_list = self.normalized_payload.get('change_list')
 
         collection_services.update_collection(
-            self.user_id, collection_id, change_list, commit_message)
+            self.user_id,
+            collection_id,
+            [change.to_dict() for change in change_list],
+            commit_message
+        )
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
@@ -306,9 +309,9 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
                     'type': 'basestring'
                 }
             },
-            'cursor': {
+            'offset': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 },
                 'default_value': None
             }
@@ -325,7 +328,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
         q = self.normalized_request.get('q').encode('utf-8')
         query_string = base64.b64decode(q).decode('utf-8')
 
-        search_offset = self.normalized_request.get('cursor')
+        search_offset = self.normalized_request.get('offset')
 
         collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(

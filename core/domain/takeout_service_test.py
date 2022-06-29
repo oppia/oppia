@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import logging
 
 from core import feconf
 from core import utils
@@ -35,13 +36,15 @@ from core.tests import test_utils
 (
     app_feedback_report_models, auth_models, base_models, blog_models,
     collection_models, config_models, email_models, exploration_models,
-    feedback_models, improvements_models, question_models, skill_models,
-    story_models, subtopic_models, suggestion_models, topic_models, user_models
+    feedback_models, improvements_models, learner_group_models,
+    question_models, skill_models, story_models, subtopic_models,
+    suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.auth,
     models.NAMES.base_model, models.NAMES.blog, models.NAMES.collection,
     models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
+    models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.learner_group, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
@@ -229,7 +232,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
     def test_export_data_for_profile_user_nontrivial_raises_error(self):
@@ -237,7 +240,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_non_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
 
@@ -307,6 +310,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     STORY_ID_2 = 'story_id_2'
     COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
     COMPLETED_NODE_IDS_2 = ['node_id_3', 'node_id_4']
+    LEARNER_GROUP_ID = 'learner_group_1'
     THREAD_ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
     THREAD_ENTITY_ID = 'exp_id_2'
     THREAD_STATUS = 'open'
@@ -397,6 +401,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         19) Simulates user_1 scrubbing a report.
         20) Creates new BlogPostModel and BlogPostRightsModel.
         21) Creates a TranslationContributionStatsModel.
+        22) Creates new LearnerGroupModel and LearnerGroupsUserModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -766,13 +771,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         improvements_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             composite_entity_id=self.GENERIC_MODEL_ID,
-            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.GENERIC_MODEL_ID,
             entity_version=1,
-            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
+            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=constants.TASK_TARGET_TYPE_STATE,
             target_id=self.GENERIC_MODEL_ID,
-            status=improvements_models.TASK_STATUS_OPEN,
+            status=constants.TASK_STATUS_OPEN,
             resolver_id=self.USER_ID_1
         ).put()
 
@@ -860,6 +865,33 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_rights_for_post_2.update_timestamps()
         blog_post_rights_for_post_2.put()
 
+        learner_group_model = learner_group_models.LearnerGroupModel(
+            id=self.LEARNER_GROUP_ID,
+            title='sample title',
+            description='sample description',
+            facilitator_user_ids=[self.USER_ID_1],
+            student_user_ids=['user_id_2'],
+            invited_student_user_ids=['user_id_3'],
+            subtopic_page_ids=['subtopic_id_1', 'subtopic_id_2'],
+            story_ids=['skill_id_1', 'skill_id_2']
+        )
+        learner_group_model.update_timestamps()
+        learner_group_model.put()
+
+        learner_grp_user_model = user_models.LearnerGroupsUserModel(
+            id=self.USER_ID_1,
+            invited_to_learner_groups_ids=['group_id_1'],
+            learner_groups_user_details=[
+                {
+                    'group_id': 'group_id_2',
+                    'progress_sharing_is_turned_on': False
+                }
+            ],
+            learner_groups_user_details_schema_version=1
+        )
+        learner_grp_user_model.update_timestamps()
+        learner_grp_user_model.put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         user_models.UserSettingsModel(
@@ -876,7 +908,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_full_user_raises_error(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user_id '
             'not found'):
@@ -933,7 +965,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'display_alias': None,
+            'has_viewed_lesson_info_modal_once': False,
         }
         skill_data = {}
         stats_data = {}
@@ -977,6 +1011,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_post_rights = {
             'editable_blog_post_ids': []
         }
+        expected_learner_group_model_data = {}
+        expected_learner_grp_user_model_data = {}
 
         expected_user_data = {
             'app_feedback_report': app_feedback_report,
@@ -993,6 +1029,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exp_user_last_playthrough': last_playthrough_data,
             'learner_goals': learner_goals_data,
             'learner_playlist': learner_playlist_data,
+            'learner_group': expected_learner_group_model_data,
+            'learner_groups_user': expected_learner_grp_user_model_data,
             'task_entry': task_entry_data,
             'topic_rights': topic_rights_data,
             'collection_progress': collection_progress_data,
@@ -1045,6 +1083,24 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
         expected_images = []
         self.assertEqual(expected_images, observed_images)
+
+    def test_export_data_for_full_user_when_user_id_is_leaked_fails(self):
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            email=self.USER_1_EMAIL,
+            roles=[self.USER_1_ROLE],
+            user_bio='I want to leak uid_abcdefghijabcdefghijabcdefghijab'
+        ).put()
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
+            takeout_service.export_data_for_user(self.USER_ID_1)
+            self.assertEqual(
+                [
+                    '[TAKEOUT] User ID (uid_abcdefghijabcdefghijabcdefghijab) '
+                    'found in the JSON generated for UserSettingsModel and '
+                    'user with ID user_1'
+                ],
+                log_messages
+            )
 
     def test_exports_have_single_takeout_dict_key(self):
         """Test to ensure that all export policies that specify a key for the
@@ -1593,6 +1649,23 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_ID_2
             ],
         }
+        expected_learner_group_data = {
+            'title': 'sample title',
+            'description': 'sample description',
+            'role_in_group': 'facilitator',
+            'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
+            'story_ids': ['skill_id_1', 'skill_id_2']
+        }
+        expected_learner_groups_user_data = {
+            'invited_to_learner_groups_ids': ['group_id_1'],
+            'learner_groups_user_details': [
+                {
+                    'group_id': 'group_id_2',
+                    'progress_sharing_is_turned_on': False
+                }
+            ]
+        }
+
         expected_translation_contribution_stats_data = {
             '%s.%s.%s' % (
                 self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
@@ -1630,6 +1703,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exp_user_last_playthrough': expected_last_playthrough_data,
             'learner_goals': expected_learner_goals_data,
             'learner_playlist': expected_learner_playlist_data,
+            'learner_group': expected_learner_group_data,
+            'learner_groups_user': expected_learner_groups_user_data,
             'task_entry': expected_task_entry_data,
             'topic_rights': expected_topic_data,
             'collection_progress': expected_collection_progress_data,

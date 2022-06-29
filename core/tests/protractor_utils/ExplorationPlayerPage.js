@@ -34,7 +34,7 @@ var ExplorationPlayerPage = function() {
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
   var conversationFeedback = element(
-    by.css('.protractor-test-conversation-feedback'));
+    by.css('.protractor-test-conversation-feedback-latest'));
   var explorationHeader = element(
     by.css('.protractor-test-exploration-header'));
   var infoCardRating = element(
@@ -186,6 +186,16 @@ var ExplorationPlayerPage = function() {
     await waitFor.elementToBeClickable(returnToParentButton);
     await action.click('Return To Parent Button', returnToParentButton);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.clickCloseLessonInfoTooltip = async function(
+      closeLessonInfoTooltipElement
+  ) {
+    await waitFor.elementToBeClickable(
+      closeLessonInfoTooltipElement,
+      'Lesson Info Tooltip takes too long to appear');
+    await action.click(
+      'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
   };
 
   // This verifies the question just asked, including formatting and
