@@ -131,6 +131,9 @@ import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab
 import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
 import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
 import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component';
+import { RuleEditorComponent } from './state-directives/rule-editor/rule-editor.component';
+import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
+import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selector.directive';
 
 import { QuestionEditorModalComponent } from './question-directives/modal-templates/question-editor-modal.component';
 // Pipes.
@@ -145,6 +148,7 @@ import { AuthService } from 'services/auth.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
+import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 
 @NgModule({
   imports: [
@@ -175,6 +179,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
 
   providers: [
     AngularFireAuth,
+    ReplaceInputsWithEllipsesPipe,
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig
@@ -280,7 +285,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel,
-    QuestionEditorModalComponent
+    QuestionEditorModalComponent,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector
   ],
 
   entryComponents: [
@@ -382,7 +390,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel,
-    QuestionEditorModalComponent
+    QuestionEditorModalComponent,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector
   ],
 
   exports: [
@@ -493,7 +504,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel,
-    QuestionEditorModalComponent
+    QuestionEditorModalComponent,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector
   ],
 })
 
