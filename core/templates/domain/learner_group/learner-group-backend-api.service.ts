@@ -39,10 +39,10 @@ export class LearnerGroupBackendApiService {
   ) {}
 
   async createNewLearnerGroupAsync(
-    title: string, description: string,
-    invitedStudentUsernames: string[],
-    subtopicPageIds: string[],
-    storyIds: string[]
+      title: string, description: string,
+      invitedStudentUsernames: string[],
+      subtopicPageIds: string[],
+      storyIds: string[]
   ): Promise<LearnerGroupData> {
     return new Promise((resolve, reject) => {
       const learnerGroupCreationUrl = '/create_learner_group_handler';
@@ -65,7 +65,7 @@ export class LearnerGroupBackendApiService {
   }
 
   async updateLearnerGroupAsync(
-    learnerGroupData: LearnerGroupData
+      learnerGroupData: LearnerGroupData
   ): Promise<LearnerGroupData> {
     return new Promise((resolve, reject) => {
       const learnerGroupUpdationUrl = (
@@ -94,7 +94,7 @@ export class LearnerGroupBackendApiService {
   }
 
   async deleteLearnerGroupAsync(
-    learnerGroupId: string
+      learnerGroupId: string
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const learnerGroupDeletionUrl = (
@@ -115,7 +115,7 @@ export class LearnerGroupBackendApiService {
   }
 
   async _fetchLearnerGroupinfoAsync(
-    learnerGroupId: string
+      learnerGroupId: string
   ):
   Promise<LearnerGroupData> {
     return new Promise((resolve, reject) => {
@@ -137,7 +137,7 @@ export class LearnerGroupBackendApiService {
   }
 
   async fetchLearnerGroupInfoAsync(
-    learnerGroupId: string
+      learnerGroupId: string
   ):
   Promise<LearnerGroupData> {
     return this._fetchLearnerGroupinfoAsync(learnerGroupId);
@@ -147,4 +147,3 @@ export class LearnerGroupBackendApiService {
 angular.module('oppia').factory(
   'LearnerGroupBackendApiService',
   downgradeInjectable(LearnerGroupBackendApiService));
- 

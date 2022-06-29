@@ -21,10 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { 
-  ShortLearnerGroupSummary,
-  ShortLearnerGroupSummaryBackendDict
-} from './short-learner-group-summary.model';
+import { ShortLearnerGroupSummary, ShortLearnerGroupSummaryBackendDict }
+  from './short-learner-group-summary.model';
 
 interface TeacherDashboardBackendResponse {
   'learner_groups_list': ShortLearnerGroupSummaryBackendDict[];
@@ -43,9 +41,9 @@ export class TeacherDashboardBackendApiService {
       this.http.get<TeacherDashboardBackendResponse>(
         '/teacher_dashboard_handler').toPromise().then(dashboardData => {
         resolve(
-            dashboardData.learner_groups_list.map(
-              shortLearnerGroupSummary => ShortLearnerGroupSummary
-                .createFromBackendDict(shortLearnerGroupSummary)));
+          dashboardData.learner_groups_list.map(
+            shortLearnerGroupSummary => ShortLearnerGroupSummary
+              .createFromBackendDict(shortLearnerGroupSummary)));
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
@@ -59,6 +57,5 @@ export class TeacherDashboardBackendApiService {
 }
 
 angular.module('oppia').factory(
-	'TeacherDashboardBackendApiService',
-	downgradeInjectable(TeacherDashboardBackendApiService));
- 
+  'TeacherDashboardBackendApiService',
+  downgradeInjectable(TeacherDashboardBackendApiService));

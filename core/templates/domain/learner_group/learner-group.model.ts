@@ -109,7 +109,7 @@ export class LearnerGroupData {
     let index = this._studentUsernames.indexOf(studentUsername);
     this._studentUsernames.splice(index, 1);
   }
-  
+
   inviteStudent(studentUsername: string): void {
     this._invitedStudentUsernames.push(studentUsername);
   }

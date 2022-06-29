@@ -87,7 +87,7 @@ export class SubtopicPageSummary {
   }
 
   static createFromBackendDict(
-    SubtopicPageSummaryBackendDict: SubtopicPageSummaryBackendDict
+      SubtopicPageSummaryBackendDict: SubtopicPageSummaryBackendDict
   ): SubtopicPageSummary {
     return new SubtopicPageSummary(
       SubtopicPageSummaryBackendDict.parent_topic_id,

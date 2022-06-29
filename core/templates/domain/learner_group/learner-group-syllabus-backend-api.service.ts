@@ -21,9 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { LearnerGroupBackendDict, LearnerGroupData } from './learner-group.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict } from './learner-group-syllabus.model';
+import { UrlInterpolationService }
+  from 'domain/utilities/url-interpolation.service';
+import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
+  from './learner-group-syllabus.model';
 
 
 interface LearnerGroupSyllabusFilter {
@@ -45,13 +46,12 @@ export class LearnerGroupSyllabusBackendApiService {
   async fetchFilteredSyllabusItemsAsync(
       learnerGroupId: string,
       syllabusFilter: LearnerGroupSyllabusFilter
-  ):
-  Promise<LearnerGroupSyllabus> {
+  ): Promise<LearnerGroupSyllabus> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
           '/facilitator_view_of_learner_group_handler', {
-              learner_group_id: learnerGroupId
+            learner_group_id: learnerGroupId
           }
         )
       );
@@ -61,7 +61,7 @@ export class LearnerGroupSyllabusBackendApiService {
         filter_type: syllabusFilter.type,
         filter_category: syllabusFilter.category,
         filter_language_code: syllabusFilter.languageCode
-      }
+      };
 
       this.http.get<LearnerGroupSyllabusBackendDict>(
         learnerGroupUrl, {

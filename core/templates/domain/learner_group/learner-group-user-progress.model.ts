@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import { StorySummary, StorySummaryBackendDict }
-  from "domain/story/story-summary.model";
+  from 'domain/story/story-summary.model';
 import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
-  from "./subtopic-page-summary.model";
+  from './subtopic-page-summary.model';
 
 /**
  * @fileoverview Model for displaying instances of frontend learner group
@@ -66,7 +66,7 @@ export class LearnerGroupUserProgress {
   }
 
   static createFromBackendDict(
-    learnerGroupUserProgressBackendDict: LearnerGroupUserProgressBackendDict
+      learnerGroupUserProgressBackendDict: LearnerGroupUserProgressBackendDict
   ): LearnerGroupUserProgress {
     return new LearnerGroupUserProgress(
       learnerGroupUserProgressBackendDict.username,
@@ -74,10 +74,15 @@ export class LearnerGroupUserProgress {
       learnerGroupUserProgressBackendDict.stories_progress ?
         learnerGroupUserProgressBackendDict.stories_progress.map(
           storySummaryBackendDict => StorySummary.createFromBackendDict(
-            storySummaryBackendDict)) : undefined,
+            storySummaryBackendDict
+          )
+        ) : undefined,
       learnerGroupUserProgressBackendDict.subtopic_page_progress ?
         learnerGroupUserProgressBackendDict.subtopic_page_progress.map(
-          subtopicProgressBackendDict => SubtopicPageSummary.createFromBackendDict(
-            subtopicProgressBackendDict)) : undefined);
+          (subtopicProgressBackendDict) => (
+            SubtopicPageSummary.createFromBackendDict(
+              subtopicProgressBackendDict)
+          )
+        ) : undefined);
   }
 }

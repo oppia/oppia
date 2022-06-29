@@ -66,7 +66,7 @@ export class ShortLearnerGroupSummary {
   }
 
   static createFromBackendDict(
-    shortLearnerGroupBackendDict: ShortLearnerGroupSummaryBackendDict
+      shortLearnerGroupBackendDict: ShortLearnerGroupSummaryBackendDict
   ): ShortLearnerGroupSummary {
     return new ShortLearnerGroupSummary(
       shortLearnerGroupBackendDict.id,

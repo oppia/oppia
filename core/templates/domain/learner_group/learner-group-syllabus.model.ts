@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import { StorySummary, StorySummaryBackendDict }
-	from "domain/story/story-summary.model";
+  from 'domain/story/story-summary.model';
 import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
-	from "./subtopic-page-summary.model";
+  from './subtopic-page-summary.model';
 
 /**
  * @fileoverview Model for displaying short summaries of learner group
@@ -34,9 +34,9 @@ export class LearnerGroupSyllabus {
   _subtopicPageSummaries: SubtopicPageSummary[];
 
   constructor(
-    learnerGroupId: string,
-    storySummaries: StorySummary[],
-    subtopicPageSummaries: SubtopicPageSummary[]) {
+      learnerGroupId: string,
+      storySummaries: StorySummary[],
+      subtopicPageSummaries: SubtopicPageSummary[]) {
     this._learnerGroupId = learnerGroupId;
     this._storySummaries = storySummaries;
     this._subtopicPageSummaries = subtopicPageSummaries;
@@ -55,7 +55,7 @@ export class LearnerGroupSyllabus {
   }
 
   static createFromBackendDict(
-    backendDict: LearnerGroupSyllabusBackendDict
+      backendDict: LearnerGroupSyllabusBackendDict
   ): LearnerGroupSyllabus {
     return new LearnerGroupSyllabus(
       backendDict.learner_group_id,

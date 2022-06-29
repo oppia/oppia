@@ -479,6 +479,7 @@
 
 # Learner group project.
 /core/domain/learner_group*.py @aks681 @paprajapati9
+/core/templates/domain/learner_group/ @aks681
 
 # Beam jobs
 /setup.py @vojtechjelinek
