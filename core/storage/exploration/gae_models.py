@@ -1181,9 +1181,11 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     # The exploration version on which the metadata was previously edited.
     # If its value is v, then it will indicate that the metadata was modified
     # when the exploration was updated from version v -> v + 1.
-    # During the creation of a new exploration, its value will be 0.
+    # Its value will be None during the creation of an exploration. The value
+    # None indicates that the metadata was not modified after the creation of
+    # the exploration.
     metadata_last_edited_version_number = datastore_services.IntegerProperty(
-        required=True, indexed=True)
+        indexed=True)
     # The user id of the user who committed the latest changes to the
     # exploration metadata.
     metadata_last_edited_committer_id = datastore_services.StringProperty(

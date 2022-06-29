@@ -1011,7 +1011,7 @@ def _create_exploration(
             ).to_dict()
             for state_name in exploration.states
         },
-        metadata_last_edited_version_number=0,
+        metadata_last_edited_version_number=None,
         metadata_last_edited_committer_id=committer_id,
         committer_ids=[committer_id]
     )

@@ -7564,7 +7564,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             version_history_model.state_version_history,
             expected_state_version_history_dict)
         self.assertEqual(
-            version_history_model.metadata_last_edited_version_number, 0)
+            version_history_model.metadata_last_edited_version_number, None)
         self.assertEqual(
             version_history_model.metadata_last_edited_committer_id,
             self.owner_id)
@@ -7836,7 +7836,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
-        self.assertEqual(old_model.metadata_last_edited_version_number, 0)
+        self.assertEqual(old_model.metadata_last_edited_version_number, None)
         self.assertEqual(
             old_model.metadata_last_edited_committer_id, self.owner_id)
 
@@ -7857,7 +7857,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
 
-        self.assertEqual(old_model.metadata_last_edited_version_number, 0)
+        self.assertEqual(old_model.metadata_last_edited_version_number, None)
         self.assertEqual(
             old_model.metadata_last_edited_committer_id, self.owner_id)
 
@@ -7877,7 +7877,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         new_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
 
-        self.assertEqual(new_model.metadata_last_edited_version_number, 0)
+        self.assertEqual(new_model.metadata_last_edited_version_number, None)
         self.assertEqual(
             new_model.metadata_last_edited_committer_id, self.owner_id)
 
