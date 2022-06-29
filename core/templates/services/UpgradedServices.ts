@@ -970,7 +970,8 @@ export class UpgradedServices {
     upgradedServices['ContributionOpportunitiesBackendApiService'] =
       new ContributionOpportunitiesBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UserService']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
