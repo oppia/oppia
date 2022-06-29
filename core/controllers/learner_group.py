@@ -369,6 +369,8 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
     """Handles operations related to the learner group syllabus."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
             'schema': {
@@ -437,6 +439,8 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
 
 class TeacherDashboardHandler(base.BaseHandler):
     """Handles operations related to the teacher dashboard."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
