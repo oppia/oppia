@@ -6,16 +6,16 @@
   </p>
   <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
     <span class="view-text" [ngStyle]="displayInCommunityLessons.length !== 0 && {'right': '100px'}">
-      <span [innerHTML]="I18N_LEARNER_DASHBOARD_VIEW | translate"></span>
+      <span>{{ 'I18N_LEARNER_DASHBOARD_VIEW' | translate }}</span>
     </span>
     <button (click)="toggleDropdown()" class="dropbtn">
       {{selectedSection}}
       <i class="fa fa-caret-down dropdown-icon"></i>
     </button>
     <div class="dropdown-content" *ngIf="dropdownEnabled">
-      <p (click)="changeSection(all)"><span [innerHTML]="I18N_LEARNER_DASHBOARD_ALL | translate"></span></p>
-      <p (click)="changeSection(completed)"><span [innerHTML]="I18N_LEARNER_DASHBOARD_COMPLETED_SECTION | translate"></span></p>
-      <p (click)="changeSection(incomplete)"><span [innerHTML]="I18N_LEARNER_DASHBOARD_INCOMPLETE | translate"></span></p>
+      <p (click)="changeSection(all)"><span>{{ 'I18N_LEARNER_DASHBOARD_ALL' | translate }}</span></p>
+      <p (click)="changeSection(completed)"><span>{{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }}</span></p>
+      <p (click)="changeSection(incomplete)"><span>{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE' | translate }}</span></p>
     </div>
     <div class="pagination" *ngIf="displayInCommunityLessons.length !== 0">
       <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page" (click)="changePageByOne(moveToPrevPage, 'communityLessons')"></i>
@@ -89,12 +89,12 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="!showMoreInSection['incomplete']">
-            <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="showMoreInSection['incomplete']">
-            <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
@@ -159,12 +159,12 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="!showMoreInSection['completed']">
-            <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="showMoreInSection['completed']">
-            <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
@@ -173,7 +173,8 @@
   <div class="community-lessons-mobile-view" *ngIf="windowIsNarrow">
     <span class="oppia-learner-dashboard-nonexistent-exploration"
           *ngIf="completedToIncompleteCollections.length !== 0">
-      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
+      <span>
+        {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length} }}
       </span>
       <span>
         <ul>
@@ -343,12 +344,12 @@
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="!showMoreInSection['playlist']">
-          <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+          <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
         </button>
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="showMoreInSection['playlist']">
-          <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+          <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
         </button>
       </div>
     </div>
@@ -381,12 +382,12 @@
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="!showMoreInSection['subscription'] && !windowIsNarrow">
-        <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+        <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
       </button>
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="showMoreInSection['subscription'] && !windowIsNarrow">
-        <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+        <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
       </button>
     </div>
   </div>
