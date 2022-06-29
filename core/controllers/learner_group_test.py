@@ -310,7 +310,7 @@ class FilterLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         params = {
             'filter_keyword': 'Place',
             'filter_category': 'All',
-            'filter_language': constants.DEFAULT_LANGUAGE_CODE,
+            'filter_language_code': constants.DEFAULT_LANGUAGE_CODE,
         }
 
         response = self.get_json(
@@ -387,7 +387,7 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
     def test_facilitators_view_details_as_invalid_facilitator(self):
         self.login(self.USER2_EMAIL)
 
-        self.get_html_response(
+        self.get_json(
             '/facilitator_view_of_learner_group_handler/%s' % (
                 self.LEARNER_GROUP_ID), expected_status_int=401)
 
@@ -629,7 +629,7 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
                 self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
         }
 
-        self.get_html_response(
+        self.get_json(
             '/learner_group_user_progress_handler/%s' % (
                 'invalidId'), params=params, expected_status_int=400)
 

@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -227,6 +228,8 @@ class LearnerGroupHandler(base.BaseHandler):
 class LearnerGroupStudentProgressHandler(base.BaseHandler):
     """Handles operations related to the learner group student's progress."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
             'schema': {
@@ -399,7 +402,7 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
                 },
                 'default_value': None
             },
-            'filter_language': {
+            'filter_language_code': {
                 'schema': {
                     'type': 'basestring',
                 },
@@ -415,12 +418,13 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
         filter_keyword = self.normalized_request.get('filter_keyword')
         filter_type = self.normalized_request.get('filter_type')
         filter_category = self.normalized_request.get('filter_category')
-        filter_language = self.normalized_request.get('filter_language')
+        filter_language_code = self.normalized_request.get(
+            'filter_language_code')
 
         filtered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
                 learner_group_id, filter_keyword,
-                filter_type, filter_category, filter_language
+                filter_type, filter_category, filter_language_code
             )
         )
 
@@ -466,6 +470,8 @@ class TeacherDashboardHandler(base.BaseHandler):
 
 class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
     """Handles operations related to the facilitators view of learner group."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
