@@ -78,7 +78,7 @@ export class SubtopicPageSummary {
     return this._thumbnailBgColor;
   }
 
-  get subtopicMastery(): number {
+  get subtopicMastery(): number | undefined {
     return this._subtopicMastery;
   }
 

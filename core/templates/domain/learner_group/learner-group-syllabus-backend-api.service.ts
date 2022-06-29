@@ -29,9 +29,9 @@ import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
 
 interface LearnerGroupSyllabusFilter {
   keyword: string;
-  type?: string;
-  category?: string;
-  languageCode?: string;
+  type: string;
+  category: string;
+  languageCode: string;
 }
 
 @Injectable({

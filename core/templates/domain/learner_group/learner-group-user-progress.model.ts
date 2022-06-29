@@ -57,11 +57,11 @@ export class LearnerGroupUserProgress {
     return this._progressSharingIsTurnedOn;
   }
 
-  get storiesProgress(): StorySummary[] {
+  get storiesProgress(): StorySummary[] | undefined {
     return this._storiesProgress;
   }
 
-  get subtopicsProgress(): SubtopicPageSummary[] {
+  get subtopicsProgress(): SubtopicPageSummary[] | undefined {
     return this._subtopicsProgress;
   }
 
