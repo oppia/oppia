@@ -1453,12 +1453,13 @@ def _pseudonymize_version_history_models(pending_deletion_request):
         for model in version_history_models:
             # Pseudonymize user id from state_version_history.
             for state_name in model.state_version_history:
-                if model.state_version_history[state_name][
-                    'committer_id'] == user_id:
-                    model.state_version_history[state_name][
-                        'committer_id'] = exp_ids_to_pids[model.exploration_id]
+                state_version_history = (
+                    model.state_version_history[state_name])
+                if state_version_history['committer_id'] == user_id:
+                    state_version_history['committer_id'] = (
+                        exp_ids_to_pids[model.exploration_id])
 
-            # Pseudonymize user id metadata_last_edited_committer_id.
+            # Pseudonymize user id from metadata_last_edited_committer_id.
             if model.metadata_last_edited_committer_id == user_id:
                 model.metadata_last_edited_committer_id = (
                     exp_ids_to_pids[model.exploration_id])
@@ -1480,7 +1481,8 @@ def _pseudonymize_version_history_models(pending_deletion_request):
     for i in range(
             0,
             len(version_history_models),
-            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+    ):
         _pseudonymize_models_transactional(
             version_history_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],

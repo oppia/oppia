@@ -61,6 +61,7 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
+
 import deepdiff
 
 datastore_services = models.Registry.import_datastore_services()
@@ -589,8 +590,13 @@ def apply_change_list(exploration_id, change_list):
 
 
 def update_states_version_history(
-    states_version_history, change_list, old_states, new_states,
-    current_version, committer_id):
+    states_version_history,
+    change_list,
+    old_states,
+    new_states,
+    current_version,
+    committer_id
+):
     """Updates the version history of each state at a particular version
     of an exploration.
 
@@ -642,13 +648,15 @@ def update_states_version_history(
     # name and we need to clear them from this dict.
     effective_old_to_new_state_names = {}
     for old_state_name, new_state_name in (
-        exp_versions_diff.old_to_new_state_names.items()):
+        exp_versions_diff.old_to_new_state_names.items()
+    ):
         if old_state_name != new_state_name:
             effective_old_to_new_state_names[old_state_name] = new_state_name
     for old_state_name in effective_old_to_new_state_names:
         del states_version_history[old_state_name]
     for old_state_name, new_state_name in (
-        effective_old_to_new_state_names.items()):
+        effective_old_to_new_state_names.items()
+    ):
         states_version_history[new_state_name] = (
             state_domain.StateVersionHistory(
                 prev_version, old_state_name, committer_id))
@@ -658,8 +666,8 @@ def update_states_version_history(
     states_which_were_not_renamed = []
     for state_name in old_states:
         if (
-            not(state_name in exp_versions_diff.deleted_state_names) and
-            not(state_name in effective_old_to_new_state_names)
+            state_name not in exp_versions_diff.deleted_state_names and
+            state_name not in effective_old_to_new_state_names
         ):
             states_which_were_not_renamed.append(state_name)
 
@@ -672,6 +680,9 @@ def update_states_version_history(
         state_name: False
         for state_name in states_which_were_not_renamed
     }
+    # The following ignore list contains those state properties which are
+    # related to translations. Hence, they are ignored in order to avoid
+    # updating the version history in case of translation-only commits.
     state_property_ignore_list = [
         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS,
         exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
@@ -703,7 +714,7 @@ def update_states_version_history(
             # get cancelled by each other and there is no 'net change'.
             diff_dict = deepdiff.DeepDiff(
                 old_states_dict[state_name], new_states_dict[state_name])
-            if diff_dict != {}:
+            if diff_dict:
                 states_version_history[state_name] = (
                     state_domain.StateVersionHistory(
                         prev_version, state_name, committer_id
@@ -713,8 +724,13 @@ def update_states_version_history(
 
 
 def update_metadata_version_history(
-    metadata_version_history, change_list, old_metadata, new_metadata,
-    current_version, committer_id):
+    metadata_version_history,
+    change_list,
+    old_metadata,
+    new_metadata,
+    current_version,
+    committer_id
+):
     """Updates the version history of the exploration at a particular version
     of an exploration.
 
@@ -737,11 +753,10 @@ def update_metadata_version_history(
     new_metadata_dict = copy.deepcopy(new_metadata.to_dict())
     prev_version = current_version - 1
 
-    metadata_was_changed = False
-    for change in change_list:
-        if change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
-            metadata_was_changed = True
-            break
+    metadata_was_changed = any(
+        change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY
+        for change in change_list
+    )
 
     if metadata_was_changed:
         # The purpose of checking the diff_dict between the two metadata
@@ -749,7 +764,7 @@ def update_metadata_version_history(
         # overall changes (by EDIT_EXPLORATION_PROPERTY) get cancelled by
         # each other and there is no 'net change'.
         diff_dict = deepdiff.DeepDiff(old_metadata_dict, new_metadata_dict)
-        if diff_dict != {}:
+        if diff_dict:
             metadata_version_history.last_edited_version_number = prev_version
             metadata_version_history.last_edited_committer_id = committer_id
 
@@ -757,7 +772,8 @@ def update_metadata_version_history(
 
 
 def get_updated_committer_ids(
-    states_version_history, metadata_last_edited_committer_id):
+    states_version_history, metadata_last_edited_committer_id
+):
     """Extracts a list of user ids who made the 'previous commit' on each state
     and the exploration metadata from the exploration states and metadata
     version history data.
@@ -773,9 +789,10 @@ def get_updated_committer_ids(
         list[str]. A list of user ids who made the 'previous commit' on each
         state and the exploration metadata.
     """
-    committer_ids = set()
-    for version_history in states_version_history.values():
-        committer_ids.add(version_history.committer_id)
+    committer_ids = {
+        version_history.committer_id
+        for version_history in states_version_history.values()
+    }
     committer_ids.add(metadata_last_edited_committer_id)
     return list(committer_ids)
 
