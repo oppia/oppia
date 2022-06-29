@@ -406,26 +406,25 @@ class ExplorationModel(base_models.VersionedModel):
         else:
             # Delete the ExplorationVersionHistoryModels if force_deletion is
             # True.
-            if force_deletion:
-                versioned_exp_models_without_none = [
-                    model for model in versioned_exp_models
-                    if model is not None
-                ]
-                version_history_ids = []
-                for model in versioned_exp_models_without_none:
-                    for version in range(1, model.version + 1):
-                        version_history_ids.append(
-                            ExplorationVersionHistoryModel.get_instance_id(
-                                model.id, version))
-                version_history_models_with_none = (
-                    ExplorationVersionHistoryModel.get_multi(
-                        version_history_ids))
-                version_history_models = [
-                    model for model in version_history_models_with_none
-                    if model is not None
-                ]
-                ExplorationVersionHistoryModel.delete_multi(
-                    version_history_models)
+            versioned_exp_models_without_none = [
+                model for model in versioned_exp_models
+                if model is not None
+            ]
+            version_history_ids = []
+            for model in versioned_exp_models_without_none:
+                for version in range(1, model.version + 1):
+                    version_history_ids.append(
+                        ExplorationVersionHistoryModel.get_instance_id(
+                            model.id, version))
+            version_history_models_with_none = (
+                ExplorationVersionHistoryModel.get_multi(
+                    version_history_ids))
+            version_history_models = [
+                model for model in version_history_models_with_none
+                if model is not None
+            ]
+            ExplorationVersionHistoryModel.delete_multi(
+                version_history_models)
 
     # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
     # to remove Any used below.
