@@ -1184,7 +1184,7 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     # During the creation of a new exploration, its value will be 0.
     metadata_last_edited_version_number = datastore_services.IntegerProperty(
         required=True, indexed=True)
-    # The user id of the user who committed the latest changes on the
+    # The user id of the user who committed the latest changes to the
     # exploration metadata.
     metadata_last_edited_committer_id = datastore_services.StringProperty(
         required=True, indexed=True)

@@ -1422,7 +1422,8 @@ def _pseudonymize_blog_post_models(pending_deletion_request):
 
 
 def _pseudonymize_version_history_models(pending_deletion_request):
-    """Pseudonymizes the version history models for the user with user_id.
+    """Pseudonymizes the version history models for the user with the given
+    user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending
@@ -1438,7 +1439,8 @@ def _pseudonymize_version_history_models(pending_deletion_request):
     save_pending_deletion_requests([pending_deletion_request])
 
     @transaction_services.run_in_transaction_wrapper
-    def _pseudonymize_models_transactional(version_history_models):
+    def _pseudonymize_models_transactional(
+        version_history_models, exp_ids_to_pids):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -1447,6 +1449,8 @@ def _pseudonymize_version_history_models(pending_deletion_request):
         Args:
             version_history_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
+            exp_ids_to_pids: dict(str, str). A mapping of exploration ids to
+                pseudonymous ids.
         """
         for model in version_history_models:
             # Pseudonymize user id from state_version_history.
@@ -1481,4 +1485,5 @@ def _pseudonymize_version_history_models(pending_deletion_request):
             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         _pseudonymize_models_transactional(
             version_history_models[
-                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+            exp_ids_to_pids)
