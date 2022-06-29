@@ -2358,10 +2358,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _convert_v55_dict_to_v56_dict(cls, exploration_dict):
         """Converts a v55 exploration dict into a v56 exploration dict.
-        Version 56 adds a new customization arg to TextInput interaction
-        which allows creators to fill a catch misspellings checkbox. Also adds
-        a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts.
+        Version 56 adds a new dest_if_really_stuck field to the Outcome class
+        to redirect the learners to a state for strengthening concepts.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
