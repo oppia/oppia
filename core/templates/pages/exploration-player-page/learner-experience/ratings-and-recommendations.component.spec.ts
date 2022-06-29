@@ -25,7 +25,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
-import { MockLimitToPipe } from '../templates/information-card-modal.component.spec';
+import { MockLimitToPipe } from 'pages/exploration-player-page/templates/lesson-information-card-modal.component.spec';
 import { RatingsAndRecommendationsComponent } from './ratings-and-recommendations.component';
 
 describe('Ratings and recommendations component', () => {
