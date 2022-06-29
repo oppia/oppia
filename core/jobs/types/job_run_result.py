@@ -29,6 +29,7 @@ from typing import Any, List, Tuple # isort: skip
 MAX_OUTPUT_CHARACTERS = 5000
 TRUNCATED_MARK = '[TRUNCATED]'
 
+
 class JobRunResult:
     """Encapsulates the result of a job run.
 
