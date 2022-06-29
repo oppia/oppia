@@ -3407,6 +3407,7 @@ class MetadataVersionHistory:
 
     def __init__(self, last_edited_version_number, last_edited_committer_id):
         """Initializes the MetadataVersionHistory domain object.
+
         Args:
             last_edited_version_number: int. The version number of the
                 exploration in which the metadata was last edited.
