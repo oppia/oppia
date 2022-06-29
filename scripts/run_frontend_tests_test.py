@@ -161,7 +161,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--terminalEnabled']
         self.assertIn(cmd, self.cmd_token_list)
-        self.assertEqual(self.print_arr.count('Done!'), 2)
         self.assertFalse(self.frontend_coverage_checks_called)
         self.assertIn(1, self.sys_exit_message)
 
