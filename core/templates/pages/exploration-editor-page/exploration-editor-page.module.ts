@@ -62,6 +62,7 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
 import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AddAnswerGroupModalComponent } from './editor-tab/templates/modal-templates/add-answer-group-modal.component';
 
 @NgModule({
   imports: [
@@ -106,6 +107,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    AddAnswerGroupModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -136,6 +138,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    AddAnswerGroupModalComponent
   ],
   providers: [
     {

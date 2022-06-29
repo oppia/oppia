@@ -18,7 +18,7 @@
 
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -33,6 +33,7 @@ import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
+import { EditabilityService } from 'services/editability.service';
 
 interface TaggedMisconception {
   skillId: string;
@@ -45,16 +46,19 @@ interface TaggedMisconception {
 })
 export class AddAnswerGroupModalComponent
   extends ConfirmOrCancelModal implements OnInit, OnDestroy {
+  @Output() addState: EventEmitter<string> = new EventEmitter<string>();
+  @Input() currentInteractionId: string;
+  @Input() stateName;
+
+  isEditable: boolean;
   eventBusGroup: EventBusGroup;
   feedbackEditorIsOpen: boolean;
-  currentInteractionId: string;
   tmpRule: Rule;
   tmpOutcome: Outcome;
   tmpTaggedSkillMisconceptionId: any;
   addAnswerGroupForm: any;
   questionModeEnabled: boolean;
   isInvalid: boolean;
-  stateName: any;
   modalId: any;
 
   constructor(
@@ -69,9 +73,14 @@ export class AddAnswerGroupModalComponent
     private ruleObjectFactory: RuleObjectFactory,
     private generateContentIdService: GenerateContentIdService,
     private outcomeObjectFactory: OutcomeObjectFactory,
+    private editabilityService: EditabilityService,
   ) {
     super(ngbActiveModal);
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
+  }
+
+  updateState(event: string): void {
+    this.addState.emit(event);
   }
 
   updateTaggedMisconception(
@@ -125,6 +134,8 @@ export class AddAnswerGroupModalComponent
   }
 
   ngOnInit(): void {
+    this.isEditable = this.editabilityService.isEditable();
+
     this.eventBusGroup.on(
       ObjectFormValidityChangeEvent,
       event => {
