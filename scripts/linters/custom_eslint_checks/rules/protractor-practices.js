@@ -43,7 +43,7 @@ module.exports = {
         'Please do not use .forEach(), consider using a' +
         ' "for loop" instead'),
       disallowAwait: 'Please do not use await for "{{propertyName}}()"',
-      useProtractorTest: (
+      useE2ETest: (
         'Please use “.e2e-test-” prefix classname selector instead of ' +
         '“{{incorrectClassname}}”')
     },
@@ -148,7 +148,7 @@ module.exports = {
         (!node.arguments[0].value.startsWith('.e2e-test-'))) {
         context.report({
           node: node.arguments[0],
-          messageId: 'useProtractorTest',
+          messageId: 'useE2ETest',
           data: {
             incorrectClassname: node.arguments[0].value
           }

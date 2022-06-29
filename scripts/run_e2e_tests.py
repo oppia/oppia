@@ -194,7 +194,7 @@ SUITES_STILL_IN_PROTRACTOR = [
     'topicsAndSkillsDashboard',
     'skillEditor',
     'topicAndStoryViewer',
-    'wipeout'
+    'wipeout',
 ]
 
 
@@ -315,6 +315,7 @@ def run_tests(args):
             stack.enter_context(servers.managed_webdriver_server(
                 chrome_version=args.chrome_driver_version))
 
+            print('Protractor suites are starting to run')
             proc = stack.enter_context(servers.managed_protractor_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
@@ -322,6 +323,7 @@ def run_tests(args):
                 sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
 
+            print('WebdriverIO suites are starting to run')
             proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
@@ -336,12 +338,13 @@ def run_tests(args):
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
 
             print(
-            'Servers have come up.\n'
-            'Note: You can view screenshots of failed tests '
-            'in ../webdriverio-screenshots/')
+                'Servers have come up.\n'
+                'Note: You can view screenshots of failed tests '
+                'in ../webdriverio-screenshots/')
 
         elif args.suite in SUITES_STILL_IN_PROTRACTOR:
             stack.enter_context(servers.managed_webdriver_server(
@@ -355,14 +358,13 @@ def run_tests(args):
                 stdout=subprocess.PIPE))
 
             print(
-            'Servers have come up.\n'
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots of the '
-            'failed tests in ../protractor-screenshots/')
+                'Servers have come up.\n'
+                'Note: You can view screenshots of the failed tests '
+                'in ../protractor-screenshots/')
 
         else:
             print(
-                'The suite requested to run does not exists'
+                'The suite requested to run does not exist'
                 'Please provide a valid suite name')
             sys.exit(1)
 

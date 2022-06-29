@@ -1062,7 +1062,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
         program_args = popen_calls[0].program_args
         self.assertIn(
-            '%s %s %s' % (
+            '%s --unhandled-rejections=strict %s %s' % (
                 common.NPX_BIN_PATH, common.NODEMODULES_WDIO_BIN_PATH,
                 common.WEBDRIVERIO_CONFIG_FILE_PATH),
             program_args)

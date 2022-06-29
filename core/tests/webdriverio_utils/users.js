@@ -23,7 +23,6 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
-var adminPage = new AdminPage.AdminPage();
 var splashPage = '.e2e-test-splash-page';
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
@@ -148,6 +147,7 @@ var createAndLoginUser = async function(
 };
 
 var createAndLoginCurriculumAdminUser = async function(email, username) {
+  var adminPage = new AdminPage.AdminPage();
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
@@ -177,6 +177,7 @@ var createUser = async function(email, username) {
 };
 
 var createUserWithRole = async function(email, username, role) {
+  var adminPage = new AdminPage.AdminPage();
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
