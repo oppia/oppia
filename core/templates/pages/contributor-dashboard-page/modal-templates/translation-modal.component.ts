@@ -276,7 +276,7 @@ export class TranslationModalComponent {
     return this.translateTextService.getActiveIndex() > 0;
   }
 
-  skipActiveTranslation(): void { 
+  skipActiveTranslation(): void {
     const translatableItem = (
       this.translateTextService.getTextToTranslate());
     this.updateActiveState(translatableItem);

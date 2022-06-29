@@ -103,6 +103,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   languageDescription!: string;
   preEditTranslationHtml!: string;
   remainingContributions!: Record<string, ActiveContributionDict>;
+  remainingContributionIds!: string[];
+  skippedContributionIds: string[] = [];
+  allContributions!: Record<string, ActiveContributionDict>;
+  isLastItem!: boolean;
+  isFirstItem: boolean = true;
   reviewMessage!: string;
   status!: string;
   subheading!: string;
@@ -111,12 +116,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   userCanReviewTranslationSuggestionsInLanguages!: string[];
   username!: string;
   resolvedSuggestionIds: string[] = [];
-  skippedSuggestionIds: string[] = [];
   errorFound: boolean = false;
   contentTypeIsHtml: boolean = false;
   contentTypeIsSetOfStrings: boolean = false;
   contentTypeIsUnicode: boolean = false;
   lastSuggestionToReview: boolean = false;
+  firstSuggestionToReview: boolean = true;
   resolvingSuggestion: boolean = false;
   reviewable: boolean = false;
   canEditTranslation: boolean = false;
@@ -168,6 +173,16 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
     this.remainingContributions = this.suggestionIdToContribution;
+    this.remainingContributionIds = Object.keys(this.remainingContributions);
+    if (this.remainingContributionIds.length === 0) {
+      this.isLastItem = true;
+    } else {
+      this.isLastItem = false;
+    }
+    this.allContributions = this.suggestionIdToContribution;
+    this.allContributions[this.activeSuggestionId] =
+      this.activeContribution;
+
     this.init();
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
@@ -280,24 +295,37 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   gotoNextItem(): void {
-    this.skippedSuggestionIds.push(this.activeSuggestionId);
-    if (this.lastSuggestionToReview) {
-      this.activeModal.close(this.skippedSuggestionIds);
+    if (this.remainingContributionIds.length === 0) {
       return;
     }
-    let lastContribution = (
-      Object.keys(this.remainingContributions)[
-        Object.keys(this.remainingContributions).length - 1]);
 
-    this.activeSuggestionId = lastContribution;
-    this.activeContribution = this.remainingContributions[
-      lastContribution];
+    // This removes reviewed contributions from the list.
+    if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
+      this.skippedContributionIds.push(this.activeSuggestionId);
+    }
 
-    delete this.remainingContributions[this.activeSuggestionId];
-    // Close modal instance if the suggestion's corresponding opportunity
-    // is deleted. See issue #14234.
+    let lastContributionId = (
+      this.remainingContributionIds[this.remainingContributionIds.length - 1]);
+
+    this.activeSuggestionId = lastContributionId;
+    this.activeContribution = this.allContributions[
+      lastContributionId];
+
+    this.remainingContributionIds.pop();
+
+    if (this.remainingContributionIds.length === 0) {
+      this.isLastItem = true;
+    } else {
+      this.isLastItem = false;
+    }
+    if (this.skippedContributionIds.length === 0) {
+      this.isFirstItem = true;
+    } else {
+      this.isFirstItem = false;
+    }
+
     if (!this.activeContribution.details) {
-      this.activeModal.close(this.skippedSuggestionIds);
+      this.activeModal.close(this.skippedContributionIds);
       return;
     }
 
@@ -313,9 +341,49 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.init();
   }
 
-  // gotoPreviousItem(): void {
+  gotoPreviousItem(): void {
+    if (this.skippedContributionIds.length === 0) {
+      return;
+    }
 
-  // }
+    this.remainingContributionIds.push(this.activeSuggestionId);
+
+    let lastContributionId = (
+      this.skippedContributionIds[this.skippedContributionIds.length - 1]);
+
+    this.activeSuggestionId = lastContributionId;
+    this.activeContribution = this.allContributions[
+      lastContributionId];
+
+    this.skippedContributionIds.pop();
+
+    if (this.remainingContributionIds.length === 0) {
+      this.isLastItem = true;
+    } else {
+      this.isLastItem = false;
+    }
+    if (this.skippedContributionIds.length === 0) {
+      this.isFirstItem = true;
+    } else {
+      this.isFirstItem = false;
+    }
+
+    if (!this.activeContribution.details) {
+      this.activeModal.close(this.remainingContributionIds);
+      return;
+    }
+
+    this.activeSuggestion = this.activeContribution.suggestion;
+    this.activeContributionDetails = this.activeContribution.details;
+    this.contextService.setCustomEntityContext(
+      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      this.activeSuggestion.target_id);
+    this.subheading = (
+      this.activeContributionDetails.topic_name + ' / ' +
+        this.activeContributionDetails.story_title +
+        ' / ' + this.activeContributionDetails.chapter_title);
+    this.init();
+  }
 
   showNextItemToReview(suggestionId: string): void {
     this.resolvedSuggestionIds.push(this.activeSuggestionId);
