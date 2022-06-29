@@ -37,13 +37,17 @@ from core.constants import constants
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
-ALL_FEATURES_LIST = (
+from typing import Dict, List, Set
+
+ALL_FEATURES_LIST: List[platform_feature_list.PARAM_NAMES] = (
     platform_feature_list.DEV_FEATURES_LIST +
     platform_feature_list.TEST_FEATURES_LIST +
     platform_feature_list.PROD_FEATURES_LIST
 )
 
-ALL_FEATURES_NAMES_SET = set(feature.value for feature in ALL_FEATURES_LIST)
+ALL_FEATURES_NAMES_SET: Set[str] = set(
+    feature.value for feature in ALL_FEATURES_LIST
+)
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -52,7 +56,9 @@ class FeatureFlagNotFoundException(Exception):
     pass
 
 
-def create_evaluation_context_for_client(client_context_dict):
+def create_evaluation_context_for_client(
+    client_context_dict: platform_parameter_domain.ClientSideContextDict
+) -> platform_parameter_domain.EvaluationContext:
     """Returns context instance for evaluation, using the information
     provided by clients.
 
@@ -70,7 +76,9 @@ def create_evaluation_context_for_client(client_context_dict):
     )
 
 
-def get_all_feature_flag_dicts():
+def get_all_feature_flag_dicts() -> List[
+    platform_parameter_domain.PlatformParameterDict
+]:
     """Returns dict representations of all feature flags. This method is used
     for providing detailed feature flags information to the admin panel.
 
@@ -84,7 +92,9 @@ def get_all_feature_flag_dicts():
     ]
 
 
-def evaluate_all_feature_flag_values_for_client(context):
+def evaluate_all_feature_flag_values_for_client(
+    context: platform_parameter_domain.EvaluationContext
+) -> Dict[str, bool]:
     """Evaluates and returns the values for all feature flags.
 
     Args:
@@ -98,7 +108,7 @@ def evaluate_all_feature_flag_values_for_client(context):
         ALL_FEATURES_NAMES_SET, context)
 
 
-def is_feature_enabled(feature_name):
+def is_feature_enabled(feature_name: str) -> bool:
     """A short-form method for server-side usage. This method evaluates and
     returns the values of the feature flag, using context from the server only.
 
@@ -113,8 +123,11 @@ def is_feature_enabled(feature_name):
 
 
 def update_feature_flag_rules(
-    feature_name, committer_id, commit_message, new_rules
-):
+    feature_name: str,
+    committer_id: str,
+    commit_message: str,
+    new_rules: List[platform_parameter_domain.PlatformParameterRule]
+) -> None:
     """Updates the feature flag's rules.
 
     Args:
@@ -140,7 +153,7 @@ def update_feature_flag_rules(
 # dev or prod. There should be another mode 'test' added for QA testing,
 # once it is added, this function needs to be updated to take that into
 # consideration.
-def _get_server_mode():
+def _get_server_mode() -> platform_parameter_domain.ServerModes:
     """Returns the running mode of Oppia.
 
     Returns:
@@ -154,16 +167,18 @@ def _get_server_mode():
     )
 
 
-def _create_evaluation_context_for_server():
+def _create_evaluation_context_for_server() -> (
+    platform_parameter_domain.EvaluationContext
+):
     """Returns evaluation context with information of the server.
 
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    # TODO(#11208): Properly set app version below using GAE app version as
-    # part of the server & client context.
+    # TODO(#11208): Properly set app version and browser type key below using
+    # GAE app version as part of the server & client context.
     return platform_parameter_domain.EvaluationContext.from_dict(
-        {
+        {  # type: ignore[typeddict-item]
             'platform_type': 'Backend',
             'app_version': None,
         },
@@ -173,7 +188,10 @@ def _create_evaluation_context_for_server():
     )
 
 
-def _evaluate_feature_flag_values_for_context(feature_names_set, context):
+def _evaluate_feature_flag_values_for_context(
+    feature_names_set: Set[str],
+    context: platform_parameter_domain.EvaluationContext
+) -> Dict[str, bool]:
     """Evaluates and returns the values for specified feature flags.
 
     Args:
@@ -198,11 +216,11 @@ def _evaluate_feature_flag_values_for_context(feature_names_set, context):
     for feature_name in feature_names_set:
         param = registry.Registry.get_platform_parameter(
             feature_name)
-        result_dict[feature_name] = param.evaluate(context)
+        result_dict[feature_name] = bool(param.evaluate(context))
     return result_dict
 
 
-def _evaluate_feature_flag_value_for_server(feature_name):
+def _evaluate_feature_flag_value_for_server(feature_name: str) -> bool:
     """Evaluates and returns the values of the feature flag, using context
     from the server only.
 
