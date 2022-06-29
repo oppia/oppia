@@ -207,14 +207,6 @@ exports.config = {
     //
     // Options to be passed to Jasmine.
     jasmineOpts: {
-         // The onComplete method will be called just before the driver quits.
-      onComplete: null,
-      // If true, display spec names.
-      isVerbose: false,
-      // If true, print colors to the terminal.
-      showColors: true,
-      // If true, include stack traces in failures.
-      includeStackTrace: true,
       // Default time to wait in ms before a test fails.
       defaultTimeoutInterval: 1200000
     },
@@ -247,8 +239,6 @@ exports.config = {
       // Navigate to the splash page so that tests can begin on an Angular page.
       browser.url('http://localhost:9001');
     },
-    // afterHook: function (test, context, { error, result, duration, passed, retries }) {
-    // },
     /**
      * Function to be executed after a test (in Mocha/Jasmine only)
      * @param {Object}  test             test object
