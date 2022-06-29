@@ -10,8 +10,9 @@
             {{ ruleDescriptionChoices[0].val | convertToPlainText | truncate }}
           </span>
           <span *ngIf="ruleDescriptionChoices.length !== 1">
-            <oppia-html-select class="oppia-rule-description-choice" [options]="ruleDescriptionChoices" [selection]="rule.inputs[item.varName]">
+            <oppia-html-select class="oppia-rule-description-choice" [options]="ruleDescriptionChoices" [(selection)]="rule.inputs[item.varName]" (onSelectionChange)="onSelectionChangeHtmlSelect($event, item)">
             </oppia-html-select>
+            selection is {{rule.inputs[item.varName]}}
           </span>
         </span>
 

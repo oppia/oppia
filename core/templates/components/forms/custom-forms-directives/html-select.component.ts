@@ -16,7 +16,7 @@
  * @fileoverview Component for the selection dropdown with HTML content.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'oppia-html-select',
@@ -24,17 +24,17 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class HtmlSelectComponent implements OnInit {
   @Input() options: { id: string; val: string }[];
-  @Input() selection: string;
+  @Input() selection: number;
+  selectionAsString: string;
+  @Output() onSelectionChange = new EventEmitter();
 
   ngOnInit(): void {
-    this.selection = String(this.options[0].id);
+    this.selectionAsString = String(this.selection);
+    this.selection = Number(this.options[0].id);
   }
 
-  getSelectionIndex(): number {
-    for (var index = 0; index < this.options.length; index++) {
-      if (this.options[index].id === this.selection) {
-        return index;
-      }
-    }
+  updatedSelection(): void {
+    this.selection = Number(this.selectionAsString);
+    this.onSelectionChange.emit(this.selection);
   }
 }

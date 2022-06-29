@@ -1,11 +1,12 @@
 <mat-form-field class="html-select" appearance="fill">
   <mat-label>Parameter:</mat-label>
   <mat-select class="protractor-test-main-html-select-selector"
-              [(value)]="selection"
+              [(value)]="selectionAsString"
               disableRipple>
     <mat-option class="protractor-test-html-select-selector"
                 *ngFor="let choice of options; index as index"
-                value="{{choice.id}}">
+                value="{{(choice.id)}}"
+                (click)="updatedSelection()">
       <angular-html-bind-wrapper classStr="oppia-html-select-option"
                                  [htmlData]="choice.val">
       </angular-html-bind-wrapper>
