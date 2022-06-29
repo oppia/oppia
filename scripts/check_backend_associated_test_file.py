@@ -81,9 +81,11 @@ def main() -> None:
         for file in files:
             full_path = os.path.join(root, file)
             _, file_extension = os.path.splitext(full_path)
-            if (file_extension == '.py') and (
-                '/third_party/' not in full_path) and (
-                    '/node_modules/' not in full_path):
+            if (
+                    file_extension == '.py' and
+                    '/third_party/' not in full_path and
+                    '/node_modules/' not in full_path
+            ):
                 all_backend_files.append(full_path)
 
     all_backend_files.sort()
