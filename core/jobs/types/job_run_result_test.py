@@ -77,6 +77,25 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
             single_job_run_result.stderr.split('\n'), ['123', '456'])
 
+    def test_accumulate_one_less_than_limit_is_not_truncated(self) -> None:
+        accumulated_results = job_run_result.JobRunResult.accumulate([
+            job_run_result.JobRunResult(stdout='', stderr='a' * 1999),
+            job_run_result.JobRunResult(stdout='', stderr='b' * 3000),
+        ])
+
+        self.assertEqual(len(accumulated_results), 1)
+
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+            accumulated_results[0].stderr.split('\n'), ['a' * 1999, 'b' * 3000])
+
+    def test_accumulate_one_more_than_limit_case_is_split(self) -> None:
+        accumulated_results = job_run_result.JobRunResult.accumulate([
+            job_run_result.JobRunResult(stdout='', stderr='a' * 2000),
+            job_run_result.JobRunResult(stdout='', stderr='b' * 3000),
+        ])
+
+        self.assertEqual(len(accumulated_results), 2)
+
     def test_accumulate_with_enormous_outputs(self) -> None:
         accumulated_results = job_run_result.JobRunResult.accumulate([
             job_run_result.JobRunResult(
@@ -93,7 +112,7 @@ class JobRunResultTests(test_utils.TestBase):
 
         # 100000 and 200000 are small enough ot fit as one, but the others will
         # each need their own result.
-        self.assertEqual(len(accumulated_results), 3)
+        self.assertEqual(len(accumulated_results), 4)
 
     def test_accumulate_with_empty_list(self) -> None:
         self.assertEqual(job_run_result.JobRunResult.accumulate([]), [])

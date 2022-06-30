@@ -133,7 +133,7 @@ class JobRunResult:
             padding = 2 if next_smallest.stdout and next_smallest.stderr else 1
 
             overall_size = latest_batch_size + padding + result_size
-            if overall_size < 2 * MAX_OUTPUT_CHARACTERS:
+            if overall_size <= MAX_OUTPUT_CHARACTERS:
                 latest_batch_size += padding + result_size
                 batches[-1].append(next_smallest)
             else:
