@@ -1358,7 +1358,7 @@ class RecommendationsHandler(base.BaseHandler):
                 },
                 'default_value': True
             },
-            'stringified_author_recommended_ids': {
+            'author_recommended_ids': {
                 'schema': {
                     'type': 'custom',
                     'obj_type': 'JsonEncodedInString'
@@ -1396,7 +1396,7 @@ class RecommendationsHandler(base.BaseHandler):
             'include_system_recommendations')
         try:
             author_recommended_exp_ids = self.normalized_request.get(
-                'stringified_author_recommended_ids')
+                'author_recommended_ids')
         except Exception as e:
             raise self.PageNotFoundException from e
 
