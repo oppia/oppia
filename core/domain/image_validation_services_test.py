@@ -23,7 +23,7 @@ from core import utils
 from core.domain import image_validation_services
 from core.tests import test_utils
 
-from typing import Optional, Union
+from typing import Union
 
 
 class ImageValidationServiceTests(test_utils.GenericTestBase):
