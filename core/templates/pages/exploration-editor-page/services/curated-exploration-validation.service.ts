@@ -35,8 +35,9 @@ export class CuratedExplorationValidationService {
       CuratedExplorationValidationBackendApiService
   ) {}
 
-  async canExplorationBeCurated(explorationId: string):
-    Promise<CuratedExplorationValidationResponse> {
+  async canExplorationBeCurated(
+      explorationId: string
+  ): Promise<CuratedExplorationValidationResponse> {
     return (
       this.curatedExplorationValidationBackendApiService
         .canExplorationBeCuratedAsync(explorationId)

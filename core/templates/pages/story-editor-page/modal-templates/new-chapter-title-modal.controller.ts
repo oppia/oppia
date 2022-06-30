@@ -150,8 +150,10 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         await ExplorationIdValidationService.isExpPublishedAsync(
           $scope.explorationId));
       if (!expIsPublished) {
-        $scope.invalidExpErrorString = 'This exploration does not exist ' +
-          'or is not published yet.';
+        $scope.invalidExpErrorString = (
+          'This exploration does not exist ' +
+          'or is not published yet.'
+        );
         $scope.invalidExpId = true;
         $scope.$applyAsync();
         return;
