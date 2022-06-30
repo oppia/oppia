@@ -49,19 +49,23 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 if self.counter > 1:
                     self.counter = 0
                     return b''
-                return b'Readline output: Trying to get the Angular injector..'
+                return b'Executed tests. Trying to get the Angular injector..'
 
         class MockTask:
             returncode = 0
             stdout = MockFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
+            def wait(self) -> None:
+                return None
 
         class MockFailedTask:
             returncode = 1
             stdout = MockFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
+            def wait(self) -> None:
+                return None
 
         self.cmd_token_list: list[list[str]] = []
         def mock_success_check_call(
@@ -196,3 +200,39 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'The frontend tests failed. Please fix it before running'
             ' the test coverage check.', self.sys_exit_message)
+
+    def test_combined_frontend_spec_file_download_failed(self) -> None:
+        with self.swap_failed_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, self.swap_sys_exit:
+                    run_frontend_tests.main(
+                        args=['--download_combined_frontend_spec_file'])
+        
+        combined_spec_download_cmd = [
+            'wget',
+            'http://localhost:9876/base/core/templates/' +
+            'combined-tests.spec.js',
+            '-P',
+            os.path.join('../karma_coverage_reports')]
+        self.assertIn(combined_spec_download_cmd, self.cmd_token_list)
+        self.assertIn(
+            'Failed to download the combined-tests.spec.js file.',
+            self.print_arr)
+
+    def test_combined_frontend_spec_file_is_downloaded_correctly(self) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, self.swap_sys_exit:
+                    run_frontend_tests.main(
+                        args=['--download_combined_frontend_spec_file'])
+        
+        combined_spec_download_cmd = [
+            'wget',
+            'http://localhost:9876/base/core/templates/' +
+            'combined-tests.spec.js',
+            '-P',
+            os.path.join('../karma_coverage_reports')]
+        self.assertIn(combined_spec_download_cmd, self.cmd_token_list)
+        self.assertIn(
+            'Downloaded the combined-tests.spec.js file and stored'
+            'in ../karma_coverage_reports', self.print_arr)
