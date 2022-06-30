@@ -122,13 +122,13 @@
     <span ngbTooltip="Enter review message before rejecting" placement="bottom" [disableTooltip]="!(reviewMessage.length == 0)">
       <button class="btn btn-danger oppia-suggestion-resolve-button" *ngIf="reviewable" [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion" (click)="rejectAndReviewNext()">
         <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
-        <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Reject' : 'Reject and review next' }}</span>
+        <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview || isLastItem ? 'Reject' : 'Reject and review next' }}</span>
       </button>
     </span>
     <span>
       <button class="btn btn-success oppia-suggestion-resolve-button" [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH" *ngIf="reviewable" (click)="acceptAndReviewNext()">
         <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
-        <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Accept' : 'Accept and review next' }}</span>
+        <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview || isLastItem ? 'Accept' : 'Accept and review next' }}</span>
       </button>
     </span>
   </div> 

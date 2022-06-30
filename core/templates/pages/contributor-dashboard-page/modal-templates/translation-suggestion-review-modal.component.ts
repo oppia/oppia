@@ -102,7 +102,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   languageCode!: string;
   languageDescription!: string;
   preEditTranslationHtml!: string;
-  remainingContributions!: Record<string, ActiveContributionDict>;
   remainingContributionIds!: string[];
   skippedContributionIds: string[] = [];
   allContributions!: Record<string, ActiveContributionDict>;
@@ -172,8 +171,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         .registerContributorDashboardViewSuggestionForReview('Translation');
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributions = this.suggestionIdToContribution;
-    this.remainingContributionIds = Object.keys(this.remainingContributions);
+    this.remainingContributionIds = Object.keys(
+      this.suggestionIdToContribution);
     if (this.remainingContributionIds.length === 0) {
       this.isLastItem = true;
     } else {
@@ -224,7 +223,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.startedEditing = false;
     this.resolvingSuggestion = false;
     this.lastSuggestionToReview = (
-      Object.keys(this.remainingContributions).length <= 0);
+      Object.keys(this.allContributions).length <= 1);
     this.translationHtml = (
       this.activeSuggestion.change.translation_html);
     this.status = this.activeSuggestion.status;
@@ -298,8 +297,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (this.remainingContributionIds.length === 0) {
       return;
     }
-
-    // This removes reviewed contributions from the list.
+    // This prevents resolved contributions from getting added to the list.
     if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
       this.skippedContributionIds.push(this.activeSuggestionId);
     }
@@ -387,35 +385,16 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   showNextItemToReview(suggestionId: string): void {
     this.resolvedSuggestionIds.push(this.activeSuggestionId);
-    if (this.lastSuggestionToReview) {
+
+    // Remove resolved contributions from the record.
+    delete this.allContributions[this.activeSuggestionId];
+
+    if (this.lastSuggestionToReview || this.isLastItem) {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
 
-    let lastContribution = (
-      Object.keys(this.remainingContributions)[
-        Object.keys(this.remainingContributions).length - 1]);
-    this.activeSuggestionId = lastContribution;
-    this.activeContribution = this.remainingContributions[
-      lastContribution];
-    delete this.remainingContributions[this.activeSuggestionId];
-    // Close modal instance if the suggestion's corresponding opportunity
-    // is deleted. See issue #14234.
-    if (!this.activeContribution.details) {
-      this.activeModal.close(this.resolvedSuggestionIds);
-      return;
-    }
-
-    this.activeSuggestion = this.activeContribution.suggestion;
-    this.activeContributionDetails = this.activeContribution.details;
-    this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
-      this.activeSuggestion.target_id);
-    this.subheading = (
-      this.activeContributionDetails.topic_name + ' / ' +
-      this.activeContributionDetails.story_title +
-      ' / ' + this.activeContributionDetails.chapter_title);
-    this.init();
+    this.gotoNextItem();
   }
 
   acceptAndReviewNext(): void {

@@ -666,8 +666,9 @@ describe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'reject', 'Review message example',
           null, jasmine.any(Function),
           jasmine.any(Function));
-      expect(activeModal.close).toHaveBeenCalledWith([
-        'suggestion_1']);
+
+      expect(component.resolvedSuggestionIds).toEqual(['suggestion_1']);
+      expect(Object.keys(component.allContributions).length).toEqual(1);
     });
   });
 
@@ -738,7 +739,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     };
 
     beforeEach(() => {
-      component.initialSuggestionId = 'suggestion_1';
+      component.initialSuggestionId = 'suggestion_2';
       component.subheading = subheading;
       component.reviewable = reviewable;
       component.suggestionIdToContribution = angular.copy(
