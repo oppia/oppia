@@ -35,7 +35,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         super(RunCustomEslintTestsTests, self).setUp()
 
         self.print_arr: list[str] = []
-        def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument
+        def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
         
