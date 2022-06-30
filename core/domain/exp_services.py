@@ -693,7 +693,7 @@ def update_states_version_history(
             change.property_name not in state_property_ignore_list
         ):
             state_name = change.state_name
-            if state_property_changed_data.get(state_name) is False:
+            if state_name in state_property_changed_data:
                 state_property_changed_data[state_name] = True
 
     for state_name, state_property_changed in (
