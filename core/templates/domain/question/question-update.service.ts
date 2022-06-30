@@ -91,6 +91,7 @@ export class QuestionUpdateService {
           // All rules input types which are translatable are subclasses of
           // BaseTranslatableObject having dict structure with contentId
           // as a key.
+
           if (ruleInput && 'contentId' in ruleInput) {
             allContentIdsSet.add(ruleInput.contentId);
           }
