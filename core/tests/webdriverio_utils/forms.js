@@ -612,9 +612,9 @@ var toRichText = async function(text) {
  * loads more divs.
  */
 var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
-  var lineContentElements = await elem.$$('.CodeMirror-line');
-  var lineNumberElements = await elem.$$('.CodeMirror-linenumber');
-  var scrollBarElements = await $$('.CodeMirror-vscrollbar');
+  var lineContentElements = elem.$$('.CodeMirror-line');
+  var lineNumberElements = elem.$$('.CodeMirror-linenumber');
+  var scrollBarElements = $$('.CodeMirror-vscrollbar');
   var codeMirrorLineNumberLocator = '.CodeMirror-linenumber';
   var codeMirrorLineBackgroundLocator = '.CodeMirror-linebackground';
   // The number of lines to scroll between reading different sections of
