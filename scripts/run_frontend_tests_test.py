@@ -56,7 +56,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             stdout = MockFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
-            def wait(self) -> None:
+            def wait(self) -> None: # pylint: disable=missing-docstring
                 return None
 
         class MockFailedTask:
@@ -64,7 +64,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             stdout = MockFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
-            def wait(self) -> None:
+            def wait(self) -> None: # pylint: disable=missing-docstring
                 return None
 
         self.cmd_token_list: list[list[str]] = []
@@ -207,7 +207,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(
                         args=['--download_combined_frontend_spec_file'])
-        
+
         combined_spec_download_cmd = [
             'wget',
             'http://localhost:9876/base/core/templates/' +
@@ -225,7 +225,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(
                         args=['--download_combined_frontend_spec_file'])
-        
+
         combined_spec_download_cmd = [
             'wget',
             'http://localhost:9876/base/core/templates/' +
