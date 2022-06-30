@@ -2174,17 +2174,17 @@ def can_exploration_be_curated(exploration):
                 break
 
     if not bool(error_message):
-      for state in exploration.states.values():
-          default_outcome = state.interaction.default_outcome
-          if (
-              default_outcome is not None and
-              len(default_outcome.param_changes) > 0
-          ):
-              error_message += (
-                  'The exploration should not have any parameter changes ' +
-                  'in the default outcome of any state interaction.'
-              )
-              break
+        for state in exploration.states.values():
+            default_outcome = state.interaction.default_outcome
+            if (
+                default_outcome is not None and
+                len(default_outcome.param_changes) > 0
+            ):
+                error_message += (
+                    'The exploration should not have any parameter changes ' +
+                    'in the default outcome of any state interaction.'
+                )
+                break
 
     if not bool(error_message):
         html_list = exploration.get_all_html_content_strings()
