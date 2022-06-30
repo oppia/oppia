@@ -701,12 +701,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             Exploration. The Exploration domain object with default
             values.
         """
-        contentIdGenerator = translation_domain.ContentIdGenerator()
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         init_state_dict = state_domain.State.create_default_state(
             init_state_name,
-            contentIdGenerator.generate(translation_domain.ContentType.CONTENT),
-            contentIdGenerator.generate(
+            content_id_generator.generate(translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True).to_dict()
 
@@ -720,7 +719,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
             feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED,
-            contentIdGenerator.next_content_id_index, True)
+            content_id_generator.next_content_id_index, True)
 
     @classmethod
     def from_dict(
@@ -1531,7 +1530,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self.add_state(
                 state_name,
                 content_id_generator.generate(
-                    translation_domain.ContentType.Content),
+                    translation_domain.ContentType.CONTENT),
                 content_id_generator.generate(
                     translation_domain.ContentType.DEFAULT_OUTCOME))
         self.next_content_id_index = content_id_generator.next_content_id_index

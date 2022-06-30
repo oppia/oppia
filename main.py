@@ -916,7 +916,7 @@ URLS = [
 
     get_redirect_route(
         r'/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/<language_code>',
-        reader.EntityTranslationhandler)
+        reader.EntityTranslationHandler)
 ]
 
 # Adding redirects for topic landing pages.

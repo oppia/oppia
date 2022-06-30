@@ -3438,7 +3438,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         'cmd': 'add_translation',
         'state_name': 'Introduction',
         'language_code': constants.DEFAULT_LANGUAGE_CODE,
-        'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+        'content_id': 'content_0',
         'content_html': '',
         'translation_html': ''
     }

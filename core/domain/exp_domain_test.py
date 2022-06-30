@@ -458,22 +458,42 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         super(ExplorationCheckpointsUnitTests, self).setUp()
         self.exploration = (
             exp_domain.Exploration.create_default_exploration('eid'))
+        self.content_id_generator = translation_domain.ContentIdGenerator(
+            self.exploration.next_content_id_index
+        )
+
         self.new_state = state_domain.State.create_default_state(
-            'Introduction', is_initial_state=True)
-        self.set_interaction_for_state(self.new_state, 'TextInput')
+            'Introduction',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
+        self.set_interaction_for_state(
+            self.new_state, 'TextInput', self.content_id_generator)
         self.exploration.init_state_name = 'Introduction'
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state
         }
         self.set_interaction_for_state(
             self.exploration.states[self.exploration.init_state_name],
-            'TextInput')
+            'TextInput', self.content_id_generator)
         self.init_state = (
             self.exploration.states[self.exploration.init_state_name])
-        self.end_state = state_domain.State.create_default_state('End')
-        self.set_interaction_for_state(self.end_state, 'EndExploration')
 
+        self.end_state = state_domain.State.create_default_state(
+            'End',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            self.end_state, 'EndExploration', self.content_id_generator)
         self.end_state.update_interaction_default_outcome(None)
+
+        self.exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
         self.init_state.update_card_is_checkpoint(False)
@@ -523,7 +543,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.exploration.states['State%s' % i].card_is_checkpoint = True
             self.set_interaction_for_state(
                 self.exploration.states['State%s' % i],
-                'Continue')
+                'Continue', self.content_id_generator)
         with self.assertRaisesRegex(
             Exception, 'Expected checkpoint count to be between 1 and 8 '
             'inclusive but found it to be 9'
@@ -551,10 +571,24 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #        │      End      │
         #        └───────────────┘.
 
-        second_state = state_domain.State.create_default_state('Second')
-        self.set_interaction_for_state(second_state, 'TextInput')
-        third_state = state_domain.State.create_default_state('Third')
-        self.set_interaction_for_state(third_state, 'TextInput')
+        second_state = state_domain.State.create_default_state(
+            'Second',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            second_state, 'TextInput', self.content_id_generator)
+        third_state = state_domain.State.create_default_state(
+            'Third',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            third_state, 'TextInput', self.content_id_generator)
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -569,7 +603,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'Second', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Feedback</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -577,7 +613,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                         {
                             'x':
                             {
-                                'contentId': 'rule_input_0',
+                                'contentId': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.RULE,
+                                        extra_prefix='input')),
                                 'normalizedStrSet': ['Test0']
                             }
                         })
@@ -587,7 +626,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'Third', state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Feedback</p>'),
+                        self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Feedback</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -595,7 +636,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                         {
                             'x':
                             {
-                                'contentId': 'rule_input_1',
+                                'contentId': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.RULE,
+                                        extra_prefix='input'))'rule_input_1',
                                 'normalizedStrSet': ['Test1']
                             }
                         })
@@ -610,7 +654,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'End', state_domain.SubtitledHtml(
-                        'feedback_0', '<p>Feedback</p>'),
+                        self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Feedback</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
@@ -618,7 +664,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                         {
                             'x':
                             {
-                                'contentId': 'rule_input_0',
+                                'contentId': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.RULE,
+                                        extra_prefix='input')),
                                 'normalizedStrSet': ['Test0']
                             }
                         })
@@ -631,6 +680,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             init_state_answer_groups)
         third_state.update_interaction_answer_groups(
             third_state_answer_groups)
+
+        self.exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
 
         # The exploration can be completed via third_state. Hence, making
         # second_state a checkpoint raises a validation error.
@@ -716,14 +768,45 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                    │    End    │
         #                    └───────────┘.
 
-        a_state = state_domain.State.create_default_state('A')
-        self.set_interaction_for_state(a_state, 'TextInput')
-        b_state = state_domain.State.create_default_state('B')
-        self.set_interaction_for_state(b_state, 'TextInput')
-        c_state = state_domain.State.create_default_state('C')
-        self.set_interaction_for_state(c_state, 'TextInput')
-        d_state = state_domain.State.create_default_state('D')
-        self.set_interaction_for_state(d_state, 'TextInput')
+        a_state = state_domain.State.create_default_state(
+            'A',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            a_state, 'TextInput', self.content_id_generator)
+
+        b_state = state_domain.State.create_default_state(
+            'B',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            b_state, 'TextInput', self.content_id_generator)
+
+        c_state = state_domain.State.create_default_state(
+            'C',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            c_state, 'TextInput', self.content_id_generator)
+
+        d_state = state_domain.State.create_default_state(
+            'D',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            d_state, 'TextInput', self.content_id_generator)
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -928,8 +1011,15 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                  │    End    │           │    End 2  │
         #                  └───────────┘           └───────────┘.
 
-        new_end_state = state_domain.State.create_default_state('End 2')
-        self.set_interaction_for_state(new_end_state, 'EndExploration')
+        new_end_state = state_domain.State.create_default_state(
+            'End 2',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            new_end_state, 'EndExploration', self.content_id_generator)
         new_end_state.update_interaction_default_outcome(None)
 
         self.exploration.states = {
@@ -1011,6 +1101,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_validation(self):
         """Test validation of explorations."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.init_state_name = ''
         exploration.states = {}
 
@@ -1023,13 +1116,25 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Note: If '/' ever becomes a valid state name, ensure that the rule
         # editor frontend tenplate is fixed -- it currently uses '/' as a
         # sentinel for an invalid state name.
-        bad_state = state_domain.State.create_default_state('/')
+        bad_state = state_domain.State.create_default_state(
+            '/',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
         exploration.states = {'/': bad_state}
         self._assert_validation_error(
             exploration, 'Invalid character / in a state name')
 
-        new_state = state_domain.State.create_default_state('ABC')
-        self.set_interaction_for_state(new_state, 'TextInput')
+        new_state = state_domain.State.create_default_state(
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME))
+        self.set_interaction_for_state(
+            new_state, 'TextInput', content_id_generator)
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -1118,7 +1223,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(
-            init_state, 'TextInput')
+            init_state, 'TextInput', content_id_generator)
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_groups)
             for answer_groups in old_answer_groups
@@ -1155,7 +1260,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name],
-            'PencilCodeEditor')
+            'PencilCodeEditor', content_id_generator)
         temp_rule = old_answer_groups[0]['rule_specs'][0]
         old_answer_groups[0]['rule_specs'][0] = {
             'rule_type': 'ErrorContains',
@@ -1271,7 +1376,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(exploration, 'Invalid interaction id')
         interaction.id = 'PencilCodeEditor'
 
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
@@ -1307,7 +1413,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid customization arg name')
 
         interaction.customization_args = valid_text_input_cust_args
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         exploration.validate()
 
         interaction.answer_groups = {}
@@ -1319,18 +1426,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             for answer_group in old_answer_groups
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)
-        self.set_interaction_for_state(init_state, 'EndExploration')
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
-        self.set_interaction_for_state(init_state, 'EndExploration')
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
         init_state.interaction.answer_groups = answer_groups
         self._assert_validation_error(
             exploration,
@@ -1342,7 +1452,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Restore a valid exploration.
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         init_state.update_interaction_answer_groups(answer_groups)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
@@ -1434,10 +1545,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.states = {
             exploration.init_state_name: (
                 state_domain.State.create_default_state(
-                    exploration.init_state_name, is_initial_state=True))
+                    exploration.init_state_name,
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                    is_initial_state=True))
         }
         self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], 'TextInput')
+            exploration.states[exploration.init_state_name], 'TextInput',
+            content_id_generator)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -1467,10 +1586,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_tag_validation(self):
         """Test validation of exploration tags."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration')
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
         init_state.update_interaction_default_outcome(None)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         exploration.validate()
 
         exploration.tags = 'this should be a list'
@@ -1689,9 +1814,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
-
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1712,9 +1840,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_content_with_incorrect_state_name_raise_error(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
-
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1775,8 +1906,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_create_demo_exp_with_invalid_param_changes(self):
         demo_exp = exp_domain.Exploration.create_default_exploration('0')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            demo_exp.next_content_id_index
+        )
         demo_dict = demo_exp.to_dict()
-        new_state = state_domain.State.create_default_state('new_state_name')
+        new_state = state_domain.State.create_default_state(
+            'new_state_name',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ))
         new_state.param_changes = [param_domain.ParamChange.from_dict({
             'customization_args': {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False
@@ -2056,11 +2197,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_verify_all_states_reachable(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'owner_id')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.validate()
 
         exploration.add_states(['End'])
         end_state = exploration.states['End']
-        self.set_interaction_for_state(end_state, 'EndExploration')
+        self.set_interaction_for_state(
+            end_state, 'EndExploration', content_id_generator)
         end_state.update_interaction_default_outcome(None)
 
         with self.assertRaisesRegex(
@@ -4999,25 +5144,32 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.add_states(['state1', 'state2', 'state3', 'state4'])
         state1 = exploration.states['state1']
         state2 = exploration.states['state2']
         state3 = exploration.states['state3']
         state4 = exploration.states['state4']
         content1_dict = {
-            'content_id': 'content',
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             'html': '<blockquote>Hello, this is state1</blockquote>'
         }
         content2_dict = {
-            'content_id': 'content',
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             'html': '<pre>Hello, this is state2</pre>'
         }
         content3_dict = {
-            'content_id': 'content',
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             'html': '<p>Hello, this is state3</p>'
         }
         content4_dict = {
-            'content_id': 'content',
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
             'html': '<p>Hello, this is state4</p>'
         }
         state1.update_content(
@@ -5029,10 +5181,14 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_content(
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
-        self.set_interaction_for_state(state1, 'TextInput')
-        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
-        self.set_interaction_for_state(state3, 'ItemSelectionInput')
-        self.set_interaction_for_state(state4, 'DragAndDropSortInput')
+        self.set_interaction_for_state(
+            state1, 'TextInput', content_id_generator)
+        self.set_interaction_for_state(
+            state2, 'MultipleChoiceInput', content_id_generator)
+        self.set_interaction_for_state(
+            state3, 'ItemSelectionInput', content_id_generator)
+        self.set_interaction_for_state(
+            state4, 'DragAndDropSortInput', content_id_generator)
 
         customization_args_dict1 = {
             'placeholder': {

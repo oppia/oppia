@@ -80,12 +80,13 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_question_empty_skill_id_list(self) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
         question_model = question_models.QuestionModel.create(
-            question_state_data, language_code, version, [], [])
+            question_state_data, language_code, version, [], [], 2)
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)
@@ -93,14 +94,15 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(question_model.linked_skill_ids, []) # type: ignore[no-untyped-call]
 
     def test_create_question_with_skill_ids(self) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         language_code = 'en'
         version = 1
         question_model = question_models.QuestionModel.create(
             question_state_data, language_code, version,
-            linked_skill_ids, ['skill-1'])
+            linked_skill_ids, ['skill-1'], 2)
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)
@@ -111,7 +113,8 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
     def test_create_question_with_inapplicable_skill_misconception_ids(
             self
     ) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         inapplicable_skill_misconception_ids = ['skill_id-1', 'skill_id-2']
@@ -119,7 +122,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         version = 1
         question_model = question_models.QuestionModel.create(
             question_state_data, language_code, version,
-            linked_skill_ids, inapplicable_skill_misconception_ids)
+            linked_skill_ids, inapplicable_skill_misconception_ids, 2)
 
         self.assertItemsEqual( # type: ignore[no-untyped-call]
             question_model.inapplicable_skill_misconception_ids,
@@ -166,7 +169,8 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             updated_question_model2.linked_skill_ids, ['skill_id3'])
 
     def test_raise_exception_by_mocking_collision(self) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
@@ -182,7 +186,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     question_models.QuestionModel)):
                 question_models.QuestionModel.create(
-                    question_state_data, language_code, version, [], [])
+                    question_state_data, language_code, version, [], [], 2)
 
 
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):

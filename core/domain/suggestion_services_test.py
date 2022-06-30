@@ -105,21 +105,19 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         accept_suggestion.
         """
         with self.swap(
-            exp_services, 'update_exploration', self.mock_update_exploration):
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
             with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
+                suggestion_registry.SuggestionEditStateContent,
+                'pre_accept_validate',
+                self.mock_pre_accept_validate_does_nothing):
                 with self.swap(
                     suggestion_registry.SuggestionEditStateContent,
-                    'pre_accept_validate',
-                    self.mock_pre_accept_validate_does_nothing):
-                    with self.swap(
-                        suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
-                        suggestion_services.accept_suggestion(
-                            suggestion_id, reviewer_id,
-                            commit_message, review_message)
+                    'get_change_list_for_accepting_suggestion',
+                    self.mock_get_change_list_does_nothing):
+                    suggestion_services.accept_suggestion(
+                        suggestion_id, reviewer_id,
+                        commit_message, review_message)
 
     def mock_create_suggestion(self, target_id):
         """Sets up the appropriate mocks to successfully call
@@ -276,14 +274,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             7 * 24 * 60 * 60 * 1000):
             self.assertEqual(
                 len(suggestion_services.get_all_stale_suggestion_ids()), 0)
-
-    def mock_update_exploration(
-            self, unused_user_id, unused_exploration_id, unused_change_list,
-            commit_message, is_suggestion):
-        self.assertTrue(is_suggestion)
-        self.assertEqual(
-            commit_message, 'Accepted suggestion by %s: %s' % (
-                'author', self.COMMIT_MESSAGE))
 
     def test_cannot_reject_suggestion_with_empty_review_message(self):
         suggestion_services.create_suggestion(
@@ -2315,7 +2305,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': translation_html,
@@ -2961,7 +2951,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
@@ -3565,7 +3555,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
@@ -4078,7 +4068,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
@@ -4358,7 +4348,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',

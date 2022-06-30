@@ -456,9 +456,12 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=48,
             states={
                 'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
-                    'state', is_initial_state=True
+                    'state',  'content_0', 'default_outcome_1',
+                    is_initial_state=True
                 ).to_dict()
-            })
+            },
+            next_content_id_index=2
+        )
         exp_model.update_timestamps()
         datastore_services.put_multi([
             exp_model, story_model, self.topic_model, topic_rights_model
@@ -541,12 +544,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=48,
             states={
                 'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
-                    'state1', is_initial_state=True
+                    'state1',  'content_0', 'default_outcome_1',
+                    is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
-                    'state2'
+                    'state2',  'content_2', 'default_outcome_3',
                 ).to_dict()
-            })
+            },
+            next_content_id_index=4
+        )
         exp_model.update_timestamps()
         datastore_services.put_multi([self.topic_model, exp_model, story_model])
 
@@ -796,12 +802,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=48,
             states={
                 'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
-                    'state1', is_initial_state=True
+                    'state1',  'content_0', 'default_outcome_1',
+                    is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
-                    'state2'
+                    'state2', 'content_2', 'default_outcome_3',
                 ).to_dict()
-            })
+            },
+            next_content_id_index=4
+        )
         exp_model.update_timestamps()
         datastore_services.put_multi([
             exp_model, story_model, topic_model, topic_rights_model

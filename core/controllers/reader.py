@@ -369,7 +369,7 @@ class ExplorationHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class EntityTranslationhandler(base.BaseHandler):
+class EntityTranslationHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'entity_type': {

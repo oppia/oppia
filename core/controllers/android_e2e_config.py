@@ -249,17 +249,18 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         Returns:
             Question. The dummy question with given values.
         """
-        contentIdGenerator = translation_domain.ContentIdGenerator()
-
+        content_id_generator = translation_domain.ContentIdGenerator()
         state = state_domain.State.create_default_state(
             'ABC',
-            contentIdGenerator.generate(translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True)
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': contentIdGenerator.generate(
+                    'content_id': content_id_generator.generate(
                         translation_domain.ContentType.CUSTOMIZATION_ARG),
                     'unicode_str': ''
                 }
@@ -269,18 +270,18 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml(
-            contentIdGenerator.generate(translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(translation_domain.ContentType.CONTENT),
             question_content))
 
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                contentIdGenerator.generate(
+                content_id_generator.generate(
                     translation_domain.ContentType.SOLUTION),
                 '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    contentIdGenerator.generate(
+                    content_id_generator.generate(
                         translation_domain.ContentType.HINT),
                     '<p>This is a hint.</p>')
             )
@@ -291,7 +292,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
-                    contentIdGenerator.generate(
+                    content_id_generator.generate(
                         translation_domain.ContentType.DEFAULT_OUTCOME),
                     '<p>Dummy Feedback</p>'),
                 True, [], None, None
@@ -301,7 +302,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [],
-            contentIdGenerator.next_content_id_index)
+            content_id_generator.next_content_id_index)
         return question
 
     def _create_dummy_skill(self, skill_id, skill_description, explanation):

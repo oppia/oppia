@@ -214,7 +214,7 @@ class Question(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def create_default_question_state(cls, contentIdGenerator):
+    def create_default_question_state(cls, content_id_generator):
         """Return a State domain object with default value for being used as
         question state data.
 
@@ -223,9 +223,9 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         return state_domain.State.create_default_state(
             None,
-            contentIdGenerator.generate(
+            content_id_generator.generate(
                 translation_domain.ContentType.CONTENT),
-            contentIdGenerator.generate(
+            content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True)
 
@@ -1453,15 +1453,15 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             Question. A Question domain object with default values.
         """
-        contentIdGenerator = translation_domain.ContentIdGenerator()
+        content_id_generator = translation_domain.ContentIdGenerator()
         default_question_state_data = cls.create_default_question_state(
-            contentIdGenerator)
+            content_id_generator)
 
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [],
-            contentIdGenerator.next_content_id_index)
+            content_id_generator.next_content_id_index)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.

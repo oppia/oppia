@@ -250,7 +250,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': self.default_translation_html,
@@ -422,7 +422,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',

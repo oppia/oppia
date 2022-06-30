@@ -143,18 +143,6 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_new_state_template(self):
-        """Test the validity of the NEW_STATE_TEMPLATE."""
-
-        exploration = exp_fetchers.get_exploration_by_id('0')
-        exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
-        new_state_dict = exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].to_dict()
-        self.assertEqual(new_state_dict, constants.NEW_STATE_TEMPLATE)
-        # Validates if the current NEW_STATE_TEMPLATE is the latest version
-        # by validating it.
-        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
-
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
@@ -308,6 +296,9 @@ class EditorTests(BaseEditorControllerTests):
             csrf_token=csrf_token)
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertEqual(exploration.edits_allowed, False)
 
         response_dict = self.put_json(
@@ -317,12 +308,24 @@ class EditorTests(BaseEditorControllerTests):
                 'commit_message': 'dummy update',
                 'change_list': [{
                     'cmd': 'add_state',
-                    'state_name': 'State 4'
+                    'state_name': 'State 4',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    ),
                 }, {
                     'cmd': 'edit_state_property',
                     'state_name': 'State 4',
                     'property_name': 'widget_id',
                     'new_value': 'TextInput',
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
                 }]
             },
             csrf_token=csrf_token,
@@ -773,9 +776,12 @@ written_translations:
             category='This is just a test category')
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.add_states(['State A', 'State 2', 'State 3'])
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
@@ -1941,6 +1947,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         exp_id = 'exp_id'
 
         rights_manager.create_new_exploration_rights(exp_id, self.owner_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         model = exp_models.ExplorationModel(
             id=exp_id,
             category='category',
@@ -1950,9 +1957,15 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
                     state_domain.State.create_default_state(
-                        'End', is_initial_state=True
+                        'End',
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME),
+                    is_initial_state=True
                     ).to_dict()),
             },
+            next_content_id_index=content_id_generator.next_content_id_index,
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
         commit_cmd = exp_domain.ExplorationChange({

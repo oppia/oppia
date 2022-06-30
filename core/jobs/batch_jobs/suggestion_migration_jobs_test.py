@@ -65,7 +65,8 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
-            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_1}
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_1},
+            next_content_id_index=2,
         )
         self.put_multi([self.exp_1])
 

@@ -703,6 +703,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'cmd': 'update_question_property',
             'property_name': 'next_content_id_index',
             'new_value': self.content_id_generator.next_content_id_index,
+            'old_value': 2
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = 'update question data'
@@ -755,6 +756,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'cmd': 'update_question_property',
             'property_name': 'next_content_id_index',
             'new_value': self.content_id_generator.next_content_id_index,
+            'old_value': 2
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = 'update question data'

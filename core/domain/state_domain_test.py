@@ -792,54 +792,51 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_dict, state_dict)
 
-    # Below two tests uses YAML for creating exp with schema version 47, so have
-    # to first write conversion then uncomment these tests.
+    def test_can_undergo_classification(self):
+        """Test the can_undergo_classification() function."""
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
 
-    # def test_can_undergo_classification(self):
-    #     """Test the can_undergo_classification() function."""
-    #     exploration_id = 'eid'
-    #     test_exp_filepath = os.path.join(
-    #         feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-    #     yaml_content = utils.get_file_contents(test_exp_filepath)
-    #     assets_list = []
-    #     exp_services.save_new_exploration_from_yaml_and_assets(
-    #         feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-    #         assets_list)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        state_with_training_data = exploration.states['Home']
+        state_without_training_data = exploration.states['End']
 
-    #     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    #     state_with_training_data = exploration.states['Home']
-    #     state_without_training_data = exploration.states['End']
+        # A state with 786 training examples.
+        self.assertTrue(
+            state_with_training_data.can_undergo_classification())
 
-    #     # A state with 786 training examples.
-    #     self.assertTrue(
-    #         state_with_training_data.can_undergo_classification())
+        # A state with no training examples.
+        self.assertFalse(
+            state_without_training_data.can_undergo_classification())
 
-    #     # A state with no training examples.
-    #     self.assertFalse(
-    #         state_without_training_data.can_undergo_classification())
+    def test_get_training_data(self):
+        """Test retrieval of training data."""
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
 
-    # def test_get_training_data(self):
-    #     """Test retrieval of training data."""
-    #     exploration_id = 'eid'
-    #     test_exp_filepath = os.path.join(
-    #         feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
-    #     yaml_content = utils.get_file_contents(test_exp_filepath)
-    #     assets_list = []
-    #     exp_services.save_new_exploration_from_yaml_and_assets(
-    #         feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-    #         assets_list)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        state = exploration.states['text']
 
-    #     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    #     state = exploration.states['text']
+        expected_training_data = [{
+            'answer_group_index': 1,
+            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
+                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
 
-    #     expected_training_data = [{
-    #         'answer_group_index': 1,
-    #         'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
-    #                     u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+        observed_training_data = state.get_training_data()
 
-    #     observed_training_data = state.get_training_data()
-
-    #     self.assertEqual(observed_training_data, expected_training_data)
+        self.assertEqual(observed_training_data, expected_training_data)
 
     def test_get_content_html_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1074,6 +1071,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertNotIn('invalid_state_name', exploration.states)
 
         self.assertEqual(len(exploration.states), 1)
@@ -1125,9 +1125,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         # Ensure the other states have interactions.
         self.set_interaction_for_state(
-            exploration.states['Renamed state'], 'TextInput')
+            exploration.states['Renamed state'], 'TextInput',
+            content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
 
         # Other miscellaneous requirements for validation.
         exploration.title = 'Title'
@@ -1146,7 +1147,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # default outcome or answer groups.
         exploration.rename_state('END', 'AnotherEnd')
         another_end_state = exploration.states['AnotherEnd']
-        self.set_interaction_for_state(another_end_state, 'EndExploration')
+        self.set_interaction_for_state(
+            another_end_state, 'EndExploration', content_id_generator)
         another_end_state.update_interaction_default_outcome(None)
         exploration.validate(strict=True)
 
@@ -1159,7 +1161,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_solicit_answer_details(self):
         """Test updating solicit_answer_details."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.solicit_answer_details, False)
         state.update_solicit_answer_details(True)
         self.assertEqual(state.solicit_answer_details, True)
@@ -1177,14 +1180,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_linked_skill_id(self):
         """Test updating linked_skill_id."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.linked_skill_id, None)
         state.update_linked_skill_id('string_2')
         self.assertEqual(state.linked_skill_id, 'string_2')
 
     def test_update_card_is_checkpoint(self):
         """Test update card_is_checkpoint."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.card_is_checkpoint, False)
         state.update_card_is_checkpoint(True)
         self.assertEqual(state.card_is_checkpoint, True)
@@ -2588,9 +2593,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         exploration.validate()
 
         hints_list = [
@@ -2644,8 +2655,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         customization args with non-unique content ids.
         """
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'MultipleChoiceInput')
+        self.set_interaction_for_state(
+            init_state, 'MultipleChoiceInput', content_id_generator)
         with self.assertRaisesRegex(
             Exception,
             'All customization argument content_ids should be unique.'
@@ -2666,9 +2681,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_solution_validation(self):
         """Test validation of state solution."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         exploration.validate()
 
         # Solution should be set to None as default.
@@ -2739,6 +2758,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_state_solicit_answer_details(self):
         """Test validation of solicit_answer_details."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(
@@ -2747,7 +2769,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
-        self.set_interaction_for_state(init_state, 'Continue')
+        self.set_interaction_for_state(
+            init_state, 'Continue', content_id_generator)
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegex(
@@ -2755,7 +2778,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'support soliciting answer details from learners.'):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
-        self.set_interaction_for_state(init_state, 'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
         self.assertEqual(init_state.interaction.id, 'TextInput')
         self.assertEqual(init_state.solicit_answer_details, False)
         exploration.validate()
@@ -3297,9 +3321,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_translatable_content_for_state_content(self):
         """Get all translatable fields for state content."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
         state.update_content(
@@ -3317,7 +3342,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_translatable_content_for_text_input_answer_groups(self):
         """Get all the translatable fields for answer group."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_answer_group = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
@@ -3353,7 +3379,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_translatable_content_for_set_input_answer_groups(self):
         """Get all the translatable fields for answer group."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_answer_group = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
@@ -3392,7 +3419,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_translatable_content_for_solution(self):
         """Get all translatable fields for solution."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
@@ -3417,7 +3445,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_test_get_all_translatable_content_for_unicode_cust_args(self):
         """Get all the translatable fields for customization args."""
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_interaction_cust_args = {
             'placeholder': {
                 'value': {
@@ -3440,7 +3469,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             translatable_contents, ['Translatable cust args.'])
 
     def test_get_all_translatable_content_for_html_in_cust_args(self):
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state.update_interaction_id('MultipleChoiceInput')
         state_interaction_cust_args = {
             'showChoicesInShuffledOrder': {

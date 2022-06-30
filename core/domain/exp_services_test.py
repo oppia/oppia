@@ -1943,6 +1943,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
     def test_get_image_filenames_from_exploration(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exploration.add_states(['state1', 'state2', 'state3'])
         state1 = exploration.states['state1']
         state2 = exploration.states['state2']
@@ -1971,9 +1974,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_content(
             state_domain.SubtitledHtml.from_dict(content3_dict))
 
-        self.set_interaction_for_state(state1, 'ImageClickInput')
-        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
-        self.set_interaction_for_state(state3, 'ItemSelectionInput')
+        self.set_interaction_for_state(
+            state1, 'ImageClickInput', content_id_generator)
+        self.set_interaction_for_state(
+            state2, 'MultipleChoiceInput', content_id_generator)
+        self.set_interaction_for_state(
+            state3, 'ItemSelectionInput', content_id_generator)
 
         customization_args_dict1 = {
             'highlightRegionsOnHover': {'value': True},
@@ -6264,21 +6270,6 @@ title: Old Title
                     'property_name': 'title',
                     'new_value': 'new title'
                 })], 'changed title')
-
-    def test_update_exploration_as_suggestion_with_invalid_commit_message(self):
-        self.save_new_valid_exploration('exp_id', 'user_id')
-
-        exploration_model = exp_models.ExplorationModel.get('exp_id')
-        exploration_model.version = 0
-
-        with self.assertRaisesRegex(
-            Exception, 'Invalid commit message for suggestion.'):
-            exp_services.update_exploration(
-                'user_id', 'exp_id', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'new title'
-                })], '', is_suggestion=True)
 
     def test_update_exploration_with_invalid_commit_message(self):
         self.save_new_valid_exploration('exp_id', 'user_id')

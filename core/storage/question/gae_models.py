@@ -247,7 +247,8 @@ class QuestionModel(base_models.VersionedModel):
         language_code: str,
         version: int,
         linked_skill_ids: List[str],
-        inapplicable_skill_misconception_ids: List[str]
+        inapplicable_skill_misconception_ids: List[str],
+        next_content_id_index: int
     ) -> QuestionModel:
         """Creates a new QuestionModel entry.
 
@@ -276,7 +277,8 @@ class QuestionModel(base_models.VersionedModel):
             version=version,
             linked_skill_ids=linked_skill_ids,
             inapplicable_skill_misconception_ids=(
-                inapplicable_skill_misconception_ids))
+                inapplicable_skill_misconception_ids),
+            next_content_id_index=next_content_id_index)
 
         return question_model_instance
 
