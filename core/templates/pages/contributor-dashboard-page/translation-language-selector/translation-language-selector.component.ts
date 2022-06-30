@@ -87,7 +87,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.languageSelection = (
       this.activeLanguageCode ?
       this.languageIdToDescription[this.activeLanguageCode] :
-      'Select a language...'
+      'Language'
     );
 
     this.contributionOpportunitiesBackendApiService

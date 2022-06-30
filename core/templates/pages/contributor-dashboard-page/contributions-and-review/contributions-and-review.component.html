@@ -103,17 +103,16 @@
   contributions-and-review .oppia-contributions-dropdown-section {
     background-color: white;
     display: none;
-    font-size: 4vw;
-    font-weight: bold;
+    font-size: 20px;
     margin-bottom: 3%;
-    padding: 3%;
-    padding-inline: 6%;
+    padding: 0 20px;
     width: 100%;
   }
   contributions-and-review .dropdown-label {
-    color: rgb(104, 104, 104);
-    font-size: 4.5vw;
-    margin-left: 10px;
+    color: #4a4a4a;
+    font-size: 20px;
+    margin-right: 10px;
+    width: 175px;
   }
   contributions-and-review .oppia-contributions-dropdown-container {
     background-color: #fff;
@@ -123,7 +122,7 @@
     justify-content: space-between;
     padding: 10px 20px;
     position: relative;
-    width: 60%;
+    width: 100%;
   }
   contributions-and-review .oppia-contributions-selection-container {
     display: flex;
@@ -132,8 +131,7 @@
     justify-content: space-between;
   }
   contributions-and-review .oppia-contributions-dropdown-arrow {
-    color: #0b6c63;
-    font-size: 1.5em;
+    color: #009688;
   }
   contributions-and-review .oppia-contributions-dropdown-list-container {
     background-color: #fff;
@@ -256,15 +254,17 @@
     width: 100%;
   }
 
-  @media only screen and (max-width: 600px) {
+  @media only screen and (max-width: 700px) {
     contributions-and-review .oppia-contributions-dropdown-section {
       align-items: center;
       display: flex;
       justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 30px;
+      padding-top: 5px;
     }
     contributions-and-review .oppia-contributions-show-review {
       align-items: center;
-      border-top: 1px solid slategray;
       flex-direction: column;
       justify-content: start;
       margin-top: 0;
@@ -284,6 +284,19 @@
     }
     contributions-and-review .oppia-contributions-navbar-items-list::before {
       font-size: 2vw;
+    }
+  }
+
+  @media only screen and (max-width: 420px) {
+    contributions-and-review .dropdown-label {
+      font-size: 18px;
+      margin-right: 2vw;
+      width: 100px;
+    }
+    .oppia-contributions-dropdown-section {
+      margin-bottom: 20px;
+      padding: auto 2vw;
+      width: 90%;
     }
   }
 </style>

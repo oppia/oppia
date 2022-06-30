@@ -221,7 +221,7 @@ describe('Translation language selector', () => {
     component.ngOnInit();
 
     fixture.detectChanges();
-    expect(component.languageSelection).toBe('Select a language...');
+    expect(component.languageSelection).toBe('Language');
     expect(component.activeLanguageCode).toBe(null);
   }));
 
