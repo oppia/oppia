@@ -16,161 +16,154 @@
  * @fileoverview Unit tests for AddAnswerGroupModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { EditorFirstTimeEventsService } from
-  'pages/exploration-editor-page/services/editor-first-time-events.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-
 import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { AddAnswerGroupModalComponent } from './add-answer-group-modal.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-describe('Add Answer Group Modal Controller', function() {
-  importAllAngularServices();
+ class MockActiveModal {
+   close(): void {
+     return;
+   }
 
-  var $scope = null;
-  var $uibModalInstance = null;
-  var editorFirstTimeEventsService = null;
-  var generateContentIdService = null;
-  var outcomeObjectFactory = null;
-  var ruleObjectFactory = null;
-  var stateEditorService = null;
+   dismiss(): void {
+     return;
+   }
+ }
 
-  var addState = null;
-  var currentInteractionId = 'Continue';
-  var existingContentIds = [];
-  var stateName = 'State Name';
+describe('Add Answer Group Modal Component', () => {
+  let component: AddAnswerGroupModalComponent;
+  let fixture: ComponentFixture<AddAnswerGroupModalComponent>;
+  var outcomeObjectFactory: OutcomeObjectFactory;
+  var stateEditorService: StateEditorService;
   var testSubscriptions: Subscription;
 
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(function() {
-    editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
-    generateContentIdService = TestBed.get(GenerateContentIdService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
-    stateEditorService = TestBed.get(StateEditorService);
-  });
-
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-
-    $scope = $rootScope.$new();
-    $controller('AddAnswerGroupModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      EditorFirstTimeEventsService: editorFirstTimeEventsService,
-      GenerateContentIdService: generateContentIdService,
-      OutcomeObjectFactory: outcomeObjectFactory,
-      RuleObjectFactory: ruleObjectFactory,
-      StateEditorService: stateEditorService,
-      addState: addState,
-      currentInteractionId: currentInteractionId,
-      existingContentIds: existingContentIds,
-      stateName: stateName
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AddAnswerGroupModalComponent
+      ],
+      providers: [
+        EditorFirstTimeEventsService,
+        GenerateContentIdService,
+        OutcomeObjectFactory,
+        RuleObjectFactory,
+        StateEditorService,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
+    fixture = TestBed.createComponent(AddAnswerGroupModalComponent);
+    component = fixture.componentInstance;
+
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
+
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
     testSubscriptions = new Subscription();
     testSubscriptions.add(stateEditorService.onSaveOutcomeDestDetails.subscribe(
       saveOutcomeDestDetailsSpy));
+
+    fixture.detectChanges();
   });
 
   afterEach(() => {
     testSubscriptions.unsubscribe();
   });
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect(true).toBe(true);
-      expect($scope.feedbackEditorIsOpen).toBe(false);
-      expect($scope.addState).toBe(addState);
-      expect($scope.questionModeEnabled).toBe(true);
-      expect($scope.tmpTaggedSkillMisconceptionId).toBe(null);
-      expect($scope.addAnswerGroupForm).toEqual({});
+  it('should initialize component properties after controller is initialized',
+    () => {
+      expect(component.feedbackEditorIsOpen).toBe(false);
+      expect(component.questionModeEnabled).toBe(true);
+      expect(component.tmpTaggedSkillMisconceptionId).toBe(null);
+      expect(component.addAnswerGroupForm).toEqual({});
     });
 
-  it('should update answer group feedback', function() {
-    expect($scope.feedbackEditorIsOpen).toBe(false);
+  it('should update answer group feedback', () => {
+    expect(component.feedbackEditorIsOpen).toBe(false);
 
-    var feedback = 'New feedback';
-    $scope.updateAnswerGroupFeedback({
+    var feedback = new SubtitledHtml('New feedback', null);
+    component.updateAnswerGroupFeedback({
       feedback: feedback
-    });
-    $scope.modalId = Symbol();
+    } as Outcome);
+    component.modalId = Symbol();
     const eventBusGroup = new EventBusGroup(TestBed.inject(EventBusService));
     eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-      value: true, modalId: $scope.modalId}));
-    expect($scope.feedbackEditorIsOpen).toBe(true);
-    expect($scope.tmpOutcome.feedback).toBe(feedback);
+      value: true, modalId: component.modalId}));
+    expect(component.feedbackEditorIsOpen).toBe(true);
+    expect(component.tmpOutcome.feedback).toBe(feedback);
   });
 
-  it('should update tagged misconception', function() {
-    expect($scope.tmpTaggedSkillMisconceptionId).toBe(null);
+  it('should update tagged misconception', () => {
+    expect(component.tmpTaggedSkillMisconceptionId).toBe(null);
 
     var taggedMisconception = {
-      misconceptionId: 'mis_1',
+      misconceptionId: 1,
       skillId: 'skill_1'
     };
-    $scope.updateTaggedMisconception(taggedMisconception);
+    component.updateTaggedMisconception(taggedMisconception);
 
-    expect($scope.tmpTaggedSkillMisconceptionId).toBe('skill_1-mis_1');
+    expect(component.tmpTaggedSkillMisconceptionId).toBe('skill_1-1');
   });
 
-  it('should check if correctness feedback is enabled', function() {
+  it('should check if correctness feedback is enabled', () => {
     spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and
       .returnValue(true);
-    expect($scope.isCorrectnessFeedbackEnabled()).toBe(true);
+
+    expect(component.isCorrectnessFeedbackEnabled()).toBe(true);
   });
 
-  it('should check if current interaction is linear', function() {
-    expect($scope.isCurrentInteractionLinear()).toBe(true);
+  it('should check if current interaction is linear', () => {
+    component.currentInteractionId = 'Continue';
+
+    expect(component.isCurrentInteractionLinear()).toBe(true);
   });
 
-  it('should check if outcome has no feedback with self loop', function() {
+  it('should check if outcome has no feedback with self loop', fakeAsync(() => {
     var outcome = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
-    expect($scope.isSelfLoopWithNoFeedback(outcome)).toBe(true);
+    component.stateName = 'State Name';
+    tick();
+
+    expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
 
     var outcome2 = outcomeObjectFactory.createNew(
       'State Name', '1', 'Feedback Text', []);
-    expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
-  });
+    tick();
+    expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
+  }));
 
   it('should check if outcome feedback exceeds 10000 characters', () => {
     var outcome1 = outcomeObjectFactory.createNew(
       'State Name', '1', 'a'.repeat(10000), []);
-    expect($scope.isFeedbackLengthExceeded(outcome1)).toBe(false);
+    expect(component.isFeedbackLengthExceeded(outcome1)).toBe(false);
 
     var outcome2 = outcomeObjectFactory.createNew(
       'State Name', '1', 'a'.repeat(10001), []);
-    expect($scope.isFeedbackLengthExceeded(outcome2)).toBe(true);
+    expect(component.isFeedbackLengthExceeded(outcome2)).toBe(true);
   });
 
-  it('should save answer group response when closing the modal', function() {
-    $scope.saveResponse(null);
-    $scope.getChanges();
+  it('should save answer group response when closing the modal', () => {
+    component.saveResponse(null);
+    component.updateState('update');
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();
-    expect($uibModalInstance.close).toHaveBeenCalledWith({
-      tmpRule: $scope.tmpRule,
-      tmpOutcome: $scope.tmpOutcome,
-      tmpTaggedSkillMisconceptionId: null,
-      reopen: null
-    });
   });
 });
