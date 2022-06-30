@@ -568,8 +568,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts',
     'core/templates/pages/skill-editor-page/questions-tab/skill-questions-tab.directive.spec.ts',
     'core/templates/pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts',
-    'core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts',
-    'core/templates/pages/skill-editor-page/services/question-creation.service.ts',
     'core/templates/pages/skill-editor-page/services/skill-editor-routing.service.spec.ts',
     'core/templates/pages/skill-editor-page/services/skill-editor-routing.service.ts',
     'core/templates/pages/skill-editor-page/services/skill-editor-staleness-detection.service.ts',
