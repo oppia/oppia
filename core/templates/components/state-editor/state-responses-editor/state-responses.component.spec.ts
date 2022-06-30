@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for StateResponsesComponent.
+ */
+
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -22,15 +26,10 @@ import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFact
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-/**
- * @fileoverview Unit tests for StateResponsesComponent.
- */
-
 describe('StateResponsesComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
-  let $uibModal = null;
   let $q = null;
   let WindowDimensionsService = null;
   let StateEditorService = null;
@@ -99,7 +98,6 @@ describe('StateResponsesComponent', () => {
     function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-      $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
       ngbModal = $injector.get('NgbModal');
 
@@ -732,15 +730,25 @@ describe('StateResponsesComponent', () => {
 
   it('should open add response modal when user clicks on' +
     ' \'+ ADD RESPONSE\' button', () => {
-    spyOn($uibModal, 'open').and.callThrough();
+    let mock = new EventEmitter();
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        addState: mock,
+        currentInteractionId: 'currentInteractionId',
+        stateName: 'stateName'
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
 
     $scope.openAddAnswerGroupModal();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should open add response modal and save new answer groups' +
-    ' added by the user', () => {
+    ' added by the user', fakeAsync(() => {
+    let mock = new EventEmitter();
     spyOn(ResponsesService, 'save').and.callFake(
       (answerGroups, defaultOutcome, callback) => {
         callback(answerGroups, defaultOutcome);
@@ -748,40 +756,53 @@ describe('StateResponsesComponent', () => {
     );
     // Returning rejecting callback as the modal opens again, as reopen is true
     // so we close it when it is opened for the second time.
-    spyOn($uibModal, 'open').and.returnValues({
-      result: $q.resolve({
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        addState: mock,
+        currentInteractionId: 'currentInteractionId',
+        stateName: 'stateName'
+      },
+      result: Promise.resolve({
         reopen: true,
         tmpRule: new Rule('', null, null),
         tmpOutcome: outcomeObjectFactory
           .createNew('Hola', '1', 'Feedback text', []),
         tmpTaggedSkillMisconceptionId: ''
       })
-    }, {
-      result: $q.reject()
-    });
+    } as NgbModalRef);
+
+    mock.emit(null);
     $scope.answerGroups = [];
 
     $scope.openAddAnswerGroupModal();
     $scope.$apply();
+    tick();
 
     expect($scope.answerGroups).toEqual([answerGroupObjectFactory.createNew(
       [new Rule('', null, null)], outcomeObjectFactory.createNew(
         'Hola', '1', 'Feedback text', []), [], ''
     )]);
     expect(ResponsesService.save).toHaveBeenCalled();
-  });
+  }));
 
-  it('should clear warnings when modal is closed', () => {
+  it('should clear warnings when modal is closed', fakeAsync(() => {
+    let mock = new EventEmitter();
     spyOn(AlertsService, 'clearWarnings');
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        addState: mock,
+        currentInteractionId: 'currentInteractionId',
+        stateName: 'stateName'
+      },
+      result: Promise.reject()
+    } as NgbModalRef);
 
     $scope.openAddAnswerGroupModal();
     $scope.$apply();
+    tick();
 
     expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);
-  });
+  }));
 
   it('should open delete answer group modal when user clicks' +
     ' on delete button', () => {
