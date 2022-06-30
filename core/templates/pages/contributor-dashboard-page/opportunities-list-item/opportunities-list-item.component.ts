@@ -60,6 +60,7 @@ export class OpportunitiesListItemComponent {
   inReviewProgressStyle!: { width: string };
   untranslatedProgressStyle!: { width: string };
   targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
+  cardsAvailable: number = 0;
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
@@ -95,6 +96,14 @@ export class OpportunitiesListItemComponent {
           ) * 100;
           const untranslatedPercentage = (
             100 - (translatedPercentage + inReviewTranslationsPercentage));
+
+          this.cardsAvailable = (
+            this.opportunity.totalCount -
+              (
+                this.opportunity.translationsCount +
+                this.opportunity.inReviewCount
+              )
+          );
 
           this.translatedProgressStyle = { width: translatedPercentage + '%' };
           this.untranslatedProgressStyle = {

@@ -130,6 +130,7 @@ describe('Opportunities List Item Component', () => {
         expect(component.progressPercentage).toBe('50%');
         expect(component.correspondingOpportunityDeleted).toBe(false);
         expect(component.translationProgressBar).toBe(true);
+        expect(component.cardsAvailable).toEqual(5);
       });
 
     describe('when opportunity subheading corresponds to deleted ' +

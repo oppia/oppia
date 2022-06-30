@@ -4,11 +4,13 @@
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading oppia-subheading-large"
-            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
+            [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
       </span>
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading oppia-subheading-small"
-            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 20 }}
+            [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.subheading | wrapTextWithEllipsis : 20 }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
@@ -52,7 +54,7 @@
         <div class="progress-bar bg-light"
              role="progressbar"
              [ngStyle]="untranslatedProgressStyle"
-             ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards available for translation"
+             ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
              container="body"
              placement="bottom">
         </div>
@@ -138,7 +140,7 @@
         <div class="progress-bar bg-light"
              role="progressbar"
              [ngStyle]="untranslatedProgressStyle"
-             ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards available for translation"
+             ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
              container="body"
              placement="bottom">
         </div>
@@ -166,11 +168,13 @@
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading oppia-subheading-large"
-            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
+            [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
       </span>
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading oppia-subheading-small"
-            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 20 }}
+            [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.subheading | wrapTextWithEllipsis : 20 }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
@@ -219,11 +223,13 @@
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading oppia-subheading-large"
-            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
+            [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
       </span>
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading oppia-subheading-small"
-            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
+            [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
@@ -266,7 +272,7 @@
         <div class="progress-bar bg-light"
              role="progressbar"
              [ngStyle]="untranslatedProgressStyle"
-             ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards available for translation"
+             ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
              container="body"
              placement="bottom">
         </div>
