@@ -1239,14 +1239,16 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
             feconf.USERNAME_CHECK_DATA_URL, {'username': '!!!INVALID!!!'},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'can only have alphanumeric characters', response_dict['error'])
+            'Validation failed: is_valid_username_string ({}) for object ',
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL,
             {'username': self.UNICODE_TEST_STRING},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'can only have alphanumeric characters', response_dict['error'])
+            'Validation failed: is_valid_username_string ({}) for object ',
+            response_dict['error'])
 
         self.logout()
 
