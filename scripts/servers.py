@@ -624,7 +624,7 @@ def managed_protractor_server(
             debugging mode:
             https://www.protractortest.org/#/debugging#disabled-control-flow.
         sharding_instances: int. How many sharding instances to be running.
-        mobile: bool. Whether to run e2e test in mobile bi.
+        mobile: bool. Whether to run e2e test in the mobile viewport.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
 
     Yields:
@@ -640,8 +640,7 @@ def managed_protractor_server(
         common.NODE_BIN_PATH,
         # This flag ensures tests fail if the `waitFor()` calls time out.
         '--unhandled-rejections=strict',
-        common.PROTRACTOR_BIN_PATH,
-        common.PROTRACTOR_CONFIG_FILE_PATH,
+        common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH,
         '--params.devMode=%s' % dev_mode,
         '--suite', suite_name,
         '--params.mobile=%s' % mobile
