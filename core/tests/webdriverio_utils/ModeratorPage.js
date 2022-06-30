@@ -21,14 +21,13 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ModeratorPage = function() {
-  var moderatorPage = $('.e2e-test-moderator-page');
-
   this.get = async function() {
     await browser.url(general.MODERATOR_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectModeratorPageToBeVisible = async function() {
+    var moderatorPage = await $('.e2e-test-moderator-page');
     await waitFor.visibilityOf(
       moderatorPage, 'Moderator page taking too long to appear.');
   };

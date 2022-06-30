@@ -20,32 +20,27 @@
 var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
-  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
-  var createdExplorationStat = $(
-    '.e2e-test-profile-created-stat');
-  var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
-  var bio = $('.e2e-test-profile-bio');
-  var interestPlaceholder = $('.e2e-test-profile-no-interest');
-  var interestPlaceholder = $('.e2e-test-profile-no-interest');
-
   this.get = async function(userName) {
     await browser.url('/profile/' + userName);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectCurrUserToHaveProfilePhoto = async function() {
+    var currUserProfilePhoto = await $('.e2e-test-profile-current-user-photo');
     await waitFor.visibilityOf(
       currUserProfilePhoto,
       'Current user profile photo taking too long to display');
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
+    var otherUserProfilePhoto = await $('.e2e-test-profile-other-user-photo');
     await waitFor.presenceOf(
       otherUserProfilePhoto,
       'Other user profile photo taking too long to display');
   };
 
   this.expectUserToHaveBio = async function(expectedText) {
+    var bio = await $('.e2e-test-profile-bio');
     await waitFor.visibilityOf(
       bio,
       'Bio is taking too long to appear');
@@ -76,6 +71,7 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveInterestPlaceholder = async function(expectedText) {
+    var interestPlaceholder = await $('.e2e-test-profile-no-interest');
     await waitFor.visibilityOf(
       interestPlaceholder,
       'Interest place holder is taking too long to appear');
@@ -83,6 +79,7 @@ var ProfilePage = function() {
   };
 
   this.expectUserToNotHaveInterestPlaceholder = async function() {
+    var interestPlaceholder = await $('.e2e-test-profile-no-interest');
     expect(await interestPlaceholder.isExisting()).toBe(false);
   };
 
@@ -115,6 +112,8 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveCreatedExplorationStat = async function(expectedStat) {
+    var createdExplorationStat = await $(
+      '.e2e-test-profile-created-stat');
     expect(await createdExplorationStat.getText()).toMatch(expectedStat);
   };
 };

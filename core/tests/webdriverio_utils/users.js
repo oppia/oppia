@@ -61,13 +61,13 @@ var login = async function(email, useManualNavigation = true) {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
-  var loginPage = $('.e2e-test-login-page');
+  var loginPage = await $('.e2e-test-login-page');
   await waitFor.presenceOf(loginPage, 'Login page did not load');
 
-  var emailInput = $('.e2e-test-sign-in-email-input');
+  var emailInput = await $('.e2e-test-sign-in-email-input');
   await action.keys('Email input', emailInput, email);
 
-  var signInButton = $('.e2e-test-sign-in-button');
+  var signInButton = await $('.e2e-test-sign-in-button');
 
   await waitFor.clientSideRedirection(async() => {
     // Click the "sign in" button to trigger redirection.
@@ -100,24 +100,24 @@ var logout = async function() {
 // that this will fail if the user already has a username.
 var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
-  var cookieBannerAcceptButton = $(
+  var cookieBannerAcceptButton = await $(
     '.e2e-test-oppia-cookie-banner-accept-button');
   var cookieButtonPresent = await cookieBannerAcceptButton.isDisplayed();
   if (cookieButtonPresent) {
     await action.click('Accept Cookie Button', cookieBannerAcceptButton);
   }
 
-  var signupPage = $('.e2e-test-signup-page');
+  var signupPage = await $('.e2e-test-signup-page');
   await waitFor.presenceOf(signupPage, 'Signup page did not load');
 
-  var usernameInput = $('.e2e-test-username-input');
+  var usernameInput = await $('.e2e-test-username-input');
   await action.keys('Username input', usernameInput, username);
 
   var agreeToTermsCheckbox = await (
     $('.e2e-test-agree-to-terms-checkbox'));
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
-  var registerUser = $('.e2e-test-register-user');
+  var registerUser = await $('.e2e-test-register-user');
 
   var currentUrl = decodeURIComponent(await browser.getUrl());
 

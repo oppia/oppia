@@ -33,12 +33,12 @@ var customizeInteraction = async function(elem, buttonText) {
 };
 
 var expectInteractionDetailsToMatch = async function(elem, buttonText) {
-  var continueButton = $('.e2e-test-continue-button');
+  var continueButton = await $('.e2e-test-continue-button');
   expect(await continueButton.getText()).toBe(buttonText.toUpperCase());
 };
 
 var submitAnswer = async function() {
-  var continueButton = $('.e2e-test-continue-button');
+  var continueButton = await $('.e2e-test-continue-button');
   await waitFor.elementToBeClickable(
     continueButton, 'Continue button is not clickable');
   await action.click('Continue Button', continueButton);

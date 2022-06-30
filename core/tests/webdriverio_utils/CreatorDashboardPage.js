@@ -23,30 +23,10 @@ var action = require('./action.js');
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
-  var activityCreationModal = $('.e2e-test-creation-modal');
-  var explorationFeedbackCount = $(
-    '.e2e-test-exp-summary-tile-open-feedback');
-  var explorationDashboardCard =
-    $('.e2e-test-exploration-dashboard-card');
-  var collectionCard = $('.e2e-test-collection-card');
-  var collectionEditorContainer = $(
-    '.e2e-test-collection-editor-cards-container');
-  var subscriptionTab = $('.e2e-test-subscription-tab');
-  var createActivityButton = $('.e2e-test-create-activity');
-  var createCollectionButton = $('.e2e-test-create-collection');
-  var createExplorationButton = $('.e2e-test-create-exploration');
-  var createNewExplorationButton = $(
-    '.e2e-test-create-new-exploration-button');
-  var listViewButton = $('.e2e-test-oppia-list-view-btn');
-  var titleMaskLocator = '.e2e-test-title-mask';
-  // Dashboard stat elements.
-  var averageRating = $('.e2e-test-oppia-average-rating');
-  var totalPlays = $('.e2e-test-oppia-total-plays');
-  var openFeedbacks = $('.e2e-test-oppia-open-feedback');
-  var subscribers = $('.e2e-test-oppia-total-subscribers');
-
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
+    var explorationDashboardCard = await $(
+      '.e2e-test-exploration-dashboard-card');
     await waitFor.visibilityOf(explorationDashboardCard);
     var allExplorationCards = await $$(
       '.e2e-test-exploration-dashboard-card');
@@ -66,6 +46,8 @@ var CreatorDashboardPage = function() {
   };
 
   this.getNumberOfFeedbackMessages = async function() {
+    var explorationFeedbackCount = await $(
+      '.e2e-test-exp-summary-tile-open-feedback');
     var feedbackCount = await explorationFeedbackCount.getText();
     return parseInt(feedbackCount);
   };
@@ -76,35 +58,45 @@ var CreatorDashboardPage = function() {
   };
 
   this.clickCreateActivityButton = async function() {
+    var createActivityButton = await $('.e2e-test-create-activity');
     await action.click('Create Activity Button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateCollectionButton = async function() {
+    var activityCreationModal = await $('.e2e-test-creation-modal');
     await waitFor.visibilityOf(
       activityCreationModal, 'Activity Creation modal is not visible');
+    var createCollectionButton = await $('.e2e-test-create-collection');
     await action.click('Create Collection Button', createCollectionButton);
     await waitFor.pageToFullyLoad();
+    var collectionEditorContainer = await $(
+      '.e2e-test-collection-editor-cards-container');
     await waitFor.visibilityOf(collectionEditorContainer);
   };
 
   this.clickCreateExplorationButton = async function() {
+    var createExplorationButton = await $('.e2e-test-create-exploration');
     await action.click('Create Exploration Button', createExplorationButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateNewExplorationButton = async function() {
+    var createNewExplorationButton = await $(
+      '.e2e-test-create-new-exploration-button');
     await action.click(
       'Create New Exploration Button', createNewExplorationButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToCollectionEditor = async function() {
+    var collectionCard = await $('.e2e-test-collection-card');
     await action.click('Collection Card', collectionCard);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToSubscriptionDashboard = async function() {
+    var subscriptionTab = await $('.e2e-test-subscription-tab');
     await action.click('Subscription Tab', subscriptionTab);
     await waitFor.pageToFullyLoad();
   };
@@ -115,36 +107,41 @@ var CreatorDashboardPage = function() {
       throw new Error(
         'Could not find exploration tile with name ' + explorationTitle);
     }
-    var explorationElement = elems[0].$(titleMaskLocator);
+    var explorationElement = await elems[0].$('.e2e-test-title-mask');
     await action.click('Exploration Element', explorationElement);
     await waitFor.pageToFullyLoad();
   };
 
   this.getAverageRating = async function() {
+    var averageRating = await $('.e2e-test-oppia-average-rating');
     await waitFor.visibilityOf(
       averageRating, 'Unable to find average rating');
     return await averageRating.getText();
   };
 
   this.getTotalPlays = async function() {
+    var totalPlays = await $('.e2e-test-oppia-total-plays');
     await waitFor.visibilityOf(
       totalPlays, 'Unable to find total plays');
     return await totalPlays.getText();
   };
 
   this.getOpenFeedbacks = async function() {
+    var openFeedbacks = await $('.e2e-test-oppia-open-feedback');
     await waitFor.visibilityOf(
       openFeedbacks, 'Unable to find open feedbacks count');
     return await openFeedbacks.getText();
   };
 
   this.getSubscribers = async function() {
+    var subscribers = await $('.e2e-test-oppia-total-subscribers');
     await waitFor.visibilityOf(
       subscribers, 'Unable to find subscribers count');
     return await subscribers.getText();
   };
 
   this.getListView = async function() {
+    var listViewButton = await $('.e2e-test-oppia-list-view-btn');
     await waitFor.visibilityOf(
       listViewButton, 'Unable to find list view button');
     await action.click('List View Button', listViewButton);

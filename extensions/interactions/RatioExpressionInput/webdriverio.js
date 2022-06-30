@@ -32,7 +32,7 @@ var customizeInteraction = async function(
 };
 
 var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
-  const ratioExpressionInputInteraction = $(
+  const ratioExpressionInputInteraction = await $(
     'oppia-interactive-ratio-expression-input');
   // We use presenceOf here instead of visibilityOf because the container
   // has a height and width of 0.

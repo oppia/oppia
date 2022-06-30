@@ -32,8 +32,6 @@ var ExplorationEditorMainTab = function() {
   /*
    * Interactive elements
    */
-  var addResponseDetails = $('.e2e-test-add-response-details');
-  var addResponseHeader = $('.e2e-test-add-response-modal-header');
   var multipleChoiceAnswerOptions = function(optionNum) {
     return $(
       `.e2e-test-html-multiple-select-option=${optionNum}`);
@@ -42,22 +40,8 @@ var ExplorationEditorMainTab = function() {
     return $(
       `.e2e-test-html-item-select-option=${optionNum}`);
   };
-  var defaultResponseTab = $('.e2e-test-default-response-tab');
-  var editorWelcomeModal = $('.e2e-test-welcome-modal');
-  var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
-  var editOutcomeDestStateIn = '.e2e-test-add-state-input';
-  var editOutcomeDestAddExplorationId = $(
-    '.e2e-test-add-refresher-exploration-id');
-  var editOutcomeDestDropdownOptions = $(
-    '.e2e-destination-selector-dropdown');
-  var feedbackBubble = $('.e2e-test-feedback-bubble');
-  var feedbackEditor = $('.e2e-test-open-feedback-editor');
-  var fadeIn = $('.e2e-test-editor-cards-container');
-  var interaction = $('.e2e-test-interaction');
-  var interactionEditor = $('.e2e-test-interaction-editor');
-  var explorationGraph = $('.e2e-test-exploration-graph');
-  var nodeLabelLocator = '.e2e-test-node-label';
   var stateNodeLabel = function(nodeElement) {
+    var nodeLabelLocator = '.e2e-test-node-label';
     return nodeElement.$(nodeLabelLocator);
   };
   var interactionTab = function(tabId) {
@@ -67,69 +51,9 @@ var ExplorationEditorMainTab = function() {
     return $(
       '.e2e-test-interaction-tile-' + interactionId);
   };
-  var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
-  var openOutcomeFeedBackEditor = $(
-    '.e2e-test-open-outcome-feedback-editor');
-  var postTutorialPopover = $('.ng-joyride .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
-  var stateContentDisplay = $('.e2e-test-state-content-display');
-  var stateEditButton = $('.e2e-test-edit-content-pencil-button');
-  var stateNameContainer = $('.e2e-test-state-name-container');
-  var stateNameInput = $('.e2e-test-state-name-input');
-  var ruleDetails = $('.e2e-test-rule-details');
-  var stateContentEditorLocator =
-    '.e2e-test-state-content-editor';
-  var addOrUpdateSolutionModal = $(
-    '.e2e-test-add-or-update-solution-modal');
-  var answerDescription = $('.e2e-test-answer-description');
-  var deleteNodeLocator = '.e2e-test-delete-node';
-  var titleElement = $('.ng-joyride-title');
-  var ckEditorElement = $('.e2e-test-ck-editor');
-  var interactionHtmlElement = $('.e2e-test-interaction-html');
-  var answerTab = $('.e2e-test-answer-tab');
-  var hintTextElement = $('.e2e-test-hint-text');
-  var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
-  var stateEditorTag = $('.e2e-test-state-content-editor');
-
-  /*
-   * Buttons
-   */
-  var addAnswerButton = $('.e2e-test-add-answer');
-  var addHintButton = $('.e2e-test-oppia-add-hint-button');
-  var addNewResponseButton = $('.e2e-test-add-new-response');
-  var addResponseButton = $('.e2e-test-open-add-response-modal');
-  var addSolutionButton = $('.e2e-test-oppia-add-solution-button');
-  var addInteractionButton = $('.e2e-test-open-add-interaction-modal');
-  var cancelOutcomeDestButton = $('.e2e-test-cancel-outcome-dest');
-  var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
-  var confirmDeleteInteractionButton = $(
-    '.e2e-test-confirm-delete-interaction');
-  var confirmDeleteResponseButton = $(
-    '.e2e-test-confirm-delete-response');
-  var confirmDeleteStateButton = $('.e2e-test-confirm-delete-state');
-  var deleteAnswerButton = $('.e2e-test-delete-answer');
-  var deleteInteractionButton = $('.e2e-test-delete-interaction');
-  var deleteResponseButton = $('.e2e-test-delete-response');
-  var dismissWelcomeModalButton = $('.e2e-test-dismiss-welcome-modal');
-  var saveAnswerButton = $('.e2e-test-save-answer');
-  var saveHintButton = $('.e2e-test-save-hint');
-  var saveInteractionButton = $('.e2e-test-save-interaction');
-  var saveOutcomeDestButton = $('.e2e-test-save-outcome-dest');
-  var saveOutcomeFeedbackButton = $('.e2e-test-save-outcome-feedback');
-  var saveStateContentButton = $('.e2e-test-save-state-content');
-  var stateNameSubmitButton = stateNameContainer.$(
-    '.e2e-test-state-name-submit');
-  var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
-  var startTutorialButton = $('.e2e-test-start-tutorial');
-  var submitSolutionButton = $('.e2e-test-submit-solution-button');
-
-  /*
-   * Symbols
-   */
-  var correctAnswerTickMark = $('.e2e-test-correct-tick-mark');
-
 
   /*
    * Actions
@@ -139,8 +63,10 @@ var ExplorationEditorMainTab = function() {
 
   this.exitTutorial = async function() {
     // Exit the welcome modal.
+    var dismissWelcomeModalButton = await $('.e2e-test-dismiss-welcome-modal');
     await action.click(
       'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
+    var editorWelcomeModal = await $('.e2e-test-welcome-modal');
     await waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
@@ -156,7 +82,7 @@ var ExplorationEditorMainTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButtons = $$('button=Finish');
+    var finishTutorialButtons = await $$('button=Finish');
     await waitFor.elementToBeClickable(
       finishTutorialButtons[0],
       'Finish Tutorial Stage button is not clickable');
@@ -179,7 +105,7 @@ var ExplorationEditorMainTab = function() {
     ];
     for (const HEADING of tutorialTabHeadings) {
     // Use: await tutorialTabHeadings.forEach(async function(heading) {
-      var tutorialTabHeadingElement = $(`.popover-title=${HEADING}`);
+      var tutorialTabHeadingElement = await $(`.popover-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.
@@ -200,9 +126,12 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.startTutorial = async function() {
+    var editorWelcomeModal = await $('.e2e-test-welcome-modal');
     await waitFor.visibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
+    var startTutorialButton = await $('.e2e-test-start-tutorial');
     await action.click('Start Tutorial button', startTutorialButton);
+    var titleElement = await $('.ng-joyride-title');
     await waitFor.visibilityOf(
       titleElement, 'Tutorial modal takes too long to appear');
   };
@@ -229,6 +158,7 @@ var ExplorationEditorMainTab = function() {
       createNewState, ruleName) {
     await action.waitForAutosave();
     // Open the "Add Response" modal if it is not already open.
+    var addResponseButton = await $('.e2e-test-open-add-response-modal');
     await action.click('Response Editor Button', addResponseButton);
     await this.setResponse.apply(null, arguments);
   };
@@ -237,6 +167,7 @@ var ExplorationEditorMainTab = function() {
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
     // Set the rule description.
+    var addResponseDetails = await $('.e2e-test-add-response-details');
     var args = [addResponseDetails, interactionId, ruleName];
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);
@@ -245,6 +176,7 @@ var ExplorationEditorMainTab = function() {
     await _selectRule(addResponseDetails, interactionId, ruleName);
     await _setRuleParameters.apply(null, args);
     // Open the feedback entry form if it is not already open.
+    var feedbackEditor = await $('.e2e-test-open-feedback-editor');
     var isVisible = await feedbackEditor.isExisting();
     if (isVisible) {
       await action.click('Feedback editor', feedbackEditor);
@@ -264,6 +196,7 @@ var ExplorationEditorMainTab = function() {
     }
 
     // Close new response modal.
+    var addNewResponseButton = await $('.e2e-test-add-new-response');
     await action.click('New Response Button', addNewResponseButton);
     await waitFor.invisibilityOf(
       addNewResponseButton, 'Add New Response Modal is not closed');
@@ -275,6 +208,7 @@ var ExplorationEditorMainTab = function() {
     var headerElem;
     if (responseNum !== 'pop') {
       if (responseNum === 'default') {
+        var defaultResponseTab = await $('.e2e-test-default-response-tab');
         headerElem = defaultResponseTab;
       } else {
         var responseTab = await $$('.e2e-test-response-tab');
@@ -287,6 +221,7 @@ var ExplorationEditorMainTab = function() {
         await action.click('Response Editor Header', headerElem);
       }
     } else {
+      var addResponseHeader = await $('.e2e-test-add-response-modal-header');
       headerElem = addResponseHeader;
       expect(await headerElem.isDisplayed()).toBe(true);
     }
@@ -305,6 +240,7 @@ var ExplorationEditorMainTab = function() {
           ruleDescription, feedbackTextArray);
         ruleDescription += '...';
         // Adding "..." to end of string.
+        var answerTab = await $('.e2e-test-answer-tab');
         expect(await action.getText('Answer Tab', answerTab)).toEqual(
           ruleDescription);
       },
@@ -314,7 +250,8 @@ var ExplorationEditorMainTab = function() {
        */
       expectFeedbackInstructionToBe: async function(feedbackInstructionsText) {
         // The first rule block's RTE.
-        var feedbackRTE = responseBody(responseNum).$('.oppia-rte-editor');
+        var feedbackRTE = await (
+          responseBody(responseNum).$('.oppia-rte-editor'));
         await waitFor.visibilityOf(
           feedbackRTE, 'Feedback Rich Text Editor not showing up.');
         expect(await action.getText('Feedback RTE', feedbackRTE)).toEqual(
@@ -323,6 +260,8 @@ var ExplorationEditorMainTab = function() {
       setFeedback: async function(richTextInstructions) {
         await action.waitForAutosave();
         // Begin editing feedback.
+        var openOutcomeFeedBackEditor = await $(
+          '.e2e-test-open-outcome-feedback-editor');
         await action.click(
           'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
 
@@ -330,6 +269,8 @@ var ExplorationEditorMainTab = function() {
         await _setOutcomeFeedback(richTextInstructions);
 
         // Save feedback.
+        var saveOutcomeFeedbackButton = await $(
+          '.e2e-test-save-outcome-feedback');
         await action.click(
           'saveOutcomeFeedbackButton', saveOutcomeFeedbackButton);
       },
@@ -341,6 +282,8 @@ var ExplorationEditorMainTab = function() {
       setDestination: async function(
           destinationName, createNewState, refresherExplorationId) {
         // Begin editing destination.
+        var openOutcomeDestEditor = await $(
+          '.e2e-test-open-outcome-dest-editor');
         await action.click(
           'Outcome Destination Editor Open Button', openOutcomeDestEditor);
 
@@ -349,16 +292,21 @@ var ExplorationEditorMainTab = function() {
           destinationName, createNewState, refresherExplorationId);
 
         // Save destination.
+        var saveOutcomeDestButton = await $('.e2e-test-save-outcome-dest');
         await action.click(
           'Outcome Destination Editor Save Button', saveOutcomeDestButton);
       },
       markAsCorrect: async function() {
+        var answerCorrectnessToggle = await $(
+          '.e2e-test-editor-correctness-toggle');
         await action.click(
           'Answer Correctness Toggle', answerCorrectnessToggle);
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: async function(stateNames) {
         // Begin editing destination.
+        var openOutcomeDestEditor = await $(
+          '.e2e-test-open-outcome-dest-editor');
         await action.click(
           'Outcome Destination Editor Open Button', openOutcomeDestEditor);
 
@@ -368,6 +316,7 @@ var ExplorationEditorMainTab = function() {
         // Create new option always at the end of the list.
         expectedOptionTexts.push(_NEW_STATE_OPTION);
 
+        var editOutcomeDestBubble = await $('.e2e-test-dest-bubble');
         var actualOptionTexts = await editOutcomeDestBubble.$$(
           '<option>').map(async function(optionElem) {
           return await action.getText('Option element', optionElem);
@@ -375,15 +324,18 @@ var ExplorationEditorMainTab = function() {
         expect(actualOptionTexts).toEqual(expectedOptionTexts);
 
         // Cancel editing the destination.
+        var cancelOutcomeDestButton = await $('.e2e-test-cancel-outcome-dest');
         await action.click('Cancel Outcome Button', cancelOutcomeDestButton);
       },
       addRule: async function(interactionId, ruleName) {
         // Additional parameters may be provided after ruleName.
 
         // Add the rule.
+        var addAnswerButton = await $('.e2e-test-add-answer');
         await action.click('Add Answer Button', addAnswerButton);
 
         // Set the rule description.
+        var ruleDetails = await $('.e2e-test-rule-details');
         var args = [ruleDetails, interactionId, ruleName];
         for (var i = 2; i < arguments.length; i++) {
           args.push(arguments[i]);
@@ -392,37 +344,49 @@ var ExplorationEditorMainTab = function() {
         await _setRuleParameters.apply(null, args);
 
         // Save the new rule.
+        var saveAnswerButton = await $('.e2e-test-save-answer');
         await action.click('Save Answer Button', saveAnswerButton);
       },
       deleteResponse: async function() {
+        var deleteResponseButton = await $('.e2e-test-delete-response');
         await action.click('Delete Response Button', deleteResponseButton);
+        var confirmDeleteResponseButton = await $(
+          '.e2e-test-confirm-delete-response');
         await action.click(
           'Confirm Delete Response Button', confirmDeleteResponseButton);
       },
       expectCannotSetFeedback: async function() {
+        var openOutcomeFeedBackEditor = await $(
+          '.e2e-test-open-outcome-feedback-editor');
         expect(await openOutcomeFeedBackEditor.isExisting()).toBeFalsy();
       },
       expectCannotSetDestination: async function() {
-        var destEditorElem = openOutcomeDestEditor;
-        expect(await destEditorElem.isExisting()).toBeFalsy();
+        var openOutcomeDestEditor = await $(
+          '.e2e-test-open-outcome-dest-editor');
+        expect(await openOutcomeDestEditor.isExisting()).toBeFalsy();
       },
       expectCannotAddRule: async function() {
+        var addAnswerButton = await $('.e2e-test-add-answer');
         expect(await addAnswerButton.isExisting()).toBeFalsy();
       },
       expectCannotDeleteRule: async function(ruleNum) {
+        var deleteAnswerButton = await $('.e2e-test-delete-answer');
         expect(await deleteAnswerButton.isExisting()).toBeFalsy();
       },
       expectCannotDeleteResponse: async function() {
+        var deleteResponseButton = await $('.e2e-test-delete-response');
         expect(await deleteResponseButton.isExisting()).toBeFalsy();
       }
     };
   };
 
   this.expectCannotAddResponse = async function() {
+    var addResponseButton = await $('.e2e-test-open-add-response-modal');
     expect(await addResponseButton.isExisting()).toBeFalsy();
   };
 
   this.expectTickMarkIsDisplayed = async function() {
+    var correctAnswerTickMark = await $('.e2e-test-correct-tick-mark');
     await waitFor.visibilityOf(
       correctAnswerTickMark, 'Correct answer tick mark not visible');
   };
@@ -440,14 +404,20 @@ var ExplorationEditorMainTab = function() {
       targetOption = destName;
     }
 
+    var editOutcomeDestDropdownOptions = await $(
+      '.e2e-destination-selector-dropdown');
     await editOutcomeDestDropdownOptions.selectByVisibleText(targetOption);
 
     if (createNewDest) {
-      var editOutcomeDestStateInput = editOutcomeDestBubble.$(
+      var editOutcomeDestBubble = await $('.e2e-test-dest-bubble');
+      var editOutcomeDestStateIn = '.e2e-test-add-state-input';
+      var editOutcomeDestStateInput = await editOutcomeDestBubble.$(
         editOutcomeDestStateIn);
       await action.keys(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
     } else if (refresherExplorationId) {
+      var editOutcomeDestAddExplorationId = await $(
+        '.e2e-test-add-refresher-exploration-id');
       await action.keys(
         'Edit Outcome Add Exploration Id',
         editOutcomeDestAddExplorationId, refresherExplorationId);
@@ -461,23 +431,29 @@ var ExplorationEditorMainTab = function() {
   // .appendBoldText(...).
   this.setContent = async function(richTextInstructions, expectFadeIn = false) {
     // Wait for browser to time out the popover, which is 4000 ms.
+    var postTutorialPopover = await $('.ng-joyride .popover-content');
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
+      var fadeIn = await $('.e2e-test-editor-cards-container');
       await waitFor.fadeInToComplete(
         fadeIn, 'Editor taking long to fade in');
     }
+    var stateEditButton = await $('.e2e-test-edit-content-pencil-button');
     await action.click('stateEditButton', stateEditButton);
+    var stateEditorTag = await $('.e2e-test-state-content-editor');
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.$(stateContentEditorLocator);
+    var stateContentEditor = await stateEditorTag.$(
+      '.e2e-test-state-content-editor');
     await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
+    var saveStateContentButton = await $('.e2e-test-save-state-content');
     await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
       saveStateContentButton,
@@ -496,6 +472,7 @@ var ExplorationEditorMainTab = function() {
   // possible to click on them to view their contents, as clicks instead open
   // the rich text editor.
   this.expectContentToMatch = async function(richTextInstructions) {
+    var stateContentDisplay = await $('.e2e-test-state-content-display');
     await forms.expectRichText(stateContentDisplay).toMatch(
       richTextInstructions);
   };
@@ -504,16 +481,20 @@ var ExplorationEditorMainTab = function() {
 
   this.addHint = async function(hint) {
     await action.waitForAutosave();
+    var addHintButton = await $('.e2e-test-oppia-add-hint-button');
     await action.click('Add Hint', addHintButton);
-    var addHintModal = $('.e2e-test-hint-modal=Add Hint');
+    var addHintModal = await $('.e2e-test-hint-modal=Add Hint');
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
+    var hintTextElement = await $('.e2e-test-hint-text');
     var hintTextButton = await hintTextElement.$$('<p>');
     var lastHintElement = hintTextButton.length - 1;
     await action.click('Hint Text Button', hintTextButton[lastHintElement]);
-    var CKEditor = ckEditorElement.$$(
+    var ckEditorElement = await $('.e2e-test-ck-editor');
+    var CKEditor = await ckEditorElement.$$(
       'oppia-rte-resizer')[0];
     await action.keys('Text CKEditor', CKEditor, hint);
+    var saveHintButton = await $('.e2e-test-save-hint');
     await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
@@ -521,19 +502,26 @@ var ExplorationEditorMainTab = function() {
 
   this.addSolution = async function(interactionId, solution) {
     await action.waitForAutosave();
+    var addSolutionButton = await $('.e2e-test-oppia-add-solution-button');
     await action.click('Add Solution', addSolutionButton);
+    var addOrUpdateSolutionModal = await $(
+      '.e2e-test-add-or-update-solution-modal');
     await waitFor.visibilityOf(
       addOrUpdateSolutionModal,
       'Add/Update Solution modal takes to long to appear');
     var interaction = await interactions.getInteraction(interactionId);
+    var interactionHtmlElement = await $('.e2e-test-interaction-html');
     await interaction.submitAnswer(
       interactionHtmlElement, solution.correctAnswer);
-    var explanationTextArea = explanationTextAreaElement.$$('<p>')[0];
+    var explanationTextAreaElement = await $('.e2e-test-explanation-textarea');
+    var explanationTextArea = await explanationTextAreaElement.$$('<p>')[0];
     await action.click('Explanation Text Area', explanationTextArea);
-    var CKEditor = ckEditorElement.$$(
+    var ckEditorElement = await $('.e2e-test-ck-editor');
+    var CKEditor = await ckEditorElement.$$(
       'oppia-rte-resizer')[0];
     await action.keys(
       'Text CKEditor', CKEditor, solution.explanation);
+    var submitSolutionButton = await $('.e2e-test-submit-solution-button');
     await action.click('Submit Solution Button', submitSolutionButton);
     await waitFor.invisibilityOf(
       addOrUpdateSolutionModal,
@@ -544,9 +532,12 @@ var ExplorationEditorMainTab = function() {
 
   this.deleteInteraction = async function() {
     await action.waitForAutosave();
+    var deleteInteractionButton = await $('.e2e-test-delete-interaction');
     await action.click('Delete interaction button', deleteInteractionButton);
 
     // Click through the "are you sure?" warning.
+    var confirmDeleteInteractionButton = await $(
+      '.e2e-test-confirm-delete-interaction');
     await action.click(
       'Confirm Delete Interaction button', confirmDeleteInteractionButton);
 
@@ -563,8 +554,10 @@ var ExplorationEditorMainTab = function() {
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
     await closeAddResponseModal();
+    var addResponseHeader = await $('.e2e-test-add-response-modal-header');
     await waitFor.invisibilityOf(
       addResponseHeader, 'Add Response modal takes too long to close');
+    var interaction = await $('.e2e-test-interaction');
     await waitFor.visibilityOf(
       interaction, 'interaction takes too long to appear');
   };
@@ -578,10 +571,12 @@ var ExplorationEditorMainTab = function() {
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
   var createNewInteraction = async function(interactionId) {
+    var deleteInteractionButton = await $('.e2e-test-delete-interaction');
     await waitFor.invisibilityOf(
       deleteInteractionButton,
       'Please delete interaction before creating a new one');
 
+    var addInteractionButton = await $('.e2e-test-open-add-interaction-modal');
     await action.click('Add Interaction button', addInteractionButton);
 
     var INTERACTION_ID_TO_TAB_NAME = {
@@ -606,11 +601,11 @@ var ExplorationEditorMainTab = function() {
       InteractiveMap: 'geography'
     };
 
-    var interactionTabButton =
-      interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]);
+    var interactionTabButton = await (
+      interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]));
     await action.click('Interaction Tab', interactionTabButton);
 
-    var targetTile = interactionTile(interactionId);
+    var targetTile = await interactionTile(interactionId);
     await waitFor.visibilityOf(
       targetTile,
       'Interaction tile ' + interactionId + ' takes too long to be visible'
@@ -622,6 +617,7 @@ var ExplorationEditorMainTab = function() {
   // using setInteraction instead.
   var customizeInteraction = async function(interactionId) {
     if (arguments.length > 1) {
+      var interactionEditor = await $('.e2e-test-interaction-editor');
       var customizationArgs = [interactionEditor];
       for (var i = 1; i < arguments.length; i++) {
         customizationArgs.push(arguments[i]);
@@ -633,6 +629,7 @@ var ExplorationEditorMainTab = function() {
 
     // The save interaction button doesn't appear for interactions having no
     // options to customize.
+    var saveInteractionButton = await $('.e2e-test-save-interaction');
     var result = await saveInteractionButton.isExisting();
     if (result) {
       await action.click('Save Interaction Button', saveInteractionButton);
@@ -646,8 +643,11 @@ var ExplorationEditorMainTab = function() {
   // using setInteraction instead.
   var closeAddResponseModal = async function() {
     // If the "Add Response" modal opens, close it.
+    var addResponseHeader = await $('.e2e-test-add-response-modal-header');
     var isVisible = await addResponseHeader.isExisting();
     if (isVisible) {
+      var closeAddResponseButton = await $(
+        '.e2e-test-close-add-response-modal');
       await action.click('Close Add Response Button', closeAddResponseButton);
     }
   };
@@ -658,6 +658,7 @@ var ExplorationEditorMainTab = function() {
   // ExplorationPlayerPage.js).
   this.expectInteractionToMatch = async function(interactionId) {
     // Convert additional arguments to an array to send on.
+    var interaction = await $('.e2e-test-interaction');
     var args = [interaction];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
@@ -667,10 +668,12 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectCannotDeleteInteraction = async function() {
+    var deleteInteractionButton = await $('.e2e-test-delete-interaction');
     expect(await deleteInteractionButton.isExisting()).toBeFalsy();
   };
 
   var _setOutcomeFeedback = async function(richTextInstructions) {
+    var feedbackBubble = await $('.e2e-test-feedback-bubble');
     await waitFor.visibilityOf(
       feedbackBubble, 'Feedback bubble takes too long to be visible.');
     var feedbackEditor = await forms.RichTextEditor(
@@ -737,16 +740,16 @@ var ExplorationEditorMainTab = function() {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
         var parameterElementButton = parameterElement.$('<button>');
         await action.click('Parameter Element Button', parameterElementButton);
-        var multipleChoiceAnswerOption =
-          multipleChoiceAnswerOptions(parameterValues[i]);
+        var multipleChoiceAnswerOption = await (
+          multipleChoiceAnswerOptions(parameterValues[i]));
         await action.click(
           'Multiple Choice Answer Option: ' + i,
           multipleChoiceAnswerOption);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var j = 0; j < answerArray.length; j++) {
-          var itemSelectionAnswerOption =
-            itemSelectionAnswerOptions(answerArray[j]);
+          var itemSelectionAnswerOption = await (
+            itemSelectionAnswerOptions(answerArray[j]));
           await action.click(
             'Item Selection Answer Option: ' + j,
             itemSelectionAnswerOption);
@@ -800,8 +803,9 @@ var ExplorationEditorMainTab = function() {
     // Replace selectors with "...".
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
+    var answerDescription = await $('.e2e-test-answer-description');
     await action.click('Answer Description', answerDescription);
-    var ruleDropdownElement = $$(
+    var ruleDropdownElement = await $$(
       `.select2-results__option=${ruleDescriptionInDropdown}`)[0];
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
@@ -811,14 +815,17 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
+    var explorationGraph = await $('.e2e-test-exploration-graph');
     var nodeElement = await explorationGraph.$$(
       `.e2e-test-node=${stateName}`)[0];
     await waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    var deleteNode = nodeElement.$(deleteNodeLocator);
+
+    var deleteNode = await nodeElement.$('.e2e-test-delete-node');
     await action.click('Delete Node', deleteNode);
 
+    var confirmDeleteStateButton = await $('.e2e-test-confirm-delete-state');
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');
@@ -827,6 +834,7 @@ var ExplorationEditorMainTab = function() {
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = async function(names) {
+    var explorationGraph = await $('.e2e-test-exploration-graph');
     var stateNodes = await explorationGraph.$$('.e2e-test-node');
     var stateNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
@@ -840,7 +848,8 @@ var ExplorationEditorMainTab = function() {
   this.moveToState = async function(targetName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var stateNodes = explorationGraph.$$('.e2e-test-node');
+    var explorationGraph = await $('.e2e-test-exploration-graph');
+    var stateNodes = await explorationGraph.$$('.e2e-test-node');
     var listOfNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));
@@ -857,6 +866,7 @@ var ExplorationEditorMainTab = function() {
       throw new Error(
         'State ' + targetName + ' not found by editorMainTab.moveToState.');
     }
+    var stateNameContainer = await $('.e2e-test-state-name-container');
     await waitFor.visibilityOf(
       stateNameContainer, 'State Name Container takes too long to appear');
     var errorMessage = (
@@ -868,13 +878,18 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setStateName = async function(name) {
+    var postTutorialPopover = await $('.ng-joyride .popover-content');
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
     await action.waitForAutosave();
+    var stateNameContainer = await $('.e2e-test-state-name-container');
     await action.click('State Name Container', stateNameContainer);
+    var stateNameInput = await $('.e2e-test-state-name-input');
     await action.clear('State Name input', stateNameInput);
     await action.keys('State Name input', stateNameInput, name);
 
+    var stateNameSubmitButton = await stateNameContainer.$(
+      '.e2e-test-state-name-submit');
     await action.click('State Name Submit button', stateNameSubmitButton);
 
     // Wait for state name container to completely disappear
@@ -888,6 +903,7 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectCurrentStateToBe = async function(name) {
+    var stateNameContainer = await $('.e2e-test-state-name-container');
     await waitFor.visibilityOf(
       stateNameContainer, 'State Name Container taking too long to show up');
     await waitFor.textToBePresentInElement(

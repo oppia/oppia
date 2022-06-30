@@ -55,7 +55,7 @@ var customizeInteraction = async function(
 // function would be readPlainText).
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
-  var optionElements = $$(
+  var optionElements = await $$(
     '.e2e-test-item-selection-input-container');
   var optionsCount = await optionElements.count();
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
@@ -82,7 +82,7 @@ var submitAnswer = async function(elem, answer) {
         '.e2e-test-item-selection-input-checkbox').click();
   }
 
-  var submitAnswerButton = $(
+  var submitAnswerButton = await $(
     '.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');

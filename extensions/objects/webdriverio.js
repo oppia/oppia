@@ -34,7 +34,7 @@ var MathEditor = function(elem) {
       await elem.click();
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
-      var mathInputElem = $$('.e2e-test-guppy-div');
+      var mathInputElem = await $$('.e2e-test-guppy-div');
       lastElement = mathInputElem.length - 1;
       var present = await mathInputElem[lastElement].isExisting();
       if (present) {
@@ -46,7 +46,7 @@ var MathEditor = function(elem) {
         elem, `"${elem.getTagName()}" takes too long to be clickable`);
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
-      var mathInputElem = $$(
+      var mathInputElem = await $$(
         '.e2e-test-guppy-div');
       lastElement = mathInputElem.length - 1;
       var present = await mathInputElem[lastElement].isExisting();

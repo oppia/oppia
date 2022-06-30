@@ -47,7 +47,7 @@ describe('Learner dashboard functionality', function() {
   var libraryPage = null;
   var learnerDashboardPage = null;
   var clickContinueButton = async function() {
-    var continueButton = $('.e2e-test-continue-button');
+    var continueButton = await $('.e2e-test-continue-button');
     await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
   };
@@ -222,7 +222,7 @@ describe('Learner dashboard functionality', function() {
     }
     // User clicks on Oppia logo to leave exploration, user should be
     // able to leave the page directly without getting any alert message.
-    var oppiaLogo = $('.e2e-test-oppia-main-logo');
+    var oppiaLogo = await $('.e2e-test-oppia-main-logo');
     await action.click('Oppia logo', oppiaLogo);
 
     // Go to 'Test Exploration'.
@@ -354,7 +354,7 @@ describe('Learner dashboard functionality', function() {
     if (browser.isMobile) {
       // In mobile, 'Play Exploration' button also needs to be clicked
       // to begin an exploration which is a part of a collection.
-      var playExploration = $('.e2e-test-play-exploration-button');
+      var playExploration = await $('.e2e-test-play-exploration-button');
       await action.click('Play exploration', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
@@ -364,7 +364,7 @@ describe('Learner dashboard functionality', function() {
     }
     // User clicks on Oppia logo to leave collection, user should be
     // able to leave the page directly without getting any alert message.
-    var oppiaLogo = $('.e2e-test-oppia-main-logo');
+    var oppiaLogo = await $('.e2e-test-oppia-main-logo');
     await action.click('Oppia logo', oppiaLogo);
 
     // Learner Dashboard should display
@@ -386,7 +386,7 @@ describe('Learner dashboard functionality', function() {
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
     if (browser.isMobile) {
-      var playExploration = $('.e2e-test-play-exploration-button');
+      var playExploration = await $('.e2e-test-play-exploration-button');
       await action.click('Play exploration', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
@@ -428,7 +428,7 @@ describe('Learner dashboard functionality', function() {
       await creatorDashboardPage.get();
       await waitFor.pageToFullyLoad();
       // Click on 'Collections' tab.
-      var collectionsTab = $('.e2e-test-collections-tab');
+      var collectionsTab = await $('.e2e-test-collections-tab');
       await action.click('Collections tab', collectionsTab);
       await creatorDashboardPage.navigateToCollectionEditor();
       await collectionEditorPage.addExistingExploration(

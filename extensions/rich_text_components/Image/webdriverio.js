@@ -145,7 +145,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
       if (customTools.includes(args[i])) {
         await action.click('Shape tool', shapeTool);
         if (args[i] === 'svgupload') {
-          var imageUploadInput = $('.e2e-test-photo-upload-input');
+          var imageUploadInput = await $('.e2e-test-photo-upload-input');
           absPath = path.resolve(__dirname, './circle.svg');
           await waitFor.presenceOf(
             imageUploadInput,

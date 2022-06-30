@@ -21,28 +21,14 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var CollectionEditorPage = function() {
-  var addExplorationButton = $('.e2e-test-add-exploration-button');
-  var addExplorationInput = $('.e2e-test-add-exploration-input');
-  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
-  var collectionEditorObjectiveInput = $(
-    '.e2e-test-collection-editor-objective-input');
-  var commitMessageInput = $('.e2e-test-commit-message-input');
-  var categoryFilterDropdown = $(
-    '.e2e-test-collection-editor-category-dropdown');
-  var editorPublishButton = $('.e2e-test-editor-publish-button');
-  var editorTitleInput = $('.e2e-test-collection-editor-title-input');
-  var saveChangesButton = $('.e2e-test-collection-save-changes-button');
-  var saveDraftButton = $('.e2e-test-save-draft-button');
-  var saveModal = $('.e2e-test-save-modal');
-  var saveInProgressLabel = $(
-    '.e2e-test-save-in-progress-label');
-
   this.addExistingExploration = async function(explorationId) {
+    var addExplorationInput = await $('.e2e-test-add-exploration-input');
     await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
     await action.keys(
       'Add Exploration Input', addExplorationInput, explorationId);
     // Waits until the button becomes active after debouncing.
+    var addExplorationButton = await $('.e2e-test-add-exploration-button');
     await waitFor.elementToBeClickable(
       addExplorationButton,
       'Unable to find exploration ID: ' + explorationId);
@@ -56,8 +42,10 @@ var CollectionEditorPage = function() {
   };
 
   this.setCommitMessage = async function(message) {
+    var saveModal = await $('.e2e-test-save-modal');
     await waitFor.visibilityOf(
       saveModal, 'Save Modal takes too long to appear');
+    var commitMessageInput = await $('.e2e-test-commit-message-input');
     await waitFor.elementToBeClickable(
       commitMessageInput, 'Commit Message input takes too long to appear');
     await action.click('Commit Message Input', commitMessageInput);
@@ -79,6 +67,7 @@ var CollectionEditorPage = function() {
 
   // Save draft of the collection.
   this.saveDraft = async function() {
+    var saveDraftButton = await $('.e2e-test-save-draft-button');
     await waitFor.elementToBeClickable(
       saveDraftButton, 'Collection Save Draft button is not clickable');
     await action.click('Save Draft Button', saveDraftButton);
@@ -86,6 +75,7 @@ var CollectionEditorPage = function() {
 
   // Closes the save modal.
   this.closeSaveModal = async function() {
+    var closeSaveModalButton = await $('.e2e-test-close-save-modal-button');
     await waitFor.elementToBeClickable(
       closeSaveModalButton, 'Publish Changes button is not clickable');
     await action.click('Close Save Modal Button', closeSaveModalButton);
@@ -95,6 +85,7 @@ var CollectionEditorPage = function() {
 
   // Click on publish collection.
   this.publishCollection = async function() {
+    var editorPublishButton = await $('.e2e-test-editor-publish-button');
     await waitFor.elementToBeClickable(
       editorPublishButton, 'Collection Publish button is not clickable');
     await action.click('Editor Publish Button', editorPublishButton);
@@ -102,11 +93,14 @@ var CollectionEditorPage = function() {
 
   // Set collection title.
   this.setTitle = async function(title) {
+    var editorTitleInput = await $('.e2e-test-collection-editor-title-input');
     await action.keys('Editor Title Input', editorTitleInput, title);
   };
 
   // Set collection objective.
   this.setObjective = async function(objective) {
+    var collectionEditorObjectiveInput = await $(
+      '.e2e-test-collection-editor-objective-input');
     await action.keys(
       'Collection Editor Objective Input',
       collectionEditorObjectiveInput, objective);
@@ -114,6 +108,8 @@ var CollectionEditorPage = function() {
 
   // Set collection category.
   this.setCategory = async function(category) {
+    var categoryFilterDropdown = await $(
+      '.e2e-test-collection-editor-category-dropdown');
     await action.click('Category filter', categoryFilterDropdown);
     var dropdownOption = await $(`.mat-option-text=${category}`);
     await action.click(
@@ -122,11 +118,15 @@ var CollectionEditorPage = function() {
 
   // Saves changes and publishes collection.
   this.saveChanges = async function() {
+    var saveChangesButton = await $(
+      '.e2e-test-collection-save-changes-button');
     await waitFor.elementToBeClickable(
       saveChangesButton, 'Save Changes button is not clickable');
     await action.click('Save Changes Button', saveChangesButton);
     await waitFor.invisibilityOf(
       saveChangesButton, 'Save Changes Modal takes too long to close');
+    var saveInProgressLabel = await $(
+      '.e2e-test-save-in-progress-label');
     await waitFor.invisibilityOf(
       saveInProgressLabel, 'Collection is taking too long to save.');
   };

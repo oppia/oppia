@@ -33,9 +33,9 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
-  var languageDropdown = $('.e2e-test-language-dropdown');
+  var languageDropdown = await $('.e2e-test-language-dropdown');
   await action.click('Language Dropdown', languageDropdown);
-  var languageOption = $('.e2e-test-i18n-language-' + language);
+  var languageOption = await $('.e2e-test-i18n-language-' + language);
   await action.click('Language Option', languageOption);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();

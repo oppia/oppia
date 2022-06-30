@@ -36,7 +36,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
 var submitAnswer = async function(elem, answer) {
   await elem.$('<oppia-interactive-numeric-input>').
     $('<input>').setValue(answer);
-  var submitAnswerBtn = $('.e2e-test-submit-answer-button');
+  var submitAnswerBtn = await $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
 };
 

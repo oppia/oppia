@@ -24,31 +24,17 @@ var action = require('./action.js');
 
 var ExplorationEditorSettingsTab = function() {
   /*
-   * Interactive elements
-   */
-  var neutralElement = $('.e2e-test-settings-container');
-  var explorationCategoryInput = $(
-    '.e2e-test-exploration-category-input');
-  var explorationLanguageInput = $(
-    '.e2e-test-exploration-language-select');
-  var explorationObjectiveInput = $(
-    '.e2e-test-exploration-objective-input');
-  var explorationTitleInput = $(
-    '.e2e-test-exploration-title-input');
-  var disableCorrectnessFeedbackButton = $(
-    '.e2e-test-enable-mark-correctness-feedback');
-  var deleteExplorationButton = $(
-    '.e2e-test-delete-exploration-button');
-  var confirmDeleteExplorationButton = $(
-    '.e2e-test-really-delete-exploration-button');
-
-  /*
    * Workflows
    */
   this.deleteExploration = async function() {
+    var neutralElement = await $('.e2e-test-settings-container');
     await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
+    var deleteExplorationButton = await $(
+      '.e2e-test-delete-exploration-button');
     await action.click('Delete Exploration Button', deleteExplorationButton);
+    var confirmDeleteExplorationButton = await $(
+      '.e2e-test-really-delete-exploration-button');
     await action.click(
       'Confirm Delete Exploration Button',
       confirmDeleteExplorationButton);
@@ -61,11 +47,15 @@ var ExplorationEditorSettingsTab = function() {
 
   this.disableCorrectnessFeedback = async function() {
     await action.waitForAutosave();
+    var disableCorrectnessFeedbackButton = await $(
+      '.e2e-test-enable-mark-correctness-feedback');
     await action.click(
       'Disable Correctness Feedback Button', disableCorrectnessFeedbackButton);
   };
 
   this.setCategory = async function(category) {
+    var explorationCategoryInput = await $(
+      '.e2e-test-exploration-category-input');
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
@@ -74,12 +64,16 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setLanguage = async function(language) {
+    var explorationLanguageInput = await $(
+      '.e2e-test-exploration-language-select');
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
     await explorationLanguageInput.selectByVisibleText(language);
   };
 
   this.setObjective = async function(objective) {
+    var explorationObjectiveInput = await $(
+      '.e2e-test-exploration-objective-input');
     await action.clear(
       'Exploration Objective input', explorationObjectiveInput);
     await action.keys(
@@ -89,6 +83,8 @@ var ExplorationEditorSettingsTab = function() {
   this.setTitle = async function(title) {
     await action.waitForAutosave();
     await general.scrollToTop();
+    var explorationTitleInput = await $(
+      '.e2e-test-exploration-title-input');
     await action.clear('Exploration Title Input', explorationTitleInput);
     await action.keys(
       'Exploration Title Input', explorationTitleInput, title);

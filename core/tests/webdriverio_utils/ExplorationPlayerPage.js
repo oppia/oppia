@@ -22,11 +22,6 @@ var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
-  var waitingForResponseElem = $(
-    '.e2e-test-input-response-loading-dots');
-  var explorationHeader = $('.e2e-test-exploration-header');
-  var conversationInput = $('.e2e-test-conversation-input');
-
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
   // sent a handler (as given in forms.RichTextChecker) to which calls such as
@@ -49,17 +44,21 @@ var ExplorationPlayerPage = function() {
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
     // TODO(#11969): Move this wait to interactions submitAnswer function.
+    var conversationInput = await $('.e2e-test-conversation-input');
     await waitFor.presenceOf(
       conversationInput, 'Conversation input takes too long to appear.');
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     await interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
+    var waitingForResponseElem = await $(
+      '.e2e-test-input-response-loading-dots');
     await waitFor.invisibilityOf(
       waitingForResponseElem, 'Response takes too long to appear');
   };
 
   this.expectExplorationNameToBe = async function(name) {
+    var explorationHeader = await $('.e2e-test-exploration-header');
     await waitFor.visibilityOf(
       explorationHeader, 'Exploration Header taking too long to appear.');
     await waitFor.textToBePresentInElement(

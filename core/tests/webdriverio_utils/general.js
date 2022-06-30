@@ -143,7 +143,7 @@ var moveToEditor = async function(welcomeModalIsShown) {
 };
 
 var expectErrorPage = async(errorNum) => {
-  var errorContainer = $('.e2e-test-error-container');
+  var errorContainer = await $('.e2e-test-error-container');
   await waitFor.visibilityOf(
     errorContainer,
     'Protractor test error container taking too long to appear');
@@ -155,7 +155,7 @@ var expectErrorPage = async(errorNum) => {
 var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  var oppiaBaseContainer = $('.e2e-test-base-container');
+  var oppiaBaseContainer = await $('.e2e-test-base-container');
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
@@ -226,13 +226,13 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
 };
 
 var goToHomePage = async function() {
-  var oppiaMainLogo = $('.e2e-test-oppia-main-logo');
+  var oppiaMainLogo = await $('.e2e-test-oppia-main-logo');
   await action.click('Oppia Main Logo', oppiaMainLogo);
   return await waitFor.pageToFullyLoad();
 };
 
 var openProfileDropdown = async function() {
-  var profileDropdown = $('.e2e-test-profile-dropdown');
+  var profileDropdown = await $('.e2e-test-profile-dropdown');
   await action.click(
     'Profile dropdown taking too long to be clickable.',
     profileDropdown);
@@ -240,7 +240,7 @@ var openProfileDropdown = async function() {
 
 var navigateToTopicsAndSkillsDashboardPage = async function() {
   await openProfileDropdown();
-  var topicsAndSkillsDashboardLink = $(
+  var topicsAndSkillsDashboardLink = await $(
     '.e2e-test-topics-and-skills-dashboard-link');
   await waitFor.clientSideRedirection(async() => {
     await action.click(

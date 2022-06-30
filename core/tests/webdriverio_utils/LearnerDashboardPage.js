@@ -22,33 +22,6 @@ var action = require('./action.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
-  var homeSection = $('.e2e-test-home-section');
-  var goalsSection =
-    $('.e2e-test-goals-section');
-  var progressSection =
-    $('.e2e-test-progress-section');
-  var communityLessonsSection =
-    $('.e2e-test-community-lessons-section');
-  var feedbackSection =
-    $('.e2e-test-feedback-section');
-  var feedbackThread =
-    $('.e2e-test-feedback-thread');
-  var feedbackMessage =
-   $$('.e2e-test-feedback-message');
-  var addToLearnerGoalsButton =
-    $('.e2e-test-add-topic-to-current-goals-button');
-  var currentGoalsTopicName =
-    $('.e2e-test-topic-name-in-current-goals');
-  var editGoalsTopicName =
-    $('.e2e-test-topic-name-in-edit-goals');
-  var skillProficiencyTopicTitle =
-    $('.e2e-test-skill-proficiency-topic-title');
-  var completedGoalsTopicName =
-    $('.e2e-test-completed-goals-topic-name');
-  var incompleteCommunityLessonsSection = $(
-    '.e2e-test-incomplete-community-lessons-section');
-  var completeCommunityLessonsSection = $(
-    '.e2e-test-completed-community-lessons-section');
 
   this.get = async function() {
     await browser.url(LEARNER_DASHBOARD_URL);
@@ -56,31 +29,38 @@ var LearnerDashboardPage = function() {
   };
 
   this.navigateToHomeSection = async function() {
+    var homeSection = await $('.e2e-test-home-section');
     await action.click('Home Section', homeSection);
   };
 
   this.navigateToGoalsSection = async function() {
+    var goalsSection = await $('.e2e-test-goals-section');
     await action.click('Goals Section', goalsSection);
   };
 
   this.navigateToProgressSection = async function() {
+    var progressSection = await $('.e2e-test-progress-section');
     await action.click('Progress Section', progressSection);
   };
 
   this.navigateToCommunityLessonsSection = async function() {
+    var communityLessonsSection = await $(
+      '.e2e-test-community-lessons-section');
     await action.click('Community Lessons Section', communityLessonsSection);
   };
 
   this.navigateToFeedbackSection = async function() {
+    var feedbackSection = await $('.e2e-test-feedback-section');
     await action.click('Feedback Section', feedbackSection);
   };
 
   this.navigateToFeedbackThread = async function() {
+    var feedbackThread = await $('.e2e-test-feedback-thread');
     await action.click('Feedback Thread', feedbackThread);
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
-    var collectionTitle = $(
+    var collectionTitle = await $(
       `.e2e-test-collection-summary-tile-title=${title}`);
     await waitFor.visibilityOf(
       collectionTitle, 'Unable to find collection ' + title);
@@ -96,37 +76,42 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter.
-    var explorationTitle = $(
+    var explorationTitle = await $(
       `.e2e-test-exp-summary-tile-title=${title}`);
     expect(await action.getText(
       'Exploration title', explorationTitle)).toMatch(title);
   };
 
   this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
+    var editGoalsTopicName = await $('.e2e-test-topic-name-in-edit-goals');
     await waitFor.visibilityOf(
       editGoalsTopicName,
       'Topic in Edit Goals takes too long to appear');
     await waitFor.textToBePresentInElement(
       editGoalsTopicName, name,
       `Text "${name}" taking too long to be present in editGoalsTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-topic-name-in-edit-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNameOfTopicInCurrentGoalsToMatch = async function(name) {
+    var currentGoalsTopicName = await $(
+      '.e2e-test-topic-name-in-current-goals');
     await waitFor.visibilityOf(
       currentGoalsTopicName,
       'Topic in Current Goals takes too long to appear');
     await waitFor.textToBePresentInElement(
       currentGoalsTopicName, name,
       `Text "${name}" taking too long to be present in currentGoalsTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-topic-name-in-current-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNameOfTopicInSkillProficiencyToMatch = async function(name) {
+    var skillProficiencyTopicTitle = await $(
+      '.e2e-test-skill-proficiency-topic-title');
     await waitFor.visibilityOf(
       skillProficiencyTopicTitle,
       'Topic in Skill Proficiency takes too long to appear'
@@ -134,12 +119,14 @@ var LearnerDashboardPage = function() {
     await waitFor.textToBePresentInElement(
       skillProficiencyTopicTitle, name,
       `Text "${name}" taking too long to be present in skillProficiencyTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-skill-proficiency-topic-title=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
   this.expectNameOfTopicInCompletedGoalsToMatch = async function(name) {
+    var completedGoalsTopicName = await $(
+      '.e2e-test-completed-goals-topic-name');
     await waitFor.visibilityOf(
       completedGoalsTopicName,
       'Topic in completed goals takes too long to appear'
@@ -147,7 +134,7 @@ var LearnerDashboardPage = function() {
     await waitFor.textToBePresentInElement(
       completedGoalsTopicName, name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-completed-goals-topic-name=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
@@ -186,6 +173,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.addTopicToLearnerGoals = async function() {
+    var addToLearnerGoalsButton = await $(
+      '.e2e-test-add-topic-to-current-goals-button');
     await action.click('Add to learner goals button', addToLearnerGoalsButton);
   };
 
@@ -216,6 +205,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectFeedbackMessageToMatch = async function(message) {
+    var feedbackMessage = await $$('.e2e-test-feedback-message');
     await waitFor.visibilityOf(
       feedbackMessage[0], 'Feedback Message takes too long to appear');
     expect(await feedbackMessage[0].getText()).toMatch(message);
@@ -224,7 +214,9 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (
     async function(explorationTitle) {
       await this.navigateToCommunityLessonsSection();
-      var explorationTitleInIncompleteSection = (
+      var incompleteCommunityLessonsSection = await $(
+        '.e2e-test-incomplete-community-lessons-section');
+      var explorationTitleInIncompleteSection = await (
         incompleteCommunityLessonsSection.$(
           `.e2e-test-exp-summary-tile-title=${explorationTitle}`));
       expect(await action.getText(
@@ -235,7 +227,9 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckCompleteExplorations = async function(
       explorationTitle) {
     await this.navigateToCommunityLessonsSection();
-    var explorationTitleInCompleteSection = (
+    var completeCommunityLessonsSection = await $(
+      '.e2e-test-completed-community-lessons-section');
+    var explorationTitleInCompleteSection = await (
       completeCommunityLessonsSection.$(
         `.e2e-test-exp-summary-tile-title=${explorationTitle}`));
     expect(await action.getText(
@@ -246,7 +240,9 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckIncompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    var collectionTitleInIncompleteSection = (
+    var incompleteCommunityLessonsSection = await $(
+      '.e2e-test-incomplete-community-lessons-section');
+    var collectionTitleInIncompleteSection = await (
       incompleteCommunityLessonsSection.$(
         `.e2e-test-collection-summary-tile-title=${collectionTitle}`));
     expect(await action.getText(
@@ -257,7 +253,9 @@ var LearnerDashboardPage = function() {
   this.navigateToCommunityLessonsAndCheckCompleteCollections = async function(
       collectionTitle) {
     await this.navigateToCommunityLessonsSection();
-    var collectionTitleInCompleteSection = (
+    var completeCommunityLessonsSection = await $(
+      '.e2e-test-completed-community-lessons-section');
+    var collectionTitleInCompleteSection = await (
       completeCommunityLessonsSection.$(
         `.e2e-test-collection-summary-tile-title=${collectionTitle}`));
     expect(await action.getText(

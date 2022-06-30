@@ -23,28 +23,9 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
-  var emailUpdatesCheckbox = $('.e2e-test-email-updates-checkbox');
-  var editorRoleEmailsCheckbox = $(
-    '.e2e-test-editor-role-email-checkbox');
-  var feedbackMessageEmailsCheckbox = $(
-    '.e2e-test-feedback-message-email-checkbox');
-  var navBar = $('.e2e-test-navbar-dropdown-toggle');
-  var pageHeader = $('.e2e-test-preferences-title');
-  var audioLanguageSelector = (
-    $('.e2e-test-audio-language-selector'));
-  var userBioElement = $('.e2e-test-user-bio');
-  var userInterestsInput = $('.e2e-test-subject-interests-input');
-  var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
-  var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
-  var profilePhotoClickable = $('.e2e-test-photo-clickable');
-  var customProfilePhoto = $('.e2e-test-custom-photo');
-  var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
-  var profilePhotoUploadError = $('.e2e-test-upload-error');
-  var deleteAccountButton = $('.e2e-test-delete-account-button');
-  var exportAccountButton = $('.e2e-test-export-account-button');
-  var languageSelector = $('.e2e-test-site-language-selector');
 
   var saveNewChanges = async function(fieldName) {
+    var navBar = await $('.e2e-test-navbar-dropdown-toggle');
     await action.click('Navbar Button', navBar);
     await waitFor.visibilityOfInfoToast(
       `Info toast for saving ${fieldName} takes too long to appear.`);
@@ -58,60 +39,76 @@ var PreferencesPage = function() {
   };
 
   this.expectUploadError = async function() {
+    var profilePhotoUploadError = await $('.e2e-test-upload-error');
     expect(await profilePhotoUploadError.isDisplayed()).toBe(true);
   };
 
   this.uploadProfilePhoto = async function(imgPath, resetExistingImage) {
+    var profilePhotoClickable = await $('.e2e-test-photo-clickable');
     return await workflow.uploadImage(
       profilePhotoClickable, imgPath, resetExistingImage);
   };
 
   this.submitProfilePhoto = async function(imgPath, resetExistingImage) {
+    var profilePhotoClickable = await $('.e2e-test-photo-clickable');
+    var profilePhotoCropper = await $(
+      '.e2e-test-photo-crop .cropper-container');
     return await workflow.submitImage(
       profilePhotoClickable, profilePhotoCropper, imgPath, resetExistingImage);
   };
 
   this.getProfilePhotoSource = async function() {
+    var customProfilePhoto = await $('.e2e-test-custom-photo');
     return await workflow.getImageSource(customProfilePhoto);
   };
 
   this.editUserBio = async function(bio) {
+    var userBioElement = await $('.e2e-test-user-bio');
     await action.keys('User bio field', userBioElement, bio);
     await saveNewChanges('User Bio');
   };
 
   this.toggleEmailUpdatesCheckbox = async function() {
+    var emailUpdatesCheckbox = await $('.e2e-test-email-updates-checkbox');
     await action.click('Email Updates checkbox', emailUpdatesCheckbox);
     await saveNewChanges('Email Updates');
   };
 
   this.toggleEditorRoleEmailsCheckbox = async function() {
+    var editorRoleEmailsCheckbox = await $(
+      '.e2e-test-editor-role-email-checkbox');
     await action.click('Editor role emails checkbox', editorRoleEmailsCheckbox);
     await saveNewChanges('Editor Role Emails');
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
+    var feedbackMessageEmailsCheckbox = await $(
+      '.e2e-test-feedback-message-email-checkbox');
     await action.click(
       'Feedback emails checkbox', feedbackMessageEmailsCheckbox);
     await saveNewChanges('Feedback Emails');
   };
 
   this.selectSystemLanguage = async function(language) {
+    var languageSelector = await $('.e2e-test-site-language-selector');
     await action.click('system language selector', languageSelector);
-    var dropdownOption = $(`.mat-option-text=${language}`);
+    var dropdownOption = await $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
     await saveNewChanges('System Language');
   };
 
   this.selectPreferredAudioLanguage = async function(language) {
+    var audioLanguageSelector = await $(
+      '.e2e-test-audio-language-selector');
     await action.click('clickable', audioLanguageSelector);
-    var dropdownOption = $(`.mat-option-text=${language}`);
+    var dropdownOption = await $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
     await saveNewChanges('Preferred Audio Language');
   };
 
   this.setUserBio = async function(bio) {
     var inputFieldName = 'User bio input field';
+    var userBioElement = await $('.e2e-test-user-bio');
     await action.clear(inputFieldName, userBioElement);
     await saveNewChanges('User Bio');
     await action.keys(inputFieldName, userBioElement, bio);
@@ -120,6 +117,7 @@ var PreferencesPage = function() {
 
   // Here Newline Character is used as ENTER KEY.
   this.setUserInterests = async function(interests) {
+    var userInterestsInput = await $('.e2e-test-subject-interests-input');
     await action.click('User Interest Input', userInterestsInput);
     for (var i = 0; i < interests.length; i++) {
       await action.keys(
@@ -129,10 +127,14 @@ var PreferencesPage = function() {
   };
 
   this.isFeedbackEmailsCheckboxSelected = async function() {
+    var feedbackMessageEmailsCheckbox = await $(
+      '.e2e-test-feedback-message-email-checkbox');
     return await feedbackMessageEmailsCheckbox.isSelected();
   };
 
   this.isEditorRoleEmailsCheckboxSelected = async function() {
+    var editorRoleEmailsCheckbox = await $(
+      '.e2e-test-editor-role-email-checkbox');
     return await editorRoleEmailsCheckbox.isSelected();
   };
 
@@ -160,12 +162,14 @@ var PreferencesPage = function() {
   };
 
   this.expectPageHeaderToBe = async function(text) {
+    var pageHeader = await $('.e2e-test-preferences-title');
     await waitFor.visibilityOf(
       pageHeader, 'pageHeader taking too long to appear.');
     expect(await pageHeader.getText()).toEqual(text);
   };
 
   this.expectPreferredSiteLanguageToBe = async function(language) {
+    var languageSelector = await $('.e2e-test-site-language-selector');
     await waitFor.visibilityOf(
       languageSelector,
       'languageSelector taking too long to appear.');
@@ -173,6 +177,8 @@ var PreferencesPage = function() {
   };
 
   this.expectPreferredAudioLanguageToBe = async function(language) {
+    var audioLanguageSelector = await $(
+      '.e2e-test-audio-language-selector');
     await waitFor.visibilityOf(
       audioLanguageSelector,
       'audio language selector taking too long to appear.');
@@ -180,6 +186,8 @@ var PreferencesPage = function() {
   };
 
   this.expectPreferredAudioLanguageNotToBe = async function(language) {
+    var audioLanguageSelector = await $(
+      '.e2e-test-audio-language-selector');
     await waitFor.visibilityOf(
       audioLanguageSelector,
       'audio language selector taking too long to appear.');
@@ -192,29 +200,34 @@ var PreferencesPage = function() {
   };
 
   this.expectUserBioToBe = async function(bio) {
+    var userBioElement = await $('.e2e-test-user-bio');
     await waitFor.visibilityOf(
       userBioElement, 'User bio field takes too long to appear.');
     expect(await userBioElement.getAttribute('value')).toMatch(bio);
   };
 
   this.selectCreatorDashboard = async function() {
+    var createrDashboardRadio = await $('.e2e-test-creator-dashboard-radio');
     await action.click(
       'Creator Dashboard radio', createrDashboardRadio);
     await saveNewChanges('Creator Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {
+    var learnerDashboardRadio = await $('.e2e-test-learner-dashboard-radio');
     await action.click(
       'Learner Dashboard radio', learnerDashboardRadio);
     await saveNewChanges('Learner Dashboard Option');
   };
 
   this.clickDeleteAccountButton = async function() {
+    var deleteAccountButton = await $('.e2e-test-delete-account-button');
     await action.click(
       'Delete Account button', deleteAccountButton);
   };
 
   this.clickExportAccountButton = async function() {
+    var exportAccountButton = await $('.e2e-test-export-account-button');
     await action.click(
       'Export Account button', exportAccountButton);
   };

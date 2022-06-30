@@ -50,7 +50,7 @@ var submitAnswer = async function(conversationInput, graphDict) {
   if (graphDict) {
     await forms.GraphEditor(graphInputContainer).setValue(graphDict);
   }
-  var submitAnswerButton = $(
+  var submitAnswerButton = await $(
     '.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');

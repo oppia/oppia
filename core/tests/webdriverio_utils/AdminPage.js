@@ -22,15 +22,6 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var adminRolesTab = $('.e2e-test-admin-roles-tab');
-  var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
-  var usernameInputFieldForRolesEditing = $(
-    '.e2e-test-username-for-role-editor');
-  var editUserRoleButton = $('.e2e-test-role-edit-button');
-  var roleEditorContainer = $('.e2e-test-roles-editor-card-container');
-  var addNewRoleButton = $('.e2e-test-add-new-role-button');
-  var progressSpinner = $('.e2e-test-progress-spinner');
-  var roleSelector = $('.e2e-test-new-role-selector');
 
   this.get = async function() {
     await browser.url(ADMIN_URL_SUFFIX);
@@ -38,9 +29,11 @@ var AdminPage = function() {
   };
 
   var _switchToRolesTab = async function() {
+    var adminRolesTab = await $('.e2e-test-admin-roles-tab');
     await action.click('Admin roles tab button', adminRolesTab);
 
     await expect(await adminRolesTab.getAttribute('class')).toMatch('active');
+    var adminRolesTabContainer = await $('.e2e-test-roles-tab-container');
     await waitFor.visibilityOf(
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
@@ -48,9 +41,13 @@ var AdminPage = function() {
   this._editUserRole = async function(username) {
     await this.get();
     await _switchToRolesTab();
+    var usernameInputFieldForRolesEditing = await $(
+      '.e2e-test-username-for-role-editor');
     await action.keys(
       'Username input field', usernameInputFieldForRolesEditing, username);
+    var editUserRoleButton = await $('.e2e-test-role-edit-button');
     await action.click('Edit user role button', editUserRoleButton);
+    var roleEditorContainer = await $('.e2e-test-roles-editor-card-container');
     await waitFor.visibilityOf(
       roleEditorContainer, 'Role editor card takes too long to appear.');
   };
@@ -58,12 +55,15 @@ var AdminPage = function() {
   this.addRole = async function(name, newRole) {
     await this._editUserRole(name);
 
+    var addNewRoleButton = await $('.e2e-test-add-new-role-button');
     await action.click('Add new role', addNewRoleButton);
+    var roleSelector = await $('.e2e-test-new-role-selector');
     await action.matSelect('New role selector', roleSelector, newRole);
 
+    var progressSpinner = await $('.e2e-test-progress-spinner');
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
-    var removeButtonElement = $(
+    var removeButtonElement = await $(
       '.e2e-test-' + newRole.split(' ').join('-') +
       '-remove-button-container');
     await waitFor.visibilityOf(

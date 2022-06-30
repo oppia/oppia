@@ -23,19 +23,13 @@ var waitFor = require('./waitFor.js');
 var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
-  var searchButton = $('.e2e-test-search-button');
-  var mainHeader = $('.e2e-test-library-main-header');
-  var allCollectionSummaryTile = $(
-    '.e2e-test-collection-summary-tile');
-  var allExplorationSummaryTile = $(
-    '.e2e-test-exp-summary-tile');
-  var allExplorationsTitled = function(explorationName) {
-    return $$(
+  var allExplorationsTitled = async function(explorationName) {
+    return await $$(
       `.e2e-test-exp-summary-tile-title=${explorationName}`);
   };
 
-  var allCollectionsTitled = function(collectionName) {
-    return $$(
+  var allCollectionsTitled = async function(collectionName) {
+    return await $$(
       `.e2e-test-collection-summary-tile-title=${collectionName}`);
   };
 
@@ -53,6 +47,7 @@ var LibraryPage = function() {
       searchInputs[0]);
     await action.clear('Search input', searchInput);
     await action.keys('Search input', searchInput, searchQuery);
+    var searchButton = await $('.e2e-test-search-button');
     let searchButtonExists = await searchButton.isExisting();
     if (searchButtonExists) {
       await action.click('Search button', searchButton);
@@ -72,11 +67,13 @@ var LibraryPage = function() {
 
   this.playExploration = async function(explorationName) {
     await waitFor.pageToFullyLoad();
+    var allExplorationSummaryTile = await $(
+      '.e2e-test-exp-summary-tile');
     await waitFor.visibilityOf(
       allExplorationSummaryTile,
       'Library Page does not have any explorations');
 
-    var explorationCard = await allExplorationsTitled(explorationName)[0];
+    var explorationCard = allExplorationsTitled(explorationName)[0];
     await waitFor.visibilityOf(
       explorationCard, 'Unable to find exploration ' + explorationName);
     // The Exploration summary card is masked by a dummy element. Therefore, a
@@ -92,15 +89,18 @@ var LibraryPage = function() {
   };
 
   this.expectMainHeaderTextToBe = async function(expectedHeaderText) {
+    var mainHeader = await $('.e2e-test-library-main-header');
     expect(await mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
   this.playCollection = async function(collectionName) {
     await waitFor.pageToFullyLoad();
+    var allCollectionSummaryTile = await $(
+      '.e2e-test-collection-summary-tile');
     await waitFor.visibilityOf(
       allCollectionSummaryTile,
       'Library Page does not have any collections');
-    var collectionCard = await allCollectionsTitled(collectionName)[0];
+    var collectionCard = allCollectionsTitled(collectionName)[0];
     await waitFor.visibilityOf(
       collectionCard,
       'Unable to find collection ' + collectionName);

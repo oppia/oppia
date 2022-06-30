@@ -230,7 +230,7 @@ describe('Playing the exploration', function() {
         await forms.toRichText('card 2'));
 
       // Test back button.
-      var backButton = $('.e2e-test-back-button');
+      var backButton = await $('.e2e-test-back-button');
       await waitFor.elementToBeClickable(
         backButton, 'Back button taking too long to be clickable');
       await backButton.click();
@@ -239,7 +239,7 @@ describe('Playing the exploration', function() {
         await forms.toRichText('card 1'));
 
       // Test next button.
-      var nextButton = $('.e2e-test-next-button');
+      var nextButton = await $('.e2e-test-next-button');
       await waitFor.elementToBeClickable(
         nextButton, 'Next button taking too long to be clickable');
       await nextButton.click();
