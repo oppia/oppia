@@ -84,15 +84,15 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCards = async function() {
-    var allExplorationCardElements = await $$(
+    var allExplorationCardElements = $(
       '.e2e-test-exploration-dashboard-card');
     await waitFor.visibilityOf(
-      allExplorationCardElements[0],
+      allExplorationCardElements,
       'Exploration cards is not present or taking time to display');
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
-    var allExplorationCardElements = await $$(
+    var allExplorationCardElements = $$(
       '.e2e-test-exploration-dashboard-card');
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {

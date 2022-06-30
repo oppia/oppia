@@ -23,13 +23,13 @@ var waitFor = require('./waitFor.js');
 var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
-  var allExplorationsTitled = async function(explorationName) {
-    return await $$(
+  var allExplorationsTitled = function(explorationName) {
+    return $$(
       `.e2e-test-exp-summary-tile-title=${explorationName}`);
   };
 
-  var allCollectionsTitled = async function(collectionName) {
-    return await $$(
+  var allCollectionsTitled = function(collectionName) {
+    return $$(
       `.e2e-test-collection-summary-tile-title=${collectionName}`);
   };
 
@@ -73,7 +73,7 @@ var LibraryPage = function() {
       allExplorationSummaryTile,
       'Library Page does not have any explorations');
 
-    var explorationCard = allExplorationsTitled(explorationName)[0];
+    var explorationCard = await allExplorationsTitled(explorationName)[0];
     await waitFor.visibilityOf(
       explorationCard, 'Unable to find exploration ' + explorationName);
     // The Exploration summary card is masked by a dummy element. Therefore, a
@@ -100,7 +100,7 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionSummaryTile,
       'Library Page does not have any collections');
-    var collectionCard = allCollectionsTitled(collectionName)[0];
+    var collectionCard = await allCollectionsTitled(collectionName)[0];
     await waitFor.visibilityOf(
       collectionCard,
       'Unable to find collection ' + collectionName);

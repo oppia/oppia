@@ -28,7 +28,7 @@ var CreatorDashboardPage = function() {
     var explorationDashboardCard = await $(
       '.e2e-test-exploration-dashboard-card');
     await waitFor.visibilityOf(explorationDashboardCard);
-    var allExplorationCards = await $$(
+    var allExplorationCards = $$(
       '.e2e-test-exploration-dashboard-card');
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
