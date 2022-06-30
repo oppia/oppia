@@ -37,8 +37,8 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
 
     def _assert_image_validation_error(
         self,
-        image: Optional[Union[str, bytes]],
-        filename: Optional[str],
+        image: Union[str, bytes],
+        filename: str,
         expected_error_substring: str
     ) -> None:
         """Checks that the image passes validation."""
@@ -48,13 +48,19 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
                 image, filename)
 
     def test_image_validation_checks(self) -> None:
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         self._assert_image_validation_error(
-            None,
+            None,  # type: ignore[arg-type]
             'image.png',
             'No image supplied'
         )
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         self._assert_image_validation_error(
-            self.raw_image, None, 'No filename supplied')
+            self.raw_image, None, 'No filename supplied')  # type: ignore[arg-type]
 
         large_image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 4000)
