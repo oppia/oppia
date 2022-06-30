@@ -419,7 +419,9 @@ def get_exploration_summaries_where_user_has_role(user_id):
     ]
 
 
-def get_exploration_user_data(user_id, exp_id):
+def get_exploration_user_data(
+    user_id: str, exp_id: str
+) -> user_domain.ExplorationUserData:
     """Returns an ExplorationUserData domain object.
 
     Args:

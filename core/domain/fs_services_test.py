@@ -169,7 +169,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.user_id_admin = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        self.admin = user_services.get_user_actions_info(self.user_id_admin)  # type: ignore[no-untyped-call]
+        self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self) -> None:
         with utils.open_file(

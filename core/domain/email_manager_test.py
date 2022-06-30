@@ -271,7 +271,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(
         self
     ) -> None:
-        user_services.update_email_preferences(  # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.new_user_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
@@ -1893,7 +1893,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         super(OnboardingReviewerInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
-        user_services.update_email_preferences(  # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.can_not_send_emails_ctx = self.swap(
@@ -1969,7 +1969,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         super(NotifyReviewerInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
-        user_services.update_email_preferences(  # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.can_not_send_emails_ctx = self.swap(
@@ -2189,11 +2189,11 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
         self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)  # type: ignore[no-untyped-call]
-        user_services.update_email_preferences(  # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.reviewer_1_id, True, False, False, False)
         self.signup(self.REVIEWER_2_EMAIL, self.REVIEWER_2_USERNAME)
         self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)  # type: ignore[no-untyped-call]
-        user_services.update_email_preferences(  # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.reviewer_2_id, True, False, False, False)
 
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -5398,7 +5398,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
         super(VoiceoverApplicationEmailUnitTest, self).setUp()   # type: ignore[no-untyped-call]
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)   # type: ignore[no-untyped-call]
-        user_services.update_email_preferences(   # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.applicant_id, True, False, False, False)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.can_not_send_emails_ctx = self.swap(
@@ -5760,9 +5760,9 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
 
         user_ids = []
         for user_id, username, user_email in zip(gae_ids, usernames, emails):
-            user_settings = user_services.create_new_user(user_id, user_email)   # type: ignore[no-untyped-call]
+            user_settings = user_services.create_new_user(user_id, user_email)
             user_ids.append(user_settings.user_id)
-            user_services.set_username(user_settings.user_id, username)   # type: ignore[no-untyped-call]
+            user_services.set_username(user_settings.user_id, username)
 
         # Both users can receive all emails in default setting.
         self.assertListEqual(email_manager.can_users_receive_thread_email(
@@ -5772,7 +5772,7 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
 
         # First user have muted feedback notifications for this exploration,
         # therefore he should receive only suggestion emails.
-        user_services.set_email_preferences_for_exploration(   # type: ignore[no-untyped-call]
+        user_services.set_email_preferences_for_exploration(
             user_ids[0], exp_id, mute_feedback_notifications=True)
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [True, True])
@@ -5781,7 +5781,7 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
 
         # Second user have muted suggestion notifications for this exploration,
         # therefore he should receive only feedback emails.
-        user_services.set_email_preferences_for_exploration(   # type: ignore[no-untyped-call]
+        user_services.set_email_preferences_for_exploration(
             user_ids[1], exp_id, mute_suggestion_notifications=True)
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [True, False])
@@ -5791,7 +5791,7 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         # Both users have disabled all emails globally, therefore they
         # should not receive any emails.
         for user_id in user_ids:
-            user_services.update_email_preferences(   # type: ignore[no-untyped-call]
+            user_services.update_email_preferences(
                 user_id, True, True, False, True)
 
         self.assertListEqual(email_manager.can_users_receive_thread_email(
@@ -5802,11 +5802,11 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         # Both users have unmuted feedback/suggestion emails for this
         # exploration, but all emails are still disabled globally,
         # therefore they should not receive any emails.
-        user_services.set_email_preferences_for_exploration(   # type: ignore[no-untyped-call]
+        user_services.set_email_preferences_for_exploration(
             user_ids[0], exp_id, mute_feedback_notifications=False)
-        user_services.set_email_preferences_for_exploration(   # type: ignore[no-untyped-call]
+        user_services.set_email_preferences_for_exploration(
             user_ids[1], exp_id, mute_suggestion_notifications=False)
-        user_services.update_email_preferences(   # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             user_id, True, True, False, True)
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [False, False])
@@ -5816,7 +5816,7 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         # Both user have enabled all emails globally, therefore they should
         # receive all emails.
         for user_id in user_ids:
-            user_services.update_email_preferences(   # type: ignore[no-untyped-call]
+            user_services.update_email_preferences(
                 user_id, True, True, True, True)
 
         self.assertListEqual(email_manager.can_users_receive_thread_email(
@@ -5908,15 +5908,15 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
         self.translation_reviewer_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
             self.TRANSLATION_REVIEWER_EMAIL)
-        user_services.update_email_preferences(   # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.translation_reviewer_id, True, False, False, False)
         self.voiceover_reviewer_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
             self.VOICEOVER_REVIEWER_EMAIL)
-        user_services.update_email_preferences(   # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.voiceover_reviewer_id, True, False, False, False)
         self.question_reviewer_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
             self.QUESTION_REVIEWER_EMAIL)
-        user_services.update_email_preferences(   # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.question_reviewer_id, True, False, False, False)
 
         self.can_send_emails_ctx = self.swap(

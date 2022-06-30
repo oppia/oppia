@@ -487,7 +487,7 @@ def _send_email(
     require_sender_id_is_valid(intent, sender_id)
 
     if recipient_email is None:
-        recipient_email = user_services.get_email_from_user_id(recipient_id)  # type: ignore[no-untyped-call]
+        recipient_email = user_services.get_email_from_user_id(recipient_id)
 
     cleaned_html_body = html_cleaner.clean(email_html_body)
     if cleaned_html_body != email_html_body:
@@ -551,7 +551,7 @@ def _send_bulk_mail(
     """
     require_sender_id_is_valid(intent, sender_id)
 
-    recipients_settings = user_services.get_users_settings(recipient_ids)  # type: ignore[no-untyped-call]
+    recipients_settings = user_services.get_users_settings(recipient_ids)
     recipient_emails = [user.email for user in recipients_settings]
 
     cleaned_html_body = html_cleaner.clean(email_html_body)
@@ -841,7 +841,7 @@ def send_role_notification_email(
 
     recipient_username = user_services.get_username(recipient_id)
     inviter_username = user_services.get_username(inviter_id)
-    recipient_preferences = user_services.get_email_preferences(recipient_id)  # type: ignore[no-untyped-call]
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
 
     if not recipient_preferences.can_receive_editor_role_email:
         # Do not send email if recipient has declined.
@@ -906,8 +906,8 @@ def send_emails_to_subscribers(
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(
         creator_id)
-    recipients_usernames = user_services.get_usernames(recipient_list)  # type: ignore[no-untyped-call]
-    recipients_preferences = user_services.get_users_email_preferences(  # type: ignore[no-untyped-call]
+    recipients_usernames = user_services.get_usernames(recipient_list)
+    recipients_preferences = user_services.get_users_email_preferences(
         recipient_list)
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index].can_receive_subscription_email:
@@ -1008,9 +1008,9 @@ def can_users_receive_thread_email(
         list(bool). True if user can receive the email, False otherwise.
     """
     users_global_prefs = (
-        user_services.get_users_email_preferences(recipient_ids))  # type: ignore[no-untyped-call]
+        user_services.get_users_email_preferences(recipient_ids))
     users_exploration_prefs = (
-        user_services.get_users_email_preferences_for_exploration(  # type: ignore[no-untyped-call]
+        user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
     zipped_preferences = list(
         zip(users_global_prefs, users_exploration_prefs))
@@ -1130,7 +1130,7 @@ def send_instant_feedback_message_email(
 
     sender_username = user_services.get_username(sender_id)
     recipient_username = user_services.get_username(recipient_id)
-    recipient_preferences = user_services.get_email_preferences(recipient_id)  # type: ignore[no-untyped-call]
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
 
     if recipient_preferences.can_receive_feedback_message_email:
         email_body = email_body_template % (
@@ -1180,7 +1180,7 @@ def send_flag_exploration_email(
         reporter_username, exploration_title, report_text, exploration_id,
         EMAIL_FOOTER.value)
 
-    recipient_list = user_services.get_user_ids_by_role(  # type: ignore[no-untyped-call]
+    recipient_list = user_services.get_user_ids_by_role(
         feconf.ROLE_ID_MODERATOR)
     for recipient_id in recipient_list:
         _send_email(
@@ -1286,7 +1286,7 @@ def send_user_query_email(
     """
     bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
     sender_name = user_services.get_username(sender_id)
-    sender_email = user_services.get_email_from_user_id(sender_id)  # type: ignore[no-untyped-call]
+    sender_email = user_services.get_email_from_user_id(sender_id)
     _send_bulk_mail(
         recipient_ids, sender_id, email_intent, email_subject, email_body,
         sender_email, sender_name, bulk_email_model_id)
@@ -1306,7 +1306,7 @@ def send_test_email_for_bulk_emails(
         email_body: str. The body of the email.
     """
     tester_name = user_services.get_username(tester_id)
-    tester_email = user_services.get_email_from_user_id(tester_id)  # type: ignore[no-untyped-call]
+    tester_email = user_services.get_email_from_user_id(tester_id)
     _send_email(
         tester_id, feconf.SYSTEM_COMMITTER_ID, feconf.BULK_EMAIL_INTENT_TEST,
         email_subject, email_body, tester_email, sender_name=tester_name)
@@ -1349,7 +1349,7 @@ def send_mail_to_onboard_new_reviewers(
         return
 
     recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(  # type: ignore[no-untyped-call]
+    can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
@@ -1393,7 +1393,7 @@ def send_mail_to_notify_users_to_review(
         return
 
     recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(  # type: ignore[no-untyped-call]
+    can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
@@ -1577,7 +1577,7 @@ def _send_suggestions_waiting_too_long_email(
         ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
             'email_body_template'])
     # Get the emails and usernames of the admins.
-    admin_user_settings = user_services.get_users_settings(admin_ids)  # type: ignore[no-untyped-call]
+    admin_user_settings = user_services.get_users_settings(admin_ids)
     curriculum_admin_usernames, admin_emails = list(zip(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
@@ -1728,7 +1728,7 @@ def _send_reviews_needed_email_to_admins(
     email_body_template = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
         'email_body_template']
     # Get the emails and usernames of the users.
-    admin_user_settings = user_services.get_users_settings(admin_ids)  # type: ignore[no-untyped-call]
+    admin_user_settings = user_services.get_users_settings(admin_ids)
     curriculum_admin_usernames, admin_emails = list(zip(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
@@ -1795,7 +1795,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         log_new_error('No Contributor Dashboard reviewers to notify.')
         return
 
-    reviewer_user_settings = user_services.get_users_settings(reviewer_ids)  # type: ignore[no-untyped-call]
+    reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
     reviewer_usernames, reviewer_emails = list(zip(*[
         (reviewer_user_setting.username, reviewer_user_setting.email)
         if reviewer_user_setting is not None else (None, None)
@@ -1873,7 +1873,7 @@ def send_accepted_voiceover_application_email(
         return
 
     recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(  # type: ignore[no-untyped-call]
+    can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
@@ -1924,7 +1924,7 @@ def send_rejected_voiceover_application_email(
         return
 
     recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(  # type: ignore[no-untyped-call]
+    can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
@@ -2039,7 +2039,7 @@ def send_email_to_new_contribution_reviewer(
         return
 
     recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(  # type: ignore[no-untyped-call]
+    can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
@@ -2109,7 +2109,7 @@ def send_email_to_removed_contribution_reviewer(
         return
 
     recipient_username = user_services.get_username(user_id)
-    can_user_receive_email = user_services.get_email_preferences(  # type: ignore[no-untyped-call]
+    can_user_receive_email = user_services.get_email_preferences(
         user_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
