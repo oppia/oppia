@@ -620,10 +620,10 @@ def get_reviewable_translation_suggestions_by_offset(
         contribution_rights.can_review_translation_for_language_codes)
     # The user cannot review any translations, so return early.
     if len(language_codes) == 0:
-        return [], 0
+        return [], offset
 
     in_review_translation_suggestions = []
-    next_offset = 0
+    next_offset = offset
     if opportunity_summary_exp_ids is None:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
