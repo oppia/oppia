@@ -1391,14 +1391,10 @@ class RecommendationsHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.normalized_request.get('collection_id')
-
         include_system_recommendations = self.normalized_request.get(
             'include_system_recommendations')
-        try:
-            author_recommended_exp_ids = self.normalized_request.get(
-                'author_recommended_ids')
-        except Exception as e:
-            raise self.PageNotFoundException from e
+        author_recommended_exp_ids = self.normalized_request.get(
+            'author_recommended_ids')
 
         system_recommended_exp_ids = []
         next_exp_id = None
