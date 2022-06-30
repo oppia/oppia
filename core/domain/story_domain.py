@@ -667,6 +667,9 @@ class StoryContents:
         # Ruling out the possibility of None for mypy type checking.
         assert self.initial_node_id is not None
         initial_index = self.get_node_index(self.initial_node_id)
+        # TODO(#15639): Not sure if this condition is a correct solution.
+        if initial_index is None:
+            return []
         current_node = self.nodes[initial_index]
         ordered_nodes_list = [current_node]
         while current_node.destination_node_ids:
