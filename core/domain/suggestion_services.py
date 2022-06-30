@@ -796,10 +796,6 @@ def get_suggestions_with_translatable_explorations(suggestions):
             content_id_exists = exploration.states[
                 suggestion.change.state_name].has_content_id(
                     suggestion.change.content_id)
-        if not content_id_exists:
-            logging.info(
-                'content_id does not exist for (suggestion ID, state_name, content_id): (%s, %s, %s)',
-                suggestion.id, suggestion.change.state_name, suggestion.change.content_id)
         return content_id_exists and exploration.edits_allowed
 
     suggestion_exp_ids = {

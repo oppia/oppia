@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import json
-import logging
 
 from core import feconf
 from core.constants import constants
@@ -319,9 +318,6 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             suggestion_services.get_suggestions_with_translatable_explorations(
                 in_review_suggestions)
         }
-        # Get possible exp_ids first to cut down on query? But keep in order.
-        # Or make limit arbitrary. Problem if ALL? Probably not cause only in
-        # backend.
         exp_ids = [
             node.exploration_id
             for story in topic_stories
