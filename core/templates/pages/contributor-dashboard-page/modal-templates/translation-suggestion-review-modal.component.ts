@@ -294,7 +294,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   gotoNextItem(): void {
-    if (this.remainingContributionIds.length === 0) {
+    // If the current item is the last item, do not navigate.
+    if (this.isLastItem) {
       return;
     }
     // This prevents resolved contributions from getting added to the list.
@@ -322,6 +323,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.isFirstItem = false;
     }
 
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
       this.activeModal.close(this.skippedContributionIds);
       return;
@@ -340,11 +343,15 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   gotoPreviousItem(): void {
-    if (this.skippedContributionIds.length === 0) {
+    // If the current item is the first item, do not navigate.
+    if (this.isFirstItem) {
       return;
     }
 
-    this.remainingContributionIds.push(this.activeSuggestionId);
+    // This prevents resolved contributions from getting added to the list.
+    if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
+      this.remainingContributionIds.push(this.activeSuggestionId);
+    }
 
     let lastContributionId = (
       this.skippedContributionIds[this.skippedContributionIds.length - 1]);
@@ -366,6 +373,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.isFirstItem = false;
     }
 
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
       this.activeModal.close(this.remainingContributionIds);
       return;
@@ -389,11 +398,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     // Remove resolved contributions from the record.
     delete this.allContributions[this.activeSuggestionId];
 
+    // If the reviewed item is the last item, close the modal.
     if (this.lastSuggestionToReview || this.isLastItem) {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
-
+    // Else go the next item.
     this.gotoNextItem();
   }
 
