@@ -92,81 +92,83 @@ describe('Learner dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  // it('should display learners subscriptions', async function() {
-  //   await users.createUser(
-  //     'learner1@learnerDashboard.com', 'learner1learnerDashboard');
-  //   var creator1Id = 'creatorName';
-  //   await users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
-  //   var creator2Id = 'collectionAdm';
-  //   await users.createUser(
-  //     creator2Id + '@learnerDashboard.com', creator2Id);
-  //   await users.login(creator1Id + '@learnerDashboard.com');
-  //   await workflow.createAndPublishExploration(
-  //     'Activations',
-  //     'Chemistry',
-  //     'Learn about different types of chemistry activations.',
-  //     'English',
-  //     true
-  //   );
-  //   await users.logout();
+  it('should display learners subscriptions', async function() {
+    await users.createUser(
+      'learner1@learnerDashboard.com', 'learner1learnerDashboard');
+    var creator1Id = 'creatorName';
+    await users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
+    var creator2Id = 'collectionAdm';
+    await users.createUser(
+      creator2Id + '@learnerDashboard.com', creator2Id);
+    await users.login(creator1Id + '@learnerDashboard.com');
+    await workflow.createAndPublishExploration(
+      'Activations',
+      'Chemistry',
+      'Learn about different types of chemistry activations.',
+      'English',
+      true
+    );
+    await users.logout();
 
-  //   await users.login('learner1@learnerDashboard.com');
-  //   // Subscribe to both the creators.
-  //   await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
-  //   await subscriptionDashboardPage.navigateToSubscriptionButton();
-  //   await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
-  //   await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await users.login('learner1@learnerDashboard.com');
+    // Subscribe to both the creators.
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
 
-  //   // Completing exploration 'Activations' to activate /learner_dashboard.
-  //   await libraryPage.get();
-  //   await libraryPage.findExploration('Activations');
-  //   await libraryPage.playExploration('Activations');
-  //   await explorationPlayerPage.expectExplorationNameToBe('Activations');
-  //   await explorationPlayerPage.rateExploration(4);
+    // Completing exploration 'Activations' to activate /learner_dashboard.
+    await libraryPage.get();
+    await libraryPage.findExploration('Activations');
+    await libraryPage.playExploration('Activations');
+    await explorationPlayerPage.expectExplorationNameToBe('Activations');
+    await explorationPlayerPage.rateExploration(4);
 
-  //   // Both creators should be present in the subscriptions section of the
-  //   // dashboard.
-  //   await learnerDashboardPage.get();
-  //   await learnerDashboardPage.navigateToCommunityLessonsSection();
-  //   // The last user (creatorName) that learner subsribes to is placed first
-  //   // in the list.
-  //   await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
-  //   // The first user (collectionAdm) that learner subscribes to is placed
-  //   // last in the list.
-  //   await learnerDashboardPage.expectSubscriptionLastNameToMatch('collect...');
-  //   await users.logout();
-  // });
+    // Both creators should be present in the subscriptions section of the
+    // dashboard.
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
+    // The last user (creatorName) that learner subsribes to is placed first
+    // in the list.
+    await learnerDashboardPage.expectSubscriptionFirstNameToMatch(
+      'creator...');
+    // The first user (collectionAdm) that learner subscribes to is placed
+    // last in the list.
+    await learnerDashboardPage.expectSubscriptionLastNameToMatch('collect...');
+    await users.logout();
+  });
 
-  // it('should display learner feedback threads', async function() {
-  //   await users.createUser(
-  //     'learner2@learnerDashboard.com', 'learner2learnerDashboard');
-  //   await users.createUser(
-  //     'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
-  //   await users.login('feedbackAdm@learnerDashboard.com');
-  //   await workflow.createAndPublishExploration(
-  //     'BUS101',
-  //     'Business',
-  //     'Learn about different business regulations around the world.',
-  //     'English',
-  //     true
-  //   );
-  //   await users.logout();
+  it('should display learner feedback threads', async function() {
+    await users.createUser(
+      'learner2@learnerDashboard.com', 'learner2learnerDashboard');
+    await users.createUser(
+      'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
+    await users.login('feedbackAdm@learnerDashboard.com');
+    await workflow.createAndPublishExploration(
+      'BUS101',
+      'Business',
+      'Learn about different business regulations around the world.',
+      'English',
+      true
+    );
+    await users.logout();
 
-  //   await users.login('learner2@learnerDashboard.com');
-  //   var feedback = 'A good exploration. Would love to see a few more questions';
-  //   await libraryPage.get();
-  //   await libraryPage.findExploration('BUS101');
-  //   await libraryPage.playExploration('BUS101');
-  //   await explorationPlayerPage.submitFeedback(feedback);
+    await users.login('learner2@learnerDashboard.com');
+    var feedback = 'A good exploration. Would love to see a few ' +
+      'more questions';
+    await libraryPage.get();
+    await libraryPage.findExploration('BUS101');
+    await libraryPage.playExploration('BUS101');
+    await explorationPlayerPage.submitFeedback(feedback);
 
-  //   // Verify feedback thread is created.
-  //   await learnerDashboardPage.get();
-  //   await learnerDashboardPage.navigateToFeedbackSection();
-  //   await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
-  //   await learnerDashboardPage.navigateToFeedbackThread();
-  //   await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
-  //   await users.logout();
-  // });
+    // Verify feedback thread is created.
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToFeedbackSection();
+    await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
+    await learnerDashboardPage.navigateToFeedbackThread();
+    await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
+    await users.logout();
+  });
 
   it('should add exploration to play later list', async function() {
     var EXPLORATION_FRACTION = 'fraction';
