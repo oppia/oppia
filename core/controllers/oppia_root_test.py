@@ -26,6 +26,10 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
         """Tests access to the unified entry page."""
         for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
             if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
-                response = self.get_html_response( # type: ignore[no-untyped-call]
+                response = self.get_html_response(  # type: ignore[no-untyped-call]
                     '/%s' % page['ROUTE'], expected_status_int=200)
-                response.mustcontain('<oppia-root></oppia-root>')
+                if 'LIGHTWEIGHT' in page:
+                    response.mustcontain(
+                        '<lightweight-oppia-root></lightweight-oppia-root>')
+                else:
+                    response.mustcontain('<oppia-root></oppia-root>')
