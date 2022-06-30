@@ -134,6 +134,7 @@ import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/t
 import { RuleEditorComponent } from './state-directives/rule-editor/rule-editor.component';
 import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
 import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selector.directive';
+import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 
 import { QuestionEditorModalComponent } from './question-directives/modal-templates/question-editor-modal.component';
 // Pipes.
@@ -288,7 +289,8 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
     QuestionEditorModalComponent,
     RuleEditorComponent,
     HtmlSelectComponent,
-    RuleTypeSelector
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent
   ],
 
   entryComponents: [
@@ -393,7 +395,8 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
     QuestionEditorModalComponent,
     RuleEditorComponent,
     HtmlSelectComponent,
-    RuleTypeSelector
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent
   ],
 
   exports: [
@@ -507,7 +510,8 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
     QuestionEditorModalComponent,
     RuleEditorComponent,
     HtmlSelectComponent,
-    RuleTypeSelector
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent
   ],
 })
 

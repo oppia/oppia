@@ -16,9 +16,9 @@
  * @fileoverview Directive for managing the state responses in the state
  * editor.
  */
-import { DeleteAnswerGroupModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
+
+import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
+import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -35,10 +35,6 @@ require(
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.component.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'add-answer-group-modal.controller.ts');
-
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
@@ -110,7 +106,7 @@ angular.module('oppia').component('stateResponses', {
   },
   template: require('./state-responses.component.html'),
   controller: [
-    '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$rootScope', '$scope', 'AlertsService',
     'AnswerGroupObjectFactory',
     'EditabilityService', 'ExternalSaveService', 'NgbModal', 'ResponsesService',
     'StateCustomizationArgsService', 'StateEditorService',
@@ -122,7 +118,7 @@ angular.module('oppia').component('stateResponses', {
     'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
-        $filter, $rootScope, $scope, $uibModal, AlertsService,
+        $filter, $rootScope, $scope, AlertsService,
         AnswerGroupObjectFactory,
         EditabilityService, ExternalSaveService, NgbModal, ResponsesService,
         StateCustomizationArgsService, StateEditorService,
@@ -309,20 +305,20 @@ angular.module('oppia').component('stateResponses', {
         var stateName = StateEditorService.getActiveStateName();
         var addState = ctrl.addState;
         var currentInteractionId = $scope.getCurrentInteractionId();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/add-answer-group-modal.template.html'),
-          // Clicking outside this modal should not dismiss it.
+
+        let modalRef = NgbModal.open(AddAnswerGroupModalComponent, {
           backdrop: 'static',
-          resolve: {
-            addState: () => addState,
-            currentInteractionId: () => currentInteractionId,
-            stateName: () => stateName,
-          },
-          windowClass: 'add-answer-group-modal',
-          controller: 'AddAnswerGroupModalController'
-        }).result.then(function(result) {
+        });
+
+        modalRef.componentInstance.addState.subscribe(
+          (value: string) => {
+            addState(value);
+          });
+
+        modalRef.componentInstance.currentInteractionId = currentInteractionId;
+        modalRef.componentInstance.stateName = stateName;
+
+        modalRef.result.then((result) => {
           StateNextContentIdIndexService.saveDisplayedValue();
           ctrl.onSaveNextContentIdIndex(
             StateNextContentIdIndexService.displayed);
@@ -333,7 +329,7 @@ angular.module('oppia').component('stateResponses', {
             result.tmpTaggedSkillMisconceptionId));
           ResponsesService.save(
             $scope.answerGroups, $scope.defaultOutcome,
-            function(newAnswerGroups, newDefaultOutcome) {
+            (newAnswerGroups, newDefaultOutcome) => {
               ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
               ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
               ctrl.refreshWarnings()();
@@ -346,7 +342,9 @@ angular.module('oppia').component('stateResponses', {
           if (result.reopen) {
             $scope.openAddAnswerGroupModal();
           }
-        }, function() {
+
+          $rootScope.$applyAsync();
+        }, () => {
           AlertsService.clearWarnings();
         });
       };
