@@ -618,6 +618,9 @@ def get_reviewable_translation_suggestions_by_offset(
         user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
+    # The user cannot review any translations, so return early.
+    if len(language_codes) == 0:
+        return [], 0
 
     in_review_translation_suggestions = []
     next_offset = 0

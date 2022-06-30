@@ -1494,6 +1494,27 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         expected_language_code_list = ['hi', 'hi', 'pt']
         self.assertEqual(actual_language_code_list, expected_language_code_list)
 
+    def test_get_reviewable_translation_suggestions_with_no_reviewable_languages( # pylint: disable=line-too-long
+            self):
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+
+        # Get all reviewable translation suggestions.
+        suggestions, offset = (
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
+                self.reviewer_id_1, None,
+                constants.OPPORTUNITIES_PAGE_SIZE, 0))
+
+        # The user does not have rights to review any languages, so expect an
+        # empty result.
+        self.assertEqual(len(suggestions), 0)
+        self.assertEqual(offset, 0)
+
     def test_get_reviewable_question_suggestions(self):
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
