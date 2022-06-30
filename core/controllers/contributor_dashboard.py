@@ -303,31 +303,31 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topics = [topic]
-        logging.info(
-            'Fetching reviewable opportunity summaries for topic: %s',
-            topic_name)
         topic_stories = story_fetchers.get_stories_by_ids([
             reference.story_id
             for topic in topics
             for reference in topic.get_all_story_references()
             if reference.story_is_published])
-        in_review_suggestions = (
-            suggestion_services.get_reviewable_translation_suggestions(user_id))
-        in_review_suggestion_target_ids = [
+        in_review_suggestions, _ = (
+            suggestion_services
+            .get_reviewable_translation_suggestions_by_offset(
+                user_id, None, None, 0))
+        # Filter out suggestions that should not be shown to the user.
+        in_review_suggestion_target_ids = {
             suggestion.target_id
             for suggestion in
             suggestion_services.get_suggestions_with_translatable_explorations(
                 in_review_suggestions)
-        ]
+        }
+        # Get possible exp_ids first to cut down on query? But keep in order.
+        # Or make limit arbitrary. Problem if ALL? Probably not cause only in
+        # backend.
         exp_ids = [
             node.exploration_id
             for story in topic_stories
             for node in story.story_contents.get_ordered_nodes()
             if node.exploration_id in in_review_suggestion_target_ids
         ]
-        logging.info(
-            'Fetching reviewable opportunity summaries for exp IDs: %s',
-            exp_ids)
         return (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 exp_ids).values())

@@ -3537,8 +3537,6 @@ class State(translation_domain.BaseTranslatableObject):
             in the translatable content.
         """
         available_translate_content = self._get_all_translatable_content()
-        logging.info('has_content_id() for: %s', content_id)
-        logging.info(available_translate_content)
         return bool(content_id in available_translate_content)
 
     def get_content_id_mapping_needing_translations(self, language_code):
