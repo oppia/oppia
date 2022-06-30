@@ -24,7 +24,6 @@ var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
   var searchButton = $('.e2e-test-search-button');
-  var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var mainHeader = $('.e2e-test-library-main-header');
   var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
   var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
@@ -66,6 +65,9 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
+    await waitFor.pageToFullyLoad();
+    var expHoverElement = await $('.e2e-test-exploration-dashboard-card');
+    await expHoverElement.scrollIntoView();
     await expHoverElement.moveTo({xOffset: 1, yOffset: 1});
 
     await waitFor.elementToBeClickable(
