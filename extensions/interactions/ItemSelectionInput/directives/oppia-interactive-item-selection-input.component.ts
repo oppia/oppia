@@ -52,7 +52,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   maxAllowableSelectionCount!: number;
   minAllowableSelectionCount!: number;
   selectionCount!: number;
-  userSelections!: {[key: string]: boolean};
+  userSelections!: Record<string, boolean>;
   displayedCard!: StateCard;
   recordedVoiceovers!: RecordedVoiceovers;
   COMPONENT_NAME_RULE_INPUT!: string;

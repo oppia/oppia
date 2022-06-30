@@ -23,8 +23,7 @@ import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerNavbarBreadcrumbComponent } from
-  'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
+import { TopicViewerNavbarBreadcrumbComponent } from 'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
