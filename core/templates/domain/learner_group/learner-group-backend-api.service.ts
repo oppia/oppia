@@ -58,8 +58,6 @@ export class LearnerGroupBackendApiService {
       this.http.post<LearnerGroupBackendDict>(
         learnerGroupCreationUrl, postData).toPromise().then(response => {
         resolve(LearnerGroupData.createFromBackendDict(response));
-      }, errorResponse => {
-        reject(errorResponse.error.error);
       });
     });
   }

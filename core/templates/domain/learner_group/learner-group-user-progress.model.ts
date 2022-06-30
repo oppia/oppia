@@ -25,24 +25,21 @@ import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
 export interface LearnerGroupUserProgressBackendDict {
   'username': string ;
   'progress_sharing_is_turned_on': boolean;
-  // Story and subtopics progress are optional because if the
-  // progress sharing is turned off, the progress is not shown
-  // in the learner group page.
-  'stories_progress'?: StorySummaryBackendDict[];
-  'subtopic_page_progress'?: SubtopicPageSummaryBackendDict[];
+  'stories_progress': StorySummaryBackendDict[];
+  'subtopic_page_progress': SubtopicPageSummaryBackendDict[];
 }
 
 export class LearnerGroupUserProgress {
   _username: string;
   _progressSharingIsTurnedOn: boolean;
-  _storiesProgress?: StorySummary[];
-  _subtopicsProgress?: SubtopicPageSummary[];
+  _storiesProgress: StorySummary[];
+  _subtopicsProgress: SubtopicPageSummary[];
 
   constructor(
       username: string,
       progressSharingIsTurnedOn: boolean,
-      storiesProgress?: StorySummary[],
-      subtopicsProgress?: SubtopicPageSummary[]) {
+      storiesProgress: StorySummary[],
+      subtopicsProgress: SubtopicPageSummary[]) {
     this._username = username;
     this._progressSharingIsTurnedOn = progressSharingIsTurnedOn;
     this._storiesProgress = storiesProgress;
@@ -57,32 +54,43 @@ export class LearnerGroupUserProgress {
     return this._progressSharingIsTurnedOn;
   }
 
-  get storiesProgress(): StorySummary[] | undefined {
+  get storiesProgress(): StorySummary[] {
     return this._storiesProgress;
   }
 
-  get subtopicsProgress(): SubtopicPageSummary[] | undefined {
+  get subtopicsProgress(): SubtopicPageSummary[] {
     return this._subtopicsProgress;
   }
 
   static createFromBackendDict(
-      learnerGroupUserProgressBackendDict: LearnerGroupUserProgressBackendDict
+      progBackendDict: LearnerGroupUserProgressBackendDict
   ): LearnerGroupUserProgress {
-    return new LearnerGroupUserProgress(
-      learnerGroupUserProgressBackendDict.username,
-      learnerGroupUserProgressBackendDict.progress_sharing_is_turned_on,
-      learnerGroupUserProgressBackendDict.stories_progress ?
-        learnerGroupUserProgressBackendDict.stories_progress.map(
-          storySummaryBackendDict => StorySummary.createFromBackendDict(
-            storySummaryBackendDict
-          )
-        ) : undefined,
-      learnerGroupUserProgressBackendDict.subtopic_page_progress ?
-        learnerGroupUserProgressBackendDict.subtopic_page_progress.map(
+    let storiesProgress: StorySummary[] = [];
+    if (progBackendDict.stories_progress.length > 0) {
+      storiesProgress = progBackendDict.stories_progress.map(
+        storySummaryBackendDict => StorySummary.createFromBackendDict(
+          storySummaryBackendDict
+        )
+      );
+    }
+
+    let subtopicsProgress: SubtopicPageSummary[] = [];
+    if (progBackendDict.subtopic_page_progress.length > 0) {
+      subtopicsProgress = (
+        progBackendDict.subtopic_page_progress.map(
           (subtopicProgressBackendDict) => (
             SubtopicPageSummary.createFromBackendDict(
               subtopicProgressBackendDict)
           )
-        ) : undefined);
+        )
+      );
+    }
+
+    return new LearnerGroupUserProgress(
+      progBackendDict.username,
+      progBackendDict.progress_sharing_is_turned_on,
+      storiesProgress,
+      subtopicsProgress
+    );
   }
 }

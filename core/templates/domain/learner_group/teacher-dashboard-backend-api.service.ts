@@ -44,8 +44,6 @@ export class TeacherDashboardBackendApiService {
           dashboardData.learner_groups_list.map(
             shortLearnerGroupSummary => ShortLearnerGroupSummary
               .createFromBackendDict(shortLearnerGroupSummary)));
-      }, errorResponse => {
-        reject(errorResponse.error.error);
       });
     });
   }

@@ -101,6 +101,11 @@ export class LearnerGroupData {
     this._facilitatorUsernames.push(facilitatorUsername);
   }
 
+  removeFacilitator(facilitatorUsername: string): void {
+    let index = this._facilitatorUsernames.indexOf(facilitatorUsername);
+    this._facilitatorUsernames.splice(index, 1);
+  }
+
   addStudent(studentUsername: string): void {
     this._studentUsernames.push(studentUsername);
   }
@@ -151,6 +156,13 @@ export class LearnerGroupData {
       issues.push(
         'Learner Group should have at least one facilitator.');
     }
+    const commonUsernames = this.studentUsernames.filter(
+      username => this.invitedStudentUsernames.includes(username)
+    );
+    if (commonUsernames.length > 0) {
+      issues.push('Students can not be invited to join the same group again.');
+    }
+
     return issues;
   }
 

@@ -24,7 +24,7 @@ describe('Subtopic Page Summary', () => {
   it('should correctly convert backend dict to object with subtopic ' +
     'mastery present', () => {
     let sampleSubtopicPageSummaryDict = {
-      subtopic_id: 'subtopicId',
+      subtopic_id: 1,
       subtopic_title: 'subtopicTitle',
       parent_topic_id: 'parentTopicId',
       parent_topic_name: 'parentTopicName',
@@ -36,7 +36,7 @@ describe('Subtopic Page Summary', () => {
     sampleSubtopicPageSummary = SubtopicPageSummary.createFromBackendDict(
       sampleSubtopicPageSummaryDict);
 
-    expect(sampleSubtopicPageSummary.subtopicId).toEqual('subtopicId');
+    expect(sampleSubtopicPageSummary.subtopicId).toEqual(1);
     expect(sampleSubtopicPageSummary.subtopicTitle).toEqual('subtopicTitle');
     expect(sampleSubtopicPageSummary.parentTopicId).toEqual('parentTopicId');
     expect(sampleSubtopicPageSummary.parentTopicName).toEqual(
@@ -50,7 +50,7 @@ describe('Subtopic Page Summary', () => {
   it('should correctly convert backend dict to object without subtopic ' +
   'mastery present', () => {
     let sampleSubtopicPageSummaryDict = {
-      subtopic_id: 'subtopicId',
+      subtopic_id: 1,
       subtopic_title: 'subtopicTitle',
       parent_topic_id: 'parentTopicId',
       parent_topic_name: 'parentTopicName',
@@ -61,7 +61,7 @@ describe('Subtopic Page Summary', () => {
     sampleSubtopicPageSummary = SubtopicPageSummary.createFromBackendDict(
       sampleSubtopicPageSummaryDict);
 
-    expect(sampleSubtopicPageSummary.subtopicId).toEqual('subtopicId');
+    expect(sampleSubtopicPageSummary.subtopicId).toEqual(1);
     expect(sampleSubtopicPageSummary.subtopicTitle).toEqual('subtopicTitle');
     expect(sampleSubtopicPageSummary.parentTopicId).toEqual('parentTopicId');
     expect(sampleSubtopicPageSummary.parentTopicName).toEqual(
@@ -70,5 +70,7 @@ describe('Subtopic Page Summary', () => {
       'thumbnailFilename');
     expect(sampleSubtopicPageSummary.thumbnailBgColor).toEqual('red');
     expect(sampleSubtopicPageSummary.subtopicMastery).toBeUndefined();
+    expect(sampleSubtopicPageSummary.subtopicPageId).toEqual(
+      'parentTopicId:1');
   });
 });

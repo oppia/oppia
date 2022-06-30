@@ -50,7 +50,7 @@ export class LearnerGroupSyllabusBackendApiService {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/facilitator_view_of_learner_group_handler', {
+          '/filter_learner_group_syllabus_handler', {
             learner_group_id: learnerGroupId
           }
         )
@@ -69,8 +69,6 @@ export class LearnerGroupSyllabusBackendApiService {
         }
       ).toPromise().then(filterSyllabus => {
         resolve(LearnerGroupSyllabus.createFromBackendDict(filterSyllabus));
-      }, errorResponse => {
-        reject(errorResponse.error.error);
       });
     });
   }

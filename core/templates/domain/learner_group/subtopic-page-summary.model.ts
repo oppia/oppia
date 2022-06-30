@@ -18,7 +18,7 @@
  */
 
 export interface SubtopicPageSummaryBackendDict {
-  'subtopic_id': string;
+  'subtopic_id': number;
   'subtopic_title': string;
   'parent_topic_id': string;
   'parent_topic_name': string;
@@ -30,7 +30,7 @@ export interface SubtopicPageSummaryBackendDict {
 export class SubtopicPageSummary {
   _parentTopicId: string;
   _parentTopicName: string;
-  _subtopicId: string;
+  _subtopicId: number;
   _subtopicTitle: string;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
@@ -40,7 +40,7 @@ export class SubtopicPageSummary {
   constructor(
       parentTopicId: string,
       parentTopicName: string,
-      subtopicId: string,
+      subtopicId: number,
       subtopicTitle: string,
       thumbnailFilename: string,
       thumbnailBgColor: string,
@@ -62,7 +62,7 @@ export class SubtopicPageSummary {
     return this._parentTopicName;
   }
 
-  get subtopicId(): string {
+  get subtopicId(): number {
     return this._subtopicId;
   }
 
@@ -83,7 +83,7 @@ export class SubtopicPageSummary {
   }
 
   get subtopicPageId(): string {
-    return this._parentTopicId + ':' + this._subtopicId;
+    return this._parentTopicId + ':' + String(this._subtopicId);
   }
 
   static createFromBackendDict(
