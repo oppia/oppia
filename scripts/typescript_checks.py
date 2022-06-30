@@ -228,6 +228,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/filters/format-timer.pipe.ts',
     'core/templates/filters/parameterize-rule-description.filter.spec.ts',
     'core/templates/filters/parameterize-rule-description.filter.ts',
+    'core/templates/filters/parameterize-rule-description.pipe.spec.ts',
+    'core/templates/filters/parameterize-rule-description.pipe.ts',
     'core/templates/filters/remove-duplicates-in-array.pipe.spec.ts',
     'core/templates/filters/string-utility-filters/camel-case-to-hyphens.filter.spec.ts',
     'core/templates/filters/string-utility-filters/camel-case-to-hyphens.filter.ts',
