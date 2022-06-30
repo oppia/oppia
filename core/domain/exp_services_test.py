@@ -7532,3 +7532,731 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_changes['customization_args'],
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
+
+
+class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
+    """Tests whether logged-out user progress is updated correctly"""
+
+    EXP_ID = 'exp_id0'
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
+
+    SAMPLE_EXPLORATION_YAML = (
+"""
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: New state
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Introduction
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>hint one,</p>
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: helloworld!
+        explanation:
+          content_id: solution
+          html: <p>hello_world is a string</p>
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: introduction_state.mp3
+            needs_update: false
+        default_outcome:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: unknown_answer_feedback.mp3
+            needs_update: false
+        feedback_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: correct_answer_feedback.mp3
+            needs_update: false
+        hint_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_hint.mp3
+            needs_update: false
+        rule_input_3: {}
+        solution:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_solution.mp3
+            needs_update: false
+    solicit_answer_details: false
+    card_is_checkpoint: true
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
+        solution: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    def setUp(self):
+        super(LoggedOutUserProgressUpdateTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
+        self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+    def test_logged_out_user_checkpoint_progress_is_updated_correctly(self):
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID
+        )
+        self.assertIsNone(logged_out_user_data)
+
+        # First checkpoint reached.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_state_name, 'Introduction')
+
+        # Make 'New state' a checkpoint.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # Second checkpoint reached.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'New state', 2)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'New state')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            2)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'New state')
+
+        # Unmark 'New state' as a checkpoint.
+        # Now version of the exploration becomes 3.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # First checkpoint reached again.
+        # Since the previously furthest reached checkpoint 'New state' doesn't
+        # exist in the current exploration, the first checkpoint behind
+        # 'New state' that exists in current exploration ('Introduction'
+        # state in this case) becomes the new furthest reached checkpoint.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 3)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 3)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            3)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction')
+
+        # Change state name of 'Introduction' state.
+        # Now version of exploration becomes 4.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Introduction',
+                'new_state_name': 'Intro',
+            })], 'Change state name'
+        )
+
+        # First checkpoint reached again.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Intro', 4)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 4)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Intro')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            4)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'Intro')
+
+    def test_sync_logged_out_learner_checkpoint_progress_with_current_exp_version(self): # pylint: disable=line-too-long
+        logged_out_user_data = (
+            exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID))
+        self.assertIsNone(logged_out_user_data)
+
+        # First checkpoint reached.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            1)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction')
+
+        # Change state name of 'Introduction' state.
+        # Now version of exploration becomes 2.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Introduction',
+                'new_state_name': 'Intro',
+            })], 'Change state name'
+        )
+
+        # This method is called when exploration data is fetched since now
+        # latest exploration version > most recently interacted exploration
+        # version.
+        # Working - First the furthest reached checkpoint ('Introduction' in
+        # this case) is searched in current exploration. It will not be found
+        # since its state name is changed to 'Intro'. It will then search for
+        # an checkpoint that had been reached in older exploration and also
+        # exists in current exploration. If such checkpoint is not found,
+        # furthest reached checkpoint is set to None. Similar workflow is
+        # carried out for most recently reached checkpoint.
+        logged_out_user_data = (
+            exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID))
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertIsNone(
+            logged_out_user_data.furthest_reached_checkpoint_state_name)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            2)
+        self.assertIsNone(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name)
+
+
+class SyncLoggedInAndLoggedOutProgressTests(test_utils.GenericTestBase):
+    """Tests whether logged-in user progress is synced correctly"""
+
+    EXP_ID = 'exp_id0'
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
+
+    SAMPLE_EXPLORATION_YAML = (
+"""
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: New state
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Introduction
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>hint one,</p>
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: helloworld!
+        explanation:
+          content_id: solution
+          html: <p>hello_world is a string</p>
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: introduction_state.mp3
+            needs_update: false
+        default_outcome:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: unknown_answer_feedback.mp3
+            needs_update: false
+        feedback_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: correct_answer_feedback.mp3
+            needs_update: false
+        hint_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_hint.mp3
+            needs_update: false
+        rule_input_3: {}
+        solution:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_solution.mp3
+            needs_update: false
+    solicit_answer_details: false
+    card_is_checkpoint: true
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
+        solution: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Third state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+  Third state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Third state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    def setUp(self):
+        super(SyncLoggedInAndLoggedOutProgressTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
+        self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+    def test_logged_in_user_progress_is_updated_correctly(self):
+        self.login(self.VIEWER_EMAIL)
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNone(exp_user_data)
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID
+        )
+        self.assertIsNone(logged_out_user_data)
+
+        # First checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_state_name, 'Introduction')
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Mark 'New state' as a checkpoint.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # New second checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'New state', 2)
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Mark 'Third state' as a checkpoint.
+        # Now version of the exploration becomes 3.
+        change_list = _get_change_list(
+            'Third state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # Unmark 'Next state' as a checkpoint.
+        # Now version of the exploration becomes 4.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # New third checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Third state', 4)
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Changing logged-in most recently reached state.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id,
+            self.EXP_ID,
+            'Introduction',
+            4
+        )
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        self.logout()

@@ -19,6 +19,8 @@
 from __future__ import annotations
 
 import datetime
+import random
+import string
 
 from core import feconf
 from core import utils
@@ -863,6 +865,104 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'voiced_exploration_ids': voiced_exploration_ids,
             'viewable_exploration_ids': viewable_exploration_ids
         }
+
+
+class TransientCheckpointUrlModel(base_models.BaseModel):
+    """Model for storing the progress of a logged-out user."""
+
+    # The exploration id.
+    exploration_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
+    # The state name of the furthest reached checkpoint.
+    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
+    # The exploration version of the furthest reached checkpoint.
+    furthest_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+    # The state name of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_state_name = (
+        datastore_services.StringProperty(default=None))
+    # The exploration version of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def create(
+        cls,
+        exploration_id: str,
+        unique_progress_url_id: str
+    ) -> TransientCheckpointUrlModel:
+        """Creates a new TransientCheckpointUrlModel instance and returns it.
+
+        Note that the client is responsible for actually saving this entity to
+        the datastore.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            unique_progress_url_id: str. The 6 digit long unique id
+                assigned to the progress made by a logged-out user.
+
+        Returns:
+            TransientCheckpointUrlModel. The newly created
+            TransientCheckpointUrlModel instance.
+        """
+        entity = cls(
+            id=unique_progress_url_id,
+            exploration_id=exploration_id)
+
+        entity.update_timestamps()
+        entity.put()
+        return entity
+
+    @classmethod
+    def get_new_progress_id(cls) -> str:
+        """Gets a new unique progress url id for the logged-out user.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Returns:
+            str. New unique progress url id.
+
+        Raises:
+            Exception. An ID cannot be generated within a reasonable number
+                of attempts.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = '%s' % ''.join(
+                random.choice(string.ascii_letters)
+                for _ in range(constants.MAX_PROGRESS_URL_ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
 
 
 class ExpSummaryModel(base_models.BaseModel):

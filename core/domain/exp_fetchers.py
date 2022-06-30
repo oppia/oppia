@@ -90,6 +90,15 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
+def get_new_unique_progress_url_id() -> str:
+    """Returns a new unique progress url id.
+
+    Returns:
+        str. A new unique progress url id.
+    """
+    return exp_models.TransientCheckpointUrlModel.get_new_progress_id()
+
+
 def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
         exp_id, version_numbers):
     """Returns a list of VersionedExplorationInteractionIdsMapping domain
@@ -452,4 +461,34 @@ def get_exploration_user_data(user_id, exp_id):
         exp_user_data_model.furthest_reached_checkpoint_state_name,
         exp_user_data_model.most_recently_reached_checkpoint_exp_version,
         exp_user_data_model.most_recently_reached_checkpoint_state_name
+    )
+
+
+def get_logged_out_user_progress(unique_progress_url_id: str):
+    """Returns an TransientCheckpointUrl domain object.
+
+    Args:
+        unique_progress_url_id: str. The 6 digit long unique id
+            assigned to the progress made by a logged-out user.
+
+    Returns:
+        TransientCheckpointUrl or None. The domain object corresponding to the
+        given unique_progress_url_id. If the model corresponding to given
+        unique_progress_url_id is not found, return None.
+    """
+    logged_out_user_progress_model = (
+        exp_models.TransientCheckpointUrlModel.get(
+        unique_progress_url_id, strict=False))
+
+    if logged_out_user_progress_model is None:
+        return None
+
+    return exp_domain.TransientCheckpointUrl(
+        logged_out_user_progress_model.exploration_id,
+        logged_out_user_progress_model.furthest_reached_checkpoint_state_name,
+        logged_out_user_progress_model.furthest_reached_checkpoint_exp_version,
+        logged_out_user_progress_model.
+            most_recently_reached_checkpoint_state_name,
+        logged_out_user_progress_model.
+            most_recently_reached_checkpoint_exp_version
     )
