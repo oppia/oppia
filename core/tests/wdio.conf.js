@@ -3,20 +3,13 @@ const video = require('wdio-video-reporter');
 var FirebaseAdmin = require('firebase-admin');
 var path = require('path');
 var fs = require('fs');
-var Constants = require('./protractor_utils/ProtractorConstants');
+var Constants = require('./webdriverio_utils/WebdriverioConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
-var chromeVersion = '89.0.4389.90';
 
 // When tests is running in debug mode, the chrome version number
 // is passed as 7th argument else it is passed as 6th argument.
-chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
-
-var dirPath = path.resolve('__dirname', '..', '..', 'webdriverio-screenshots/');
-try {
-  fs.mkdirSync(dirPath, { recursive: true });
-  var screenshotPath = '../webdriverio-screenshots';
-} catch (err) {}
+var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 
 var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
@@ -72,16 +65,15 @@ reportersArray = [
 ];
 
 // Only running videos recorder on Github Action when its enabled
-// using environment variables, since running it on
-// CicleCI causes RAM issues (meaning very high flakiness).
+// using environment variables, since running it on Github Actions
+// can introduce flakiness due to increase RAM usage.
 if ((process.env.GITHUB_ACTIONS &&
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
     LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
   videoReporter = [video, {
     outputDir: '../webdriverio-video',
     // Enable saveAllVideos if you want to save the videos
-    // of the tests that passes as well when recording videos
-    // is enabled.
+    // of the tests that pass as well.
     saveAllVideos: false,
     videoSlowdownMultiplier: 3,
   }];
@@ -142,19 +134,7 @@ exports.config = {
           }
         }
     }],
-    // First, you can define how many instances should be started at the same time. Let's
-    // say you have 3 different capabilities (Chrome, Firefox, and Safari) and you have
-    // set maxInstances to 1; wdio will spawn 3 processes. Therefore, if you have 10 spec
-    // files and you set maxInstances to 10, all spec files will get tested at the same time
-    // and 30 processes will get spawned. The property handles how many capabilities
-    // from the same test should run tests.
-    //
-    maxInstances: 3,
-    //
-    // If you have trouble getting all important capabilities together, check out the
-    // Sauce Labs platform configurator - a great tool to configure your capabilities:
-    // https://saucelabs.com/platform/platform-configurator
-    //
+
     // ===================
     // Test Configurations
     // ===================
@@ -162,41 +142,20 @@ exports.config = {
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
     logLevel: 'info',
-    //
-    // Set specific log levels per logger
-    // loggers:
-    // - webdriver, webdriverio
-    // - @wdio/browserstack-service, @wdio/devtools-service, @wdio/sauce-service
-    // - @wdio/mocha-framework, @wdio/jasmine-framework
-    // - @wdio/local-runner
-    // - @wdio/sumologic-reporter
-    // - @wdio/cli, @wdio/config, @wdio/utils
-    // Level of logging verbosity: trace | debug | info | warn | error | silent
-    // logLevels: {
-    //     webdriver: 'info',
-    //     '@wdio/appium-service': 'info'
-    // },
-    //
-    // If you only want to run your tests until a specific amount of tests have failed use
-    // bail (default is 0 - don't bail, run all tests).
-    bail: 0,
-    //
+
     // Set a base URL in order to shorten url command calls. If your `url` parameter starts
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
     baseUrl: 'http://localhost:9001',
-    //
-    // Default timeout for all waitFor* commands.
-    waitforTimeout: 60000,
-    //
+
     // Default timeout in milliseconds for request
     // if browser driver or grid doesn't send response
     connectionRetryTimeout: 120000,
-    //
+
     // Default request retries count
     connectionRetryCount: 3,
-    //
+
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
@@ -213,21 +172,21 @@ exports.config = {
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
     framework: 'jasmine',
-    //
+
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
     reporters: reportersArray,
 
     isMobile: false,
-    //
+
     // Options to be passed to Jasmine.
     jasmineOpts: {
       // Default time to wait in ms before a test fails.
       defaultTimeoutInterval: 1200000
     },
     
-    //
+
     // =====
     // Hooks
     // =====
@@ -256,7 +215,7 @@ exports.config = {
       browser.url('http://localhost:9001');
     },
     /**
-     * Function to be executed after a test (in Mocha/Jasmine only)
+     * Function to be executed after a test
      * @param {Object}  test             test object
      * @param {Object}  context          scope object the test was executed with
      * @param {Error}   result.error     error object in case the test fails, otherwise `undefined`
@@ -269,6 +228,12 @@ exports.config = {
       // If a test fails then only the error will be defined and
       // the screenshot will be taken and saved.
       if (error) {
+        var dirPath = path.resolve('__dirname', '..', '..', 'webdriverio-screenshots/');
+        try {
+          fs.mkdirSync(dirPath, { recursive: true });
+          var screenshotPath = '../webdriverio-screenshots';
+        } catch (err) {}
+
         var testName = encodeURIComponent(test.fullName.replace(/\s+/g, '-'));
         var fileName = testName + '.png';
         var filePath = path.join(screenshotPath, fileName);

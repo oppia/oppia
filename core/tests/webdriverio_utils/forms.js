@@ -185,10 +185,10 @@ var RichTextEditor = async function(elem) {
     '.e2e-test-close-rich-text-component-editor');
   // Set focus in the RTE.
   await waitFor.elementToBeClickable(rteElements[0]);
-  await (await rteElements[0]).click();
+  await rteElements[0].click();
 
   var _appendContentText = async function(text) {
-    await (await rteElements[0]).setValue(text);
+    await rteElements[0].setValue(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
@@ -197,10 +197,10 @@ var RichTextEditor = async function(elem) {
     await elem.$('.' + buttonName).click();
   };
   var _clearContent = async function() {
-    await expect(
-      await (await rteElements[0]).isExisting()
+    expect(
+      await rteElements[0].isExisting()
     ).toBe(true);
-    await (await rteElements[0]).clearValue();
+    await rteElements[0].clearValue();
   };
 
   return {

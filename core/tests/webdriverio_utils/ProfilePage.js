@@ -23,6 +23,8 @@ var ProfilePage = function() {
   var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
   var createdExplorationStat = $(
     '.e2e-test-profile-created-stat');
+  var allExplorationCardElements = $(
+    '.e2e-test-exploration-dashboard-card');
   var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
   var bio = $('.e2e-test-profile-bio');
   var interestPlaceholder = $('.e2e-test-profile-no-interest');
@@ -87,19 +89,17 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCards = async function() {
-    var allExplorationCardElements = await $$(
-      '.e2e-test-exploration-dashboard-card');
     await waitFor.visibilityOf(
-      allExplorationCardElements[0],
+      allExplorationCardElements,
       'Exploration cards is not present or taking time to display');
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
-    var allExplorationCardElements = await $$(
+    var allExplorationCardElements = $$(
       '.e2e-test-exploration-dashboard-card');
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
-        var cardTitle = card.$('.e2e-test-exp-summary-tile-title');
+        var cardTitle = await card.$('.e2e-test-exp-summary-tile-title');
         await waitFor.visibilityOf(
           cardTitle,
           'CardTitle is not present or taking too long to display');

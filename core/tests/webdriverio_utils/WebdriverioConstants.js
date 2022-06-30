@@ -16,6 +16,7 @@
  * @fileoverview Provides constant global variables, for use in WebdriverIO
  * tests.
  */
+
 var path = require('path');
 var DOWNLOAD_PATH = path.resolve(__dirname, '../downloads');
 
