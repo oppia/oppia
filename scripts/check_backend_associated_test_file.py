@@ -94,11 +94,8 @@ def main() -> None:
         if not file.endswith('_test.py'):
             # Replace last occurance of '.py' with '_test.py' to get the
             # associated test file.
-            to_be_replaced = '.py'
-            to_replace_with = '_test.py'
-            test_file = file[::-1].replace(
-                to_be_replaced[::-1], to_replace_with[::-1], 1)[::-1]
-            if test_file not in all_backend_files:
+            test_file_name = '%s_test.py' % file[:-3]
+            if test_file_name not in all_backend_files:
                 files_without_test.append(file)
 
     non_empty_files = []
