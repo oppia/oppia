@@ -564,12 +564,11 @@
 
 
 # Release team.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/.gcloudignore @ankita240796 @vojtechjelinek
-/core/controllers/release_coordinator*.py @ankita240796 @vojtechjelinek
-/core/templates/pages/release-coordinator-page/ @ankita240796 @vojtechjelinek
-/scripts/release_scripts/ @ankita240796 @vojtechjelinek
-/assets/release_constants.json @ankita240796 @vojtechjelinek
+/.gcloudignore @nithusha21 @vojtechjelinek
+/core/controllers/release_coordinator*.py @nithusha21 @vojtechjelinek
+/core/templates/pages/release-coordinator-page/ @nithusha21 @vojtechjelinek
+/scripts/release_scripts/ @nithusha21 @vojtechjelinek
+/assets/release_constants.json @nithusha21 @vojtechjelinek
 
 
 # Rich text editor team.
