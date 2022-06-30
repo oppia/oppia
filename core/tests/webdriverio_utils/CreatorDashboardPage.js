@@ -48,7 +48,7 @@ var CreatorDashboardPage = function() {
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    var allExplorationCards = await $$(
+    var allExplorationCards = $$(
       '.e2e-test-exploration-dashboard-card');
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();

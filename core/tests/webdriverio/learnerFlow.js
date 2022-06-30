@@ -72,7 +72,7 @@ describe('Learner dashboard functionality', function() {
     await responseEditor.setDestination('Second', true, null);
     await explorationEditorMainTab.moveToState('Second');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'So what can I tell you?'));
+      'So what can I tell you?'), true);
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('How do your explorations work?'),
       await forms.toRichText('What can you tell me about this website?'),
@@ -87,7 +87,7 @@ describe('Learner dashboard functionality', function() {
     await responseEditor.setFeedback(await forms.toRichText('I do not know!'));
     await explorationEditorMainTab.moveToState('End Card');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Congratulations, you have finished!'));
+      await forms.toRichText('Congratulations, you have finished!'), true);
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Dummy Exploration');

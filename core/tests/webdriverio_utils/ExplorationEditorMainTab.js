@@ -119,8 +119,6 @@ var ExplorationEditorMainTab = function() {
   var saveOutcomeDestButton = $('.e2e-test-save-outcome-dest');
   var saveOutcomeFeedbackButton = $('.e2e-test-save-outcome-feedback');
   var saveStateContentButton = $('.e2e-test-save-state-content');
-  var stateNameSubmitButton = stateNameContainer.$(
-    '.e2e-test-state-name-submit');
   var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
   var startTutorialButton = $('.e2e-test-start-tutorial');
   var submitSolutionButton = $('.e2e-test-submit-solution-button');
@@ -875,6 +873,8 @@ var ExplorationEditorMainTab = function() {
     await action.clear('State Name input', stateNameInput);
     await action.keys('State Name input', stateNameInput, name);
 
+    var stateNameSubmitButton = stateNameContainer.$(
+      '.e2e-test-state-name-submit');
     await action.click('State Name Submit button', stateNameSubmitButton);
 
     // Wait for state name container to completely disappear
