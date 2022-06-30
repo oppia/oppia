@@ -18,8 +18,10 @@
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_BASE_HREF } from '@angular/common';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { platformFeatureInitFactory, PlatformFeatureService } from
@@ -29,12 +31,17 @@ import { EmailDashboardResultComponent } from './email-dashboard-result.componen
 import { EmailDashboardResultPageRootComponent } from './email-dashboard-result-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -57,6 +64,10 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ],
   bootstrap: [EmailDashboardResultPageRootComponent]
