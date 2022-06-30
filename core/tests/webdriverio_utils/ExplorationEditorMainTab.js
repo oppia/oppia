@@ -41,8 +41,7 @@ var ExplorationEditorMainTab = function() {
       `.e2e-test-html-item-select-option=${optionNum}`);
   };
   var stateNodeLabel = function(nodeElement) {
-    var nodeLabelLocator = '.e2e-test-node-label';
-    return nodeElement.$(nodeLabelLocator);
+    return nodeElement.$('.e2e-test-node-label');
   };
   var interactionTab = function(tabId) {
     return $('.e2e-test-interaction-tab-' + tabId);
@@ -848,8 +847,8 @@ var ExplorationEditorMainTab = function() {
   this.moveToState = async function(targetName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var explorationGraph = await $('.e2e-test-exploration-graph');
-    var stateNodes = await explorationGraph.$$('.e2e-test-node');
+    var explorationGraph = $('.e2e-test-exploration-graph');
+    var stateNodes = explorationGraph.$$('.e2e-test-node');
     var listOfNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));
