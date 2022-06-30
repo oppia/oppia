@@ -2143,7 +2143,7 @@ def can_exploration_be_curated(exploration):
 
     Returns:
         tuple[bool, str]. A tuple consisting of whether the exploration can be
-            curated along with the error message.
+        curated along with the error message.
     """
     error_message = ''
 
@@ -2153,43 +2153,49 @@ def can_exploration_be_curated(exploration):
     ):
         error_message += (
             'The exploration should not have classifier model for any state.')
-        return (False, error_message)
 
-    if len(exploration.param_changes) > 0:
-        error_message += 'The exploration should not have any parameter changes.'
-        return (False, error_message)
+    if not bool(error_message) and len(exploration.param_changes) > 0:
+        error_message += (
+            'The exploration should not have any parameter changes.')
 
-    if len(exploration.param_specs) > 0:
+    if not bool(error_message) and len(exploration.param_specs) > 0:
         error_message += 'The exploration should not have any parameter specs.'
-        return (False, error_message)
 
-    for state in exploration.states.values():
-        for answer_group in state.interaction.answer_groups:
-            if len(answer_group.training_data) > 0:
+    if not bool(error_message):
+        for state in exploration.states.values():
+            for answer_group in state.interaction.answer_groups:
+                if len(answer_group.training_data) > 0:
+                    error_message += (
+                        'The exploration should not have training data ' +
+                        'for any answer group in any state.'
+                    )
+                    break
+            if not bool(error_message):
+                break
+
+    if not bool(error_message):
+      for state in exploration.states.values():
+          default_outcome = state.interaction.default_outcome
+          if (
+              default_outcome is not None and
+              len(default_outcome.param_changes) > 0
+          ):
+              error_message += (
+                  'The exploration should not have any parameter changes ' +
+                  'in the default outcome of any state interaction.'
+              )
+              break
+
+    if not bool(error_message):
+        html_list = exploration.get_all_html_content_strings()
+        video_tag = 'oppia-noninteractive-video'
+        link_tag = 'oppia-noninteractive-link'
+        for html_string in html_list:
+            if video_tag in html_string or link_tag in html_string:
                 error_message += (
-                    'The exploration should not have training data ' +
-                    'for any answer group in any state.')
-                return (False, error_message)
+                    'The exploration should not have any video or link ' +
+                    'in any of its states.'
+                )
+                break
 
-    for state in exploration.states.values():
-        default_outcome = state.interaction.default_outcome
-        if (
-            default_outcome is not None and
-            len(default_outcome.param_changes) > 0
-        ):
-            error_message += (
-                'The exploration should not have any parameter changes ' +
-                'in the default outcome of any state interaction.')
-            return (False, error_message)
-
-    html_list = exploration.get_all_html_content_strings()
-    video_tag = 'oppia-noninteractive-video'
-    link_tag = 'oppia-noninteractive-link'
-    for html_string in html_list:
-        if video_tag in html_string or link_tag in html_string:
-            error_message += (
-                'The exploration should not have any video or link ' +
-                'in any of its states.')
-            return (False, error_message)
-
-    return (True, error_message)
+    return (not bool(error_message), error_message)
