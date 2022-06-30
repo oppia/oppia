@@ -259,4 +259,6 @@ exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
+exports.newTabToBeCreated = newTabToBeCreated;
+exports.urlRedirection = urlRedirection;
 exports.clientSideRedirection = clientSideRedirection;
