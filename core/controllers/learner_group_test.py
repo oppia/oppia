@@ -103,7 +103,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Title', 'Description',
-            [self.facilitator_id], [], [self.user_id_1],
+            [self.facilitator_id], [self.user_id_1],
             ['subtopic_id_1'], ['story_id_1'])
 
     def test_update_learner_group_as_facilitator(self):
@@ -187,7 +187,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'], 'You do not have the rights to delete this '
-            'learner group as you are its facilitator.')
+            'learner group as you are not its facilitator.')
 
         self.logout()
 
@@ -215,8 +215,7 @@ class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
 
         learner_group = learner_group_services.create_learner_group(
             learner_group_id, 'Learner Group Title', 'Description',
-            [self.facilitator_id], [], [],
-            ['subtopic_id_1'], ['story_id_1'])
+            [self.facilitator_id], [], ['subtopic_id_1'], ['story_id_1'])
 
         response = self.get_json('%s' % (feconf.TEACHER_DASHBOARD_HANDLER))
 
@@ -253,7 +252,7 @@ class FilterLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
 
         learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.facilitator_id], [], [self.STUDENT_ID], ['subtopic_id_1'],
+            [self.facilitator_id], [self.STUDENT_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
         # Set up topics, subtopics and stories for learner group syllabus.
@@ -360,7 +359,7 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Title', 'Description',
-            [self.facilitator_id], [], [self.user_id_1],
+            [self.facilitator_id], [self.user_id_1],
             ['subtopic_id_1'], ['story_id_1'])
 
     def test_facilitators_view_details_as_facilitator(self):
@@ -442,7 +441,7 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
 
         learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.facilitator_id], [], [self.STUDENT_ID_1, self.STUDENT_ID_2],
+            [self.facilitator_id], [self.STUDENT_ID_1, self.STUDENT_ID_2],
             [self.SUBTOPIC_PAGE_ID_1], [self.STORY_ID_1])
 
         # Set up topics, subtopics and stories for learner group syllabus.

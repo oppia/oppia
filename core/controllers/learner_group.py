@@ -22,7 +22,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
-from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import user_services
@@ -102,14 +101,11 @@ class CreateLearnerGroupHandler(base.BaseHandler):
 
         title = self.normalized_payload.get('group_title')
         description = self.normalized_payload.get('group_description')
-        student_usernames = self.normalized_payload.get('student_usernames')
         invited_student_usernames = self.normalized_payload.get(
             'invited_student_usernames')
         subtopic_page_ids = self.normalized_payload.get('subtopic_page_ids')
         story_ids = self.normalized_payload.get('story_ids')
 
-        student_ids = user_services.get_multi_user_ids_from_usernames(
-            student_usernames)
         invited_student_ids = user_services.get_multi_user_ids_from_usernames(
             invited_student_usernames)
 
@@ -118,7 +114,7 @@ class CreateLearnerGroupHandler(base.BaseHandler):
 
         learner_group = learner_group_services.create_learner_group(
             new_learner_grp_id, title, description, [self.user_id],
-            student_ids, invited_student_ids, subtopic_page_ids, story_ids
+            invited_student_ids, subtopic_page_ids, story_ids
         )
 
         self.render_json({
@@ -216,7 +212,7 @@ class LearnerGroupHandler(base.BaseHandler):
         if not is_valid_request:
             raise self.UnauthorizedUserException(
                 'You do not have the rights to delete this learner group '
-                'as you are its facilitator.')
+                'as you are not its facilitator.')
 
         learner_group_services.remove_learner_group(learner_group_id)
 
@@ -322,41 +318,14 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                     progress_dict['all_node_dicts'])
                 student_progress['stories_progress'].append(story_prog_dict)
 
-            # Fetch the progress of the student in all the subtopics assigned
-            # in the group syllabus.
-            skills_mastery_dict = (
-                skill_services.get_multi_user_skill_mastery(
-                    user_id, all_skill_ids
+            subtopic_page_progress = (
+                learner_group_services.get_subtopic_page_progress(
+                    user_id, subtopic_page_ids, topics, all_skill_ids
                 )
             )
-            for topic in topics:
-                for subtopic in topic.subtopics:
-                    subtopic_page_id = topic.id + ':' + str(subtopic.id)
-                    if not subtopic_page_id in subtopic_page_ids:
-                        continue
-                    skill_mastery_dict = {
-                        skill_id: mastery
-                        for skill_id, mastery in skills_mastery_dict.items()
-                        if mastery is not None and (
-                            skill_id in subtopic.skill_ids
-                        )
-                    }
-                    if skill_mastery_dict:
-                        # Subtopic mastery is average of skill masteries.
-                        subtopic_prog_dict = {
-                            'subtopic_id': subtopic.id,
-                            'subtopic_title': subtopic.title,
-                            'parent_topic_id': topic.id,
-                            'parent_topic_name': topic.name,
-                            'thumbnail_filename': subtopic.thumbnail_filename,
-                            'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                            'subtopic_mastery': (
-                                sum(skill_mastery_dict.values()) /
-                                len(skill_mastery_dict)
-                            )
-                        }
-                        student_progress['subtopic_page_progress'].append(
-                            subtopic_prog_dict)
+
+            student_progress['subtopic_page_progress'].append(
+                subtopic_page_progress.to_dict())
 
             # Add current student's progress to all students progress.
             all_students_progress.append(student_progress)
@@ -396,19 +365,19 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                 },
-                'default_value': None
+                'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER
             },
             'filter_category': {
                 'schema': {
                     'type': 'basestring',
                 },
-                'default_value': None
+                'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER
             },
             'filter_language_code': {
                 'schema': {
                     'type': 'basestring',
                 },
-                'default_value': None
+                'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER
             }
         }
     }

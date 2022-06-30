@@ -18,10 +18,13 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
 from core.domain import learner_group_fetchers
+from core.domain import skill_services
 from core.domain import story_fetchers
+from core.domain import subtopic_page_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
@@ -43,7 +46,7 @@ def is_learner_group_feature_enabled() -> bool:
 
 def create_learner_group(
         group_id, title, description,
-        facilitator_user_ids, student_ids, invited_student_ids,
+        facilitator_user_ids, invited_student_ids,
         subtopic_page_ids, story_ids
     ) -> learner_group_domain.LearnerGroup:
     """Creates a new learner group.
@@ -53,8 +56,6 @@ def create_learner_group(
         title: str. The title of the learner group.
         description: str. The description of the learner group.
         facilitator_user_ids: str. List of user ids of the facilitators of the
-            learner group.
-        student_ids: list(str). List of user ids of the students of the
             learner group.
         invited_student_ids: list(str). List of user ids of the students who
             have been invited to join the learner group.
@@ -68,12 +69,25 @@ def create_learner_group(
         LearnerGroup. The domain object of the newly created learner group.
     """
 
+    learner_group = learner_group_domain.LearnerGroup(
+        group_id=group_id,
+        title=title,
+        description=description,
+        facilitator_user_ids=facilitator_user_ids,
+        student_user_ids=[],
+        invited_student_user_ids=invited_student_ids,
+        subtopic_page_ids=subtopic_page_ids,
+        story_ids=story_ids
+    )
+
+    learner_group.validate()
+
     learner_group_model = learner_group_models.LearnerGroupModel(
         id=group_id,
         title=title,
         description=description,
         facilitator_user_ids=facilitator_user_ids,
-        student_user_ids=student_ids,
+        student_user_ids=[],
         invited_student_user_ids=invited_student_ids,
         subtopic_page_ids=subtopic_page_ids,
         story_ids=story_ids
@@ -82,20 +96,9 @@ def create_learner_group(
     learner_group_model.update_timestamps()
     learner_group_model.put()
 
-    learner_group = learner_group_domain.LearnerGroup(
-        learner_group_model.id,
-        learner_group_model.title,
-        learner_group_model.description,
-        learner_group_model.facilitator_user_ids,
-        learner_group_model.student_user_ids,
-        learner_group_model.invited_student_user_ids,
-        learner_group_model.subtopic_page_ids,
-        learner_group_model.story_ids
-    )
-
-    if len(learner_group.invited_student_user_ids) > 0:
+    if len(learner_group_model.invited_student_user_ids) > 0:
         invite_students_to_learner_group(
-            group_id, learner_group.invited_student_user_ids)
+            group_id, learner_group_model.invited_student_user_ids)
 
     return learner_group
 
@@ -138,11 +141,26 @@ def update_learner_group(
         raise Exception(
             'The learner group with the given group id does not exist.')
 
+    learner_group = learner_group_domain.LearnerGroup(
+        group_id=group_id,
+        title=title,
+        description=description,
+        facilitator_user_ids=facilitator_user_ids,
+        student_user_ids=student_ids,
+        invited_student_user_ids=invited_student_ids,
+        subtopic_page_ids=subtopic_page_ids,
+        story_ids=story_ids
+    )
+
+    learner_group.validate()
+
     old_invited_student_ids = set(learner_group_model.invited_student_user_ids)
     new_invited_student_ids = set(invited_student_ids)
     if new_invited_student_ids != old_invited_student_ids:
-        newly_added_invites = new_invited_student_ids - old_invited_student_ids
-        newly_removed_invites = (
+        newly_added_invites = list(
+            new_invited_student_ids - old_invited_student_ids
+        )
+        newly_removed_invites = list(
             old_invited_student_ids - new_invited_student_ids
         )
         invite_students_to_learner_group(
@@ -160,17 +178,6 @@ def update_learner_group(
 
     learner_group_model.update_timestamps()
     learner_group_model.put()
-
-    learner_group = learner_group_domain.LearnerGroup(
-        learner_group_model.id,
-        learner_group_model.title,
-        learner_group_model.description,
-        learner_group_model.facilitator_user_ids,
-        learner_group_model.student_user_ids,
-        learner_group_model.invited_student_user_ids,
-        learner_group_model.subtopic_page_ids,
-        learner_group_model.story_ids
-    )
 
     return learner_group
 
@@ -256,8 +263,6 @@ def get_filtered_learner_group_syllabus(
     group_subtopic_page_ids = learner_group.subtopic_page_ids
     group_story_ids = learner_group.story_ids
 
-    all_topics: List[topic_domain.Topic] = topic_fetchers.get_all_topics()
-
     filtered_topics: List[topic_domain.Topic] = []
 
     filtered_topic_ids: List[str] = []
@@ -266,17 +271,14 @@ def get_filtered_learner_group_syllabus(
     filtered_subtopics_dicts = []
     filtered_story_syllabus_item_dicts = []
 
-    if category != 'All':
+    if category != constants.DEFAULT_ADD_SYLLABUS_FILTER:
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 filtered_topic_ids.extend(classroom['topic_ids'])
 
-        filtered_topics = (
-            [topic.id for topic in all_topics if (
-                topic.id in filtered_topic_ids)]
-        )
+        filtered_topics = topic_fetchers.get_topics_by_ids(filtered_topic_ids)
     else:
-        filtered_topics = all_topics
+        filtered_topics = topic_fetchers.get_all_topics()
 
     for topic in filtered_topics:
         if language_code and language_code != topic.language_code:
@@ -284,33 +286,48 @@ def get_filtered_learner_group_syllabus(
 
         # If the keyword matches a topic name.
         if topic.canonical_name.find(keyword) != -1:
-            # If type filter is not set or type filter is set to 'Story',
-            # add all story ids of this topic to the filtered story ids.
-            if filter_type is None or filter_type == 'Story':
+            # If type filter is set to default or type filter is set to
+            # 'Story', add all story ids of this topic to the filtered
+            # story ids.
+            if (
+                filter_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+            ):
                 filtered_story_syllabus_item_dicts.extend(
                     get_filtered_story_syllabus_item_dicts(
                         topic, group_story_ids))
 
-            # If type filter is not set or type filter is set to 'Skill',
-            # add all subtopics of this topic to the filtered subtopics.
-            if filter_type is None or filter_type == 'Skill':
+            # If type filter is set to default or type filter is set to
+            # 'Skill', add all subtopics of this topic to the filtered
+            # subtopics.
+            if (
+                filter_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+            ):
                 filtered_subtopics_dicts.extend(
                     get_filtered_subtopic_syllabus_item_dicts(
                         topic, group_subtopic_page_ids))
 
         # If the keyword does not matches a topic name.
         else:
-            # If type filter is not set or type filter is set to 'Skill',
-            # add the subtopics which have the keyword in their title to the
-            # filtered subtopics.
-            if filter_type is None or filter_type == 'Skill':
+            # If type filter is set to default or type filter is set to
+            # 'Skill', add the subtopics which have the keyword in their
+            # title to the filtered subtopics.
+            if (
+                filter_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+            ):
                 filtered_subtopics_dicts.extend(
                     get_filtered_subtopic_syllabus_item_dicts(
                         topic, group_subtopic_page_ids, keyword))
 
-            # If type filter is not set or type filter is set to 'Story',
-            # add all story ids of this topic to the possible story ids.
-            if filter_type is None or filter_type == 'Story':
+            # If type filter is set to default or type filter is set to
+            # 'Story', add all story ids of this topic to the possible
+            # story ids.
+            if (
+                filter_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+            ):
                 filtered_story_syllabus_item_dicts.extend(
                     get_filtered_story_syllabus_item_dicts(
                         topic, group_story_ids, keyword))
@@ -494,3 +511,64 @@ def remove_invited_students_from_learner_group(group_id, student_ids) -> None:
 
     user_models.LearnerGroupsUserModel.update_timestamps_multi(found_models)
     user_models.LearnerGroupsUserModel.put_multi(found_models)
+
+
+def get_subtopic_page_progress(
+        user_id: str,
+        subtopic_page_ids: List[str],
+        topics: List[topic_domain.Topic],
+        all_skill_ids: List[str]
+    ):
+    """Returns the progress of the given user on the given subtopic pages.
+
+    Args:
+        user_id: str. The id of the user.
+        subtopic_page_ids: list(str). The ids of the subtopic pages.
+        topics: list(Topic). The topics corresponding to the subtopic pages.
+        all_skill_ids: list(str). The ids of all the skills in the topics.
+
+    Returns:
+        SubtopicPageSummary. Subtopic Page Summary domain object containing
+        details of the subtopic page and users mastery in it.
+    """
+
+    # Fetch the progress of the student in all the subtopics assigned
+    # in the group syllabus.
+    skills_mastery_dict = (
+        skill_services.get_multi_user_skill_mastery(
+            user_id, all_skill_ids
+        )
+    )
+
+    subtopic_prog_summary: subtopic_page_domain.SubtopicPageSummary
+
+    for topic in topics:
+        for subtopic in topic.subtopics:
+            subtopic_page_id = topic.id + ':' + str(subtopic.id)
+            if not subtopic_page_id in subtopic_page_ids:
+                continue
+            skill_mastery_dict = {
+                skill_id: mastery
+                for skill_id, mastery in skills_mastery_dict.items()
+                if mastery is not None and (
+                    skill_id in subtopic.skill_ids
+                )
+            }
+            if skill_mastery_dict:
+                # Subtopic mastery is average of skill masteries.
+                subtopic_prog_summary = (
+                    subtopic_page_domain.SubtopicPageSummary(
+                        subtopic_id=subtopic.id,
+                        subtopic_title=subtopic.title,
+                        parent_topic_id=topic.id,
+                        parent_topic_name=topic.name,
+                        thumbnail_filename=subtopic.thumbnail_filename,
+                        thumbnail_bg_color=subtopic.thumbnail_bg_color,
+                        subtopic_mastery=(
+                            sum(skill_mastery_dict.values()) /
+                            len(skill_mastery_dict)
+                        )
+                    )
+                )
+
+    return subtopic_prog_summary

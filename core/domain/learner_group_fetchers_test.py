@@ -44,7 +44,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [], [self.STUDENT_ID], ['subtopic_id_1'],
+            [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
     def test_get_new_learner_group_id(self):

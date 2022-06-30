@@ -294,6 +294,11 @@ export default {
 
   "TASK_TARGET_TYPE_STATE": "state",
 
+  // Filters for adding new syllabus items to learner groups.
+  "DEFAULT_ADD_SYLLABUS_FILTER": "All",
+  "LEARNER_GROUP_ADD_STORY_FILTER": "Story",
+  "LEARNER_GROUP_ADD_SKILL_FILTER": "Skill",
+
   // Roles in exploration.
   "ROLE_OWNER": "owner",
   "ROLE_EDITOR": "editor",

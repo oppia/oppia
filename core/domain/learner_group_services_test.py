@@ -22,7 +22,9 @@ from core.constants import constants
 from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import skill_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
@@ -57,7 +59,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [], [self.STUDENT_ID], ['subtopic_id_1'],
+            [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
         # Set up topics, subtopics and stories for learner group syllabus.
@@ -187,7 +189,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         # Test 1: Default filters with topic name matching.
         fltered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
-                self.LEARNER_GROUP_ID, 'Place', None,
+                self.LEARNER_GROUP_ID, 'Place', 'All',
                 'All', constants.DEFAULT_LANGUAGE_CODE
             )
         )
@@ -239,7 +241,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         # Test 4: Classroom name filter.
         fltered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
-                self.LEARNER_GROUP_ID, 'Place', None,
+                self.LEARNER_GROUP_ID, 'Place', 'All',
                 'math', constants.DEFAULT_LANGUAGE_CODE
             )
         )
@@ -254,7 +256,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         # Test 5: Language filter.
         fltered_syllabus = (
             learner_group_services.get_filtered_learner_group_syllabus(
-                self.LEARNER_GROUP_ID, 'Place', None, 'All', 'pt-br'
+                self.LEARNER_GROUP_ID, 'Place', 'All', 'All', 'pt-br'
             )
         )
         # No storys or subtopics are returned as the topics are all
@@ -342,3 +344,25 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_model_2.invited_to_learner_groups_ids,
             ['group_id_2'])
+
+    def test_get_subtopic_page_progress(self):
+        degree_of_mastery = 0.5
+
+        # Add some subtopic progress for the student.
+        skill_ids = ['skill_id_1']
+        skill_services.create_user_skill_mastery(
+            self.STUDENT_ID, 'skill_id_1', degree_of_mastery)
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID_1)
+
+        subtopic_page_id = self.TOPIC_ID_1 + ':1'
+
+        progress = learner_group_services.get_subtopic_page_progress(
+            self.STUDENT_ID, [subtopic_page_id], [topic], skill_ids
+        )
+
+        self.assertEqual(progress.subtopic_id, 1)
+        self.assertEqual(progress.subtopic_title, 'Intro to negative numbers')
+        self.assertEqual(progress.parent_topic_id, self.TOPIC_ID_1)
+        self.assertEqual(progress.parent_topic_name, 'Negative Numbers')
+        self.assertEqual(progress.subtopic_mastery, degree_of_mastery)
