@@ -234,19 +234,19 @@ def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
     return topic_ids
 
 
-def get_filtered_learner_group_syllabus(
+def get_matching_learner_group_syllabus_to_add(
         learner_group_id, keyword,
-        filter_type, category,
+        search_type, category,
         language_code
     ):
-    """Returns the syllabus of the learner group filtered by the given
-    filter arguments.
+    """Returns the syllabus of items matching the given filter arguments
+    that can be added to the learner group.
 
     Args:
         learner_group_id: str. The id of the learner group.
-        keyword: str. The keyword to filter the syllabus. It is compared with
+        keyword: str. The keyword to search the syllabus. It is compared with
             the title of the topics, stories and subtopics.
-        filter_type: str. The type of the syllabus item to filter. It can be
+        search_type: str. The type of the syllabus item to search. It can be
             either 'Story' or 'Skill'.
         category: str. The category of the syllabus items. It is the
             classroom in which the stories and subtopics are to be searched.
@@ -254,7 +254,7 @@ def get_filtered_learner_group_syllabus(
             and subtopics are to be searched.
 
     Returns:
-        list(dict). The filtered syllabus of the learner group.
+        list(dict). The matching syllabus items to add to the learner group.
     """
     keyword = keyword.lower()
     learner_group = learner_group_fetchers.get_learner_group_by_id(
@@ -263,102 +263,102 @@ def get_filtered_learner_group_syllabus(
     group_subtopic_page_ids = learner_group.subtopic_page_ids
     group_story_ids = learner_group.story_ids
 
-    filtered_topics: List[topic_domain.Topic] = []
+    matching_topics: List[topic_domain.Topic] = []
 
-    filtered_topic_ids: List[str] = []
+    matching_topic_ids: List[str] = []
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
-    filtered_subtopics_dicts = []
-    filtered_story_syllabus_item_dicts = []
+    matching_subtopics_dicts = []
+    matching_story_syllabus_item_dicts = []
 
     if category != constants.DEFAULT_ADD_SYLLABUS_FILTER:
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
-                filtered_topic_ids.extend(classroom['topic_ids'])
+                matching_topic_ids.extend(classroom['topic_ids'])
 
-        filtered_topics = topic_fetchers.get_topics_by_ids(filtered_topic_ids)
+        matching_topics = topic_fetchers.get_topics_by_ids(matching_topic_ids)
     else:
-        filtered_topics = topic_fetchers.get_all_topics()
+        matching_topics = topic_fetchers.get_all_topics()
 
-    for topic in filtered_topics:
+    for topic in matching_topics:
         if language_code and language_code != topic.language_code:
             continue
 
         # If the keyword matches a topic name.
         if topic.canonical_name.find(keyword) != -1:
-            # If type filter is set to default or type filter is set to
+            # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the filtered
             # story ids.
             if (
-                filter_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                search_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
                 constants.DEFAULT_ADD_SYLLABUS_FILTER)
             ):
-                filtered_story_syllabus_item_dicts.extend(
-                    get_filtered_story_syllabus_item_dicts(
+                matching_story_syllabus_item_dicts.extend(
+                    get_matching_story_syllabus_item_dicts(
                         topic, group_story_ids))
 
-            # If type filter is set to default or type filter is set to
+            # If search type is set to default or search type is set to
             # 'Skill', add all subtopics of this topic to the filtered
             # subtopics.
             if (
-                filter_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                search_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
                 constants.DEFAULT_ADD_SYLLABUS_FILTER)
             ):
-                filtered_subtopics_dicts.extend(
-                    get_filtered_subtopic_syllabus_item_dicts(
+                matching_subtopics_dicts.extend(
+                    get_matching_subtopic_syllabus_item_dicts(
                         topic, group_subtopic_page_ids))
 
         # If the keyword does not matches a topic name.
         else:
-            # If type filter is set to default or type filter is set to
+            # If search type is set to default or search type is set to
             # 'Skill', add the subtopics which have the keyword in their
             # title to the filtered subtopics.
             if (
-                filter_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                search_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
                 constants.DEFAULT_ADD_SYLLABUS_FILTER)
             ):
-                filtered_subtopics_dicts.extend(
-                    get_filtered_subtopic_syllabus_item_dicts(
+                matching_subtopics_dicts.extend(
+                    get_matching_subtopic_syllabus_item_dicts(
                         topic, group_subtopic_page_ids, keyword))
 
-            # If type filter is set to default or type filter is set to
+            # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the possible
             # story ids.
             if (
-                filter_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                search_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
                 constants.DEFAULT_ADD_SYLLABUS_FILTER)
             ):
-                filtered_story_syllabus_item_dicts.extend(
-                    get_filtered_story_syllabus_item_dicts(
+                matching_story_syllabus_item_dicts.extend(
+                    get_matching_story_syllabus_item_dicts(
                         topic, group_story_ids, keyword))
 
     return {
-        'story_summaries': filtered_story_syllabus_item_dicts,
-        'subtopic_summaries': filtered_subtopics_dicts
+        'story_summaries': matching_story_syllabus_item_dicts,
+        'subtopic_summaries': matching_subtopics_dicts
     }
 
 
-def get_filtered_subtopic_syllabus_item_dicts(
+def get_matching_subtopic_syllabus_item_dicts(
         topic: topic_domain.Topic,
         group_subtopic_page_ids: List[str],
         keyword: Optional[str] = None
     ):
-    """Returns the subtopic syllabus items of the given topic filtered by the
-    given keyword.
+    """Returns the matching subtopics syllabus item dicts of the given topic
+    that can be added to the learner group syllabus.
 
     Args:
-        topic: Topic. The topic whose subtopic syllabus items are to be
-            filtered.
+        topic: Topic. The topic whose subtopic subtopic items are to be
+            searched.
         group_subtopic_page_ids: list(str). The ids of the subtopic pages of
             the learner group.
-        keyword: Optional[str]. The keyword to filter the subtopic syllabus
+        keyword: Optional[str]. The keyword to search the subtopic syllabus
             items. It is compared with the title of the subtopics if passed
             in arguments.
 
     Returns:
-        list(dict). The filtered subtopic syllabus items of the given topic.
+        list(dict). The matching subtopic syllabus items of the given topic.
     """
-    filtered_subtopic_syllabus_item_dicts = []
+    matching_subtopic_syllabus_item_dicts = []
 
     for subtopic in topic.subtopics:
         subtopic_page_id = topic.id + ':' + str(subtopic.id)
@@ -372,27 +372,28 @@ def get_filtered_subtopic_syllabus_item_dicts(
                     'thumbnail_filename': subtopic.thumbnail_filename,
                     'thumbnail_bg_color': subtopic.thumbnail_bg_color
                 }
-                filtered_subtopic_syllabus_item_dicts.append(
+                matching_subtopic_syllabus_item_dicts.append(
                     syllabus_subtopic_dict)
 
-    return filtered_subtopic_syllabus_item_dicts
+    return matching_subtopic_syllabus_item_dicts
 
 
-def get_filtered_story_syllabus_item_dicts(
+def get_matching_story_syllabus_item_dicts(
         topic: topic_domain.Topic,
         group_story_ids: List(str),
         keyword: Optional[str] = None
     ):
-    """Returns the filtered story syllabus item dicts of the given topic.
+    """Returns the matching story syllabus item dicts of the given topic
+    that can be added to the learner group syllabus.
 
     Args:
-        topic: Topic. The topic whose syllabus is to be filtered.
+        topic: Topic. The topic whose stories are to be searched.
         group_story_ids: list(str). The story ids of the learner group.
-        keyword: Optional[str]. The keyword to filter the syllabus. It is
+        keyword: Optional[str]. The keyword to search the stories. It is
             compared with the title of the story if passed in arguments.
 
     Returns:
-        list(dict). The filtered story syllabus item dicts of the given topic.
+        list(dict). The matching story syllabus item dicts of the given topic.
     """
     story_ids = (
         [
@@ -403,12 +404,12 @@ def get_filtered_story_syllabus_item_dicts(
         ]
     )
 
-    filtered_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
+    matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
     stories = story_fetchers.get_stories_by_ids(story_ids)
 
-    filtered_story_syllabus_item_dicts = []
+    matching_story_syllabus_item_dicts = []
 
-    for ind, story in enumerate(filtered_stories):
+    for ind, story in enumerate(matching_stories):
         if keyword is None or story.title.lower().find(keyword) != -1:
             syllabus_story_dict = story.to_dict()
             syllabus_story_dict['story_is_published'] = True
@@ -418,9 +419,9 @@ def get_filtered_story_syllabus_item_dicts(
             ]
             syllabus_story_dict['topic_name'] = topic.name
             syllabus_story_dict['topic_url_fragment'] = topic.url_fragment
-            filtered_story_syllabus_item_dicts.append(syllabus_story_dict)
+            matching_story_syllabus_item_dicts.append(syllabus_story_dict)
 
-    return filtered_story_syllabus_item_dicts
+    return matching_story_syllabus_item_dicts
 
 
 def add_student_to_learner_group(

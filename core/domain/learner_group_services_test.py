@@ -185,86 +185,86 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_ids, ['topic1', 'topic2'])
 
-    def test_get_filtered_learner_group_syllabus(self):
+    def test_get_matching_learner_group_syllabus_to_add(self):
         # Test 1: Default filters with topic name matching.
-        fltered_syllabus = (
-            learner_group_services.get_filtered_learner_group_syllabus(
+        matching_syllabus = (
+            learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Place', 'All',
                 'All', constants.DEFAULT_LANGUAGE_CODE
             )
         )
-        story_summaries = fltered_syllabus['story_summaries']
+        story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 1)
         self.assertEqual(story_summaries[0]['id'], self.STORY_ID_0)
         self.assertEqual(story_summaries[0]['title'], 'Story test 0')
 
-        subtopic_summaries = fltered_syllabus['subtopic_summaries']
+        subtopic_summaries = matching_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 1)
         self.assertEqual(subtopic_summaries[0]['subtopic_id'], 1)
         self.assertEqual(
             subtopic_summaries[0]['subtopic_title'], 'Naming Numbers')
 
         # Test 2: Skill type filter with subtopic name matching.
-        fltered_syllabus = (
-            learner_group_services.get_filtered_learner_group_syllabus(
+        matching_syllabus = (
+            learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Naming', 'Skill',
                 'All', constants.DEFAULT_LANGUAGE_CODE
             )
         )
 
-        story_summaries = fltered_syllabus['story_summaries']
+        story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 0)
 
-        subtopic_summaries = fltered_syllabus['subtopic_summaries']
+        subtopic_summaries = matching_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 1)
         self.assertEqual(subtopic_summaries[0]['subtopic_id'], 1)
         self.assertEqual(subtopic_summaries[0][
             'subtopic_title'], 'Naming Numbers')
 
         # Test 3: Story type filter with story name matching.
-        fltered_syllabus = (
-            learner_group_services.get_filtered_learner_group_syllabus(
+        matching_syllabus = (
+            learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Story test', 'Story',
                 'All', constants.DEFAULT_LANGUAGE_CODE
             )
         )
         # Story test 1 is already par tof the group syllabus
         # so it should not be returned in the filtered syllabus.
-        story_summaries = fltered_syllabus['story_summaries']
+        story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 1)
         self.assertEqual(story_summaries[0]['id'], self.STORY_ID_0)
         self.assertEqual(story_summaries[0]['title'], 'Story test 0')
 
-        subtopic_summaries = fltered_syllabus['subtopic_summaries']
+        subtopic_summaries = matching_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 0)
 
         # Test 4: Classroom name filter.
-        fltered_syllabus = (
-            learner_group_services.get_filtered_learner_group_syllabus(
+        matching_syllabus = (
+            learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Place', 'All',
                 'math', constants.DEFAULT_LANGUAGE_CODE
             )
         )
         # No storys or subtopics are returned as the topics were not added
         # to the classroom.
-        story_summaries = fltered_syllabus['story_summaries']
+        story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 0)
 
-        subtopic_summaries = fltered_syllabus['subtopic_summaries']
+        subtopic_summaries = matching_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 0)
 
         # Test 5: Language filter.
-        fltered_syllabus = (
-            learner_group_services.get_filtered_learner_group_syllabus(
+        matching_syllabus = (
+            learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Place', 'All', 'All', 'pt-br'
             )
         )
         # No storys or subtopics are returned as the topics are all
         # of default language.
-        story_summaries = fltered_syllabus['story_summaries']
+        story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 0)
 
-        subtopic_summaries = fltered_syllabus['subtopic_summaries']
+        subtopic_summaries = matching_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 0)
 
     def test_add_student_to_learner_group(self):
@@ -353,12 +353,13 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.STUDENT_ID, 'skill_id_1', degree_of_mastery)
 
-        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID_1)
+        topics = topic_fetchers.get_topics_by_ids(
+            [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         subtopic_page_id = self.TOPIC_ID_1 + ':1'
 
         progress = learner_group_services.get_subtopic_page_progress(
-            self.STUDENT_ID, [subtopic_page_id], [topic], skill_ids
+            self.STUDENT_ID, [subtopic_page_id], topics, skill_ids
         )
 
         self.assertEqual(progress.subtopic_id, 1)

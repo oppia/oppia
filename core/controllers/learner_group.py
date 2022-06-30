@@ -335,7 +335,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         })
 
 
-class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
+class SearchLearnerGroupSyllabusHandler(base.BaseHandler):
     """Handles operations related to the learner group syllabus."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -355,25 +355,25 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'filter_keyword': {
+            'search_keyword': {
                 'schema': {
                     'type': 'basestring',
                 },
                 'default_value': ''
             },
-            'filter_type': {
+            'search_type': {
                 'schema': {
                     'type': 'basestring',
                 },
                 'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER
             },
-            'filter_category': {
+            'search_category': {
                 'schema': {
                     'type': 'basestring',
                 },
                 'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER
             },
-            'filter_language_code': {
+            'search_language_code': {
                 'schema': {
                     'type': 'basestring',
                 },
@@ -386,23 +386,23 @@ class FilterLearnerGroupSyllabusHandler(base.BaseHandler):
     def get(self, learner_group_id):
         """Handles GET requests for learner group syllabus views."""
 
-        filter_keyword = self.normalized_request.get('filter_keyword')
-        filter_type = self.normalized_request.get('filter_type')
-        filter_category = self.normalized_request.get('filter_category')
-        filter_language_code = self.normalized_request.get(
-            'filter_language_code')
+        search_keyword = self.normalized_request.get('search_keyword')
+        search_type = self.normalized_request.get('search_type')
+        search_category = self.normalized_request.get('search_category')
+        search_language_code = self.normalized_request.get(
+            'search_language_code')
 
-        filtered_syllabus = (
-            learner_group_services.get_filtered_learner_group_syllabus(
-                learner_group_id, filter_keyword,
-                filter_type, filter_category, filter_language_code
+        matching_syllabus = (
+            learner_group_services.get_matching_learner_group_syllabus_to_add(
+                learner_group_id, search_keyword,
+                search_type, search_category, search_language_code
             )
         )
 
         self.render_json({
             'learner_group_id': learner_group_id,
-            'story_summaries': filtered_syllabus['story_summaries'],
-            'subtopic_summaries': filtered_syllabus['subtopic_summaries']
+            'story_summaries': matching_syllabus['story_summaries'],
+            'subtopic_summaries': matching_syllabus['subtopic_summaries']
         })
 
 

@@ -226,7 +226,7 @@ class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class FilterLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
+class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
 
     LEARNER_GROUP_ID = None
     STUDENT_ID = 'student_user_1'
@@ -236,7 +236,7 @@ class FilterLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     STORY_ID_1 = 'story_id_1'
 
     def setUp(self):
-        super(FilterLearnerGroupSyllabusHandlerTests, self).setUp()
+        super(SearchLearnerGroupSyllabusHandlerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -307,13 +307,13 @@ class FilterLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
         params = {
-            'filter_keyword': 'Place',
-            'filter_category': 'All',
-            'filter_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'search_keyword': 'Place',
+            'search_category': 'All',
+            'search_language_code': constants.DEFAULT_LANGUAGE_CODE,
         }
 
         response = self.get_json(
-            '/filter_learner_group_syllabus_handler/%s' % (
+            '/search_learner_group_syllabus_handler/%s' % (
                 self.LEARNER_GROUP_ID),
             params=params
         )
