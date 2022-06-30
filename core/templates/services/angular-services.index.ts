@@ -418,7 +418,6 @@ import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skil
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
-import { QuestionCreationService } from 'pages/skill-editor-page/services/question-creation.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -863,7 +862,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['baseInteractionValidationService', baseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
-  ['QuestionCreationService', QuestionCreationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
   ['NumberConversionService', NumberConversionService],
