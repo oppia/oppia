@@ -148,6 +148,29 @@ var elementAttributeToBe = async function(
   });
 };
 
+/**
+* Wait for new tab is opened
+*/
+var newTabToBeCreated = async function(errorMessage, urlToMatch) {
+  await browser.wait(async function() {
+    var handles = await browser.driver.getAllWindowHandles();
+    await browser.waitForAngularEnabled(false);
+    await browser.switchTo().window(await handles.pop());
+    var url = await browser.getCurrentUrl();
+    await browser.waitForAngularEnabled(true);
+    return await url.match(urlToMatch);
+  }, DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB, errorMessage);
+};
+
+/**
+ * @param {string} url - URL to redirect
+ */
+var urlRedirection = async function(url) {
+  // Checks that the current URL matches the expected text.
+  await browser.wait(
+    until.urlIs(url), DEFAULT_WAIT_TIME_MSECS, 'URL redirection took too long');
+};
+
 var visibilityOfInfoToast = async function(errorMessage) {
   var toastInfoElement = $('.toast-info');
   await visibilityOf(toastInfoElement, errorMessage);

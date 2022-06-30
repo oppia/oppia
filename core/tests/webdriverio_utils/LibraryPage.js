@@ -66,7 +66,6 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
-    waitFor.pageToFullyLoad();
     await expHoverElement.moveTo({xOffset: 1, yOffset: 1});
 
     await waitFor.elementToBeClickable(
