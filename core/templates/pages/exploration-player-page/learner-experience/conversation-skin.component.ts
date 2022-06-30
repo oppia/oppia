@@ -73,6 +73,7 @@ import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-su
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -196,7 +197,8 @@ export class ConversationSkinComponent {
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService:
-      ReadOnlyExplorationBackendApiService
+      ReadOnlyExplorationBackendApiService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -562,6 +564,10 @@ export class ConversationSkinComponent {
         return result;
       }
     }
+  }
+
+  isEndChapterCelebrationFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 
   reloadExploration(): void {

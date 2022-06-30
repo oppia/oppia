@@ -18,19 +18,34 @@
 
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { PostChapterRecommendationsComponent } from './post-chapter-recommendations.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('End chapter check mark component', function() {
   let component: PostChapterRecommendationsComponent;
   let fixture: ComponentFixture<PostChapterRecommendationsComponent>;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [PostChapterRecommendationsComponent]
+      declarations: [PostChapterRecommendationsComponent, MockTranslatePipe],
+      providers: [UrlInterpolationService],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PostChapterRecommendationsComponent);
     component = fixture.componentInstance;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+  });
+
+  it('should get static image url', () => {
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('image_url');
+
+    expect(component.getStaticImageUrl('practice_session_image_path'))
+      .toBe('image_url');
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      'practice_session_image_path');
   });
 });

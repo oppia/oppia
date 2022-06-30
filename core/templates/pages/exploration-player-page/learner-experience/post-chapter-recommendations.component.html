@@ -1,64 +1,103 @@
 <div class="post-chapter-recommendations-container">
-  <p class="post-chapter-recommendation-text">Here's what you could do next!</p>
+  <p class="post-chapter-recommendation-text">{{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}</p>
   <div class="post-chapter-recommendation-cards-container">
-    <div class="recommendation-card">
-      <svg width="192" height="150" class="recommendation-card-svg">
-        <a [attr.href]="nextLessonLink">
-          <rect width="192"
+    <div *ngIf="nextStoryNodeTitle" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <a [attr.href]="nextStoryNodeLink">
+            <rect width="192"
                   height="150"
-                  [attr.fill]="">
-          </rect>
-          <image x="0"
-                 y="0"
-                 height="180"
-                 width="240"
-                 class="next-story-node-image"
-                 [attr.xlink:href]="">
-          </image>
-        </a>
-      </svg>
+                  [attr.fill]="nextStoryNodeThumbnailBgColor">
+            </rect>
+            <image x="0"
+                   y="0"
+                   height="180"
+                   width="240"
+                   class="next-story-node-image"
+                   [attr.xlink:href]="nextStoryNodeThumbnailUrl">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p class="to-the-next-lesson-text">{{ 'I18N_END_CHAPTER_NEXT_CHAPTER_TEXT' | translate }}</p>
+      <p>{{ nextStoryNodeTitle }}</p>
     </div>
-    <p>Or</p>
-    <div class="recommendation-card">
-      <svg width="192" height="150" class="recommendation-card-svg">
-        <a [attr.href]="nextLessonLink">
-          <rect width="192"
+    <p *ngIf="nextStoryNodeTitle" class="or-text">Or</p>
+    <div class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <a [attr.href]="nextStoryNodeLink">
+            <rect width="192"
                   height="150"
-                  [attr.fill]="">
-          </rect>
-          <image x="0"
-                 y="0"
-                 height="180"
-                 width="240"
-                 class="next-story-node-image"
-                 [attr.xlink:href]="">
-          </image>
-        </a>
-      </svg>
+                  [attr.fill]="'#a6dacf'">
+            </rect>
+            <image x="17"
+                   y="20"
+                   height="180"
+                   width="240"
+                   class="practice-icon"
+                   [attr.xlink:href]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p>{{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}</p>
     </div>
   </div>
 </div>
 
 <style>
+  .post-chapter-recommendations-container {
+    margin-bottom: 30px;
+  }
   .post-chapter-recommendation-text {
-    margin: auto;
+    font-size: 1.4em;
+    text-align: center;
   }
   .post-chapter-recommendation-cards-container {
+    align-items: flex-start;
     display: flex;
-    align-items: center;
-    justify-content: space-around;
+    justify-content: space-evenly;
+  }
+  .recommendation-card-wrapper {
+    width: 192px;
   }
   .recommendation-card {
-    width: 192px;
+    border-radius: 15px;
+    box-shadow: 7px 7px 5px rgba(0, 0, 0, 0.08);
     height: 150px;
-    border-radius: 4px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 20px;
+    width: 192px;
   }
   .recommendation-card-svg {
-    border-radius: 4px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
   }
   .next-story-node-image {
     scale: 0.8;
+  }
+  .practice-icon {
+    scale: 0.7;
+  }
+  .post-chapter-recommendation-cards-container p {
+    font-size: 1.2em;
+    text-align: center;
+  }
+  .post-chapter-recommendation-cards-container .or-text {
+    margin-top: 65px;
+  }
+  .post-chapter-recommendation-cards-container .to-the-next-lesson-text {
+    font-weight: 800;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .post-chapter-recommendation-cards-container {
+      align-items: center;
+      flex-direction: column;
+    }
+    .post-chapter-recommendation-cards-container .or-text {
+      margin-bottom: 40px;
+      margin-top: 40px;
+    }
   }
 </style>

@@ -17,12 +17,23 @@
  */
 
 import { Component, Input } from '@angular/core';
-
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 @Component({
   selector: 'oppia-post-chapter-recommendations',
   template: require('./post-chapter-recommendations.component.html'),
 })
 export class PostChapterRecommendationsComponent {
-  @Input() nextLessonLink: string;
-  constructor() {}
+  @Input() nextStoryNodeLink: string;
+  @Input() nextStoryNodeThumbnailUrl: string;
+  @Input() nextStoryNodeThumbnailBgColor: string;
+  @Input() nextStoryNodeTitle: string;
+  thumbnailUrl: string;
+  thumbnailBgColor: string;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 }
