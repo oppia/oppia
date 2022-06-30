@@ -88,8 +88,9 @@ var LearnerDashboardPage = function() {
     // that is the exploration with the title passed as a parameter.
     var explorationTitle = $(
       `.e2e-test-exp-summary-tile-title=${title}`);
-    expect(await action.getText(
-      'Exploration title', explorationTitle)).toMatch(title);
+    var titleOfExplorationSummary = await action.getText(
+      'Exploration title', explorationTitle);
+    expect(titleOfExplorationSummary).toMatch(title);
   };
 
   this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
