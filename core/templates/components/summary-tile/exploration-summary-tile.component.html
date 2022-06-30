@@ -118,6 +118,12 @@
       </div>
     </a>
   </mat-card>
+  <button mat-button class="oppia-learner-confirm-button oppia-return-to-parent-button protractor-test-return-to-parent-button"
+            *ngIf="isRefresherExploration" (click)="loadParentExploration()">
+    <span [innerHTML]="'I18N_PLAYER_RETURN_TO_PARENT' | translate"></span>
+    <i class="fas fa-arrow-right oppia-arrow-icon">
+    </i>
+  </button>
 </div>
 <style>
   .oppia-exploration-dashboard-card {
@@ -168,10 +174,6 @@
 
   .views-text {
     margin-left: 6px;
-  }
-
-  .protractor-test-exp-summary-tile-title {
-    font-size: 1.7rem;
   }
 
   .thumbnail-image {
