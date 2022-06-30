@@ -30,7 +30,7 @@ from core.domain import user_domain
 from core.platform import models
 
 from typing import Callable, List, Optional, Sequence, overload
-from typing_extensions import TypedDict
+from typing_extensions import Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -76,8 +76,14 @@ def get_blog_post_from_model(
 
 @overload
 def get_blog_post_by_id(
-    blog_post_id: str
+    blog_post_id: str, strict: Literal[True] = ...
 ) -> blog_domain.BlogPost: ...
+
+
+@overload
+def get_blog_post_by_id(
+    blog_post_id: str, strict: Literal[False] = ...
+) -> Optional[blog_domain.BlogPost]: ...
 
 
 @overload
@@ -154,8 +160,14 @@ def get_blog_post_summary_from_model(
 
 @overload
 def get_blog_post_summary_by_id(
-    blog_post_id: str
+    blog_post_id: str, strict: Literal[True] = ...
 ) -> blog_domain.BlogPostSummary: ...
+
+
+@overload
+def get_blog_post_summary_by_id(
+    blog_post_id: str, strict: Literal[False] = ...
+) -> Optional[blog_domain.BlogPostSummary]: ...
 
 
 @overload
@@ -309,8 +321,14 @@ def get_blog_post_rights_from_model(
 
 @overload
 def get_blog_post_rights(
-    blog_post_id: str
+    blog_post_id: str, strict: Literal[True] = ...
 ) -> blog_domain.BlogPostRights: ...
+
+
+@overload
+def get_blog_post_rights(
+    blog_post_id: str, strict: Literal[False] = ...
+) -> Optional[blog_domain.BlogPostRights]: ...
 
 
 @overload
@@ -425,9 +443,9 @@ def publish_blog_post(blog_post_id: str) -> None:
     blog_post_rights = get_blog_post_rights(blog_post_id, strict=False)
     if blog_post_rights is None:
         raise Exception('The given blog post does not exist')
-    blog_post = get_blog_post_by_id(blog_post_id)
+    blog_post = get_blog_post_by_id(blog_post_id, strict=True)
     blog_post.validate(strict=True)
-    blog_post_summary = get_blog_post_summary_by_id(blog_post_id)
+    blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
     blog_post_summary.validate(strict=True)
     blog_post_rights.blog_post_is_published = True
 
@@ -627,7 +645,7 @@ def apply_change_dict(
     Returns:
         UpdatedBlogPost. The modified blog post object.
     """
-    blog_post = get_blog_post_by_id(blog_post_id)
+    blog_post = get_blog_post_by_id(blog_post_id, strict=True)
 
     if 'title' in change_dict:
         blog_post.update_title(change_dict['title'])
@@ -746,8 +764,8 @@ def update_blog_models_author_and_published_on_date(
         author_id: str. User ID of the author.
         date: str. The date of publishing the blog post.
     """
-    blog_post = get_blog_post_by_id(blog_post_id)
-    blog_post_rights = get_blog_post_rights(blog_post_id)
+    blog_post = get_blog_post_by_id(blog_post_id, strict=True)
+    blog_post_rights = get_blog_post_rights(blog_post_id, strict=True)
 
     blog_post.author_id = author_id
     supported_date_string = date + ', 00:00:00:00'

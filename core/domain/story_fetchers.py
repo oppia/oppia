@@ -30,6 +30,7 @@ from core.domain import story_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -145,23 +146,26 @@ def get_story_summary_from_model(
 
 @overload
 def get_story_by_id(
-    story_id: str
-) -> story_domain.Story: ...
-
-
-@overload
-def get_story_by_id(
-    story_id: str,
-    strict: bool = True
-) -> story_domain.Story: ...
-
-
-@overload
-def get_story_by_id(
     story_id: str,
     *,
     version: Optional[int] = None
 ) -> story_domain.Story: ...
+
+
+@overload
+def get_story_by_id(
+    story_id: str,
+    strict: Literal[True] = ...,
+    version: Optional[int] = None
+) -> story_domain.Story: ...
+
+
+@overload
+def get_story_by_id(
+    story_id: str,
+    strict: Literal[False] = ...,
+    version: Optional[int] = None
+) -> Optional[story_domain.Story]: ...
 
 
 @overload
@@ -235,7 +239,15 @@ def get_story_by_url_fragment(
 @overload
 def get_story_summary_by_id(
     story_id: str,
+    strict: Literal[True] = ...
 ) -> story_domain.StorySummary: ...
+
+
+@overload
+def get_story_summary_by_id(
+    story_id: str,
+    strict: Literal[False] = ...
+) -> Optional[story_domain.StorySummary]: ...
 
 
 @overload
@@ -330,7 +342,7 @@ def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
         return []
 
     num_of_nodes = min(len(progress_model.completed_node_ids), 3)
-    story = get_story_by_id(story_id)
+    story = get_story_by_id(story_id, strict=True)
     ordered_node_ids = (
         [node.id for node in story.story_contents.get_ordered_nodes()])
     ordered_completed_node_ids = (
@@ -353,7 +365,7 @@ def get_completed_nodes_in_story(
         list(StoryNode). The list of the story nodes that the user has
         completed.
     """
-    story = get_story_by_id(story_id)
+    story = get_story_by_id(story_id, strict=True)
     completed_nodes = []
 
     completed_node_ids = get_completed_node_ids(user_id, story_id)
@@ -377,7 +389,7 @@ def get_pending_and_all_nodes_in_story(
         Dict[str, List[story_domain.StoryNode]]. The list of story nodes,
         pending for the user.
     """
-    story = get_story_by_id(story_id)
+    story = get_story_by_id(story_id, strict=True)
     pending_nodes = []
 
     completed_node_ids = get_completed_node_ids(user_id, story_id)

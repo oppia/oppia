@@ -26,6 +26,7 @@ from core.domain import subtopic_page_domain
 from core.platform import models
 
 from typing import List, Optional, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -104,7 +105,16 @@ def get_subtopic_page_from_model(
 def get_subtopic_page_by_id(
     topic_id: str,
     subtopic_id: int,
+    strict: Literal[True] = ...
 ) -> subtopic_page_domain.SubtopicPage: ...
+
+
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: Literal[False] = ...
+) -> Optional[subtopic_page_domain.SubtopicPage]: ...
 
 
 @overload
@@ -177,8 +187,17 @@ def get_subtopic_pages_with_ids(
 @overload
 def get_subtopic_page_contents_by_id(
     topic_id: str,
-    subtopic_id: int
+    subtopic_id: int,
+    strict: Literal[True] = ...
 ) -> subtopic_page_domain.SubtopicPageContents: ...
+
+
+@overload
+def get_subtopic_page_contents_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: Literal[False] = ...
+) -> Optional[subtopic_page_domain.SubtopicPageContents]: ...
 
 
 @overload

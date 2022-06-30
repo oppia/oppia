@@ -32,6 +32,7 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import Optional, overload
+from typing_extensions import Literal
 
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
@@ -386,8 +387,16 @@ def create_new_collection_rights(collection_id, committer_id):
 
 @overload
 def get_collection_rights(
-    collection_id: str
+    collection_id: str,
+    strict: Literal[True] = ...
 ) -> rights_domain.ActivityRights: ...
+
+
+@overload
+def get_collection_rights(
+    collection_id: str,
+    strict: Literal[False] = ...
+) -> Optional[rights_domain.ActivityRights]: ...
 
 
 @overload
