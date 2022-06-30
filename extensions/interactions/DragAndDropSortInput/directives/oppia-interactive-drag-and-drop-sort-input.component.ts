@@ -257,14 +257,12 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
 
   getHtmlOfContentId(contentId: string): string {
     // Return the html of the content id.
-    let contentHtml = '';
     for (let choice of this.choicesValue) {
       if (choice.contentId === contentId) {
-        contentHtml = choice.html;
-        break;
+        return choice.html;
       }
     }
-    return contentHtml;
+    throw new Error('contentId not found');
   }
 
   submitAnswer(): void {

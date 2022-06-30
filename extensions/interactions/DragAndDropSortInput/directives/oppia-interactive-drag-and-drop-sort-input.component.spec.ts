@@ -284,6 +284,31 @@ describe('Drag and drop sort input interactive component', () => {
       }).toThrowError('contentId cannot be null');
     });
 
+    it('should throw error if content id not exist', () => {
+      component.choicesValue = [
+        {
+          html: '<p>choice 1</p>',
+          contentId: 'ca_choices_1'
+        },
+        {
+          html: '<p>choice 2</p>',
+          contentId: 'ca_choices_2'
+        },
+        {
+          html: '<p>choice 3</p>',
+          contentId: 'ca_choices_3'
+        },
+        {
+          html: '<p>choice 4</p>',
+          contentId: 'ca_choices_4'
+        },
+      ] as SubtitledHtml[];
+
+      expect(() => {
+        component.getHtmlOfContentId('ca_choices_5');
+      }).toThrowError('contentId not found');
+    });
+
     it('should move items between lists', () => {
       component.noShow = 1;
       component.hide = [1, 2, 3, 4];

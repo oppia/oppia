@@ -19,9 +19,10 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { LibraryPageConstants, libraryPathToModes } from '../library-page.constants';
+import { LibraryPageConstants } from '../library-page.constants';
 
-type libraryPathToModesKeys = keyof typeof libraryPathToModes;
+type libraryPathToModesKeys = (
+  keyof typeof LibraryPageConstants.LIBRARY_PATHS_TO_MODES);
 
 @Component({
   selector: 'oppia-library-footer',

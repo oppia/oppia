@@ -24,7 +24,6 @@ import { TopicViewerBackendApiService } from
 import { ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerNavbarBreadcrumbComponent } from
-  // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';

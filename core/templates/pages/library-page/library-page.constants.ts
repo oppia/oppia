@@ -16,13 +16,6 @@
  * @fileoverview Constants for the Oppia contributors' library page.
  */
 
-export const libraryPathToModes = {
-  '/community-library': 'index',
-  '/community-library/top-rated': 'group',
-  '/community-library/recently-published': 'group',
-  '/search/find': 'search'
-} as const;
-
 // NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
 // LIBRARY_PAGE_MODES.GROUP should have the same value as
@@ -34,7 +27,12 @@ export const LibraryPageConstants = {
     SEARCH: 'search'
   },
 
-  LIBRARY_PATHS_TO_MODES: libraryPathToModes,
+  LIBRARY_PATHS_TO_MODES: {
+    '/community-library': 'index',
+    '/community-library/top-rated': 'group',
+    '/community-library/recently-published': 'group',
+    '/search/find': 'search'
+  },
 
   SEARCH_EXPLORATION_URL_TEMPLATE:
     '/exploration/metadata_search?q=<query>'
