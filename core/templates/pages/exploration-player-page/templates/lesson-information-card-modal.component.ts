@@ -27,6 +27,7 @@ import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-b
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
@@ -72,6 +73,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlService: UrlService,
+    private userService: UserService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private windowRef: WindowRef,
@@ -182,6 +184,20 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         });
     }
     this.saveProgressMenuIsShown = true;
+  }
+
+  copyProgressUrl(): void {
+    navigator.clipboard.writeText(
+      'https://oppia.org/progress/' + this.loggedOutProgressUniqueUrlId);
+  }
+
+  onLoginButtonClicked(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) => {
+        this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+          this.loggedOutProgressUniqueUrlId);
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      });
   }
 
   closeSaveProgressMenu(): void {

@@ -371,6 +371,7 @@ export class ExplorationPlayerStateService {
       .then((response) => {
         this.uniqueProgressUrlId = (
           response.unique_progress_url_id);
+        this.trackLoggedOutLearnerProgress();
       });
   }
 

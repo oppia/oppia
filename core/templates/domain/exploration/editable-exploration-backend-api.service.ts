@@ -170,14 +170,14 @@ export class EditableExplorationBackendApiService {
       }).toPromise();
   }
 
-  async changeLoggedOutProgressToLoggedInProgress(
+  async changeLoggedOutProgressToLoggedInProgressAsync(
       explorationId: string,
-      uid: string
+      pid: string
   ): Promise<void> {
     const requestUrl =
       '/sync_logged_out_and_logged_in_progress/' + explorationId;
     return this.httpClient.post<void>(requestUrl, {
-      unique_progress_url_id: uid
+      unique_progress_url_id: pid
     }).toPromise();
   }
 

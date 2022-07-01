@@ -288,7 +288,7 @@ export class ConversationSkinComponent {
 
     // Moved the following code to then section as isLoggedIn
     // variable needs to be defined before the following code is executed.
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(async(userInfo) => {
       this.isLoggedIn = userInfo.isLoggedIn();
 
       this.windowRef.nativeWindow.addEventListener('beforeunload', (e) => {
@@ -296,19 +296,32 @@ export class ConversationSkinComponent {
           return;
         }
         if (this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
-            !this.displayedCard.isTerminal() &&
+            !this.displayedCard.isTerminal() && !this.isLoggedIn &&
+            !this.explorationPlayerStateService.isLoggedOutProgressTracked &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
           this.statsReportingService.recordMaybeLeaveEvent(
             this.playerTranscriptService.getLastStateName(),
             this.learnerParamsService.getAllParams());
+          let confirmationMessage = (
+            'If you navigate away from this page, your progress on the ' +
+              'exploration will be lost.');
+          if (!this.isIframed) {
+            confirmationMessage = (
+              'If you navigate away from this page, your progress after the ' +
+                'last completed checkpoint will be lost.');
+          }
+          (e || this.windowRef.nativeWindow.event).returnValue = (
+            confirmationMessage);
+          return confirmationMessage;
         }
       });
 
-      let uid = this.localStorageService
+      let pid = this.localStorageService
         .getUniqueProgressIdOfLoggedOutLearner();
-      if (uid && this.isLoggedIn) {
-        this.editableExplorationBackendApiService
-          .changeLoggedOutProgressToLoggedInProgress(uid, this.explorationId);
+      if (pid && this.isLoggedIn) {
+        await this.editableExplorationBackendApiService
+          .changeLoggedOutProgressToLoggedInProgressAsync(
+            this.explorationId, pid);
         this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
       }
 

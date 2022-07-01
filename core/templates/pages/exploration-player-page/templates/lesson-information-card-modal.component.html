@@ -140,10 +140,11 @@
     <div class="sign-in-box">
       <p>Your learning progress will be automatically saved if you have an account.</p>
       <button type="button"
-              class="btn btn-secondary create-account-btn">
+              class="btn btn-secondary create-account-btn"
+              (click)="onLoginButtonClicked()">
             Create Account
       </button>
-      <p class="sign-in-text">Already have an account? <a class="sign-in-link">Sign In</a></p>
+      <p class="sign-in-text">Already have an account? <a class="sign-in-link" (click)="onLoginButtonClicked()">Sign In</a></p>
     </div>
     <div class="separator">
       <div class="bars"></div>
@@ -155,7 +156,7 @@
       <p class="copy-text">Write or copy the link below</p>
       <div class="uid-copy">
         <div id="unique-progress-id">https://oppia.org/progress/{{ loggedOutProgressUniqueUrlId }}</div>
-        <button type="button" class="btn btn-secondary uid-copy-btn">Copy</button>
+        <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
       </div>
     </div>
     <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">

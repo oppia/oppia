@@ -309,10 +309,6 @@ class ExplorationHandler(base.BaseHandler):
                 exp_fetchers.get_logged_out_user_progress(
                     unique_progress_url_id))
 
-            print('\n\n\n\n\n')
-            print(logged_out_user_data.to_dict())
-            print('\n\n\n\n')
-
             synced_exp_user_data = None
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.
@@ -401,9 +397,6 @@ class ExplorationHandler(base.BaseHandler):
             'most_recently_reached_checkpoint_state_name': (
                 most_recently_reached_checkpoint_state_name)
         })
-        print('\n\n\n\n\n')
-        print(self.values)
-        print('\n\n\n\n')
         self.render_json(self.values)
 
 
