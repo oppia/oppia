@@ -274,7 +274,7 @@ describe('Exploration history', function() {
       },
       10: {
         text: '      dest_if_really_stuck: null',
-        highlighted: false
+        highlighted: true
       },
       11: {
         text: '      feedback:',
@@ -354,7 +354,7 @@ describe('Exploration history', function() {
       },
       30: {
         text: '    dest_if_really_stuck: null',
-        highlighted: false
+        highlighted: true
       },
       31: {
         text: '    feedback:',
