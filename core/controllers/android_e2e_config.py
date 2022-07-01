@@ -130,7 +130,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         # Add other structures to the topic.
         topic.add_canonical_story(story_id)
         topic.add_uncategorized_skill_id(skill_id)
-        topic.add_subtopic(1, 'Test Subtopic Title')
+        topic.add_subtopic(1, 'Test Subtopic Title', 'testsubtop')
 
         # Update and validate subtopic.
         topic_services.update_subtopic_thumbnail_filename(
@@ -204,7 +204,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Dummy Subtopic Title'
+                'title': 'Dummy Subtopic Title',
+                'url_fragment': 'dummy-fragment'
             })]
         )
 

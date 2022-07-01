@@ -148,7 +148,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title')
+            1, 'Subtopic Title', 'url-frag')
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         skill_id = skill_services.get_new_skill_id()

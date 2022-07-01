@@ -1359,7 +1359,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             description='Subtopic Skill')
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title')
+            1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = [subtopic_skill_id]
 
         self.save_new_topic(

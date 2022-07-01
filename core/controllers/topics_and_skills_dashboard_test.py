@@ -56,7 +56,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.subtopic_skill_id, self.admin_id, description='Subtopic Skill')
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title')
+            1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = [self.subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',

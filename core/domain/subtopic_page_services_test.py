@@ -55,7 +55,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         self.subtopic_page_id = (
@@ -167,7 +168,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment-one'
             })])
         with self.assertRaisesRegex(
             Exception, 'Unexpected error: received an invalid change list *'):
@@ -186,7 +188,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
-                    'title': 'Sample'
+                    'title': 'Sample',
+                    'url_fragment': 'fragment'
                 })])
         subtopic_page_1.version = 3
         subtopic_page_model_1.version = 2
@@ -197,7 +200,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
-                    'title': 'Sample'
+                    'title': 'Sample',
+                    'url_fragment': 'sample-frag'
                 })])
 
     def test_commit_log_entry(self):

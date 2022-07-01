@@ -70,7 +70,8 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'dummy-subtopic'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,
@@ -575,7 +576,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-fragment-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
@@ -798,7 +800,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-frag-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
