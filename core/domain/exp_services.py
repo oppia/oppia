@@ -1268,8 +1268,10 @@ def regenerate_exploration_summary_with_new_contributor(
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
-    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
-    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration_id)
+    exp_rights = exp_models.ExplorationRightsModel.get(
+        exploration_id, strict=False)
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration_id, strict=False)
     if exploration is not None:
         exp_summary = compute_summary_of_exploration(
             exploration, exp_rights, exp_summary_model)
@@ -1288,8 +1290,10 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
-    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration_id)
+    exp_rights = exp_models.ExplorationRightsModel.get(
+        exploration_id, strict=False)
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration_id, strict=False)
     exp_summary = compute_summary_of_exploration(
         exploration, exp_rights, exp_summary_model)
     exp_summary.contributors_summary = (
@@ -1394,7 +1398,7 @@ def save_exploration_summary(exp_summary):
     """
 
     existing_exp_summary_model = (
-        exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+        exp_models.ExpSummaryModel.get(exp_summary.id, strict=False))
     exp_summary_model = populate_exp_summary_model_fields(
         existing_exp_summary_model, exp_summary)
     exp_summary_model.update_timestamps()

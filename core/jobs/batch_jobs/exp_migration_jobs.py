@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -205,9 +205,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 change_dicts,
                 additional_models={'rights_model': exp_rights_model}
             ).values()
-
-            exp_services.discard_draft(
-                exp_model.id, feconf.MIGRATION_BOT_USERNAME)
 
             if opportunity_services.is_exploration_available_for_contribution(
                 migrated_exp.id):
