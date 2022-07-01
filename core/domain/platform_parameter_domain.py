@@ -474,8 +474,7 @@ class PlatformParameterFilter:
             return is_client_version_larger
         elif op == '>=':
             return is_equal or is_client_version_larger
-
-        if (op not in ['=', '<', '<=', '>', '>=']):
+        else:
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.' % (
@@ -559,8 +558,7 @@ class PlatformParameterFilter:
             return is_client_flavor_larger
         elif op == '>=':
             return is_equal or is_client_flavor_larger
-
-        if (op not in ['=', '<', '<=', '>', '>=']):
+        else:
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.' % (
