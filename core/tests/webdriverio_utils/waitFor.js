@@ -25,7 +25,7 @@ var Constants = require('./WebdriverioConstants');
 // server since the mobile tests are run on a real
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
-
+var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 30000;
 
 var alertToBePresent = async() => {
   await browser.waitUntil(
@@ -152,14 +152,16 @@ var elementAttributeToBe = async function(
 * Wait for new tab is opened
 */
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
-  await browser.wait(async function() {
-    var handles = await browser.driver.getAllWindowHandles();
-    await browser.waitForAngularEnabled(false);
-    await browser.switchTo().window(await handles.pop());
-    var url = await browser.getCurrentUrl();
-    await browser.waitForAngularEnabled(true);
+  await browser.waitUntil(async function() {
+    var handles = await browser.getWindowHandles();
+    await browser.switchToWindow(await handles.pop());
+    var url = await browser.getUrl();
     return await url.match(urlToMatch);
-  }, DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB, errorMessage);
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
+    timeoutMsg: errorMessage
+  });
 };
 
 /**
@@ -167,8 +169,12 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
  */
 var urlRedirection = async function(url) {
   // Checks that the current URL matches the expected text.
-  await browser.wait(
-    until.urlIs(url), DEFAULT_WAIT_TIME_MSECS, 'URL redirection took too long');
+  await browser.waitUntil(
+    await until.urlIs(url),
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: 'URL redirection took too long'
+    });
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {

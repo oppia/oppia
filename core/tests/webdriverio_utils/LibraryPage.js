@@ -28,6 +28,7 @@ var LibraryPage = function() {
   var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
   var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
   var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
+  var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var allExplorationsTitled = function(explorationName) {
     return $$(
       `.e2e-test-exp-summary-tile-title=${explorationName}`);
@@ -65,10 +66,7 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
-    await waitFor.pageToFullyLoad();
-    var expHoverElement = await $('.e2e-test-exploration-dashboard-card');
-    await expHoverElement.scrollIntoView();
-    await expHoverElement.moveTo({xOffset: 1, yOffset: 1});
+    await expHoverElement.moveTo();
 
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,
