@@ -34,8 +34,7 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Full exploration editor', function() {
+describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
