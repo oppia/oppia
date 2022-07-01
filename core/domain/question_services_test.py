@@ -3292,6 +3292,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group1 = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3329,6 +3330,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group2 = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_2',
                     'html': '<p>Feedback</p>'
@@ -3379,6 +3381,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
