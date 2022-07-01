@@ -387,28 +387,24 @@ def create_new_collection_rights(collection_id, committer_id):
 
 @overload
 def get_collection_rights(
-    collection_id: str,
-    strict: Literal[True] = ...
+    collection_id: str
 ) -> rights_domain.ActivityRights: ...
 
 
 @overload
 def get_collection_rights(
-    collection_id: str,
-    strict: Literal[False] = ...
-) -> Optional[rights_domain.ActivityRights]: ...
+    collection_id: str, *, strict: Literal[True]
+) -> rights_domain.ActivityRights: ...
 
 
 @overload
 def get_collection_rights(
-    collection_id: str,
-    strict: bool = False
+    collection_id: str, *, strict: Literal[False]
 ) -> Optional[rights_domain.ActivityRights]: ...
 
 
 def get_collection_rights(
-    collection_id: str,
-    strict: bool = True
+    collection_id: str, *, strict: bool = True
 ) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights for this collection from the datastore.
 

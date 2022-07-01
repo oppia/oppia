@@ -76,24 +76,24 @@ def get_blog_post_from_model(
 
 @overload
 def get_blog_post_by_id(
-    blog_post_id: str, strict: Literal[True] = ...
+    blog_post_id: str
 ) -> blog_domain.BlogPost: ...
 
 
 @overload
 def get_blog_post_by_id(
-    blog_post_id: str, strict: Literal[False] = ...
-) -> Optional[blog_domain.BlogPost]: ...
+    blog_post_id: str, *, strict: Literal[True]
+) -> blog_domain.BlogPost: ...
 
 
 @overload
 def get_blog_post_by_id(
-    blog_post_id: str, strict: bool = False
+    blog_post_id: str, *, strict: Literal[False]
 ) -> Optional[blog_domain.BlogPost]: ...
 
 
 def get_blog_post_by_id(
-    blog_post_id: str, strict: bool = True
+    blog_post_id: str, *, strict: bool = True
 ) -> Optional[blog_domain.BlogPost]:
     """Returns a domain object representing a blog post.
 
@@ -160,24 +160,24 @@ def get_blog_post_summary_from_model(
 
 @overload
 def get_blog_post_summary_by_id(
-    blog_post_id: str, strict: Literal[True] = ...
+    blog_post_id: str
 ) -> blog_domain.BlogPostSummary: ...
 
 
 @overload
 def get_blog_post_summary_by_id(
-    blog_post_id: str, strict: Literal[False] = ...
-) -> Optional[blog_domain.BlogPostSummary]: ...
+    blog_post_id: str, *, strict: Literal[True]
+) -> blog_domain.BlogPostSummary: ...
 
 
 @overload
 def get_blog_post_summary_by_id(
-    blog_post_id: str, strict: bool = False
+    blog_post_id: str, *, strict: Literal[False]
 ) -> Optional[blog_domain.BlogPostSummary]: ...
 
 
 def get_blog_post_summary_by_id(
-    blog_post_id: str, strict: bool = True
+    blog_post_id: str, *, strict: bool = True
 ) -> Optional[blog_domain.BlogPostSummary]:
     """Returns a domain object representing a blog post summary.
 
@@ -321,24 +321,24 @@ def get_blog_post_rights_from_model(
 
 @overload
 def get_blog_post_rights(
-    blog_post_id: str, strict: Literal[True] = ...
+    blog_post_id: str
 ) -> blog_domain.BlogPostRights: ...
 
 
 @overload
 def get_blog_post_rights(
-    blog_post_id: str, strict: Literal[False] = ...
-) -> Optional[blog_domain.BlogPostRights]: ...
+    blog_post_id: str, *, strict: Literal[True]
+) -> blog_domain.BlogPostRights: ...
 
 
 @overload
 def get_blog_post_rights(
-    blog_post_id: str, strict: bool = False
+    blog_post_id: str, *, strict: Literal[False]
 ) -> Optional[blog_domain.BlogPostRights]: ...
 
 
 def get_blog_post_rights(
-    blog_post_id: str, strict: bool = True
+    blog_post_id: str, *, strict: bool = True
 ) -> Optional[blog_domain.BlogPostRights]:
     """Retrieves the rights object for the given blog post.
 

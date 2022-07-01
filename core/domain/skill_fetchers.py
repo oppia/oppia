@@ -65,6 +65,12 @@ def get_multi_skills(
 @overload
 def get_skill_by_id(
     skill_id: str,
+) -> skill_domain.Skill: ...
+
+
+@overload
+def get_skill_by_id(
+    skill_id: str,
     *,
     version: Optional[int] = None
 ) -> skill_domain.Skill: ...
@@ -73,7 +79,8 @@ def get_skill_by_id(
 @overload
 def get_skill_by_id(
     skill_id: str,
-    strict: Literal[True] = ...,
+    *,
+    strict: Literal[True],
     version: Optional[int] = None
 ) -> skill_domain.Skill: ...
 
@@ -81,21 +88,15 @@ def get_skill_by_id(
 @overload
 def get_skill_by_id(
     skill_id: str,
-    strict: Literal[False] = ...,
-    version: Optional[int] = None
-) -> Optional[skill_domain.Skill]: ...
-
-
-@overload
-def get_skill_by_id(
-    skill_id: str,
-    strict: bool = False,
+    *,
+    strict: Literal[False],
     version: Optional[int] = None
 ) -> Optional[skill_domain.Skill]: ...
 
 
 def get_skill_by_id(
     skill_id: str,
+    *,
     strict: bool = True,
     version: Optional[int] = None
 ) -> Optional[skill_domain.Skill]:

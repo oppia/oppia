@@ -147,6 +147,12 @@ def get_story_summary_from_model(
 @overload
 def get_story_by_id(
     story_id: str,
+) -> story_domain.Story: ...
+
+
+@overload
+def get_story_by_id(
+    story_id: str,
     *,
     version: Optional[int] = None
 ) -> story_domain.Story: ...
@@ -155,7 +161,8 @@ def get_story_by_id(
 @overload
 def get_story_by_id(
     story_id: str,
-    strict: Literal[True] = ...,
+    *,
+    strict: Literal[True],
     version: Optional[int] = None
 ) -> story_domain.Story: ...
 
@@ -163,21 +170,15 @@ def get_story_by_id(
 @overload
 def get_story_by_id(
     story_id: str,
-    strict: Literal[False] = ...,
-    version: Optional[int] = None
-) -> Optional[story_domain.Story]: ...
-
-
-@overload
-def get_story_by_id(
-    story_id: str,
-    strict: bool = False,
+    *,
+    strict: Literal[False],
     version: Optional[int] = None
 ) -> Optional[story_domain.Story]: ...
 
 
 def get_story_by_id(
     story_id: str,
+    *,
     strict: bool = True,
     version: Optional[int] = None
 ) -> Optional[story_domain.Story]:
@@ -238,28 +239,24 @@ def get_story_by_url_fragment(
 
 @overload
 def get_story_summary_by_id(
-    story_id: str,
-    strict: Literal[True] = ...
+    story_id: str
 ) -> story_domain.StorySummary: ...
 
 
 @overload
 def get_story_summary_by_id(
-    story_id: str,
-    strict: Literal[False] = ...
-) -> Optional[story_domain.StorySummary]: ...
+    story_id: str, *, strict: Literal[True]
+) -> story_domain.StorySummary: ...
 
 
 @overload
 def get_story_summary_by_id(
-    story_id: str,
-    strict: bool = False
+    story_id: str, *, strict: Literal[False]
 ) -> Optional[story_domain.StorySummary]: ...
 
 
 def get_story_summary_by_id(
-    story_id: str,
-    strict: bool = True
+    story_id: str, *, strict: bool = True
 ) -> Optional[story_domain.StorySummary]:
     """Returns a domain object representing a story summary.
 
