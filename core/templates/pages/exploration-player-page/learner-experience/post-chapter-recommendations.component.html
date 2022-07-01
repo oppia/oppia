@@ -4,6 +4,7 @@
     <div *ngIf="nextStoryNodeTitle" class="recommendation-card-wrapper">
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Next story node card image</title>
           <a [attr.href]="nextStoryNodeLink">
             <rect width="192"
                   height="150"
@@ -20,12 +21,13 @@
         </svg>
       </div>
       <p class="to-the-next-lesson-text">{{ 'I18N_END_CHAPTER_NEXT_CHAPTER_TEXT' | translate }}</p>
-      <p>{{ nextStoryNodeTitle }}</p>
+      <p [ngStyle]="{'font-style': 'italic'}">{{ nextStoryNodeTitle }}</p>
     </div>
     <p *ngIf="nextStoryNodeTitle" class="or-text">Or</p>
     <div class="recommendation-card-wrapper">
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Practice session card image</title>
           <a [attr.href]="getPracticeTabUrl()">
             <rect width="192"
                   height="150"
@@ -41,7 +43,7 @@
           </a>
         </svg>
       </div>
-      <p>{{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}</p>
+      <p [ngStyle]="{'font-style': 'italic'}">{{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}</p>
     </div>
   </div>
 </div>

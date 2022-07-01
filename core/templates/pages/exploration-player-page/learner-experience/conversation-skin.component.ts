@@ -74,6 +74,7 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -145,6 +146,8 @@ export class ConversationSkinComponent {
   mostRecentlyReachedCheckpoint: string;
   showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
+  completedChaptersCount: number | undefined;
+  chapterIsCompletedForTheFirstTime: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -198,7 +201,8 @@ export class ConversationSkinComponent {
       EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -223,6 +227,11 @@ export class ConversationSkinComponent {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
+
+    this.learnerDashboardBackendApiService
+      .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
+        this.completedChaptersCount = data.completedChaptersCount;
+      });
 
     if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
@@ -862,6 +871,16 @@ export class ConversationSkinComponent {
                     story_url_fragment: storyUrlFragment
                   });
             }
+            this.learnerDashboardBackendApiService
+              .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
+                let newCompletedChaptersCount = data.completedChaptersCount;
+                if (
+                  newCompletedChaptersCount === this.completedChaptersCount + 1
+                ) {
+                  this.completedChaptersCount = newCompletedChaptersCount;
+                  this.chapterIsCompletedForTheFirstTime = true;
+                }
+              });
           });
         } else {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(

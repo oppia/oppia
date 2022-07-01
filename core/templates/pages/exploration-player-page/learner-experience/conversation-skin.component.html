@@ -22,7 +22,9 @@
                         [recommendedExplorationSummaries]="recommendedExplorationSummaries"
                         [parentExplorationIds]="parentExplorationIds"
                         [inStoryMode]="inStoryMode"
-                        [nextLessonLink]="getExplorationLink()">
+                        [nextLessonLink]="getExplorationLink()"
+                        [completedChaptersCount]="completedChaptersCount"
+                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
