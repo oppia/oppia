@@ -106,7 +106,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
         """
         states_dict = {}
         for state_name in exploration.states:
-            states_dict[state_name] = exploration.states[state_name].to_dict()
+            states_dict[state_name] = exploration.states[state_name]
         (old_content_id_to_new_content_id, _) = (
             state_domain.State
             .generate_old_content_id_to_new_content_id_in_v49_states(
@@ -152,8 +152,6 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             | 'Get all exploration models' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(
                     include_deleted=False))
-            | 'Transform to exploration domain object' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
             | 'Fetch old to new content id mapping' >> beam.Map(
                 self._get_old_content_id_to_new_content_id_mapping)
         )
