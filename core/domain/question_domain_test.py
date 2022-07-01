@@ -1806,8 +1806,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'TextInput'
-
         question_data['interaction']['answer_groups'] = [
             {
                 'outcome': {
@@ -1823,23 +1821,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'state_schema_version': 50
         }
 
-        self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {}
-        )
-
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 51)
-        self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {
-                'catchMisspellings': {
-                    'value': False
-                }
-            }
-        )
 
         default_outcome_dict = test_value['state']['interaction']['default_outcome'] # pylint: disable=line-too-long
         outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome'] # pylint: disable=line-too-long

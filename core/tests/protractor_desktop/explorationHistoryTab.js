@@ -346,7 +346,7 @@ describe('Exploration history', function() {
       },
       28: {
         text: '  default_outcome:',
-        highlighted: false
+        highlighted: true
       },
       29: {
         text: '    dest: first',
@@ -474,6 +474,7 @@ describe('Exploration history', function() {
       '        unicode_str: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
+      '    dest_if_really_stuck: null\n'
       '    feedback:\n' +
       '      content_id: default_outcome\n' +
       '      html: \'\'\n' +

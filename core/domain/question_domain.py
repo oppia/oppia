@@ -1238,9 +1238,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
-        """Converts from version 49 to 50. Version 50 adds a new
-        customization arg to TextInput interaction which allows
-        creators to fill a catch misspellings checkbox. Also adds
+        """Converts from version 49 to 50. Version 50 adds
         a new dest_if_really_stuck field to the Outcome class to redirect
         the learners to a state for strengthening concepts.
 
@@ -1259,6 +1257,8 @@ class Question(translation_domain.BaseTranslatableObject):
 
         if question_state_dict['interaction']['default_outcome'] is not None:
             question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
+
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(
