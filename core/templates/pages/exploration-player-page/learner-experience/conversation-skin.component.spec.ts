@@ -396,8 +396,8 @@ describe('Conversation skin component', () => {
     record_playthrough_probability: 1,
     draft_change_list_id: 0,
     has_viewed_lesson_info_modal_once: false,
-    furthest_completed_checkpoint_exp_version: 1,
-    furthest_completed_checkpoint_state_name: 'End',
+    furthest_reached_checkpoint_exp_version: 1,
+    furthest_reached_checkpoint_state_name: 'End',
     most_recently_reached_checkpoint_state_name: 'Mid',
     most_recently_reached_checkpoint_exp_version: 2
   };
@@ -425,8 +425,8 @@ describe('Conversation skin component', () => {
     record_playthrough_probability: 1,
     draft_change_list_id: 0,
     has_viewed_lesson_info_modal_once: false,
-    furthest_completed_checkpoint_exp_version: 1,
-    furthest_completed_checkpoint_state_name: 'End',
+    furthest_reached_checkpoint_exp_version: 1,
+    furthest_reached_checkpoint_state_name: 'End',
     most_recently_reached_checkpoint_state_name: null,
     most_recently_reached_checkpoint_exp_version: 2
   };
@@ -995,7 +995,6 @@ describe('Conversation skin component', () => {
     expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
   }));
 
-
   it('should unsubscribe on destroy', () => {
     spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');
 
@@ -1398,6 +1397,8 @@ describe('Conversation skin component', () => {
         summaries: []
       }));
 
+    componentInstance.alertMessageTimeout = 5;
+
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
@@ -1656,6 +1657,9 @@ describe('Conversation skin component', () => {
 
   it('should get recommended summaries when exploration in story chapter mode',
     fakeAsync(() => {
+      let alertMessageElement = document.createElement('div');
+      alertMessageElement.className =
+        'oppia-exploration-checkpoints-message';
       spyOn(explorationPlayerStateService, 'recordNewCardAdded');
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
       spyOn(componentInstance, 'scrollToTop');
@@ -1680,6 +1684,11 @@ describe('Conversation skin component', () => {
         .and.callFake((ids, recommendations, callb) => {
           callb(null);
         });
+      spyOn(document, 'querySelector').withArgs(
+        '.oppia-exploration-checkpoints-message')
+        .and.returnValue(alertMessageElement);
+
+      componentInstance.alertMessageTimeout = 5;
 
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
@@ -1721,4 +1730,12 @@ describe('Conversation skin component', () => {
         toBeFalse();
     }
   );
+
+  it('should tell if progress clearance message is shown or not', () => {
+    expect(componentInstance.isProgressClearanceMessageShown()).toBeFalse();
+
+    componentInstance.showProgressClearanceMessage = true;
+
+    expect(componentInstance.isProgressClearanceMessageShown()).toBeTrue();
+  });
 });
