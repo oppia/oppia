@@ -58,6 +58,10 @@ export interface FetchExplorationBackendResponse {
   'most_recently_reached_checkpoint_exp_version': number;
 }
 
+interface CheckpointsFeatureStatusBackendDict {
+  'checkpoints_feature_is_enabled': boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -68,6 +72,24 @@ export class ReadOnlyExplorationBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
+
+  _fetchCheckpointsFeatureIsEnabledStatus(
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void): void {
+    const checkpointsFeatureIsEnabledStatusHandlerUrl = (
+      '/checkpoints_feature_status_handler');
+
+    this.http.get<CheckpointsFeatureStatusBackendDict>(
+      checkpointsFeatureIsEnabledStatusHandlerUrl).toPromise().then(data => {
+      if (successCallback) {
+        successCallback(data.checkpoints_feature_is_enabled);
+      }
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
+  }
 
   private async _fetchExplorationAsync(
       explorationId: string, version: number | null
@@ -201,6 +223,16 @@ export class ReadOnlyExplorationBackendApiService {
     if (this._isCached(explorationId)) {
       delete this._explorationCache[explorationId];
     }
+  }
+
+  /**
+   * 
+   * @returns {boolean} Whether the checkpoints feature is enabled.
+   */
+  async fetchCheckpointsFeatureIsEnabledStatus(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._fetchCheckpointsFeatureIsEnabledStatus(resolve, reject);
+    });
   }
 }
 

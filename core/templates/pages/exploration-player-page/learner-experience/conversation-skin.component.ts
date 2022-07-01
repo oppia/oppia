@@ -145,6 +145,7 @@ export class ConversationSkinComponent {
   mostRecentlyReachedCheckpoint: string;
   showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
+  CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -204,6 +205,13 @@ export class ConversationSkinComponent {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+
+    this.readOnlyExplorationBackendApiService
+      .fetchCheckpointsFeatureIsEnabledStatus().then(
+        (checkpointsFeatureIsEnabled) => {
+          this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
+        }
+      );
 
     if (this.collectionId) {
       this.readOnlyCollectionBackendApiService.loadCollectionAsync(
@@ -329,32 +337,34 @@ export class ConversationSkinComponent {
       }
 
       // We do not save checkpoints progress for iframes.
-      if (!this.isIframed && this.isLoggedIn && !this._editorPreviewMode &&
-        !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-        // For the first state which is always a checkpoint.
-        let firstStateName: string;
-        let expVersion: number;
-        this.readOnlyExplorationBackendApiService.
-          loadLatestExplorationAsync(this.explorationId).then(
-            response => {
-              expVersion = response.version;
-              firstStateName = response.exploration.init_state_name;
-              this.mostRecentlyReachedCheckpoint = (
-                response.most_recently_reached_checkpoint_state_name
-              );
-              // If the exploration is freshly started, mark the first state
-              // as the most recently reached checkpoint.
-              if (!this.mostRecentlyReachedCheckpoint) {
-                this.editableExplorationBackendApiService.
-                  recordMostRecentlyReachedCheckpointAsync(
-                    this.explorationId,
-                    expVersion,
-                    firstStateName
-                  );
+      if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+        if (!this.isIframed && this.isLoggedIn && !this._editorPreviewMode &&
+          !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+          // For the first state which is always a checkpoint.
+          let firstStateName: string;
+          let expVersion: number;
+          this.readOnlyExplorationBackendApiService.
+            loadLatestExplorationAsync(this.explorationId).then(
+              response => {
+                expVersion = response.version;
+                firstStateName = response.exploration.init_state_name;
+                this.mostRecentlyReachedCheckpoint = (
+                  response.most_recently_reached_checkpoint_state_name
+                );
+                // If the exploration is freshly started, mark the first state
+                // as the most recently reached checkpoint.
+                if (!this.mostRecentlyReachedCheckpoint) {
+                  this.editableExplorationBackendApiService.
+                    recordMostRecentlyReachedCheckpointAsync(
+                      this.explorationId,
+                      expVersion,
+                      firstStateName
+                    );
+                }
               }
-            }
-          );
-        this.visitedStateNames.push(firstStateName);
+            );
+          this.visitedStateNames.push(firstStateName);
+        }
       }
     });
   }
@@ -672,7 +682,8 @@ export class ConversationSkinComponent {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
 
-    if (index > 0 && !this.isIframed && this.isLoggedIn &&
+    if (this.CHECKPOINTS_FEATURE_IS_ENABLED && index > 0 &&
+      !this.isIframed && this.isLoggedIn &&
       !this._editorPreviewMode &&
       !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       let currentState = this.explorationEngineService.getState();
@@ -908,13 +919,15 @@ export class ConversationSkinComponent {
     this.explorationPlayerStateService.onPlayerStateChange.emit(
       this.nextCard.getStateName());
 
-    // We do not store checkpoints progress for iframes hence we do not
-    // need to consider redirecting the user to the most recently
-    // reached checkpoint on exploration initial load in that case.
-    if (!this.isIframed && this.isLoggedIn && !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-      // Navigate the learner to the most recently reached checkpoint state.
-      this._navigateToMostRecentlyReachedCheckpoint();
+    if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+      // We do not store checkpoints progress for iframes hence we do not
+      // need to consider redirecting the user to the most recently
+      // reached checkpoint on exploration initial load in that case.
+      if (!this.isIframed && this.isLoggedIn && !this._editorPreviewMode &&
+        !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+        // Navigate the learner to the most recently reached checkpoint state.
+        this._navigateToMostRecentlyReachedCheckpoint();
+      }
     }
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);

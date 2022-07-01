@@ -499,6 +499,11 @@ describe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
   }));
 
   it('should create', () => {
