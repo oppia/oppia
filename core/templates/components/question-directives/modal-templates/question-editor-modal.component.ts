@@ -190,6 +190,7 @@ export class QuestionEditorModalComponent
     if (!this.isQuestionValid()) {
       return;
     }
+
     this.contextService.resetImageSaveDestination();
     this.ngbActiveModal.close(this.returnModalObject);
   }

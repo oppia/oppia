@@ -277,6 +277,7 @@ describe('Question Editor Modal Component', () => {
     });
 
   it('should close modal successfully', () => {
+    spyOn(component, 'isQuestionValid').and.returnValue(true);
     component.done();
     expect(ngbActiveModal.close).toHaveBeenCalled();
   });
