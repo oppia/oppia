@@ -263,7 +263,6 @@ describe('Learner dashboard functionality', function() {
         elem = await elem.addItem('Unicode');
         await elem.setValue(topicId);
       });
-    await browser.debug();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     (
