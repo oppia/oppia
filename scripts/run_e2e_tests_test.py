@@ -253,7 +253,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'dev_mode': True,
-                    'mobile': False,
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
@@ -303,7 +302,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'dev_mode': True,
-                    'mobile': False,
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
@@ -596,7 +594,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'dev_mode': True,
-                    'mobile': False,
                     'suite_name': 'full',
                     'sharding_instances': 3,
                     'debug_mode': False,
@@ -642,7 +639,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {
                     'dev_mode': True,
                     'suite_name': 'full',
-                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': True,
                     'stdout': subprocess.PIPE,
@@ -688,7 +684,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {
                     'dev_mode': True,
                     'suite_name': 'full',
-                    'mobile': False,
                     'sharding_instances': 3,
                     'debug_mode': False,
                     'stdout': subprocess.PIPE,

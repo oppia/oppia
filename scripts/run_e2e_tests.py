@@ -97,10 +97,6 @@ _PARSER.add_argument(
     '--source_maps',
     help='Build webpack with source maps.',
     action='store_true')
-_PARSER.add_argument(
-    '--use_mobile_config',
-    help='Run e2e test in mobile viewport.',
-    action='store_true')
 
 # Never rerun failing tests, even when they match a known flake.
 RERUN_POLICY_NEVER = 'never'
@@ -277,7 +273,6 @@ def run_tests(args):
             dev_mode=dev_mode,
             debug_mode=args.debug_mode,
             sharding_instances=args.sharding_instances,
-            mobile=args.use_mobile_config,
             stdout=subprocess.PIPE))
 
         print(

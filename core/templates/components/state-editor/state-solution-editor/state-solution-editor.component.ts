@@ -25,6 +25,7 @@ import { SolutionVerificationService } from 'pages/exploration-editor-page/edito
 import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import { DeleteSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-solution-modal.component';
 import { AlertsService } from 'services/alerts.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { ExternalSaveService } from 'services/external-save.service';
@@ -80,11 +81,13 @@ export class StateSolutionEditorComponent implements OnInit {
     private stateHintsService: StateHintsService,
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService,
+    private windowDimensionsService: WindowDimensionsService,
   ) {}
 
   ngOnInit(): void {
     this.correctAnswer = null;
-    this.solutionCardIsShown = true;
+    this.solutionCardIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
     this.inlineSolutionEditorIsActive = false;
     this.SOLUTION_EDITOR_FOCUS_LABEL = (
       'currentCorrectAnswerEditorHtmlForSolutionEditor');

@@ -612,7 +612,7 @@ def managed_webdriver_server(chrome_version=None):
 @contextlib.contextmanager
 def managed_protractor_server(
         suite_name='full', dev_mode=True, debug_mode=False,
-        sharding_instances=1, mobile=False, **kwargs):
+        sharding_instances=1, **kwargs):
     """Returns context manager to start/stop the Protractor server gracefully.
 
     Args:
@@ -624,7 +624,6 @@ def managed_protractor_server(
             debugging mode:
             https://www.protractortest.org/#/debugging#disabled-control-flow.
         sharding_instances: int. How many sharding instances to be running.
-        mobile: bool. Whether to run e2e test in mobile bi.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
 
     Yields:
@@ -636,18 +635,13 @@ def managed_protractor_server(
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
 
-    config_file_path = common.PROTRACTOR_CONFIG_FILE_PATH
-    if mobile:
-        config_file_path = common.PROTRACTOR_MOBILE_CONFIG_FILE_PATH
-
     protractor_args = [
         common.NODE_BIN_PATH,
         # This flag ensures tests fail if the `waitFor()` calls time out.
         '--unhandled-rejections=strict',
-        common.PROTRACTOR_BIN_PATH, config_file_path,
+        common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH,
         '--params.devMode=%s' % dev_mode,
         '--suite', suite_name,
-        '--params.mobile=%s' % mobile
     ]
 
     if debug_mode:
