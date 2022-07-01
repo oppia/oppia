@@ -68,11 +68,11 @@ export class RatingsAndRecommendationsComponent {
   @Input() isRefresherExploration: boolean;
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
-  @Input() nextLessonLink: string;
+  @Input() nextLessonLink: string | undefined;
   inStoryMode: boolean;
   storyViewerUrl: string | undefined;
   nextStoryNode: ReadOnlyStoryNode = null;
-  nextStoryNodeIconUrl: string = null;
+  nextStoryNodeIconUrl: string | undefined;
   storyId: string | undefined;
   collectionId: string;
   userRating: number;

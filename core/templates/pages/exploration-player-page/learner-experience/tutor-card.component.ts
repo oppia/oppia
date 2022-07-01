@@ -102,7 +102,7 @@ export class TutorCardComponent {
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
   @Input() inStoryMode: boolean;
-  @Input() nextLessonLink: string;
+  @Input() nextLessonLink: string | undefined;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;

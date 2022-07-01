@@ -20,16 +20,18 @@ import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { PostChapterRecommendationsComponent } from './post-chapter-recommendations.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { UrlService } from 'services/contextual/url.service';
 
 describe('End chapter check mark component', function() {
   let component: PostChapterRecommendationsComponent;
   let fixture: ComponentFixture<PostChapterRecommendationsComponent>;
   let urlInterpolationService: UrlInterpolationService;
+  let urlService: UrlService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PostChapterRecommendationsComponent, MockTranslatePipe],
-      providers: [UrlInterpolationService],
+      providers: [UrlInterpolationService, UrlService],
     }).compileComponents();
   }));
 
@@ -37,6 +39,7 @@ describe('End chapter check mark component', function() {
     fixture = TestBed.createComponent(PostChapterRecommendationsComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    urlService = TestBed.inject(UrlService);
   });
 
   it('should get static image url', () => {
@@ -47,5 +50,21 @@ describe('End chapter check mark component', function() {
       .toBe('image_url');
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
       'practice_session_image_path');
+  });
+
+  it('should get practice tab url', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl')
+      .and.returnValue('practice_tab_url');
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      topic_url_fragment: 'topic_url_fragment',
+      classroom_url_fragment: 'classroom_url_fragment'
+    });
+
+    expect(component.getPracticeTabUrl()).toBe('practice_tab_url');
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
+      '/learn/<classroom_url_fragment>/<topic_url_fragment>', {
+        topic_url_fragment: 'topic_url_fragment',
+        classroom_url_fragment: 'classroom_url_fragment'
+      });
   });
 });

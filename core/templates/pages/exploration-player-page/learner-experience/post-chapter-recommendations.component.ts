@@ -18,22 +18,32 @@
 
 import { Component, Input } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
 @Component({
   selector: 'oppia-post-chapter-recommendations',
   template: require('./post-chapter-recommendations.component.html'),
 })
 export class PostChapterRecommendationsComponent {
-  @Input() nextStoryNodeLink: string;
-  @Input() nextStoryNodeThumbnailUrl: string;
-  @Input() nextStoryNodeThumbnailBgColor: string;
-  @Input() nextStoryNodeTitle: string;
-  thumbnailUrl: string;
-  thumbnailBgColor: string;
+  @Input() nextStoryNodeLink: string | undefined;
+  @Input() nextStoryNodeThumbnailUrl!: string;
+  @Input() nextStoryNodeThumbnailBgColor!: string;
+  @Input() nextStoryNodeTitle!: string;
   constructor(
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getPracticeTabUrl(): string {
+    return this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.TOPIC_VIEWER_PAGE, {
+        topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
+        classroom_url_fragment: (
+          this.urlService.getUrlParams().classroom_url_fragment)
+      }) + '/practice';
   }
 }
