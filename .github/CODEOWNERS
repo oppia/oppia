@@ -38,7 +38,6 @@
 /core/templates/components/ @srijanreddy98
 /core/templates/domain/ @oppia/lace-frontend-reviewers
 /core/templates/pages/ @srijanreddy98
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
 /core/templates/services/ @oppia/lace-frontend-reviewers
 /core/templates/utility/ @srijanreddy98
 /extensions/ @vojtechjelinek
