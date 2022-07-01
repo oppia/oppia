@@ -314,9 +314,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     if (this.remainingContributionIds.length === 0) {
       this.isLastItem = true;
-    } else {
-      this.isLastItem = false;
     }
+
     if (this.skippedContributionIds.length === 0) {
       this.isFirstItem = true;
     } else {
@@ -326,7 +325,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
-      this.activeModal.close(this.skippedContributionIds);
+      this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
 
@@ -362,21 +361,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     this.skippedContributionIds.pop();
 
-    if (this.remainingContributionIds.length === 0) {
-      this.isLastItem = true;
-    } else {
+    if (this.remainingContributionIds.length !== 0) {
       this.isLastItem = false;
     }
     if (this.skippedContributionIds.length === 0) {
       this.isFirstItem = true;
-    } else {
-      this.isFirstItem = false;
     }
 
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
-      this.activeModal.close(this.remainingContributionIds);
+      this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
 

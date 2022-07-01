@@ -401,6 +401,24 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.startedEditing).toBe(false);
       });
 
+    it('should toggle the expansion state for the content area', ()=>{
+      spyOn(component, 'toggleExpansionState').and.callThrough();
+      expect(component.isContentExpanded).toBeFalse();
+      component.toggleExpansionState('content');
+      expect(component.isContentExpanded).toBeTrue();
+      component.toggleExpansionState('content');
+      expect(component.isContentExpanded).toBeFalse();
+    });
+
+    it('should toggle the expansion state for the translation area', ()=>{
+      spyOn(component, 'toggleExpansionState').and.callThrough();
+      expect(component.isTranslationExpanded).toBeFalse();
+      component.toggleExpansionState('translation');
+      expect(component.isTranslationExpanded).toBeTrue();
+      component.toggleExpansionState('translation');
+      expect(component.isTranslationExpanded).toBeFalse();
+    });
+
     it(
       'should update translation when the update button is clicked',
       function() {
@@ -666,9 +684,183 @@ describe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'reject', 'Review message example',
           null, jasmine.any(Function),
           jasmine.any(Function));
+      expect(activeModal.close).toHaveBeenCalledWith([
+        'suggestion_1']);
+    });
+  });
 
-      expect(component.resolvedSuggestionIds).toEqual(['suggestion_1']);
-      expect(Object.keys(component.allContributions).length).toEqual(1);
+  describe('when navigating through suggestions', function() {
+    const reviewable = false;
+    const subheading = 'subheading_title';
+
+    const suggestion1 = {
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: ['Translation1', 'Translation2'],
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      status: 'rejected',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      target_type: 'target_type',
+    };
+    const suggestion2 = {
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: 'Translation',
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      target_type: 'target_type',
+    };
+
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: {
+        topic_name: 'topic_1',
+        story_title: 'story_1',
+        chapter_title: 'chapter_1'
+      }
+    };
+    const contribution2 = {
+      suggestion: suggestion2,
+      details: {
+        topic_name: 'topic_2',
+        story_title: 'story_2',
+        chapter_title: 'chapter_2'
+      }
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_2: contribution2,
+    };
+
+    const suggestionIdToContributionOne = {
+      suggestion_1: contribution1
+    };
+
+    beforeEach(() => {
+      component.initialSuggestionId = 'suggestion_1';
+      component.subheading = subheading;
+      component.reviewable = reviewable;
+    });
+
+    it('should correctly set variables if there is only one item', ()=>{
+      component.suggestionIdToContribution = angular.copy(
+        suggestionIdToContributionOne);
+      component.ngOnInit();
+
+      expect(component.isFirstItem).toBeTrue();
+      expect(component.isLastItem).toBeTrue();
+      expect(component.remainingContributionIds.length).toEqual(0);
+      expect(component.skippedContributionIds.length).toEqual(0);
+    });
+
+    it('should correctly set variables if there are multiple items', ()=>{
+      component.suggestionIdToContribution = angular.copy(
+        suggestionIdToContribution);
+      component.ngOnInit();
+
+      expect(component.isFirstItem).toBeTrue();
+      expect(component.isLastItem).toBeFalse();
+      expect(component.remainingContributionIds.length).toEqual(1);
+      expect(component.skippedContributionIds.length).toEqual(0);
+    });
+
+    it('should successfully naviagte between items', () => {
+      component.suggestionIdToContribution = angular.copy(
+        suggestionIdToContribution);
+      component.ngOnInit();
+
+      expect(component.isFirstItem).toBeTrue();
+      expect(component.isLastItem).toBeFalse();
+      expect(component.remainingContributionIds).toEqual(['suggestion_2']);
+      expect(component.skippedContributionIds.length).toEqual(0);
+      expect(component.activeSuggestionId).toEqual('suggestion_1');
+
+      component.gotoPreviousItem();
+      // As we are on the first item, gotoPreviousItem shouldn't navigate.
+      expect(component.isFirstItem).toBeTrue();
+      expect(component.isLastItem).toBeFalse();
+      expect(component.remainingContributionIds).toEqual(['suggestion_2']);
+      expect(component.skippedContributionIds.length).toEqual(0);
+      expect(component.activeSuggestionId).toEqual('suggestion_1');
+
+      component.gotoNextItem();
+
+      expect(component.isFirstItem).toBeFalse();
+      expect(component.isLastItem).toBeTrue();
+      expect(component.remainingContributionIds.length).toEqual(0);
+      expect(component.skippedContributionIds).toEqual(['suggestion_1']);
+      expect(component.activeSuggestionId).toEqual('suggestion_2');
+
+      component.gotoNextItem();
+      // As we are on the last item, gotoNextItem shoudn't navigate.
+      expect(component.isFirstItem).toBeFalse();
+      expect(component.isLastItem).toBeTrue();
+      expect(component.remainingContributionIds.length).toEqual(0);
+      expect(component.skippedContributionIds).toEqual(['suggestion_1']);
+      expect(component.activeSuggestionId).toEqual('suggestion_2');
+
+      component.gotoPreviousItem();
+
+      expect(component.isFirstItem).toBeTrue();
+      expect(component.isLastItem).toBeFalse();
+      expect(component.remainingContributionIds).toEqual(['suggestion_2']);
+      expect(component.skippedContributionIds.length).toEqual(0);
+      expect(component.activeSuggestionId).toEqual('suggestion_1');
+    });
+
+    it('should close the modal if the opportunity is' +
+      ' deleted when navigating forward', () => {
+      component.suggestionIdToContribution = angular.copy(
+        suggestionIdToContribution);
+      component.ngOnInit();
+      spyOn(activeModal, 'close');
+      component.allContributions.suggestion_2.details = null;
+
+      component.gotoNextItem();
+
+      expect(activeModal.close).toHaveBeenCalledWith([]);
+    });
+
+    it('should close the modal if the opportunity is' +
+      ' deleted when navigating backward', () => {
+      component.suggestionIdToContribution = angular.copy(
+        suggestionIdToContribution);
+      component.ngOnInit();
+      spyOn(activeModal, 'close');
+
+      component.gotoNextItem();
+
+      expect(component.activeSuggestionId).toEqual('suggestion_2');
+      // Delete the opportunity of the previous item.
+      component.allContributions.suggestion_1.details = null;
+
+      component.gotoPreviousItem();
+
+      expect(activeModal.close).toHaveBeenCalledWith([]);
     });
   });
 

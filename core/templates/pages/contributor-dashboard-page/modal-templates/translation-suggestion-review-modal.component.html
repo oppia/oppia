@@ -113,7 +113,10 @@
     </div>
   </div>
   <div [hidden]="reviewable || !reviewMessage" class="oppia-suggestion-review-message">
-    <strong>Review message: </strong>{{ reviewMessage }}
+    <strong>Review message: </strong>
+    <div class="oppia-review-message">
+      {{ reviewMessage }}
+    </div>
   </div>
 </div>
 
@@ -149,6 +152,12 @@
 </div>
 
 <style>
+  .oppia-review-message {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    padding: 10px;
+    min-height: 100px;
+  }
   .oppia-review-buttons {
     display: flex;
     width: 100%;
@@ -217,7 +226,6 @@
     max-height: none;
   }
   .oppia-suggestion-review-message {
-    margin-left: 10px;
     margin-top: 20px;
   }
   .oppia-suggestion-resolve-button {
@@ -341,12 +349,12 @@
   }
   @media only screen and (max-width: 450px) {
     .oppia-suggestion-resolve-button {
-      margin: 5px 0;
+      min-width: 40vw;
+      margin-right: 0;
+      margin-left: 4px;
     }
     .oppia-review-buttons {
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-end;
+      justify-content: center;
     }
   }
 </style>
