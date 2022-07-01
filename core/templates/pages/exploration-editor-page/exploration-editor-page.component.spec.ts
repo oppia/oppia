@@ -715,6 +715,8 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
+      flushMicrotasks();
+      $scope.$apply();
       tick();
 
       expect(successCallback).toHaveBeenCalled();

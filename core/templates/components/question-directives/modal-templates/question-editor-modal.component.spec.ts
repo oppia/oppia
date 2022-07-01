@@ -26,6 +26,7 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { QuestionValidationService } from 'services/question-validation.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -62,6 +63,7 @@ describe('Question Editor Modal Component', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let questionUndoRedoService: QuestionUndoRedoService;
   let stateEditorService: StateEditorService;
+  let questionValidationService: QuestionValidationService;
 
   const associatedSkillSummariesDict = [{
     id: '1',
@@ -108,6 +110,7 @@ describe('Question Editor Modal Component', () => {
         QuestionObjectFactory,
         QuestionUndoRedoService,
         StateEditorService,
+        QuestionValidationService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -123,6 +126,7 @@ describe('Question Editor Modal Component', () => {
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     stateEditorService = TestBed.inject(StateEditorService);
+    questionValidationService = TestBed.inject(QuestionValidationService);
 
     fixture.detectChanges();
 
@@ -350,19 +354,17 @@ describe('Question Editor Modal Component', () => {
   });
 
   it('should save and commit after modifying skills', () => {
-    const commitMessage = 'Commiting skills';
-    const openModalSpy = spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve('Commiting skills')
+    } as NgbModalRef);
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionValidationService, 'isQuestionValid').and.returnValue(true);
 
     expect(component.isSaveAndCommitButtonDisabled()).toBe(false);
 
-    openModalSpy.and.returnValue({
-      result: Promise.resolve(commitMessage)
-    } as NgbModalRef);
-
     component.saveAndCommit();
 
-    expect(openModalSpy).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should not save and commit when dismissing the add skill modal',
