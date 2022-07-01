@@ -139,7 +139,7 @@ describe('Exploration history', function() {
       },
       12: {
         text: '    dest_if_really_stuck: null',
-        highlighted: false
+        highlighted: true
       },
       13: {
         text: '    feedback:',
@@ -274,7 +274,7 @@ describe('Exploration history', function() {
       },
       10: {
         text: '      dest_if_really_stuck: null',
-        highlighted: false
+        highlighted: true
       },
       11: {
         text: '      feedback:',
@@ -354,7 +354,7 @@ describe('Exploration history', function() {
       },
       30: {
         text: '    dest_if_really_stuck: null',
-        highlighted: false
+        highlighted: true
       },
       31: {
         text: '    feedback:',
@@ -474,7 +474,6 @@ describe('Exploration history', function() {
       '        unicode_str: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
-      '    dest_if_really_stuck: null\n' +
       '    feedback:\n' +
       '      content_id: default_outcome\n' +
       '      html: \'\'\n' +
