@@ -316,22 +316,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
-    def get_multiple_suggestions_from_suggestion_ids(
-        cls, suggestion_ids: List[str]
-    ) -> List[Optional[GeneralSuggestionModel]]:
-        """Returns suggestions matching the supplied suggestion IDs.
-
-        Args:
-            suggestion_ids: list(str). Suggestion IDs of suggestions that need
-                to be returned.
-
-        Returns:
-            list(SuggestionModel|None). A list of suggestions in matching the
-            supplied suggestion IDs.
-        """
-        return GeneralSuggestionModel.get_multi(suggestion_ids)
-
-    @classmethod
     def get_translation_suggestion_ids_with_exp_ids(
             cls, exp_ids: List[str]
     ) -> List[str]:
