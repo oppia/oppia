@@ -218,6 +218,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             author_name
         );
       });
+    this.isContentExpanded = false;
+    this.isTranslationExpanded = false;
     this.errorMessage = '';
     this.errorFound = false;
     this.startedEditing = false;
