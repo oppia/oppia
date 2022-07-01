@@ -43,32 +43,32 @@ export class LearnerGroupSyllabusBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  async fetchFilteredSyllabusItemsAsync(
+  async searchNewSyllabusItemsAsync(
       learnerGroupId: string,
       syllabusFilter: LearnerGroupSyllabusFilter
   ): Promise<LearnerGroupSyllabus> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/filter_learner_group_syllabus_handler', {
+          '/search_learner_group_syllabus_handler', {
             learner_group_id: learnerGroupId
           }
         )
       );
 
       const filterData = {
-        filter_keyword: syllabusFilter.keyword,
-        filter_type: syllabusFilter.type,
-        filter_category: syllabusFilter.category,
-        filter_language_code: syllabusFilter.languageCode
+        search_keyword: syllabusFilter.keyword,
+        search_type: syllabusFilter.type,
+        search_category: syllabusFilter.category,
+        search_language_code: syllabusFilter.languageCode
       };
 
       this.http.get<LearnerGroupSyllabusBackendDict>(
         learnerGroupUrl, {
           params: filterData
         }
-      ).toPromise().then(filterSyllabus => {
-        resolve(LearnerGroupSyllabus.createFromBackendDict(filterSyllabus));
+      ).toPromise().then(matchingSyllabus => {
+        resolve(LearnerGroupSyllabus.createFromBackendDict(matchingSyllabus));
       });
     });
   }

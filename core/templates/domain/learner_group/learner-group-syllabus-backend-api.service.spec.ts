@@ -73,7 +73,7 @@ describe('Teacher Dashboard Backend API Service', () => {
     subtopic_page_summaries: [sampleSubtopicPageSummaryDict]
   };
 
-  const FILTER_SYLLABUS_URL = '/filter_learner_group_syllabus_handler';
+  const SEARCH_NEW_SYLLABUS_URL = '/search_learner_group_syllabus_handler';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -103,12 +103,12 @@ describe('Teacher Dashboard Backend API Service', () => {
       };
 
       learnerGroupSyllabusBackendApiService
-        .fetchFilteredSyllabusItemsAsync(
+        .searchNewSyllabusItemsAsync(
           'groupId', syllabusFilter).then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        FILTER_SYLLABUS_URL + '?filter_keyword=Place&filter_type=All' +
-        '&filter_category=All&filter_language_code=en'
+        SEARCH_NEW_SYLLABUS_URL + '?search_keyword=Place&search_type=All' +
+        '&search_category=All&search_language_code=en'
       );
       expect(req.request.method).toEqual('GET');
       req.flush(sampleLearnerGroupSyllabusDict);
