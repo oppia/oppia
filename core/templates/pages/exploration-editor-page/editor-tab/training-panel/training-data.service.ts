@@ -18,187 +18,210 @@
  * across all answer groups.
  */
 
-require('domain/exploration/RuleObjectFactory.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration-editor-page/services/graph-data.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import cloneDeep from 'lodash/cloneDeep';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { State } from 'domain/state/StateObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
-angular.module('oppia').factory('TrainingDataService', [
-  'ExplorationStatesService', 'GraphDataService',
-  'ResponsesService', 'StateEditorService',
-  function(
-      ExplorationStatesService, GraphDataService,
-      ResponsesService, StateEditorService) {
-    var _getIndexOfTrainingData = function(answer, trainingData) {
-      var index = -1;
-      for (var i = 0; i < trainingData.length; i++) {
-        if (angular.equals(trainingData[i], answer)) {
-          index = i;
-          break;
-        }
+interface AnswerGroupData {
+  answerGroupIndex: number;
+  answers: InteractionAnswer[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TrainingDataService {
+  constructor(
+    private explorationStatesService: ExplorationStatesService,
+    private graphDataService: GraphDataService,
+    private responsesService: ResponsesService,
+    private stateEditorService: StateEditorService,
+  ) { }
+
+  _getIndexOfTrainingData(
+      answer: InteractionAnswer, trainingData: InteractionAnswer[]): number {
+    let index = -1;
+    for (let i = 0; i < trainingData.length; i++) {
+      if (trainingData[i] === answer) {
+        index = i;
+        break;
       }
-      return index;
-    };
-
-    // Attempts to remove a given answer from a list of trained answers. This
-    // function returns the index of the answer that was removed if it was
-    // successfully removed from the training data, or -1 otherwise.
-    var _removeAnswerFromTrainingData = function(answer, trainingData) {
-      var index = _getIndexOfTrainingData(answer, trainingData);
-      if (index !== -1) {
-        trainingData.splice(index, 1);
-      }
-      return index;
-    };
-
-    // This removes any occurrences of the answer from any training data inputs
-    // or the confirmed unclassified answer list. It also removes the answer
-    // from the training data being presented to the user so that it does not
-    // show up again.
-    var _removeAnswer = function(answer) {
-      var answerGroups = ResponsesService.getAnswerGroups();
-      var confirmedUnclassifiedAnswers = (
-        ResponsesService.getConfirmedUnclassifiedAnswers());
-      var updatedAnswerGroups = false;
-      var updatedConfirmedUnclassifiedAnswers = false;
-
-      // Remove the answer from all answer groups.
-      for (var i = 0; i < answerGroups.length; i++) {
-        var answerGroup = answerGroups[i];
-        var trainingData = answerGroup.trainingData;
-        if (trainingData &&
-            _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
-          updatedAnswerGroups = true;
-        }
-      }
-
-      // Remove the answer from the confirmed unclassified answers.
-      updatedConfirmedUnclassifiedAnswers = (_removeAnswerFromTrainingData(
-        answer, confirmedUnclassifiedAnswers) !== -1);
-
-      if (updatedAnswerGroups) {
-        ResponsesService.save(
-          answerGroups, ResponsesService.getDefaultOutcome(),
-          function(newAnswerGroups, newDefaultOutcome) {
-            ExplorationStatesService.saveInteractionAnswerGroups(
-              StateEditorService.getActiveStateName(),
-              angular.copy(newAnswerGroups));
-
-            ExplorationStatesService.saveInteractionDefaultOutcome(
-              StateEditorService.getActiveStateName(),
-              angular.copy(newDefaultOutcome));
-
-            GraphDataService.recompute();
-          });
-      }
-
-      if (updatedConfirmedUnclassifiedAnswers) {
-        ResponsesService.updateConfirmedUnclassifiedAnswers(
-          confirmedUnclassifiedAnswers);
-        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
-          StateEditorService.getActiveStateName(),
-          angular.copy(confirmedUnclassifiedAnswers));
-      }
-    };
-
-    return {
-      getTrainingDataAnswers: function() {
-        var trainingDataAnswers = [];
-        var answerGroups = ResponsesService.getAnswerGroups();
-
-        for (var i = 0; i < answerGroups.length; i++) {
-          var answerGroup = answerGroups[i];
-          trainingDataAnswers.push({
-            answerGroupIndex: i,
-            answers: answerGroup.trainingData
-          });
-        }
-        return trainingDataAnswers;
-      },
-
-      getTrainingDataOfAnswerGroup: function(answerGroupIndex) {
-        return ResponsesService.getAnswerGroup(answerGroupIndex).trainingData;
-      },
-
-      getAllPotentialOutcomes: function(state) {
-        var potentialOutcomes = [];
-        var interaction = state.interaction;
-
-        for (var i = 0; i < interaction.answerGroups.length; i++) {
-          potentialOutcomes.push(interaction.answerGroups[i].outcome);
-        }
-
-        if (interaction.defaultOutcome) {
-          potentialOutcomes.push(interaction.defaultOutcome);
-        }
-
-        return potentialOutcomes;
-      },
-
-      associateWithAnswerGroup: function(answerGroupIndex, answer) {
-        // Remove answer from traning data of any answer group or
-        // confirmed unclassified answers.
-        _removeAnswer(answer);
-
-        var answerGroups = ResponsesService.getAnswerGroups();
-        var answerGroup = answerGroups[answerGroupIndex];
-
-        // Train the rule to include this answer.
-        answerGroup.trainingData.push(answer);
-        ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          trainingData: answerGroup.trainingData
-        }, function(newAnswerGroups) {
-          ExplorationStatesService.saveInteractionAnswerGroups(
-            StateEditorService.getActiveStateName(),
-            angular.copy(newAnswerGroups));
-
-          GraphDataService.recompute();
-        });
-      },
-
-      associateWithDefaultResponse: function(answer) {
-        // Remove answer from traning data of any answer group or
-        // confirmed unclassified answers.
-        _removeAnswer(answer);
-
-        var confirmedUnclassifiedAnswers = (
-          ResponsesService.getConfirmedUnclassifiedAnswers());
-        confirmedUnclassifiedAnswers.push(answer);
-        ResponsesService.updateConfirmedUnclassifiedAnswers(
-          confirmedUnclassifiedAnswers);
-        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
-          StateEditorService.getActiveStateName(),
-          angular.copy(confirmedUnclassifiedAnswers));
-      },
-
-      isConfirmedUnclassifiedAnswer: function(answer) {
-        return (_getIndexOfTrainingData(
-          answer, ResponsesService.getConfirmedUnclassifiedAnswers()) !== -1);
-      },
-
-      removeAnswerFromAnswerGroupTrainingData: function(
-          answer, answerGroupIndex) {
-        var trainingData = ResponsesService.getAnswerGroup(
-          answerGroupIndex).trainingData;
-        _removeAnswerFromTrainingData(answer, trainingData);
-
-        var answerGroups = ResponsesService.getAnswerGroups();
-        answerGroups[answerGroupIndex].trainingData = trainingData;
-
-        ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          trainingData: trainingData
-        }, function(newAnswerGroups) {
-          ExplorationStatesService.saveInteractionAnswerGroups(
-            StateEditorService.getActiveStateName(),
-            angular.copy(newAnswerGroups));
-
-          GraphDataService.recompute();
-        });
-      }
-    };
+    }
+    return index;
   }
-]);
+
+  // Attempts to remove a given answer from a list of trained answers. This
+  // function returns the index of the answer that was removed if it was
+  // successfully removed from the training data, or -1 otherwise.
+  _removeAnswerFromTrainingData(
+      answer: InteractionAnswer, trainingData: InteractionAnswer[]): number {
+    let index = this._getIndexOfTrainingData(answer, trainingData);
+    if (index !== -1) {
+      trainingData.slice(index, 1);
+    }
+    return index;
+  }
+
+  // This removes any occurrences of the answer from any training data inputs
+  // or the confirmed unclassified answer list. It also removes the answer
+  // from the training data being presented to the user so that it does not
+  // show up again.
+  _removeAnswer(answer: InteractionAnswer): void {
+    let answerGroups = this.responsesService.getAnswerGroups();
+    let confirmedUnclassifiedAnswers = [...(
+      this.responsesService.getConfirmedUnclassifiedAnswers())];
+    let updatedAnswerGroups = false;
+    let updatedConfirmedUnclassifiedAnswers = false;
+
+    // Remove the answer from all answer groups.
+    for (let i = 0; i < answerGroups.length; i++) {
+      let answerGroup = answerGroups[i];
+      let trainingData = answerGroup.trainingData;
+      if (trainingData &&
+        this._removeAnswerFromTrainingData(
+          answer, [...trainingData]) !== -1) {
+        updatedAnswerGroups = true;
+      }
+    }
+
+    // Remove the answer from the confirmed unclassified answers.
+    updatedConfirmedUnclassifiedAnswers = (this._removeAnswerFromTrainingData(
+      answer, confirmedUnclassifiedAnswers) !== -1);
+
+    if (updatedAnswerGroups) {
+      this.responsesService.save(
+        answerGroups, this.responsesService.getDefaultOutcome(),
+        (newAnswerGroups, newDefaultOutcome) => {
+          this.explorationStatesService.saveInteractionAnswerGroups(
+            this.stateEditorService.getActiveStateName(),
+            cloneDeep(newAnswerGroups));
+
+          this.explorationStatesService.saveInteractionDefaultOutcome(
+            this.stateEditorService.getActiveStateName(),
+            cloneDeep(newDefaultOutcome));
+
+          this.graphDataService.recompute();
+        });
+    }
+
+    if (updatedConfirmedUnclassifiedAnswers) {
+      this.responsesService.updateConfirmedUnclassifiedAnswers(
+        confirmedUnclassifiedAnswers);
+      this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
+        this.stateEditorService.getActiveStateName(),
+        confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
+    }
+  }
+
+  getTrainingDataAnswers(): AnswerGroupData[] {
+    let trainingDataAnswers = [];
+    let answerGroups = this.responsesService.getAnswerGroups();
+
+    for (let i = 0; i < answerGroups.length; i++) {
+      let answerGroup = answerGroups[i];
+      trainingDataAnswers.push({
+        answerGroupIndex: i,
+        answers: answerGroup.trainingData
+      });
+    }
+    return trainingDataAnswers;
+  }
+
+  getTrainingDataOfAnswerGroup(answerGroupIndex: number): InteractionAnswer[] {
+    return [
+      ...this.responsesService.getAnswerGroup(answerGroupIndex).trainingData];
+  }
+
+  getAllPotentialOutcomes(state: State): Outcome[] {
+    let potentialOutcomes = [];
+    let interaction = state.interaction;
+
+    for (let i = 0; i < interaction.answerGroups.length; i++) {
+      potentialOutcomes.push(interaction.answerGroups[i].outcome);
+    }
+
+    if (interaction.defaultOutcome) {
+      potentialOutcomes.push(interaction.defaultOutcome);
+    }
+
+    return potentialOutcomes;
+  }
+
+  associateWithAnswerGroup(
+      answerGroupIndex: number, answer: InteractionAnswer): void {
+    // Remove answer from traning data of any answer group or
+    // confirmed unclassified answers.
+    this._removeAnswer(answer);
+
+    let answerGroups: AnswerGroup[] = this.responsesService.getAnswerGroups();
+    let answerGroup: AnswerGroup = answerGroups[answerGroupIndex];
+
+    // Train the rule to include this answer.
+    answerGroup.trainingData = [
+      ...answerGroup.trainingData,
+      answer];
+
+    this.responsesService.updateAnswerGroup(answerGroupIndex, {
+      trainingData: answerGroup.trainingData
+    } as AnswerGroup, (newAnswerGroups) => {
+      this.explorationStatesService.saveInteractionAnswerGroups(
+        this.stateEditorService.getActiveStateName(),
+        [newAnswerGroups]);
+
+      this.graphDataService.recompute();
+    });
+  }
+
+  associateWithDefaultResponse(answer: InteractionAnswer): void {
+    // Remove answer from traning data of any answer group or
+    // confirmed unclassified answers.
+    this._removeAnswer(answer);
+
+    let confirmedUnclassifiedAnswers = [...(
+      this.responsesService.getConfirmedUnclassifiedAnswers())];
+
+    confirmedUnclassifiedAnswers.push(answer);
+    this.responsesService.updateConfirmedUnclassifiedAnswers(
+      confirmedUnclassifiedAnswers);
+    this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
+      this.stateEditorService.getActiveStateName(),
+      confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
+  }
+
+  isConfirmedUnclassifiedAnswer(answer: InteractionAnswer): boolean {
+    return (this._getIndexOfTrainingData(
+      answer,
+      [...this.responsesService.getConfirmedUnclassifiedAnswers()]) !== -1);
+  }
+
+  removeAnswerFromAnswerGroupTrainingData(
+      answer: InteractionAnswer, answerGroupIndex: number): void {
+    let trainingData = [...this.responsesService.getAnswerGroup(
+      answerGroupIndex).trainingData];
+    this._removeAnswerFromTrainingData(answer, trainingData);
+
+    let answerGroups = this.responsesService.getAnswerGroups();
+    answerGroups[answerGroupIndex].trainingData = trainingData;
+
+    this.responsesService.updateAnswerGroup(answerGroupIndex, {
+      trainingData: trainingData
+    } as unknown as AnswerGroup, (newAnswerGroups) => {
+      this.explorationStatesService.saveInteractionAnswerGroups(
+        this.stateEditorService.getActiveStateName(),
+        [newAnswerGroups]);
+
+      this.graphDataService.recompute();
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'TrainingDataService', downgradeInjectable(TrainingDataService));

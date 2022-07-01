@@ -17,61 +17,37 @@
  * the training data editor of an answer group.
  */
 
-require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
-  'test-interaction-panel.component.ts');
+import { TrainingDataEditorPanelComponent } from './training-data-editor-panel-modal.component';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertsService } from 'services/alerts.service';
+import { ExternalSaveService } from 'services/external-save.service';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/angular-name.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-data.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-modal.service.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/exploration-html-formatter.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-data-editor-panel-modal.controller.ts');
-require('services/external-save.service.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class TrainingDataEditorPanelService {
+  constructor(
+    private alertsService: AlertsService,
+    private externalSaveService: ExternalSaveService,
+    private ngbModal: NgbModal
+  ) {}
 
-angular.module('oppia').factory('TrainingDataEditorPanelService', [
-  '$uibModal', 'AlertsService', 'ExternalSaveService',
-  function(
-      $uibModal, AlertsService, ExternalSaveService) {
-    return {
-      /**
-      * Opens training data editor for currently selected answer group.
-      */
-      openTrainingDataEditor: function() {
-        AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'training-data-editor.template.html'),
-          backdrop: 'static',
-          controller: 'TrainingDataEditorPanelServiceModalController'
-        });
-        // Save the modified training data externally in state content.
-        ExternalSaveService.onExternalSave.emit();
-      }
-    };
+  /**
+   * Opens training data editor for currently selected answer group.
+   */
+  openTrainingDataEditor(): void {
+    this.alertsService.clearWarnings();
+
+    this.ngbModal.open(TrainingDataEditorPanelComponent, {
+      backdrop: 'static',
+    }).result.then(() => {}, () => {});
+
+    // Save the modified training data externally in state content.
+    this.externalSaveService.onExternalSave.emit();
   }
-]);
+}
+
+angular.module('oppia').factory('TrainingDataEditorPanelService',
+  downgradeInjectable(TrainingDataEditorPanelService));

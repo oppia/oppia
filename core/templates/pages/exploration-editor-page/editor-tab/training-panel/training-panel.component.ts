@@ -15,103 +15,119 @@
 /**
  * @fileoverview Component for the training panel in the state editor.
  */
-require(
-  'components/state-directives/outcome-editor/' +
-  'outcome-feedback-editor.component.ts');
-require('directives/angular-html-bind.directive.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require(
-  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 
-angular.module('oppia').component('trainingPanel', {
-  bindings: {
-    answer: '=',
-    // The classification input is an object with two keys:
-    //   -answerGroupIndex: This refers to which answer group the answer
-    //      being trained has been classified to (for displaying feedback
-    //      to the creator). If answerGroupIndex is equal to the number of
-    //      answer groups, then it represents the default outcome feedback.
-    //      This index is changed by the panel when the creator specifies
-    //      which feedback should be associated with the answer.
-    //   -newOutcome: This refers to an outcome structure (containing a
-    //      list of feedback and a destination state name) which is
-    //      non-null if, and only if, the creator has specified that a new
-    //      response should be created for the trained answer.
-    classification: '=',
-    onFinishTraining: '&',
-    addingNewResponse: '='
-  },
-  template: require('./training-panel.component.html'),
-  controller: [
-    '$scope', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
-    'GenerateContentIdService', 'OutcomeObjectFactory', 'ResponsesService',
-    'StateCustomizationArgsService', 'StateEditorService',
-    'StateInteractionIdService', 'TrainingDataService',
-    'COMPONENT_NAME_FEEDBACK',
-    function(
-        $scope, ExplorationHtmlFormatterService, ExplorationStatesService,
-        GenerateContentIdService, OutcomeObjectFactory, ResponsesService,
-        StateCustomizationArgsService, StateEditorService,
-        StateInteractionIdService, TrainingDataService,
-        COMPONENT_NAME_FEEDBACK) {
-      var ctrl = this;
-      var _updateAnswerTemplate = function() {
-        $scope.answerTemplate = (
-          ExplorationHtmlFormatterService.getAnswerHtml(
-            ctrl.answer, StateInteractionIdService.savedMemento,
-            StateCustomizationArgsService.savedMemento));
-      };
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { ResponsesService } from '../services/responses.service';
+import { TrainingDataService } from './training-data.service';
+import { AppConstants } from 'app.constants';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
-      $scope.getCurrentStateName = function() {
-        return StateEditorService.getActiveStateName();
-      };
+interface ClassificationInterface {
+  answerGroupIndex: number;
+  newOutcome: Outcome;
+}
 
-      $scope.beginAddingNewResponse = function() {
-        var contentId = GenerateContentIdService.getNextStateId(
-          COMPONENT_NAME_FEEDBACK);
-        ctrl.classification.newOutcome = OutcomeObjectFactory.createNew(
-          StateEditorService.getActiveStateName(), contentId, '', []);
-        ctrl.addingNewResponse = true;
-      };
+@Component({
+  selector: 'oppia-training-panel',
+  templateUrl: './training-panel.component.html'
+})
+export class TrainingPanelComponent
+  implements OnInit {
+  @Input() answer: InteractionAnswer;
+  // The classification input is an object with two keys:
+  //   -answerGroupIndex: This refers to which answer group the answer
+  //      being trained has been classified to (for displaying feedback
+  //      to the creator). If answerGroupIndex is equal to the number of
+  //      answer groups, then it represents the default outcome feedback.
+  //      This index is changed by the panel when the creator specifies
+  //      which feedback should be associated with the answer.
+  //   -newOutcome: This refers to an outcome structure (containing a
+  //      list of feedback and a destination state name) which is
+  //      non-null if, and only if, the creator has specified that a new
+  //      response should be created for the trained answer.
+  @Input() classification: ClassificationInterface;
+  @Input() addingNewResponse: boolean;
 
-      $scope.cancelAddingNewResponse = function() {
-        ctrl.addingNewResponse = false;
-        ctrl.classification.newOutcome = null;
-      };
+  answerTemplate: string = '';
+  selectedAnswerGroupIndex: number;
+  allOutcomes: Outcome[];
 
-      $scope.selectAnswerGroupIndex = function(index) {
-        $scope.selectedAnswerGroupIndex = index;
-        ctrl.classification.answerGroupIndex = index;
-        if (index > ResponsesService.getAnswerGroupCount()) {
-          ctrl.classification.newOutcome = $scope.allOutcomes[index];
-        }
-      };
+  constructor(
+    private stateEditorService: StateEditorService,
+    private responsesService: ResponsesService,
+    private stateCustomizationArgsService: StateCustomizationArgsService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private trainingDataService: TrainingDataService,
+    private explorationStatesService: ExplorationStatesService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private generateContentIdService: GenerateContentIdService,
+    private outcomeObjectFactory: OutcomeObjectFactory,
+  ) { }
 
-      $scope.confirmNewFeedback = function() {
-        if (ctrl.classification.newOutcome) {
-          // Push the new outcome at the end of the existing outcomes.
-          $scope.allOutcomes.push(ctrl.classification.newOutcome);
-          $scope.selectAnswerGroupIndex($scope.allOutcomes.length - 1);
-          ctrl.addingNewResponse = false;
-        }
-      };
-      ctrl.$onInit = function() {
-        ctrl.addingNewResponse = false;
+  _updateAnswerTemplate(): void {
+    this.answerTemplate = (
+      this.explorationHtmlFormatterService.getAnswerHtml(
+        this.answer, this.stateInteractionIdService.savedMemento,
+        this.stateCustomizationArgsService.savedMemento));
+  }
 
-        var _stateName = StateEditorService.getActiveStateName();
-        var _state = ExplorationStatesService.getState(_stateName);
-        $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
-          _state);
-        $scope.$watch('answer', _updateAnswerTemplate);
-        _updateAnswerTemplate();
-        $scope.selectedAnswerGroupIndex = (
-          ctrl.classification.answerGroupIndex);
-      };
+  getCurrentStateName(): string | null {
+    return this.stateEditorService.getActiveStateName();
+  }
+
+  beginAddingNewResponse(): void {
+    let contentId = this.generateContentIdService.getNextStateId(
+      AppConstants.COMPONENT_NAME_FEEDBACK);
+    this.classification.newOutcome = this.outcomeObjectFactory.createNew(
+      this.stateEditorService.getActiveStateName(), contentId, '', []);
+    this.addingNewResponse = true;
+  }
+
+  cancelAddingNewResponse(): void {
+    this.addingNewResponse = false;
+    this.classification.newOutcome = null;
+  }
+
+  selectAnswerGroupIndex(index: number): void {
+    this.selectedAnswerGroupIndex = index;
+    this.classification.answerGroupIndex = index;
+    if (index > this.responsesService.getAnswerGroupCount()) {
+      this.classification.newOutcome = this.allOutcomes[index];
     }
-  ]
-});
+  }
+
+  confirmNewFeedback(): void {
+    if (this.classification.newOutcome) {
+      // Push the new outcome at the end of the existing outcomes.
+      this.allOutcomes.push(this.classification.newOutcome);
+      this.selectAnswerGroupIndex(this.allOutcomes.length - 1);
+      this.addingNewResponse = false;
+    }
+  }
+
+  ngOnInit(): void {
+    this.addingNewResponse = false;
+
+    let _stateName = this.stateEditorService.getActiveStateName();
+    let _state = this.explorationStatesService.getState(_stateName);
+    this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
+      _state);
+
+    this._updateAnswerTemplate();
+    this.selectedAnswerGroupIndex = (
+      this.classification.answerGroupIndex);
+  }
+}
+
+angular.module('oppia').directive('oppiaTrainingPanel',
+  downgradeComponent({
+    component: TrainingPanelComponent
+  }) as angular.IDirectiveFactory);
