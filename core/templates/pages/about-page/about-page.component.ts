@@ -63,10 +63,6 @@ export class AboutPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   onClickVisitClassroomButton(): void {
     let classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {

@@ -260,10 +260,6 @@ export class LibraryPageComponent {
     this.toggleButtonText(idx);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   setPageTitle(): void {
     let titleKey = 'I18N_LIBRARY_PAGE_TITLE';
     if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP ||

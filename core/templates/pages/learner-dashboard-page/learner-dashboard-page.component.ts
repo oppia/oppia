@@ -307,10 +307,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   setActiveSection(newActiveSectionName: string): void {
     this.activeSection = newActiveSectionName;
     if (this.activeSection ===

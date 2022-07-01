@@ -83,10 +83,6 @@ export class InputResponsePairComponent {
       this.playerPositionService.getDisplayedCardIndex());
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   isStringifiedNumber(value: string): boolean {
     const validRegex = /.*[^0-9.\-].*/g;
     if (validRegex.test(value)) {

@@ -73,10 +73,6 @@ export class SplashPageComponent implements OnInit {
     );
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   onClickBrowseLessonsButton(): void {
     this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
     this.windowRef.nativeWindow.location.href = this.classroomUrl;

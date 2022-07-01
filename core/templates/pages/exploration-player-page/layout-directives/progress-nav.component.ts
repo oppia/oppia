@@ -105,10 +105,6 @@ export class ProgressNavComponent {
     }
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
 

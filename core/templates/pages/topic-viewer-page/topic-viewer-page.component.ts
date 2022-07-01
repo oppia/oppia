@@ -158,10 +158,6 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   checkMobileView(): boolean {
     return this.windowDimensionsService.getWidth() < 500;
   }

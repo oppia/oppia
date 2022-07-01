@@ -79,10 +79,6 @@ export class AttributionGuideComponent implements OnInit {
     this.maskIsShown = true;
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   hideAttributionModal(): void {
     this.attributionService.hideAttributionModal();
     this.maskIsShown = false;

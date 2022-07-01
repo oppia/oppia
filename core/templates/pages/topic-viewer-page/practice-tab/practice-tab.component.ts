@@ -142,10 +142,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     );
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   isStartButtonDisabled(): boolean {
     if (this.previewMode) {
       return true;

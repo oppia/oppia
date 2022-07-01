@@ -102,10 +102,6 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   showChapters(): boolean {
     if (!this.storyPlaythroughObject) {
       return false;

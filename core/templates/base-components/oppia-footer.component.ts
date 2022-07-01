@@ -20,7 +20,6 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './oppia-footer.component.css';
 
@@ -33,14 +32,6 @@ export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
-
-  constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {}
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
 }
 
 angular.module('oppia').directive('oppiaFooter',

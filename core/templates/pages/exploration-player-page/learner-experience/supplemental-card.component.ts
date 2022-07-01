@@ -123,10 +123,6 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
     }
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   // We use the max because the height property of the help card is
   // unstable while animating, causing infinite digest errors.
   clearHelpCard(): void {

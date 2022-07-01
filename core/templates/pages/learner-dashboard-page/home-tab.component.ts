@@ -79,10 +79,6 @@ export class HomeTabComponent {
       }));
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   getTimeOfDay(): string {
     let time = new Date().getHours();
 

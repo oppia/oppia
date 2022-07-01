@@ -73,10 +73,6 @@ export class StoriesListComponent implements OnInit {
   checkTabletView(): boolean {
     return this.windowDimensionsService.getWidth() < 768;
   }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
 }
 angular.module('oppia').directive(
   'storiesList', downgradeComponent(

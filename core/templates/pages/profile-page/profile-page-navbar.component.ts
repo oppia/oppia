@@ -20,7 +20,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './profile-page-navbar.component.css';
 
@@ -32,16 +31,11 @@ import './profile-page-navbar.component.css';
 })
 export class ProfilePageNavbarComponent implements OnInit {
   constructor(
-    private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private urlService: UrlService
   ) {}
 
   username: string = '';
   ngOnInit(): void {
     this.username = this.urlService.getUsernameFromProfileUrl();
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }

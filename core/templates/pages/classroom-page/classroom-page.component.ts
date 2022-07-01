@@ -125,10 +125,6 @@ export class ClassroomPageComponent implements OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   // This method is used to choose whether to display the classroom name or
   // the classroom name translation in the UI.
   isHackyClassroomTranslationDisplayed(): boolean {

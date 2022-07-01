@@ -52,11 +52,6 @@ describe('Subtopics List Component', () => {
       true);
   });
 
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should create', () => {
     expect(component).toBeDefined();
   });

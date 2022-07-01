@@ -70,10 +70,6 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     return (this.windowDimensionsService.getWidth() < 500);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   subscribeToOnLangChange(): void {
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {

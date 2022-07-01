@@ -108,10 +108,6 @@ export class StorySummaryTileComponent implements OnInit {
     return this.storySummary.isNodeCompleted(title);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   isPreviousChapterCompleted(index: number): boolean {
     if (index === 0) {
       return true;
