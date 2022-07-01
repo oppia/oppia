@@ -25,12 +25,15 @@ from __future__ import annotations
 
 from core.platform.app_identity import (
     gae_app_identity_services as app_identity_services)
+from core.platform.auth import firebase_auth_services as platform_auth_services
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
 from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
 from core.platform.storage import dev_mode_storage_services as storage_services
+from core.platform.taskqueue import (
+    dev_mode_taskqueue_services as platform_taskqueue_services)
 from core.platform.transactions import (
     cloud_transaction_services as transaction_services)
 from core.platform.translate import (
@@ -51,6 +54,7 @@ from core.storage.exploration import gae_models as exp_models
 from core.storage.feedback import gae_models as feedback_models
 from core.storage.improvements import gae_models as improvements_models
 from core.storage.job import gae_models as job_models
+from core.storage.learner_group import gae_models as learner_group_models
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.question import gae_models as question_models
 from core.storage.recommendations import gae_models as recommendations_models
@@ -82,8 +86,11 @@ __all__ = [
     'feedback_models',
     'improvements_models',
     'job_models',
+    'learner_group_models',
     'memory_cache_services',
     'opportunity_models',
+    'platform_auth_services',
+    'platform_taskqueue_services',
     'question_models',
     'recommendations_models',
     'search_services',

@@ -451,6 +451,96 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             exp_domain.ExpVersionReference(0, 1)
 
 
+class TransientCheckpointUrlTests(test_utils.GenericTestBase):
+    """Testing TransientCheckpointUrl domain object."""
+
+    def setUp(self) -> None:
+        super(TransientCheckpointUrlTests, self).setUp()
+        self.transient_checkpoint_url = exp_domain.TransientCheckpointUrl(
+            'exp_id', 'frcs_name', 1, 'mrrcs_name', 1)
+
+    def test_initialization(self) -> None:
+        """Testing init method."""
+
+        self.assertEqual(self.transient_checkpoint_url.exploration_id, 'exp_id')
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .furthest_reached_checkpoint_state_name,
+            'frcs_name')
+        self.assertEqual(
+            self.transient_checkpoint_url.
+            furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .most_recently_reached_checkpoint_state_name, 'mrrcs_name')
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .most_recently_reached_checkpoint_exp_version, 1)
+
+    def test_to_dict(self):
+        logged_out_learner_progress_dict = {
+            'exploration_id': 'exploration_id',
+            'furthest_reached_checkpoint_exp_version': 1,
+            'furthest_reached_checkpoint_state_name': (
+                'furthest_reached_checkpoint_state_name'),
+            'most_recently_reached_checkpoint_exp_version': 1,
+            'most_recently_reached_checkpoint_state_name': (
+                'most_recently_reached_checkpoint_state_name')
+        }
+        logged_out_learner_progress_object = exp_domain.TransientCheckpointUrl(
+            'exploration_id',
+            'furthest_reached_checkpoint_state_name', 1,
+            'most_recently_reached_checkpoint_state_name', 1
+        )
+        self.assertEqual(
+            logged_out_learner_progress_object.to_dict(),
+            logged_out_learner_progress_dict)
+
+    def test_exploration_id_incorrect_type(self) -> None:
+        self.transient_checkpoint_url.exploration_id = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected exploration_id to be a str'):
+            self.transient_checkpoint_url.validate()
+
+    def test_furthest_reached_checkpoint_state_name_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.furthest_reached_checkpoint_state_name = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected furthest_reached_checkpoint_state_name to be a str'):
+            self.transient_checkpoint_url.validate()
+
+    def test_furthest_reached_checkpoint_exp_version_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.furthest_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected furthest_reached_checkpoint_exp_version to be an int'):
+            self.transient_checkpoint_url.validate()
+
+    def test_most_recently_reached_checkpoint_state_name_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.most_recently_reached_checkpoint_state_name = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected most_recently_reached_checkpoint_state_name to be a str'):
+            self.transient_checkpoint_url.validate()
+
+    def test_most_recently_reached_checkpoint_exp_version_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.most_recently_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected most_recently_reached_checkpoint_exp_version to be an int'
+            ):
+            self.transient_checkpoint_url.validate()
+
+
 class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
     """Test checkpoints validations in an exploration. """
 
@@ -1911,6 +2001,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 6)
+
+    def test_get_metadata(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        actual_metadata_dict = exploration.get_metadata().to_dict()
+        expected_metadata_dict = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
+            'param_specs': {},
+            'param_changes': [],
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
+            'edits_allowed': exploration.edits_allowed
+        }
+
+        self.assertEqual(actual_metadata_dict, expected_metadata_dict)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -11350,3 +11463,70 @@ class ExplorationChangesMergeabilityUnitTests(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
             self.assertEqual(expected_email_html_body_2, messages[1].html)
+
+
+class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_exploration_metadata_gets_created(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.update_param_specs({
+            'ExampleParamOne': (
+                param_domain.ParamSpec('UnicodeString').to_dict())
+        })
+        exploration.update_param_changes([
+            param_domain.ParamChange(
+                'ParamChange', 'RandomSelector', {
+                    'list_of_values': ['3', '4'],
+                    'parse_with_jinja': True
+                }
+            ),
+            param_domain.ParamChange(
+                'ParamChange', 'RandomSelector', {
+                    'list_of_values': ['5', '6'],
+                    'parse_with_jinja': True
+                }
+            )
+        ])
+        actual_metadata_dict = exp_domain.ExplorationMetadata(
+            exploration.title, exploration. category, exploration.objective,
+            exploration.language_code, exploration.tags, exploration.blurb,
+            exploration.author_notes, exploration.states_schema_version,
+            exploration.init_state_name, exploration.param_specs,
+            exploration.param_changes, exploration.auto_tts_enabled,
+            exploration.correctness_feedback_enabled, exploration.edits_allowed
+        ).to_dict()
+        expected_metadata_dict = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
+            'param_specs': {
+                'ExampleParamOne': (
+                    param_domain.ParamSpec('UnicodeString').to_dict())
+            },
+            'param_changes': [
+                param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['3', '4'],
+                        'parse_with_jinja': True
+                    }
+                ).to_dict(),
+                param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['5', '6'],
+                        'parse_with_jinja': True
+                    }
+                ).to_dict()
+            ],
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
+            'edits_allowed': exploration.edits_allowed
+        }
+
+        self.assertEqual(actual_metadata_dict, expected_metadata_dict)
