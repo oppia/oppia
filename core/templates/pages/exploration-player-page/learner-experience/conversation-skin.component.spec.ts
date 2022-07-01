@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync, flush } from '@angular/core/testing';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -74,6 +74,7 @@ import { RefresherExplorationConfirmationModalService } from '../services/refres
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { ConversationSkinComponent } from './conversation-skin.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -147,6 +148,7 @@ describe('Conversation skin component', () => {
     ReadOnlyExplorationBackendApiService;
   let stateObjectFactory: StateObjectFactory;
   let platformFeatureService: PlatformFeatureService;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
 
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
@@ -516,6 +518,8 @@ describe('Conversation skin component', () => {
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    learnerDashboardBackendApiService = TestBed.inject(
+      LearnerDashboardBackendApiService);
   }));
 
   it('should create', () => {
@@ -638,6 +642,12 @@ describe('Conversation skin component', () => {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
         '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(
+      learnerDashboardBackendApiService,
+      'fetchLearnerCompletedChaptersCountDataAsync').and.returnValue(
+      Promise.resolve({
+        completedChaptersCount: 1,
+      }));
     spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
     spyOn(explorationEngineService, 'isInPreviewMode')
       .and.returnValue(isInPreviewMode);
@@ -828,6 +838,80 @@ describe('Conversation skin component', () => {
       ['Start']);
     expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
   }));
+
+  it('should determine if chapter was completed for the first time',
+    fakeAsync(() => {
+      componentInstance.isLoggedIn = true;
+      componentInstance.completedChaptersCount = 0;
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded');
+      spyOn(focusManagerService, 'setFocusIfOnDesktop');
+      spyOn(componentInstance, 'scrollToTop');
+      spyOn(playerPositionService.onNewCardOpened, 'emit');
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('en');
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
+      spyOn(contentTranslationManagerService, 'displayTranslations');
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+      spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
+      spyOn(playerPositionService, 'setDisplayedCardIndex');
+      spyOn(playerPositionService, 'changeCurrentQuestion');
+      spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue(['123']);
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(true);
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        topic_url_fragment: 'topicUrlFragment',
+        classroom_url_fragment: 'classroomUrlFragment',
+        story_url_fragment: 'storyUrlFragment',
+        node_id: 'nodeId'
+      });
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('story');
+      let readOnlyStoryNode = new ReadOnlyStoryNode(
+        'nodeId', '', '', [], [], [], '', false, '', null, false, '', '');
+      spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync')
+        .and.returnValue(Promise.resolve(
+          new StoryPlaythrough(
+            'nodeId', [readOnlyStoryNode, readOnlyStoryNode], '', '', '', '')
+        ));
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerCompletedChaptersCountDataAsync').and.returnValue(
+        Promise.resolve({
+          completedChaptersCount: 1,
+        }));
+      spyOn(storyViewerBackendApiService, 'recordChapterCompletionAsync')
+        .and.returnValue(Promise.resolve({
+          readyForReviewTest: true,
+          nextNodeId: '',
+          summaries: []
+        }));
+
+      componentInstance.displayedCard = new StateCard(
+        null, null, null, new Interaction(
+          [], [], null, null, [], 'EndExploration', null),
+        [], null, null, '', null);
+      componentInstance.isLoggedIn = true;
+      spyOn(componentInstance, 'isSupplementalCardNonempty')
+        .and.returnValues(false, true, true, false);
+      spyOn(componentInstance, 'animateToOneCard').and.callFake((callb) => {
+        callb();
+      });
+
+      componentInstance.showPendingCard();
+      tick(1000);
+
+      expect(componentInstance.chapterIsCompletedForTheFirstTime).toBe(true);
+      expect(componentInstance.completedChaptersCount).toBe(1);
+
+      componentInstance.completedChaptersCount = 1;
+      componentInstance.chapterIsCompletedForTheFirstTime = false;
+
+      componentInstance.showPendingCard();
+      tick(1000);
+
+      expect(componentInstance.chapterIsCompletedForTheFirstTime).toBe(false);
+
+      flush();
+    }));
 
   it('should unsubscribe on destroy', () => {
     spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');
