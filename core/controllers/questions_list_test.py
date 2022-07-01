@@ -55,7 +55,8 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'dummy-fragment'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')

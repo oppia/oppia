@@ -35,6 +35,7 @@ import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/under
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
+
 @NgModule({
   declarations: [
     CamelCaseToHyphensPipe,
