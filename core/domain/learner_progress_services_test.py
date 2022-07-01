@@ -156,7 +156,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -199,7 +200,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -243,7 +245,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -270,7 +273,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
