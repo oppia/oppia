@@ -45,7 +45,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -78,7 +78,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -143,7 +143,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'recorded_voiceovers': recorded_voiceovers_dict,
                 'written_translations': {
@@ -170,7 +170,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '<p>hello world</p>',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -191,7 +191,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.subtopic_page.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }))
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
@@ -214,7 +214,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents': {
                 'subtitled_html': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
@@ -284,7 +284,7 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         expected_subtopic_page_contents_dict = {
             'subtitled_html': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -305,7 +305,7 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         subtopic_page_contents_dict = {
             'subtitled_html': {
                 'html': '<p>test</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {

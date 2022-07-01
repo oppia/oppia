@@ -1584,7 +1584,7 @@ class GenericTestBase(AppEngineTestBase):
     }
 
     VERSION_27_STATE_DICT = {
-        'content': {'content_id': 'content', 'html': ''},
+        'content': {'content_id': 'content_0', 'html': ''},
         'param_changes': [],
         'content_ids_to_audio_translations': {
             'content': {},
@@ -2637,8 +2637,8 @@ title: Title
             init_interaction.default_outcome.dest = end_state_name
             if correctness_feedback_enabled:
                 init_interaction.default_outcome.labelled_as_correct = True
-            exploration.next_content_id_index = (
-                content_id_generator.next_content_id_index)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration

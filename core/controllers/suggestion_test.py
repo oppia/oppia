@@ -168,7 +168,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 3',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
                     'translation_html': '<p>In हिन्दी (Hindi)</p>',
@@ -680,7 +680,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 ['EndExploration'], category='Algebra'))
 
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': (
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
@@ -731,7 +731,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': text_to_translate,
                     'translation_html': (
@@ -795,7 +795,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
                     'translation_html': ['test1', 'test2'],
@@ -842,7 +842,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'state_name': 'State 1',
@@ -873,7 +873,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'state_name': 'State 1',
@@ -901,7 +901,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'state_name': 'State 1',
@@ -1303,7 +1303,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 ['EndExploration'], category='Algebra'))
 
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': (
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
@@ -1356,7 +1356,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': text_to_translate,
                     'translation_html': valid_html,
@@ -1377,7 +1377,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 ['EndExploration'], category='Algebra'))
 
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': (
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
@@ -1432,7 +1432,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': text_to_translate,
                     'translation_html': valid_html,
@@ -1591,7 +1591,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         question_state_dict = {
             'content': {
                 'html': '<p>Text</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'classifier_model_id': None,
             'linked_skill_id': None,
@@ -2179,7 +2179,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'Introduction',
                     'new_value': {
-                        'content_id': 'content',
+                        'content_id': 'content_0',
                         'html': '<p>new content html</p>'
                     }
                 })], 'Add content')
@@ -2199,7 +2199,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': '<p>new content html</p>',
                     'translation_html': '<p>new content html in Hindi</p>',

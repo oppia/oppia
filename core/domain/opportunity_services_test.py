@@ -57,7 +57,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     suggestion_change = {
         'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
         'state_name': 'End State',
-        'content_id': 'content',
+        'content_id': 'content_0',
         'language_code': 'hi',
         'content_html': '',
         'translation_html': '<p>This is translated html.</p>',
@@ -487,13 +487,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'property_name': 'content',
                 'new_value': {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'Introduction',
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
                 'translation_html': '<p>Translated text</p>',
@@ -505,13 +505,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'property_name': 'content',
                 'new_value': {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'End State',
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
                 'translation_html': '<p>Translated text</p>',
@@ -533,7 +533,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_needs_update_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
             'state_name': 'Introduction',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi'
         })]
         exp_services.update_exploration(

@@ -33,7 +33,7 @@ class ContentType(enum.Enum):
     CONTENT = 'content'
     INTERACTION = 'interaction'
     DEFAULT_OUTCOME = 'default_outcome'
-    CUSTOMIZATION_ARG = 'customization_arg'
+    CUSTOMIZATION_ARG = 'ca'
     RULE = 'rule'
     FEEDBACK = 'feedback'
     HINT = 'hint'

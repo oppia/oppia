@@ -43,6 +43,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
+        self.content_id_generator_1 = translation_domain.ContentIdGenerator(
+            self.exploration_1.next_content_id_index
+        )
         self.exploration_2 = self.save_new_default_exploration(
             self.EXP_2_ID, self.owner_id, title='Bb')
         self.exploration_3 = self.save_new_default_exploration(
@@ -150,10 +153,24 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_multiple_exploration_versions(self):
         # Update exploration to version 2.
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state',
-        })]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state',
+                'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+    ,
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
@@ -161,7 +178,20 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state 2',
-        })]
+            'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+    ,
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
@@ -184,7 +214,20 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
-        })]
+            'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+    ,
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
@@ -192,7 +235,19 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state 2',
-        })]
+            'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
@@ -524,7 +579,7 @@ title: Old Title
             'param_changes': [],
             'classifier_model_id': None,
             'content': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Unicode Characters 😍😍😍😍</p>'
             },
             'next_content_id_index': 5,

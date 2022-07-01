@@ -371,9 +371,25 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(stats_for_new_exp_version_log.times_called, 0)
 
         # Update exploration by adding a state.
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         })]
         with self.swap(
             stats_services, 'get_stats_for_new_exp_version',
@@ -481,6 +497,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
 
         # Test addition of states.
         exploration.add_states(['New state', 'New state 2'])
@@ -488,9 +507,33 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         }), exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'New state 2'
+            'state_name': 'New state 2',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -562,7 +605,19 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'New state 2'
+            'state_name': 'New state 2',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state 2',
@@ -592,7 +647,20 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state 2',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
         }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
+        }),
+            exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state 2',
             'new_state_name': 'New state 3'
@@ -642,7 +710,20 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         }), exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
         }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
+        }),
+            exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state',
             'new_state_name': 'New state 4'
@@ -700,10 +781,34 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'New state 5'
+            'state_name': 'New state 5',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         }), exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'New state 6'
+            'state_name': 'New state 6',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -1406,6 +1511,9 @@ class AnswerEventTests(test_utils.GenericTestBase):
     def test_record_answer(self):
         self.save_new_default_exploration('eid', 'fake@user.com')
         exp = exp_fetchers.get_exploration_by_id('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exp.next_content_id_index
+        )
 
         first_state_name = exp.init_state_name
         second_state_name = 'State 2'
@@ -1431,17 +1539,31 @@ class AnswerEventTests(test_utils.GenericTestBase):
                     'rows': {'value': 1}
                 }
             }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                'new_value': 1
-            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': second_state_name,
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': third_state_name,
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': second_state_name,
@@ -1463,12 +1585,6 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': second_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                'new_value': 1
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': third_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'Continue',
@@ -1485,12 +1601,6 @@ class AnswerEventTests(test_utils.GenericTestBase):
                         }
                     },
                 }
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': third_state_name,
-                'property_name':
-                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                'new_value': 2
             })], 'Add new state')
         exp = exp_fetchers.get_exploration_by_id('eid')
 

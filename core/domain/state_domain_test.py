@@ -61,7 +61,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
         state_customization_args_dict = {
@@ -232,7 +232,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
 
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
         state_answer_group = [state_domain.AnswerGroup(
@@ -321,7 +321,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
 
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
         state_customization_args_dict = {
@@ -646,7 +646,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
         state_customization_args_dict = {
@@ -736,7 +736,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
 
@@ -757,7 +757,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         expected_dict = {
             'classifier_model_id': None,
             'content': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'interaction': {
@@ -960,7 +960,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': (
                     '<oppia-noninteractive-tabs tab_contents-with-value'
                     '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
@@ -972,7 +972,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': (
                     '<p><oppia-noninteractive-link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
@@ -982,7 +982,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': (
                     '<p><oppia-noninteractive-skillreview text-with-value="'
                     '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
@@ -1306,7 +1306,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content_0', 'html': 'Hello!'
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -1386,7 +1386,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content_0', 'html': 'Hello!'
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -1559,7 +1559,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content_0', 'html': 'Hello!'
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -1630,7 +1630,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content_0', 'html': 'Hello!'
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -1766,7 +1766,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content_0', 'html': html_with_old_math_schema
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -1826,7 +1826,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
+                'content_id': 'content_0', 'html': html_with_new_math_schema
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -1947,7 +1947,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content_0', 'html': html_with_old_math_schema
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -1997,7 +1997,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
+                'content_id': 'content_0', 'html': html_with_new_math_schema
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2088,7 +2088,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content_0', 'html': 'Hello!'
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2197,7 +2197,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': 'Hello!'
+                'content_id': 'content_0', 'html': 'Hello!'
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2282,7 +2282,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content_0', 'html': html_with_old_math_schema
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2376,7 +2376,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_old_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
+                'content_id': 'content_0', 'html': html_with_old_math_schema
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
@@ -2419,7 +2419,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict_with_new_math_schema = {
             'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
+                'content_id': 'content_0', 'html': html_with_new_math_schema
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},

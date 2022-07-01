@@ -44,6 +44,7 @@ from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1706,7 +1707,14 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: New state
         feedback:
@@ -1717,7 +1725,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: null
+      id: TextInput
       solution: null
     linked_skill_id: null
     next_content_id_index: 0
@@ -1951,7 +1959,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2 = exploration.states['state2']
         state3 = exploration.states['state3']
         content1_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': (
                 '<blockquote>Hello, this is state1</blockquote>'
                 '<oppia-noninteractive-image filepath-with-value='
@@ -1960,11 +1968,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 '</oppia-noninteractive-image>')
         }
         content2_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<pre>Hello, this is state2</pre>'
         }
         content3_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>Hello, this is state3</p>'
         }
         state1.update_content(
@@ -2175,6 +2183,7 @@ correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: %s
 language_code: en
+next_content_id_index: 6
 objective: The objective
 param_changes: []
 param_specs: {}
@@ -2184,7 +2193,7 @@ states:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: ''
     interaction:
       answer_groups: []
@@ -2192,14 +2201,14 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_0
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: %s
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -2209,24 +2218,18 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
+        ca_placeholder_2: {}
+        content_0: {}
+        default_outcome_1: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
   New state:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_3
       html: %s
     interaction:
       answer_groups: []
@@ -2234,14 +2237,14 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_0
+            content_id: ca_placeholder_5
             unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: New state
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_4
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -2251,19 +2254,13 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
+        ca_placeholder_5: {}
+        content_3: {}
+        default_outcome_4: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -2284,6 +2281,7 @@ correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: %s
 language_code: en
+next_content_id_index: 6
 objective: The objective
 param_changes: []
 param_specs: {}
@@ -2293,7 +2291,7 @@ states:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: ''
     interaction:
       answer_groups: []
@@ -2301,14 +2299,14 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_0
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: %s
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -2318,24 +2316,18 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
+        ca_placeholder_2: {}
+        content_0: {}
+        default_outcome_1: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
   Renamed state:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_3
       html: %s
     interaction:
       answer_groups: []
@@ -2343,14 +2335,14 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_0
+            content_id: ca_placeholder_5
             unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: Renamed state
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_4
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -2360,19 +2352,13 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
+        ca_placeholder_5: {}
+        content_3: {}
+        default_outcome_4: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -2386,9 +2372,13 @@ title: A title
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
@@ -2404,6 +2394,14 @@ title: A title
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2419,7 +2417,11 @@ title: A title
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate((
+                                        translation_domain
+                                        .ContentType.CUSTOMIZATION_ARG),
+                                    extra_prefix='placeholder'
+                                    ),
                                 'unicode_str': ''
                             }
                         },
@@ -2431,14 +2433,19 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'New state',
                     'old_value': state_domain.SubtitledHtml(
-                        'content', '').to_dict(),
+                        'content_3', '').to_dict(),
                     'new_value': state_domain.SubtitledHtml(
-                        'content',
+                        'content_3',
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&quot;abc.png&quot;" caption-with-value="&quot;'
                         '&quot;" alt-with-value="&quot;Image&quot;">'
                         '</oppia-noninteractive-image>').to_dict()
-                })], 'Add state name')
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                }),], 'Add state name')
 
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -2460,6 +2467,7 @@ title: A title
 
     def test_export_to_zip_file_with_unpublished_exploration(self):
         """Test the export_to_zip_file() method."""
+        self.maxDiff = None
         self.save_new_default_exploration(
             self.EXP_0_ID, self.owner_id, title='')
 
@@ -2470,9 +2478,13 @@ title: A title
 
     def test_export_to_zip_file_with_assets(self):
         """Test exporting an exploration with assets to a zip file."""
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
@@ -2488,6 +2500,14 @@ title: A title
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2503,7 +2523,11 @@ title: A title
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate((
+                                        translation_domain
+                                        .ContentType.CUSTOMIZATION_ARG),
+                                    extra_prefix='placeholder'
+                                    ),
                                 'unicode_str': ''
                             }
                         },
@@ -2515,13 +2539,18 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'New state',
                     'old_value': state_domain.SubtitledHtml(
-                        'content', '').to_dict(),
+                        'content_3', '').to_dict(),
                     'new_value': state_domain.SubtitledHtml(
-                        'content',
+                        'content_3',
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&quot;abc.png&quot;" caption-with-value="'
                         '&quot;&quot;" alt-with-value="&quot;Image&quot;">'
                         '</oppia-noninteractive-image>').to_dict()
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
                 })], 'Add state name')
 
         with utils.open_file(
@@ -2552,9 +2581,13 @@ title: A title
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
@@ -2568,7 +2601,13 @@ title: A title
             'new_value': default_outcome_dict
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'New state',
@@ -2582,7 +2621,11 @@ title: A title
             'new_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.CUSTOMIZATION_ARG
+                                , extra_prefix='placeholder')
+                        ),
                         'unicode_str': ''
                     }
                 },
@@ -2593,13 +2636,18 @@ title: A title
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'New state',
             'old_value': state_domain.SubtitledHtml(
-                'content', '').to_dict(),
+                'content_3', '').to_dict(),
             'new_value': state_domain.SubtitledHtml(
-                'content',
+                'content_3',
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&quot;abc.png&quot;" caption-with-value="&quot;&quot;" '
                 'alt-with-value="&quot;Image&quot;">'
                 '</oppia-noninteractive-image>').to_dict()
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
+
         })]
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -2655,7 +2703,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
         """card_is_checkpoint: true
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_0
   html: ''
 interaction:
   answer_groups: []
@@ -2663,14 +2711,14 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_2
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: %s
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_1
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -2680,19 +2728,13 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_2: {}
+    content_0: {}
+    default_outcome_1: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
@@ -2701,7 +2743,7 @@ written_translations:
             """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_3
   html: ''
 interaction:
   answer_groups: []
@@ -2709,14 +2751,14 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_5
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: New state
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_4
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -2726,19 +2768,13 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_5: {}
+    content_3: {}
+    default_outcome_4: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """)
     }
 
@@ -2748,7 +2784,7 @@ written_translations:
             """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_3
   html: ''
 interaction:
   answer_groups: []
@@ -2756,14 +2792,14 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_5
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: Renamed state
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_4
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -2773,26 +2809,24 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_5: {}
+    content_3: {}
+    default_outcome_4: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """)
     }
 
     def test_export_to_dict(self):
         """Test the export_to_dict() method."""
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
@@ -2808,6 +2842,14 @@ written_translations:
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2823,12 +2865,22 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate((
+                                        translation_domain
+                                        .ContentType.CUSTOMIZATION_ARG),
+                                    extra_prefix='placeholder'
+                                    ),
                                 'unicode_str': ''
                             }
                         },
                         'rows': {'value': 1}
                     }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+
                 })], 'Add state name')
 
         dict_output = exp_services.export_states_to_yaml(
@@ -2841,6 +2893,9 @@ written_translations:
         self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
@@ -2854,7 +2909,20 @@ written_translations:
             'new_value': default_outcome_dict
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
+
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'New state',
@@ -2868,7 +2936,11 @@ written_translations:
             'new_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'ca_placeholder_0',
+                        'content_id': content_id_generator.generate((
+                                        translation_domain
+                                        .ContentType.CUSTOMIZATION_ARG),
+                                    extra_prefix='placeholder'
+                                    ),
                         'unicode_str': ''
                     }
                 },
@@ -2972,6 +3044,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_add_state_cmd(self):
         """Test adding of states."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
 
         self.assertNotIn('new state', exploration.states)
 
@@ -2979,23 +3054,58 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })], 'Add state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertIn('new state', exploration.states)
 
     def test_are_changes_mergeable_send_email(self):
-        self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 1',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })], 'Added state')
         change_list_same_state_name = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'State 1',
-            })]
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        })]
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertFalse(exp_services.are_changes_mergeable(
             self.EXP_0_ID, updated_exploration.version - 1,
@@ -3005,13 +3115,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_rename_state_cmd(self):
         """Test updating of state name."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })], 'Add state name')
 
         exp_services.update_exploration(
@@ -3059,10 +3183,26 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_delete_state_cmd(self):
         """Test deleting a state name."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })], 'Add state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3197,7 +3337,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
         change_list = _get_change_list(
@@ -3265,7 +3405,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
         change_list = _get_change_list(
@@ -3296,11 +3436,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })] +
             _get_change_list(
                 'State 2',
@@ -3341,11 +3497,26 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of interaction_answer_groups."""
         # We create a second state to use as a rule destination.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })] +
             _get_change_list(
                 'State 2',
@@ -3551,7 +3722,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
 
@@ -3559,451 +3730,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
-
-    def test_add_translation(self):
-        """Test updating of content."""
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        self.assertEqual(exploration.get_translation_counts(), {})
-
-        change_list = _get_change_list(
-            self.init_state_name, 'content', {
-                'html': '<p><strong>Test content</strong></p>',
-                'content_id': 'content',
-            })
-
-        change_list.append(exp_domain.ExplorationChange({
-            'cmd': exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
-            'state_name': self.init_state_name,
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p><strong>Test content</strong></p>',
-            'translation_html': '<p>Translated text</p>'
-        }))
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
-
-    def test_add_written_translation(self):
-        """Test updating of content."""
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        self.assertEqual(exploration.get_translation_counts(), {})
-
-        change_list = _get_change_list(
-            self.init_state_name, 'content', {
-                'html': '<p><strong>Test content</strong></p>',
-                'content_id': 'content',
-            })
-
-        change_list.append(exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': self.init_state_name,
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>original text</p>',
-            'translation_html': '<p>Translated text</p>',
-            'data_format': 'html'
-        }))
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1
-        })
-
-        # Check that the property can be changed when working
-        # on old version.
-        # Add a change to upgrade the version.
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': 'placeholder'
-                        }
-                    },
-                    'rows': {'value': 1}
-                }),
-            'Add Customization Args')
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': self.init_state_name,
-            'content_id': 'content',
-            'language_code': 'bn',
-            'content_html': '<p>original text</p>',
-            'translation_html': '<p>Translated text 2</p>',
-            'data_format': 'html'
-        })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list)
-        self.assertTrue(changes_are_mergeable)
-        # Applying changed translation to the old_version.
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
-            change_list,
-            '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        init_interaction = exploration.init_state.interaction
-        customization_args = init_interaction.customization_args
-        self.assertEqual(
-            customization_args['placeholder'].value.unicode_str,
-            'placeholder')
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1,
-            'bn': 1,
-        })
-
-    def test_mark_written_translation_as_needing_update(self):
-        """Test marking of written translation for a given language and content
-        id as needing update.
-        """
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.get_translation_counts(), {})
-        # Update the exploration with a content and add corresponding
-        # translations in two languages.
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': self.init_state_name,
-                'property_name': 'content',
-                'new_value': {
-                    'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
-                }
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'hi',
-                'content_html': '<p>Original content</p>',
-                'translation_html': '<p>Translated text in Hindi</p>',
-                'data_format': 'html'
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'bn',
-                'content_html': '<p>Original content</p>',
-                'translation_html': '<p>Translated text in Bangla</p>',
-                'data_format': 'html'
-            })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that there are translations in two languages.
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1,
-            'bn': 1
-        })
-        # Assert that the written translations are not marked as needing update.
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertFalse(hindi_written_translation.needs_update)
-        self.assertFalse(bangla_written_translation.needs_update)
-
-        # Mark all translations for a state as needing update.
-        update_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
-            'state_name': self.init_state_name,
-            'content_id': 'content',
-            'language_code': 'hi'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, update_change_list, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that there are no completed translations and check that the
-        # needs_update property is set for the corresponding written
-        # translations.
-        self.assertEqual(exploration.get_translation_counts(), {
-            'bn': 1
-        })
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertTrue(hindi_written_translation.needs_update)
-        self.assertFalse(bangla_written_translation.needs_update)
-
-        # Update translations again so the translations are completed.
-        change_list_2 = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'hi',
-                'content_html': '<p>Original content</p>',
-                'translation_html': '<p>Translated text in Hindi</p>',
-                'data_format': 'html'
-            })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that the written translations are not marked as needing update.
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertFalse(hindi_written_translation.needs_update)
-        self.assertFalse(bangla_written_translation.needs_update)
-
-        # Check that the property can be changed when working
-        # on old version.
-        # Add a change to upgrade the version.
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': 'placeholder'
-                        }
-                    },
-                    'rows': {'value': 1}
-                }),
-            'Add Customization Args')
-
-        # Mark all translations for a state as needing update in the
-        # old version.
-        update_change_list_2 = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
-            'state_name': self.init_state_name,
-            'content_id': 'content',
-            'language_code': 'hi'
-        })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 4, update_change_list_2)
-        self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, update_change_list_2,
-            '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that there are no completed translations and check that the
-        # needs_update property is set for the corresponding written
-        # translations in the final version.
-        self.assertEqual(exploration.get_translation_counts(), {
-            'bn': 1
-        })
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertTrue(hindi_written_translation.needs_update)
-        self.assertFalse(bangla_written_translation.needs_update)
-
-        # Assert that final version has all the changes made above.
-        init_interaction = exploration.init_state.interaction
-        customization_args = init_interaction.customization_args
-        self.assertEqual(
-            customization_args['placeholder'].value.unicode_str,
-            'placeholder')
-
-    def test_mark_written_translations_as_needing_update(self):
-        """Test marking of written translations in all languages for a
-        particular content id as needing update.
-        """
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.get_translation_counts(), {})
-        # Update the exploration with a content and add corresponding
-        # translations in two languages.
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': self.init_state_name,
-                'property_name': 'content',
-                'new_value': {
-                    'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
-                }
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'hi',
-                'content_html': '<p>Original content</p>',
-                'translation_html': '<p>Translated text in Hindi</p>',
-                'data_format': 'html'
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'bn',
-                'content_html': '<p>Original content</p>',
-                'translation_html': '<p>Translated text in Bangla</p>',
-                'data_format': 'html'
-            })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that there are translations in two languages.
-        self.assertEqual(exploration.get_translation_counts(), {
-            'hi': 1,
-            'bn': 1
-        })
-        # Assert that the written translations are not marked as needing update.
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertFalse(hindi_written_translation.needs_update)
-        self.assertFalse(bangla_written_translation.needs_update)
-
-        # Mark all translations for a state as needing update.
-        update_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
-            'state_name': self.init_state_name,
-            'content_id': 'content'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, update_change_list, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that there are no completed translations and check that the
-        # needs_update property is set for the corresponding written
-        # translations.
-        self.assertEqual(exploration.get_translation_counts(), {})
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertTrue(hindi_written_translation.needs_update)
-        self.assertTrue(bangla_written_translation.needs_update)
-
-        # Update translations again so the translations are completed.
-        change_list_2 = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'hi',
-                'content_html': '<p>Original content</p>',
-                'translation_html': '<p>Translated text in Hindi</p>',
-                'data_format': 'html'
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'bn',
-                'content_html': '<p>Original content</p>',
-                'translation_html': '<p>Translated text in Bangla</p>',
-                'data_format': 'html'
-            })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2, '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that the written translations are not marked as needing update.
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertFalse(hindi_written_translation.needs_update)
-        self.assertFalse(bangla_written_translation.needs_update)
-
-        # Check that the property can be changed when working
-        # on old version.
-        # Add a change to upgrade the version.
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': 'placeholder'
-                        }
-                    },
-                    'rows': {'value': 1}
-                }),
-            'Add Customization Args')
-
-        # Mark all translations for a state as needing update in the
-        # old version.
-        update_change_list_2 = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
-            'state_name': self.init_state_name,
-            'content_id': 'content'
-        })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 4, update_change_list_2)
-        self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, update_change_list_2,
-            '')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
-        # Assert that there are no completed translations and check that the
-        # needs_update property is set for the corresponding written
-        # translations in the final version.
-        self.assertEqual(exploration.get_translation_counts(), {})
-        actual_written_translations = (
-            exploration.states[self.init_state_name].written_translations)
-        hindi_written_translation = (
-            actual_written_translations.translations_mapping['content']['hi'])
-        bangla_written_translation = (
-            actual_written_translations.translations_mapping['content']['bn'])
-        self.assertTrue(hindi_written_translation.needs_update)
-        self.assertTrue(bangla_written_translation.needs_update)
-
-        # Assert that final version has all the changes made above.
-        init_interaction = exploration.init_state.interaction
-        customization_args = init_interaction.customization_args
-        self.assertEqual(
-            customization_args['placeholder'].value.unicode_str,
-            'placeholder')
 
     def test_update_solicit_answer_details(self):
         """Test updating of solicit_answer_details."""
@@ -4027,7 +3753,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
 
@@ -4076,7 +3802,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
         change_list = _get_change_list(
@@ -4104,12 +3830,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_linked_skill_id(self):
         """Test updating linked_skill_id."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertEqual(
             exploration.init_state.linked_skill_id, None)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State1',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })], 'Add state name')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
@@ -4131,7 +3872,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
 
@@ -4156,12 +3897,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_card_is_checkpoint(self):
         """Test updating of card_is_checkpoint."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.assertEqual(
             exploration.init_state.card_is_checkpoint, True)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State1',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })], 'Add state name')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
@@ -4184,7 +3940,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
 
@@ -4229,7 +3985,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                 }),
             '')
 
@@ -4267,73 +4023,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'html': '<b>Test content</b>',
                     }),
                 '')
-
-    def test_update_written_translations(self):
-        """Test update content translations."""
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Test!</p>',
-                        'needs_update': True
-                    }
-                },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
-            }
-        }
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name, 'written_translations',
-                written_translations_dict), 'Added text translations.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.init_state.written_translations.to_dict(),
-            written_translations_dict)
-
-    def test_update_written_translations_cleans_html_translations(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<incomplete-bad-tag><div>OK tag</div>',
-                        'needs_update': True
-                    }
-                },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
-            }
-        }
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name, 'written_translations',
-                written_translations_dict), 'Added text translations.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.init_state.written_translations.to_dict(), {
-                'translations_mapping': {
-                    'content': {
-                        'hi': {
-                            'data_format': 'html',
-                            'translation': '<div>OK tag</div>',
-                            'needs_update': True
-                        }
-                    },
-                    'default_outcome': {},
-                    'ca_placeholder_0': {}
-                }
-            })
-
-    def test_update_written_translations_with_list_fails(self):
-        """Test update content translation with a list fails."""
-        with self.assertRaisesRegex(
-            Exception, 'Expected written_translations to be a dict, received '):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
-                    self.init_state_name, 'written_translations',
-                    [1, 2]), 'Added fake text translations.')
 
     def test_set_edits_allowed(self):
         """Test update edits allowed field in an exploration."""
@@ -4629,9 +4318,24 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(snapshots_metadata), 2)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'New state',
@@ -4722,9 +4426,24 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # In version 3, a new state is added.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'New state',
@@ -4784,6 +4503,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     def test_get_composite_change_list(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
 
         # Upgrade to version 2.
         exp_services.update_exploration(
@@ -4797,7 +4519,18 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # Change list for version 3.
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME))
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'New state',
@@ -4836,7 +4569,19 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # Complete change list from version 1 to 4.
         composite_change_list_dict_expected = [{
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
+            'state_name': 'New state',
+            'content_id_for_state_content': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            ),
+            'content_id_for_default_outcome': (
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+            )
+        }, {
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': content_id_generator.next_content_id_index
         }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'old_value': None,
@@ -4883,12 +4628,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -4897,12 +4642,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -4911,12 +4656,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -4925,12 +4670,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -4953,12 +4698,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -4967,12 +4712,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -4981,12 +4726,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -4995,12 +4740,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5027,12 +4772,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5041,12 +4786,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
                 self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5055,12 +4800,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5069,12 +4814,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5097,12 +4842,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5111,12 +4856,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5125,12 +4870,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5139,12 +4884,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5172,12 +4917,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5186,12 +4931,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5200,12 +4945,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -5214,12 +4959,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'content 1'
                 },
                 'state_name': 'Introduction',
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
@@ -6074,9 +5819,6 @@ states:
       voiceovers_mapping:
         content: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
   %s:
     classifier_model_id: null
     content:
@@ -6111,11 +5853,6 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText: {}
-        content: {}
-        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Old Title
@@ -6180,8 +5917,7 @@ title: Old Title
             'Voice artist does not have permission to make some '
             'changes in the change list.'):
             exp_services.update_exploration(
-                user_id, exp_id, change_list, 'By voice artist',
-                False, True)
+                user_id, exp_id, change_list, 'By voice artist', True)
 
     def test_update_exploration_linked_to_story(self):
         story_id = story_services.get_new_story_id()
@@ -6522,11 +6258,26 @@ title: Old Title
 
     def test_update_exploration_init_state_name(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'State'
+                'state_name': 'State',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })], 'Added new state.')
 
         self.assertEqual(

@@ -63,7 +63,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'state_name': 'state_1',
         'new_value': {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': 'new suggestion content'
         }
     }
@@ -91,7 +91,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.NORMAL_USER_EMAIL, 'normaluser')
         self.normal_user_id = self.get_user_id_from_email(
             self.NORMAL_USER_EMAIL)
-        self.save_new_valid_exploration(
+        self.exploration = self.save_new_valid_exploration(
             self.target_id, self.author_id, category='Algebra')
 
     def assert_suggestion_status(self, suggestion_id, status):
@@ -188,7 +188,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'new suggestion content'
                 },
                 'old_value': None
@@ -224,7 +224,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>The invalid content html</p>',
             'translation_html': '<p>Translation for invalid content.</p>',
@@ -298,19 +298,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
     def test_accept_suggestion_and_send_email_to_author(self):
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'state 1',
-        })]
-        exp_services.update_exploration(
-            self.author_id, self.target_id, change_list, 'Add state.')
-
         new_suggestion_content = state_domain.SubtitledHtml(
             'content', '<p>new suggestion content html</p>').to_dict()
         change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'state 1',
+            'state_name': 'Introduction',
             'new_value': new_suggestion_content
         }
 
@@ -470,7 +463,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_1',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': (
                     '<oppia-noninteractive-math raw_latex-with-value="&am'
                     'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
@@ -793,7 +786,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state 1',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>old content html</p>'
             }
         })]
@@ -802,7 +795,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>Translation for original content.</p>',
@@ -942,7 +935,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state 1',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>old content html</p>'
             }
         })]
@@ -951,7 +944,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>Translation for original content.</p>',
@@ -1003,7 +996,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     add_translation_change_dict = {
         'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
         'state_name': 'state_1',
-        'content_id': 'content',
+        'content_id': 'content_0',
         'language_code': 'hi',
         'content_html': '<p>State name: state_1, Content id: content</p>',
         'translation_html': '<p>This is translated html.</p>',
@@ -1080,7 +1073,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state_1',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': (
                 '<p>State name: state_1, Content id: content</p>'),
@@ -1908,7 +1901,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'State 1',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': content_html,
             'translation_html': '<p>This is translated html.</p>',
@@ -2133,7 +2126,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': state_name,
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': exploration.states[state_name].content.html,
             'translation_html': '<p>This is translated html.</p>',
@@ -2363,11 +2356,11 @@ class ReviewableSuggestionEmailInfoUnitTests(
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Introduction',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'new html content'
             },
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'old html content'
             }
         }
@@ -3606,11 +3599,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Introduction',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'new html content'
             },
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'old html content'
             }
         }

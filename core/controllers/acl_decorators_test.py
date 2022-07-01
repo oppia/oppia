@@ -6612,7 +6612,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     target_version_id = 1
     change_dict = {
         'cmd': 'add_written_translation',
-        'content_id': 'content',
+        'content_id': 'content_0',
         'language_code': 'hi',
         'content_html': '<p>old content html</p>',
         'state_name': 'State 1',

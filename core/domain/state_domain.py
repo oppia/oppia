@@ -3123,23 +3123,31 @@ class State(translation_domain.BaseTranslatableObject):
 
         interaction_id = interaction['id']
         customisation_args = interaction['customization_args']
-        ca_specs_dict = (
+        interaction_specs = (
             interaction_registry.Registry
-            .get_all_specs_for_state_schema_version(
-                feconf.CURRENT_STATE_SCHEMA_VERSION,
-                can_fetch_latest_specs=True
-            )[interaction_id]['customization_arg_specs']
+                .get_all_specs_for_state_schema_version(
+                    feconf.CURRENT_STATE_SCHEMA_VERSION,
+                    can_fetch_latest_specs=True
+               )
         )
-        for spec in ca_specs_dict:
-            customisation_arg = customisation_args[spec["name"]]
-            contents = InteractionCustomizationArg.traverse_by_schema_and_get(
-                spec['schema'], customisation_arg["value"], [
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-                lambda x: x
-            )
-            for content in contents:
-                yield content, translation_domain.ContentType.CUSTOMIZATION_ARG
+        if interaction_id in interaction_specs:
+            ca_specs_dict = interaction_specs[interaction_id][
+                'customization_arg_specs']
+            for spec in ca_specs_dict:
+                customisation_arg = customisation_args[spec["name"]]
+                contents = (
+                    InteractionCustomizationArg.traverse_by_schema_and_get(
+                        spec['schema'], customisation_arg["value"], [
+                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
+                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+                        lambda x: x
+                    )
+                )
+                for content in contents:
+                    yield (
+                        content,
+                        translation_domain.ContentType.CUSTOMIZATION_ARG
+                    )
 
     @classmethod
     def update_old_content_id_to_new_content_id_in_v49_states(

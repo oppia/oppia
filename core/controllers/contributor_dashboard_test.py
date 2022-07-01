@@ -462,7 +462,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
@@ -710,7 +710,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
@@ -790,7 +790,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create translation suggestions for the explorations.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
@@ -1007,7 +1007,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'Introduction',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': '<p>A content to translate.</p>'
                 }
             })], 'Changes content.')
@@ -1048,7 +1048,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         change_dict = {
             'cmd': 'add_written_translation',
             'state_name': 'Introduction',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '',
             'translation_html': '<p>Translation for content.</p>',
@@ -1182,7 +1182,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'End State',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Please continue.'
                 }
             })], 'Changes content.')
@@ -1251,7 +1251,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'Introduction',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Please continue.'
                 }
             })], 'Changes content.')

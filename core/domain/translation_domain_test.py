@@ -429,7 +429,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
 #         init_state = exploration.states[exploration.init_state_name]
 #         init_state.update_content(
 #             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content',
+#                 'content_id': 'content_0',
 #                 'html': '<p>This is content</p>'
 #             }))
 #         init_state.update_interaction_id('TextInput')
@@ -465,7 +465,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
 #         new_state = exploration.states['New state']
 #         new_state.update_content(
 #             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content',
+#                 'content_id': 'content_0',
 #                 'html': '<p>This is content</p>'
 #             }))
 #         new_state.update_interaction_id('TextInput')
@@ -506,7 +506,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
 #         init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
 #         init_state.update_content(
 #             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content',
+#                 'content_id': 'content_0',
 #                 'html': '<p>This is content</p>'
 #             }))
 #         init_state.update_interaction_id('TextInput')
@@ -547,7 +547,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
 #         init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
 #         init_state.update_content(
 #             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content',
+#                 'content_id': 'content_0',
 #                 'html': '<p>This is content</p>'
 #             }))
 #         init_state.update_interaction_id('TextInput')

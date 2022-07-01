@@ -30,7 +30,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
     def test_incorrect_exp_domain_object_raises_exception(self) -> None:
         incorrect_change_dict = {
             'state_name': 'State 3',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>In Hindi</p>',
@@ -45,7 +45,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         incorrect_change_dict = {
             'cmd': 'add_subtopic',
             'state_name': 'State 3',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>In Hindi</p>',
@@ -61,7 +61,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         correct_change_dict = {
             'cmd': 'add_written_translation',
             'state_name': 'State 3',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>In हिन्दी (Hindi)</p>',
@@ -153,7 +153,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
 
     def test_valid_object_raises_no_exception(self) -> None:
         state_dict = {
-            'content': {'content_id': 'content', 'html': ''},
+            'content': {'content_id': 'content_0', 'html': ''},
             'param_changes': [],
             'interaction': {
                 'solution': None,

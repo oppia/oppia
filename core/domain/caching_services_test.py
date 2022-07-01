@@ -84,7 +84,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'param_changes': [],
                 'classifier_model_id': None,
                 'content': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': '<p>Unicode Characters 😍😍😍😍</p>'
                 },
                 'linked_skill_id': None,

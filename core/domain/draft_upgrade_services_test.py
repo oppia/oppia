@@ -1042,7 +1042,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': html_content
                 }
             }), exp_domain.ExplorationChange({
@@ -1240,7 +1240,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': expected_html_content
                 }
             }).to_dict())

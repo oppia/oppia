@@ -435,7 +435,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         suggestions = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list'][0]
         change_dict['old_value'] = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': ''
         }
         self.assertEqual(suggestions['change'], change_dict)
@@ -477,7 +477,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_1', None)
 
         change_dict['old_value'] = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': ''
         }
         suggestions = self.get_json(

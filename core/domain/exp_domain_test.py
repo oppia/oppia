@@ -134,6 +134,8 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         exp_change_object = exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'state_name',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         })
 
         self.assertEqual(exp_change_object.cmd, 'add_state')
@@ -262,6 +264,8 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
@@ -294,6 +298,8 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state',
@@ -317,7 +323,9 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.delete_state('Renamed state 2')
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'New state 2'
+            'state_name': 'New state 2',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state 2',
@@ -639,7 +647,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                                 'contentId': (
                                     self.content_id_generator.generate(
                                         translation_domain.ContentType.RULE,
-                                        extra_prefix='input'))'rule_input_1',
+                                        extra_prefix='input')),
                                 'normalizedStrSet': ['Test1']
                             }
                         })
@@ -1730,6 +1738,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         })]
 
         expected_dict = {
@@ -1767,6 +1777,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state',
@@ -2282,7 +2294,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_content_dict = {
-            'content_id': 'content',
+            'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
         state_answer_group = [state_domain.AnswerGroup(
@@ -5065,7 +5077,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 'linked_skill_id': None,
                 'classifier_model_id': None,
                 'content': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': content_str,
                 },
                 'recorded_voiceovers': {
@@ -5444,11 +5456,11 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'new_value': {
                 'html': '<p>Congratulations, you have finished!</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         })]
 
@@ -5485,11 +5497,11 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'new_value': {
                 'html': '<p>Hello</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         })]
 
@@ -5516,11 +5528,11 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'new_value': {
                 'html': '<p>Content 1.</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         })]
         exp_services.update_exploration(
@@ -5534,11 +5546,11 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'new_value': {
                 'html': '<p>Content 2.</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         })]
 
@@ -5557,12 +5569,12 @@ class ExplorationChangesMergeabilityUnitTests(
         # not related to the interaction id.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -5601,12 +5613,12 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -5868,12 +5880,12 @@ class ExplorationChangesMergeabilityUnitTests(
         # customization args or doesn't affects customization_args.
         change_list = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -5912,12 +5924,12 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -6441,12 +6453,12 @@ class ExplorationChangesMergeabilityUnitTests(
         # they can be merged easily.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -6474,12 +6486,12 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -7208,12 +7220,12 @@ class ExplorationChangesMergeabilityUnitTests(
         # Changes to the properties unrelated to the solutions.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>This is the first state.</p>'
             },
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -7241,12 +7253,12 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Congratulations, you have finished!</p>'
             },
             'state_name': 'End',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
@@ -7890,11 +7902,11 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'new_value': {
                 'html': '<p>Content in Introduction.</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'solution',
@@ -8020,11 +8032,11 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'new_value': {
                 'html': '<p>Congratulations, you have finished!</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'title',
@@ -8294,13 +8306,13 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'new_value': {
                 'html': '<p>Content</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
@@ -8500,13 +8512,13 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End',
             'new_value': {
                 'html': '<p>Congratulations, you have finished!</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             }
         }), exp_domain.ExplorationChange({
             'new_state_name': 'End-State',
@@ -8717,13 +8729,13 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -8813,13 +8825,13 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Second State Content.</p>'
             }
         })]
@@ -8869,7 +8881,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'language_code': 'de',
             'data_format': 'html',
             'cmd': 'add_written_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'translation_html': '<p>Translation Content.</p>',
             'state_name': 'Introduction',
             'content_html': 'N/A'
@@ -8953,7 +8965,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'translation_html': '<p>State 2 Content Translation.</p>',
             'state_name': 'End',
             'language_code': 'de',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'cmd': 'add_written_translation',
             'data_format': 'html'
         })]
@@ -9073,13 +9085,13 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -9169,13 +9181,13 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Second State Content.</p>'
             }
         })]
@@ -9187,11 +9199,11 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_2 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>First State Content.</p>'
             },
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Changed First State Content.</p>'
             },
             'property_name': 'content',
@@ -9200,7 +9212,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'language_code': 'de',
             'data_format': 'html',
             'cmd': 'add_written_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'translation_html': '<p>Translation Content.</p>',
             'state_name': 'Introduction',
             'content_html': 'N/A'
@@ -9273,7 +9285,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'language_code': 'bn',
             'data_format': 'html',
             'cmd': 'add_written_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'translation_html': '<p>Translation Content.</p>',
             'state_name': 'Introduction',
             'content_html': 'N/A'
@@ -9298,11 +9310,11 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_3 = [exp_domain.ExplorationChange({
             'state_name': 'End',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Second State Content.</p>'
             },
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Changed Second State Content.</p>'
             },
             'property_name': 'content',
@@ -9319,7 +9331,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'translation_html': '<p>State 2 Content Translation.</p>',
             'state_name': 'End',
             'language_code': 'de',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'cmd': 'add_written_translation',
             'data_format': 'html'
         })]
@@ -9338,13 +9350,13 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -9432,13 +9444,13 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Second State Content.</p>'
             }
         })]
@@ -9616,11 +9628,11 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_6 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>First State Content.</p>'
             },
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Changed First State Content.</p>'
             },
             'property_name': 'content',
@@ -9641,11 +9653,11 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_6 = [exp_domain.ExplorationChange({
             'state_name': 'End',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Second State Content.</p>'
             },
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Changed Second State Content.</p>'
             },
             'property_name': 'content',
@@ -9671,13 +9683,13 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>First State Content.</p>'
             }
         }), exp_domain.ExplorationChange({
@@ -9765,13 +9777,13 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'state_name': 'End',
             'cmd': 'edit_state_property',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>Second State Content.</p>'
             }
         })]
@@ -9996,13 +10008,13 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'Congratulations, you have finished!'
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>2Congratulations, you have finished!</p>'
             },
             'state_name': 'End'
@@ -10017,11 +10029,11 @@ class ExplorationChangesMergeabilityUnitTests(
         change_list_2 = [exp_domain.ExplorationChange({
             'old_value': {
                 'html': '',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'new_value': {
                 'html': '<p>Hello Aryaman!</p>',
-                'content_id': 'content'
+                'content_id': 'content_0'
             },
             'state_name': 'Introduction',
             'property_name': 'content',
@@ -10044,13 +10056,17 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End-State'
         }), exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'End'
+            'state_name': 'End',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         }), exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
             'cmd': 'add_state',
-            'state_name': 'End'
+            'state_name': 'End',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
         }), exp_domain.ExplorationChange({
             'new_state_name': 'End-State',
             'cmd': 'rename_state',
@@ -10133,13 +10149,13 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': ''
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'Congratulations, you have finished!'
             },
             'state_name': 'End'
@@ -10269,13 +10285,13 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': 'Congratulations, you have finished!'
             },
             'cmd': 'edit_state_property',
             'property_name': 'content',
             'new_value': {
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'html': '<p>2Congratulations, you have finished!</p>'
             },
             'state_name': 'End'
@@ -10397,13 +10413,13 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Congratulations, you have finished!'
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': '<p>2Congratulations, you have finished!</p>'
                 },
                 'state_name': 'End'
@@ -10422,13 +10438,17 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'End-State'
             }), exp_domain.ExplorationChange({
                 'cmd': 'add_state',
-                'state_name': 'End'
+                'state_name': 'End',
+                'content_id_for_state_content': 'content_0',
+                'content_id_for_default_outcome': 'default_outcome_1'
             }), exp_domain.ExplorationChange({
                 'cmd': 'delete_state',
                 'state_name': 'End'
             }), exp_domain.ExplorationChange({
                 'cmd': 'add_state',
-                'state_name': 'End'
+                'state_name': 'End',
+                'content_id_for_state_content': 'content_0',
+                'content_id_for_default_outcome': 'default_outcome_1'
             }), exp_domain.ExplorationChange({
                 'new_state_name': 'End-State',
                 'cmd': 'rename_state',
@@ -10511,13 +10531,13 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
                 'old_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': ''
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Congratulations, you have finished!'
                 },
                 'state_name': 'End'
@@ -10561,11 +10581,11 @@ class ExplorationChangesMergeabilityUnitTests(
             change_list_3 = [exp_domain.ExplorationChange({
                 'old_value': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'new_value': {
                     'html': '<p>Hello Aryaman!</p>',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'state_name': 'Introduction',
                 'property_name': 'content',
@@ -10581,11 +10601,11 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'Introduction',
                 'new_value': {
                     'html': '<p>Hello Aryaman!</p>',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'old_value': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
             }]
 
@@ -10619,11 +10639,11 @@ class ExplorationChangesMergeabilityUnitTests(
             change_list = [exp_domain.ExplorationChange({
                 'old_value': {
                     'html': '',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'new_value': {
                     'html': '<p>End State</p>',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'state_name': 'End',
                 'property_name': 'content',
@@ -10647,11 +10667,11 @@ class ExplorationChangesMergeabilityUnitTests(
             change_list_3 = [exp_domain.ExplorationChange({
                 'old_value': {
                     'html': 'End State',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'new_value': {
                     'html': '<p>End State Changed</p>',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'state_name': 'End',
                 'property_name': 'content',
@@ -10667,11 +10687,11 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'End',
                 'new_value': {
                     'html': '<p>End State Changed</p>',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
                 'old_value': {
                     'html': 'End State',
-                    'content_id': 'content'
+                    'content_id': 'content_0'
                 },
             }]
             expected_email_html_body = (
@@ -10696,7 +10716,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'translation_html': '<p>State 2 Content Translation.</p>',
                 'state_name': 'End',
                 'language_code': 'de',
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'cmd': 'add_written_translation',
                 'data_format': 'html'
             })]
@@ -10707,7 +10727,7 @@ class ExplorationChangesMergeabilityUnitTests(
             change_list_4_dict = [{
                 'cmd': 'add_written_translation',
                 'state_name': 'End',
-                'content_id': 'content',
+                'content_id': 'content_0',
                 'language_code': 'de',
                 'content_html': 'N/A',
                 'translation_html': '<p>State 2 Content Translation.</p>',

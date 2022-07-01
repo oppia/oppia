@@ -377,7 +377,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': 'Introduction',
                     'new_value': {
-                        'content_id': 'content',
+                        'content_id': 'content_0',
                         'html': '<p>The new content to voiceover</p>'
                     }
                 })], 'Adds new content to init state')
@@ -395,13 +395,13 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': 'Introduction',
                     'new_value': {
-                        'content_id': 'content',
+                        'content_id': 'content_0',
                         'html': '<p>The new content to voiceover</p>'
                     }
                 }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': '<p>The new content to voiceover</p>',
                     'translation_html': '<p>Translation in Hindi</p>',

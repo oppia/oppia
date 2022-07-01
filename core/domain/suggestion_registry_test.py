@@ -556,14 +556,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(
-            self.author_id, 'exp1', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                })
-            ], 'Added state')
-        suggestion.change.state_name = 'State A'
+        suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()
 
@@ -606,7 +599,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
         change = {
-            'cmd': exp_domain.CMD_ADD_STATE,
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': suggestion.change.state_name,
             'new_value': 'new suggestion content',
@@ -880,7 +873,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], self.fake_date)
 
         change = {
-            'cmd': exp_domain.CMD_ADD_STATE,
+            'cmd': exp_domain.CMD_DELETE_STATE,
             'state_name': 'Introduction'
         }
         with self.assertRaisesRegex(
@@ -1393,20 +1386,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                }),
-                exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
                         'content_id': 'content',
                         'html': '<p>This is a content.</p>'
                     },
-                    'state_name': 'State A',
+                    'state_name': 'Introduction',
                 })
             ], 'Added state')
-        suggestion.change.state_name = 'State A'
+        suggestion.change.state_name = 'Introduction'
 
         suggestion.pre_accept_validate()
 

@@ -455,8 +455,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         change_list = self.get_change_list_for_accepting_suggestion()
         exp_services.update_exploration(
-            self.final_reviewer_id, self.target_id, change_list,
-            commit_message, is_suggestion=True)
+            self.final_reviewer_id, self.target_id, change_list, commit_message)
 
     def pre_update_validate(self, change):
         """Performs the pre update validation. This function needs to be called
