@@ -382,8 +382,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id);
     this.subheading = (
       this.activeContributionDetails.topic_name + ' / ' +
-        this.activeContributionDetails.story_title +
-        ' / ' + this.activeContributionDetails.chapter_title);
+      this.activeContributionDetails.story_title +
+      ' / ' + this.activeContributionDetails.chapter_title);
     this.init();
   }
 
