@@ -404,7 +404,7 @@ def get_collection_rights(
 
 
 def get_collection_rights(
-    collection_id: str, *, strict: bool = True
+    collection_id: str, strict: bool = True
 ) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights for this collection from the datastore.
 

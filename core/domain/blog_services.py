@@ -93,7 +93,7 @@ def get_blog_post_by_id(
 
 
 def get_blog_post_by_id(
-    blog_post_id: str, *, strict: bool = True
+    blog_post_id: str, strict: bool = True
 ) -> Optional[blog_domain.BlogPost]:
     """Returns a domain object representing a blog post.
 
@@ -177,7 +177,7 @@ def get_blog_post_summary_by_id(
 
 
 def get_blog_post_summary_by_id(
-    blog_post_id: str, *, strict: bool = True
+    blog_post_id: str, strict: bool = True
 ) -> Optional[blog_domain.BlogPostSummary]:
     """Returns a domain object representing a blog post summary.
 
@@ -338,7 +338,7 @@ def get_blog_post_rights(
 
 
 def get_blog_post_rights(
-    blog_post_id: str, *, strict: bool = True
+    blog_post_id: str, strict: bool = True
 ) -> Optional[blog_domain.BlogPostRights]:
     """Retrieves the rights object for the given blog post.
 

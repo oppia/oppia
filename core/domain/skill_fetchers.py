@@ -96,7 +96,6 @@ def get_skill_by_id(
 
 def get_skill_by_id(
     skill_id: str,
-    *,
     strict: bool = True,
     version: Optional[int] = None
 ) -> Optional[skill_domain.Skill]:

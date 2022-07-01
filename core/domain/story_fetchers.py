@@ -178,7 +178,6 @@ def get_story_by_id(
 
 def get_story_by_id(
     story_id: str,
-    *,
     strict: bool = True,
     version: Optional[int] = None
 ) -> Optional[story_domain.Story]:
@@ -256,7 +255,7 @@ def get_story_summary_by_id(
 
 
 def get_story_summary_by_id(
-    story_id: str, *, strict: bool = True
+    story_id: str, strict: bool = True
 ) -> Optional[story_domain.StorySummary]:
     """Returns a domain object representing a story summary.
 

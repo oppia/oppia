@@ -137,7 +137,6 @@ def get_subtopic_page_by_id(
 def get_subtopic_page_by_id(
     topic_id: str,
     subtopic_id: int,
-    *,
     strict: bool = True
 ) -> Optional[subtopic_page_domain.SubtopicPage]:
     """Returns a domain object representing a subtopic page.
@@ -221,7 +220,6 @@ def get_subtopic_page_contents_by_id(
 def get_subtopic_page_contents_by_id(
     topic_id: str,
     subtopic_id: int,
-    *,
     strict: bool = True
 ) -> Optional[subtopic_page_domain.SubtopicPageContents]:
     """Returns the page contents of a subtopic
