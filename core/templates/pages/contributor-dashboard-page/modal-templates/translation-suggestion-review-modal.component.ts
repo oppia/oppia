@@ -102,7 +102,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   languageCode!: string;
   languageDescription!: string;
   preEditTranslationHtml!: string;
-  remainingContributions!: Record<string, ActiveContributionDict>;
+  remainingContributionIds!: string[];
+  skippedContributionIds: string[] = [];
+  allContributions!: Record<string, ActiveContributionDict>;
+  isLastItem!: boolean;
+  isFirstItem: boolean = true;
   reviewMessage!: string;
   status!: string;
   subheading!: string;
@@ -116,10 +120,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   contentTypeIsSetOfStrings: boolean = false;
   contentTypeIsUnicode: boolean = false;
   lastSuggestionToReview: boolean = false;
+  firstSuggestionToReview: boolean = true;
   resolvingSuggestion: boolean = false;
   reviewable: boolean = false;
   canEditTranslation: boolean = false;
   userIsCurriculumAdmin: boolean = false;
+  isContentExpanded: boolean = false;
+  isTranslationExpanded: boolean = false;
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
   MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
@@ -164,7 +171,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         .registerContributorDashboardViewSuggestionForReview('Translation');
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributions = this.suggestionIdToContribution;
+    this.remainingContributionIds = Object.keys(
+      this.suggestionIdToContribution);
+    if (this.remainingContributionIds.length === 0) {
+      this.isLastItem = true;
+    } else {
+      this.isLastItem = false;
+    }
+    this.allContributions = this.suggestionIdToContribution;
+    this.allContributions[this.activeSuggestionId] =
+      this.activeContribution;
+
     this.init();
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
@@ -206,7 +223,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.startedEditing = false;
     this.resolvingSuggestion = false;
     this.lastSuggestionToReview = (
-      Object.keys(this.remainingContributions).length <= 0);
+      Object.keys(this.allContributions).length <= 1);
     this.translationHtml = (
       this.activeSuggestion.change.translation_html);
     this.status = this.activeSuggestion.status;
@@ -229,6 +246,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.reviewMessage = '';
     if (!this.reviewable) {
       this._getThreadMessagesAsync(this.activeSuggestionId);
+    }
+  }
+
+  toggleExpansionState(tab: string): void {
+    if (tab === 'content') {
+      this.isContentExpanded = !this.isContentExpanded;
+    } else if (tab === 'translation') {
+      this.isTranslationExpanded = !this.isTranslationExpanded;
     }
   }
 
@@ -265,23 +290,38 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       threadId);
     const threadMessageBackendDicts = response.messages;
     this.reviewMessage = threadMessageBackendDicts.map(
-      m => ThreadMessage.createFromBackendDict(m))[1].text;
+      m => ThreadMessage.createFromBackendDict(m))[1]?.text ?? '';
   }
 
-  showNextItemToReview(suggestionId: string): void {
-    this.resolvedSuggestionIds.push(this.activeSuggestionId);
-    if (this.lastSuggestionToReview) {
-      this.activeModal.close(this.resolvedSuggestionIds);
+  gotoNextItem(): void {
+    // If the current item is the last item, do not navigate.
+    if (this.isLastItem) {
       return;
     }
+    // This prevents resolved contributions from getting added to the list.
+    if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
+      this.skippedContributionIds.push(this.activeSuggestionId);
+    }
 
-    let lastContribution = (
-      Object.keys(this.remainingContributions)[
-        Object.keys(this.remainingContributions).length - 1]);
-    this.activeSuggestionId = lastContribution;
-    this.activeContribution = this.remainingContributions[
-      lastContribution];
-    delete this.remainingContributions[this.activeSuggestionId];
+    let lastContributionId = (
+      this.remainingContributionIds[this.remainingContributionIds.length - 1]);
+
+    this.activeSuggestionId = lastContributionId;
+    this.activeContribution = this.allContributions[
+      lastContributionId];
+
+    this.remainingContributionIds.pop();
+
+    if (this.remainingContributionIds.length === 0) {
+      this.isLastItem = true;
+    }
+
+    if (this.skippedContributionIds.length === 0) {
+      this.isFirstItem = true;
+    } else {
+      this.isFirstItem = false;
+    }
+
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
@@ -296,9 +336,70 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id);
     this.subheading = (
       this.activeContributionDetails.topic_name + ' / ' +
-      this.activeContributionDetails.story_title +
-      ' / ' + this.activeContributionDetails.chapter_title);
+        this.activeContributionDetails.story_title +
+        ' / ' + this.activeContributionDetails.chapter_title);
     this.init();
+  }
+
+  gotoPreviousItem(): void {
+    // If the current item is the first item, do not navigate.
+    if (this.isFirstItem) {
+      return;
+    }
+
+    // This prevents resolved contributions from getting added to the list.
+    if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
+      this.remainingContributionIds.push(this.activeSuggestionId);
+    }
+
+    let lastContributionId = (
+      this.skippedContributionIds[this.skippedContributionIds.length - 1]);
+
+    this.activeSuggestionId = lastContributionId;
+    this.activeContribution = this.allContributions[
+      lastContributionId];
+
+    this.skippedContributionIds.pop();
+
+    if (this.remainingContributionIds.length !== 0) {
+      this.isLastItem = false;
+    }
+    if (this.skippedContributionIds.length === 0) {
+      this.isFirstItem = true;
+    }
+
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
+    if (!this.activeContribution.details) {
+      this.activeModal.close(this.resolvedSuggestionIds);
+      return;
+    }
+
+    this.activeSuggestion = this.activeContribution.suggestion;
+    this.activeContributionDetails = this.activeContribution.details;
+    this.contextService.setCustomEntityContext(
+      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      this.activeSuggestion.target_id);
+    this.subheading = (
+      this.activeContributionDetails.topic_name + ' / ' +
+        this.activeContributionDetails.story_title +
+        ' / ' + this.activeContributionDetails.chapter_title);
+    this.init();
+  }
+
+  showNextItemToReview(suggestionId: string): void {
+    this.resolvedSuggestionIds.push(this.activeSuggestionId);
+
+    // Remove resolved contributions from the record.
+    delete this.allContributions[this.activeSuggestionId];
+
+    // If the reviewed item is the last item, close the modal.
+    if (this.lastSuggestionToReview || this.isLastItem) {
+      this.activeModal.close(this.resolvedSuggestionIds);
+      return;
+    }
+    // Else go the next item.
+    this.gotoNextItem();
   }
 
   acceptAndReviewNext(): void {
