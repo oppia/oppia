@@ -50,7 +50,8 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestAddExplorationId = element(
     by.css('.protractor-test-add-refresher-exploration-id'));
   var editOutcomeDestDropdownOptions = function(targetOption) {
-    return element.all(by.cssContainingText('option', targetOption)).first();
+    return element.all(by.cssContainingText(
+      '.protractor-afterward-dest-selector', targetOption)).first();
   };
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
