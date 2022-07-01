@@ -352,6 +352,42 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+    def test_get_multi_user_ids_from_usernames(self):
+        auth_id1 = 'someUser1'
+        username1 = 'username1'
+        user_email1 = 'user1@example.com'
+        auth_id2 = 'someUser2'
+        username2 = 'username2'
+        user_email2 = 'user2@example.com'
+
+        # Create user 1.
+        user_settings = user_services.create_new_user(auth_id1, user_email1)
+        user_id1 = user_settings.user_id
+        user_services.set_username(user_id1, username1)
+        self.assertEqual(user_services.get_username(user_id1), username1)
+
+        # Create user 2.
+        user_settings = user_services.create_new_user(auth_id2, user_email2)
+        user_id2 = user_settings.user_id
+        user_services.set_username(user_id2, username2)
+        self.assertEqual(user_services.get_username(user_id2), username2)
+
+        # Handle usernames that exist.
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_usernames(
+                [username1, username2]), [user_id1, user_id2])
+
+        # Handle usernames in the same equivalence class correctly.
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_usernames(
+                ['USERNAME1', 'USERNAME2']), [user_id1, user_id2])
+
+        # Return None for usernames which don't exist.
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_usernames(['fakeUsername']),
+            []
+        )
+
     def test_get_user_settings_from_username_returns_user_settings(self):
         auth_id = 'someUser'
         username = 'username'
@@ -851,7 +887,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'ACCESS_TOPICS_AND_SKILLS_DASHBOARD', 'EDIT_SKILL',
             'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
             'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
-            'CAN_MANAGE_VOICE_ARTIST'])
+            'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS'])
         expected_roles = set(
             ['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
             'VOICEOVER_ADMIN'])

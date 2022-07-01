@@ -36,6 +36,7 @@ from core.domain import user_domain
 from core.platform import models
 
 import requests
+from typing import List
 
 auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
@@ -101,6 +102,25 @@ def get_user_id_from_username(username):
         return None
     else:
         return user_model.id
+
+
+def get_multi_user_ids_from_usernames(usernames):
+    """Gets the user_ids for a given list of usernames.
+
+    Args:
+        usernames: list(str). Identifiable usernames to display in the UI.
+
+    Returns:
+        list(str). Return the list of user ids corresponding to given
+        usernames.
+        """
+    user_ids: List[str] = []
+    for username in usernames:
+        user_id = get_user_id_from_username(username)
+        if user_id is not None:
+            user_ids.append(user_id)
+
+    return user_ids
 
 
 def get_user_settings_from_username(username):

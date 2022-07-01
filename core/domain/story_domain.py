@@ -1708,6 +1708,37 @@ class HumanReadableStorySummaryDict(TypedDict):
     url_fragment: str
 
 
+class StoryProgressDict(TypedDict):
+    """Dictionary representing the story progress object."""
+
+    story_id: str
+    completed_node_titles: List[str]
+    all_node_dicts: List[StoryNodeDict]
+
+
+class StoryProgress:
+    """Domain object for story progress."""
+
+    def __init__(
+        self,
+        story_id: str,
+        completed_node_titles: List[str],
+        all_nodes: List[StoryNode]
+    ) -> None:
+        """Constructs a StoryProgress domain object."""
+        self.story_id = story_id
+        self.completed_node_titles = completed_node_titles
+        self.all_nodes = all_nodes
+
+    def to_dict(self) -> StoryProgressDict:
+        """Returns a dictionary representing the story progress object."""
+        return {
+            'story_id': self.story_id,
+            'completed_node_titles': self.completed_node_titles,
+            'all_node_dicts': [node.to_dict() for node in self.all_nodes]
+        }
+
+
 class StorySummaryDict(HumanReadableStorySummaryDict):
     """Dictionary representing the StorySummary object."""
 
