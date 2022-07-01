@@ -28,7 +28,7 @@ import { State } from 'domain/state/StateObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import cloneDeep from 'lodash/cloneDeep';
 
-interface getUnsetParametersInfoResult {
+interface GetUnsetParametersInfoResult {
   paramName: string;
   stateName: null | string;
 }
@@ -135,7 +135,7 @@ export class ParameterMetadataService {
   //     (e.g. one parameter may be set based on the value assigned to
   //     another parameter).
   getUnsetParametersInfo(
-      initNodeIds: string[]): getUnsetParametersInfoResult[] {
+      initNodeIds: string[]): GetUnsetParametersInfoResult[] {
     let graphData = this.graphDataService.getGraphData();
 
     let states = this.explorationStatesService.getStates();
