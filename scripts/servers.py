@@ -636,7 +636,7 @@ def managed_protractor_server(
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
 
-    config_file_path = common.PROTRACTOR_CONFIG_FILE_PATH 
+    config_file_path = common.PROTRACTOR_CONFIG_FILE_PATH
     if mobile:
         config_file_path = common.PROTRACTOR_MOBILE_CONFIG_FILE_PATH
 
