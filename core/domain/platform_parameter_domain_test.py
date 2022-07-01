@@ -1346,16 +1346,18 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Unsupported comparison operator \'>>\''):
             self.assertFalse(filter_domain.evaluate(
-                self._create_example_context(app_version=None)))
+                self._create_example_context(app_version='1.0.0-abcdef-test')))
 
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [['==', 'dev']]}
+                {'type': 'app_version_flavor', 'conditions': [['==', 'beta']]}
             ))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Unsupported comparison operator \'==\''):
-            filter_domain.evaluate(self._create_example_context())
+            filter_domain.evaluate(
+                self._create_example_context(app_version='1.0.0-abcdef-test')
+            )
 
     def test_validate_filter_passes_without_exception(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
