@@ -226,8 +226,7 @@ export class ReadOnlyExplorationBackendApiService {
   }
 
   /**
-   * 
-   * @returns {boolean} Whether the checkpoints feature is enabled.
+   * Retrieves status of the checkpoints feature flag from the backend.
    */
   async fetchCheckpointsFeatureIsEnabledStatus(): Promise<boolean> {
     return new Promise((resolve, reject) => {
