@@ -2046,7 +2046,7 @@ def get_interaction_id_for_state(exp_id, state_name):
     """Returns the interaction id for the given state name.
 
     Args:
-        exp_id: str. The ID of the exp.
+        exp_id: str. The ID of the exploration.
         state_name: str. The name of the state.
 
     Returns:
@@ -2061,6 +2061,361 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def update_logged_out_user_progress(
+    exploration_id: str,
+    unique_progress_url_id: str,
+    state_name: str,
+    exp_version: int,
+) -> None:
+    """Updates the logged-out user's progress in the
+        associated TransientCheckpointUrlModel.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        unique_progress_url_id: str. Unique 6-digit url to track a
+            logged-out user's progress.
+        state_name: str. State name of the most recently
+            reached checkpoint in the exploration.
+        exp_version: int. Exploration version in which a
+            checkpoint was most recently reached.
+    """
+    # Fetch the model associated with the unique_progress_url_id.
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+        unique_progress_url_id, strict=False)
+
+    # Create a model if it doesn't already exist.
+    if checkpoint_url_model is None:
+        checkpoint_url_model = exp_models.TransientCheckpointUrlModel.create(
+            exploration_id, unique_progress_url_id)
+
+    current_exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, True, exp_version)
+
+    # If the exploration is being visited the first time.
+    if checkpoint_url_model.furthest_reached_checkpoint_state_name is None:
+        checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
+            exp_version)
+        checkpoint_url_model.furthest_reached_checkpoint_state_name = (
+            state_name)
+    elif checkpoint_url_model.furthest_reached_checkpoint_exp_version <= exp_version: # pylint: disable=line-too-long
+        furthest_reached_checkpoint_exp = (
+            exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                strict=True,
+                version=checkpoint_url_model.furthest_reached_checkpoint_exp_version # pylint: disable=line-too-long
+            )
+        )
+        checkpoints_in_current_exp = user_services.get_checkpoints_in_order(
+            current_exploration.init_state_name, current_exploration.states)
+        checkpoints_in_older_exp = user_services.get_checkpoints_in_order(
+            furthest_reached_checkpoint_exp.init_state_name,
+            furthest_reached_checkpoint_exp.states)
+
+        # Get the furthest reached checkpoint in current exploration.
+        furthest_reached_checkpoint_in_current_exp = (
+            user_services.
+                get_most_distant_reached_checkpoint_in_current_exploration(
+                    checkpoints_in_current_exp,
+                    checkpoints_in_older_exp,
+                    checkpoint_url_model.furthest_reached_checkpoint_state_name
+                )
+        )
+
+        # If the furthest reached checkpoint doesn't exist in current
+        # exploration.
+        if furthest_reached_checkpoint_in_current_exp is None:
+            checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
+                exp_version)
+            checkpoint_url_model.furthest_reached_checkpoint_state_name = (
+                state_name)
+        else:
+            # Index of the furthest reached checkpoint.
+            frc_index = checkpoints_in_current_exp.index(
+                furthest_reached_checkpoint_in_current_exp)
+            # If furthest reached checkpoint is behind most recently
+            # reached checkpoint.
+            if frc_index <= checkpoints_in_current_exp.index(state_name):
+                checkpoint_url_model.furthest_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
+                    exp_version)
+                checkpoint_url_model.furthest_reached_checkpoint_state_name = (
+                    state_name)
+
+    checkpoint_url_model.most_recently_reached_checkpoint_exp_version = (
+        exp_version)
+    checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
+        state_name)
+    checkpoint_url_model.last_updated = datetime.datetime.utcnow()
+    checkpoint_url_model.update_timestamps()
+    checkpoint_url_model.put()
+
+
+def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
+    exploration_id,
+    unique_progress_url_id
+):
+    """Synchronizes the most recently reached checkpoint and the furthest
+    reached checkpoint with the latest exploration.
+
+    Args:
+        exploration_id: str. The Id of the exploration.
+        unique_progress_url_id: str. Unique 6-digit url to track a
+            logged-out user's progress.
+
+    Returns:
+        TransientCheckpointUrl. The domain object corresponding to the
+        TransientCheckpointUrlModel.
+    """
+    # Fetch the model associated with the unique_progress_url_id.
+    checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
+        unique_progress_url_id, strict=False)
+
+    if checkpoint_url_model is None:
+        return None
+
+    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    most_recently_interacted_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            True,
+            checkpoint_url_model.most_recently_reached_checkpoint_exp_version
+        ))
+    furthest_reached_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            True,
+            checkpoint_url_model.furthest_reached_checkpoint_exp_version
+        ))
+
+    most_recently_reached_checkpoint_in_current_exploration = (
+        user_services.
+            get_most_distant_reached_checkpoint_in_current_exploration(
+                user_services.get_checkpoints_in_order(
+                    latest_exploration.init_state_name,
+                    latest_exploration.states),
+                user_services.get_checkpoints_in_order(
+                    most_recently_interacted_exploration.init_state_name,
+                    most_recently_interacted_exploration.states),
+                checkpoint_url_model.most_recently_reached_checkpoint_state_name
+            )
+    )
+
+    furthest_reached_checkpoint_in_current_exploration = (
+        user_services.
+            get_most_distant_reached_checkpoint_in_current_exploration(
+                user_services.get_checkpoints_in_order(
+                    latest_exploration.init_state_name,
+                    latest_exploration.states),
+                user_services.get_checkpoints_in_order(
+                    furthest_reached_exploration.init_state_name,
+                    furthest_reached_exploration.states),
+                checkpoint_url_model.furthest_reached_checkpoint_state_name
+            )
+    )
+
+    # If the most recently reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        most_recently_reached_checkpoint_in_current_exploration !=
+        checkpoint_url_model.most_recently_reached_checkpoint_state_name
+    ):
+        checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_in_current_exploration)
+        checkpoint_url_model.most_recently_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        checkpoint_url_model.update_timestamps()
+        checkpoint_url_model.put()
+
+    # If the furthest reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        furthest_reached_checkpoint_in_current_exploration !=
+        checkpoint_url_model.furthest_reached_checkpoint_state_name
+    ):
+        checkpoint_url_model.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_in_current_exploration)
+        checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        checkpoint_url_model.update_timestamps()
+        checkpoint_url_model.put()
+
+    return exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
+
+
+def sync_logged_out_learner_progress_with_logged_in_progress(
+    user_id, exploration_id, unique_progress_url_id):
+
+    """Syncs logged out and logged in learner's checkpoints progress."""
+
+    logged_out_user_data = (
+        exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+
+    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    exp_user_data = exp_fetchers.get_exploration_user_data(
+        user_id,
+        exploration_id
+    )
+
+    logged_in_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+
+    if logged_in_user_model is None:
+        logged_in_user_model = user_models.ExplorationUserDataModel.create(
+            user_id, exploration_id)
+
+        logged_in_user_model.most_recently_reached_checkpoint_exp_version = (
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        logged_in_user_model.most_recently_reached_checkpoint_state_name = (
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        logged_in_user_model.furthest_reached_checkpoint_exp_version = (
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        logged_in_user_model.furthest_reached_checkpoint_state_name = (
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+        logged_in_user_model.update_timestamps()
+        logged_in_user_model.put()
+
+    elif logged_in_user_model.most_recently_reached_checkpoint_exp_version == logged_out_user_data.most_recently_reached_checkpoint_exp_version: # pylint: disable=line-too-long
+        current_exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            False,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        most_recently_reached_checkpoint_index_in_logged_in_progress = (
+            user_services.get_checkpoints_in_order(
+                current_exploration.init_state_name,
+                current_exploration.states
+            ).index(
+                exp_user_data.most_recently_reached_checkpoint_state_name
+            )
+        )
+
+        most_recently_reached_checkpoint_index_in_logged_out_progress = (
+            user_services.get_checkpoints_in_order(
+                current_exploration.init_state_name,
+                current_exploration.states
+            ).index(
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+            )
+        )
+
+        if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
+            logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
+            )
+            logged_in_user_model.most_recently_reached_checkpoint_state_name = (
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+            )
+            logged_in_user_model.furthest_reached_checkpoint_exp_version = (
+                logged_out_user_data.furthest_reached_checkpoint_exp_version
+            )
+            logged_in_user_model.furthest_reached_checkpoint_state_name = (
+                logged_out_user_data.furthest_reached_checkpoint_state_name
+            )
+            logged_in_user_model.update_timestamps()
+            logged_in_user_model.put()
+
+    elif (
+        logged_in_user_model.most_recently_reached_checkpoint_exp_version <
+        logged_out_user_data.most_recently_reached_checkpoint_exp_version
+    ):
+
+        most_recently_interacted_exploration = (
+            exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                True,
+                exp_user_data.most_recently_reached_checkpoint_exp_version
+            )
+        )
+        furthest_reached_exploration = (
+            exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                True,
+                exp_user_data.furthest_reached_checkpoint_exp_version
+            )
+        )
+
+        most_recently_reached_checkpoint_in_current_exploration = (
+            user_services.get_most_distant_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
+                user_services.get_checkpoints_in_order(
+                    latest_exploration.init_state_name,
+                    latest_exploration.states),
+                user_services.get_checkpoints_in_order(
+                    most_recently_interacted_exploration.init_state_name,
+                    most_recently_interacted_exploration.states),
+                exp_user_data.most_recently_reached_checkpoint_state_name
+            )
+        )
+
+        furthest_reached_checkpoint_in_current_exploration = (
+            user_services.get_most_distant_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
+                user_services.get_checkpoints_in_order(
+                    latest_exploration.init_state_name,
+                    latest_exploration.states),
+                user_services.get_checkpoints_in_order(
+                    furthest_reached_exploration.init_state_name,
+                    furthest_reached_exploration.states),
+                exp_user_data.furthest_reached_checkpoint_state_name
+            )
+        )
+
+        # If the most recently reached checkpoint doesn't exist in current
+        # exploration.
+        if (
+            most_recently_reached_checkpoint_in_current_exploration !=
+            exp_user_data.most_recently_reached_checkpoint_state_name
+        ):
+            exp_user_data.most_recently_reached_checkpoint_state_name = (
+                most_recently_reached_checkpoint_in_current_exploration)
+            exp_user_data.most_recently_reached_checkpoint_exp_version = (
+                latest_exploration.version)
+
+        # If the furthest reached checkpoint doesn't exist in current
+        # exploration.
+        if (
+            furthest_reached_checkpoint_in_current_exploration !=
+            exp_user_data.furthest_reached_checkpoint_state_name
+        ):
+            exp_user_data.furthest_reached_checkpoint_state_name = (
+                furthest_reached_checkpoint_in_current_exploration)
+            exp_user_data.furthest_reached_checkpoint_exp_version = (
+                latest_exploration.version)
+
+        most_recently_reached_checkpoint_index_in_logged_in_progress = (
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states
+            ).index(
+                exp_user_data.most_recently_reached_checkpoint_state_name
+                ))
+
+        most_recently_reached_checkpoint_index_in_logged_out_progress = (
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states
+            ).index(
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+                ))
+
+        if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
+            logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
+            )
+            logged_in_user_model.most_recently_reached_checkpoint_state_name = (
+                logged_out_user_data.most_recently_reached_checkpoint_state_name
+            )
+            logged_in_user_model.furthest_reached_checkpoint_exp_version = (
+                logged_out_user_data.furthest_reached_checkpoint_exp_version
+            )
+            logged_in_user_model.furthest_reached_checkpoint_state_name = (
+                logged_out_user_data.furthest_reached_checkpoint_state_name
+            )
+            logged_in_user_model.update_timestamps()
+            logged_in_user_model.put()
 
 
 def set_exploration_edits_allowed(exp_id, edits_are_allowed):
