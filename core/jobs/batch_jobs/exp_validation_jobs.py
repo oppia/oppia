@@ -215,7 +215,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     if (
                         text_with_value != 'Not found' and
-                        (text_with_value == '' or text_with_value is None)
+                        (
+                            text_with_value.strip() == '' or
+                            text_with_value is None
+                        )
                     ):
                         rte_components_errors.append(
                             f'State - {key} Skill review tag text '
@@ -306,7 +309,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     if (
                         text_with_value != 'Not found' and
-                        (text_with_value == '' or text_with_value is None)
+                        (
+                            text_with_value.strip() == '' or
+                            text_with_value is None
+                        )
                     ):
                         rte_components_errors.append(
                             f'State - {key} Link tag text '
