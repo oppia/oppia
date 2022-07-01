@@ -333,7 +333,10 @@ class PlatformParameterFilter:
         Raises:
             Exception. Given operator is not supported.
         """
-        if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
+        if (
+            self._type in ['server_mode', 'platform_type', 'browser_type']
+            and op != '='
+        ):
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.' % (
@@ -443,7 +446,16 @@ class PlatformParameterFilter:
 
         Returns:
             bool. True if the expression matches the version.
+
+        Raises:
+            Exception. Given operator is not supported.
         """
+        if (op not in ['=', '<', '<=', '>', '>=']):
+            raise Exception(
+                'Unsupported comparison operator \'%s\' for %s filter, '
+                'expected one of %s.' % (
+                    op, self._type, self.SUPPORTED_OP_FOR_FILTERS[self._type]))
+
         if client_version is None:
             return False
 
@@ -520,7 +532,16 @@ class PlatformParameterFilter:
         Returns:
             bool. True is the client_version matches the given flavor using
             the operator.
+
+        Raises:
+            Exception. Given operator is not supported.
         """
+        if (op not in ['=', '<', '<=', '>', '>=']):
+            raise Exception(
+                'Unsupported comparison operator \'%s\' for %s filter, '
+                'expected one of %s.' % (
+                    op, self._type, self.SUPPORTED_OP_FOR_FILTERS[self._type]))
+
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
         # Ruling out the possibility of None for mypy type checking.
         assert match is not None
