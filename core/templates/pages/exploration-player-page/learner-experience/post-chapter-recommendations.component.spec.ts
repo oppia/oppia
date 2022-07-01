@@ -54,13 +54,13 @@ describe('End chapter check mark component', function() {
 
   it('should get practice tab url', () => {
     spyOn(urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('practice_tab_url');
+      .and.returnValue('topic_page');
     spyOn(urlService, 'getUrlParams').and.returnValue({
       topic_url_fragment: 'topic_url_fragment',
       classroom_url_fragment: 'classroom_url_fragment'
     });
 
-    expect(component.getPracticeTabUrl()).toBe('practice_tab_url');
+    expect(component.getPracticeTabUrl()).toBe('topic_page/practice');
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
       '/learn/<classroom_url_fragment>/<topic_url_fragment>', {
         topic_url_fragment: 'topic_url_fragment',
