@@ -287,6 +287,10 @@
   margin-left: 20px;
   border-radius: 5px;
   height: 100%;
+  padding-left: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .save-progress-menu .uid-box .uid-copy .uid-copy-btn {

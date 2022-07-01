@@ -123,7 +123,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
                 this.storyId, TranslationKeyType.TITLE));
         });
     }
-
+    this.loggedOutProgressUniqueUrlId = (
+      this.explorationPlayerStateService.getUniqueProgressUrlId());
     // Rendering the separators in the progress bar requires
     // the number of separators.The purpose of separatorArray
     // is to provide the number of checkpoints in the template file.
@@ -171,10 +172,15 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  saveLoggedOutProgress(): void {
-    // this.explorationPlayerStateService.setUniqueProgressUrlId();
-    // this.loggedOutProgressUniqueUrlId = (
-    //   this.explorationPlayerStateService.getUniqueProgressUrlId());
+  async saveLoggedOutProgress(): Promise<void> {
+    if (!this.loggedOutProgressUniqueUrlId) {
+      this.explorationPlayerStateService
+        .setUniqueProgressUrlId()
+        .then(() => {
+          this.loggedOutProgressUniqueUrlId = (
+            this.explorationPlayerStateService.getUniqueProgressUrlId());
+        });
+    }
     this.saveProgressMenuIsShown = true;
   }
 

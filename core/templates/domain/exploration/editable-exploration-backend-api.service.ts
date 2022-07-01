@@ -141,8 +141,9 @@ export class EditableExplorationBackendApiService {
           mostRecentlyReachedCheckpointStateName
       }).toPromise();
     } else if (!isUserLoggedIn && uniqueProgressUrlId) {
-      requestUrl =
-        '/explorehandler/states_completed_by_logged_out_user/' + explorationId;
+      requestUrl = (
+        '/explorehandler/checkpoint_reached_by_logged_out_user/' +
+        explorationId);
       return this.httpClient.put<void>(requestUrl, {
         unique_progress_url_id: uniqueProgressUrlId,
         most_recently_reached_checkpoint_exp_version:
@@ -159,7 +160,7 @@ export class EditableExplorationBackendApiService {
       mostRecentlyReachedCheckpointStateName: string,
   ): Promise< {'unique_progress_url_id': string} > {
     const requestUrl =
-     '/explorehandler/states_completed_by_logged_out_user/' + explorationId;
+      '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId;
     return this.httpClient.post<{'unique_progress_url_id': string}>(
       requestUrl, {
         most_recently_reached_checkpoint_exp_version:
@@ -169,9 +170,12 @@ export class EditableExplorationBackendApiService {
       }).toPromise();
   }
 
-  async changeLoggedOutProgressToLoggedInProgress(uid: string): Promise<void> {
+  async changeLoggedOutProgressToLoggedInProgress(
+      explorationId: string,
+      uid: string
+  ): Promise<void> {
     const requestUrl =
-      '/sync_logged_out_learner_progress_with_logged_in_progress';
+      '/sync_logged_out_and_logged_in_progress/' + explorationId;
     return this.httpClient.post<void>(requestUrl, {
       unique_progress_url_id: uid
     }).toPromise();

@@ -207,13 +207,6 @@ export class ConversationSkinComponent {
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 
-    let uid = this.localStorageService.getUniqueProgressIdOfLoggedOutLearner();
-    if (uid) {
-      this.editableExplorationBackendApiService
-        .changeLoggedOutProgressToLoggedInProgress(uid);
-      this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
-    }
-
     if (this.collectionId) {
       this.readOnlyCollectionBackendApiService.loadCollectionAsync(
         this.collectionId).then((collection) => {
@@ -310,6 +303,14 @@ export class ConversationSkinComponent {
             this.learnerParamsService.getAllParams());
         }
       });
+
+      let uid = this.localStorageService
+        .getUniqueProgressIdOfLoggedOutLearner();
+      if (uid && this.isLoggedIn) {
+        this.editableExplorationBackendApiService
+          .changeLoggedOutProgressToLoggedInProgress(uid, this.explorationId);
+        this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+      }
 
       this.windowRef.nativeWindow.onresize = () => {
         this.adjustPageHeight(false, null);
@@ -926,7 +927,7 @@ export class ConversationSkinComponent {
     // We do not store checkpoints progress for iframes hence we do not
     // need to consider redirecting the user to the most recently
     // reached checkpoint on exploration initial load in that case.
-    if (!this.isIframed && this.isLoggedIn && !this._editorPreviewMode &&
+    if (!this.isIframed && !this._editorPreviewMode &&
       !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();

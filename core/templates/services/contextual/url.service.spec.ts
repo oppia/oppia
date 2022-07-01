@@ -357,14 +357,14 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve unique progress id from the url', () => {
-    mockLocation.search = '?uid=123456';
-    expect(urlService.getUidFromUrl()).toBe('123456');
+    mockLocation.search = '?pid=123456';
+    expect(urlService.getPidFromUrl()).toBe('123456');
 
-    mockLocation.search = '?someparam=otherval&uid=123456';
-    expect(urlService.getUidFromUrl()).toBe('123456');
+    mockLocation.search = '?someparam=otherval&pid=123456';
+    expect(urlService.getPidFromUrl()).toBe('123456');
 
     mockLocation.search = '?another=1';
-    expect(urlService.getUidFromUrl()).toBe(null);
+    expect(urlService.getPidFromUrl()).toBe(null);
   });
 
   it('should correctly retrieve username from url', () => {

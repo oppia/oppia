@@ -26,6 +26,7 @@ import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFact
 import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 
 export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
@@ -67,14 +68,15 @@ export class ReadOnlyExplorationBackendApiService {
 
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService) {}
 
   private async _fetchExplorationAsync(
-      explorationId: string, version: number | null, uid: string | null = null
+      explorationId: string, version: number | null, pid: string | null = null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       const explorationDataUrl = this._getExplorationUrl(
-        explorationId, version, uid);
+        explorationId, version, pid);
 
       this.http.get<FetchExplorationBackendResponse>(
         explorationDataUrl).toPromise().then(response => {
@@ -90,7 +92,7 @@ export class ReadOnlyExplorationBackendApiService {
   }
 
   private _getExplorationUrl(
-      explorationId: string, version: number | null, uid: string | null = null):
+      explorationId: string, version: number | null, pid: string | null = null):
      string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
@@ -98,11 +100,11 @@ export class ReadOnlyExplorationBackendApiService {
           exploration_id: explorationId,
           version: String(version)
         });
-    } else if (uid) {
+    } else if (pid) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_PROGRESS_UID_URL_TEMPLATE, {
           exploration_id: explorationId,
-          uid: uid
+          pid: pid
         });
     }
     return this.urlInterpolationService.interpolateUrl(
@@ -123,9 +125,9 @@ export class ReadOnlyExplorationBackendApiService {
    * passed any data returned by the backend in the case of an error.
    */
   async fetchExplorationAsync(
-      explorationId: string, version: number | null, uid: string | null = null):
+      explorationId: string, version: number | null, pid: string | null = null):
      Promise<FetchExplorationBackendResponse> {
-    return this._fetchExplorationAsync(explorationId, version, uid);
+    return this._fetchExplorationAsync(explorationId, version, pid);
   }
 
   /**
@@ -146,13 +148,15 @@ export class ReadOnlyExplorationBackendApiService {
           resolve(this._explorationCache[explorationId]);
         }
       } else {
-        this._fetchExplorationAsync(explorationId, null).then(exploration => {
+        this._fetchExplorationAsync(
+          explorationId, null, this.urlService.getPidFromUrl())
+          .then(exploration => {
           // Save the fetched exploration to avoid future fetches.
-          this._explorationCache[explorationId] = exploration;
-          if (resolve) {
-            resolve(exploration);
-          }
-        }, reject);
+            this._explorationCache[explorationId] = exploration;
+            if (resolve) {
+              resolve(exploration);
+            }
+          }, reject);
       }
     });
   }

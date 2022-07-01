@@ -273,8 +273,10 @@ export class ExplorationFooterComponent {
 
   learnerHasViewedLessonInfo(): void {
     this.learnerHasViewedLessonInfoTooltip = true;
-    this.editableExplorationBackendApiService
-      .recordLearnerHasViewedLessonInfoModalOnce();
+    if (this.userIsLoggedIn) {
+      this.editableExplorationBackendApiService
+        .recordLearnerHasViewedLessonInfoModalOnce();
+    }
   }
 
   hasLearnerHasViewedLessonInfoTooltip(): boolean {

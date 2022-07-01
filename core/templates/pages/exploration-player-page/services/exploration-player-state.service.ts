@@ -361,8 +361,8 @@ export class ExplorationPlayerStateService {
     return this.isLoggedOutProgressTracked;
   }
 
-  setUniqueProgressUrlId(): void {
-    this.editableExplorationBackendApiService.
+  async setUniqueProgressUrlId(): Promise<void> {
+    await this.editableExplorationBackendApiService.
       recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
         this.explorationId,
         this.version,

@@ -405,11 +405,11 @@ export class UrlService {
     return null;
   }
 
-  getUidFromUrl(): string | null {
+  getPidFromUrl(): string | null {
     let urlParams: UrlParamsType = this.getUrlParams();
-    if (urlParams.hasOwnProperty('uid')) {
-      let uid = urlParams.uid;
-      return String(uid);
+    if (urlParams.hasOwnProperty('pid')) {
+      let pid = urlParams.pid;
+      return String(pid);
     }
     return null;
   }

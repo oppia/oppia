@@ -88,7 +88,7 @@ export class LearnerViewInfoComponent {
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       this.explorationId,
       this.urlService.getExplorationVersionFromUrl(),
-      this.urlService.getUidFromUrl())
+      this.urlService.getPidFromUrl())
       .then((response) => {
         this.explorationTitle = response.exploration.title;
       });

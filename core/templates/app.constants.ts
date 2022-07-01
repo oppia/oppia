@@ -51,7 +51,7 @@ export const AppConstants = {
   EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?v=<version>'),
   EXPLORATION_PROGRESS_UID_URL_TEMPLATE: (
-    '/explorehandler/init/<exploration_id>?uid=<uid>'),
+    '/explorehandler/init/<exploration_id>?pid=<pid>'),
 
   WARNING_TYPES: {
     // These must be fixed before the exploration can be saved.
