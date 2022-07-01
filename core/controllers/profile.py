@@ -32,7 +32,6 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import takeout_service
-from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 
@@ -185,6 +184,8 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_site_language_code),
             'preferred_audio_language_code': (
                 user_settings.preferred_audio_language_code),
+            'preferred_translation_language_code': (
+                user_settings.preferred_translation_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
@@ -223,6 +224,9 @@ class PreferencesHandler(base.BaseHandler):
                 self.user_id, data)
         elif update_type == 'preferred_audio_language_code':
             user_services.update_preferred_audio_language_code(
+                self.user_id, data)
+        elif update_type == 'preferred_translation_language_code':
+            user_services.update_preferred_translation_language_code(
                 self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
@@ -519,14 +523,24 @@ class UsernameCheckHandler(base.BaseHandler):
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
-        username = self.payload.get('username')
-        try:
-            user_domain.UserSettings.require_valid_username(username)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        username = self.normalized_payload.get('username')
 
         username_is_taken = user_services.is_username_taken(username)
         self.render_json({

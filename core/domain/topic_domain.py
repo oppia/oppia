@@ -116,7 +116,7 @@ class TopicChange(change_domain.BaseChange):
 
     # The allowed list of topic properties which can be used in
     # update_topic_property command.
-    TOPIC_PROPERTIES = (
+    TOPIC_PROPERTIES: List[str] = [
         TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_ABBREVIATED_NAME,
         TOPIC_PROPERTY_DESCRIPTION,
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
@@ -127,127 +127,166 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_URL_FRAGMENT,
         TOPIC_PROPERTY_META_TAG_CONTENT,
         TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
-        TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB)
+        TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB
+    ]
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
-    SUBTOPIC_PROPERTIES = (
+    SUBTOPIC_PROPERTIES: List[str] = [
         SUBTOPIC_PROPERTY_TITLE,
         SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
         SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-        SUBTOPIC_PROPERTY_URL_FRAGMENT)
+        SUBTOPIC_PROPERTY_URL_FRAGMENT
+    ]
 
     # The allowed list of subtopic page properties which can be used in
     # update_subtopic_page_property command.
-    SUBTOPIC_PAGE_PROPERTIES = (
+    SUBTOPIC_PAGE_PROPERTIES: List[str] = (
         subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['name'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_SUBTOPIC,
-        'required_attribute_names': ['title', 'subtopic_id'],
+        'required_attribute_names': ['title', 'subtopic_id', 'url_fragment'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_DELETE_SUBTOPIC,
         'required_attribute_names': ['subtopic_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_REARRANGE_CANONICAL_STORY,
         'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_ADDITIONAL_STORY,
         'required_attribute_names': ['story_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_DELETE_ADDITIONAL_STORY,
         'required_attribute_names': ['story_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_PUBLISH_STORY,
         'required_attribute_names': ['story_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_UNPUBLISH_STORY,
         'required_attribute_names': ['story_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['new_uncategorized_skill_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['uncategorized_skill_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
         'required_attribute_names': [
             'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_REARRANGE_SUBTOPIC,
         'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'skill_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
         'required_attribute_names': [
             'subtopic_id', 'property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': SUBTOPIC_PROPERTIES}
+        'allowed_values': {'property_name': SUBTOPIC_PROPERTIES},
+        'deprecated_values': {}
     }, {
         'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'new_value', 'old_value', 'subtopic_id'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES}
+        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
+        'deprecated_values': {}
     }, {
         'name': CMD_UPDATE_TOPIC_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': TOPIC_PROPERTIES}
+        'allowed_values': {'property_name': TOPIC_PROPERTIES},
+        'deprecated_values': {}
     }, {
         'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
 
 
@@ -423,18 +462,24 @@ class Subtopic:
         return subtopic
 
     @classmethod
-    def create_default_subtopic(cls, subtopic_id: int, title: str) -> Subtopic:
+    def create_default_subtopic(
+        cls,
+        subtopic_id: int,
+        title: str,
+        url_frag: str
+    ) -> Subtopic:
         """Creates a Subtopic object with default values.
 
         Args:
             subtopic_id: int. ID of the new subtopic.
             title: str. The title for the new subtopic.
+            url_frag: str. The url fragment for the new subtopic.
 
         Returns:
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None, None, '')
+        return cls(subtopic_id, title, [], None, None, None, url_frag)
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename: str) -> None:
@@ -491,6 +536,24 @@ class Subtopic:
             raise utils.ValidationError(
                 'Expected subtopic title to be less than %d characters, '
                 'received %s' % (title_limit, self.title))
+
+        url_fragment_limit = (
+            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+        regex = android_validation_constants.SUBTOPIC_URL_FRAGMENT_REGEXP
+        if len(self.url_fragment) > url_fragment_limit:
+            raise utils.ValidationError(
+                'Expected subtopic url fragment to be less '
+                'than or equal to %d characters, received %s'
+                % (url_fragment_limit, self.url_fragment))
+
+        if len(self.url_fragment) > 0:
+            if not bool(re.match(regex, self.url_fragment)):
+                raise utils.ValidationError(
+                    'Invalid url fragment: %s' % self.url_fragment)
+        else:
+            raise utils.ValidationError(
+                'Expected subtopic url fragment to be non '
+                'empty')
 
         if len(self.skill_ids) > len(set(self.skill_ids)):
             raise utils.ValidationError(
@@ -1493,12 +1556,18 @@ class Topic:
         raise Exception(
             'The subtopic with id %s does not exist.' % subtopic_id)
 
-    def add_subtopic(self, new_subtopic_id: int, title: str) -> None:
+    def add_subtopic(
+        self,
+        new_subtopic_id: int,
+        title: str,
+        url_frag: str
+    ) -> None:
         """Adds a subtopic with the given id and title.
 
         Args:
             new_subtopic_id: int. The id of the new subtopic.
             title: str. The title for the new subtopic.
+            url_frag: str. The url fragment of the new subtopic.
 
         Raises:
             Exception. The new subtopic ID is not equal to the expected next
@@ -1511,7 +1580,7 @@ class Topic:
                 % (new_subtopic_id, self.next_subtopic_id))
         self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
-            Subtopic.create_default_subtopic(new_subtopic_id, title))
+            Subtopic.create_default_subtopic(new_subtopic_id, title, url_frag))
 
     def delete_subtopic(self, subtopic_id: int) -> None:
         """Deletes the subtopic with the given id and adds all its skills to

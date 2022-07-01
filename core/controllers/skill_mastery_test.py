@@ -438,7 +438,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 1',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'subtopic-one'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
@@ -459,7 +460,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 2',
-            'subtopic_id': 2
+            'subtopic_id': 2,
+            'url_fragment': 'subtopic-two'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
@@ -480,7 +482,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 1',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'subtopic-one'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
@@ -501,7 +504,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 2',
-            'subtopic_id': 2
+            'subtopic_id': 2,
+            'url_fragment': 'subtopic-two'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
