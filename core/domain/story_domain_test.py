@@ -795,6 +795,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(calculated_list[1].id, expected_list[1].id)
         self.assertEqual(calculated_list[2].id, expected_list[2].id)
 
+    def test_get_ordered_nodes_when_initial_node_does_not_exist(self) -> None:
+        self.story.story_contents.next_node_id = 'node_4'
+        self.story.story_contents.initial_node_id = 'node_6'
+        self.assertEqual(self.story.story_contents.get_ordered_nodes(), [])
+
     def test_get_all_linked_exp_ids(self) -> None:
         self.story.story_contents.next_node_id = 'node_4'
         node_1: story_domain.StoryNodeDict = {

@@ -666,7 +666,7 @@ class StoryContents:
         """
         # Ruling out the possibility of None for mypy type checking.
         assert self.initial_node_id is not None
-        initial_index = self.get_node_index(self.initial_node_id)
+        initial_index = self.get_node_index(self.initial_node_id, strict=False)
         # TODO(#15639): Not sure if this condition is a correct solution.
         if initial_index is None:
             return []
