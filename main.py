@@ -938,7 +938,10 @@ URLS = [
         learner_group.SearchLearnerGroupSyllabusHandler),
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
-        learner_group.LearnerGroupStudentProgressHandler)
+        learner_group.LearnerGroupStudentProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.TEACHER_DASHBOARD_PAGE_URL,
+        learner_group.TeacherDashboardPage)
 ]
 
 # Adding redirects for topic landing pages.

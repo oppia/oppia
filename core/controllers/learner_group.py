@@ -489,3 +489,17 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'story_ids': learner_group.story_ids
         })
+
+
+class TeacherDashboardPage(base.BaseHandler):
+    """Page showing the teacher dashboard."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self):
+        """Handles GET requests."""
+        self.render_template('teacher-dashboard-page.mainpage.html')

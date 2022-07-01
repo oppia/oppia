@@ -1047,6 +1047,7 @@ USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 TEACHER_DASHBOARD_HANDLER = '/teacher_dashboard_handler'
+TEACHER_DASHBOARD_PAGE_URL = '/teacher-dashboard'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

@@ -31,6 +31,7 @@ export const ServicesConstants = {
     TOPICS_AND_SKILLS_DASHBOARD: 'topics_and_skills_dashboard',
     CONTRIBUTOR_DASHBOARD: 'contributor_dashboard',
     BLOG_DASHBOARD: 'blog_dashboard',
+    TEACHER_DASHBOARD: 'learner_group',
     OTHER: 'other'
   },
 

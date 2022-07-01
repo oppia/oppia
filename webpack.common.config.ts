@@ -96,6 +96,9 @@ module.exports = {
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
+    teacher_dashboard:
+      commonPrefix + '/pages/teacher-dashboard-page/' +
+      'teacher-dashboard-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
@@ -471,6 +474,17 @@ module.exports = {
       template:
         commonPrefix + '/pages/topic-viewer-page/' +
         'topic-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['teacher_dashboard'],
+      filename: 'teacher-dashboard-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/teacher-dashboard-page/' +
+        'teacher-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
