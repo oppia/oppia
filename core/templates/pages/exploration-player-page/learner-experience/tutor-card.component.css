@@ -142,11 +142,17 @@
   padding: 8px 20px 25px;
   position: relative;
   word-break: break-word;
+  white-space: normal;
 }
 
 .conversation-skin-inline-interaction .conversation-skin-user-avatar {
   left: -20px;
   top: 14px;
+}
+
+.mat-checkbox p {
+  word-wrap:break-word;
+  white-space: normal;
 }
 
 .oppia-conversation-skin-inline-interaction {
