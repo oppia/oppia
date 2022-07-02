@@ -329,7 +329,7 @@ describe('Question Editor Modal Component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.resolve()
     } as NgbModalRef);
-    spyOn(questionValidationService, 'isQuestionValid').and.returnValue(true)
+    spyOn(questionValidationService, 'isQuestionValid').and.returnValue(true);
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
 
     expect(component.isSaveAndCommitButtonDisabled()).toBe(true);
