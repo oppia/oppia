@@ -205,6 +205,7 @@
   font-weight: 400;
   font-size: 24px;
   margin: 40px auto 20px 18px;
+  text-align: left;
 }
 
 .save-progress-menu .sign-in-box {
@@ -288,7 +289,7 @@
   margin-left: 20px;
   border-radius: 5px;
   height: 100%;
-  padding-left: 5px;
+  padding: 5px;
   display: flex;
   flex-direction: row;
   align-items: center;

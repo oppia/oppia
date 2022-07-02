@@ -135,11 +135,27 @@
   top: 0;
 }
 
+.oppia-lesson-info-card .oppia-lesson-info-card-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
 .oppia-lesson-info-card .restart-lesson-btn {
   background-color: #00645c;
   color: white;
   cursor: pointer;
   margin-top: 20px;
+  cursor: pointer;
+}
+
+.oppia-lesson-info-card .save-progress-btn {
+  background-color: #00645c;
+  color: white;
+  cursor: pointer;
+  margin-top: 20px;
+  cursor: pointer;
 }
 
 .oppia-lesson-info-card .lesson-progress-bar {
@@ -169,4 +185,140 @@
   position: absolute;
   width: 100%;
   z-index: 0;
+}
+
+.save-progress-menu {
+  height: 700px;
+  position: fixed;
+  top: 8vh;
+  right: 50%;
+  background-color: white;
+  transform: translateX(50%);
+  width: 100%;
+  max-width: 600px;
+  animation: slideUp 0.8s;
+  border-radius: 10px
+}
+
+.save-progress-menu h3 {
+  font-family: capriola;
+  font-weight: 400;
+  font-size: 24px;
+  margin: 40px 18px 20px auto;
+  text-align: right;
+}
+
+.save-progress-menu .sign-in-box {
+  height: 40%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-progress-menu .sign-in-box p {
+  margin: 10px 20px;
+}
+
+.save-progress-menu .sign-in-box .sign-in-text a{
+  color: #00645c;
+  text-decoration: underline;
+}
+
+.save-progress-menu .sign-in-box .create-account-btn {
+  background-color: #00645c;
+  color: white;
+  cursor: pointer;
+  height: 38px;
+  width: 169px;
+  font-family: Capriola;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.save-progress-menu .separator {
+  height: 10%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.save-progress-menu .separator .bars{
+  height: 2px;
+  width: 30%;
+  background-color: #B7B7B7;
+  padding: auto;
+}
+
+.save-progress-menu .uid-box {
+  height: 40%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.save-progress-menu .uid-box .guide-text{
+  width: 100%;
+  text-align: center;
+}
+
+.save-progress-menu .uid-box .copy-text{
+  width: 100%;
+  padding-right: 20px;
+  font-size: 14px;
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.save-progress-menu .uid-box .uid-copy {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.save-progress-menu .uid-box .uid-copy #unique-progress-id {
+  width: 70%;
+  border: 1px solid black;
+  margin-right: 20px;
+  border-radius: 5px;
+  height: 100%;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.save-progress-menu .uid-box .uid-copy .uid-copy-btn {
+  margin: 0 auto;
+  width: 20%;
+  box-shadow: -1px 1px 2px 0px rgb(0 54 50 / 50%);
+  font-family: Roboto;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.save-progress-menu .save-progress-close-button {
+  outline: none;
+  position: absolute;
+  padding: 0;
+  left: 10px;
+  top: 10px;
+  background: transparent;
+  border: none;
+}
+
+@keyframes slideUp {
+  0% {
+    -webkit-transform: translate(50%, 90vh);
+  }
+  100% {
+    -webkit-transform: translate(50%, 0);
+  }
 }
