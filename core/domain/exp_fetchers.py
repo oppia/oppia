@@ -578,7 +578,9 @@ def get_exploration_user_data(
     )
 
 
-def get_logged_out_user_progress(unique_progress_url_id: str):
+def get_logged_out_user_progress(
+    unique_progress_url_id: str
+) -> Optional[exp_domain.TransientCheckpointUrl]:
     """Returns an TransientCheckpointUrl domain object.
 
     Args:
@@ -597,7 +599,7 @@ def get_logged_out_user_progress(unique_progress_url_id: str):
     if logged_out_user_progress_model is None:
         return None
 
-    return exp_domain.TransientCheckpointUrl(
+    return exp_domain.TransientCheckpointUrl(  # type: ignore[no-untyped-call]
         logged_out_user_progress_model.exploration_id,
         logged_out_user_progress_model.furthest_reached_checkpoint_state_name,
         logged_out_user_progress_model.furthest_reached_checkpoint_exp_version,

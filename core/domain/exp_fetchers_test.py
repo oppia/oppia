@@ -332,14 +332,14 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
     UNIQUE_PROGRESS_URL_ID = 'pid123'
     EXP_1_ID = 'exploration_1_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(LoggedOutUserProgressTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.exploration_1 = self.save_new_default_exploration(
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
             self.EXP_1_ID, self.owner_id, title='Aa')
 
-    def test_get_logged_out_user_progress(self):
+    def test_get_logged_out_user_progress(self) -> None:
 
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID)
@@ -358,7 +358,8 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
         }
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID)
-        self.assertIsNotNone(logged_out_user_data)
+        # Ruling out the possibility of None for mypy type checking.
+        assert logged_out_user_data is not None
         self.assertEqual(
             expected_progress_dict['exploration_id'],
             logged_out_user_data.exploration_id)
