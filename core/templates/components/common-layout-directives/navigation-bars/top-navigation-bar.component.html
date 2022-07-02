@@ -4,7 +4,7 @@
 <div class="navbar-header e2e-test-navbar-header oppia-top-navigation-bar">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar($event)"
-     class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button ml-0"
+     class="navbar-brand oppia-navbar-menu oppia-transition-200 e2e-mobile-test-navbar-button ml-0"
      tabindex="0">
     <i class="fas fa-bars oppia-navbar-menu-icon"
        *ngIf="!isSidebarShown()"
@@ -491,7 +491,7 @@
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
+                class="btn dropdown-toggle oppia-navbar-button e2e-mobile-test-login"
                 (click)="onLoginButtonClicked()">
           <span [innerHTML]="'I18N_TOPNAV_SIGN_IN' | translate"></span>
         </button>
