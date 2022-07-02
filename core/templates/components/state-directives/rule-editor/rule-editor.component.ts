@@ -26,30 +26,37 @@ import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/ser
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import DEFAULT_OBJECT_VALUES from 'objects/object_defaults.json';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 interface SelectItem {
   type: string;
   varName: string;
 }
+
+interface Choice {
+  id: string;
+  val: string | number | SubtitledHtml;
+}
+
 @Component({
   selector: 'oppia-rule-editor',
   templateUrl: './rule-editor.component.html'
 })
 export class RuleEditorComponent implements OnInit {
-  @Input() isEditable;
-  @Input() isEditingRuleInline;
+  @Input() isEditable: boolean;
+  @Input() isEditingRuleInline: boolean;
   @Output() onCancelRuleEdit = new EventEmitter<void>();
   @Output() onSaveRule = new EventEmitter<void>();
-  @Input() rule;
-  @Input() modalId;
+  @Input() rule: Rule;
+  @Input() modalId: unknown;
 
-  ruleDescriptionFragments;
-  currentInteractionId;
-  ruleDescriptionChoices;
-  isInvalid;
-  eventBusGroup;
-  editRuleForm;
-  ruleEditForm;
+  ruleDescriptionFragments: unknown[];
+  currentInteractionId: string;
+  ruleDescriptionChoices: Choice[];
+  isInvalid: boolean;
+  eventBusGroup: EventBusGroup;
+  editRuleForm: object;
 
   constructor(
      private eventBusService: EventBusService,
@@ -152,7 +159,7 @@ export class RuleEditorComponent implements OnInit {
             this.ruleDescriptionChoices = answerChoices.map(
               function(choice) {
                 return {
-                  id: choice.val,
+                  id: choice.val as string,
                   val: choice.label
                 };
               }

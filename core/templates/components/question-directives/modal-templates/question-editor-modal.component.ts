@@ -15,7 +15,8 @@
 /**
  * @fileoverview Component for question editor modal.
  */
-import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+
+import { CategorizedSkills, SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitModalComponent } from './confirm-question-exit-modal.component';
 import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
@@ -29,34 +30,40 @@ import { AlertsService } from 'services/alerts.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { QuestionValidationService } from 'services/question-validation.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { Rubric } from 'domain/skill/rubric.model';
+import { State } from 'howler';
+import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 
 interface SkillLinkageModificationsArray {
   id: string;
   task: string;
 }
+
 interface ReturnModalObject {
   skillLinkageModificationsArray: SkillLinkageModificationsArray[];
   commitMessage: string;
 }
+
 @Component({
   selector: 'question-editor-modal',
   templateUrl: './question-editor-modal.component.html'
 })
-
 export class QuestionEditorModalComponent
   extends ConfirmOrCancelModal {
-  @Input() question;
-  @Input() questionId;
-  @Input() questionStateData;
-  @Input() rubric;
-  @Input() skillName;
-  @Input() associatedSkillSummaries;
-  @Input() untriagedSkillSummaries;
-  @Input() canEditQuestion;
-  @Input() categorizedSkills;
-  @Input() groupedSkillSummaries;
-  @Input() misconceptionsBySkill;
-  @Input() newQuestionIsBeingCreated;
+  @Input() question: Question;
+  @Input() questionId: string | null;
+  @Input() questionStateData: State;
+  @Input() rubric: Rubric[];
+  @Input() skillName: string[];
+  @Input() associatedSkillSummaries: ShortSkillSummary[];
+  @Input() untriagedSkillSummaries: ShortSkillSummary[];
+  @Input() canEditQuestion: boolean;
+  @Input() categorizedSkills: CategorizedSkills[];
+  @Input() groupedSkillSummaries: GroupedSkillSummaries;
+  @Input() misconceptionsBySkill: MisconceptionSkillMap;
+  @Input() newQuestionIsBeingCreated: boolean;
 
   returnModalObject: ReturnModalObject = {
     skillLinkageModificationsArray: [],

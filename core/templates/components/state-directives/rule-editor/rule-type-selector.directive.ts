@@ -22,6 +22,11 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
+interface Choice {
+  id: unknown;
+  text: string;
+}
+
 @Component({
   selector: 'oppia-rule-type-selector',
   templateUrl: './rule-type-selector.component.html'
@@ -29,7 +34,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 export class RuleTypeSelector implements OnInit {
   @Input() localValue;
   @Output() onSelectionChange = new EventEmitter();
-  choices = [];
+  choices: Choice[] = [];
 
   constructor(
     private stateInteractionIdService: StateInteractionIdService,

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for rule editor.
  */
 
-import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { RuleEditorComponent } from './rule-editor.component';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
@@ -25,6 +25,7 @@ import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/servi
 import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 @Pipe({ name: 'truncate' })
 class MockTruncatePipe {
@@ -92,7 +93,7 @@ describe('Rule Editor Component', () => {
   it('should set component properties on initialization', () => {
     component.rule = {
       type: null
-    };
+    } as unknown as Rule;
     stateInteractionIdService.savedMemento = 'TextInput';
 
     expect(component.currentInteractionId).toBe(undefined);
@@ -105,11 +106,11 @@ describe('Rule Editor Component', () => {
   });
 
   it('should set change validity on form valid' +
-    ' change event', () => {
+    ' change event', fakeAsync(() => {
     const eventBusGroup = new EventBusGroup(eventBusService);
     component.rule = {
       type: null
-    };
+    } as unknown as Rule;
 
     expect(component.isInvalid).toBe(undefined);
 
@@ -120,12 +121,13 @@ describe('Rule Editor Component', () => {
 
     component.modalId = Symbol();
     eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-      value: true, modalId: component.modalId
+      value: true, modalId: component.modalId as unknown as symbol
     }));
+    tick();
     component.ngAfterViewChecked();
 
     expect(component.isInvalid).toBe(true);
-  });
+  }));
 
   it('should change rule type when user selects' +
     ' new rule type and answer choice is present', fakeAsync(() => {
@@ -154,7 +156,7 @@ describe('Rule Editor Component', () => {
           normalizedStrSet: []
         }
       }
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'TextInput';
 
     component.onSelectNewRuleType('StartsWith');
@@ -168,7 +170,7 @@ describe('Rule Editor Component', () => {
       inputs: {
         x: { contentId: null, normalizedStrSet: [] }
       }
-    });
+    } as unknown as Rule);
   }));
 
   it('should change rule type when user selects' +
@@ -184,7 +186,7 @@ describe('Rule Editor Component', () => {
           normalizedStrSet: []
         }
       }
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'TextInput';
 
     component.onSelectNewRuleType('StartsWith');
@@ -214,7 +216,7 @@ describe('Rule Editor Component', () => {
           normalizedStrSet: []
         }
       }
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'AlgebraicExpressionInput';
 
     component.onSelectNewRuleType('MatchesExactlyWith');
@@ -238,7 +240,7 @@ describe('Rule Editor Component', () => {
     };
     component.rule = {
       inputs: {varName: 2}
-    };
+    } as unknown as Rule;
 
     spyOn(component.onCancelRuleEdit, 'emit');
 
@@ -251,7 +253,7 @@ describe('Rule Editor Component', () => {
   it('should save rule when user clicks save button', () => {
     component.rule = {
       type: null
-    };
+    } as unknown as Rule;
     spyOn(component.onSaveRule, 'emit').and.stub();
     spyOn(populateRuleContentIdsService, 'populateNullRuleContentIds')
       .and.stub();
@@ -275,7 +277,7 @@ describe('Rule Editor Component', () => {
     );
     component.rule = {
       type: 'Equals'
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'ItemSelectionInput';
 
     component.onSelectNewRuleType('Equals');
@@ -305,7 +307,7 @@ describe('Rule Editor Component', () => {
     );
     component.rule = {
       type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'DragAndDropSortInput';
 
     component.onSelectNewRuleType(
@@ -336,7 +338,7 @@ describe('Rule Editor Component', () => {
     );
     component.rule = {
       type: 'IsEqualToOrdering'
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'DragAndDropSortInput';
     component.onSelectNewRuleType('IsEqualToOrdering');
     flush();
@@ -365,7 +367,7 @@ describe('Rule Editor Component', () => {
     );
     component.rule = {
       type: 'HasElementXAtPositionY'
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'DragAndDropSortInput';
 
     component.onSelectNewRuleType('HasElementXAtPositionY');
@@ -379,7 +381,7 @@ describe('Rule Editor Component', () => {
     spyOn(responsesService, 'getAnswerChoices').and.returnValue([]);
     component.rule = {
       type: 'MatchesExactlyWith'
-    };
+    } as unknown as Rule;
     component.currentInteractionId = 'AlgebraicExpressionInput';
 
     component.onSelectNewRuleType('MatchesExactlyWith');
