@@ -413,10 +413,10 @@ import { ParameterMetadataService } from 'pages/exploration-editor-page/services
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
 import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
-import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
-import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 
 export const angularServices: [string, Type<{}>][] = [
@@ -866,5 +866,5 @@ export const angularServices: [string, Type<{}>][] = [
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
   ['NumberConversionService', NumberConversionService],
   ['ParameterMetadataService', ParameterMetadataService],
-  ['ExplorationWarningsService', ExplorationWarningsService],
+  ['ExplorationWarningsService', ExplorationWarningsService]
 ];

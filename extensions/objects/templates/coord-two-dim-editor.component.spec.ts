@@ -41,7 +41,11 @@ describe('CoordTwoDimEditorComponent', () => {
 
   it('should create', () => {
     expect(component).toBeDefined();
+
+    component.value = undefined;
     component.ngOnInit();
+
+    expect(component.value).toEqual([0, 0]);
   });
 
   it('should initialise component when world map interaction is edited', () => {
