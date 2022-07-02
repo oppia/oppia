@@ -180,19 +180,15 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         draft_change_list_v50_dict_list = [
             change.to_dict() for change in draft_change_list_v50
         ]
-        print('\n\n\n\n')
-        print(draft_change_list_v50)
-        print('\n\n\n\n')
+
         migrated_draft_change_list_v51_dict_list = [
             change.to_dict() for change in migrated_draft_change_list_v51
         ]
-        print('\n\n\n\n')
-        print(migrated_draft_change_list_v51)
-        print('\n\n\n\n')
+
         self.assertEqual(
             draft_change_list_v50_dict_list,
             migrated_draft_change_list_v51_dict_list)
-    
+
     def test_convert_states_v49_dict_to_v50_dict(self):
         draft_change_list_v49 = [
             exp_domain.ExplorationChange({
