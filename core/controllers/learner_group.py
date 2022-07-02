@@ -503,3 +503,17 @@ class TeacherDashboardPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template('teacher-dashboard-page.mainpage.html')
+
+
+class CreateLearnerGroupPage(base.BaseHandler):
+    """Page for creating a new learner group."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self):
+        """Handles GET requests."""
+        self.render_template('create-learner-group-page.mainpage.html')

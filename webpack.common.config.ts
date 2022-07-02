@@ -99,6 +99,9 @@ module.exports = {
     teacher_dashboard:
       commonPrefix + '/pages/teacher-dashboard-page/' +
       'teacher-dashboard-page.import.ts',
+    learner_group_creator:
+      commonPrefix + '/pages/learner-group/' +
+      'create-learner-group-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
@@ -485,6 +488,17 @@ module.exports = {
       template:
         commonPrefix + '/pages/teacher-dashboard-page/' +
         'teacher-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['learner_group_creator'],
+      filename: 'create-learner-group-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/learner-group/' +
+        'create-learner-group-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
