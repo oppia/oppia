@@ -23,7 +23,7 @@ from core import utils
 from core.domain import image_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -183,7 +183,7 @@ class GcsFileSystem(GeneralFileSystem):
     def commit(
         self,
         filepath: str,
-        raw_bytes: Union[bytes, str],
+        raw_bytes: bytes,
         mimetype: Optional[str] = None
     ) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
@@ -191,7 +191,7 @@ class GcsFileSystem(GeneralFileSystem):
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            raw_bytes: Union[bytes, str]. The content to be stored in the file.
+            raw_bytes: bytes. The content to be stored in the file.
             mimetype: Optional[str]. The content-type of the cloud file.
         """
         # Note that textual data needs to be converted to bytes so that it can
@@ -199,8 +199,6 @@ class GcsFileSystem(GeneralFileSystem):
         # required for binary data (i.e. when mimetype is set to
         # 'application/octet-stream').
 
-        if isinstance(raw_bytes, str):
-            raw_bytes = raw_bytes.encode('utf-8')
         self._check_filepath(filepath)
         storage_services.commit(
             self._bucket_name,
