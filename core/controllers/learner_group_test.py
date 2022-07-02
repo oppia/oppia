@@ -529,15 +529,13 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
         self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'sub-one-frag')
         self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2')
+            2, 'Subtopic Title 2', 'sub-two-frag')
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
         self.subtopic_1.skill_ids = [self.SKILL_ID_1]
-        self.subtopic_1.url_fragment = 'sub-one-frag'
         self.subtopic_2.skill_ids = [self.SKILL_ID_2]
-        self.subtopic_2.url_fragment = 'sub-two-frag'
         self.save_new_topic(
             self.TOPIC_ID_1, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[story.id],
