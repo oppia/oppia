@@ -508,6 +508,11 @@ describe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
   }));
 
   it('should create', () => {
@@ -828,7 +833,7 @@ describe('Conversation skin component', () => {
       .and.returnValue(Promise.resolve(sampleExpResponse));
     spyOn(
       editableExplorationBackendApiService,
-      'changeLoggedOutProgressToLoggedInProgress');
+      'changeLoggedOutProgressToLoggedInProgressAsync');
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
@@ -855,7 +860,7 @@ describe('Conversation skin component', () => {
     componentInstance.ngOnInit();
     expect(
       editableExplorationBackendApiService
-        .changeLoggedOutProgressToLoggedInProgress).toHaveBeenCalled();
+        .changeLoggedOutProgressToLoggedInProgressAsync).toHaveBeenCalled();
   }));
 
   it('should show alert when collection summaries are not loaded',
