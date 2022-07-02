@@ -48,13 +48,22 @@
                  [style.width.%]="0">
             </div>
           </div>
-          <button type="button"
+          <div class="oppia-lesson-info-card-buttons">
+            <button type="button"
                   class="btn btn-secondary restart-lesson-btn"
                   *ngIf="userIsLoggedIn"
                   [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
                   (click)="restartExploration()">
-            {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
-          </button>
+              {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+            </button>
+            <button type="button"
+                  class="btn btn-secondary save-progress-btn"
+                  *ngIf="!userIsLoggedIn"
+                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                  (click)="saveLoggedOutProgress()">
+              Save Progress
+            </button>
+          </div>
         </div>
         <div class="oppia-lesson-info-card-authors">
           <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>

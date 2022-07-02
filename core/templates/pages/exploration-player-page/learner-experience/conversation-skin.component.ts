@@ -303,7 +303,8 @@ export class ConversationSkinComponent {
         if (this.redirectToRefresherExplorationConfirmed) {
           return;
         }
-        if (this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
+        if (this.CHECKPOINTS_FEATURE_IS_ENABLED &&
+            this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
             !this.displayedCard.isTerminal() && !this.isLoggedIn &&
             !this.explorationPlayerStateService.isLoggedOutProgressTracked &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
@@ -311,13 +312,8 @@ export class ConversationSkinComponent {
             this.playerTranscriptService.getLastStateName(),
             this.learnerParamsService.getAllParams());
           let confirmationMessage = (
-            'If you navigate away from this page, your progress on the ' +
-              'exploration will be lost.');
-          if (!this.isIframed) {
-            confirmationMessage = (
-              'If you navigate away from this page, your progress after the ' +
-                'last completed checkpoint will be lost.');
-          }
+            'Please save your progress before navigating away from the' +
+            ' page; else, you will lose your exploration progress.');
           (e || this.windowRef.nativeWindow.event).returnValue = (
             confirmationMessage);
           return confirmationMessage;
@@ -951,7 +947,7 @@ export class ConversationSkinComponent {
       // We do not store checkpoints progress for iframes hence we do not
       // need to consider redirecting the user to the most recently
       // reached checkpoint on exploration initial load in that case.
-      if (!this.isIframed && this.isLoggedIn && !this._editorPreviewMode &&
+      if (!this.isIframed && !this._editorPreviewMode &&
           !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
         // Navigate the learner to the most recently reached checkpoint state.
         this._navigateToMostRecentlyReachedCheckpoint();

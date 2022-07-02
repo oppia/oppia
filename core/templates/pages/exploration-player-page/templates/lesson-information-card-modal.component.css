@@ -197,6 +197,7 @@
   width: 100%;
   max-width: 600px;
   animation: slideUp 0.8s;
+  border-radius: 10px
 }
 
 .save-progress-menu h3 {
