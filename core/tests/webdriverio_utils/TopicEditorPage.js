@@ -17,15 +17,18 @@
  * in WebdriverIO tests.
  */
 
+var dragAndDropScript = require('html-dnd').code;
 var action = require('../webdriverio_utils/action.js');
 var general = require('../webdriverio_utils/general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
   var createStoryButton = $('.e2e-test-create-story-button');
   var saveTopicButton = $('.e2e-test-save-topic-button');
+  var practiceTabCheckbox = $('.e2e-test-toggle-practice-tab');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
@@ -40,6 +43,7 @@ var TopicEditorPage = function() {
   var topicMetaTagContentField = $('.e2e-test-topic-meta-tag-content-field');
   var topicMetaTagContentLabel = $('.e2e-test-topic-meta-tag-content-label');
   var publishTopicButton = $('.e2e-test-publish-topic-button');
+  var subtopicSkillDescriptionLocator = '.e2e-test-subtopic-skill-description';
   var confirmSubtopicCreationButton = $(
     '.e2e-test-confirm-subtopic-creation-button');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
@@ -59,6 +63,14 @@ var TopicEditorPage = function() {
     '.e2e-test-topic-page-title-fragment-field');
   var topicPageTitleFragmentLabel = $(
     '.e2e-test-topic-page-title-fragment-label');
+
+  var dragAndDrop = async function(fromElement, toElement) {
+    await browser.execute(dragAndDropScript, fromElement, toElement);
+  };
+
+  this.togglePracticeTab = async function() {
+    await action.click('Practice tab checkbox', practiceTabCheckbox);
+  };
 
   this.get = async function(topicId) {
     await browser.url(EDITOR_URL_PREFIX + topicId);
@@ -162,14 +174,14 @@ var TopicEditorPage = function() {
   };
 
   this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
-    var uncategorizedSkills = $$('.e2e-test-uncategorized-skill-card');
+    var uncategorizedSkills = await $$('.e2e-test-uncategorized-skill-card');
     await waitFor.visibilityOf(
       uncategorizedSkills[0],
       'Uncategorized skills taking too long to appear.');
     var subtopicColumns = await $$('.e2e-test-subtopic-column');
     var target = subtopicColumns[subtopicIndex];
     var uncategorizedSkillIndex = -1;
-    for (var i = 0; i < await uncategorizedSkills.length; i++) {
+    for (var i = 0; i < uncategorizedSkills.length; i++) {
       var uncategorizedSkill = uncategorizedSkills[i];
       var text = await action.getText(
         'Ungategorized Skill Text', uncategorizedSkill);
@@ -180,7 +192,7 @@ var TopicEditorPage = function() {
     }
     expect(uncategorizedSkillIndex).not.toEqual(-1);
     var toMove = uncategorizedSkills[uncategorizedSkillIndex];
-    await toMove.dragAndDrop(target);
+    await dragAndDrop(toMove, target);
   };
 
   this.saveRearrangedSkills = async function() {
@@ -204,6 +216,38 @@ var TopicEditorPage = function() {
     await action.keys(
       'Update Meta Tag Content', topicMetaTagContentField, newMetaTagContent);
     await action.click('Meta Tag Content label', topicMetaTagContentLabel);
+  };
+
+  this.expectSubtopicWithIndexToHaveSkills = async function(
+      subtopicIndex, skillNames) {
+    var subtopicColumns = await $$('.e2e-test-subtopic-column');
+    var assignedSkillDescriptions = await (
+      subtopicColumns[subtopicIndex].$$(
+        subtopicSkillDescriptionLocator));
+    var assignedSkillsLength = assignedSkillDescriptions.length;
+
+    expect(skillNames.length).toEqual(assignedSkillsLength);
+
+    for (var i = 0; i < assignedSkillsLength; i++) {
+      var skillDescription = assignedSkillDescriptions[i];
+      var text = await action.getText(
+        'Skill Description Text', skillDescription);
+      expect(text).toEqual(skillNames[i]);
+    }
+  };
+
+  this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
+    var uncategorizedSkills = await $$('.e2e-test-uncategorized-skill-card');
+    await waitFor.visibilityOf(
+      uncategorizedSkills[0],
+      'Uncategorized skills taking too long to appear.');
+
+    for (var i = 0; i < uncategorizedSkills.length; i++) {
+      var uncategorizedSkill = uncategorizedSkills[i];
+      var text = await action.getText(
+        'Uncategorized Skill Text', uncategorizedSkill);
+      expect(skillDescriptions[i]).toEqual(text);
+    }
   };
 };
 

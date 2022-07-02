@@ -35,7 +35,8 @@ var TopicsAndSkillsDashboardPage = function() {
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
   var skillDescriptionField = $('.e2e-test-skill-description-field');
   var editor = $('.e2e-test-concept-card-text');
-  var skillsListItems = $$('.e2e-test-skills-list-item');
+  var mergeSkillsButton = $('.e2e-test-merge-skills-button');
+  var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
   var createTopicButton = $('.e2e-test-create-topic-button');
   var topicNameField = $('.e2e-test-new-topic-name-field');
   var topicNameFieldElement = $('.e2e-test-topic-name-field');
@@ -82,6 +83,29 @@ var TopicsAndSkillsDashboardPage = function() {
     var topicsListItems = await $$('.e2e-test-topics-list-item');
     await waitFor.visibilityOf(
       topicsListItems[0], 'Topics list taking too long to appear');
+  };
+
+  this.isTopicTablePresent = async function() {
+    return await topicsTable.isExisting();
+  };
+
+  this.mergeSkills = async function(oldSkillName, newSkillName) {
+    await this.waitForSkillsToLoad();
+    await this.searchSkillByName(oldSkillName);
+    var skillEditOptions = await $$('.e2e-test-skill-edit-box');
+    expect(skillEditOptions.length).toEqual(1);
+    await action.click(
+      'Skill edit options', skillEditOptions[0]);
+    await action.click(
+      'Merge skill button', mergeSkillsButton);
+
+    var skill = $(`.e2e-test-skills-list-item=${newSkillName}`);
+    await action.click('Skill radio button', skill);
+    await action.click(
+      'Confirm Skills Merge button', confirmSkillsMergeButton);
+    await waitFor.invisibilityOf(
+      confirmSkillsMergeButton,
+      'Confirm Skill Modal takes too long to close.');
   };
 
   this.assignSkillToTopic = async function(skillName, topicName) {
@@ -161,6 +185,21 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click(
       'Edit topic button', editTopicButton);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToSkillWithDescription = async function(description) {
+    await this.navigateToSkillsTab();
+    await this.waitForSkillsToLoad();
+    var openSkillEditorButtons = await $$('.e2e-test-open-skill-editor');
+    for (var i = 0; i < openSkillEditorButtons.length; i++) {
+      var button = openSkillEditorButtons[i];
+      var buttonText = await action.getText('Skill editor button', button);
+      if (buttonText.includes(description)) {
+        await action.click('Skill editor', button);
+        await waitFor.pageToFullyLoad();
+        return;
+      }
+    }
   };
 
   this.navigateToSkillsTab = async function() {
@@ -245,11 +284,25 @@ var TopicsAndSkillsDashboardPage = function() {
       expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
       return;
     }
-    expect(await skillsListItems.length).toEqual(number);
+    var skillsListItems = await $$('.e2e-test-skills-list-item');
+    expect(skillsListItems.length).toEqual(number);
+  };
+
+  this.getTopicsCount = async function() {
+    var topicsListItems = await $$('.e2e-test-topics-list-item');
+    return topicsListItems.length;
   };
 
   this.searchSkillByName = async function(name) {
     return await this.filterTopicsByKeyword(name);
+  };
+
+  this.editTopic = async function(topicName) {
+    await this.waitForTopicsToLoad();
+    await this.filterTopicsByKeyword(topicName);
+    var topicNames = await $$('.e2e-test-topic-name');
+    expect(topicNames.length).toEqual(1);
+    await this.navigateToTopicWithIndex(0);
   };
 };
 

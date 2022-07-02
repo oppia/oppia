@@ -115,12 +115,13 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
-    var chapterTitles = await $$('.e2e-test-chapter-title');
+    var chapterNameSelector = $(`span=${chapterName}`);
     await waitFor.visibilityOf(
-      chapterTitles[0], 'Chapter list taking too long to appear');
+      chapterNameSelector, 'Chapter name is taking too lon to appear');
+    var chapterTitles = await $$('.e2e-test-chapter-title');
     var chapterIndex = -1;
     var chapterText = '';
-    for (var i = 0; i < await chapterTitles.length; i++) {
+    for (var i = 0; i < chapterTitles.length; i++) {
       chapterText = await action.getText(
         'Chapter Title Element', chapterTitles[i]);
       if (chapterText === chapterName) {
@@ -159,7 +160,7 @@ var StoryEditorPage = function() {
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible');
     await nodeDescriptionInputField.clearValue();
-    await nodeDescriptionInputField.keys(nodeDescription);
+    await nodeDescriptionInputField.setValue(nodeDescription);
   };
 
   this.changeNodeOutline = async function(richTextInstructions) {

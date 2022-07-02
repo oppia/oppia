@@ -102,8 +102,8 @@ var AdminPage = function() {
     await waitFor.elementToBeClickable(saveAllConfigs);
 
     var results = [];
-    var configProperties = $$('.e2e-test-config-property');
-    for (let configProperty of (await configProperties)) {
+    var configProperties = await $$('.e2e-test-config-property');
+    for (let configProperty of configProperties) {
       results.push(
         await saveConfigProperty(
           configProperty, propertyName, objectType, editingInstructions)

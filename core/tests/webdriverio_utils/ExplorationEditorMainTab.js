@@ -509,8 +509,8 @@ var ExplorationEditorMainTab = function() {
     var hintTextButton = await hintTextElement.$$('<p>');
     var lastHintElement = hintTextButton.length - 1;
     await action.click('Hint Text Button', hintTextButton[lastHintElement]);
-    var CKEditor = ckEditorElement.$$(
-      'oppia-rte-resizer')[0];
+    var CKEditor = await ckEditorElement.$$(
+      '.oppia-rte-resizer')[0];
     await action.keys('Text CKEditor', CKEditor, hint);
     await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
@@ -526,10 +526,10 @@ var ExplorationEditorMainTab = function() {
     var interaction = await interactions.getInteraction(interactionId);
     await interaction.submitAnswer(
       interactionHtmlElement, solution.correctAnswer);
-    var explanationTextArea = explanationTextAreaElement.$$('<p>')[0];
+    var explanationTextArea = await explanationTextAreaElement.$$('<p>')[0];
     await action.click('Explanation Text Area', explanationTextArea);
-    var CKEditor = ckEditorElement.$$(
-      'oppia-rte-resizer')[0];
+    var CKEditor = await ckEditorElement.$$(
+      '.oppia-rte-resizer')[0];
     await action.keys(
       'Text CKEditor', CKEditor, solution.explanation);
     await action.click('Submit Solution Button', submitSolutionButton);

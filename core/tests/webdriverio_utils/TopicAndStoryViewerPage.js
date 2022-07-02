@@ -43,14 +43,14 @@ var TopicAndStoryViewerPage = function() {
     var lessonCompletedIcons = await $$('.e2e-test-lesson-icon-completed');
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
-    expect(await lessonCompletedIcons.length).toEqual(count);
+    expect(lessonCompletedIcons.length).toEqual(count);
   };
 
   this.expectUncompletedLessonCountToBe = async function(count) {
     var lessonUncompletedIcons = await $$('.e2e-test-lesson-icon-uncompleted');
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
-    expect(await lessonUncompletedIcons.length).toEqual(count);
+    expect(lessonUncompletedIcons.length).toEqual(count);
   };
 
   this.waitForPracticeSessionContainer = async function() {
