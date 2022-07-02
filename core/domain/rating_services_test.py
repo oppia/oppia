@@ -201,13 +201,11 @@ class RatingServicesTests(test_utils.GenericTestBase):
     ) -> None:
 
         def _mock_get_exploration_summary_by_id(
-            exp_id: str,
-            strict: bool = True
+            exp_id: str, strict: bool = True
         ) -> exp_models.ExpSummaryModel:
             """Assign None to exploration summary ratings."""
             exp_summary_model = exp_models.ExpSummaryModel.get(
-                exp_id,
-                strict=strict
+                exp_id, strict=strict
             )
             # Ruling out the possibility of None for mypy type checking.
             assert exp_summary_model is not None

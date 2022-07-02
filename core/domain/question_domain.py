@@ -35,7 +35,6 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from extensions import domain
 
-
 from pylatexenc import latex2text
 from typing_extensions import TypedDict
 

@@ -273,8 +273,7 @@ def handle_exploration_start(exp_id):
         exp_id: str. The exploration which has been started.
     """
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
-        exp_id,
-        strict=False
+        exp_id, strict=False
     )
     if exp_summary:
         for user_id in exp_summary.owner_ids:
@@ -291,8 +290,7 @@ def handle_exploration_rating(exp_id, rating, old_rating):
             refreshing.
     """
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
-        exp_id,
-        strict=False
+        exp_id, strict=False
     )
     if exp_summary:
         for user_id in exp_summary.owner_ids:

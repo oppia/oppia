@@ -88,8 +88,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_get_exploration_summary_by_id(self) -> None:
         fake_eid = 'fake_eid'
         fake_exp = exp_fetchers.get_exploration_summary_by_id(
-            fake_eid,
-            strict=False
+            fake_eid, strict=False
         )
         self.assertIsNone(fake_exp)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(
@@ -116,7 +115,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_fake_exploration(self) -> None:
         self.assertIsNone(
-            exp_fetchers.get_exploration_by_id('fake_eid', False)
+            exp_fetchers.get_exploration_by_id('fake_eid', strict=False)
         )
 
     def test_get_exploration_summaries_where_user_has_role(self) -> None:
