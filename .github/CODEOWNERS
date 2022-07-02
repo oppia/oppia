@@ -155,23 +155,23 @@
 
 
 # Dashboard pages.
-/core/controllers/creator_dashboard*.py @nithusha21
-/core/controllers/email_dashboard*.py @nithusha21
-/core/controllers/learner_dashboard*.py @nithusha21
-/core/controllers/learner_goals*.py @nithusha21
-/core/controllers/learner_playlist*.py @nithusha21
-/core/controllers/subscriptions*.py @nithusha21
-/core/domain/activity*.py @nithusha21
-/core/domain/learner_goals_services*.py @nithusha21
-/core/domain/learner_playlist_services*.py @nithusha21
-/core/domain/learner_progress*.py @nithusha21
-/core/domain/subscription_services*.py @nithusha21
-/core/templates/domain/creator_dashboard/ @nithusha21
-/core/templates/domain/email-dashboard/ @nithusha21
-/core/templates/domain/learner_dashboard/ @nithusha21
-/core/templates/pages/creator-dashboard-page/ @nithusha21
-/core/templates/pages/email-dashboard-pages/ @nithusha21
-/core/templates/pages/learner-dashboard-page/ @nithusha21
+/core/controllers/creator_dashboard*.py @oppia/lace-backend-reviewers
+/core/controllers/email_dashboard*.py @oppia/lace-backend-reviewers
+/core/controllers/learner_dashboard*.py @oppia/lace-backend-reviewers
+/core/controllers/learner_goals*.py @oppia/lace-backend-reviewers
+/core/controllers/learner_playlist*.py @oppia/lace-backend-reviewers
+/core/controllers/subscriptions*.py @oppia/lace-backend-reviewers
+/core/domain/activity*.py @oppia/lace-backend-reviewers
+/core/domain/learner_goals_services*.py @oppia/lace-backend-reviewers
+/core/domain/learner_playlist_services*.py @oppia/lace-backend-reviewers
+/core/domain/learner_progress*.py @oppia/lace-backend-reviewers
+/core/domain/subscription_services*.py @oppia/lace-backend-reviewers
+/core/templates/domain/creator_dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/domain/email-dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/domain/learner_dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/pages/creator-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/email-dashboard-pages/ @oppia/lace-frontend-reviewers
+/core/templates/pages/learner-dashboard-page/ @oppia/lace-frontend-reviewers
 
 
 # Dev workflow team.
