@@ -174,6 +174,13 @@ class LearnerAnswerInfoDict(TypedDict):
     created_on: str
 
 
+class AggregatedStatsDict(TypedDict):
+    """Dictionary representing aggregated_stats dict."""
+    num_starts: int
+    num_actual_starts: int
+    num_completions: int
+    state_stats_mapping: Dict[str, Dict[str, int]]
+
 class ExplorationStats:
     """Domain object representing analytics data for an exploration."""
 
@@ -755,6 +762,68 @@ class SessionStateStats:
             'num_completions': self.num_completions
         }
         return session_state_stats_dict
+
+    @staticmethod
+    def validate_aggregated_stats_dict(aggregated_stats: AggregatedStatsDict) -> AggregatedStatsDict:
+        """Validates the SessionStateStats domain object.
+
+        Args:
+            aggregated_stats: dict. The aggregated stats dict to validate.
+
+        Returns:
+            aggregated_stats: dict. The validated aggregated stats dict.
+
+        Raises:
+            ValidationError. Whether the aggregated_stats dict is invalid.
+        """
+
+        exploration_stats_properties = [
+            'num_starts',
+            'num_actual_starts',
+            'num_completions'
+        ]
+        state_stats_properties = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'total_hit_count',
+            'first_hit_count',
+            'num_times_solution_viewed',
+            'num_completions'
+        ]
+        # use ignore[misc] here because mypy does not recognize that keys
+        # represented by the variable exp_stats_property are string literals.
+        for exp_stats_property in exploration_stats_properties:
+            if exp_stats_property not in aggregated_stats:
+                raise utils.ValidationError(
+                    '%s not in aggregated stats dict.' % (exp_stats_property))
+            if not isinstance(aggregated_stats[exp_stats_property], int): # type: ignore[misc]
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (
+                        exp_stats_property,
+                        aggregated_stats[exp_stats_property] # type: ignore[misc]
+                    )
+                )
+        state_stats_mapping = aggregated_stats['state_stats_mapping']
+        for state_name in state_stats_mapping:
+            for state_stats_property in state_stats_properties:
+                if state_stats_property not in state_stats_mapping[state_name]:
+                    raise utils.ValidationError(
+                        '%s not in state stats mapping of %s in aggregated '
+                        'stats dict.' % (state_stats_property, state_name))
+                if not isinstance(
+                    state_stats_mapping[state_name][state_stats_property],
+                    int
+                ):
+                    state_stats = state_stats_mapping[state_name]
+                    raise utils.ValidationError(
+                        'Expected %s to be an int, received %s' % (
+                            state_stats_property,
+                            state_stats[state_stats_property]
+                        )
+                    )
+        # The aggregated_stats parameter does not represent any domain class,
+        # hence dict form of the data is returned from here.
+        return aggregated_stats
 
     # NOTE: Needs to return Any because of:
     # https://github.com/python/mypy/issues/363#issue-39383094
