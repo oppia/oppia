@@ -228,11 +228,6 @@ export class ConversationSkinComponent {
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
 
-    this.learnerDashboardBackendApiService
-      .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
-        this.completedChaptersCount = data.completedChaptersCount;
-      });
-
     if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onHintConsumed.subscribe(
@@ -336,6 +331,13 @@ export class ConversationSkinComponent {
                 'summary.');
             }
           );
+      }
+
+      if (this.isLoggedIn) {
+        this.learnerDashboardBackendApiService
+          .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
+            this.completedChaptersCount = data.completedChaptersCount;
+          });
       }
 
       // We do not save checkpoints progress for iframes.

@@ -26,6 +26,9 @@ import { PracticeSessionPageConstants } from 'pages/practice-session-page/practi
 })
 export class PostChapterRecommendationsComponent {
   @Input() nextStoryNodeLink: string | undefined;
+  // The properties below will not be null because when being passed down as
+  // input from the parent component, a null/undefined check is performed and
+  // if the check fails, an empty string is passed down instead.
   @Input() nextStoryNodeThumbnailUrl!: string;
   @Input() nextStoryNodeThumbnailBgColor!: string;
   @Input() nextStoryNodeTitle!: string;
