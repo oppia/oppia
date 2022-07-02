@@ -177,14 +177,11 @@ describe('I18n service', () => {
     ).and.returnValue(Promise.resolve({
       site_language_code: 'es'
     }));
-    if (i18nService.localStorage) {
-      i18nService.localStorage.setItem(CACHE_KEY_LANG, 'es');
-      i18nService.localStorage.setItem(CACHE_KEY_DIRECTION, 'ltr');
-    }
     spyOn(i18nService, 'removeUrlLangParam');
 
     let newLangCode = 'en';
 
+    i18nLanguageCodeService.setI18nLanguageCode('es');
     expect(userInfo.getPreferredSiteLanguageCode()).toBe('es');
 
     i18nService.updateUserPreferredLanguage(newLangCode);
