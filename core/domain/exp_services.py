@@ -798,7 +798,8 @@ def get_updated_committer_ids(
 
 
 def update_version_history(
-    exploration, change_list, committer_id, old_states, old_metadata):
+    exploration, change_list, committer_id, old_states, old_metadata
+):
     """Creates the updated ExplorationVersionHistoryModel for the new version
     of the exploration (after the commit) and puts it into the datastore.
 
@@ -1687,7 +1688,8 @@ def delete_exploration_summaries(exploration_ids):
 
 
 def revert_version_history(
-    exploration_id, current_version, revert_to_version):
+    exploration_id, current_version, revert_to_version
+):
     """Reverts the version history to the given version number. Puts the
     reverted version history model into the datastore.
 
