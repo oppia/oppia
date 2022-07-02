@@ -239,7 +239,8 @@ var ExplorationEditorMainTab = function() {
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    expect(await addResponseDetails.isDisplayed()).toBe(true);
+    await waitFor.visibilityOf(
+      addResponseDetails, 'Add Response take too long to appear');
     await _selectRule(addResponseDetails, interactionId, ruleName);
     await _setRuleParameters.apply(null, args);
     // Open the feedback entry form if it is not already open.

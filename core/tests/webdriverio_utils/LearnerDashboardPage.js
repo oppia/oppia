@@ -80,7 +80,7 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToBeHidden = async function(title) {
     var items = await $$(
       `.e2e-test-exp-summary-tile-title=${title}`);
-    expect(await items.length).toBe(0);
+    expect(items.length).toBe(0);
   };
 
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
@@ -139,7 +139,7 @@ var LearnerDashboardPage = function() {
       completedGoalsTopicName, name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`);
     var topicName = $(
-      `.e2e-test-completed-goals-topic-name=${name}`);
+      `.e2e-test-completed-goals-topic-name*=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -151,7 +151,7 @@ var LearnerDashboardPage = function() {
         topicNamesInLearnerTopicSummaryTiles[0],
         'Learner Topic Name takes too long to appear');
     }
-    expect(await topicNamesInLearnerTopicSummaryTiles.length).toEqual(value);
+    expect(topicNamesInLearnerTopicSummaryTiles.length).toEqual(value);
   };
 
   this.expectNumberOfStoriesInCompletedStory = async function(value) {
@@ -162,7 +162,7 @@ var LearnerDashboardPage = function() {
         storyNamesInLearnerStorySummaryTiles[0],
         'Story Name Card takes too long to appear');
     }
-    expect(await storyNamesInLearnerStorySummaryTiles.length).toEqual(value);
+    expect(storyNamesInLearnerStorySummaryTiles.length).toEqual(value);
   };
 
   this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
@@ -173,7 +173,7 @@ var LearnerDashboardPage = function() {
         topicNamesInLearnerStorySummaryTiles[0],
         'Topic Name Card takes too long to appear');
     }
-    expect(await topicNamesInLearnerStorySummaryTiles.length).toEqual(value);
+    expect(topicNamesInLearnerStorySummaryTiles.length).toEqual(value);
   };
 
   this.addTopicToLearnerGoals = async function() {

@@ -31,6 +31,7 @@ var ExplorationPlayerPage = function() {
   var explorationHeader = $('.e2e-test-exploration-header');
   var conversationInput = $('.e2e-test-conversation-input');
   var feedbackCloseButton = $('.e2e-test-exploration-feedback-close-button');
+  var lessonCompleteMessage = $('.e2e-test-exploration-checkpoints-message');
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
@@ -56,7 +57,7 @@ var ExplorationPlayerPage = function() {
     // TODO(#11969): Move this wait to interactions submitAnswer function.
     await waitFor.presenceOf(
       conversationInput, 'Conversation input takes too long to appear.');
-    // The .first() targets the inline interaction, if it exists. Otherwise,
+    // The [0] targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     await interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
@@ -95,6 +96,11 @@ var ExplorationPlayerPage = function() {
     expect(
       await conversationContent[lastElement].getText()
     ).not.toEqual('Congratulations, you have finished!');
+  };
+
+  this.expectLessonCompleteMessage = async function() {
+    await waitFor.visibilityOf(
+      lessonCompleteMessage, 'Checkpoint message take too long to appear');
   };
 
   this.submitFeedback = async function(feedback) {
