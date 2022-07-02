@@ -120,6 +120,8 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             ['en'], original_preferences['preferred_language_codes'])
         self.assertIsNone(original_preferences['preferred_site_language_code'])
         self.assertIsNone(original_preferences['preferred_audio_language_code'])
+        self.assertIsNone(
+            original_preferences['preferred_translation_language_code'])
         self.put_json(
             '/preferenceshandler/data',
             {'update_type': 'preferred_site_language_code', 'data': 'en'},
@@ -127,6 +129,12 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.put_json(
             '/preferenceshandler/data',
             {'update_type': 'preferred_audio_language_code', 'data': 'hi-en'},
+            csrf_token=csrf_token)
+        self.put_json(
+            '/preferenceshandler/data', {
+                'update_type': 'preferred_translation_language_code',
+                'data': 'en'
+            },
             csrf_token=csrf_token)
         self.put_json(
             '/preferenceshandler/data',
@@ -137,6 +145,8 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(new_preferences['preferred_site_language_code'], 'en')
         self.assertEqual(
             new_preferences['preferred_audio_language_code'], 'hi-en')
+        self.assertEqual(
+            new_preferences['preferred_translation_language_code'], 'en')
 
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1162,6 +1172,8 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 user_settings.preferred_site_language_code),
             preferred_audio_language_code=(
                 user_settings.preferred_audio_language_code),
+            preferred_translation_language_code=(
+                user_settings.preferred_translation_language_code),
             deleted=user_settings.deleted
         ).put()
 
@@ -1227,14 +1239,16 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
             feconf.USERNAME_CHECK_DATA_URL, {'username': '!!!INVALID!!!'},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'can only have alphanumeric characters', response_dict['error'])
+            'Validation failed: is_valid_username_string ({}) for object ',
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL,
             {'username': self.UNICODE_TEST_STRING},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'can only have alphanumeric characters', response_dict['error'])
+            'Validation failed: is_valid_username_string ({}) for object ',
+            response_dict['error'])
 
         self.logout()
 

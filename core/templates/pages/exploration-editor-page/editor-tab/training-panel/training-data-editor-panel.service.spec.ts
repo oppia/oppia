@@ -16,42 +16,52 @@
  * @fileoverview Unit tests for TrainingDataEditorPanelService.
  */
 
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AlertsService } from 'services/alerts.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TrainingDataEditorPanelService } from './training-data-editor-panel.service';
 
-describe('Training Data Editor Panel Service', function() {
-  importAllAngularServices();
+describe('Training Modal Service', () => {
+  let trainingDataEditorPanelService: TrainingDataEditorPanelService;
+  let alertsService: AlertsService;
+  let ngbModal: NgbModal;
+  let externalSaveService: ExternalSaveService;
 
-  var TrainingDataEditorPanelService = null;
-  var $uibModal = null;
-  var AlertsService = null;
-
-  var mockExternalSaveEventEmitter = null;
-
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('ExternalSaveService', {
-      onExternalSave: mockExternalSaveEventEmitter
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        TrainingDataEditorPanelService,
+        AlertsService,
+        ExternalSaveService,
+        NgbModal
+      ]
     });
-  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    TrainingDataEditorPanelService = $injector.get(
-      'TrainingDataEditorPanelService');
-    $uibModal = $injector.get('$uibModal');
-    AlertsService = $injector.get('AlertsService');
-    spyOn(mockExternalSaveEventEmitter, 'emit');
-  }));
+    trainingDataEditorPanelService = TestBed.inject(
+      TrainingDataEditorPanelService);
+    alertsService = TestBed.inject(AlertsService);
+    ngbModal = TestBed.inject(NgbModal);
+    externalSaveService = TestBed.inject(ExternalSaveService);
+  });
 
-  it('should call $uibModal when opening training data editor', function() {
-    var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
-    var clearWarningsSpy = spyOn(AlertsService, 'clearWarnings').and
-      .callThrough();
-    TrainingDataEditorPanelService.openTrainingDataEditor();
-    expect(uibModalSpy).toHaveBeenCalled();
-    expect(clearWarningsSpy).toHaveBeenCalled();
-    expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
+  it('should open NgbModal', () => {
+    spyOn(alertsService, 'clearWarnings')
+      .and.stub();
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return ({
+        result: Promise.resolve()
+      } as NgbModalRef);
+    });
+    spyOn(externalSaveService.onExternalSave, 'emit').and.stub();
+
+    trainingDataEditorPanelService.openTrainingDataEditor();
+
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(
+      externalSaveService.onExternalSave.emit).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 });

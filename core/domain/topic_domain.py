@@ -153,7 +153,7 @@ class TopicChange(change_domain.BaseChange):
         'deprecated_values': {}
     }, {
         'name': CMD_ADD_SUBTOPIC,
-        'required_attribute_names': ['title', 'subtopic_id'],
+        'required_attribute_names': ['title', 'subtopic_id', 'url_fragment'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -462,18 +462,24 @@ class Subtopic:
         return subtopic
 
     @classmethod
-    def create_default_subtopic(cls, subtopic_id: int, title: str) -> Subtopic:
+    def create_default_subtopic(
+        cls,
+        subtopic_id: int,
+        title: str,
+        url_frag: str
+    ) -> Subtopic:
         """Creates a Subtopic object with default values.
 
         Args:
             subtopic_id: int. ID of the new subtopic.
             title: str. The title for the new subtopic.
+            url_frag: str. The url fragment for the new subtopic.
 
         Returns:
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None, None, '')
+        return cls(subtopic_id, title, [], None, None, None, url_frag)
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename: str) -> None:
@@ -530,6 +536,24 @@ class Subtopic:
             raise utils.ValidationError(
                 'Expected subtopic title to be less than %d characters, '
                 'received %s' % (title_limit, self.title))
+
+        url_fragment_limit = (
+            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+        regex = android_validation_constants.SUBTOPIC_URL_FRAGMENT_REGEXP
+        if len(self.url_fragment) > url_fragment_limit:
+            raise utils.ValidationError(
+                'Expected subtopic url fragment to be less '
+                'than or equal to %d characters, received %s'
+                % (url_fragment_limit, self.url_fragment))
+
+        if len(self.url_fragment) > 0:
+            if not bool(re.match(regex, self.url_fragment)):
+                raise utils.ValidationError(
+                    'Invalid url fragment: %s' % self.url_fragment)
+        else:
+            raise utils.ValidationError(
+                'Expected subtopic url fragment to be non '
+                'empty')
 
         if len(self.skill_ids) > len(set(self.skill_ids)):
             raise utils.ValidationError(
@@ -1532,12 +1556,18 @@ class Topic:
         raise Exception(
             'The subtopic with id %s does not exist.' % subtopic_id)
 
-    def add_subtopic(self, new_subtopic_id: int, title: str) -> None:
+    def add_subtopic(
+        self,
+        new_subtopic_id: int,
+        title: str,
+        url_frag: str
+    ) -> None:
         """Adds a subtopic with the given id and title.
 
         Args:
             new_subtopic_id: int. The id of the new subtopic.
             title: str. The title for the new subtopic.
+            url_frag: str. The url fragment of the new subtopic.
 
         Raises:
             Exception. The new subtopic ID is not equal to the expected next
@@ -1550,7 +1580,7 @@ class Topic:
                 % (new_subtopic_id, self.next_subtopic_id))
         self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
-            Subtopic.create_default_subtopic(new_subtopic_id, title))
+            Subtopic.create_default_subtopic(new_subtopic_id, title, url_frag))
 
     def delete_subtopic(self, subtopic_id: int) -> None:
         """Deletes the subtopic with the given id and adds all its skills to
