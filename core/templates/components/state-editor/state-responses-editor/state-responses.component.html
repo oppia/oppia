@@ -49,20 +49,20 @@
               <div ng-if="activeAnswerGroupIndex === $index">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container protractor-test-response-body-<[$index]>">
-                    <answer-group-editor rules="answerGroup.rules"
-                                         outcome="answerGroup.outcome"
-                                         tagged-skill-misconception-id="answerGroup.taggedSkillMisconceptionId"
-                                         on-save-answer-group-feedback="saveActiveAnswerGroupFeedback"
-                                         on-save-answer-group-dest="saveActiveAnswerGroupDest"
-                                         on-save-answer-group-correctness-label="saveActiveAnswerGroupCorrectnessLabel"
-                                         on-save-answer-group-rules="saveActiveAnswerGroupRules"
-                                         on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                                         on-save-tagged-misconception="saveTaggedMisconception"
-                                         is-editable="EditabilityService.isEditable()"
-                                         display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                         class="protractor-test-response-body"
-                                         add-state="$ctrl.addState"
-                                         show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
+                    <answer-group-editor class="protractor-test-response-body"
+                                         [rules]="answerGroup.rules"
+                                         [outcome]="answerGroup.outcome"
+                                         [tagged-skill-misconception-id]="answerGroup.taggedSkillMisconceptionId"
+                                         (on-save-answer-group-feedback)="$ctrl.saveActiveAnswerGroupFeedback($event)"
+                                         (on-save-answer-group-dest)="$ctrl.saveActiveAnswerGroupDest($event)"
+                                         (on-save-answer-group-correctness-label)="$ctrl.saveActiveAnswerGroupCorrectnessLabel($event)"
+                                         [on-save-answer-group-rules]="saveActiveAnswerGroupRules"
+                                         [on-save-next-content-id-index]="$ctrl.onSaveNextContentIdIndex"
+                                         [on-save-tagged-misconception]="saveTaggedMisconception"
+                                         [is-editable]="EditabilityService.isEditable()"
+                                         [display-feedback]="!isLinearWithNoFeedback(answerGroup.outcome)"
+                                         [add-state]="$ctrl.addState"
+                                         (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </answer-group-editor>
                   </div>
                 </div>
@@ -94,19 +94,19 @@
               <div ng-if="activeAnswerGroupIndex === answerGroups.length">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container protractor-test-response-body-default">
-                    <answer-group-editor rules="null"
-                                         outcome="defaultOutcome"
-                                         tagged-skill-misconception-id="null"
-                                         on-save-answer-group-feedback="saveDefaultOutcomeFeedback"
-                                         on-save-answer-group-dest="saveDefaultOutcomeDest"
-                                         on-save-answer-group-correctness-label="saveDefaultOutcomeCorrectnessLabel"
-                                         on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                                         is-editable="EditabilityService.isEditable()"
-                                         suppress-warnings="suppressDefaultAnswerGroupWarnings()"
-                                         display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
-                                         class="protractor-test-response-body"
-                                         add-state="$ctrl.addState"
-                                         show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
+                    <answer-group-editor class="protractor-test-response-body"
+                                         [rules]="null"
+                                         [outcome]="defaultOutcome"
+                                         [tagged-skill-misconception-id]="null"
+                                         (on-save-answer-group-feedback)="$ctrl.saveDefaultOutcomeFeedback($event)"
+                                         (on-save-answer-group-dest)="$ctrl.saveDefaultOutcomeDest($event)"
+                                         (on-save-answer-group-correctness-label)="$ctrl.saveDefaultOutcomeCorrectnessLabel($event)"
+                                         [on-save-next-content-id-index]="$ctrl.onSaveNextContentIdIndex"
+                                         [is-editable]="EditabilityService.isEditable()"
+                                         [suppress-warnings]="suppressDefaultAnswerGroupWarnings()"
+                                         [display-feedback]="!isLinearWithNoFeedback(defaultOutcome)"
+                                         [add-state]="$ctrl.addState"
+                                         (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </answer-group-editor>
                   </div>
                 </div>

@@ -29,7 +29,7 @@ import { AppConstants } from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 @Pipe({
-  name: 'parameterizeRuleDescription'
+  name: 'parameterizeRuleDescriptionPipe'
 })
 export class ParameterizeRuleDescriptionPipe implements PipeTransform {
   constructor(
