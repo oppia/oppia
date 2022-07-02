@@ -7534,6 +7534,487 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
 
+class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
+    """Tests for ensuring creation, deletion and updation of version history
+    data is carried out correctly.
+    """
+
+    def setUp(self):
+        super(UpdateVersionHistoryUnitTests, self).setUp()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_0_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        self.exploration = exploration
+        self.version_history_model_class = (
+            exp_models.ExplorationVersionHistoryModel)
+
+    def test_creating_new_exploration_creates_version_history_model(self):
+        version_history_id = (
+            self.version_history_model_class.get_instance_id(
+                self.exploration.id, self.exploration.version))
+        version_history_model = self.version_history_model_class.get(
+            version_history_id)
+        expected_state_version_history_dict = {
+            feconf.DEFAULT_INIT_STATE_NAME: state_domain.StateVersionHistory(
+                None, None, self.owner_id
+            ).to_dict()
+        }
+
+        self.assertEqual(
+            version_history_model.state_version_history,
+            expected_state_version_history_dict)
+        self.assertEqual(
+            version_history_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            version_history_model.metadata_last_edited_committer_id,
+            self.owner_id)
+        self.assertIn(self.owner_id, version_history_model.committer_ids)
+
+    def test_soft_deletion_does_not_delete_version_history_models(self):
+        version_history_models_before_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+        exp_services.delete_exploration(self.owner_id, self.exploration.id)
+        version_history_models_after_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+
+        self.assertEqual(
+            version_history_models_before_deletion,
+            version_history_models_after_deletion)
+
+    def test_hard_deletion_deletes_version_history_models(self):
+        version_history_models_before_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+        exp_services.delete_exploration(
+            self.owner_id, self.exploration.id, force_deletion=True)
+        version_history_models_after_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+
+        self.assertNotEqual(
+            version_history_models_before_deletion,
+            version_history_models_after_deletion)
+
+    def test_version_history_on_add_state(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(
+            old_model.state_version_history.get('New state'), None)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+            })], 'Added state')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get('New state'),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+    def test_version_history_on_delete_state(self):
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+            })], 'Added state')
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            old_model.state_version_history.get('New state'),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'New state',
+            })], 'Deleted state')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
+
+        self.assertEqual(
+            new_model.state_version_history.get('New state'), None)
+
+    def test_version_history_on_rename_state(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        new_state_name = 'Another name'
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+        self.assertEqual(
+            old_model.state_version_history.get(new_state_name), None)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': new_state_name
+            })], 'Renamed state')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), None)
+        self.assertEqual(
+            new_model.state_version_history.get(new_state_name),
+            state_domain.StateVersionHistory(
+                1, feconf.DEFAULT_INIT_STATE_NAME, self.owner_id).to_dict())
+
+    def test_version_history_on_cancelled_rename_state(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        new_state_name = 'Another name'
+        expected_dict = state_domain.StateVersionHistory(
+            None, None, self.owner_id).to_dict()
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': new_state_name
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': new_state_name,
+                    'new_state_name': feconf.DEFAULT_INIT_STATE_NAME
+                })
+            ], 'Renamed state')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+    def test_version_history_on_edit_state_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                })
+            ], 'Edited interaction'
+        )
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME),
+            state_domain.StateVersionHistory(
+                1, feconf.DEFAULT_INIT_STATE_NAME, self.owner_id).to_dict())
+
+    def test_version_history_on_cancelled_edit_state_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        expected_dict = state_domain.StateVersionHistory(
+            None, None, self.owner_id).to_dict()
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': None
+                })
+            ], 'Edited interaction id'
+        )
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+    def test_version_history_on_only_translation_commits(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        expected_dict = state_domain.StateVersionHistory(
+            None, None, self.owner_id).to_dict()
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': recorded_voiceovers_dict
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Translation commits')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+    def test_version_history_on_edit_exploration_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(old_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            old_model.metadata_last_edited_committer_id, self.owner_id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+              'property_name': 'title',
+              'new_value': 'New title'})], 'Changed title')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(new_model.metadata_last_edited_version_number, 1)
+        self.assertEqual(
+            new_model.metadata_last_edited_committer_id, self.owner_id)
+
+    def test_version_history_on_cancelled_edit_exploration_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(old_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            old_model.metadata_last_edited_committer_id, self.owner_id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'}
+                ), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': feconf.DEFAULT_EXPLORATION_TITLE}
+                )
+            ], 'Changed title')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(new_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            new_model.metadata_last_edited_committer_id, self.owner_id)
+
+    def test_version_history_on_revert_exploration(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+              'property_name': 'title',
+              'new_value': 'New title'})], 'Changed title')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'Another state'
+                })
+            ], 'Renamed state')
+        exp_services.revert_exploration(self.owner_id, self.EXP_0_ID, 3, 1)
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 4))
+
+        self.assertEqual(
+            old_model.state_version_history,
+            new_model.state_version_history)
+        self.assertEqual(
+            old_model.metadata_last_edited_version_number,
+            new_model.metadata_last_edited_version_number)
+        self.assertEqual(
+            old_model.metadata_last_edited_committer_id,
+            new_model.metadata_last_edited_committer_id)
+        self.assertEqual(old_model.committer_ids, new_model.committer_ids)
+
+    def test_version_history_on_cancelled_add_state(self):
+        # In this case, the version history for that state should not be
+        # recorded because it was added and deleted in the same commit.
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        change_list = [
+          exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+          }), exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_DELETE_STATE,
+              'state_name': 'New state'
+          })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list,
+            'Added and deleted state')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertIsNone(old_model.state_version_history.get('New state'))
+        self.assertIsNone(new_model.state_version_history.get('New state'))
+
+    def test_version_history_on_state_name_interchange(self):
+        change_list_from_v1_to_v2 = [
+          exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'first'
+          }), exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_ADD_STATE,
+              'state_name': 'second'
+          })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_from_v1_to_v2,
+            'Added two new states')
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            old_model.state_version_history['first'],
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+        self.assertEqual(
+            old_model.state_version_history['second'],
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+        # Correctly interchanging the state names.
+        change_list_from_v2_to_v3 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'first',
+                'new_state_name': 'temporary'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'second',
+                'new_state_name': 'first'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'temporary',
+                'new_state_name': 'second'
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_from_v2_to_v3,
+            'Added two new states')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
+
+        self.assertEqual(
+            new_model.state_version_history['second'],
+            state_domain.StateVersionHistory(
+                2, 'first', self.owner_id).to_dict())
+        self.assertEqual(
+            new_model.state_version_history['first'],
+            state_domain.StateVersionHistory(
+                2, 'second', self.owner_id).to_dict())
+
+    def test_new_committer_id_is_added_to_committer_ids_list(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertNotIn(self.editor_id, old_model.committer_ids)
+
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+            })], 'Added a state')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'Another state'
+            })], 'Added a state')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
+
+        self.assertIn(self.editor_id, new_model.committer_ids)
+
+
 class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether logged-out user progress is updated correctly"""
 

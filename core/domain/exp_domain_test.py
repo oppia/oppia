@@ -11307,3 +11307,31 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(actual_metadata_dict, expected_metadata_dict)
+
+
+class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_metadata_version_history_gets_created(self):
+        expected_dict = {
+            'last_edited_version_number': 1,
+            'last_edited_committer_id': 'user_1'
+        }
+        actual_dict = exp_domain.MetadataVersionHistory(1, 'user_1').to_dict()
+
+        self.assertEqual(expected_dict, actual_dict)
+
+    def test_metadata_version_history_gets_created_from_dict(self):
+        metadata_version_history_dict = {
+            'last_edited_version_number': 1,
+            'last_edited_committer_id': 'user_1'
+        }
+        metadata_version_history = (
+            exp_domain.MetadataVersionHistory.from_dict(
+                metadata_version_history_dict))
+
+        self.assertEqual(
+            metadata_version_history.last_edited_version_number,
+            metadata_version_history_dict['last_edited_version_number'])
+        self.assertEqual(
+            metadata_version_history.last_edited_committer_id,
+            metadata_version_history_dict['last_edited_committer_id'])
