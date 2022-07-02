@@ -64,7 +64,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'fragment-one'
         })]
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
@@ -355,7 +356,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title2',
-            'subtopic_id': 2
+            'subtopic_id': 2,
+            'url_fragment': 'fragment-two'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
@@ -365,7 +367,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title3',
-            'subtopic_id': 3
+            'subtopic_id': 3,
+            'url_fragment': 'fragment-three'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
@@ -746,7 +749,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title3',
-            'subtopic_id': 3
+            'subtopic_id': 3,
+            'url_fragment': 'fragment-three'
         })]
         with self.assertRaisesRegex(
             Exception, 'The given new subtopic id 3 is not equal to '
@@ -767,7 +771,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'title': 'Title2',
-                'subtopic_id': 2
+                'subtopic_id': 2,
+                'url_fragment': 'fragment-two'
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
@@ -808,7 +813,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'title': 'Title2',
-                'subtopic_id': 2
+                'subtopic_id': 2,
+                'url_fragment': 'fragment-two'
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
@@ -899,12 +905,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'title': 'Title3',
-                'subtopic_id': 3
+                'subtopic_id': 3,
+                'url_fragment': 'fragment-three'
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'title': 'Title4',
-                'subtopic_id': 4
+                'subtopic_id': 4,
+                'url_fragment': 'fragment-four'
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
@@ -1146,7 +1154,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'title': 'Title2',
-                'subtopic_id': 2
+                'subtopic_id': 2,
+                'url_fragment': 'fragment-two'
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
@@ -1379,7 +1388,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'fragment-one'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
@@ -1389,7 +1399,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 2
+            'subtopic_id': 2,
+            'url_fragment': 'fragment-two'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
