@@ -32,6 +32,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { ExternalSaveService } from 'services/external-save.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { BaseTranslatableObject } from 'interactions/rule-input-defs';
 
 interface TaggedMisconception {
   skillId: string;
@@ -90,7 +91,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   sendOnSaveAnswerGroupDest(event: Outcome): void {
-    console.error(event);
     this.onSaveAnswerGroupDest.emit(event);
   }
 
@@ -264,9 +264,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   cancelActiveRuleEdit(): void {
-    console.error(this.rules);
-    console.error(this.rulesMemento);
-
     this.rules.splice(0, this.rules.length);
     for (let i = 0; i < this.rulesMemento.length; i++) {
       this.rules.push(this.rulesMemento[i]);
@@ -314,8 +311,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   openRuleEditor(index: number): void {
-    console.error('this is');
-    console.error(this.rules);
     if (!this.isEditable) {
       // The rule editor may not be opened in a read-only editor view.
       return;
@@ -365,10 +360,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
         // All rules input types which are translatable are subclasses of
         // BaseTranslatableObject having dict structure with contentId
         // as a key.
-        if ('contentId' in ruleInput) {
-          if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-            contentIdToContentMap[ruleInput.contentId] = ruleInput;
-          }
+        if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+          contentIdToContentMap[(
+            ruleInput as BaseTranslatableObject).contentId] = ruleInput;
         }
       });
     });
