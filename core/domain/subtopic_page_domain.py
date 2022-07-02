@@ -421,14 +421,15 @@ class SubtopicPageSummary:
     """Domain object for Subtopic Page Summary."""
 
     def __init__(
-            self,
-            subtopic_id: int,
-            subtopic_title: str,
-            parent_topic_id: str,
-            parent_topic_name: str,
-            thumbnail_filename: str,
-            thumbnail_bg_color: str,
-            subtopic_mastery: float):
+        self,
+        subtopic_id: int,
+        subtopic_title: str,
+        parent_topic_id: str,
+        parent_topic_name: str,
+        thumbnail_filename: str,
+        thumbnail_bg_color: str,
+        subtopic_mastery: float
+    ):
         """Initialize a SubtopicPageSummary object.
 
         Args:

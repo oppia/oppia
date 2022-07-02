@@ -134,11 +134,10 @@ def get_multi_user_ids_from_usernames(usernames):
     for model in found_models:
         username_to_user_id_map[model.normalized_username] = model.id
 
-    for username in normalized_usernames:
-        if username in username_to_user_id_map:
-            user_ids.append(username_to_user_id_map[username])
-        else:
-            user_ids.append(None)
+    user_ids = [
+        username_to_user_id_map.get(username)
+        for username in normalized_usernames
+    ]
 
     return user_ids
 

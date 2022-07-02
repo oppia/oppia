@@ -37,7 +37,7 @@ def get_new_learner_group_id() -> str:
 
 
 def get_learner_group_by_id(
-        group_id
+        group_id: str
     ) -> Optional[learner_group_domain.LearnerGroup]:
     """Returns the learner group domain object given the learner group id.
 
@@ -82,7 +82,7 @@ def get_learner_groups_of_facilitator(
     if not learner_grp_models:
         return []
 
-    learner_groups = []
+    learner_groups: List[learner_group_domain.LearnerGroup] = []
     for learner_grp_model in learner_grp_models:
         learner_groups.append(
             learner_group_domain.LearnerGroup(
@@ -98,7 +98,7 @@ def get_learner_groups_of_facilitator(
     return learner_groups
 
 
-def get_progress_sharing_permission(user_id, group_id) -> bool:
+def get_progress_sharing_permission(user_id: str, group_id: str) -> bool:
     """Returns the progress sharing permission of the given user in the given
     group.
 

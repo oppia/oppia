@@ -29,7 +29,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 (learner_group_models, user_models) = models.Registry.import_models(
     [models.NAMES.learner_group, models.NAMES.user])
@@ -45,9 +45,13 @@ def is_learner_group_feature_enabled() -> bool:
 
 
 def create_learner_group(
-        group_id, title, description,
-        facilitator_user_ids, invited_student_ids,
-        subtopic_page_ids, story_ids
+        group_id: str,
+        title: str,
+        description: str,
+        facilitator_user_ids: List[str],
+        invited_student_ids: List[str],
+        subtopic_page_ids: List[str],
+        story_ids: List[str]
     ) -> learner_group_domain.LearnerGroup:
     """Creates a new learner group.
 
@@ -104,9 +108,14 @@ def create_learner_group(
 
 
 def update_learner_group(
-        group_id, title, description,
-        facilitator_user_ids, student_ids, invited_student_ids,
-        subtopic_page_ids, story_ids
+        group_id: str,
+        title: str,
+        description: str,
+        facilitator_user_ids: List[str],
+        student_ids: List[str],
+        invited_student_ids: List[str],
+        subtopic_page_ids: List[str],
+        story_ids: List[str]
     ) -> learner_group_domain.LearnerGroup:
     """Updates a learner group if it is present.
 
@@ -182,7 +191,7 @@ def update_learner_group(
     return learner_group
 
 
-def is_user_a_facilitator(user_id, group_id) -> bool:
+def is_user_a_facilitator(user_id: str, group_id: str) -> bool:
     """Checks if the user is a facilitator of the leaner group.
 
     Args:
@@ -198,7 +207,7 @@ def is_user_a_facilitator(user_id, group_id) -> bool:
     return user_id in learner_group.facilitator_user_ids
 
 
-def remove_learner_group(group_id) -> None:
+def remove_learner_group(group_id: str) -> None:
     """Removes the learner group with of given learner group ID.
 
     Args:
@@ -215,7 +224,9 @@ def remove_learner_group(group_id) -> None:
     learner_group_model.delete()
 
 
-def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
+def get_topic_ids_from_subtopic_page_ids(
+        subtopic_page_ids: List[str]
+    ) -> List[str]:
     """Returns the topic ids corresponding to the given subtopic page ids.
 
     Args:
@@ -235,9 +246,11 @@ def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids):
 
 
 def get_matching_learner_group_syllabus_to_add(
-        learner_group_id, keyword,
-        search_type, category,
-        language_code
+        learner_group_id: str,
+        keyword: str,
+        search_type: str,
+        category: str,
+        language_code: str
     ):
     """Returns the syllabus of items matching the given filter arguments
     that can be added to the learner group.
@@ -358,7 +371,7 @@ def get_matching_subtopic_syllabus_item_dicts(
     Returns:
         list(dict). The matching subtopic syllabus items of the given topic.
     """
-    matching_subtopic_syllabus_item_dicts = []
+    matching_subtopic_syllabus_item_dicts: Dict[str, str] = []
 
     for subtopic in topic.subtopics:
         subtopic_page_id = topic.id + ':' + str(subtopic.id)
@@ -425,7 +438,9 @@ def get_matching_story_syllabus_item_dicts(
 
 
 def add_student_to_learner_group(
-        group_id, user_id, progress_sharing_permission
+        group_id: str,
+        user_id: str,
+        progress_sharing_permission: bool
     ) -> None:
     """Adds the given student to the given learner group.
 
@@ -467,7 +482,10 @@ def add_student_to_learner_group(
     learner_group_model.put()
 
 
-def invite_students_to_learner_group(group_id, invited_student_ids) -> None:
+def invite_students_to_learner_group(
+        group_id: str,
+        invited_student_ids: List[str]
+    ) -> None:
     """Invites the given students to the given learner group.
 
     Args:
@@ -496,7 +514,10 @@ def invite_students_to_learner_group(group_id, invited_student_ids) -> None:
     user_models.LearnerGroupsUserModel.put_multi(learner_groups_user_models)
 
 
-def remove_invited_students_from_learner_group(group_id, student_ids) -> None:
+def remove_invited_students_from_learner_group(
+        group_id: str,
+        student_ids: List[str]
+    ) -> None:
     """Removes the given invited students from the given learner group.
 
     Args:
@@ -519,7 +540,7 @@ def get_subtopic_page_progress(
         subtopic_page_ids: List[str],
         topics: List[topic_domain.Topic],
         all_skill_ids: List[str]
-    ):
+    ) -> subtopic_page_domain.SubtopicPageSummary:
     """Returns the progress of the given user on the given subtopic pages.
 
     Args:

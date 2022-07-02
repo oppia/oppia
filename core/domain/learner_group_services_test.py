@@ -185,7 +185,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_ids, ['topic1', 'topic2'])
 
-    def test_get_matching_learner_group_syllabus_to_add(self):
+    def test_get_matching_syllabus_to_add_with_default_filters(self):
         # Test 1: Default filters with topic name matching.
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
@@ -204,6 +204,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_summaries[0]['subtopic_title'], 'Naming Numbers')
 
+    def test_get_syllabus_to_add_with_matching_subtopic_name(self):
         # Test 2: Skill type filter with subtopic name matching.
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
@@ -221,6 +222,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_summaries[0][
             'subtopic_title'], 'Naming Numbers')
 
+    def test_get_syllabus_to_add_with_matching_story_name(self):
         # Test 3: Story type filter with story name matching.
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
@@ -228,7 +230,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'All', constants.DEFAULT_LANGUAGE_CODE
             )
         )
-        # Story test 1 is already par tof the group syllabus
+        # Story test 1 is already part of the group syllabus
         # so it should not be returned in the filtered syllabus.
         story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 1)
@@ -238,6 +240,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         subtopic_summaries = matching_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 0)
 
+    def test_get_matching_syllabus_to_add_with_classroom_filter(self):
         # Test 4: Classroom name filter.
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
@@ -245,7 +248,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'math', constants.DEFAULT_LANGUAGE_CODE
             )
         )
-        # No storys or subtopics are returned as the topics were not added
+        # No stories or subtopics are returned as the topics were not added
         # to the classroom.
         story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 0)
@@ -253,13 +256,14 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         subtopic_summaries = matching_syllabus['subtopic_summaries']
         self.assertEqual(len(subtopic_summaries), 0)
 
+    def test_get_matching_syllabus_to_add_with_language_filter(self):
         # Test 5: Language filter.
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Place', 'All', 'All', 'pt-br'
             )
         )
-        # No storys or subtopics are returned as the topics are all
+        # No stories or subtopics are returned as the topics are all
         # of default language.
         story_summaries = matching_syllabus['story_summaries']
         self.assertEqual(len(story_summaries), 0)
@@ -270,7 +274,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     def test_add_student_to_learner_group(self):
         # Test for invited student.
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-                self.LEARNER_GROUP_ID)
+            self.LEARNER_GROUP_ID)
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get_by_id(
             self.STUDENT_ID)
         self.assertEqual(
@@ -284,7 +288,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-                self.LEARNER_GROUP_ID)
+            self.LEARNER_GROUP_ID)
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get_by_id(
             self.STUDENT_ID)
         self.assertEqual(

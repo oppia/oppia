@@ -29,6 +29,8 @@ from core.domain import caching_services
 from core.domain import story_domain
 from core.platform import models
 
+from typing import List
+
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
 
@@ -294,7 +296,9 @@ def get_completed_nodes_in_story(user_id, story_id):
     return completed_nodes
 
 
-def get_progress_in_stories(user_id, story_ids):
+def get_progress_in_stories(
+        user_id: str, story_ids: List[str]
+    ) -> List[story_domain.StoryProgress]:
     """Returns the progress of the user in all given stories.
 
     Args:
@@ -304,24 +308,22 @@ def get_progress_in_stories(user_id, story_ids):
     Returns:
         list(StoryProgress). The list of story progress of the user.
     """
-    all_stories_progress = []
+    all_stories_progress: List[story_domain.StoryProgress] = []
     all_stories = get_stories_by_ids(story_ids)
 
     for story in all_stories:
-        story_progress = {}
         completed_node_ids = get_completed_node_ids(user_id, story.id)
-        completed_node_titles = []
-        for node in story.story_contents.nodes:
-            if node.id in completed_node_ids:
-                completed_node_titles.append(node.title)
-
-        story_progress = story_domain.StoryProgress(
-            story.id,
-            completed_node_titles,
-            story.story_contents.nodes
+        completed_node_titles = [
+            node.title for node in story.story_contents.nodes
+            if node.id in completed_node_ids
+        ]
+        all_stories_progress.append(
+            story_domain.StoryProgress(
+                story.id,
+                completed_node_titles,
+                story.story_contents.nodes
+            )
         )
-
-        all_stories_progress.append(story_progress)
 
     return all_stories_progress
 
