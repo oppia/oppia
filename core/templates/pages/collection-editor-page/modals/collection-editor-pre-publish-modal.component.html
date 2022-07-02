@@ -9,14 +9,14 @@
   <p *ngIf="requireTitleToBeSpecified">
     Add a title: what should your collection be called?
     <input type="text"
-           class="form-control protractor-collection-editor-title-input e2e-test-collection-editor-title-input"
+           class="form-control e2e-collection-editor-title-input e2e-test-collection-editor-title-input"
            [(ngModel)]="newTitle"
            placeholder="Music in the 19th Century">
   </p>
   <p *ngIf="requireObjectiveToBeSpecified">
     Add a goal: what does the collection help people to do?
     <input type="text"
-           class="form-control protractor-collection-editor-objective-input e2e-test-collection-editor-objective-input"
+           class="form-control e2e-collection-editor-objective-input e2e-test-collection-editor-objective-input"
            [(ngModel)]="newObjective"
            placeholder="Learn how to ...">
   </p>
