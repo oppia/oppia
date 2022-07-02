@@ -67,6 +67,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   userIsLoggedIn: boolean = false;
   lessonAuthorsSubmenuIsShown: boolean = false;
   loggedOutProgressUniqueUrlId: string;
+  loggedOutProgressUniqueUrl: string;
   saveProgressMenuIsShown: boolean = false;
 
 
@@ -127,6 +128,11 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     }
     this.loggedOutProgressUniqueUrlId = (
       this.explorationPlayerStateService.getUniqueProgressUrlId());
+    if (this.loggedOutProgressUniqueUrlId) {
+      this.loggedOutProgressUniqueUrl = (
+        this.windowRef.nativeWindow.location.origin +
+        '/progress/' + this.loggedOutProgressUniqueUrlId);
+    }
     // Rendering the separators in the progress bar requires
     // the number of separators.The purpose of separatorArray
     // is to provide the number of checkpoints in the template file.
@@ -181,14 +187,16 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         .then(() => {
           this.loggedOutProgressUniqueUrlId = (
             this.explorationPlayerStateService.getUniqueProgressUrlId());
+          this.loggedOutProgressUniqueUrl = (
+            this.windowRef.nativeWindow.location.origin +
+            '/progress/' + this.loggedOutProgressUniqueUrlId);
         });
     }
     this.saveProgressMenuIsShown = true;
   }
 
   copyProgressUrl(): void {
-    navigator.clipboard.writeText(
-      'https://oppia.org/progress/' + this.loggedOutProgressUniqueUrlId);
+    navigator.clipboard.writeText(this.loggedOutProgressUniqueUrl);
   }
 
   onLoginButtonClicked(): void {

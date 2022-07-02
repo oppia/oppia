@@ -155,7 +155,7 @@
       <p class="guide-text">Use the link below to save progress for 72 hours.<br>You may lose your progress after 72 hours.</p>
       <p class="copy-text">Write or copy the link below</p>
       <div class="uid-copy">
-        <div id="unique-progress-id">https://oppia.org/progress/{{ loggedOutProgressUniqueUrlId }}</div>
+        <div id="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
         <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
       </div>
     </div>
