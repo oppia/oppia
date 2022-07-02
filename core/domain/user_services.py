@@ -111,14 +111,30 @@ def get_multi_user_ids_from_usernames(usernames):
         usernames: list(str). Identifiable usernames to display in the UI.
 
     Returns:
-        list(str). Return the list of user ids corresponding to given
+        list(str|None). Return the list of user ids corresponding to given
         usernames.
         """
     user_ids: List[str] = []
-    for username in usernames:
-        user_id = get_user_id_from_username(username)
-        if user_id is not None:
-            user_ids.append(user_id)
+    normalized_usernames = [
+        user_domain.UserSettings.normalize_username(username)
+        for username in usernames
+    ]
+    found_models = user_models.UserSettingsModel.query(
+        user_models.UserSettingsModel.normalized_username.IN(
+            normalized_usernames
+        )
+    ).fetch()
+
+    max_index = len(found_models)
+    model_index = 0
+    for username in normalized_usernames:
+        if (model_index < max_index and
+            found_models[model_index].normalized_username == username
+        ):
+            user_ids.append(found_models[model_index].id)
+            model_index += 1
+        else:
+            user_ids.append(None)
 
     return user_ids
 

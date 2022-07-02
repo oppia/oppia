@@ -384,8 +384,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # Return None for usernames which don't exist.
         self.assertEqual(
-            user_services.get_multi_user_ids_from_usernames(['fakeUsername']),
-            []
+            user_services.get_multi_user_ids_from_usernames(
+                ['USERNAME1', 'fakeUsername']
+            ), [user_id1, None]
         )
 
     def test_get_user_settings_from_username_returns_user_settings(self):
