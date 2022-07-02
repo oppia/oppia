@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import isEqual from 'lodash/isEqual';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
@@ -31,35 +31,40 @@ import { AlertsService } from 'services/alerts.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { ExternalSaveService } from 'services/external-save.service';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+
+interface TaggedMisconception {
+  skillId: string;
+  misconceptionId: number;
+}
 
 @Component({
   selector: 'answer-group-editor',
   templateUrl: './answer-group-editor.component.html'
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {
-  @Input() addState;
-  @Input() displayFeedback;
-  @Input() oSaveAnswerGroupDest; // not used
-  @Input() onSaveAnswerGroupRules;
-  @Output() onSaveAnswerGroupCorrectnessLabel = new EventEmitter();
-  @Input() onSaveNextContentIdIndex;
-  @Input() taggedSkillMisconceptionId;
+  @Input() displayFeedback: boolean;
+  @Input() taggedSkillMisconceptionId: string;
   @Input() isEditable: boolean;
-  @Output() onSaveAnswerGroupDest = new EventEmitter();
-  @Output() onSaveAnswerGroupFeedback = new EventEmitter();
-  @Input() oSaveAnswerGroupFeedbackFn;
-  @Input() onSaveTaggedMisconception;
-  @Input() outcome;
-  @Input() rules;
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter();
-  @Input() suppressWarnings;
+  @Input() outcome: Outcome;
+  @Input() rules: Rule[];
+  @Input() suppressWarnings: boolean;
+  @Input() addState: (value: string) => void;
+  @Output() onSaveAnswerGroupRules = new EventEmitter<Rule[]>();
+  @Output() onSaveAnswerGroupCorrectnessLabel = new EventEmitter<Outcome>();
+  @Output() onSaveNextContentIdIndex = new EventEmitter();
+  @Output() onSaveAnswerGroupDest = new EventEmitter<Outcome>();
+  @Output() onSaveAnswerGroupFeedback = new EventEmitter<Outcome>();
+  @Output() onSaveTaggedMisconception = new EventEmitter<TaggedMisconception>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
+    new EventEmitter<string[]>();
 
-  rulesMemento: any;
+  rulesMemento: Rule[];
   directiveSubscriptions = new Subscription();
-  originalContentIdToContent: any;
-  activeRuleIndex: any;
-  answerChoices: any;
-  editAnswerGroupForm: any;
+  originalContentIdToContent: object;
+  activeRuleIndex: number;
+  answerChoices: AnswerChoice[];
+  editAnswerGroupForm: object;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -72,20 +77,21 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     private externalSaveService: ExternalSaveService,
   ) {}
 
-  sendOnSaveAnswerGroupCorrectnessLabel(event): void {
+  sendOnSaveTaggedMisconception(event: TaggedMisconception): void {
+    this.onSaveTaggedMisconception.emit(event);
+  }
+
+  sendOnSaveAnswerGroupCorrectnessLabel(event: Outcome): void {
     this.onSaveAnswerGroupCorrectnessLabel.emit(event);
   }
 
-  sendOnSaveAnswerGroupFeedback(event): void {
+  sendOnSaveAnswerGroupFeedback(event: Outcome): void {
     this.onSaveAnswerGroupFeedback.emit(event);
   }
 
-  sendOnSaveAnswerGroupDest(event): void {
+  sendOnSaveAnswerGroupDest(event: Outcome): void {
+    console.error(event);
     this.onSaveAnswerGroupDest.emit(event);
-  }
-
-  suppressWarningsEmit(): void {
-    this.suppressWarnings.emit();
   }
 
   isInQuestionMode(): boolean {
@@ -243,7 +249,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.changeActiveRuleIndex(this.rules.length - 1);
   }
 
-  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(event: any): void {
+  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(event: string[]): void {
     this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(event);
   }
 
@@ -296,9 +302,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
     this.changeActiveRuleIndex(-1);
     this.rulesMemento = null;
-    this.onSaveAnswerGroupRules(this.rules);
+    this.onSaveAnswerGroupRules.emit(this.rules);
     this.stateNextContentIdIndexService.saveDisplayedValue();
-    this.onSaveNextContentIdIndex(
+    this.onSaveNextContentIdIndex.emit(
       this.stateNextContentIdIndexService.displayed);
   }
 
@@ -359,8 +365,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
         // All rules input types which are translatable are subclasses of
         // BaseTranslatableObject having dict structure with contentId
         // as a key.
-        if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-          contentIdToContentMap[ruleInput.contentId] = ruleInput;
+        if ('contentId' in ruleInput) {
+          if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+            contentIdToContentMap[ruleInput.contentId] = ruleInput;
+          }
         }
       });
     });
