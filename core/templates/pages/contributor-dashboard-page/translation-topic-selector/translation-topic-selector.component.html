@@ -7,7 +7,8 @@
   </div>
 
   <div *ngIf="dropdownShown" class="oppia-translation-topic-selector-dropdown-container protractor-test-topic-selector-dropdown">
-    <div class="oppia-translation-topic-selector-dropdown-label">All Topics</div>
+    <!-- TODO(#15648): Re-enable "All Topics" after fetching latency is fixed. -->
+    <!-- <div class="oppia-translation-topic-selector-dropdown-label">All Topics</div> -->
     <div class="oppia-translation-topic-selector-dropdown-option protractor-test-topic-selector-option"
          *ngFor="let option of options"
          (click)="selectOption(option)"
