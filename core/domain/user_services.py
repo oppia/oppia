@@ -115,24 +115,28 @@ def get_multi_user_ids_from_usernames(usernames):
         usernames.
         """
     user_ids: List[str] = []
+
+    if len(usernames) == 0:
+        return user_ids
+
     normalized_usernames = [
         user_domain.UserSettings.normalize_username(username)
         for username in usernames
     ]
+
     found_models = user_models.UserSettingsModel.query(
         user_models.UserSettingsModel.normalized_username.IN(
             normalized_usernames
         )
     ).fetch()
 
-    max_index = len(found_models)
-    model_index = 0
+    username_to_user_id_map = {}
+    for model in found_models:
+        username_to_user_id_map[model.normalized_username] = model.id
+
     for username in normalized_usernames:
-        if (model_index < max_index and
-            found_models[model_index].normalized_username == username
-        ):
-            user_ids.append(found_models[model_index].id)
-            model_index += 1
+        if username in username_to_user_id_map:
+            user_ids.append(username_to_user_id_map[username])
         else:
             user_ids.append(None)
 

@@ -385,8 +385,22 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return None for usernames which don't exist.
         self.assertEqual(
             user_services.get_multi_user_ids_from_usernames(
-                ['USERNAME1', 'fakeUsername']
-            ), [user_id1, None]
+                ['fakeUsername1', 'fakeUsername2', 'fakeUsername3',
+                'fakeUsername4', 'fakeUsername5', 'fakeUsername6',
+                'fakeUsername7', 'fakeUsername8', 'fakeUsername9']
+            ), [None, None, None, None, None, None, None, None, None]
+        )
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_usernames(
+                ['fakeUsername1', 'USERNAME1', 'fakeUsername3',
+                'fakeUsername4', 'fakeUsername5', 'fakeUsername6',
+                'fakeUsername7', username2, 'fakeUsername9']
+            ), [None, user_id1, None, None, None, None, None, user_id2, None]
+        )
+
+        # Return empty list if empty list is passed in as arguments.
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_usernames([]), []
         )
 
     def test_get_user_settings_from_username_returns_user_settings(self):

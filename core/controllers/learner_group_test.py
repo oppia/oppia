@@ -192,10 +192,10 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
+class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TeacherDashboardHandlerTests, self).setUp()
+        super(FacilitatorDashboardHandlerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
         self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -204,7 +204,7 @@ class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
         # There are no learner groups created by new user yet.
-        response = self.get_json('%s' % (feconf.TEACHER_DASHBOARD_HANDLER))
+        response = self.get_json('%s' % (feconf.FACILITATOR_DASHBOARD_HANDLER))
 
         self.assertEqual(response['learner_groups_list'], [])
 
@@ -217,7 +217,7 @@ class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
             learner_group_id, 'Learner Group Title', 'Description',
             [self.facilitator_id], [], ['subtopic_id_1'], ['story_id_1'])
 
-        response = self.get_json('%s' % (feconf.TEACHER_DASHBOARD_HANDLER))
+        response = self.get_json('%s' % (feconf.FACILITATOR_DASHBOARD_HANDLER))
 
         self.assertEqual(len(response['learner_groups_list']), 1)
         self.assertEqual(

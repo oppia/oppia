@@ -406,8 +406,8 @@ class SearchLearnerGroupSyllabusHandler(base.BaseHandler):
         })
 
 
-class TeacherDashboardHandler(base.BaseHandler):
-    """Handles operations related to the teacher dashboard."""
+class FacilitatorDashboardHandler(base.BaseHandler):
+    """Handles operations related to the facilitator dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -418,7 +418,7 @@ class TeacherDashboardHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_groups
     def get(self):
-        """Handles GET requests for the teacher dashboard."""
+        """Handles GET requests for the facilitator dashboard."""
 
         learner_groups = (
             learner_group_fetchers.get_learner_groups_of_facilitator(

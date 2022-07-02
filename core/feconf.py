@@ -1046,7 +1046,7 @@ USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
-TEACHER_DASHBOARD_HANDLER = '/teacher_dashboard_handler'
+FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
