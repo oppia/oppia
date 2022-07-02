@@ -302,16 +302,11 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topics = [topic]
-        # TODO(#15639): Not sure if this filter is a correct solution.
-        topic_stories = filter(
-            lambda topic: topic is not None,
-            story_fetchers.get_stories_by_ids([
-                reference.story_id
-                for topic in topics
-                for reference in topic.get_all_story_references()
-                if reference.story_is_published
-            ])
-        )
+        topic_stories = story_fetchers.get_stories_by_ids([
+            reference.story_id
+            for topic in topics
+            for reference in topic.get_all_story_references()
+            if reference.story_is_published])
         in_review_suggestions = (
             suggestion_services.get_reviewable_translation_suggestions(user_id))
         in_review_suggestion_target_ids = [
