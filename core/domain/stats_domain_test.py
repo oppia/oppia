@@ -602,35 +602,35 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
 
     # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[typeddict-item] is used to test that
-    # num_starts must be in aggregated stats dict. 
+    # num_starts must be in aggregated stats dict.
     def test_aggregated_stats_validation_when_session_property_is_missing(
             self
         ) -> None:
-            sessions_state_stats: stats_domain.AggregatedStatsDict = { # type: ignore[typeddict-item]
-                'num_actual_starts': 1,
-                'num_completions': 1,
-                'state_stats_mapping': {
-                    'Home': {
-                        'total_hit_count': 1,
-                        'first_hit_count': 1,
-                        'total_answers_count': 1,
-                        'useful_feedback_count': 1,
-                        'num_times_solution_viewed': 1,
-                        'num_completions': 1
-                    }
+        sessions_state_stats: stats_domain.AggregatedStatsDict = { # type: ignore[typeddict-item]
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
                 }
             }
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-                utils.ValidationError,
-                'num_starts not in aggregated stats dict.'
-            ):
-                stats_domain.SessionStateStats.validate_aggregated_stats_dict(
-                    sessions_state_stats)
+        }
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'num_starts not in aggregated stats dict.'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
 
     # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[typeddict-item] is used to test that
-    # num_actual_starts must be an int. 
-    def test_aggregated_stats_validation_when_session_property_type_is_invalid( 
+    # num_actual_starts must be an int.
+    def test_aggregated_stats_validation_when_session_property_type_is_invalid(
         self
     ) -> None:
         sessions_state_stats: stats_domain.AggregatedStatsDict = {
@@ -682,7 +682,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
 
     # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[dict-item] is used to test that
-    # first_hit_count must be an int. 
+    # first_hit_count must be an int.
     def test_aggregated_stats_validation_when_state_property_type_is_invalid(
         self
     ) -> None:
@@ -732,6 +732,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             ),
             sessions_state_stats
         )
+
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""

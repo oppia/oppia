@@ -175,11 +175,14 @@ class LearnerAnswerInfoDict(TypedDict):
 
 
 class AggregatedStatsDict(TypedDict):
-    """Dictionary representing aggregated_stats dict."""
+    """Dictionary representing aggregated_stats dict used to validate the
+    SessionStateStats domain object."""
+
     num_starts: int
     num_actual_starts: int
     num_completions: int
     state_stats_mapping: Dict[str, Dict[str, int]]
+
 
 class ExplorationStats:
     """Domain object representing analytics data for an exploration."""
@@ -764,7 +767,9 @@ class SessionStateStats:
         return session_state_stats_dict
 
     @staticmethod
-    def validate_aggregated_stats_dict(aggregated_stats: AggregatedStatsDict) -> AggregatedStatsDict:
+    def validate_aggregated_stats_dict(
+        aggregated_stats: AggregatedStatsDict
+    ) -> AggregatedStatsDict:
         """Validates the SessionStateStats domain object.
 
         Args:
@@ -790,7 +795,7 @@ class SessionStateStats:
             'num_times_solution_viewed',
             'num_completions'
         ]
-        # use ignore[misc] here because mypy does not recognize that keys
+        # Use ignore[misc] here because mypy does not recognize that keys
         # represented by the variable exp_stats_property are string literals.
         for exp_stats_property in exploration_stats_properties:
             if exp_stats_property not in aggregated_stats:
