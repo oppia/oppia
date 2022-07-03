@@ -41,8 +41,9 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
-(classifier_models,) = models.Registry.import_models(
-    [models.NAMES.classifier])
+(classifier_models,) = models.Registry.import_models([
+    models.NAMES.classifier
+])
 
 
 class ClassifierServicesTests(test_utils.ClassifierTestBase):

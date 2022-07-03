@@ -220,13 +220,13 @@ def get_exploration_summary_by_id(
 
 @overload
 def get_exploration_summary_by_id(
-    exploration_id: str, *, strict: Literal[True] = ...
+    exploration_id: str, *, strict: Literal[True]
 ) -> exp_domain.ExplorationSummary: ...
 
 
 @overload
 def get_exploration_summary_by_id(
-    exploration_id: str, *, strict: Literal[False] = ...
+    exploration_id: str, *, strict: Literal[False]
 ) -> Optional[exp_domain.ExplorationSummary]: ...
 
 
@@ -367,7 +367,7 @@ def get_exploration_by_id(
 def get_exploration_by_id(
     exploration_id: str,
     *,
-    strict: Literal[True] = ...,
+    strict: Literal[True],
     version: Optional[int] = None
 ) -> exp_domain.Exploration: ...
 
@@ -376,7 +376,7 @@ def get_exploration_by_id(
 def get_exploration_by_id(
     exploration_id: str,
     *,
-    strict: Literal[False] = ...,
+    strict: Literal[False],
     version: Optional[int] = None
 ) -> Optional[exp_domain.Exploration]: ...
 
