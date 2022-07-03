@@ -508,6 +508,10 @@ describe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
   }));
 
   it('should create', () => {
@@ -763,10 +767,6 @@ describe('Conversation skin component', () => {
       .and.returnValue(mockOnSolutionViewedEventEmitter);
     spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
       .and.returnValue(mockOnPlayerStateChange);
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'fetchCheckpointsFeatureIsEnabledStatus'
-    ).and.returnValue(Promise.resolve(true));
 
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
@@ -834,10 +834,6 @@ describe('Conversation skin component', () => {
     spyOn(messengerService, 'sendMessage');
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
       .and.returnValue(Promise.resolve(sampleExpResponse));
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'fetchCheckpointsFeatureIsEnabledStatus'
-    ).and.returnValue(Promise.resolve(true));
     spyOn(
       editableExplorationBackendApiService,
       'changeLoggedOutProgressToLoggedInProgressAsync')
@@ -986,10 +982,6 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
       .and.returnValue(Promise.resolve(expResponse));
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'fetchCheckpointsFeatureIsEnabledStatus'
-    ).and.returnValue(Promise.resolve(true));
     spyOn(explorationEngineService, 'getShortestPathToState')
       .and.returnValue(['Start', 'Mid']);
 
