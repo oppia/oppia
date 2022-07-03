@@ -613,7 +613,7 @@ describe('Conversation skin component', () => {
     spyOn(alertsService, 'addWarning');
     componentInstance.ngOnInit();
 
-    TestBed.inject(WindowRef).nativeWindow.onresize(null);
+    windowRef.nativeWindow.onresize(null);
     tick(1000);
   }));
 
@@ -883,6 +883,8 @@ describe('Conversation skin component', () => {
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
         'collection_id');
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(localStorageService, 'getUniqueProgressIdOfLoggedOutLearner')
+        .and.returnValue(null);
       spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
         .and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning');
