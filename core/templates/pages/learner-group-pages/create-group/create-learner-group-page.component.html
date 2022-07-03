@@ -1,0 +1,30 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.rtl.css" as="style">
+
+<div class="oppia-create-learner-group-container position-relative">
+  <div class="oppia-create-learner-group-title">
+      <span translate="I18N_CREATE_LEARNER_GROUP"></span>
+  </div>
+  <div class="oppia-create-learner-group-progress">
+    <ul class="cdt-step-progressbar horizontal">
+      <li class="active">
+        <span class="indicator">1</span>
+        <span class="title">Add Group Details</span>
+      </li>
+      <li>
+        <span class="indicator">2</span>
+        <span class="title">Add Syllabus Items</span>
+      </li>
+      <li>
+        <span class="indicator">3</span>
+        <span class="title">Add Members</span>
+      </li>
+    </ul>
+  </div>
+  <div class="oppia-create-learner-group-tab-container">
+    
+  </div>
+</div>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.rtl.css">
