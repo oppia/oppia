@@ -79,13 +79,8 @@ def get_questions_and_skill_descriptions_by_skill_ids(
 
     for skill_ids_list in grouped_skill_ids:
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
-        skill_descriptions: List[Optional[str]] = []
-        for skill in skills:
-            if skill:
-                # Ruling out the possibility of None for mypy type checking.
-                assert isinstance(skill.description, str)
-                skill_descriptions.append(skill.description)
-        grouped_skill_descriptions.append(skill_descriptions)
+        grouped_skill_descriptions.append(
+            [skill.description if (skill and isinstance(skill.description, str)) else None for skill in skills])
 
     questions = get_questions_by_ids(question_ids)
     return questions, grouped_skill_descriptions
