@@ -86,6 +86,7 @@ export const AppConstants = {
 
   // We use a slash because this character is forbidden in a state name.
   PLACEHOLDER_OUTCOME_DEST: '/',
+  PLACEHOLDER_OUTCOME_DEST_IF_STUCK: '/',
   INTERACTION_DISPLAY_MODE_INLINE: 'inline',
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
