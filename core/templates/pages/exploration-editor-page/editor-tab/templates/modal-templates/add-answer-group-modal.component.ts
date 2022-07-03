@@ -42,7 +42,7 @@ import cloneDeep from 'lodash/cloneDeep';
  }
 
  @Component({
-   selector: 'add-answer-group-modal-component',
+   selector: 'oppia-add-answer-group-modal-component',
    templateUrl: './add-answer-group-modal.component.html'
  })
 export class AddAnswerGroupModalComponent

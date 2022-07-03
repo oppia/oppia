@@ -40,7 +40,7 @@ interface TaggedMisconception {
 }
 
 @Component({
-  selector: 'answer-group-editor',
+  selector: 'oppia-answer-group-editor',
   templateUrl: './answer-group-editor.component.html'
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {

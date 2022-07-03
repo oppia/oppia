@@ -47,7 +47,7 @@ interface ReturnModalObject {
 }
 
 @Component({
-  selector: 'question-editor-modal',
+  selector: 'oppia-question-editor-modal',
   templateUrl: './question-editor-modal.component.html'
 })
 export class QuestionEditorModalComponent
