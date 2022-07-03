@@ -23,12 +23,17 @@ from core import feconf
 from core import utils
 from core.domain import html_validation_service
 
+from typing import Union
 
-def validate_image_and_filename(raw_image, filename):
+
+def validate_image_and_filename(
+    raw_image: Union[str, bytes],
+    filename: str
+) -> str:
     """Validates the image data and its filename.
 
     Args:
-        raw_image: str. The image content.
+        raw_image: Union[str, bytes]. The image content.
         filename: str. The filename for the image.
 
     Returns:
@@ -42,17 +47,19 @@ def validate_image_and_filename(raw_image, filename):
 
     if not raw_image:
         raise utils.ValidationError('No image supplied')
-    if utils.is_base64_encoded(raw_image):
+    if isinstance(raw_image, str) and utils.is_base64_encoded(raw_image):
         raw_image = base64.decodebytes(raw_image.encode('utf-8'))
     if len(raw_image) > hundred_kb_in_bytes:
         raise utils.ValidationError(
             'Image exceeds file size limit of 100 KB.')
     allowed_formats = ', '.join(
         list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-    if html_validation_service.is_parsable_as_xml(raw_image):
+    # Ruling out the possibility of str for mypy type checking.
+    assert isinstance(raw_image, bytes)
+    if html_validation_service.is_parsable_as_xml(raw_image):  # type: ignore[no-untyped-call]
         file_format = 'svg'
         invalid_tags, invalid_attrs = (
-            html_validation_service.get_invalid_svg_tags_and_attrs(raw_image))
+            html_validation_service.get_invalid_svg_tags_and_attrs(raw_image))  # type: ignore[no-untyped-call]
         if invalid_tags or invalid_attrs:
             invalid_tags_message = (
                 'tags: %s' % invalid_tags if invalid_tags else '')
@@ -61,7 +68,7 @@ def validate_image_and_filename(raw_image, filename):
             raise utils.ValidationError(
                 'Unsupported tags/attributes found in the SVG:\n%s\n%s' % (
                     invalid_tags_message, invalid_attrs_message))
-        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(
+        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(  # type: ignore[no-untyped-call]
                 raw_image):
             raise utils.ValidationError(
                 'The svg tag does not contains the \'xmlns\' attribute.')

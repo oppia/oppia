@@ -56,10 +56,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             expected_thread_dict['status'], expected_thread_dict['subject'],
             expected_thread_dict['summary'], False, 1, fake_date, fake_date,
             'last message', self.viewer_id)
-        # Using type ignore[arg-type] here because assertDictEqual method
-        # expects both arguments to be of type Dict[Any, Any].
         self.assertDictEqual(
-            expected_thread_dict, observed_thread.to_dict()) # type: ignore[arg-type]
+            expected_thread_dict, observed_thread.to_dict())
 
     def test_get_last_two_message_ids_from_thread_with_many_messages(
         self
@@ -119,10 +117,8 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             self.owner_id, expected_message_dict['updated_status'],
             expected_message_dict['updated_subject'],
             expected_message_dict['text'], fake_date, fake_date, False)
-        # Using type ignore[arg-type] here because assertDictEqual method
-        # expects both arguments to be of type Dict[Any, Any].
         self.assertDictEqual(
-            expected_message_dict, observed_message.to_dict()) # type: ignore[arg-type]
+            expected_message_dict, observed_message.to_dict())
 
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):

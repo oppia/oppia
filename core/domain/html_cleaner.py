@@ -106,7 +106,7 @@ def clean(user_submitted_html: str) -> str:
         and attributes.
     """
     oppia_custom_tags = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
+        rte_component_registry.Registry.get_tag_list_with_attrs())
 
     core_tags = ATTRS_WHITELIST.copy()
     core_tags.update(oppia_custom_tags)
@@ -175,7 +175,7 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
     components: List[ComponentsDict] = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())  # type: ignore[no-untyped-call]
+        rte_component_registry.Registry.get_tag_list_with_attrs())
     for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:

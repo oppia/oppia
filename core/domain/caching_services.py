@@ -152,7 +152,7 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
-    CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
     CACHE_NAMESPACE_CONFIG: json.dumps,
     CACHE_NAMESPACE_DEFAULT: json.dumps
 }
