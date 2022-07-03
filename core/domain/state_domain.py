@@ -34,7 +34,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Mapping, Optional, Union
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -392,6 +392,10 @@ class Hint(translation_domain.BaseTranslatableObject):
         return hint_dict
 
 
+# Here, correct_answer is annotated with Any type. Because correct_answer
+# can accept values of type List[Set[str]], List[str], str, int, Dict and
+# other types too. So, to make it generalized for every types of values.
+# We used Any type here.
 class SolutionDict(TypedDict):
     """Dictionary representing the Solution object."""
 
@@ -411,6 +415,10 @@ class Solution(translation_domain.BaseTranslatableObject):
     an explanation for the solution.
     """
 
+    # Here, argument `correct_answer` is annotated with Any type. Because
+    # correct_answer can accept values of type List[Set[str]], List[str], str,
+    # int, Dict and other types too. So, to make it generalized for every types
+    # of values. We used Any type here.
     def __init__(
         self,
         interaction_id: str,
@@ -572,6 +580,10 @@ class Solution(translation_domain.BaseTranslatableObject):
         return solution_dict
 
 
+# Here, in 'customization_args', we used Any type because it accepts
+# the values of customization args and that values can be of type str, int,
+# bool, List and other types too. So to make it generalize for every type
+# of values, we used Any here.
 class InteractionInstanceDict(TypedDict):
     """Dictionary representing the InteractionInstance object."""
 
@@ -2346,7 +2358,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Dict[str, Any]
+    inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2355,7 +2367,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Dict[str, Any]
+        inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
     ) -> None:
         """Initializes a RuleSpec domain object.
 
@@ -2370,6 +2382,9 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                 enclosed in {{...}} braces.
         """
         self.rule_type = rule_type
+        # Here, we are narrowing down the type from Mapping to Dict. Because
+        # Mapping is used just to accept the different types of allowed Dicts.
+        assert isinstance(inputs, dict)
         self.inputs = inputs
 
     def get_translatable_contents_collection(
