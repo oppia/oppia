@@ -80,7 +80,8 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     for skill_ids_list in grouped_skill_ids:
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
         grouped_skill_descriptions.append(
-            [skill.description if (skill and isinstance(skill.description, str)) else None for skill in skills])
+            [skill.description if (skill and isinstance(skill.description, str))
+            else None for skill in skills])
 
     questions = get_questions_by_ids(question_ids)
     return questions, grouped_skill_descriptions
