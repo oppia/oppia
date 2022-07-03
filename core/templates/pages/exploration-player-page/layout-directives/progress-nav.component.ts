@@ -32,6 +32,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -92,7 +93,8 @@ export class ProgressNavComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
   ngOnChanges(): void {
@@ -120,6 +122,13 @@ export class ProgressNavComponent {
       this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
         () => {
           this.submit.emit();
+        }
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.contentTranslationManagerService.onStateCardContentUpdate.subscribe(
+        () => {
+          this.updateDisplayedCardInfo();
         }
       )
     );

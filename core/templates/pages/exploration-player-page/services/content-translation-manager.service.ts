@@ -87,7 +87,9 @@ export class ContentTranslationManagerService {
     const cards = this.playerTranscriptService.transcript;
 
     if (languageCode === this.explorationLanguageCode) {
-      this.playerTranscriptService.restoreImmutably(this.originalTranscript);
+      this.playerTranscriptService.restoreImmutably(
+        cloneDeep(this.originalTranscript)
+      );
     } else {
       cards.forEach(
         card => this._displayTranslationsForCard(card, languageCode));
