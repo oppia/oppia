@@ -23,18 +23,18 @@ from core import feconf
 from core import utils
 from core.domain import html_validation_service
 
-from typing import Optional, Union
+from typing import Union
 
 
 def validate_image_and_filename(
-    raw_image: Optional[Union[str, bytes]],
-    filename: Optional[str]
+    raw_image: Union[str, bytes],
+    filename: str
 ) -> str:
     """Validates the image data and its filename.
 
     Args:
-        raw_image: Optional[Union[str, bytes]]. The image content.
-        filename: Optional[str]. The filename for the image.
+        raw_image: Union[str, bytes]. The image content.
+        filename: str. The filename for the image.
 
     Returns:
         str. The file format of the image.

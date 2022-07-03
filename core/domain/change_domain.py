@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Mapping, Union, cast
 AcceptableChangeDictTypes = Union[
     str,
     bool,
+    int,
     List[str],
     # This Dict type is added to allow BaseChange to accept customization_args.
     Dict[str, Dict[str, Any]]
