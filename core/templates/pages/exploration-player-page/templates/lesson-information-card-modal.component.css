@@ -293,7 +293,7 @@
 }
 
 .save-progress-menu .uid-box .uid-copy .uid-copy-btn {
-  box-shadow: 1px 1px 2px 0px rgba(0, 54, 50, 0.5);
+  box-shadow: 1px 1px 2px 0 rgba(0, 54, 50, 0.5);
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 700;
