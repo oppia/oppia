@@ -50,17 +50,17 @@
           </div>
           <div class="oppia-lesson-info-card-buttons">
             <button type="button"
-                  class="btn btn-secondary restart-lesson-btn"
-                  *ngIf="userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
-                  (click)="restartExploration()">
+                    class="btn btn-secondary restart-lesson-btn"
+                    *ngIf="userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="restartExploration()">
               {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
             </button>
             <button type="button"
-                  class="btn btn-secondary save-progress-btn"
-                  *ngIf="!userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
-                  (click)="saveLoggedOutProgress()">
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="!userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="saveLoggedOutProgress()">
               Save Progress
             </button>
           </div>
@@ -114,17 +114,17 @@
           </div>
           <div class="oppia-lesson-info-card-buttons">
             <button type="button"
-                  class="btn btn-secondary restart-lesson-btn"
-                  *ngIf="userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
-                  (click)="restartExploration()">
+                    class="btn btn-secondary restart-lesson-btn"
+                    *ngIf="userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="restartExploration()">
               {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
             </button>
             <button type="button"
-                  class="btn btn-secondary save-progress-btn"
-                  *ngIf="!userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
-                  (click)="saveLoggedOutProgress()">
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="!userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="saveLoggedOutProgress()">
               Save Progress
             </button>
           </div>
@@ -145,33 +145,33 @@
 </button>
 <div class="save-progress-menu"
      *ngIf="saveProgressMenuIsShown && !userIsLoggedIn">
-    <h3>Save Progress</h3>
-    <div class="sign-in-box">
-      <p>Your learning progress will be automatically saved if you have an account.</p>
-      <button type="button"
-              class="btn btn-secondary create-account-btn"
-              (click)="onLoginButtonClicked()">
-            Create Account
-      </button>
-      <p class="sign-in-text">Already have an account? <a class="sign-in-link" (click)="onLoginButtonClicked()">Sign In</a></p>
-    </div>
-    <div class="separator">
-      <div class="bars"></div>
-      <div class="mid">or</div>
-      <div class="bars"></div>
-    </div>
-    <div class="uid-box">
-      <p class="guide-text">Use the link below to save progress for 72 hours.<br>You may lose your progress after 72 hours.</p>
-      <p class="copy-text">Write or copy the link below</p>
-      <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
-        <div id="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
-        <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
-      </div>
-    </div>
-    <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
-      <i class="material-icons md-24">&#xE5CD;</i>
-      <span class="oppia-icon-accessibility-label">Close</span>
+  <h3>Save Progress</h3>
+  <div class="sign-in-box">
+    <p>Your learning progress will be automatically saved if you have an account.</p>
+    <button type="button"
+            class="btn btn-secondary create-account-btn"
+            (click)="onLoginButtonClicked()">
+          Create Account
     </button>
+    <p class="sign-in-text">Already have an account? <a class="sign-in-link" (click)="onLoginButtonClicked()">Sign In</a></p>
+  </div>
+  <div class="separator">
+    <div class="bars"></div>
+    <div class="mid">or</div>
+    <div class="bars"></div>
+  </div>
+  <div class="uid-box">
+    <p class="guide-text">Use the link below to save progress for 72 hours.<br>You may lose your progress after 72 hours.</p>
+    <p class="copy-text">Write or copy the link below</p>
+    <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
+      <div id="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
+      <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
+    </div>
+  </div>
+  <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
+    <i class="material-icons md-24">&#xE5CD;</i>
+    <span class="oppia-icon-accessibility-label">Close</span>
+  </button>
 </div>
 
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
