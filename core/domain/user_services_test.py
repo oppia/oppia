@@ -46,8 +46,8 @@ from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models
     from mypy_imports import audit_models
+    from mypy_imports import auth_models
     from mypy_imports import user_models
 
 (auth_models, user_models, audit_models) = (models.Registry.import_models([
