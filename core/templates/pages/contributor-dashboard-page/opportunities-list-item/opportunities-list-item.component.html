@@ -235,7 +235,8 @@
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span class="protractor-test-opportunity-list-item-heading" title="{{ opportunity?.heading }}"
+      <span class="protractor-test-opportunity-list-item-heading" 
+            title="{{ opportunity?.heading }}"
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
       </span>
