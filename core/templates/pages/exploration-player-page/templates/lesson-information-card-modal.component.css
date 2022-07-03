@@ -199,7 +199,7 @@
 }
 
 .save-progress-menu h3 {
-  font-family: capriola;
+  font-family: capriola, sans-serif;
   font-size: 24px;
   font-weight: 400;
   margin: 40px auto 20px 18px;
@@ -219,7 +219,7 @@
   margin: 10px 20px;
 }
 
-.save-progress-menu .sign-in-box .sign-in-text a{
+.save-progress-menu .sign-in-box .sign-in-text a {
   color: #00645c;
   text-decoration: underline;
 }
@@ -228,7 +228,7 @@
   background-color: #00645c;
   color: white;
   cursor: pointer;
-  font-family: Capriola;
+  font-family: Capriola, sans-serif;
   font-size: 14px;
   font-weight: 700;
   height: 38px;
@@ -245,8 +245,8 @@
   width: 100%;
 }
 
-.save-progress-menu .separator .bars{
-  background-color: #B7B7B7;
+.save-progress-menu .separator .bars {
+  background-color: #b7b7b7;
   height: 2px;
   padding: auto;
   width: 30%;
@@ -260,12 +260,12 @@
   width: 100%;
 }
 
-.save-progress-menu .uid-box .guide-text{
+.save-progress-menu .uid-box .guide-text {
   text-align: center;
   width: 100%;
 }
 
-.save-progress-menu .uid-box .copy-text{
+.save-progress-menu .uid-box .copy-text {
   font-size: 14px;
   margin-bottom: 10px;
   padding-left: 20px;
@@ -293,8 +293,8 @@
 }
 
 .save-progress-menu .uid-box .uid-copy .uid-copy-btn {
-  box-shadow: 1px 1px 2px 0px rgb(0 54 50 / 50%);
-  font-family: Roboto;
+  box-shadow: 1px 1px 2px 0px rgba(0, 54, 50, 0.5);
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 700;
   margin: 0 auto;
