@@ -230,7 +230,7 @@ export class QuestionEditorModalComponent
   }
 }
 
-angular.module('oppia').directive('questionEditorModal',
+angular.module('oppia').directive('oppiaQuestionEditorModal',
   downgradeComponent({
     component: QuestionEditorModalComponent
   }) as angular.IDirectiveFactory);

@@ -171,7 +171,7 @@ export class AddAnswerGroupModalComponent
    }
 }
 
-angular.module('oppia').directive('addAnswerGroupModalComponent',
+angular.module('oppia').directive('oppiaAddAnswerGroupModalComponent',
    downgradeComponent({
      component: AddAnswerGroupModalComponent
    }) as angular.IDirectiveFactory);
