@@ -97,9 +97,6 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
-    # issue_customization_args: Dict[str, Union[str, int, Dict[
-    #     Union[str, int], Union[str, int]
-    # ]]]
     issue_customization_args: Dict[str, Dict[str, Union[str, int]]]
     actions: List[LearnerActionDict]
 
@@ -154,7 +151,7 @@ class LearnerActionDict(TypedDict):
 
     action_type: str
     action_customization_args: Dict[str, Union[str, int, Dict[
-        Union[str, int], Union[str, int]
+        str, Union[str, int]
     ]]]
     schema_version: int
 
@@ -1264,8 +1261,8 @@ class LearnerAction:
         self,
         action_type: str,
         action_customization_args: Dict[str, Union[str, int, Dict[
-            Union[str, int], Union[str, int]
-        ]]],
+        str, Union[str, int]
+    ]]],
         schema_version: int
     ):
         """Constructs a LearnerAction domain object.
