@@ -23,12 +23,15 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict, List, Mapping, Union, cast
+from typing import Any, Dict, List, Mapping, Union, cast
 
 # Union type defined from allowed types that a Dict can contain for its values.
 AcceptableChangeDictTypes = Union[
     str,
-    List[str]
+    bool,
+    List[str],
+    # This Dict type is added to allow BaseChange to accept customization_args.
+    Dict[str, Dict[str, Any]]
 ]
 
 

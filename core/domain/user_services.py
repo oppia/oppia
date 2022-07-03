@@ -774,7 +774,7 @@ def _get_user_settings_from_model(
     )
 
 
-def is_user_registered(user_id: str) -> bool:
+def is_user_registered(user_id: Optional[str]) -> bool:
     """Checks if a user is registered with the given user_id.
 
     Args:
