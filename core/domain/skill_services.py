@@ -545,7 +545,7 @@ def get_skill_summary_by_id(skill_id, strict=True):
         return None
 
 
-def get_new_skill_id():
+def get_new_skill_id() -> str:
     """Returns a new skill id.
 
     Returns:

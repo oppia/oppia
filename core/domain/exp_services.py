@@ -1898,7 +1898,7 @@ def delete_demo(exploration_id):
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
-def load_demo(exploration_id):
+def load_demo(exploration_id: str) -> None:
     """Loads a demo exploration.
 
     The resulting exploration will have two commits in its history (one for

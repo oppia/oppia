@@ -814,13 +814,13 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         rubrics = [
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'])]
 

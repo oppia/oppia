@@ -54,8 +54,7 @@ class ValueGeneratorNameTests(test_utils.GenericTestBase):
     def test_value_generator_names(self) -> None:
         """This function checks for duplicate value generators."""
 
-        all_python_files = (
-            self.get_all_python_files()) # type: ignore[no-untyped-call]
+        all_python_files = self.get_all_python_files()
         all_value_generators = []
 
         for file_name in all_python_files:
