@@ -29,12 +29,12 @@
       </div>
       <div class="oppia-suggestion-review-panel"
            [ngClass]="isContentExpanded ? 'oppia-expanded' : 'oppia-contracted'">
-        <ul *ngIf="isSetOfStringsContent">
+        <ul *ngIf="contentTypeIsSetOfStrings">
           <li *ngFor="let item of displayExplorationContent(); index as idx">
             {{ item }}
           </li>
         </ul>
-        <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
+        <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
                                     [htmlData]="displayExplorationContent()">
         </angular-html-bind-wrapper>
       </div>
@@ -59,21 +59,21 @@
           <angular-html-bind-wrapper [htmlData]="translationHtml"
                                      *ngIf="!startedEditing">
           </angular-html-bind-wrapper>
-          <ul *ngIf="isSetOfStringsContent">
+          <ul *ngIf="contentTypeIsSetOfStrings">
             <li *ngFor="let item of translationHtml; index as idx">
               {{ item }}
             </li>
           </ul>
           <schema-based-editor [schema]="HTML_SCHEMA"
-                               *ngIf="startedEditing && isHtmlContent"
+                               *ngIf="startedEditing && contentTypeIsHtml"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="UNICODE_SCHEMA"
-                               *ngIf="startedEditing && isUnicodeContent"
+                               *ngIf="startedEditing && contentTypeIsUnicode"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
-                               *ngIf="startedEditing && isSetOfStringsContent"
+                               *ngIf="startedEditing && contentTypeIsSetOfStrings"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
         </div>
@@ -106,16 +106,18 @@
            *ngIf="hasExplorationContentChanged()">
     <p class="oppia-suggestion-review-exploration-change-note">
       <strong>
-        NOTE: The content has been modified since this translation has been submitted. Please edit the translation as necessary. The original content at the time of submission was:
+        NOTE: The content has been modified since this translation has been submitted.
+        Please edit the translation as necessary.
+        The original content at the time of submission was:
       </strong>
     </p>
     <div class="oppia-suggestion-review-panel">
-      <ul *ngIf="isSetOfStringsContent">
+      <ul *ngIf="contentTypeIsSetOfStrings">
         <li *ngFor="let item of contentHtml; index as idx">
           {{ item }}
         </li>
       </ul>
-      <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
+      <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
                                  [htmlData]="contentHtml">
       </angular-html-bind-wrapper>
     </div>
