@@ -2570,7 +2570,7 @@ def get_dashboard_stats(user_id: str) -> DashboardStatsDict:
     }
 
 
-def _get_checkpoints_in_order(
+def get_checkpoints_in_order(
     init_state_name: str, states: Dict[str, state_domain.State]
 ) -> List[str]:
     """Returns the checkpoints of an exploration in sequential order by a
@@ -2607,7 +2607,7 @@ def _get_checkpoints_in_order(
     return checkpoint_state_names
 
 
-def _get_most_distant_reached_checkpoint_in_current_exploration(
+def get_most_distant_reached_checkpoint_in_current_exploration(
     checkpoints_in_current_exploration: List[str],
     checkpoints_in_older_exploration: List[str],
     most_distant_reached_checkpoint_state_name_in_older_exploration: str
@@ -2683,15 +2683,15 @@ def update_learner_checkpoint_progress(
                 version=exp_user_model.furthest_reached_checkpoint_exp_version
             )
         )
-        checkpoints_in_current_exp = _get_checkpoints_in_order(
+        checkpoints_in_current_exp = get_checkpoints_in_order(
             current_exploration.init_state_name, current_exploration.states)
-        checkpoints_in_older_exp = _get_checkpoints_in_order(
+        checkpoints_in_older_exp = get_checkpoints_in_order(
             furthest_reached_checkpoint_exp.init_state_name,
             furthest_reached_checkpoint_exp.states)
 
         # Get the furthest reached checkpoint in current exploration.
         furthest_reached_checkpoint_in_current_exp = (
-            _get_most_distant_reached_checkpoint_in_current_exploration(
+            get_most_distant_reached_checkpoint_in_current_exploration(
                 checkpoints_in_current_exp,
                 checkpoints_in_older_exp,
                 exp_user_model.furthest_reached_checkpoint_state_name
@@ -2752,7 +2752,7 @@ def clear_learner_checkpoint_progress(
         exp_user_model.put()
 
 
-def sync_learner_checkpoint_progress_with_current_exp_version(
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     user_id: str, exploration_id: str
 ) -> Optional[user_domain.ExplorationUserData]:
     """Synchronizes the most recently reached checkpoint and the furthest
@@ -2787,11 +2787,11 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
         ))
 
     most_recently_reached_checkpoint_in_current_exploration = (
-        _get_most_distant_reached_checkpoint_in_current_exploration(
-            _get_checkpoints_in_order(
+        get_most_distant_reached_checkpoint_in_current_exploration(
+            get_checkpoints_in_order(
                 latest_exploration.init_state_name,
                 latest_exploration.states),
-            _get_checkpoints_in_order(
+            get_checkpoints_in_order(
                 most_recently_interacted_exploration.init_state_name,
                 most_recently_interacted_exploration.states),
             exp_user_model.most_recently_reached_checkpoint_state_name
@@ -2799,11 +2799,11 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
     )
 
     furthest_reached_checkpoint_in_current_exploration = (
-        _get_most_distant_reached_checkpoint_in_current_exploration(
-            _get_checkpoints_in_order(
+        get_most_distant_reached_checkpoint_in_current_exploration(
+            get_checkpoints_in_order(
                 latest_exploration.init_state_name,
                 latest_exploration.states),
-            _get_checkpoints_in_order(
+            get_checkpoints_in_order(
                 furthest_reached_exploration.init_state_name,
                 furthest_reached_exploration.states),
             exp_user_model.furthest_reached_checkpoint_state_name
