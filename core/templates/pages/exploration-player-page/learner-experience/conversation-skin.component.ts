@@ -312,8 +312,11 @@ export class ConversationSkinComponent {
             this.playerTranscriptService.getLastStateName(),
             this.learnerParamsService.getAllParams());
 
+          let isLoggedOutProgressTracked = (
+            this.explorationPlayerStateService
+              .isLoggedOutLearnerProgressTracked());
           if (this.CHECKPOINTS_FEATURE_IS_ENABLED && !this.isLoggedIn &&
-            !this.explorationPlayerStateService.isLoggedOutProgressTracked) {
+            !isLoggedOutProgressTracked) {
             let confirmationMessage = (
               'Please save your progress before navigating away from the' +
               ' page; else, you will lose your exploration progress.');

@@ -763,6 +763,10 @@ describe('Conversation skin component', () => {
       .and.returnValue(mockOnSolutionViewedEventEmitter);
     spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
       .and.returnValue(mockOnPlayerStateChange);
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
 
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
