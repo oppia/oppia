@@ -421,7 +421,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('answerGroupEditor',
+angular.module('oppia').directive('oppiaAnswerGroupEditor',
   downgradeComponent({
     component: AnswerGroupEditor
   }) as angular.IDirectiveFactory);
