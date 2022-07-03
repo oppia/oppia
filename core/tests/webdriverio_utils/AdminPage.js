@@ -47,7 +47,8 @@ var AdminPage = function() {
     if (title.match(propertyName)) {
       await editingInstructions(
         await forms.getEditor(objectType)(configProperty));
-      await action.click('Save All Configs Button', saveAllConfigs);
+      await action.clickAndSkipRelease(
+        'Save All Configs Button', saveAllConfigs);
       await general.acceptAlert();
       // Waiting for success message.
       await waitFor.textToBePresentInElement(
