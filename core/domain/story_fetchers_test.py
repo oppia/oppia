@@ -192,24 +192,29 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_progress_in_stories(self) -> None:
         all_stories_progress = story_fetchers.get_progress_in_stories(
-            self.USER_ID, [self.STORY_ID])
-        all_stories = story_fetchers.get_stories_by_ids([self.STORY_ID])
+            self.USER_ID, [self.story_id])
+        all_stories = story_fetchers.get_stories_by_ids([self.story_id])
 
         self.assertEqual(len(all_stories_progress), 1)
-        self.assertEqual(all_stories_progress[0].story_id, self.STORY_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert all_stories_progress[0] is not None
+        assert all_stories[0] is not None
+        self.assertEqual(all_stories_progress[0].story_id, self.story_id)
         self.assertEqual(all_stories_progress[0].completed_node_titles, [])
         self.assertEqual(
             len(all_stories_progress[0].all_nodes),
             len(all_stories[0].story_contents.nodes)
         )
 
-        story_services.record_completed_node_in_story_context(
-            self.USER_ID, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context( # type: ignore[no-untyped-call]
+            self.USER_ID, self.story_id, self.NODE_ID_1)
 
         all_stories_progress = story_fetchers.get_progress_in_stories(
-            self.USER_ID, [self.STORY_ID])
+            self.USER_ID, [self.story_id])
         self.assertEqual(len(all_stories_progress), 1)
-        self.assertEqual(all_stories_progress[0].story_id, self.STORY_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert all_stories_progress[0] is not None
+        self.assertEqual(all_stories_progress[0].story_id, self.story_id)
         self.assertEqual(
             all_stories_progress[0].completed_node_titles, ['Title 1'])
 
