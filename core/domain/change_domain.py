@@ -24,11 +24,12 @@ from core import feconf
 from core import utils
 from core.domain import state_domain
 
-from typing import List, Mapping, Union, cast
+from typing import Dict, List, Mapping, Union, cast
 
 
 AcceptableChangeDictTypes = Union[
     str,
+    int,
     List[str],
     List[state_domain.AnswerGroupDict],
     state_domain.RecordedVoiceoversDict
@@ -217,7 +218,7 @@ class BaseChange:
 
         actual_cmd_attributes = copy.deepcopy(change_dict)
         # Here, `actual_cmd_attributes` is of type Mapping and Mapping does not
-        # contain extra methods (e.g: .pop()). But here we are using `pop()`
+        # contain extra methods (e.g: .pop()). But here we are accessing `pop()`
         # method, which causes MyPy to throw error. Thus to avoid the error,
         # we used ignore here.
         actual_cmd_attributes.pop('cmd', None)  # type: ignore[attr-defined]
@@ -225,7 +226,7 @@ class BaseChange:
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
-    def to_dict(self) -> Mapping[str, AcceptableChangeDictTypes]:
+    def to_dict(self) -> Dict[str, AcceptableChangeDictTypes]:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:

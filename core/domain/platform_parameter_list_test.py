@@ -31,9 +31,9 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'end_chapter_celebration']
 
     def test_all_defined_parameters_are_valid(self) -> None:
-        all_names = params.Registry.get_all_platform_parameter_names()  # type: ignore[no-untyped-call]
+        all_names = params.Registry.get_all_platform_parameter_names()
         for name in all_names:
-            param = params.Registry.get_platform_parameter(name)  # type: ignore[no-untyped-call]
+            param = params.Registry.get_platform_parameter(name)
             param.validate()
 
     def test_number_of_parameters_meets_expectation(self) -> None:
@@ -50,7 +50,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         EXPECTED_PARAM_NAMES list as well.
         """
         self.assertEqual(
-            len(params.Registry.get_all_platform_parameter_names()),  # type: ignore[no-untyped-call]
+            len(params.Registry.get_all_platform_parameter_names()),
             len(self.EXPECTED_PARAM_NAMES))
 
     def test_all_expected_parameters_are_present_in_registry(self) -> None:
@@ -65,7 +65,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         need to delete a parameter (this should not happen in most cases),
         make sure it's also deleted from EXPECTED_PARAM_NAMES.
         """
-        existing_names = params.Registry.get_all_platform_parameter_names()  # type: ignore[no-untyped-call]
+        existing_names = params.Registry.get_all_platform_parameter_names()
         missing_names = set(self.EXPECTED_PARAM_NAMES) - set(existing_names)
 
         self.assertFalse(
@@ -84,7 +84,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         If you are creating new platform parameters, make sure to add it to
         the EXPECTED_PARAM_NAMES list as well.
         """
-        existing_names = params.Registry.get_all_platform_parameter_names()  # type: ignore[no-untyped-call]
+        existing_names = params.Registry.get_all_platform_parameter_names()
         unexpected_names = set(existing_names) - set(self.EXPECTED_PARAM_NAMES)
 
         self.assertFalse(
