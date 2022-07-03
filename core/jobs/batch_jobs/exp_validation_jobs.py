@@ -1146,10 +1146,17 @@ class ExpStateValidationJob(base_jobs.JobBase):
             errored_values: list[dict]. The list of dictionaries
             containing the errored values with removed empty.
         """
+        values_to_remove = []
         for ele in errored_values:
             for key, value in list(ele.items()):
                 if len(value) == 0:
                     ele.pop(key)
+            if len(ele) == 1:
+                values_to_remove.append(ele)
+
+        for ele in values_to_remove:
+            errored_values.remove(ele)
+
         return errored_values
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -1178,13 +1185,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 lambda exp_id, exp_states_rte_errors, exp_created_on: (
                     exp_id, self.remove_empty_values(exp_states_rte_errors),
                     exp_created_on.date()))
-        )
-
-        report_number_of_exps_queried = (
-            invalid_exps_with_errored_state_rte_values
-            | 'Report count of exp models' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPS'))
+            | 'Filter invalid exps for RTE' >> beam.Filter(
+                lambda exp_values: len(exp_values[1]) > 0
+            )
         )
 
         report_invalid_state_rte_values = (
@@ -1214,6 +1217,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     exp_id, self.remove_empty_values(
                     exp_states_interaction_errors),
                     exp_created_on.date()))
+            | 'Filter invalid exps frac, numeric, num units' >> beam.Filter(
+                lambda exp_values: len(exp_values[1]) > 0
+            )
         )
 
         show_invalid_state_frac_numeric_num_with_unit_interactions = (
@@ -1245,6 +1251,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     exp_id, self.remove_empty_values(
                     exp_states_interaction_errors),
                     exp_created_on.date()))
+            | 'Filter invalid exps for multi choice, item sele' >> beam.Filter(
+                lambda exp_values: len(exp_values[1]) > 0
+            )
         )
 
         show_invalid_state_multi_choice_and_item_selc_interac_values = (
@@ -1273,6 +1282,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     exp_id, self.remove_empty_values(
                     exp_states_interaction_errors),
                     exp_created_on.date()))
+            | 'Filter invalid exps for cont, end, drag drop' >> beam.Filter(
+                lambda exp_values: len(exp_values[1]) > 0
+            )
         )
 
         show_invalid_state_cont_end_drag_drop_interac_values = (
@@ -1299,6 +1311,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 lambda exp_id, exp_states_errors, exp_created_on: (
                     exp_id, self.remove_empty_values(exp_states_errors),
                     exp_created_on.date()))
+            | 'Filter invalid exps for state values' >> beam.Filter(
+                lambda exp_values: len(exp_values[1]) > 0
+            )
         )
 
         report_invalid_state_values = (
@@ -1315,7 +1330,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         return (
             (
-                report_number_of_exps_queried,
                 report_invalid_state_rte_values,
                 show_invalid_state_frac_numeric_num_with_unit_interactions,
                 show_invalid_state_multi_choice_and_item_selc_interac_values,

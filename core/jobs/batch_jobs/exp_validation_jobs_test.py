@@ -1174,69 +1174,11 @@ class ExpStateValidationJobTests(
 
     def test_run_with_one_valid_model(self) -> None:
         self.put_multi([self.exp_4])
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 4, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state RTE erroneous data are '
-              f'[{{\'state_name\': \'EXP_4_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 4, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state fraction, numeric and number '
-              f'with units interaction '
-              f'erroneous data are [{{\'state_name\': \'EXP_4_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 4, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state multiple choice and '
-              f'item selection interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_4_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 4, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state continue, end and '
-              f'drag and drop interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_4_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 4, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data are '
-              f'[{{\'state_name\': \'EXP_4_STATE_1\'}}]'
-            )
-        ])
+        self.assert_job_output_is([])
 
     def test_run_with_state_validation(self) -> None:
         self.put_multi([self.exp_1])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state RTE erroneous data are '
-              f'[{{\'state_name\': \'EXP_1_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_1_STATE_2\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state fraction, numeric and number '
-              f'with units interaction '
-              f'erroneous data are [{{\'state_name\': \'EXP_1_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state multiple choice and '
-              f'item selection interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_1_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state continue, end and '
-              f'drag and drop interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_1_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\'}}]'
-            ),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
               f', and the state erroneous data are '
@@ -1263,33 +1205,11 @@ class ExpStateValidationJobTests(
     def test_run_with_state_drag_frac_interaction_validation(self) -> None:
         self.put_multi([self.exp_5])
         self.assert_job_output_is([
-          job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-          job_run_result.JobRunResult.as_stderr(
-            f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-            f', and the state RTE erroneous data are '
-            f'[{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
-            f'\'EXP_5_STATE_2\'}}, {{\'state_name\': \'EXP_5_STATE_3\'}}]'
-          ),
-          job_run_result.JobRunResult.as_stderr(
-            f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-            f', and the state erroneous data are '
-            f'[{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
-            f'\'EXP_5_STATE_2\'}}, {{\'state_name\': \'EXP_5_STATE_3\'}}]'
-          ),
-          job_run_result.JobRunResult.as_stderr(
-            f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-            f', and the state multiple choice and '
-            f'item selection interactions '
-            f'erroneous data are ['
-            f'{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
-            f'\'EXP_5_STATE_2\'}}, {{\'state_name\': \'EXP_5_STATE_3\'}}]'
-          ),
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
             f', and the state fraction, numeric and number '
             f'with units interaction '
-            f'erroneous data are ['
-            f'{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
+            f'erroneous data are [{{\'state_name\': '
             f'\'EXP_5_STATE_2\', \'fraction_interaction_invalid_values\': '
             f'[\'The rule 0 of answer group 0 has denominator less than or '
             f'equal to zero.\', \'The rule 0 of answer group 0 '
@@ -1301,8 +1221,7 @@ class ExpStateValidationJobTests(
             f'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has '
             f'non zero integer part.\', \'The rule 0 of answer group 4 has '
             f'denominator less than or equal to zero having rule type '
-            f'HasDenominatorEqualTo.\']}}, {{\'state_name\': '
-            f'\'EXP_5_STATE_3\'}}]'
+            f'HasDenominatorEqualTo.\']}}]'
             ),
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
@@ -1319,7 +1238,7 @@ class ExpStateValidationJobTests(
             f'the value 1 and value 2 cannot be same when rule type is '
             f'HasElementXBeforeElementY\', \'Atleast 2 choices should be '
             f'there\', \'There should not be any empty choices\']}}'
-            f', {{\'state_name\': \'EXP_5_STATE_2\'}}, {{\'state_name\': '
+            f', {{\'state_name\': '
             f'\'EXP_5_STATE_3\', \'drag_drop_interaction_values\': '
             f'[\'There should not be any duplicate choices\']}}]'
           )
@@ -1328,39 +1247,17 @@ class ExpStateValidationJobTests(
     def test_run_with_state_interaction_validaton(self) -> None:
         self.put_multi([self.exp_2])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state RTE erroneous data are '
-              f'[{{\'state_name\': \'EXP_2_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_2\'}}, {{\'state_name\': \'EXP_2_STATE_3\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_4\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_5\'}}, {{\'state_name\': \'EXP_2_STATE_6\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_7\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data are '
-              f'[{{\'state_name\': \'EXP_2_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_2\'}}, {{\'state_name\': \'EXP_2_STATE_3\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_4\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_5\'}}, {{\'state_name\': \'EXP_2_STATE_6\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_7\'}}]'
-            ),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
               f', and the state multiple choice and '
               f'item selection interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_2\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_3\'}}, {{\'state_name\': \'EXP_2_STATE_4\', '
+              f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_4\', '
               f'\'mc_interaction_invalid_values\': [\'rule - 0, answer '
               f'group - 2 is already present.\', '
               f'\'There should not be any empty choices\', '
               f'\'There should not be any duplicate choices\', '
               f'\'All choices have feedback and still has default '
-              f'outcome\']}}, {{\'state_name\': \'EXP_2_STATE_5\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_6\'}}, {{\'state_name\': '
+              f'outcome\']}}, {{\'state_name\': '
               f'\'EXP_2_STATE_7\', \'item_selec_interaction_values\': '
               f'[\'Selected choices of rule 0 of answer group 0 either less '
               f'than min_selection_value or greter than max_selection_value.\','
@@ -1376,9 +1273,7 @@ class ExpStateValidationJobTests(
               f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
               f', and the state fraction, numeric and number '
               f'with units interaction '
-              f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_2\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_3\'}}, {{\'state_name\': \'EXP_2_STATE_4\'}}, '
+              f'erroneous data are ['
               f'{{\'state_name\': \'EXP_2_STATE_5\', '
               f'\'numeric_input_interaction_values\': [\'The rule 0 of answer '
               f'group 0 having rule type IsWithinTolerance have tol value '
@@ -1387,7 +1282,7 @@ class ExpStateValidationJobTests(
               f'value\']}}, {{\'state_name\': \'EXP_2_STATE_6\', '
               f'\'number_with_units_errors\': [\'The rule 0 of answer group 1 '
               f'has rule type equal is coming after rule type equivalent '
-              f'having same value\']}}, {{\'state_name\': \'EXP_2_STATE_7\'}}]'
+              f'having same value\']}}]'
             ),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
@@ -1404,18 +1299,13 @@ class ExpStateValidationJobTests(
               f'default value present in the end exploration interaction.\', '
               f'\'There should be no answer groups present in the end '
               f'exploration interaction.\', \'Total number of recommended '
-              f'explorations should not be more than 3, found 4.\']}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_3\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_4\'}}, {{\'state_name\': \'EXP_2_STATE_5\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_6\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_7\'}}]'
+              f'explorations should not be more than 3, found 4.\']}}]'
             )
         ])
 
     def test_run_with_state_rte_validation(self) -> None:
         self.put_multi([self.exp_3])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
               f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
               f', and the state RTE erroneous data are '
@@ -1440,270 +1330,147 @@ class ExpStateValidationJobTests(
               f'EXP_3_STATE_1 Video tag does not have a video_id.\', '
               f'\'State - EXP_3_STATE_1 Video tag autoplay '
               f'value is not boolean.\']}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state fraction, numeric and number '
-              f'with units interaction '
-              f'erroneous data are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state multiple choice and '
-              f'item selection interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state continue, end and '
-              f'drag and drop interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data '
-              f'are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
             )
         ])
 
     def test_run_with_all_models(self) -> None:
         self.put_multi([self.exp_1, self.exp_2, self.exp_3, self.exp_5])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 4'),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state RTE erroneous data are '
-              f'[{{\'state_name\': \'EXP_1_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_1_STATE_2\'}}]'
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state erroneous data are '
+            f'[{{\'state_name\': \'EXP_1_STATE_1\', '
+            f'\'tagged_skill_misconception_ids\': [\'The '
+            f'tagged_skill_misconception_id of answer group 0 is not None.\']'
+            f', \'not_single_rule_spec\': '
+            f'[\'There is no rule present in answer group 0, atleast one '
+            f'is required.\'], \'invalid_refresher_exploration_id\': '
+            f'[\'The refresher_exploration_id of answer group 0 is not '
+            f'None.\', \'The refresher_exploration_id of default '
+            f'outcome is not None.\'], '
+            f'\'invalid_destinations\': [\'The destination '
+            f'Not valid state of answer group 0 is not valid.\'], '
+            f'\'invalid_default_outcome_dest\': [\'The destination of default'
+            f' outcome is not valid, the value is Not valid state\']}}, '
+            f'{{\'state_name\': \'EXP_1_STATE_2\','
+            f' \'wrong_labelled_as_correct_values\': [\'The value of '
+            f'labelled_as_correct of answer group 0 is True but the '
+            f'destination is the state itself.\']}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state fraction, numeric and number '
+            f'with units interaction '
+            f'erroneous data are [{{\'state_name\': '
+            f'\'EXP_5_STATE_2\', \'fraction_interaction_invalid_values\': '
+            f'[\'The rule 0 of answer group 0 has denominator less than or '
+            f'equal to zero.\', \'The rule 0 of answer group 0 '
+            f'do not have value in '
+            f'proper fraction\', \'The rule 0 of answer group 1 do not have '
+            f'value in simple form\', \'The rule 0 of answer group 1 do not '
+            f'have value in proper fraction\', \'The rule 0 of answer group '
+            f'2 has non zero integer part having rule type '
+            f'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has '
+            f'non zero integer part.\', \'The rule 0 of answer group 4 has '
+            f'denominator less than or equal to zero having rule type '
+            f'HasDenominatorEqualTo.\']}}]'
             ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state fraction, numeric and number '
-              f'with units interaction '
-              f'erroneous data are [{{\'state_name\': \'EXP_1_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state multiple choice and '
-              f'item selection interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_1_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state continue, end and '
-              f'drag and drop interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_1_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data are '
-              f'[{{\'state_name\': \'EXP_1_STATE_1\', '
-              f'\'tagged_skill_misconception_ids\': [\'The '
-              f'tagged_skill_misconception_id of answer group 0 is not None.\']'
-              f', \'not_single_rule_spec\': '
-              f'[\'There is no rule present in answer group 0, atleast one '
-              f'is required.\'], \'invalid_refresher_exploration_id\': '
-              f'[\'The refresher_exploration_id of answer group 0 is not '
-              f'None.\', \'The refresher_exploration_id of default '
-              f'outcome is not None.\'], '
-              f'\'invalid_destinations\': [\'The destination '
-              f'Not valid state of answer group 0 is not valid.\'], '
-              f'\'invalid_default_outcome_dest\': [\'The destination of default'
-              f' outcome is not valid, the value is Not valid state\']}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\','
-              f' \'wrong_labelled_as_correct_values\': [\'The value of '
-              f'labelled_as_correct of answer group 0 is True but the '
-              f'destination is the state itself.\']}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state RTE erroneous data are '
-              f'[{{\'state_name\': \'EXP_2_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_2\'}}, {{\'state_name\': \'EXP_2_STATE_3\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_4\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_5\'}}, {{\'state_name\': \'EXP_2_STATE_6\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_7\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data are '
-              f'[{{\'state_name\': \'EXP_2_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_2\'}}, {{\'state_name\': \'EXP_2_STATE_3\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_4\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_5\'}}, {{\'state_name\': \'EXP_2_STATE_6\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_7\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state multiple choice and '
-              f'item selection interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_2\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_3\'}}, {{\'state_name\': \'EXP_2_STATE_4\', '
-              f'\'mc_interaction_invalid_values\': [\'rule - 0, answer '
-              f'group - 2 is already present.\', '
-              f'\'There should not be any empty choices\', '
-              f'\'There should not be any duplicate choices\', '
-              f'\'All choices have feedback and still has default '
-              f'outcome\']}}, {{\'state_name\': \'EXP_2_STATE_5\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_6\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_7\', \'item_selec_interaction_values\': '
-              f'[\'Selected choices of rule 0 of answer group 0 either less '
-              f'than min_selection_value or greter than max_selection_value.\','
-              f' \'Selected choices of rule 0 of answer group 1 either '
-              f'less than min_selection_value or greter than '
-              f'max_selection_value.\', \'Min value which is 6 is greater '
-              f'than max value which is 5\', \'Number of choices which is 4 '
-              f'is lesser than the min value selection which is 6\', '
-              f'\'There should not be any empty choices\', '
-              f'\'There should not be any duplicate choices\']}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state fraction, numeric and number '
-              f'with units interaction '
-              f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_2\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_3\'}}, {{\'state_name\': \'EXP_2_STATE_4\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_5\', '
-              f'\'numeric_input_interaction_values\': [\'The rule 0 of answer '
-              f'group 0 having rule type IsWithinTolerance have tol value '
-              f'less than zero.\', \'The rule 0 of answer group 1 having rule '
-              f'type IsInclusivelyBetween have a value greater than b '
-              f'value\']}}, {{\'state_name\': \'EXP_2_STATE_6\', '
-              f'\'number_with_units_errors\': [\'The rule 0 of answer group 1 '
-              f'has rule type equal is coming after rule type equivalent '
-              f'having same value\']}}, {{\'state_name\': \'EXP_2_STATE_7\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state continue, end and '
-              f'drag and drop interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\', '
-              f'\'continue_interaction_invalid_values\': [\'The text value '
-              f'is invalid, either it is empty or the character length is '
-              f'more than 20 or it is None, the value is Continueeeeeeeeeeeeee'
-              f'eeeeeeeeeeee\', \'There should be '
-              f'no answer groups present in the continue exploration '
-              f'interaction.\']}}, {{\'state_name\': \'EXP_2_STATE_2\', '
-              f'\'end_interaction_invalid_values\': [\'There should be no '
-              f'default value present in the end exploration interaction.\', '
-              f'\'There should be no answer groups present in the end '
-              f'exploration interaction.\', \'Total number of recommended '
-              f'explorations should not be more than 3, found 4.\']}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_3\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_4\'}}, {{\'state_name\': \'EXP_2_STATE_5\'}}, '
-              f'{{\'state_name\': \'EXP_2_STATE_6\'}}, {{\'state_name\': '
-              f'\'EXP_2_STATE_7\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state RTE erroneous data are '
-              f'[{{\'state_name\': \'EXP_3_STATE_1\', '
-              f'\'rte_components_errors\':'
-              f' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
-              f'than 160 having value img_1.svgg.\', \'State - '
-              f'EXP_3_STATE_1 Image tag alt value is '
-              f'less than 5 having value img_1.svgg.\', '
-              f'\'State - EXP_3_STATE_1 Image tag filepath value does '
-              f'not have svg extension having value img_1.svgg.\', '
-              f'\'State - EXP_3_STATE_1 Link tag text value is either empty '
-              f'or None having url http://www.example.com\', '
-              f'\'State - EXP_3_STATE_1 Math tag svg_filename'
-              f' value has a non svg extension having value '
-              f'mathImg.svgas.\', \'State - EXP_3_STATE_1 Math tag raw_latex '
-              f'value is either empty or None having filename '
-              f'mathImg.svgas.\', \'State - EXP_3_STATE_1 '
-              f'Skill review tag text value is either empty or None.\', '
-              f'\'State - EXP_3_STATE_1 Video tag start value is greater '
-              f'than end value having video id Ntcw0H0hwPU.\', \'State - '
-              f'EXP_3_STATE_1 Video tag does not have a video_id.\', '
-              f'\'State - EXP_3_STATE_1 Video tag autoplay '
-              f'value is not boolean.\']}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state fraction, numeric and number '
-              f'with units interaction '
-              f'erroneous data are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state multiple choice and '
-              f'item selection interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state continue, end and '
-              f'drag and drop interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data '
-              f'are [{{\'state_name\': \'EXP_3_STATE_1\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state RTE erroneous data are '
-              f'[{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_5_STATE_2\'}}, {{\'state_name\': \'EXP_5_STATE_3\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data are '
-              f'[{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_5_STATE_2\'}}, {{\'state_name\': \'EXP_5_STATE_3\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state multiple choice and '
-              f'item selection interactions '
-              f'erroneous data are ['
-              f'{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_5_STATE_2\'}}, {{\'state_name\': \'EXP_5_STATE_3\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state fraction, numeric and number '
-              f'with units interaction '
-              f'erroneous data are ['
-              f'{{\'state_name\': \'EXP_5_STATE_1\'}}, {{\'state_name\': '
-              f'\'EXP_5_STATE_2\', \'fraction_interaction_invalid_values\': '
-              f'[\'The rule 0 of answer group 0 has denominator less than or '
-              f'equal to zero.\', \'The rule 0 of answer group 0 '
-              f'do not have value in '
-              f'proper fraction\', \'The rule 0 of answer group 1 do not have '
-              f'value in simple form\', \'The rule 0 of answer group 1 do not '
-              f'have value in proper fraction\', \'The rule 0 of answer group '
-              f'2 has non zero integer part having rule type '
-              f'HasIntegerPartEqualTo.\', \'The rule 0 of answer group 3 has '
-              f'non zero integer part.\', \'The rule 0 of answer group 4 has '
-              f'denominator less than or equal to zero having rule type '
-              f'HasDenominatorEqualTo.\']}}, {{\'state_name\': '
-              f'\'EXP_5_STATE_3\'}}]'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state continue, end and '
-              f'drag and drop interactions '
-              f'erroneous data are [{{\'state_name\': \'EXP_5_STATE_1\', '
-              f'\'drag_drop_interaction_values\': [\'The rule 0 of answer '
-              f'group 0 have multiple items at same place when multiple '
-              f'items in same position settings is turned off.\', \'The '
-              f'rule 0 of answer group 0 having rule type - '
-              f'IsEqualToOrderingWithOneItemAtIncorrectPosition should '
-              f'not be there when the multiple items in same position '
-              f'setting is turned off.\', \'The rule 0 of answer group 1 '
-              f'the value 1 and value 2 cannot be same when rule type is '
-              f'HasElementXBeforeElementY\', \'Atleast 2 choices should be '
-              f'there\', \'There should not be any empty choices\']}}'
-              f', {{\'state_name\': \'EXP_5_STATE_2\'}}, {{\'state_name\': '
-              f'\'EXP_5_STATE_3\', \'drag_drop_interaction_values\': '
-              f'[\'There should not be any duplicate choices\']}}]'
-            )
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 5, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state continue, end and '
+            f'drag and drop interactions '
+            f'erroneous data are [{{\'state_name\': \'EXP_5_STATE_1\', '
+            f'\'drag_drop_interaction_values\': [\'The rule 0 of answer '
+            f'group 0 have multiple items at same place when multiple '
+            f'items in same position settings is turned off.\', \'The '
+            f'rule 0 of answer group 0 having rule type - '
+            f'IsEqualToOrderingWithOneItemAtIncorrectPosition should '
+            f'not be there when the multiple items in same position '
+            f'setting is turned off.\', \'The rule 0 of answer group 1 '
+            f'the value 1 and value 2 cannot be same when rule type is '
+            f'HasElementXBeforeElementY\', \'Atleast 2 choices should be '
+            f'there\', \'There should not be any empty choices\']}}'
+            f', {{\'state_name\': '
+            f'\'EXP_5_STATE_3\', \'drag_drop_interaction_values\': '
+            f'[\'There should not be any duplicate choices\']}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state multiple choice and '
+            f'item selection interactions '
+            f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_4\', '
+            f'\'mc_interaction_invalid_values\': [\'rule - 0, answer '
+            f'group - 2 is already present.\', '
+            f'\'There should not be any empty choices\', '
+            f'\'There should not be any duplicate choices\', '
+            f'\'All choices have feedback and still has default '
+            f'outcome\']}}, {{\'state_name\': '
+            f'\'EXP_2_STATE_7\', \'item_selec_interaction_values\': '
+            f'[\'Selected choices of rule 0 of answer group 0 either less '
+            f'than min_selection_value or greter than max_selection_value.\','
+            f' \'Selected choices of rule 0 of answer group 1 either '
+            f'less than min_selection_value or greter than '
+            f'max_selection_value.\', \'Min value which is 6 is greater '
+            f'than max value which is 5\', \'Number of choices which is 4 '
+            f'is lesser than the min value selection which is 6\', '
+            f'\'There should not be any empty choices\', '
+            f'\'There should not be any duplicate choices\']}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state fraction, numeric and number '
+            f'with units interaction '
+            f'erroneous data are ['
+            f'{{\'state_name\': \'EXP_2_STATE_5\', '
+            f'\'numeric_input_interaction_values\': [\'The rule 0 of answer '
+            f'group 0 having rule type IsWithinTolerance have tol value '
+            f'less than zero.\', \'The rule 0 of answer group 1 having rule '
+            f'type IsInclusivelyBetween have a value greater than b '
+            f'value\']}}, {{\'state_name\': \'EXP_2_STATE_6\', '
+            f'\'number_with_units_errors\': [\'The rule 0 of answer group 1 '
+            f'has rule type equal is coming after rule type equivalent '
+            f'having same value\']}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 2, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state continue, end and '
+            f'drag and drop interactions '
+            f'erroneous data are [{{\'state_name\': \'EXP_2_STATE_1\', '
+            f'\'continue_interaction_invalid_values\': [\'The text value '
+            f'is invalid, either it is empty or the character length is '
+            f'more than 20 or it is None, the value is Continueeeeeeeeeeeeee'
+            f'eeeeeeeeeeee\', \'There should be '
+            f'no answer groups present in the continue exploration '
+            f'interaction.\']}}, {{\'state_name\': \'EXP_2_STATE_2\', '
+            f'\'end_interaction_invalid_values\': [\'There should be no '
+            f'default value present in the end exploration interaction.\', '
+            f'\'There should be no answer groups present in the end '
+            f'exploration interaction.\', \'Total number of recommended '
+            f'explorations should not be more than 3, found 4.\']}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 3, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state RTE erroneous data are '
+            f'[{{\'state_name\': \'EXP_3_STATE_1\', '
+            f'\'rte_components_errors\':'
+            f' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
+            f'than 160 having value img_1.svgg.\', \'State - '
+            f'EXP_3_STATE_1 Image tag alt value is '
+            f'less than 5 having value img_1.svgg.\', '
+            f'\'State - EXP_3_STATE_1 Image tag filepath value does '
+            f'not have svg extension having value img_1.svgg.\', '
+            f'\'State - EXP_3_STATE_1 Link tag text value is either empty '
+            f'or None having url http://www.example.com\', '
+            f'\'State - EXP_3_STATE_1 Math tag svg_filename'
+            f' value has a non svg extension having value '
+            f'mathImg.svgas.\', \'State - EXP_3_STATE_1 Math tag raw_latex '
+            f'value is either empty or None having filename '
+            f'mathImg.svgas.\', \'State - EXP_3_STATE_1 '
+            f'Skill review tag text value is either empty or None.\', '
+            f'\'State - EXP_3_STATE_1 Video tag start value is greater '
+            f'than end value having video id Ntcw0H0hwPU.\', \'State - '
+            f'EXP_3_STATE_1 Video tag does not have a video_id.\', '
+            f'\'State - EXP_3_STATE_1 Video tag autoplay '
+            f'value is not boolean.\']}}]'
+          )
         ])
