@@ -2171,7 +2171,7 @@ title: Title
         # because those are always valid auth IDs.
         return str(abs(hash(email)))
 
-    def get_all_python_files(self):
+    def get_all_python_files(self) -> List[str]:
         """Recursively collects all Python files in the core/ and extensions/
         directory.
 
