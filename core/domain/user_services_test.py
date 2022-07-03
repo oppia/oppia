@@ -69,6 +69,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': 'user_id',
         }
         new_user_data_dict = {
@@ -78,6 +79,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -937,6 +939,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings.preferred_audio_language_code
         )
 
+    def test_update_preferred_translation_language_code(self):
+        language_code = 'es'
+
+        user_id = user_services.create_new_user(
+            'someUser', 'user@example.com').user_id
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertNotEqual(
+            user_settings.preferred_translation_language_code, 'es')
+
+        user_services.update_preferred_translation_language_code(
+            user_id, language_code)
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertEqual(
+            language_code, user_settings.preferred_translation_language_code)
+
     def test_remove_user_role(self):
         user_id = user_services.create_new_user(
             'someUser',
@@ -1074,6 +1093,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         modifiable_user_data = user_domain.ModifiableUserData.from_raw_dict(
@@ -1349,6 +1369,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         modifiable_new_user_data_2 = (
@@ -1503,6 +1524,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         modifiable_new_user_data_2 = (
@@ -2242,10 +2264,10 @@ title: Title
 
         self.logout()
 
-    def test_sync_learner_checkpoint_progress_with_current_exp_version(self):
+    def test_sync_logged_in_learner_checkpoint_progress_with_current_exp_version(self): # pylint: disable=line-too-long
         self.login(self.VIEWER_EMAIL)
         exp_user_data = (
-            user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+            user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                 self.viewer_id, self.EXP_ID))
         self.assertIsNone(exp_user_data)
 
@@ -2287,7 +2309,7 @@ title: Title
         # furthest reached checkpoint is set to None. Similar workflow is
         # carried out for most recently reached checkpoint.
         exp_user_data = (
-            user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+            user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                 self.viewer_id, self.EXP_ID))
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 2)
