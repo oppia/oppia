@@ -162,7 +162,8 @@ export class ReadOnlyExplorationBackendApiService {
    * will store the exploration in the cache to avoid requests from the
    * backend in further function calls.
    */
-  async loadLatestExplorationAsync(explorationId: string):
+  async loadLatestExplorationAsync(
+      explorationId: string, pid: string | null = null):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(explorationId)) {
@@ -171,7 +172,7 @@ export class ReadOnlyExplorationBackendApiService {
         }
       } else {
         this._fetchExplorationAsync(
-          explorationId, null, this.urlService.getPidFromUrl())
+          explorationId, null, pid)
           .then(exploration => {
           // Save the fetched exploration to avoid future fetches.
             this._explorationCache[explorationId] = exploration;

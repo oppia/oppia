@@ -508,11 +508,6 @@ describe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
-
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'fetchCheckpointsFeatureIsEnabledStatus'
-    ).and.returnValue(Promise.resolve(true));
   }));
 
   it('should create', () => {
@@ -832,8 +827,13 @@ describe('Conversation skin component', () => {
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
       .and.returnValue(Promise.resolve(sampleExpResponse));
     spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
+    spyOn(
       editableExplorationBackendApiService,
-      'changeLoggedOutProgressToLoggedInProgressAsync');
+      'changeLoggedOutProgressToLoggedInProgressAsync')
+      .and.returnValue(Promise.resolve());
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
@@ -846,6 +846,9 @@ describe('Conversation skin component', () => {
       .and.returnValue(mockOnSolutionViewedEventEmitter);
     spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
       .and.returnValue(mockOnPlayerStateChange);
+    spyOn(localStorageService, 'getUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue('abcdef');
+    spyOn(localStorageService, 'removeUniqueProgressIdOfLoggedOutLearner');
 
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
@@ -856,11 +859,10 @@ describe('Conversation skin component', () => {
     componentInstance.hasInteractedAtLeastOnce = true;
     componentInstance.displayedCard = displayedCard;
 
-    localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
     componentInstance.ngOnInit();
     expect(
-      editableExplorationBackendApiService
-        .changeLoggedOutProgressToLoggedInProgressAsync).toHaveBeenCalled();
+      localStorageService.
+        removeUniqueProgressIdOfLoggedOutLearner).toHaveBeenCalled();
   }));
 
   it('should show alert when collection summaries are not loaded',
@@ -970,6 +972,10 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
       .and.returnValue(Promise.resolve(expResponse));
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
     spyOn(explorationEngineService, 'getShortestPathToState')
       .and.returnValue(['Start', 'Mid']);
 
@@ -991,6 +997,7 @@ describe('Conversation skin component', () => {
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.alertMessageTimeout = 5;
+    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
 
     componentInstance.initializePage();
     tick(100);

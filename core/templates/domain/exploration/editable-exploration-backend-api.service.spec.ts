@@ -336,7 +336,7 @@ describe('Editable exploration backend API service', function() {
     };
 
     req = httpTestingController.expectOne(
-      '/explorehandler/states_completed_by_logged_out_user/' + explorationId);
+      '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId);
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(loggedOutPayload);
 
@@ -372,7 +372,7 @@ describe('Editable exploration backend API service', function() {
       ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/states_completed_by_logged_out_user/' + explorationId);
+      '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId);
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -389,16 +389,17 @@ describe('Editable exploration backend API service', function() {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
+    let explorationId = '0';
     let payload = {
       unique_progress_url_id: 'abcdef'
     };
 
     editableExplorationBackendApiService
-      .changeLoggedOutProgressToLoggedInProgress('abcdef')
+      .changeLoggedOutProgressToLoggedInProgressAsync(explorationId, 'abcdef')
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/sync_logged_out_learner_progress_with_logged_in_progress');
+      '/sync_logged_out_and_logged_in_progress/' + explorationId);
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 

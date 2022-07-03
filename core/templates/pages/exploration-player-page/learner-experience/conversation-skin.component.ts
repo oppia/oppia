@@ -147,6 +147,7 @@ export class ConversationSkinComponent {
   showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
+  pidInUrl: string;
 
   constructor(
     private windowRef: WindowRef,
@@ -207,6 +208,7 @@ export class ConversationSkinComponent {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+    this.pidInUrl = this.urlService.getPidFromUrl();
 
     this.readOnlyExplorationBackendApiService
       .fetchCheckpointsFeatureIsEnabledStatus().then(
@@ -363,7 +365,7 @@ export class ConversationSkinComponent {
         let firstStateName: string;
         let expVersion: number;
         this.readOnlyExplorationBackendApiService.
-          loadLatestExplorationAsync(this.explorationId).then(
+          loadLatestExplorationAsync(this.explorationId, this.pidInUrl).then(
             response => {
               expVersion = response.version;
               firstStateName = response.exploration.init_state_name;
@@ -639,7 +641,7 @@ export class ConversationSkinComponent {
   private _navigateToMostRecentlyReachedCheckpoint() {
     let states: StateObjectsBackendDict;
     this.readOnlyExplorationBackendApiService.
-      loadLatestExplorationAsync(this.explorationId).then(
+      loadLatestExplorationAsync(this.explorationId, this.pidInUrl).then(
         response => {
           states = response.exploration.states;
           this.mostRecentlyReachedCheckpoint = (
