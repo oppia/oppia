@@ -534,6 +534,7 @@ describe('Conversation skin component', () => {
         false, false, false, '', '', '', true)));
     spyOn(urlService, 'getCollectionIdFromExplorationUrl')
       .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
@@ -631,6 +632,7 @@ describe('Conversation skin component', () => {
         false, false, false, '', '', '', true)));
     spyOn(urlService, 'getCollectionIdFromExplorationUrl')
       .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
@@ -710,6 +712,7 @@ describe('Conversation skin component', () => {
         false, false, false, '', '', '', false)));
     spyOn(urlService, 'getCollectionIdFromExplorationUrl')
       .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
@@ -793,6 +796,7 @@ describe('Conversation skin component', () => {
         false, false, false, '', '', '', true)));
     spyOn(urlService, 'getCollectionIdFromExplorationUrl')
       .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
@@ -860,6 +864,10 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+    tick(100);
+    expect(
+      editableExplorationBackendApiService
+        .changeLoggedOutProgressToLoggedInProgressAsync).toHaveBeenCalled();
     expect(
       localStorageService.
         removeUniqueProgressIdOfLoggedOutLearner).toHaveBeenCalled();
@@ -874,6 +882,7 @@ describe('Conversation skin component', () => {
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
         'collection_id');
+      spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
       spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
         .and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning');
@@ -955,6 +964,7 @@ describe('Conversation skin component', () => {
     spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
     spyOn(explorationPlayerStateService, 'getLanguageCode')
       .and.returnValues('en', 'en', 'en', 'pq');
     spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')

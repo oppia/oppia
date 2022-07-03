@@ -130,7 +130,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       this.explorationPlayerStateService.getUniqueProgressUrlId());
     if (this.loggedOutProgressUniqueUrlId) {
       this.loggedOutProgressUniqueUrl = (
-        this.windowRef.nativeWindow.location.origin +
+        this.urlService.getOrigin() +
         '/progress/' + this.loggedOutProgressUniqueUrlId);
     }
     // Rendering the separators in the progress bar requires
@@ -188,7 +188,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
           this.loggedOutProgressUniqueUrlId = (
             this.explorationPlayerStateService.getUniqueProgressUrlId());
           this.loggedOutProgressUniqueUrl = (
-            this.windowRef.nativeWindow.location.origin +
+            this.urlService.getOrigin() +
             '/progress/' + this.loggedOutProgressUniqueUrlId);
         });
     }

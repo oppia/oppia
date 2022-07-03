@@ -143,7 +143,7 @@ describe('Read only exploration backend API service', () => {
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/init/0?uid=123456');
+      '/explorehandler/init/0?pid=123456');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
     flushMicrotasks();

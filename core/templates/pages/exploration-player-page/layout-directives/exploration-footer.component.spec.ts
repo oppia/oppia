@@ -36,6 +36,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -61,6 +62,8 @@ describe('ExplorationFooterComponent', () => {
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let stateObjectFactory: StateObjectFactory;
   let explorationEngineService: ExplorationEngineService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
@@ -97,6 +100,8 @@ describe('ExplorationFooterComponent', () => {
       ReadOnlyExplorationBackendApiService);
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
     questionPlayerStateService = TestBed.inject(
       QuestionPlayerStateService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
@@ -747,9 +752,17 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should correctly mark lesson info tooltip as viewed', () => {
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordLearnerHasViewedLessonInfoModalOnce').and.returnValue(
+      Promise.resolve());
     expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    component.userIsLoggedIn = true;
     component.learnerHasViewedLessonInfo();
     expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeTrue();
+    expect(
+      editableExplorationBackendApiService.
+        recordLearnerHasViewedLessonInfoModalOnce).toHaveBeenCalled();
   });
 
   it('should show hints when initialized in question player when user is' +

@@ -305,20 +305,22 @@ export class ConversationSkinComponent {
         if (this.redirectToRefresherExplorationConfirmed) {
           return;
         }
-        if (this.CHECKPOINTS_FEATURE_IS_ENABLED &&
-            this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
-            !this.displayedCard.isTerminal() && !this.isLoggedIn &&
-            !this.explorationPlayerStateService.isLoggedOutProgressTracked &&
+        if (this.hasInteractedAtLeastOnce && !this.isInPreviewMode &&
+            !this.displayedCard.isTerminal() &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
           this.statsReportingService.recordMaybeLeaveEvent(
             this.playerTranscriptService.getLastStateName(),
             this.learnerParamsService.getAllParams());
-          let confirmationMessage = (
-            'Please save your progress before navigating away from the' +
-            ' page; else, you will lose your exploration progress.');
-          (e || this.windowRef.nativeWindow.event).returnValue = (
-            confirmationMessage);
-          return confirmationMessage;
+
+          if (this.CHECKPOINTS_FEATURE_IS_ENABLED && !this.isLoggedIn &&
+            !this.explorationPlayerStateService.isLoggedOutProgressTracked) {
+            let confirmationMessage = (
+              'Please save your progress before navigating away from the' +
+              ' page; else, you will lose your exploration progress.');
+            (e || this.windowRef.nativeWindow.event).returnValue = (
+              confirmationMessage);
+            return confirmationMessage;
+          }
         }
       });
 
