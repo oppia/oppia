@@ -27,8 +27,7 @@ from typing import Dict, List, Mapping, Union, cast
 
 # Union type defined from allowed types that a Dict can contain for its values.
 AcceptableChangeDictTypes = Union[
-    str,
-    List[str]
+    str, int, List[str]
 ]
 
 
