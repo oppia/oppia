@@ -20,13 +20,26 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { of } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 import { ExplorationOpportunity, OpportunitiesListItemComponent } from './opportunities-list-item.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
+class MockWindowDimensionsService {
+  getResizeEvent() {
+    return of(new Event('resize'));
+  }
+
+  getWidth(): number {
+    return 530;
+  }
+}
+
 describe('Opportunities List Item Component', () => {
   let component: OpportunitiesListItemComponent;
   let fixture: ComponentFixture<OpportunitiesListItemComponent>;
+  let windowDimensionsService: MockWindowDimensionsService;
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
@@ -37,7 +50,13 @@ describe('Opportunities List Item Component', () => {
         OpportunitiesListItemComponent,
         LazyLoadingComponent,
         WrapTextWithEllipsisPipe
-      ]
+      ],
+      providers: [
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
+        }
+      ],
     }).compileComponents().then(() => {
       fixture = TestBed.createComponent(
         OpportunitiesListItemComponent);
@@ -61,12 +80,19 @@ describe('Opportunities List Item Component', () => {
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = 35;
+      windowDimensionsService = TestBed.inject(WindowDimensionsService);
       fixture.detectChanges();
       component.ngOnInit();
     });
 
     it('should initialize $scope properties after controller is initialized',
       () => {
+        const windowResizeSpy = spyOn(
+          windowDimensionsService, 'getResizeEvent').and.callThrough();
+
+        component.ngOnInit();
+        fixture.detectChanges();
+
         expect(component.opportunityDataIsLoading).toBe(false);
         expect(component.labelText).toBe('Label text');
         expect(component.labelStyle).toEqual({
@@ -78,6 +104,9 @@ describe('Opportunities List Item Component', () => {
           width: '50%'
         });
         expect(component.correspondingOpportunityDeleted).toBe(false);
+        expect(windowResizeSpy).toHaveBeenCalled();
+        expect(component.resizeSubscription).not.toBe(undefined);
+        expect(component.onMobile).toBeTrue();
       });
 
     describe('when opportunity subheading corresponds to deleted ' +

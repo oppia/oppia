@@ -22,6 +22,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import constants from 'assets/constants';
 import { floor } from 'mathjs';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 export interface ExplorationOpportunity {
   id: string;
@@ -40,6 +42,11 @@ export interface ExplorationOpportunity {
   styleUrls: []
 })
 export class OpportunitiesListItemComponent {
+  constructor(
+    private windowDimensionsService: WindowDimensionsService
+  ) {
+  }
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -61,6 +68,8 @@ export class OpportunitiesListItemComponent {
   untranslatedProgressStyle!: { width: string };
   targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
   cardsAvailable: number = 0;
+  onMobile!: boolean;
+  resizeSubscription!: Subscription;
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
@@ -71,6 +80,12 @@ export class OpportunitiesListItemComponent {
   opportunityButtonDisabled: boolean = false;
 
   ngOnInit(): void {
+    this.onMobile = this.windowDimensionsService.getWidth() <= 700;
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.onMobile = this.windowDimensionsService.getWidth() <= 700;
+      });
+
     if (this.opportunity && this.labelRequired) {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {
@@ -127,6 +142,12 @@ export class OpportunitiesListItemComponent {
       }
     } else {
       this.opportunityDataIsLoading = true;
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeSubscription) {
+      this.resizeSubscription.unsubscribe();
     }
   }
 }

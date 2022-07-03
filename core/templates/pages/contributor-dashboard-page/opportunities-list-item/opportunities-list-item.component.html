@@ -1,5 +1,6 @@
 <!-- Desktop -->
-<div class="oppia-opportunities-list-item oppia-desktop-list-item protractor-test-opportunity-list-item">
+<div *ngIf="!onMobile"
+     class="oppia-opportunities-list-item oppia-desktop-list-item protractor-test-opportunity-list-item">
   <div class="oppia-opportunities-details">
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
@@ -107,8 +108,8 @@
 </div>
 
 <!-- Mobile -->
-<div *ngIf="showOpportunityButton"
-     class="oppia-opportunities-list-item oppia-mobile-list-item protractor-test-opportunity-list-item">
+<div *ngIf="showOpportunityButton && onMobile"
+     class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
   <div class="oppia-opportunities-progress oppia-animate-fadein"
        *ngIf="progressBarRequired">
     <div class="oppia-opportunities-progress-bar">
@@ -214,8 +215,8 @@
   </div>
 </div>
 
-<button *ngIf="!showOpportunityButton"
-        class="oppia-opportunities-list-item oppia-mobile-list-item oppia-button-list-item protractor-test-opportunity-list-item"
+<button *ngIf="!showOpportunityButton && onMobile"
+        class="oppia-opportunities-list-item oppia-button-list-item protractor-test-opportunity-list-item"
         [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
         [disabled]="opportunityButtonDisabled"
         (click)="clickActionButton.emit(opportunity.id)">
@@ -397,12 +398,17 @@
     width: 25%;
   }
   .oppia-opportunities-label {
+    align-items: center;
     background-color: #fff;
     border-radius: 8px;
+    display: flex;
     font-size: 18px;
+    height: 60px;
+    justify-content: center;
     opacity: 0.8;
-    padding: 2px;
+    padding: auto 2px;
     text-align: center;
+    width: 92px;
   }
   .oppia-opportunities-progress {
     align-items: center;
@@ -429,12 +435,6 @@
     margin-top: 24px;
     min-height: 90px;
     padding: 0% 3%;
-  }
-  .oppia-desktop-list-item {
-    display: flex;
-  }
-  .oppia-mobile-list-item {
-    display: none;
   }
   .oppia-animate-fadein {
     -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */
@@ -467,22 +467,19 @@
       margin-right: 20px;
       width: 90%;
     }
-    .oppia-desktop-list-item {
-      display: none;
-    }
-    .oppia-mobile-list-item {
-      display: flex;
-    }
   }
 
   @media only screen and (max-width: 500px) {
     .oppia-opportunities-label {
       font-size: 16px;
+      height: 56px;
     }
     .oppia-opportunities-heading {
       font-size: 18px;
     }
-    .oppia-opportunities-button-container, .oppia-opportunities-button {
+    .oppia-opportunities-button-container,
+    .oppia-opportunities-button,
+    .oppia-opportunities-disabled-button {
       font-size: 16px;
       min-width: none;
     }
