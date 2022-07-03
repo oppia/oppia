@@ -1,5 +1,113 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.2.6 (03 Jul 2022)
+------------------------
+Contributor Pages
+* Fix #15552 and part of #15639: Fix contributor dashboard (#15666)
+* Fix #15648: Remove limit from in-review translation suggestion query (#15649)
+* Fix #15431: Update skill opportunity progress percentage denominator to 10 (#15450)
+* Fix #15321: Show review message for accepted suggestions (#15405)
+* Fix part of #15182: Organize translations in translation review page by lesson (#15295)
+
+Speed improvement
+* Improve loading speed of splash and math page (#15477)
+* Fix images on splash (#15459)
+
+Bug fixes
+* Fix #15638: Fix broken page and broken FA icons (#15641)
+* Fix pre-commit linter and release scripts (#15608)
+
+Learner/Creator Pages
+* Fix #15369: Users can now use the keyboard to navigate the Learner Dashboard (#15556)
+* Fix #15538, #15541, #15534, #15527: Fix console error when previewing a skill; fix invalid profile URL in the history tab; fix controller schema validation error (#15553)
+* Fix edits allowed banner showing when the page hasn't loaded (#15510)
+* Fix svg sanitization logic to handle mixed camelCase attrs correctly (#15492)
+* Fix #15370: Can report an exploration from the keyboard (#15488)
+* Enable translations for the topic name in the "Master Skills for..." text on the practice tab (#15481)
+* Fix part of #15444: Add delay to fix issue with dropdowns on the exploration-settings-page (#15474)
+* Prevent page from reloading when attempting to navigate to the learner dashboard while currently on the learner dashboard (#15448)
+* Fix part of #14702: Add the stale tab and unsaved changes detection functionality for story editor page (#15443)
+* Fix #15246: Prerequisite skills from other topics now load properly in the chapter editor (#15442)
+* Fix part of #14702: Add the stale tab and unsaved changes detection functionality for skill editor page (#15440)
+* Fix #15376: Make classroom page responsive (#15418)
+* Add admin utility to rollback explorations (#15397)
+* Fix #15375: Make splash page's benefits subsection responsive on wider screens (#15391)
+* Fix part of #13822: Add validation for Curated Lesson Category (#15342)
+* Fix part of #14219: Increase interaction_registry test coverage to 100% (#15339)
+* Fix #14261: Voiceover of multiple choice components (#15315)
+* Fix part of #15134: Add a border to the language selector button (#15305)
+* Fix #15263: Make titles on exploration cards readable  (#15297)
+* Fix #14085: Deprecate math interactions' unsupported rules and update cust arg name. (#15271)
+* Introduce backend changes for Logged in user checkpoints (#15213)
+* Fix #15526 and #15523: Console errors when ENTER key is used in a numeric input field and Unable to enter numbers in formats using a comma as a decimal separator (#15575)
+
+Dev Workflow
+* Remove import from utils (#15557)
+* Fix codemirror (#15555)
+* Fix how we revert wiki changes from web interface (#15494)
+* Fix #15489: Upgrade pip-tools to v6.6.2 for pip 22.1.1 support (#15490)
+* Upgrade pip-tools to v6.6.1 for pip 22.1 support (#15465)
+* Revert updates to the wiki made through the web interface (#15446)
+* Purge python utils (#15441)
+* Fix #15425: Increase max_old_space_size for webpack (#15437)
+* Upgrade Beam to 2.38.0 (#15400)
+* Run clean up before build and ensure webpack_bundles is non-empty (#15317)
+* Fix bug in hanging indent checker (#15226)
+* Fix secret names for revert-web-wiki-updates workflow (#15467)
+* Make instructions for getting help clearer in the PR template. (#15355)
+
+Typing
+* Fix part of #14033: Added Mypy type annotations to `fs_services` and `rating_services` (#15424)
+* Fix part of #14033: Type annotate user_query_services.py (#15395)
+* Add Mypy type annotations to pending files of storage models. (#15390)
+* Add schema for params dict in reader controller (#15388)
+* Add Mypy type annotations to pending files of jobs/types directory. (#15373)
+* Fix part of #10474: Strict checks for skill-selector.component.ts (#15310)
+* Fix part of #13341: Type annotate typescript_checks (#15289)
+* Fix part of #14033: Added MyPy type annotation to the file role_services.py (#15286)
+* Fix part of #13341: Type annotate common.py (#15258)
+* Fix part of #10474: Make typescript checks strict for few more files (#15257)
+* Type annotate classroom_services (#15241)
+* Fix part of #13341: Type annotate regenerate_requirements.py, run_frontend_tests.py and run_custom_eslint_tests.py (#15208)
+* Fix part of #10474: Make typescript checks strict for few more files (#15089)
+
+Release team
+* Fix deployment issue on MacOS (#15454)
+
+Translations
+* Routine update of translations (#15449)
+* Fix part of #14960: Page title translations - 2 (#15445)
+* Fix part of #14960: Page title translations - 1 (#15304)
+
+Automated QA Team
+* Relax Lighthouse uses-responsive-images assertion (#15434)
+* Extend failure notifications to backend, lint, and type checks (#15416)
+* Fix Context Service Flake in Translation Tab Component (#15398)
+* Fix part of #14219 :Increased coverage to 100% for user.gae_models_test (#15393)
+* Fix frontend time flake and other miscellaneous fixes (#15389)
+* Fix part of #14219: Increase role_services test coverage to 100% (#15384)
+* Extend lighthouse timeout for retrieving sourcemaps (#15379)
+* Fix part of #14219: Raise backend test coverage to 100% for core.constants.py (#15292)
+* Fix part of #14219: install_third_party_libs.py (#15290)
+* Fix part of #14219: Increase core.jobs.job_test_utils_test to 100% test coverage (#15272)
+* Fix part of #14219: Increasing backend test coverage of core.utils_test to 100% (#15161)
+
+Data handling
+* Fix part of #14419: Changed the format of REPORT_TYPE class (#15296)
+* Fix part of #14419: Changed the format of PARAM_NAMES class (#15291)
+* Fix part of #13822: Backend validation of skill medium rubrics explanations. (#15235)
+* Fix part of #14537: Refactor fs_domain (#15221)
+* Fix part of #13822: Validation for rubric explanations (#15173)
+* Add job to populate mailchimp database (#15120)
+* Fix part of #13341: Type annotate build.py, check_e2e_tests_are_captured_in_ci.py, check_frontend_test_coverage.py (#15104)
+* Refactor param domain file (#15048)
+* Fix part of #13162: Add Schema for AnswerSubmittedEventHandler (#14494)
+* Improve validation and minor fixes to clear the erroring deferred job queue (#15491)
+
+Angular Migration
+* Fix part of #9749: Migrate Schema Based Editors (#14776)
+
+
 v3.2.5 (04 May 2022)
 ------------------------
 Contributor Pages
