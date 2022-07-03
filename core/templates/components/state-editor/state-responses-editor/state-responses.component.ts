@@ -17,10 +17,7 @@
  * editor.
  */
 
-import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
-import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
-
-require(
+ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
@@ -88,23 +85,556 @@ require('services/external-save.service.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/ngb-modal.service.ts');
 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ContextService } from 'services/context.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
+import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
+import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import { StateSolicitAnswerDetailsService } from '../state-editor-properties-services/state-solicit-answer-details.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
+import { AppConstants } from 'app.constants';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
+import { AlertsService } from 'services/alerts.service';
+
+@Component({
+  selector: 'oppia-state-responses',
+  templateUrl: './state-responses.component.html'
+})
+export class StateResponsesComponent {
+  @Input() addState;
+  @Input() onResponsesInitialized;
+  @Input() onSaveInapplicableSkillMisconceptionIds;
+  @Input() onSaveInteractionAnswerGroups;
+  @Input() onSaveInteractionDefaultOutcome;
+  @Input() onSaveNextContentIdIndex;
+  @Input() onSaveSolicitAnswerDetails;
+  @Input() navigateToState;
+  @Input() refreshWarnings;
+  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+
+  directiveSubscriptions = new Subscription();
+
+  constructor(
+    private stateEditorService: StateEditorService,
+    private responsesService: ResponsesService,
+    private stateCustomizationArgsService: StateCustomizationArgsService,
+    private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
+    private externalSaveService: ExternalSaveService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private alertsService: AlertsService,
+    private ngbModal: NgbModal,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private answerGroupObjectFactory: AnswerGroupObjectFactory,
+  ) {}
+
+  _initializeTrainingData(): void {
+    if (this.stateEditorService.isInQuestionMode()) {
+      return;
+    }
+  }
+
+  isInQuestionMode(): boolean {
+    return this.stateEditorService.isInQuestionMode();
+  }
+
+  suppressDefaultAnswerGroupWarnings(): boolean {
+    let interactionId = this.getCurrentInteractionId();
+    let answerGroups = this.responsesService.getAnswerGroups();
+    // This array contains the text of each of the possible answers
+    // for the interaction.
+    let answerChoices = [];
+    let customizationArgs = (
+      this.stateCustomizationArgsService.savedMemento);
+    let handledAnswersArray = [];
+
+    if (interactionId === 'MultipleChoiceInput') {
+      let numChoices = this.getAnswerChoices().length;
+      let choiceIndices = [];
+      // Collect all answers which have been handled by at least one
+      // answer group.
+      for (let i = 0; i < answerGroups.length; i++) {
+        for (let j = 0; j < answerGroups[i].rules.length; j++) {
+          handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
+        }
+      }
+      for (let i = 0; i < numChoices; i++) {
+        choiceIndices.push(i);
+      }
+      // We only suppress the default warning if each choice index has
+      // been handled by at least one answer group.
+      return choiceIndices.every((choiceIndex) => {
+        return handledAnswersArray.indexOf(choiceIndex) !== -1;
+      });
+    } else if (interactionId === 'ItemSelectionInput') {
+      let maxSelectionCount = (
+        customizationArgs.maxAllowableSelectionCount.value);
+      if (maxSelectionCount === 1) {
+        let numChoices = this.getAnswerChoices().length;
+        // This array contains a list of booleans, one for each answer
+        // choice. Each boolean is true if the corresponding answer has
+        // been covered by at least one rule, and false otherwise.
+        handledAnswersArray = [];
+        for (let i = 0; i < numChoices; i++) {
+          handledAnswersArray.push(false);
+          answerChoices.push(this.getAnswerChoices()[i].val);
+        }
+
+        let answerChoiceToIndex = {};
+        answerChoices.forEach((answerChoice, choiceIndex) => {
+          answerChoiceToIndex[answerChoice] = choiceIndex;
+        });
+
+        answerGroups.forEach((answerGroup) => {
+          let rules = answerGroup.rules;
+          rules.forEach((rule) => {
+            let ruleInputs = rule.inputs.x;
+            ruleInputs.forEach((ruleInput) => {
+              let choiceIndex = answerChoiceToIndex[ruleInput];
+              if (rule.type === 'Equals' ||
+                  rule.type === 'ContainsAtLeastOneOf') {
+                handledAnswersArray[choiceIndex] = true;
+              } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
+                for (let i = 0; i < handledAnswersArray.length; i++) {
+                  if (i !== choiceIndex) {
+                    handledAnswersArray[i] = true;
+                  }
+                }
+              }
+            });
+          });
+        });
+
+        let areAllChoicesCovered = handledAnswersArray.every(
+          (handledAnswer) => {
+            return handledAnswer;
+          });
+        // We only suppress the default warning if each choice text has
+        // been handled by at least one answer group, based on rule
+        // type.
+        return areAllChoicesCovered;
+      }
+    }
+    return false;
+  }
+
+  onChangeSolicitAnswerDetails(): void {
+    this.onSaveSolicitAnswerDetails(
+      this.stateSolicitAnswerDetailsService.displayed);
+    this.stateSolicitAnswerDetailsService.saveDisplayedValue();
+  };
+
+  isSelfLoopWithNoFeedback(outcome): boolean {
+    if (outcome && typeof outcome === 'object' &&
+      outcome.constructor.name === 'Outcome') {
+      return outcome.isConfusing(this.stateName);
+    }
+    return false;
+  }
+
+  isSelfLoopThatIsMarkedCorrect(outcome): boolean {
+    if (!outcome ||
+        !this.stateEditorService.getCorrectnessFeedbackEnabled()) {
+      return false;
+    }
+
+    let currentStateName = this.stateName;
+
+    return (
+      (outcome.dest === currentStateName) &&
+      outcome.labelledAsCorrect);
+  }
+
+  changeActiveAnswerGroupIndex(newIndex): void {
+    this.externalSaveService.onExternalSave.emit();
+    this.responsesService.changeActiveAnswerGroupIndex(newIndex);
+    this.activeAnswerGroupIndex = (
+      this.responsesService.getActiveAnswerGroupIndex());
+  }
+
+  getCurrentInteractionId(): string {
+    return this.stateInteractionIdService.savedMemento;
+  }
+
+  isCreatingNewState(outcome): boolean {
+    return (outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST);
+  }
+
+  // This returns false if the current interaction ID is null.
+  isCurrentInteractionLinear(): boolean {
+    let interactionId = this.getCurrentInteractionId();
+    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+  }
+
+  isCurrentInteractionTrivial(): boolean {
+    let interactionId = this.getCurrentInteractionId();
+    let array: string[] = [...AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS];
+    return array.indexOf(
+      interactionId) !== -1;
+  }
+
+  isLinearWithNoFeedback(outcome: Outcome): boolean {
+    // Returns false if current interaction is linear and has no
+    // feedback.
+    if (outcome && typeof outcome === 'object' &&
+      outcome.constructor.name === 'Outcome') {
+      return this.isCurrentInteractionLinear() &&
+        !outcome.hasNonemptyFeedback();
+    }
+    return false;
+  }
+
+  getOutcomeTooltip(outcome: Outcome): string {
+    if (this.isSelfLoopThatIsMarkedCorrect(outcome)) {
+      return 'Self-loops should not be labelled as correct.';
+    }
+
+    // Outcome tooltip depends on whether feedback is displayed.
+    if (this.isLinearWithNoFeedback(outcome)) {
+      return 'Please direct the learner to a different card.';
+    } else {
+      return 'Please give Oppia something useful to say,' +
+             ' or direct the learner to a different card.';
+    }
+  }
+
+  openAddAnswerGroupModal(): void {
+    this.alertsService.clearWarnings();
+    this.externalSaveService.onExternalSave.emit();
+    let stateName = this.stateEditorService.getActiveStateName();
+    let addState = this.addState;
+    let currentInteractionId = this.getCurrentInteractionId();
+
+    let modalRef = this.ngbModal.open(AddAnswerGroupModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.addState.subscribe(
+      (value: string) => {
+        addState(value);
+      });
+
+    modalRef.componentInstance.currentInteractionId = currentInteractionId;
+    modalRef.componentInstance.stateName = stateName;
+
+    modalRef.result.then((result) => {
+      this.stateNextContentIdIndexService.saveDisplayedValue();
+      this.onSaveNextContentIdIndex(
+        this.stateNextContentIdIndexService.displayed);
+
+      // Create a new answer group.
+      this.answerGroups.push(this.answerGroupObjectFactory.createNew(
+        [result.tmpRule], result.tmpOutcome, [],
+        result.tmpTaggedSkillMisconceptionId));
+      this.responsesService.save(
+        this.answerGroups, this.defaultOutcome,
+        (newAnswerGroups, newDefaultOutcome) => {
+          this.onSaveInteractionAnswerGroups(newAnswerGroups);
+          this.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+          this.refreshWarnings()();
+        });
+      this.changeActiveAnswerGroupIndex(
+        this.answerGroups.length - 1);
+
+      // After saving it, check if the modal should be reopened right
+      // away.
+      if (result.reopen) {
+        this.openAddAnswerGroupModal();
+      }
+    }, () => {
+      this.alertsService.clearWarnings();
+    });
+  }
+
+  deleteAnswerGroup(value): void {
+    // Prevent clicking on the delete button from also toggling the
+    // display state of the answer group.
+    value.evt.stopPropagation();
+
+    this.alertsService.clearWarnings();
+    this.ngbModal.open(DeleteAnswerGroupModalComponent, {
+      backdrop: true,
+    }).result.then(() => {
+      this.responsesService.deleteAnswerGroup(
+        value.index, (newAnswerGroups) => {
+          this.onSaveInteractionAnswerGroups(newAnswerGroups);
+          this.refreshWarnings()();
+        });
+    }, () => {
+      this.alertsService.clearWarnings();
+    });
+  }
+
+  verifyAndUpdateInapplicableSkillMisconceptionIds(): void {
+    let answerGroups = this.responsesService.getAnswerGroups();
+    let taggedSkillMisconceptionIds = [];
+    for (let i = 0; i < answerGroups.length; i++) {
+      if (!answerGroups[i].outcome.labelledAsCorrect &&
+          answerGroups[i].taggedSkillMisconceptionId !== null) {
+        taggedSkillMisconceptionIds.push(
+          answerGroups[i].taggedSkillMisconceptionId);
+      }
+    }
+    let commonSkillMisconceptionIds = (
+      taggedSkillMisconceptionIds.filter(
+        skillMisconceptionId => (
+          this.inapplicableSkillMisconceptionIds.includes(
+            skillMisconceptionId))));
+    if (commonSkillMisconceptionIds.length) {
+      commonSkillMisconceptionIds.forEach((skillMisconceptionId => {
+        this.inapplicableSkillMisconceptionIds = (
+          this.inapplicableSkillMisconceptionIds.filter(
+            item => item !== skillMisconceptionId));
+      }));
+      this.onSaveInapplicableSkillMisconceptionIds(
+        this.inapplicableSkillMisconceptionIds);
+    }
+  }
+
+  saveTaggedMisconception(misconceptionId, skillId): void {
+    this.responsesService.updateActiveAnswerGroup({
+      taggedSkillMisconceptionId: skillId + '-' + misconceptionId
+    }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups(newAnswerGroups);
+      this.refreshWarnings()();
+    });
+  }
+
+  saveActiveAnswerGroupFeedback(updatedOutcome): void {
+    this.responsesService.updateActiveAnswerGroup({
+      feedback: updatedOutcome.feedback
+    }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups(newAnswerGroups);
+      this.refreshWarnings()();
+    });
+  }
+
+  saveActiveAnswerGroupDest(updatedOutcome): void {
+    this.responsesService.updateActiveAnswerGroup({
+      dest: updatedOutcome.dest,
+      refresherExplorationId: updatedOutcome.refresherExplorationId,
+      missingPrerequisiteSkillId:
+        updatedOutcome.missingPrerequisiteSkillId
+    }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups(newAnswerGroups);
+      this.refreshWarnings()();
+    });
+  }
+
+  saveActiveAnswerGroupCorrectnessLabel(
+      updatedOutcome): void {
+    this.responsesService.updateActiveAnswerGroup({
+      labelledAsCorrect: updatedOutcome.labelledAsCorrect
+    }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups(newAnswerGroups);
+      this.refreshWarnings()();
+    });
+  }
+
+  saveActiveAnswerGroupRules(updatedRules): void {
+    this.responsesService.updateActiveAnswerGroup({
+      rules: updatedRules
+    }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups(newAnswerGroups);
+      this.refreshWarnings()();
+    });
+  }
+
+  saveDefaultOutcomeFeedback(updatedOutcome): void {
+    this.responsesService.updateDefaultOutcome({
+      feedback: updatedOutcome.feedback,
+      dest: updatedOutcome.dest
+    }, (newDefaultOutcome) => {
+      this.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+    });
+  }
+
+  saveDefaultOutcomeDest(updatedOutcome): void {
+    this.responsesService.updateDefaultOutcome({
+      dest: updatedOutcome.dest,
+      refresherExplorationId: updatedOutcome.refresherExplorationId,
+      missingPrerequisiteSkillId:
+        updatedOutcome.missingPrerequisiteSkillId
+    }, (newDefaultOutcome) => {
+      this.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+    });
+  };
+
+  saveDefaultOutcomeCorrectnessLabel(
+      updatedOutcome): void {
+    this.responsesService.updateDefaultOutcome({
+      labelledAsCorrect: updatedOutcome.labelledAsCorrect
+    }, (newDefaultOutcome) => {
+      this.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+    });
+  };
+
+  getAnswerChoices(): AnswerChoice[] {
+    return this.responsesService.getAnswerChoices();
+  };
+
+  summarizeAnswerGroup(
+      answerGroup, interactionId: string, answerChoices: AnswerChoice[], shortenRule): string {
+    let summary = '';
+    let outcome = answerGroup.outcome;
+    let hasFeedback = outcome.hasNonemptyFeedback();
+
+    if (answerGroup.rules) {
+      let firstRule = $filter('convertToPlainText')(
+        $filter('parameterizeRuleDescription')(
+          answerGroup.rules[0], interactionId, answerChoices));
+      summary = 'Answer ' + firstRule;
+
+      if (hasFeedback && shortenRule) {
+        summary = $filter('wrapTextWithEllipsis')(
+          summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+      }
+      summary = '[' + summary + '] ';
+    }
+
+    if (hasFeedback) {
+      summary += (
+        shortenRule ?
+          $filter('truncate')(outcome.feedback.html, 30) :
+          $filter('convertToPlainText')(outcome.feedback.html));
+    }
+    return summary;
+  }
+
+  summarizeDefaultOutcome(
+      defaultOutcome, interactionId, answerGroupCount, shortenRule): string {
+    if (!defaultOutcome) {
+      return '';
+    }
+
+    let summary = '';
+    let hasFeedback = defaultOutcome.hasNonemptyFeedback();
+
+    if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
+      summary =
+        INTERACTION_SPECS[interactionId].default_outcome_heading;
+    } else if (answerGroupCount > 0) {
+      summary = 'All other answers';
+    } else {
+      summary = 'All answers';
+    }
+
+    if (hasFeedback && shortenRule) {
+      summary = $filter('wrapTextWithEllipsis')(
+        summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+    }
+    summary = '[' + summary + '] ';
+
+    if (hasFeedback) {
+      summary +=
+        $filter(
+          'convertToPlainText'
+        )(defaultOutcome.feedback.html);
+    }
+    return summary;
+  };
+
+  isOutcomeLooping(outcome): boolean {
+    let activeStateName = this.stateName;
+    return outcome && (outcome.dest === activeStateName);
+  }
+
+  toggleResponseCard(): void {
+    this.responseCardIsShown = !this.responseCardIsShown;
+  }
+
+  getUnaddressedMisconceptionNames(): any {
+    let answerGroups = this.responsesService.getAnswerGroups();
+    let taggedSkillMisconceptionIds = {};
+    for (let i = 0; i < answerGroups.length; i++) {
+      if (!answerGroups[i].outcome.labelledAsCorrect &&
+          answerGroups[i].taggedSkillMisconceptionId !== null) {
+        taggedSkillMisconceptionIds[
+          answerGroups[i].taggedSkillMisconceptionId] = true;
+      }
+    }
+    let unaddressedMisconceptionNames = [];
+    Object.keys(this.misconceptionsBySkill).forEach(
+      function(skillId) {
+        let misconceptions = this.misconceptionsBySkill[skillId];
+        for (let i = 0; i < misconceptions.length; i++) {
+          if (!misconceptions[i].isMandatory()) {
+            continue;
+          }
+          let skillMisconceptionId = (
+            skillId + '-' + misconceptions[i].getId());
+          if (!taggedSkillMisconceptionIds.hasOwnProperty(
+            skillMisconceptionId)) {
+            unaddressedMisconceptionNames.push(
+              misconceptions[i].getName());
+          }
+        }
+      });
+    return unaddressedMisconceptionNames;
+  }
+
+  getOptionalSkillMisconceptionStatus(
+      optionalSkillMisconceptionId): string {
+    let answerGroups = this.responsesService.getAnswerGroups();
+    let taggedSkillMisconceptionIds = [];
+    for (let i = 0; i < answerGroups.length; i++) {
+      if (!answerGroups[i].outcome.labelledAsCorrect &&
+          answerGroups[i].taggedSkillMisconceptionId !== null) {
+        taggedSkillMisconceptionIds.push(
+          answerGroups[i].taggedSkillMisconceptionId);
+      }
+    }
+    let skillMisconceptionIdIsAssigned = (
+      taggedSkillMisconceptionIds.includes(
+        optionalSkillMisconceptionId));
+    if (skillMisconceptionIdIsAssigned) {
+      return 'Assigned';
+    }
+    return this.inapplicableSkillMisconceptionIds.includes(
+      optionalSkillMisconceptionId) ? 'Not Applicable' : '';
+  };
+
+  this.updateOptionalMisconceptionIdStatus = function(
+      skillMisconceptionId, isApplicable) {
+    if (isApplicable) {
+      this.inapplicableSkillMisconceptionIds = (
+        this.inapplicableSkillMisconceptionIds.filter(
+          item => item !== skillMisconceptionId));
+    } else {
+      this.inapplicableSkillMisconceptionIds.push(
+        skillMisconceptionId);
+    }
+    this.onSaveInapplicableSkillMisconceptionIds(
+      this.inapplicableSkillMisconceptionIds);
+    this.setActiveEditOption(null);
+  };
+
+  this.setActiveEditOption = function(activeEditOption) {
+    this.activeEditOption = activeEditOption;
+  };
+
+  this.isNoActionExpected = function(skillMisconceptionId) {
+    return ['Assigned', 'Not Applicable'].includes(
+      this.getOptionalSkillMisconceptionStatus(
+        skillMisconceptionId));
+  };
+}
+
 
 angular.module('oppia').component('stateResponses', {
   bindings: {
-    addState: '=',
-    onResponsesInitialized: '=',
-    onSaveInapplicableSkillMisconceptionIds: '=',
-    onSaveInteractionAnswerGroups: '=',
-    onSaveInteractionDefaultOutcome: '=',
-    onSaveNextContentIdIndex: '=',
-    onSaveSolicitAnswerDetails: '=',
-    navigateToState: '=',
-    refreshWarnings: '&',
-    showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
   },
-  template: require('./state-responses.component.html'),
+  template: require(''),
   controller: [
     '$filter', '$rootScope', '$scope', 'AlertsService',
     'AnswerGroupObjectFactory',
@@ -129,560 +659,68 @@ angular.module('oppia').component('stateResponses', {
         INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
         PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
         SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
-      var ctrl = this;
+      let ctrl = this;
 
-      ctrl.directiveSubscriptions = new Subscription();
-      var _initializeTrainingData = function() {
-        if (StateEditorService.isInQuestionMode()) {
-          return;
-        }
-      };
-
-      $scope.isInQuestionMode = function() {
-        return StateEditorService.isInQuestionMode();
-      };
-
-      $scope.suppressDefaultAnswerGroupWarnings = function() {
-        var interactionId = $scope.getCurrentInteractionId();
-        var answerGroups = ResponsesService.getAnswerGroups();
-        // This array contains the text of each of the possible answers
-        // for the interaction.
-        var answerChoices = [];
-        var customizationArgs = (
-          StateCustomizationArgsService.savedMemento);
-        var handledAnswersArray = [];
-
-        if (interactionId === 'MultipleChoiceInput') {
-          var numChoices = $scope.getAnswerChoices().length;
-          var choiceIndices = [];
-          // Collect all answers which have been handled by at least one
-          // answer group.
-          for (var i = 0; i < answerGroups.length; i++) {
-            for (var j = 0; j < answerGroups[i].rules.length; j++) {
-              handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
-            }
-          }
-          for (var i = 0; i < numChoices; i++) {
-            choiceIndices.push(i);
-          }
-          // We only suppress the default warning if each choice index has
-          // been handled by at least one answer group.
-          return choiceIndices.every(function(choiceIndex) {
-            return handledAnswersArray.indexOf(choiceIndex) !== -1;
-          });
-        } else if (interactionId === 'ItemSelectionInput') {
-          var maxSelectionCount = (
-            customizationArgs.maxAllowableSelectionCount.value);
-          if (maxSelectionCount === 1) {
-            var numChoices = $scope.getAnswerChoices().length;
-            // This array contains a list of booleans, one for each answer
-            // choice. Each boolean is true if the corresponding answer has
-            // been covered by at least one rule, and false otherwise.
-            handledAnswersArray = [];
-            for (var i = 0; i < numChoices; i++) {
-              handledAnswersArray.push(false);
-              answerChoices.push($scope.getAnswerChoices()[i].val);
-            }
-
-            var answerChoiceToIndex = {};
-            answerChoices.forEach(function(answerChoice, choiceIndex) {
-              answerChoiceToIndex[answerChoice] = choiceIndex;
-            });
-
-            answerGroups.forEach(function(answerGroup) {
-              var rules = answerGroup.rules;
-              rules.forEach(function(rule) {
-                var ruleInputs = rule.inputs.x;
-                ruleInputs.forEach(function(ruleInput) {
-                  var choiceIndex = answerChoiceToIndex[ruleInput];
-                  if (rule.type === 'Equals' ||
-                      rule.type === 'ContainsAtLeastOneOf') {
-                    handledAnswersArray[choiceIndex] = true;
-                  } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
-                    for (var i = 0; i < handledAnswersArray.length; i++) {
-                      if (i !== choiceIndex) {
-                        handledAnswersArray[i] = true;
-                      }
-                    }
-                  }
-                });
-              });
-            });
-
-            var areAllChoicesCovered = handledAnswersArray.every(
-              function(handledAnswer) {
-                return handledAnswer;
-              });
-            // We only suppress the default warning if each choice text has
-            // been handled by at least one answer group, based on rule
-            // type.
-            return areAllChoicesCovered;
-          }
-        }
-        return false;
-      };
-
-      $scope.onChangeSolicitAnswerDetails = function() {
-        ctrl.onSaveSolicitAnswerDetails(
-          $scope.stateSolicitAnswerDetailsService.displayed);
-        StateSolicitAnswerDetailsService.saveDisplayedValue();
-      };
-
-      $scope.isSelfLoopWithNoFeedback = function(outcome) {
-        if (outcome && typeof outcome === 'object' &&
-          outcome.constructor.name === 'Outcome') {
-          return outcome.isConfusing($scope.stateName);
-        }
-        return false;
-      };
-
-      $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
-        if (!outcome ||
-            !StateEditorService.getCorrectnessFeedbackEnabled()) {
-          return false;
-        }
-        var currentStateName = $scope.stateName;
-        return (
-          (outcome.dest === currentStateName) &&
-          outcome.labelledAsCorrect);
-      };
-
-      $scope.changeActiveAnswerGroupIndex = function(newIndex) {
-        ExternalSaveService.onExternalSave.emit();
-        ResponsesService.changeActiveAnswerGroupIndex(newIndex);
-        $scope.activeAnswerGroupIndex = (
-          ResponsesService.getActiveAnswerGroupIndex());
-      };
-
-      $scope.getCurrentInteractionId = function() {
-        return StateInteractionIdService.savedMemento;
-      };
-
-      $scope.isCreatingNewState = function(outcome) {
-        return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-      };
-
-      // This returns false if the current interaction ID is null.
-      $scope.isCurrentInteractionLinear = function() {
-        var interactionId = $scope.getCurrentInteractionId();
-        return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-      };
-
-      $scope.isCurrentInteractionTrivial = function() {
-        var interactionId = $scope.getCurrentInteractionId();
-        return INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
-          interactionId) !== -1;
-      };
-
-      $scope.isLinearWithNoFeedback = function(outcome) {
-        // Returns false if current interaction is linear and has no
-        // feedback.
-        if (outcome && typeof outcome === 'object' &&
-          outcome.constructor.name === 'Outcome') {
-          return $scope.isCurrentInteractionLinear() &&
-            !outcome.hasNonemptyFeedback();
-        }
-        return false;
-      };
-
-      $scope.getOutcomeTooltip = function(outcome) {
-        if ($scope.isSelfLoopThatIsMarkedCorrect(outcome)) {
-          return 'Self-loops should not be labelled as correct.';
-        }
-
-        // Outcome tooltip depends on whether feedback is displayed.
-        if ($scope.isLinearWithNoFeedback(outcome)) {
-          return 'Please direct the learner to a different card.';
-        } else {
-          return 'Please give Oppia something useful to say,' +
-                 ' or direct the learner to a different card.';
-        }
-      };
-
-      $scope.openAddAnswerGroupModal = function() {
-        AlertsService.clearWarnings();
-        ExternalSaveService.onExternalSave.emit();
-        var stateName = StateEditorService.getActiveStateName();
-        var addState = ctrl.addState;
-        var currentInteractionId = $scope.getCurrentInteractionId();
-
-        let modalRef = NgbModal.open(AddAnswerGroupModalComponent, {
-          backdrop: 'static',
-        });
-
-        modalRef.componentInstance.addState.subscribe(
-          (value: string) => {
-            addState(value);
-          });
-
-        modalRef.componentInstance.currentInteractionId = currentInteractionId;
-        modalRef.componentInstance.stateName = stateName;
-
-        modalRef.result.then((result) => {
-          StateNextContentIdIndexService.saveDisplayedValue();
-          ctrl.onSaveNextContentIdIndex(
-            StateNextContentIdIndexService.displayed);
-
-          // Create a new answer group.
-          $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-            [result.tmpRule], result.tmpOutcome, [],
-            result.tmpTaggedSkillMisconceptionId));
-          ResponsesService.save(
-            $scope.answerGroups, $scope.defaultOutcome,
-            (newAnswerGroups, newDefaultOutcome) => {
-              ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-              ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-              ctrl.refreshWarnings()();
-            });
-          $scope.changeActiveAnswerGroupIndex(
-            $scope.answerGroups.length - 1);
-
-          // After saving it, check if the modal should be reopened right
-          // away.
-          if (result.reopen) {
-            $scope.openAddAnswerGroupModal();
-          }
-
-          $rootScope.$applyAsync();
-        }, () => {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      $scope.deleteAnswerGroup = function(value) {
-        // Prevent clicking on the delete button from also toggling the
-        // display state of the answer group.
-        value.evt.stopPropagation();
-
-        AlertsService.clearWarnings();
-        NgbModal.open(DeleteAnswerGroupModalComponent, {
-          backdrop: true,
-        }).result.then(function() {
-          ResponsesService.deleteAnswerGroup(
-            value.index, function(newAnswerGroups) {
-              ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-              ctrl.refreshWarnings()();
-            });
-          $rootScope.$apply();
-        }, function() {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      var verifyAndUpdateInapplicableSkillMisconceptionIds = function() {
-        var answerGroups = ResponsesService.getAnswerGroups();
-        var taggedSkillMisconceptionIds = [];
-        for (var i = 0; i < answerGroups.length; i++) {
-          if (!answerGroups[i].outcome.labelledAsCorrect &&
-              answerGroups[i].taggedSkillMisconceptionId !== null) {
-            taggedSkillMisconceptionIds.push(
-              answerGroups[i].taggedSkillMisconceptionId);
-          }
-        }
-        var commonSkillMisconceptionIds = (
-          taggedSkillMisconceptionIds.filter(
-            skillMisconceptionId => (
-              $scope.inapplicableSkillMisconceptionIds.includes(
-                skillMisconceptionId))));
-        if (commonSkillMisconceptionIds.length) {
-          commonSkillMisconceptionIds.forEach((skillMisconceptionId => {
-            $scope.inapplicableSkillMisconceptionIds = (
-              $scope.inapplicableSkillMisconceptionIds.filter(
-                item => item !== skillMisconceptionId));
-          }));
-          ctrl.onSaveInapplicableSkillMisconceptionIds(
-            $scope.inapplicableSkillMisconceptionIds);
-        }
-      };
-
-      $scope.saveTaggedMisconception = function(misconceptionId, skillId) {
-        ResponsesService.updateActiveAnswerGroup({
-          taggedSkillMisconceptionId: skillId + '-' + misconceptionId
-        }, function(newAnswerGroups) {
-          ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-          ctrl.refreshWarnings()();
-        });
-      };
-
-      $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
-        ResponsesService.updateActiveAnswerGroup({
-          feedback: updatedOutcome.feedback
-        }, function(newAnswerGroups) {
-          ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-          ctrl.refreshWarnings()();
-        });
-      };
-
-      $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
-        ResponsesService.updateActiveAnswerGroup({
-          dest: updatedOutcome.dest,
-          refresherExplorationId: updatedOutcome.refresherExplorationId,
-          missingPrerequisiteSkillId:
-            updatedOutcome.missingPrerequisiteSkillId
-        }, function(newAnswerGroups) {
-          ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-          ctrl.refreshWarnings()();
-        });
-      };
-
-      $scope.saveActiveAnswerGroupCorrectnessLabel = function(
-          updatedOutcome) {
-        ResponsesService.updateActiveAnswerGroup({
-          labelledAsCorrect: updatedOutcome.labelledAsCorrect
-        }, function(newAnswerGroups) {
-          ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-          ctrl.refreshWarnings()();
-        });
-      };
-
-      $scope.saveActiveAnswerGroupRules = function(updatedRules) {
-        ResponsesService.updateActiveAnswerGroup({
-          rules: updatedRules
-        }, function(newAnswerGroups) {
-          ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-          ctrl.refreshWarnings()();
-        });
-      };
-
-      $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
-        ResponsesService.updateDefaultOutcome({
-          feedback: updatedOutcome.feedback,
-          dest: updatedOutcome.dest
-        }, function(newDefaultOutcome) {
-          ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-        });
-      };
-
-      $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
-        ResponsesService.updateDefaultOutcome({
-          dest: updatedOutcome.dest,
-          refresherExplorationId: updatedOutcome.refresherExplorationId,
-          missingPrerequisiteSkillId:
-            updatedOutcome.missingPrerequisiteSkillId
-        }, function(newDefaultOutcome) {
-          ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-        });
-      };
-
-      $scope.saveDefaultOutcomeCorrectnessLabel = function(
-          updatedOutcome) {
-        ResponsesService.updateDefaultOutcome({
-          labelledAsCorrect: updatedOutcome.labelledAsCorrect
-        }, function(newDefaultOutcome) {
-          ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-        });
-      };
-
-      $scope.getAnswerChoices = function() {
-        return ResponsesService.getAnswerChoices();
-      };
-
-      $scope.summarizeAnswerGroup = function(
-          answerGroup, interactionId, answerChoices, shortenRule) {
-        var summary = '';
-        var outcome = answerGroup.outcome;
-        var hasFeedback = outcome.hasNonemptyFeedback();
-
-        if (answerGroup.rules) {
-          var firstRule = $filter('convertToPlainText')(
-            $filter('parameterizeRuleDescription')(
-              answerGroup.rules[0], interactionId, answerChoices));
-          summary = 'Answer ' + firstRule;
-
-          if (hasFeedback && shortenRule) {
-            summary = $filter('wrapTextWithEllipsis')(
-              summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-          }
-          summary = '[' + summary + '] ';
-        }
-
-        if (hasFeedback) {
-          summary += (
-            shortenRule ?
-              $filter('truncate')(outcome.feedback.html, 30) :
-              $filter('convertToPlainText')(outcome.feedback.html));
-        }
-        return summary;
-      };
-
-      $scope.summarizeDefaultOutcome = function(
-          defaultOutcome, interactionId, answerGroupCount, shortenRule) {
-        if (!defaultOutcome) {
-          return '';
-        }
-
-        var summary = '';
-        var hasFeedback = defaultOutcome.hasNonemptyFeedback();
-
-        if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
-          summary =
-            INTERACTION_SPECS[interactionId].default_outcome_heading;
-        } else if (answerGroupCount > 0) {
-          summary = 'All other answers';
-        } else {
-          summary = 'All answers';
-        }
-
-        if (hasFeedback && shortenRule) {
-          summary = $filter('wrapTextWithEllipsis')(
-            summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-        }
-        summary = '[' + summary + '] ';
-
-        if (hasFeedback) {
-          summary +=
-            $filter(
-              'convertToPlainText'
-            )(defaultOutcome.feedback.html);
-        }
-        return summary;
-      };
-
-      $scope.isOutcomeLooping = function(outcome) {
-        var activeStateName = $scope.stateName;
-        return outcome && (outcome.dest === activeStateName);
-      };
-
-      $scope.toggleResponseCard = function() {
-        $scope.responseCardIsShown = !$scope.responseCardIsShown;
-      };
-
-      $scope.getUnaddressedMisconceptionNames = function() {
-        var answerGroups = ResponsesService.getAnswerGroups();
-        var taggedSkillMisconceptionIds = {};
-        for (var i = 0; i < answerGroups.length; i++) {
-          if (!answerGroups[i].outcome.labelledAsCorrect &&
-              answerGroups[i].taggedSkillMisconceptionId !== null) {
-            taggedSkillMisconceptionIds[
-              answerGroups[i].taggedSkillMisconceptionId] = true;
-          }
-        }
-        var unaddressedMisconceptionNames = [];
-        Object.keys($scope.misconceptionsBySkill).forEach(
-          function(skillId) {
-            var misconceptions = $scope.misconceptionsBySkill[skillId];
-            for (var i = 0; i < misconceptions.length; i++) {
-              if (!misconceptions[i].isMandatory()) {
-                continue;
-              }
-              var skillMisconceptionId = (
-                skillId + '-' + misconceptions[i].getId());
-              if (!taggedSkillMisconceptionIds.hasOwnProperty(
-                skillMisconceptionId)) {
-                unaddressedMisconceptionNames.push(
-                  misconceptions[i].getName());
-              }
-            }
-          });
-        return unaddressedMisconceptionNames;
-      };
-
-      $scope.getOptionalSkillMisconceptionStatus = function(
-          optionalSkillMisconceptionId) {
-        var answerGroups = ResponsesService.getAnswerGroups();
-        var taggedSkillMisconceptionIds = [];
-        for (var i = 0; i < answerGroups.length; i++) {
-          if (!answerGroups[i].outcome.labelledAsCorrect &&
-              answerGroups[i].taggedSkillMisconceptionId !== null) {
-            taggedSkillMisconceptionIds.push(
-              answerGroups[i].taggedSkillMisconceptionId);
-          }
-        }
-        var skillMisconceptionIdIsAssigned = (
-          taggedSkillMisconceptionIds.includes(
-            optionalSkillMisconceptionId));
-        if (skillMisconceptionIdIsAssigned) {
-          return 'Assigned';
-        }
-        return $scope.inapplicableSkillMisconceptionIds.includes(
-          optionalSkillMisconceptionId) ? 'Not Applicable' : '';
-      };
-
-      $scope.updateOptionalMisconceptionIdStatus = function(
-          skillMisconceptionId, isApplicable) {
-        if (isApplicable) {
-          $scope.inapplicableSkillMisconceptionIds = (
-            $scope.inapplicableSkillMisconceptionIds.filter(
-              item => item !== skillMisconceptionId));
-        } else {
-          $scope.inapplicableSkillMisconceptionIds.push(
-            skillMisconceptionId);
-        }
-        ctrl.onSaveInapplicableSkillMisconceptionIds(
-          $scope.inapplicableSkillMisconceptionIds);
-        $scope.setActiveEditOption(null);
-      };
-
-      $scope.setActiveEditOption = function(activeEditOption) {
-        $scope.activeEditOption = activeEditOption;
-      };
-
-      $scope.isNoActionExpected = function(skillMisconceptionId) {
-        return ['Assigned', 'Not Applicable'].includes(
-          $scope.getOptionalSkillMisconceptionStatus(
-            skillMisconceptionId));
-      };
-
-      ctrl.$onInit = function() {
-        $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+      this.$onInit = function() {
+        this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
           SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-        $scope.EditabilityService = EditabilityService;
-        $scope.responseCardIsShown = (
+        this.EditabilityService = EditabilityService;
+        this.responseCardIsShown = (
           !WindowDimensionsService.isWindowNarrow());
-        $scope.stateName = StateEditorService.getActiveStateName();
-        $scope.enableSolicitAnswerDetailsFeature = (
+        this.stateName = this.stateEditorService.getActiveStateName();
+        this.enableSolicitAnswerDetailsFeature = (
           ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
-        $scope.stateSolicitAnswerDetailsService = (
+        this.stateSolicitAnswerDetailsService = (
           StateSolicitAnswerDetailsService);
-        $scope.misconceptionsBySkill = {};
-        ctrl.directiveSubscriptions.add(
-          ResponsesService.onInitializeAnswerGroups.subscribe((data) => {
-            ResponsesService.init(data);
-            $scope.answerGroups = ResponsesService.getAnswerGroups();
-            $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+        this.misconceptionsBySkill = {};
+        this.directiveSubscriptions.add(
+          this.responsesService.onInitializeAnswerGroups.subscribe((data) => {
+            this.responsesService.init(data);
+            this.answerGroups = this.responsesService.getAnswerGroups();
+            this.defaultOutcome = this.responsesService.getDefaultOutcome();
 
             // If the creator selects an interaction which has only one
             // possible answer, automatically expand the default response.
             // Otherwise, default to having no responses initially
             // selected.
-            if ($scope.isCurrentInteractionLinear()) {
-              ResponsesService.changeActiveAnswerGroupIndex(0);
+            if (this.isCurrentInteractionLinear()) {
+              this.responsesService.changeActiveAnswerGroupIndex(0);
             }
 
             // Initialize training data for these answer groups.
             _initializeTrainingData();
 
-            $scope.activeAnswerGroupIndex = (
-              ResponsesService.getActiveAnswerGroupIndex());
+            this.activeAnswerGroupIndex = (
+              this.responsesService.getActiveAnswerGroupIndex());
             ExternalSaveService.onExternalSave.emit();
           })
         );
 
-        $scope.getStaticImageUrl = function(imagePath) {
+        this.getStaticImageUrl = function(imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
 
-        ctrl.directiveSubscriptions.add(
+        this.directiveSubscriptions.add(
           StateInteractionIdService.onInteractionIdChanged.subscribe(
             (newInteractionId) => {
               ExternalSaveService.onExternalSave.emit();
-              ResponsesService.onInteractionIdChanged(
+              this.responsesService.onInteractionIdChanged(
                 newInteractionId,
                 function(newAnswerGroups, newDefaultOutcome) {
-                  ctrl.onSaveInteractionDefaultOutcome(
+                  this.onSaveInteractionDefaultOutcome(
                     newDefaultOutcome);
-                  ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  ctrl.refreshWarnings()();
-                  $scope.answerGroups = ResponsesService.getAnswerGroups();
-                  $scope.defaultOutcome =
-                    ResponsesService.getDefaultOutcome();
+                  this.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  this.refreshWarnings()();
+                  this.answerGroups = this.responsesService.getAnswerGroups();
+                  this.defaultOutcome =
+                    this.responsesService.getDefaultOutcome();
 
                   // Reinitialize training data if the interaction ID is
                   // changed.
                   _initializeTrainingData();
 
-                  $scope.activeAnswerGroupIndex = (
-                    ResponsesService.getActiveAnswerGroupIndex());
+                  this.activeAnswerGroupIndex = (
+                    this.responsesService.getActiveAnswerGroupIndex());
                 });
 
               // Prompt the user to create a new response if it is not a
@@ -691,48 +729,48 @@ angular.module('oppia').component('stateResponses', {
               if (newInteractionId &&
                   !INTERACTION_SPECS[newInteractionId].is_linear &&
                   !INTERACTION_SPECS[newInteractionId].is_terminal) {
-                $scope.openAddAnswerGroupModal();
+                this.openAddAnswerGroupModal();
               }
             }
           )
         );
 
-        ctrl.directiveSubscriptions.add(
-          ResponsesService.onAnswerGroupsChanged.subscribe(
+        this.directiveSubscriptions.add(
+          this.responsesService.onAnswerGroupsChanged.subscribe(
             () => {
-              $scope.answerGroups = ResponsesService.getAnswerGroups();
-              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-              $scope.activeAnswerGroupIndex =
-              ResponsesService.getActiveAnswerGroupIndex();
+              this.answerGroups = this.responsesService.getAnswerGroups();
+              this.defaultOutcome = this.responsesService.getDefaultOutcome();
+              this.activeAnswerGroupIndex =
+              this.responsesService.getActiveAnswerGroupIndex();
               verifyAndUpdateInapplicableSkillMisconceptionIds();
             }
           ));
-        ctrl.directiveSubscriptions.add(
-          StateEditorService.onUpdateAnswerChoices.subscribe(
+        this.directiveSubscriptions.add(
+          this.stateEditorService.onUpdateAnswerChoices.subscribe(
             (newAnswerChoices) => {
-              ResponsesService.updateAnswerChoices(newAnswerChoices);
+              this.responsesService.updateAnswerChoices(newAnswerChoices);
             })
         );
 
-        ctrl.directiveSubscriptions.add(
-          StateEditorService.onHandleCustomArgsUpdate.subscribe(
+        this.directiveSubscriptions.add(
+          this.stateEditorService.onHandleCustomArgsUpdate.subscribe(
             (newAnswerChoices) => {
-              ResponsesService.handleCustomArgsUpdate(
+              this.responsesService.handleCustomArgsUpdate(
                 newAnswerChoices, function(newAnswerGroups) {
-                  ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  ctrl.refreshWarnings()();
+                  this.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  this.refreshWarnings()();
                 });
             }
           )
         );
 
-        ctrl.directiveSubscriptions.add(
-          StateEditorService.onStateEditorInitialized.subscribe(
+        this.directiveSubscriptions.add(
+          this.stateEditorService.onStateEditorInitialized.subscribe(
             () => {
-              $scope.misconceptionsBySkill = (
-                StateEditorService.getMisconceptionsBySkill());
-              $scope.containsOptionalMisconceptions = (
-                Object.values($scope.misconceptionsBySkill).some(
+              this.misconceptionsBySkill = (
+                this.stateEditorService.getMisconceptionsBySkill());
+              this.containsOptionalMisconceptions = (
+                Object.values(this.misconceptionsBySkill).some(
                   (misconceptions: Misconception[]) => misconceptions.some(
                     misconception => !misconception.isMandatory())));
             })
@@ -742,7 +780,7 @@ angular.module('oppia').component('stateResponses', {
         // the browser viewport, there are some bugs in the positioning of
         // the helper. This is a bug in jQueryUI that has not been fixed
         // yet. For more details, see http://stackoverflow.com/q/5791886
-        $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
+        this.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
           axis: 'y',
           cursor: 'move',
           handle: '.oppia-rule-sort-handle',
@@ -751,29 +789,29 @@ angular.module('oppia').component('stateResponses', {
           tolerance: 'pointer',
           start: function(e, ui) {
             ExternalSaveService.onExternalSave.emit();
-            $scope.changeActiveAnswerGroupIndex(-1);
+            this.changeActiveAnswerGroupIndex(-1);
             ui.placeholder.height(ui.item.height());
           },
           stop: function() {
-            ResponsesService.save(
-              $scope.answerGroups, $scope.defaultOutcome,
+            this.responsesService.save(
+              this.answerGroups, this.defaultOutcome,
               function(newAnswerGroups, newDefaultOutcome) {
-                ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
-                ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-                ctrl.refreshWarnings()();
+                this.onSaveInteractionAnswerGroups(newAnswerGroups);
+                this.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                this.refreshWarnings()();
               });
           }
         };
-        if (StateEditorService.isInQuestionMode()) {
-          ctrl.onResponsesInitialized();
+        if (this.stateEditorService.isInQuestionMode()) {
+          this.onResponsesInitialized();
         }
-        StateEditorService.updateStateResponsesInitialised();
-        $scope.inapplicableSkillMisconceptionIds = (
-          StateEditorService.getInapplicableSkillMisconceptionIds());
-        $scope.activeEditOption = null;
+        this.stateEditorService.updateStateResponsesInitialised();
+        this.inapplicableSkillMisconceptionIds = (
+          this.stateEditorService.getInapplicableSkillMisconceptionIds());
+        this.activeEditOption = null;
       };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
+      this.$onDestroy = function() {
+        this.directiveSubscriptions.unsubscribe();
       };
     }
   ]
