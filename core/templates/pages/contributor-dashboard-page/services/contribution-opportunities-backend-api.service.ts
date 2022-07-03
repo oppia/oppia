@@ -246,7 +246,8 @@ export class ContributionOpportunitiesBackendApiService {
     try {
       const response = await this.http
         .get<TopicNamesBackendDict>('/gettranslatabletopicnames').toPromise();
-      response.topic_names.unshift('All');
+      // TODO(#15648): Re-enable "All Topics" after fetching latency is fixed.
+      // response.topic_names.unshift('All');
 
       return response.topic_names;
     } catch {

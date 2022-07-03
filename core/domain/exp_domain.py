@@ -3485,3 +3485,57 @@ class ExplorationMetadata:
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'edits_allowed': self.edits_allowed
         }
+
+
+class MetadataVersionHistory:
+    """Class to represent an element of the version history list of the
+    exploration metadata.
+
+    Attributes:
+        last_edited_version_number: int. The version number of the
+            exploration in which the metadata was last edited.
+        last_edited_committer_id: str. The user id of the user who committed
+            the latest changes to the exploration metadata.
+    """
+
+    def __init__(self, last_edited_version_number, last_edited_committer_id):
+        """Initializes the MetadataVersionHistory domain object.
+
+        Args:
+            last_edited_version_number: int. The version number of the
+                exploration in which the metadata was last edited.
+            last_edited_committer_id: str. The user id of the user who
+                committed the latest changes to the exploration metadata.
+        """
+        self.last_edited_version_number = last_edited_version_number
+        self.last_edited_committer_id = last_edited_committer_id
+
+    def to_dict(self):
+        """Returns a dict representation of the MetadataVersionHistory domain
+        object.
+
+        Returns:
+            dict. The dict representation of the MetadataVersionHistory domain
+            object.
+        """
+        return {
+            'last_edited_version_number': self.last_edited_version_number,
+            'last_edited_committer_id': self.last_edited_committer_id
+        }
+
+    @classmethod
+    def from_dict(cls, metadata_version_history_dict):
+        """Returns an MetadataVersionHistory domain object from a dict.
+
+        Args:
+            metadata_version_history_dict: dict. The dict representation of
+                MetadataVersionHistory object.
+
+        Returns:
+            MetadataVersionHistory. The corresponding MetadataVersionHistory
+            domain object.
+        """
+        return cls(
+            metadata_version_history_dict['last_edited_version_number'],
+            metadata_version_history_dict['last_edited_committer_id']
+        )
