@@ -238,7 +238,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
-        models_to_put = []
+        exp_opp_summary_model = None
         if exp_id_to_exp_opp_summary_model is not None:
             try:
                 content_count = migrated_exp.get_content_count()
@@ -277,20 +277,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
                 exp_opp_summary.validate()
 
-                models_to_put.append(exp_opp_summary_model)
+                exp_opp_summary_model.populate(**exp_opp_summary.to_dict())
+
             except Exception as e:
                 logging.info(e)
 
-        return models_to_put
-
-        # content_count = migrated_exp.get_content_count()
-        # translation_counts = migrated_exp.get_translation_counts()
-        # completed_translation_language_list = (
-        #     migrated_exp.get_languages_with_complete_translation())
-        # exploration_opportunity_summary = (
-        #     opportunity_services
-        #         .get_exploration_opportunity_summary_from_model(
-        #             exp_opp_summary_model))
+        return exp_opp_summary_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration migration.
@@ -439,12 +431,18 @@ class MigrateExplorationJob(base_jobs.JobBase):
         unused_put_results = (
             (
                 exp_models_to_put,
-                exp_summary_models_to_put,
-                exp_opp_summary_models_to_put
+                exp_summary_models_to_put
             )
             | 'Merge models' >> beam.Flatten()
             | 'Put models into datastore' >> ndb_io.PutModels()
         )
+
+        unused_put_results = (
+            exp_opp_summary_models_to_put
+            | 'Filter None models' >> beam.Filter(
+                lambda x: x is not None)
+            | 'Put exp opp summary models into datastore' >> (
+                ndb_io.PutModels()))
 
         return (
             (
