@@ -1,8 +1,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
-<% if (!htmlWebpackPlugin.options.lightweight) { %>
-  <link rel="preload" href="/third_party/generated/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-<% } %>
+
+<link rel="preload" href="/third_party/generated/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/third_party/generated/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
 
 <link rel="preload"
@@ -10,11 +9,13 @@
       href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'">
-<link rel="preload"
-      media="screen"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'">
+<% if (!htmlWebpackPlugin.options.lightweight) { %>
+  <link rel="preload"
+        media="screen"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+<% } %>
 <% if (webpackConfig.mode == 'production') { %>
   <link rel="preload"
         href="/third_party/generated/css/third_party.min.css"
@@ -23,14 +24,6 @@
   <% if (!htmlWebpackPlugin.options.lightweight) { %>
     <link rel="preload"
           href="/third_party/static/bower-material-1.1.19/angular-material.min.css"
-          as="style"
-          onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload"
-          href="/third_party/static/fontawesome-free-5.9.0-web/css/regular.css"
-          as="style"
-          onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload"
-          href="/third_party/static/fontawesome-free-5.9.0-web/css/solid.css"
           as="style"
           onload="this.onload=null;this.rel='stylesheet'">
   <% } %>
@@ -42,14 +35,6 @@
   <% if (!htmlWebpackPlugin.options.lightweight) { %>
     <link rel="preload"
           href="/third_party/static/bower-material-1.1.19/angular-material.css"
-          as="style"
-          onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload"
-          href="/third_party/static/fontawesome-free-5.9.0-web/css/regular.min.css"
-          as="style"
-          onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload"
-          href="/third_party/static/fontawesome-free-5.9.0-web/css/solid.min.css"
           as="style"
           onload="this.onload=null;this.rel='stylesheet'">
   <% } %>

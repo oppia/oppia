@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import copy
 import datetime
+import types
 
 from core import feconf
 from core.constants import constants
@@ -894,3 +895,191 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExpSummaryModel
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
+
+
+class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
+    """Unit tests for ExplorationVersionHistoryModel."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            exp_models.ExplorationVersionHistoryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        )
+
+    def test_get_export_policy(self) -> None:
+        export_policy_dict = base_models.BaseModel.get_export_policy()
+        export_policy_dict.update({
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'metadata_last_edited_version_number': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'metadata_last_edited_committer_id': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+        self.assertEqual(
+            exp_models.ExplorationVersionHistoryModel.get_export_policy(),
+            export_policy_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            exp_models.ExplorationVersionHistoryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_instance_id(self) -> None:
+        expected_instance_id = 'exp1.2'
+        actual_instance_id = (
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                'exp1', 2))
+
+        self.assertEqual(actual_instance_id, expected_instance_id)
+
+    def test_has_reference_to_user_id(self) -> None:
+        exp_models.ExplorationVersionHistoryModel(
+            exploration_id='exp1',
+            exploration_version=2,
+            state_version_history={
+                feconf.DEFAULT_INIT_STATE_NAME: {
+                    'previously_edited_in_version': 1,
+                    'state_name_in_previous_version': (
+                        feconf.DEFAULT_INIT_STATE_NAME),
+                    'committer_id': 'user_1'
+                }
+            },
+            metadata_last_edited_version_number=1,
+            metadata_last_edited_committer_id='user_1',
+            committer_ids=['user_1']
+        ).put()
+
+        self.assertTrue(
+            exp_models.ExplorationVersionHistoryModel
+            .has_reference_to_user_id('user_1'))
+        self.assertFalse(
+            exp_models.ExplorationVersionHistoryModel
+            .has_reference_to_user_id('user_2'))
+
+
+class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
+    """Tests for the TransientCheckpointUrl model."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            exp_models.TransientCheckpointUrlModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            exp_models.TransientCheckpointUrlModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'exploration_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        fetched_dict = (
+            exp_models.TransientCheckpointUrlModel.get_export_policy())
+        self.assertEqual(
+            expected_dict['exploration_id'],
+            fetched_dict['exploration_id'])
+        self.assertEqual(
+            expected_dict['furthest_reached_checkpoint_exp_version'],
+            fetched_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertEqual(
+            expected_dict['furthest_reached_checkpoint_state_name'],
+            fetched_dict['furthest_reached_checkpoint_state_name'])
+        self.assertEqual(
+            expected_dict['most_recently_reached_checkpoint_exp_version'],
+            fetched_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertEqual(
+            expected_dict['most_recently_reached_checkpoint_state_name'],
+            fetched_dict['most_recently_reached_checkpoint_state_name'])
+
+    def test_create_new_object(self) -> None:
+        exp_models.TransientCheckpointUrlModel.create(
+            'exp_id', 'progress_id')
+        transient_checkpoint_url_model = (
+            exp_models.TransientCheckpointUrlModel.get(
+                'progress_id', strict=True))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert transient_checkpoint_url_model is not None
+        self.assertEqual(
+            transient_checkpoint_url_model.exploration_id,
+            'exp_id')
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            most_recently_reached_checkpoint_exp_version)
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            most_recently_reached_checkpoint_state_name)
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            furthest_reached_checkpoint_exp_version)
+        self.assertIsNone(
+            transient_checkpoint_url_model.
+            furthest_reached_checkpoint_state_name)
+
+    def test_get_object(self) -> None:
+        exp_models.TransientCheckpointUrlModel.create(
+            'exp_id', 'progress_id')
+        expected_model = exp_models.TransientCheckpointUrlModel(
+            exploration_id='exp_id',
+            most_recently_reached_checkpoint_exp_version=None,
+            most_recently_reached_checkpoint_state_name=None,
+            furthest_reached_checkpoint_exp_version=None,
+            furthest_reached_checkpoint_state_name=None
+        )
+
+        actual_model = (
+            exp_models.TransientCheckpointUrlModel.get(
+                'progress_id', strict=True))
+
+        self.assertEqual(
+            actual_model.exploration_id,
+            expected_model.exploration_id)
+        self.assertEqual(
+            actual_model.most_recently_reached_checkpoint_exp_version,
+            expected_model.most_recently_reached_checkpoint_exp_version)
+        self.assertEqual(
+            actual_model.most_recently_reached_checkpoint_state_name,
+            expected_model.most_recently_reached_checkpoint_state_name)
+        self.assertEqual(
+            actual_model.furthest_reached_checkpoint_exp_version,
+            expected_model.furthest_reached_checkpoint_exp_version)
+        self.assertEqual(
+            actual_model.furthest_reached_checkpoint_state_name,
+            expected_model.furthest_reached_checkpoint_state_name)
+
+    def test_raise_exception_by_mocking_collision(self) -> None:
+        """Tests get_new_progress_id method for raising exception."""
+        transient_checkpoint_progress_model_cls = (
+            exp_models.TransientCheckpointUrlModel)
+
+        # Test get_new_progress_id method.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'New id generator is producing too many collisions.'
+        ):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                transient_checkpoint_progress_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    transient_checkpoint_progress_model_cls
+                )
+            ):
+                transient_checkpoint_progress_model_cls.get_new_progress_id()
