@@ -779,7 +779,7 @@ var ExplorationEditorMainTab = function() {
           'Parameter Element Button', parameterElementButton, true);
 
         var multipleChoiceAnswerOption = element.all(by.cssContainingText(
-          '.protractor-test-html-select-selector', parameterValues[i]));
+          '.protractor-test-html-select-selector', parameterValues[i])).first();
 
         await action.click(
           'Multiple Choice Answer Option: ' + i,

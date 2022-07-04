@@ -55,7 +55,7 @@ export class RuleEditorComponent
 
   ruleDescriptionFragments: unknown[];
   currentInteractionId: string;
-  ruleDescriptionChoices: any[];
+  ruleDescriptionChoices: Choice[];
   isInvalid: boolean;
   eventBusGroup: EventBusGroup;
   editRuleForm: object;
@@ -68,11 +68,6 @@ export class RuleEditorComponent
      private readonly changeDetectorRef: ChangeDetectorRef,
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
-  }
-
-  rajesh(): void {
-    console.error(this.rule);
-    console.error(this.ruleDescriptionChoices);
   }
 
   computeRuleDescriptionFragments(): string {
