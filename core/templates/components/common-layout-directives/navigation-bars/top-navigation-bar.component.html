@@ -6,12 +6,11 @@
      (click)="toggleSidebar($event)"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button ml-0"
      tabindex="0">
-    <i class="material-icons oppia-navbar-menu-icon"
+    <i class="fas fa-bars oppia-navbar-menu-icon"
        *ngIf="!isSidebarShown()"
        [ngClass]="{ 'oppia-stop-scroll': !isSidebarShown() }" >
-       &#xE5D2;
     </i>
-    <i class="material-icons oppia-navbar-close-icon"
+    <i class="fas fa-x-mark oppia-navbar-close-icon"
        *ngIf="isSidebarShown()"
        [ngClass]="{ 'oppia-stop-scroll': isSidebarShown() }" >
        &#10005;
@@ -19,7 +18,7 @@
   </a>
   <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-sm-block"
      href="/"
-     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+     [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
      [oppiaFocusOn]="labelForClearingFocus"
      [ngClass]="windowIsNarrow ? 'oppia-logo-small ml-0' : 'oppia-logo-wide'">
     <picture>
@@ -64,7 +63,7 @@
              aria-hidden="false"
              tabindex="0"
              href="/"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
              autofocus>
             <span class="oppia-navbar-tab-content">
               {{ 'I18N_TOPNAV_HOME' | translate }}
@@ -144,7 +143,7 @@
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
                       <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
-                      <span class="material-icons arrow-forward">arrow_forward</span>
+                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </div>
                 </a>
@@ -155,7 +154,7 @@
                   <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                        class="nav-item-bottom-link">
                     <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
-                    <span class="material-icons arrow-forward">arrow_forward</span>
+                    <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                   </div>
                 </a>
               </div>
@@ -188,14 +187,14 @@
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link about-link"
                  href="/about"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
+                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
                 <span class="link">{{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}</span>
               </a>
             </li>
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
+                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
@@ -208,7 +207,7 @@
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
-                <span class="material-icons launch">launch</span>
+                <span class="fas fa-external-link-alt launch"></span>
               </a>
             </li>
           </ul>
@@ -238,11 +237,11 @@
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
                    href="/partnerships"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
-                    <span class="material-icons language mx-1">language</span>
+                    <span class="fas fa-globe language mx-1"></span>
                     <span class="heading-text">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}</span>
                   </div>
                   <div class="des">
@@ -251,11 +250,11 @@
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
                    href="/volunteer"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons volunteer mx-1">supervisor_account</span>
+                    <span class="fas fa-user-friends volunteer mx-1"></span>
                     <span class="heading-text">{{'I18N_HEADING_VOLUNTEER'| translate}}</span>
                   </div>
                   <div class="des">
@@ -266,11 +265,11 @@
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
                    href="/contact"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons contact mx-1">mail</span>
+                    <span class="fas fa-envelope contact mx-1"></span>
                     <span class="heading-text">{{'I18N_TOPNAV_CONTACT_US' | translate}}</span>
                   </div>
                   <div class="des">
@@ -279,11 +278,11 @@
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
                    href="/donate"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
-                    <span class="material-icons fav mx-1">favorite</span>
+                    <span class="fas fa-heart fav mx-1"></span>
                     <span class="heading-text">{{'I18N_TOPNAV_DONATE' | translate}}</span>
                   </div>
                   <div class="des">
@@ -303,7 +302,7 @@
              aria-expanded="false"
              tabindex="0"
              href="/donate"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
              rel="noopener"
              autofocus>
             <span class="oppia-navbar-tab-content"
@@ -324,7 +323,7 @@
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button protractor-test-language-dropdown"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
-          <i class="material-icons language-icon"> &#xE894; </i>
+          <i class="fas fa-globe language-icon"></i>
           <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
@@ -339,7 +338,7 @@
              (keydown)="onMenuKeypress($event, 'languageMenu', {enter: ACTION_CLOSE})">
             <div class="language-element oppia-nav-right-dropdown" [ngClass]="{'language-element-selected': currentLanguageCode === language.id}">
               <span *ngIf="currentLanguageCode === language.id">
-                <i class="material-icons"> &#xE876; </i>
+                <i class="fas fa-check oppia-tick-mark"></i>
               </span>
               <span [ngClass]="{'language-padding-left': currentLanguageCode !== language.id}">
                 {{ language.text }}
@@ -402,7 +401,7 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"
-             [routerLink]="profilePageUrl"
+             [smartRouterLink]="profilePageUrl"
              class="dropdown-item nav-link protractor-test-profile-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE})">
             <strong>
@@ -451,7 +450,7 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
              class="dropdown-item nav-link protractor-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
           </a>
@@ -478,7 +477,7 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"
              [href]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
              class="dropdown-item nav-link protractor-test-logout-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {tab: ACTION_CLOSE})">
             <span [innerHTML]="'I18N_TOPNAV_LOGOUT' | translate"></span>

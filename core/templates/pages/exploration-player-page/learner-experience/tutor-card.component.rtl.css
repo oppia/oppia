@@ -103,6 +103,30 @@
   transform: translateX(1000px);
 }
 
+.check-mark-hidden {
+  display: none;
+}
+
+.check-mark-skipped {
+  opacity: 0;
+}
+
+.end-chapter-check-mark {
+  transition-duration: 0.5s;
+  transition-property: opacity;
+}
+
+.learner-view-card-transition-class {
+  transition-duration: 1s;
+  transition-property: transform, opacity;
+}
+
+.card-content-hidden {
+  opacity: 0;
+  position: fixed;
+  transform: translate(0, 7px);
+}
+
 .conversation-skin-responses-dropdown-container {
   border-bottom: 1px solid #ccc;
   cursor: pointer;
