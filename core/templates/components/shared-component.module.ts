@@ -137,7 +137,7 @@ import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selec
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { AnswerGroupEditor } from './state-directives/answer-group-editor/answer-group-editor.component';
 import { QuestionEditorModalComponent } from './question-directives/modal-templates/question-editor-modal.component';
-
+import { StateResponsesComponent } from './state-editor/state-responses-editor/state-responses.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -152,6 +152,10 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
+import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
+import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 @NgModule({
   imports: [
@@ -183,6 +187,10 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
   providers: [
     AngularFireAuth,
     ReplaceInputsWithEllipsesPipe,
+    ParameterizeRuleDescriptionPipe,
+    ConvertToPlainTextPipe,
+    TruncatePipe,
+    WrapTextWithEllipsisPipe,
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig
@@ -293,7 +301,8 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
     HtmlSelectComponent,
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
-    AnswerGroupEditor
+    AnswerGroupEditor,
+    StateResponsesComponent
   ],
 
   entryComponents: [
@@ -400,7 +409,8 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
     HtmlSelectComponent,
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
-    AnswerGroupEditor
+    AnswerGroupEditor,
+    StateResponsesComponent
   ],
 
   exports: [
@@ -516,7 +526,8 @@ import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/re
     HtmlSelectComponent,
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
-    AnswerGroupEditor
+    AnswerGroupEditor,
+    StateResponsesComponent
   ],
 })
 

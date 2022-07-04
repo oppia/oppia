@@ -40,16 +40,16 @@
 </div>
 
 <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
-  <oppia-state-responses add-state="$ctrl.addState"
-                         navigate-to-state="$ctrl.navigateToState"
-                         on-responses-initialized="reinitializeEditor"
-                         on-save-inapplicable-skill-misconception-ids="$ctrl.onSaveInapplicableSkillMisconceptionIds"
-                         on-save-interaction-answer-groups="$ctrl.onSaveInteractionAnswerGroups"
-                         on-save-interaction-default-outcome="$ctrl.onSaveInteractionDefaultOutcome"
-                         on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                         on-save-solicit-answer-details="$ctrl.onSaveSolicitAnswerDetails"
-                         refresh-warnings="$ctrl.refreshWarnings"
-                         show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
+  <oppia-state-responses [add-state]="$ctrl.addState"
+                         (navigate-to-state)="$ctrl.navigateToState($event)"
+                         (on-responses-initialized)="reinitializeEditor($event)"
+                         (on-save-inapplicable-skill-misconception-ids)="$ctrl.onSaveInapplicableSkillMisconceptionIds($event)"
+                         (on-save-interaction-answer-groups)="$ctrl.onSaveInteractionAnswerGroups($event)"
+                         (on-save-interaction-default-outcome)="$ctrl.onSaveInteractionDefaultOutcome($event)"
+                         (on-save-next-content-id-index)="$ctrl.onSaveNextContentIdIndex($event)"
+                         (on-save-solicit-answer-details)="$ctrl.onSaveSolicitAnswerDetails($event)"
+                         [refresh-warnings]="$ctrl.refreshWarnings"
+                         [show-mark-all-audio-as-needing-update-modal-if-required]="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </oppia-state-responses>
   <div>
     <oppia-state-hints-editor (on-save-next-content-id-index)="$ctrl.onSaveNextContentIdIndex($event)"
