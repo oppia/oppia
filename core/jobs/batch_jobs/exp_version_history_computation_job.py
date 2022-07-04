@@ -24,8 +24,6 @@ from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import html_cleaner
-from core.domain import param_domain
 from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -34,7 +32,6 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from apache_beam import utils
 from typing import Dict, List, Optional
 from typing_extensions import TypedDict
 
