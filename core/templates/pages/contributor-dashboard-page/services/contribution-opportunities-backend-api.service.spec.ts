@@ -434,7 +434,7 @@ describe('Contribution Opportunities backend API service', function() {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
-      ['All', 'Topic 1', 'Topic 2']
+      ['Topic 1', 'Topic 2']
     );
     expect(failHandler).not.toHaveBeenCalled();
   }));
