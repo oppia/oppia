@@ -779,7 +779,7 @@ var ExplorationEditorMainTab = function() {
           'Parameter Element Button', parameterElementButton, true);
 
         var multipleChoiceAnswerOption = element.all(by.cssContainingText(
-          '.protractor-test-html-select-selector', parameterValues[i])).first();
+          '.protractor-test-html-select-selector', parameterValues[i]));
 
         await action.click(
           'Multiple Choice Answer Option: ' + i,
@@ -845,7 +845,6 @@ var ExplorationEditorMainTab = function() {
 
     var ruleDropdownElement = element.all(by.cssContainingText(
       '.protractor-rule-type-selector', ruleDescriptionInDropdown)).first();
-
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 
