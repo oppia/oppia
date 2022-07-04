@@ -160,6 +160,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'profileFeatures',
     'profileMenu',
     'subscriptions',
+    'topicAndStoryViewer',
     'users',
 ]
 
@@ -193,7 +194,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'topicAndStoryEditorFileUploadFeatures',
     'topicsAndSkillsDashboard',
     'skillEditor',
-    'topicAndStoryViewer',
     'wipeout',
 ]
 

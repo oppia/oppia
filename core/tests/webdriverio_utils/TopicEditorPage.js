@@ -40,9 +40,16 @@ var TopicEditorPage = function() {
   var commitMessageField = $('.e2e-test-commit-message-input');
   var newSubtopicEditorElement = $('.e2e-test-new-subtopic-editor');
   var topicEditorTab = $('.e2e-test-edit-topic-tab');
+  var topicThumbnailImageElement = $(
+    '.e2e-test-thumbnail-editor .e2e-test-custom-photo');
   var topicMetaTagContentField = $('.e2e-test-topic-meta-tag-content-field');
   var topicMetaTagContentLabel = $('.e2e-test-topic-meta-tag-content-label');
+  var topicThumbnailButton = $(
+    '.e2e-test-thumbnail-editor .e2e-test-photo-button');
   var publishTopicButton = $('.e2e-test-publish-topic-button');
+  var subtopicPageContentButton = $('.e2e-test-edit-html-content');
+  var saveSubtopicPageContentButton = $(
+    '.e2e-test-save-subtopic-content-button');
   var subtopicSkillDescriptionLocator = '.e2e-test-subtopic-skill-description';
   var confirmSubtopicCreationButton = $(
     '.e2e-test-confirm-subtopic-creation-button');
@@ -57,12 +64,16 @@ var TopicEditorPage = function() {
   var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
   var reassignSkillButton = $('.e2e-test-reassign-skill-button');
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
+  var subtopicThumbnailImageElement = $(
+    '.e2e-test-subtopic-thumbnail .e2e-test-custom-photo');
   var subtopicThumbnailButton = $(
     '.e2e-test-subtopic-thumbnail .e2e-test-photo-button');
   var topicPageTitleFragmentField = $(
     '.e2e-test-topic-page-title-fragment-field');
   var topicPageTitleFragmentLabel = $(
     '.e2e-test-topic-page-title-fragment-label');
+  var cKEditorElement = $('.e2e-test-ck-editor');
+  var closeRTEButton = $('.e2e-test-close-rich-text-component-editor');
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.execute(dragAndDropScript, fromElement, toElement);
@@ -75,6 +86,20 @@ var TopicEditorPage = function() {
   this.get = async function(topicId) {
     await browser.url(EDITOR_URL_PREFIX + topicId);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.getTopicThumbnailSource = async function() {
+    return await workflow.getImageSource(topicThumbnailImageElement);
+  };
+
+  this.getSubtopicThumbnailSource = async function() {
+    return await workflow.getImageSource(subtopicThumbnailImageElement);
+  };
+
+  this.submitTopicThumbnail = async function(imgPath, resetExistingImage) {
+    return await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath,
+      resetExistingImage);
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
@@ -163,6 +188,25 @@ var TopicEditorPage = function() {
     await waitFor.invisibilityOf(
       newSubtopicEditorElement,
       'Create subtopic modal taking too long to disappear.');
+  };
+
+  this.addConceptCardToSubtopicExplanation = async function(skillName) {
+    await action.click('RTE input', subtopicPageContentButton);
+    var conceptCardButton = await cKEditorElement.$(
+      '.cke_button=Insert Concept Card Link');
+    await action.click('Concept card button', conceptCardButton);
+    var skillForConceptCard = $(
+      '.e2e-test-rte-skill-selector-item=', skillName);
+    await action.click('Skill for concept card', skillForConceptCard);
+    await action.click('Close RTE button', closeRTEButton);
+  };
+
+  this.saveSubtopicExplanation = async function() {
+    await waitFor.elementToBeClickable(
+      saveSubtopicPageContentButton,
+      'Save Subtopic content button taking too long to be clickable');
+    await action.click(
+      'Save subtopic content button', saveSubtopicPageContentButton);
   };
 
   this.navigateToTopicEditorTab = async function() {

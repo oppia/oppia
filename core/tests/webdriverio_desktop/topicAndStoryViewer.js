@@ -97,7 +97,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
     await topicEditorPage.saveTopic('Added thumbnail.');
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
     await adminPage.editConfigProperty(
@@ -116,7 +116,7 @@ describe('Topic and Story viewer functionality', function() {
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     skillId = url.split('/')[4];
     await skillEditorPage.get(skillId);
 
@@ -193,7 +193,7 @@ describe('Topic and Story viewer functionality', function() {
 
     // Signing up with the login button should redirect the user back to the
     // exploration.
-    var loginButton = element(by.css('.e2e-test-login-button'));
+    var loginButton = $('.e2e-test-login-button');
     await action.click('Login button', loginButton);
     await users.createAndLoginUser(
       'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
