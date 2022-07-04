@@ -20,7 +20,6 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
-import { floor } from 'mathjs';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -99,7 +98,7 @@ export class OpportunitiesListItemComponent {
     if (this.opportunity) {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage = (
-          String((floor(this.opportunity.progressPercentage))) + '%'
+          String((Math.floor(this.opportunity.progressPercentage))) + '%'
         );
         if (this.opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
           this.translationProgressBar = true;
