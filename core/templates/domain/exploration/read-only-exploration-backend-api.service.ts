@@ -94,11 +94,13 @@ export class ReadOnlyExplorationBackendApiService {
   }
 
   private async _fetchExplorationAsync(
-      explorationId: string, version: number | null, pid: string | null = null
+      explorationId: string,
+      version: number | null,
+      uniqueProgressUrlId: string | null = null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       const explorationDataUrl = this._getExplorationUrl(
-        explorationId, version, pid);
+        explorationId, version, uniqueProgressUrlId);
 
       this.http.get<FetchExplorationBackendResponse>(
         explorationDataUrl).toPromise().then(response => {
@@ -114,19 +116,20 @@ export class ReadOnlyExplorationBackendApiService {
   }
 
   private _getExplorationUrl(
-      explorationId: string, version: number | null, pid: string | null = null):
-     string {
+      explorationId: string,
+      version: number | null,
+      uniqueProgressUrlId: string | null = null): string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
           exploration_id: explorationId,
           version: String(version)
         });
-    } else if (pid) {
+    } else if (uniqueProgressUrlId) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_PROGRESS_PID_URL_TEMPLATE, {
           exploration_id: explorationId,
-          pid: pid
+          pid: uniqueProgressUrlId
         });
     }
     return this.urlInterpolationService.interpolateUrl(
@@ -147,9 +150,12 @@ export class ReadOnlyExplorationBackendApiService {
    * passed any data returned by the backend in the case of an error.
    */
   async fetchExplorationAsync(
-      explorationId: string, version: number | null, pid: string | null = null):
+      explorationId: string,
+      version: number | null,
+      uniqueProgressUrlId: string | null = null):
      Promise<FetchExplorationBackendResponse> {
-    return this._fetchExplorationAsync(explorationId, version, pid);
+    return this._fetchExplorationAsync(
+      explorationId, version, uniqueProgressUrlId);
   }
 
   /**
@@ -163,7 +169,7 @@ export class ReadOnlyExplorationBackendApiService {
    * backend in further function calls.
    */
   async loadLatestExplorationAsync(
-      explorationId: string, pid: string | null = null):
+      explorationId: string, uniqueProgressUrlId: string | null = null):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(explorationId)) {
@@ -172,7 +178,7 @@ export class ReadOnlyExplorationBackendApiService {
         }
       } else {
         this._fetchExplorationAsync(
-          explorationId, null, pid)
+          explorationId, null, uniqueProgressUrlId)
           .then(exploration => {
           // Save the fetched exploration to avoid future fetches.
             this._explorationCache[explorationId] = exploration;

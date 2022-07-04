@@ -135,7 +135,7 @@ describe('Read only exploration backend API service', () => {
   }));
 
   it('should successfully fetch an existing exploration from a unique' +
-    ' url progress id', fakeAsync(() => {
+    ' URL progress id', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 

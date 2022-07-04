@@ -356,7 +356,7 @@ describe('Url Service', () => {
     expect(urlService.getExplorationVersionFromUrl()).toBe(null);
   });
 
-  it('should correctly retrieve unique progress id from the url', () => {
+  it('should correctly retrieve unique progress ID from the URL', () => {
     mockLocation.search = '?pid=123456';
     expect(urlService.getPidFromUrl()).toBe('123456');
 

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -82,6 +83,7 @@ describe('Lesson Information card modal component', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let localStorageService: LocalStorageService;
+  let clipboard: Clipboard;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -154,6 +156,7 @@ describe('Lesson Information card modal component', () => {
       EditableExplorationBackendApiService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
+    clipboard = TestBed.inject(Clipboard);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(true, true, false);
@@ -235,8 +238,8 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.storyTitleIsPresent).toBe(false);
   }));
 
-  it('should correctly set logged-out progress learner url ' +
-    'when unique progress url id exists', fakeAsync (() => {
+  it('should correctly set logged-out progress learner URL ' +
+    'when unique progress URL ID exists', fakeAsync (() => {
     spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
       .and.returnValue(true);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
@@ -294,16 +297,16 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.loggedOutProgressUniqueUrlId).toEqual('abcdef');
   }));
 
-  it('should correctly copy progress url', () => {
-    spyOn(navigator.clipboard, 'writeText');
+  it('should correctly copy progress URL', () => {
+    spyOn(clipboard, 'copy');
     let loggedOutProgressUrl = 'https://oppia.org/progress/abcdef';
     componentInstance.loggedOutProgressUniqueUrl = loggedOutProgressUrl;
     componentInstance.copyProgressUrl();
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+    expect(clipboard.copy).toHaveBeenCalledWith(
       loggedOutProgressUrl);
   });
 
-  it('should store unique progress url id when login button is clicked',
+  it('should store unique progress URL ID when login button is clicked',
     fakeAsync(() => {
       spyOn(userService, 'getLoginUrlAsync').and.returnValue(
         Promise.resolve('https://oppia.org/login'));

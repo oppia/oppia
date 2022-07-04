@@ -144,14 +144,14 @@
 
 .oppia-lesson-info-card .restart-lesson-btn {
   background-color: #00645c;
-  color: white;
+  color: #fff;
   cursor: pointer;
   margin-top: 20px;
 }
 
 .oppia-lesson-info-card .save-progress-btn {
   background-color: #00645c;
-  color: white;
+  color: #fff;
   cursor: pointer;
   margin-top: 20px;
 }
@@ -187,7 +187,7 @@
 
 .save-progress-menu {
   animation: slideUp 0.8s;
-  background-color: white;
+  background-color: #fff;
   border-radius: 10px;
   height: 480px;
   left: 50%;
@@ -226,7 +226,7 @@
 
 .save-progress-menu .sign-in-box .create-account-btn {
   background-color: #00645c;
-  color: white;
+  color: #fff;
   cursor: pointer;
   font-family: Capriola, sans-serif;
   font-size: 14px;
@@ -281,7 +281,7 @@
   width: 100%;
 }
 
-.save-progress-menu .uid-box .uid-copy #unique-progress-id {
+.save-progress-menu .uid-box .uid-copy .unique-progress-id {
   align-items: center;
   border: 1px solid black;
   border-radius: 5px;

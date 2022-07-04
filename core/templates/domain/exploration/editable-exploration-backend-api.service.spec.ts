@@ -286,7 +286,8 @@ describe('Editable exploration backend API service', function() {
   }));
 
   it('should update most recently reached checkpoint state name and most' +
-    ' recently reached checkpoint exploration version', fakeAsync(() => {
+    ' recently reached checkpoint exploration version for logged-in learner',
+  fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
@@ -318,6 +319,20 @@ describe('Editable exploration backend API service', function() {
       { status: 200, statusText: 'Success.'});
     flushMicrotasks();
 
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should update most recently reached checkpoint state name and most' +
+  ' recently reached checkpoint exploration version for logged-out learner',
+  fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let explorationId = '0';
+    let mostRecentlyReachedCheckpointExpVersion = 1;
+    let mostRecentlyReachedCheckpointStateName = 'State A';
+
     editableExplorationBackendApiService.
       recordMostRecentlyReachedCheckpointAsync(
         explorationId,
@@ -330,12 +345,12 @@ describe('Editable exploration backend API service', function() {
     let loggedOutPayload = {
       unique_progress_url_id: '123456',
       most_recently_reached_checkpoint_exp_version:
-         mostRecentlyReachedCheckpointExpVersion,
+       mostRecentlyReachedCheckpointExpVersion,
       most_recently_reached_checkpoint_state_name:
-         mostRecentlyReachedCheckpointStateName
+       mostRecentlyReachedCheckpointStateName
     };
 
-    req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId);
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(loggedOutPayload);

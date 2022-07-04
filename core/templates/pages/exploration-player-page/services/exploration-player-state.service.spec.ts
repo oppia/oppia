@@ -664,7 +664,7 @@ describe('Exploration Player State Service', () => {
       .toBeTrue();
   });
 
-  it('should set unique progress url id correctly', () => {
+  it('should set unique progress URL id correctly', fakeAsync(() => {
     spyOn(
       editableExplorationBackendApiService,
       'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
@@ -674,5 +674,8 @@ describe('Exploration Player State Service', () => {
     expect(explorationPlayerStateService.getUniqueProgressUrlId()).toBeNull();
     explorationPlayerStateService.setLastCompletedCheckpoint('abc');
     explorationPlayerStateService.setUniqueProgressUrlId();
-  });
+    tick(100);
+    expect(explorationPlayerStateService.getUniqueProgressUrlId()).toEqual(
+      '123456');
+  }));
 });

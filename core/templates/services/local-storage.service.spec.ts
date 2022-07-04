@@ -205,7 +205,7 @@ describe('LocalStorageService', () => {
       expect(callbackFnSpy).toHaveBeenCalled();
     });
 
-    it('should correctly save unique progress url id', () => {
+    it('should correctly save unique progress URL ID', () => {
       expect(
         localStorageService.getUniqueProgressIdOfLoggedOutLearner()).toBeNull();
       localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
@@ -214,7 +214,7 @@ describe('LocalStorageService', () => {
         .toEqual('abcdef');
     });
 
-    it('should not save unique progress url id when storage is not ' +
+    it('should not save unique progress URL ID when storage is not ' +
     'available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
       localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
@@ -222,7 +222,7 @@ describe('LocalStorageService', () => {
         localStorageService.getUniqueProgressIdOfLoggedOutLearner()).toBeNull();
     });
 
-    it('should correctly remove unique progress url id', () => {
+    it('should correctly remove unique progress URL ID', () => {
       localStorageService.updateUniqueProgressIdOfLoggedOutLearner('abcdef');
       expect(
         localStorageService.getUniqueProgressIdOfLoggedOutLearner())

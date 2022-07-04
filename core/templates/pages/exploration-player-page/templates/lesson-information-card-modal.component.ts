@@ -16,6 +16,7 @@
  * @fileoverview Component for lesson information card modal.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -73,6 +74,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
+    private clipboard: Clipboard,
     private urlService: UrlService,
     private userService: UserService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -196,7 +198,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   }
 
   copyProgressUrl(): void {
-    navigator.clipboard.writeText(this.loggedOutProgressUniqueUrl);
+    this.clipboard.copy(this.loggedOutProgressUniqueUrl);
   }
 
   onLoginButtonClicked(): void {

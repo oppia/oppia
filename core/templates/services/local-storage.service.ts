@@ -200,9 +200,10 @@ export class LocalStorageService {
     return null;
   }
 
-  updateUniqueProgressIdOfLoggedOutLearner(pid: string): void {
+  updateUniqueProgressIdOfLoggedOutLearner(uniqueProgressUrlId: string): void {
     if (this.isStorageAvailable()) {
-      (this.storage as Storage).setItem('unique_progress_id', pid);
+      (this.storage as Storage).setItem(
+        'unique_progress_id', uniqueProgressUrlId);
     }
   }
 
