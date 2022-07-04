@@ -41,21 +41,24 @@ describe('Text Input rules service', () => {
       x: {
         contentId: 'rule_input',
         normalizedStrSet: ['abc def']
-      }
+      },
+      contentId: null
     };
 
     RULE_INPUT_PLURAL = {
       x: {
         contentId: 'rule_input',
         normalizedStrSet: ['testing', 'abc def']
-      }
+      },
+      contentId: null
     };
 
     RULE_INPUT_EMPTY = {
       x: {
         contentId: 'rule_input',
         normalizedStrSet: []
-      }
+      },
+      contentId: null
     };
   });
 
