@@ -353,106 +353,102 @@ describe('Exploration history', function() {
         highlighted: true
       },
       30: {
-        text: '    dest_if_really_stuck: null',
-        highlighted: false
-      },
-      31: {
         text: '    feedback:',
         highlighted: false
       },
-      32: {
+      31: {
         text: '      content_id: default_outcome',
         highlighted: false
       },
-      33: {
+      32: {
         text: '      html: \'\'',
         highlighted: false
       },
-      34: {
+      33: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      35: {
+      34: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
-      36: {
+      35: {
         text: '    param_changes: []',
         highlighted: false
       },
-      37: {
+      36: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      38: {
+      37: {
         text: '  hints: []',
         highlighted: false
       },
-      39: {
+      38: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      40: {
+      39: {
         text: '  solution: null',
         highlighted: false
       },
-      41: {
+      40: {
         text: 'linked_skill_id: null',
         highlighted: false
       },
-      42: {
+      41: {
         text: 'next_content_id_index: 2',
         highlighted: true
       },
-      43: {
+      42: {
         text: 'param_changes: []',
         highlighted: false
       },
-      44: {
+      43: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      45: {
+      44: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      46: {
+      45: {
         text: '    content: {}',
+        highlighted: false
+      },
+      46: {
+        text: '    default_outcome: {}',
         highlighted: false
       },
       47: {
-        text: '    default_outcome: {}',
-        highlighted: false
-      },
-      48: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      49: {
+      48: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      50: {
+      49: {
         text: 'written_translations:',
         highlighted: false
       },
-      51: {
+      50: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      52: {
+      51: {
         text: '    content: {}',
         highlighted: false
       },
-      53: {
+      52: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      54: {
+      53: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      55: {
+      54: {
         text: '',
         highlighted: false
       }
