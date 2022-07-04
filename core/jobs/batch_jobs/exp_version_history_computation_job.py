@@ -33,7 +33,7 @@ from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-from typing import List, Optional
+from typing import Dict, List, Optional
 from typing_extensions import TypedDict
 
 import apache_beam as beam
@@ -77,7 +77,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         old_exploration: exp_domain.Exploration,
         change_list: List[exp_domain.ExplorationChange]
     ) -> exp_domain.Exploration:
-        """Applies a changelist to a pristine exploration and returns the result.
+        """Applies a changelist to an exploration and returns the result.
 
         Args:
             old_exploration: Exploration. The exploration object on which we need
@@ -348,9 +348,15 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         }
 
     def _get_updated_version_history_model(
-        self, vh_model, exp_id, current_version, committer_id,
-        updated_states_vh, updated_metadata_vh, updated_committer_ids
-    ):
+        self,
+        vh_model: Optional[exp_models.ExplorationVersionHistoryModel],
+        exp_id: str,
+        current_version: int,
+        committer_id: str,
+        updated_states_vh: Dict[str, state_domain.StateVersionHistory],
+        updated_metadata_vh: exp_domain.MetadataVersionHistory,
+        updated_committer_ids: List[str]
+    ) -> exp_models.ExplorationVersionHistoryModel:
         """Updates the version history model or creates one for the given
         version of the exploration.
 
@@ -403,8 +409,12 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         return vh_model
 
     def _get_reverted_version_history_model(
-        self, revert_to_vh_model, current_vh_model, exp_id, current_version
-    ):
+        self,
+        revert_to_vh_model: exp_models.ExplorationVersionHistoryModel,
+        current_vh_model: Optional[exp_models.ExplorationVersionHistoryModel],
+        exp_id: str,
+        current_version: int
+    ) -> exp_models.ExplorationVersionHistoryModel:
         """Updates the version history model for the current version of the
         exploration with the model data of the reverted version.
 
@@ -449,7 +459,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         return current_vh_model
 
-    def _check_for_revert_commit(self, change_list):
+    def _check_for_revert_commit(
+        self, change_list: List[exp_domain.ExplorationChange]
+    ) -> Optional[int]:
         """Checks if revert commit is present in the change list and returns
         the version number (if present).
 
@@ -464,11 +476,13 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 return change.version_number
         return None
 
-    def _create_version_history_models(self, model_group):
+    def _create_version_history_models(
+        self, model_group: FormattedModelGroupDict
+    ) -> List[exp_models.ExplorationVersionHistoryModel]:
         """Creates the version history models for a particular exploration.
 
         Args:
-            model_group: dict. The formatted model group.
+            model_group: FormattedModelGroupDict. The formatted model group.
 
         Returns:
             list[ExplorationVersionHistoryModel]. The created version history
@@ -483,16 +497,20 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             exp_version = exp_vlatest.version
             exp_id = exp_vlatest.id
 
-            versioned_explorations = [None] * exp_version
+            versioned_explorations: List[exp_domain.Exploration] = (
+                [None] * exp_version
+            )
             versioned_explorations[0] = exp_v1
             versioned_explorations[exp_version - 1] = exp_vlatest
 
             for version in range(1, exp_version + 1):
                 commit_log_model = commit_log_models[version - 1]
-                committer_id = commit_log_model.user_id
-                change_list = []
+                committer_id: str = commit_log_model.user_id
+                change_list: List[exp_domain.ExplorationChange] = []
                 for change_dict in commit_log_model.commit_cmds:
-                    change_list.append(exp_domain.ExplorationChange(change_dict))
+                    change_list.append(exp_domain.ExplorationChange(
+                        change_dict
+                    ))
 
                 if (version == 1):
                     new_states_vh = {
@@ -514,11 +532,20 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     version_history_models[version - 1] = new_vh_model
                 else:
                     old_exploration = versioned_explorations[version - 2]
-
                     # If the change list contains evert commit, we have to
                     # handle it separately.
                     revert_to_version = self._check_for_revert_commit(change_list)
                     if revert_to_version is not None:
+                        # If the revert to version number is invalid, we cannot
+                        # generate the further version history models
+                        # correctly. Hence, an empty list is returned
+                        # indicating that the version history of this
+                        # exploration cannot be shown to the user.
+                        if not(
+                            revert_to_version > 0 and
+                            revert_to_version < version
+                        ):
+                            return []
                         new_exploration = copy.deepcopy(
                             versioned_explorations[revert_to_version - 1]
                         )
@@ -594,9 +621,11 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         version_history_models[version - 1] = new_vh_model
                         versioned_explorations[version - 1] = new_exploration
 
-        return version_history_models
+            return version_history_models
 
-    def _get_exploration_model_at_v1(self, exp_id):
+    def _get_exploration_model_at_v1(
+        self, exp_id: str
+    ) -> exp_models.ExplorationModel:
         """Returns the exploration model with given id at version 1.
 
         Args:
@@ -681,7 +710,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         version_history_models = (
             model_groups
             | 'Create the version history models for each valid exploration' >>
-                beam.ParDo(self._create_version_history_models)
+                beam.Map(self._create_version_history_models)
             | 'Flatten the models' >> beam.FlatMap(lambda x: x)
         )
 
