@@ -15,7 +15,7 @@
 /**
  * @fileoverview Component for set of translatable html content id editor.
  */
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface Choice {
@@ -44,7 +44,9 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
     }
   };
 
-  constructor() { }
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+  ) { }
 
   ngOnInit(): void {
     if (!this.value) {
@@ -65,6 +67,7 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
       this.value.push(this.choices[choiceListIndex].val);
     }
     this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 angular.module('oppia').directive(

@@ -69,6 +69,10 @@ export class RuleEditorComponent implements OnInit {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
+  rajesh(): void {
+    console.error(this.rule);
+  }
+
   computeRuleDescriptionFragments(): string {
     if (!this.rule.type) {
       this.ruleDescriptionFragments = [];
@@ -204,6 +208,8 @@ export class RuleEditorComponent implements OnInit {
 
   onSelectionChangeHtmlSelect(selection: number, item: SelectItem): void {
     this.rule.inputs[item.varName] = selection;
+
+    this.changeDetectorRef.detectChanges();
   }
 
   onSelectNewRuleType(newRuleType: string): void {
@@ -256,6 +262,8 @@ export class RuleEditorComponent implements OnInit {
         this.rule.inputs[key] = oldRuleInputs[key];
       }
     }
+
+    this.changeDetectorRef.detectChanges();
   }
 
   cancelThisEdit(): void {
