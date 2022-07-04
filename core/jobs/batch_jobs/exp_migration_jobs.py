@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core import utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -34,17 +35,19 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Iterable, Sequence, Tuple
+from typing import Dict, Iterable, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
 
-(base_models, exp_models) = (
+(base_models, exp_models, opportunity_models) = (
     models.Registry.import_models(
-        [models.NAMES.base_model, models.NAMES.exploration]))
+        [models.NAMES.base_model, models.NAMES.exploration,
+         models.NAMES.opportunity]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -216,6 +219,79 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         return models_to_put
 
+    @staticmethod
+    def _update_exploration_opportunity_summary_models(
+        migrated_exp: exp_domain.Exploration,
+        exp_id_to_exp_opp_summary_model: (
+            Optional[Dict[
+                str,
+                opportunity_models.ExplorationOpportunitySummaryModel]]) = None
+    ):
+        """Generates newly updated exploration opportunity summary models.
+
+        Args:
+            migrated_exp: Exploration. The updated exploration domain object.
+            exp_id_to_exp_opp_summary_model: ExplorationOpportunitySummaryModel.
+                The exploration opportunity summary model.
+
+        Returns:
+            sequence(BaseModel). Sequence of models which should be put into
+            the datastore.
+        """
+        models_to_put = []
+        if exp_id_to_exp_opp_summary_model is not None:
+            try:
+                content_count = migrated_exp.get_content_count()
+                translation_counts = migrated_exp.get_translation_counts()
+                complete_translation_language_list = (
+                    migrated_exp.get_languages_with_complete_translation())
+
+                exp_opp_summary_model = (
+                    exp_id_to_exp_opp_summary_model[migrated_exp.id])
+
+                exp_opp_summary = (
+                    opportunity_services
+                        .get_exploration_opportunity_summary_from_model(
+                            exp_opp_summary_model))
+
+                exp_opp_summary.content_count = content_count
+                exp_opp_summary.translation_counts = translation_counts
+                exp_opp_summary.incomplete_translation_language_codes = (
+                    utils.compute_list_difference(
+                        exp_opp_summary
+                        .incomplete_translation_language_codes,
+                        complete_translation_language_list))
+
+                new_languages_for_voiceover = (
+                    set(complete_translation_language_list) - set(
+                    exp_opp_summary.language_codes_with_assigned_voice_artists)
+                )
+
+                language_codes_needing_voice_artists_set = set(
+                    exp_opp_summary.language_codes_needing_voice_artists)
+                language_codes_needing_voice_artists_set |= set(
+                    new_languages_for_voiceover)
+
+                exp_opp_summary.language_codes_needing_voice_artists = list(
+                    language_codes_needing_voice_artists_set)
+
+                exp_opp_summary.validate()
+
+                models_to_put.append(exp_opp_summary_model)
+            except Exception as e:
+                logging.info(e)
+
+        return models_to_put
+
+        # content_count = migrated_exp.get_content_count()
+        # translation_counts = migrated_exp.get_translation_counts()
+        # completed_translation_language_list = (
+        #     migrated_exp.get_languages_with_complete_translation())
+        # exploration_opportunity_summary = (
+        #     opportunity_services
+        #         .get_exploration_opportunity_summary_from_model(
+        #             exp_opp_summary_model))
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration migration.
 
@@ -251,6 +327,19 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Add exploration summary ID' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
                 lambda exp_summary_model: exp_summary_model.id)
         )
+
+        exp_opp_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted exp opportunity summary models' >> (
+                ndb_io.GetModels(
+                    opportunity_models
+                        .ExplorationOpportunitySummaryModel.get_all()))
+            | 'Add exploration ID keys' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
+                lambda model: model.id)
+        )
+
+        exp_opp_summary_models_to_exp = beam.pvalue.AsDict(
+            exp_opp_summary_models)
 
         migrated_exp_results = (
             unmigrated_exploration_models
@@ -337,10 +426,22 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
+        exp_opp_summary_models_to_put = (
+            exp_objects_list
+            | 'Generate exp opportunity summary models to put' >> beam.Map(
+                lambda exp_objects: (
+                    self._update_exploration_opportunity_summary_models(
+                        exp_objects['exploration'],
+                        exp_opp_summary_models_to_exp
+                    )))
+        )
+
         unused_put_results = (
             (
                 exp_models_to_put,
-                exp_summary_models_to_put)
+                exp_summary_models_to_put,
+                exp_opp_summary_models_to_put
+            )
             | 'Merge models' >> beam.Flatten()
             | 'Put models into datastore' >> ndb_io.PutModels()
         )
