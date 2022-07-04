@@ -17,9 +17,9 @@
 """Unit tests for app_feedback_report_constants.py"""
 
 from __future__ import annotations
+from core.tests import test_utils
 
 from core.domain import app_feedback_report_constants   # pylint: disable=unused-import # isort: skip
-from core.tests import test_utils
 
 
 class AppFeedbackReportConstantsTests(test_utils.GenericTestBase):
