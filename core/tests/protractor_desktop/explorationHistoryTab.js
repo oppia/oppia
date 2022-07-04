@@ -138,94 +138,98 @@ describe('Exploration history', function() {
         highlighted: true
       },
       12: {
-        text: '    feedback:',
+        text: '    dest_if_really_stuck: null',
         highlighted: false
       },
       13: {
-        text: '      content_id: default_outcome',
+        text: '    feedback:',
         highlighted: false
       },
       14: {
-        text: '      html: \'\'',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       15: {
-        text: '    labelled_as_correct: false',
+        text: '      html: \'\'',
         highlighted: false
       },
       16: {
-        text: '    missing_prerequisite_skill_id: null',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       17: {
-        text: '    param_changes: []',
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       18: {
-        text: '    refresher_exploration_id: null',
+        text: '    param_changes: []',
         highlighted: false
       },
       19: {
-        text: '  hints: []',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       20: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      21: {
         text: '  id: null',
         highlighted: true
       },
-      21: {
+      22: {
         text: '  solution: null',
         highlighted: false
       },
-      22: {
+      23: {
         text: 'linked_skill_id: null',
         highlighted: false
       },
-      23: {
+      24: {
         text: 'next_content_id_index: 0',
         highlighted: true
       },
-      24: {
+      25: {
         text: 'param_changes: []',
         highlighted: false
       },
-      25: {
+      26: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      26: {
+      27: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      27: {
+      28: {
         text: '    content: {}',
         highlighted: false
       },
-      28: {
+      29: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      29: {
+      30: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      30: {
+      31: {
         text: 'written_translations:',
         highlighted: false
       },
-      31: {
+      32: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      32: {
+      33: {
         text: '    content: {}',
         highlighted: false
       },
-      33: {
+      34: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      34: {
+      35: {
         text: '',
         highlighted: false
       }
@@ -270,7 +274,7 @@ describe('Exploration history', function() {
       },
       10: {
         text: '      dest_if_really_stuck: null',
-        highlighted: true
+        highlighted: false
       },
       11: {
         text: '      feedback:',
@@ -350,7 +354,7 @@ describe('Exploration history', function() {
       },
       30: {
         text: '    dest_if_really_stuck: null',
-        highlighted: true
+        highlighted: false
       },
       31: {
         text: '    feedback:',
