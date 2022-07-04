@@ -63,20 +63,22 @@ interface ValueEvent {
 export class StateResponsesComponent implements OnInit, OnDestroy {
   @Input() addState: (value: string) => void;
   @Output() onResponsesInitialized = new EventEmitter<void>();
-  @Output() onSaveInapplicableSkillMisconceptionIds = new EventEmitter();
-  @Output() onSaveInteractionAnswerGroups = new EventEmitter();
-  @Output() onSaveInteractionDefaultOutcome = new EventEmitter();
-  @Output() onSaveNextContentIdIndex = new EventEmitter();
-  @Output() onSaveSolicitAnswerDetails = new EventEmitter();
-  @Output() navigateToState = new EventEmitter();
+  @Output() onSaveInteractionAnswerGroups = new EventEmitter<unknown>();
+  @Output() onSaveInteractionDefaultOutcome = new EventEmitter<Outcome>();
+  @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
+  @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
+  @Output() navigateToState = new EventEmitter<string>();
   @Output() refreshWarnings = new EventEmitter<void>();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+    new EventEmitter<string[]>());
+
+  @Output() onSaveInapplicableSkillMisconceptionIds = (
+    new EventEmitter<string[]>());
 
   directiveSubscriptions = new Subscription();
 
   inapplicableSkillMisconceptionIds: string[];
   activeEditOption: boolean;
-  ANSWER_GROUP_LIST_SORTABLE_OPTIONS: object;
   misconceptionsBySkill: object;
   answerGroups: AnswerGroup[];
   defaultOutcome: Outcome;
@@ -107,11 +109,11 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private editabilityService: EditabilityService,
   ) {}
 
-  sendOnSaveNextContentIdIndex($event): void {
-    this.onSaveNextContentIdIndex.emit($event);
+  sendOnSaveNextContentIdIndex(event: number): void {
+    this.onSaveNextContentIdIndex.emit(event);
   }
 
-  sendshowMarkAllAudioAsNeedingUpdateModalIfRequired(event): void {
+  sendshowMarkAllAudioAsNeedingUpdateModalIfRequired(event: string[]): void {
     this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(event);
   }
 
@@ -119,6 +121,14 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     moveItemInArray(
       this.answerGroups, event.previousIndex,
       event.currentIndex);
+
+    this.responsesService.save(
+      this.answerGroups, this.defaultOutcome,
+      (newAnswerGroups, newDefaultOutcome) => {
+        this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+        this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+        this.refreshWarnings.emit();
+      });
   }
 
   _initializeTrainingData(): void {
@@ -728,32 +738,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
         })
     );
 
-    // When the page is scrolled so that the top of the page is above
-    // the browser viewport, there are some bugs in the positioning of
-    // the helper. This is a bug in jQueryUI that has not been fixed
-    // yet. For more details, see http://stackoverflow.com/q/5791886
-    this.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
-      axis: 'y',
-      cursor: 'move',
-      handle: '.oppia-rule-sort-handle',
-      items: '.oppia-sortable-rule-block',
-      revert: 100,
-      tolerance: 'pointer',
-      start: (e, ui) => {
-        this.externalSaveService.onExternalSave.emit();
-        this.changeActiveAnswerGroupIndex(-1);
-        ui.placeholder.height(ui.item.height());
-      },
-      stop: () => {
-        this.responsesService.save(
-          this.answerGroups, this.defaultOutcome,
-          (newAnswerGroups, newDefaultOutcome) => {
-            this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-            this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
-            this.refreshWarnings.emit();
-          });
-      }
-    };
     if (this.stateEditorService.isInQuestionMode()) {
       this.onResponsesInitialized.emit();
     }
