@@ -109,10 +109,6 @@
   </section>
   <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-<<<<<<< HEAD
-    <textarea class="e2e-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage" [maxlength]="MAX_REVIEW_MESSAGE_LENGTH"></textarea>
-    <div class="alert alert-danger" [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
-=======
     <textarea class="e2e-test-suggestion-review-message w-100"
               rows="3"
               [(ngModel)]="reviewMessage"
@@ -120,7 +116,6 @@
     </textarea>
     <div class="alert alert-danger"
          [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
->>>>>>> 2c89393c66636b399b93dc1397486c2f45e577f3
       Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>
   </div>
