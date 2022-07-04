@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/actions/ExplorationStart/ExplorationStart.py"""
+"""Unit tests for ExplorationStart.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import ExplorationStart # pylint: disable=unused-import
+from extensions.actions.ExplorationStart import ExplorationStart # pylint: disable=unused-import
 
 
 class ExplorationStartTests(test_utils.GenericTestBase):

@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core/domain/takeout_domain.py"""
+"""Unit tests for takeout_domain.py"""
 
 from __future__ import annotations
 
+from core.domain import takeout_domain
 from core.tests import test_utils
-from . import takeout_domain
 
 
 class TakeoutDataTests(test_utils.GenericTestBase):

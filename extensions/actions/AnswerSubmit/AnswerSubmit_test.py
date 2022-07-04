@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/actions/AnswerSubmit/AnswerSubmit.py"""
+"""Unit tests for AnswerSubmit.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import AnswerSubmit # pylint: disable=unused-import
+from extensions.actions.AnswerSubmit import AnswerSubmit # pylint: disable=unused-import
 
 
 class AnswerSubmitTests(test_utils.GenericTestBase):

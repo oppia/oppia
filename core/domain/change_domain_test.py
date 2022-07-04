@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core/domain/change_domain.py"""
+"""Unit tests for change_domain.py"""
 
 from __future__ import annotations
 
 from core import feconf
+from core.domain import change_domain
 from core.tests import test_utils
-from . import change_domain
 
 
 # TODO (#14219): Update these tests to fully cover file change_domain.py.

@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core/domain/classroom_domain.py"""
+"""Unit tests for classroom_domain.py"""
 
 from __future__ import annotations
 
+from core.domain import classroom_domain
 from core.tests import test_utils
-from . import classroom_domain
 
 
 class ClassroomDomainTests(test_utils.GenericTestBase):

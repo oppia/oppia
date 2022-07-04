@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core/domain/app_feedback_report_constants.py"""
+"""Unit tests for app_feedback_report_constants.py"""
 
 from __future__ import annotations
 
+from core.domain import app_feedback_report_constants # pylint: disable=unused-import
 from core.tests import test_utils
-from . import app_feedback_report_constants # pylint: disable=unused-import
 
 
 class AppFeedbackReportConstantsTests(test_utils.GenericTestBase):
