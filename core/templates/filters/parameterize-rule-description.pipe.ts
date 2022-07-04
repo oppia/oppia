@@ -38,9 +38,9 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
   ) { }
 
   transform(
-      rule: Rule | null, interactionId: string,
+      rule: Rule | null, interactionId: string | null,
       choices: AnswerChoice[] | null): string {
-    if (!rule) {
+    if (!rule || !interactionId) {
       return '';
     }
 

@@ -295,7 +295,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
         label: 'string'
       }]);
 
-    expect(result).toEqual('is equal to [INVALID,INVALID,INVALID,INVALID]');
+    expect(result).toEqual('is equal to []');
   });
 
   it('should correctly parameterize for SetOfTranslatableHtmlContentIds',
