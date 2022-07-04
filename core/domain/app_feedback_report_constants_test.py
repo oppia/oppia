@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-from core.domain import (
-    app_feedback_report_constants) # pylint: disable=unused-import
+from core.domain import (   # pylint: disable=unused-import
+    app_feedback_report_constants)
 from core.tests import test_utils
 
 
