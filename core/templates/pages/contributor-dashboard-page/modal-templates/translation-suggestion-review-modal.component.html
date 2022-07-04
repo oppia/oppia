@@ -5,11 +5,16 @@
           class="col-8 pt-1 mt-4 oppia-translation-modal-subheading protractor-translation-suggestion-review-subheading"
           aria-hidden="false"> {{ subheading }}
     </span>
-    <button type="button" class="col-1 close oppia-close-button-position" (click)="cancel()" aria-label="Close">
+    <button type="button"
+            class="col-1 close oppia-close-button-position"
+            (click)="cancel()"
+            aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
     <div class="w-100"></div>
-    <h4 class="col oppia-translation-modal-author-header">Submitted by {{ authorName }} in {{ languageDescription }} language</h4>
+    <h4 class="col oppia-translation-modal-author-header">
+      Submitted by {{ authorName }} in {{ languageDescription }} language
+    </h4>
   </div>
 </div>
 
@@ -20,12 +25,12 @@
         <strong>Content to translate:</strong>
       </div>
       <div class="oppia-suggestion-review-panel">
-        <ul *ngIf="isSetOfStringsContent">
+        <ul *ngIf="contentTypeIsSetOfStrings">
           <li *ngFor="let item of displayExplorationContent(); index as idx">
             {{ item }}
           </li>
         </ul>
-        <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
+        <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
                                     [htmlData]="displayExplorationContent()">
         </angular-html-bind-wrapper>
       </div>
@@ -33,35 +38,48 @@
     <div class="oppia-suggestion-review-panel-container float-right">
       <div dir="auto" class="oppia-suggestion-review-panel-header-container">
         <strong> Translation:</strong>
-        <button class="btn btn-sm btn-secondary float-right" *ngIf="!startedEditing && status === 'review' && canEditTranslation" (click)="editSuggestion()">Edit</button>
+        <button class="btn btn-sm btn-secondary float-right"
+                *ngIf="!startedEditing && status === 'review' && canEditTranslation"
+                (click)="editSuggestion()">
+          Edit
+        </button>
       </div>
       <div class="oppia-suggestion-review-panel">
         <div>
           <angular-html-bind-wrapper [htmlData]="translationHtml" *ngIf="!startedEditing">
           </angular-html-bind-wrapper>
-          <ul *ngIf="isSetOfStringsContent">
+          <ul *ngIf="contentTypeIsSetOfStrings">
             <li *ngFor="let item of translationHtml; index as idx">
               {{ item }}
             </li>
           </ul>
           <schema-based-editor [schema]="HTML_SCHEMA"
-                               *ngIf="startedEditing && isHtmlContent"
+                               *ngIf="startedEditing && contentTypeIsHtml"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="UNICODE_SCHEMA"
-                               *ngIf="startedEditing && isUnicodeContent"
+                               *ngIf="startedEditing && contentTypeIsUnicode"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
-                               *ngIf="startedEditing && isSetOfStringsContent"
+                               *ngIf="startedEditing && contentTypeIsSetOfStrings"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">
-          <button class="btn btn-secondary" *ngIf="startedEditing" (click)="cancelEdit()">Cancel</button>
-          <button class="btn btn-success" *ngIf="startedEditing" (click)="updateSuggestion()">Update</button>
+          <button class="btn btn-secondary"
+                  *ngIf="startedEditing"
+                  (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button class="btn btn-success"
+                  *ngIf="startedEditing"
+                  (click)="updateSuggestion()">
+            Update
+          </button>
         </div>
-        <div class="oppia-translation-error-section" *ngIf="startedEditing && errorFound">
+        <div class="oppia-translation-error-section"
+             *ngIf="startedEditing && errorFound">
           <p>
             {{ errorMessage }}
           </p>
@@ -69,45 +87,68 @@
       </div>
     </div>
   </section>
-  <section class="oppia-suggestion-review-exploration-change" *ngIf="hasExplorationContentChanged()">
+  <section class="oppia-suggestion-review-exploration-change"
+           *ngIf="hasExplorationContentChanged()">
     <p class="oppia-suggestion-review-exploration-change-note">
-      <strong>NOTE: The content has been modified since this translation has been submitted. Please edit the translation as necessary. The original content at the time of submission was:</strong>
+      <strong>
+        NOTE: The content has been modified since this translation has been submitted.
+        Please edit the translation as necessary.
+        The original content at the time of submission was:
+      </strong>
     </p>
     <div class="oppia-suggestion-review-panel">
-      <ul *ngIf="isSetOfStringsContent">
+      <ul *ngIf="contentTypeIsSetOfStrings">
         <li *ngFor="let item of contentHtml; index as idx">
           {{ item }}
         </li>
       </ul>
-      <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
+      <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
                                  [htmlData]="contentHtml">
       </angular-html-bind-wrapper>
     </div>
   </section>
   <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <textarea class="protractor-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage" [maxlength]="MAX_REVIEW_MESSAGE_LENGTH"></textarea>
-    <div class="alert alert-danger" [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
+    <textarea class="protractor-test-suggestion-review-message w-100"
+              rows="3"
+              [(ngModel)]="reviewMessage"
+              [maxlength]="MAX_REVIEW_MESSAGE_LENGTH">
+    </textarea>
+    <div class="alert alert-danger"
+         [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
       Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>
   </div>
-  <div [hidden]="reviewable || !reviewMessage" class="oppia-suggestion-review-message">
+  <div [hidden]="reviewable || !reviewMessage"
+       class="oppia-suggestion-review-message">
     <strong>Review message: </strong>{{ reviewMessage }}
   </div>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Close</button>
-  <span ngbTooltip="Enter review message before rejecting" placement="bottom" [disableTooltip]="!(reviewMessage.length == 0)">
-    <button class="btn btn-danger oppia-suggestion-resolve-button" *ngIf="reviewable" [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion" (click)="rejectAndReviewNext()">
+  <span ngbTooltip="Enter review message before rejecting"
+        placement="bottom"
+        [disableTooltip]="!(reviewMessage.length == 0)">
+    <button class="btn btn-danger oppia-suggestion-resolve-button"
+            *ngIf="reviewable"
+            [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion"
+            (click)="rejectAndReviewNext()">
       <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
-      <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Reject' : 'Reject and review next' }}</span>
+      <span [hidden]="resolvingSuggestion">
+        {{ lastSuggestionToReview ? 'Reject' : 'Reject and review next' }}
+      </span>
     </button>
   </span>
   <span>
-    <button class="btn btn-success oppia-suggestion-resolve-button" [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH" *ngIf="reviewable" (click)="acceptAndReviewNext()">
+    <button class="btn btn-success oppia-suggestion-resolve-button"
+            [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH"
+            *ngIf="reviewable"
+            (click)="acceptAndReviewNext()">
       <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
-      <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Accept' : 'Accept and review next' }}</span>
+      <span [hidden]="resolvingSuggestion">
+        {{ lastSuggestionToReview ? 'Accept' : 'Accept and review next' }}
+      </span>
     </button>
   </span>
 </div>

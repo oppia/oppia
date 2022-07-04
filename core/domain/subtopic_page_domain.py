@@ -25,6 +25,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 
 from typing import List
+from typing_extensions import TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
@@ -72,11 +73,30 @@ class SubtopicPageChange(change_domain.BaseChange):
     }]
 
 
+class SubtopicPageContentsDict(TypedDict):
+    """Dictionary representing the SubtopicPageContents object."""
+
+    subtitled_html: state_domain.SubtitledHtmlDict
+    recorded_voiceovers: state_domain.RecordedVoiceoversDict
+    written_translations: state_domain.WrittenTranslationsDict
+
+
+class VersionedSubtopicPageContentsDict(TypedDict):
+    """Dictionary representing the versioned SubtopicPageContents object."""
+
+    schema_version: int
+    page_contents: SubtopicPageContentsDict
+
+
 class SubtopicPageContents:
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
-            self, subtitled_html, recorded_voiceovers, written_translations):
+        self,
+        subtitled_html: state_domain.SubtitledHtml,
+        recorded_voiceovers: state_domain.RecordedVoiceovers,
+        written_translations: state_domain.WrittenTranslations
+    ) -> None:
         """Constructs a SubtopicPageContents domain object.
 
         Args:
@@ -92,7 +112,7 @@ class SubtopicPageContents:
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the SubtopicPageContentsObject, verifying that all
         fields are of the correct type.
         """
@@ -117,7 +137,7 @@ class SubtopicPageContents:
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {content_id: {}}}))
 
-    def to_dict(self):
+    def to_dict(self) -> SubtopicPageContentsDict:
         """Returns a dict representing this SubtopicPageContents domain object.
 
         Returns:
@@ -130,7 +150,9 @@ class SubtopicPageContents:
         }
 
     @classmethod
-    def from_dict(cls, page_contents_dict):
+    def from_dict(
+        cls, page_contents_dict: SubtopicPageContentsDict
+    ) -> SubtopicPageContents:
         """Creates a subtopic page contents object from a dictionary.
 
         Args:
@@ -151,12 +173,29 @@ class SubtopicPageContents:
                 'written_translations']))
 
 
+class SubtopicPageDict(TypedDict):
+    """Dictionary representing the SubtopicPage object."""
+
+    id: str
+    topic_id: str
+    page_contents: SubtopicPageContentsDict
+    page_contents_schema_version: int
+    language_code: str
+    version: int
+
+
 class SubtopicPage:
     """Domain object for a Subtopic page."""
 
     def __init__(
-            self, subtopic_page_id, topic_id, page_contents,
-            page_contents_schema_version, language_code, version):
+        self,
+        subtopic_page_id: str,
+        topic_id: str,
+        page_contents: SubtopicPageContents,
+        page_contents_schema_version: int,
+        language_code: str,
+        version: int
+    ) -> None:
         """Constructs a SubtopicPage domain object.
 
         Args:
@@ -177,7 +216,7 @@ class SubtopicPage:
         self.language_code = language_code
         self.version = version
 
-    def to_dict(self):
+    def to_dict(self) -> SubtopicPageDict:
         """Returns a dict representing this SubtopicPage domain object.
 
         Returns:
@@ -193,7 +232,7 @@ class SubtopicPage:
         }
 
     @classmethod
-    def get_subtopic_page_id(cls, topic_id, subtopic_id):
+    def get_subtopic_page_id(cls, topic_id: str, subtopic_id: int) -> str:
         """Returns the subtopic page id from the topic_id and subtopic_id.
 
         Args:
