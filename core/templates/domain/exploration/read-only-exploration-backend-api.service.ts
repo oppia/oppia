@@ -124,7 +124,7 @@ export class ReadOnlyExplorationBackendApiService {
         });
     } else if (pid) {
       return this.urlInterpolationService.interpolateUrl(
-        AppConstants.EXPLORATION_PROGRESS_UID_URL_TEMPLATE, {
+        AppConstants.EXPLORATION_PROGRESS_PID_URL_TEMPLATE, {
           exploration_id: explorationId,
           pid: pid
         });

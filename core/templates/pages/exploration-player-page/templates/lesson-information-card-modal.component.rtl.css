@@ -189,7 +189,7 @@
   animation: slideUp 0.8s;
   background-color: white;
   border-radius: 10px;
-  height: 500px;
+  height: 480px;
   right: 50%;
   max-width: 450px;
   position: fixed;
@@ -291,10 +291,12 @@
   margin-right: 20px;
   padding: 5px;
   width: 70%;
+  word-break: break-word;
 }
 
 .save-progress-menu .uid-box .uid-copy .uid-copy-btn {
-  box-shadow: -1px 1px 2px 0 rgba(0, 54, 50, 0.5);
+  box-shadow: -1px 1px 2px 0 rgba(0, 100, 92, 0.8);
+  color: #00645c;
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 700;

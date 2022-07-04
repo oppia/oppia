@@ -61,7 +61,7 @@
                     *ngIf="!userIsLoggedIn"
                     [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
                     (click)="saveLoggedOutProgress()">
-              Save Progress
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
             </button>
           </div>
         </div>
@@ -125,7 +125,7 @@
                     *ngIf="!userIsLoggedIn"
                     [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
                     (click)="saveLoggedOutProgress()">
-              Save Progress
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
             </button>
           </div>
         </div>
@@ -145,15 +145,15 @@
 </button>
 <div class="save-progress-menu"
      *ngIf="saveProgressMenuIsShown && !userIsLoggedIn">
-  <h3>Save Progress</h3>
+  <h3>{{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}</h3>
   <div class="sign-in-box">
-    <p>Your learning progress will be automatically saved if you have an account.</p>
+    <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1' | translate }}</p>
     <button type="button"
             class="btn btn-secondary create-account-btn"
             (click)="onLoginButtonClicked()">
-          Create Account
+          {{ 'I18N_CREATE_ACCOUNT' | translate }}
     </button>
-    <p class="sign-in-text">Already have an account? <a class="sign-in-link" (click)="onLoginButtonClicked()">Sign In</a></p>
+    <p class="sign-in-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2' | translate }}<a class="sign-in-link" (click)="onLoginButtonClicked()">{{ 'I18N_TOPNAV_SIGN_IN' | translate }}</a></p>
   </div>
   <div class="separator">
     <div class="bars"></div>
@@ -161,8 +161,8 @@
     <div class="bars"></div>
   </div>
   <div class="uid-box">
-    <p class="guide-text">Use the link below to save progress for 72 hours.<br>You may lose your progress after 72 hours.</p>
-    <p class="copy-text">Write or copy the link below</p>
+    <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3' | translate }}<br>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4' | translate }}</p>
+    <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
     <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
       <div id="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
       <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
