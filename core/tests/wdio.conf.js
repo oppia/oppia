@@ -48,6 +48,10 @@ var suites = {
     './core/tests/webdriverio_desktop/profileFeatures.js'
   ],
 
+  profileMenu: [
+    './core/tests/webdriverio/profileMenuFlow.js'
+  ],
+
   subscriptions: [
     './core/tests/webdriverio/subscriptionsFlow.js'
   ],

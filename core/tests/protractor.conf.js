@@ -100,10 +100,6 @@ var suites = {
       'protractor_desktop/fileUploadExtensions.js'
     ],
 
-    learnerDashboard: [
-      'protractor_desktop/learnerDashboard.js'
-    ],
-
     library: [
       'protractor/libraryFlow.js'
     ],
@@ -114,10 +110,6 @@ var suites = {
 
     playVoiceovers: [
       'protractor_desktop/playVoiceovers.js'
-    ],
-
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
     ],
 
     publication: [
