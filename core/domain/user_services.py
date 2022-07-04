@@ -107,8 +107,6 @@ def get_email_from_user_id(user_id: str) -> str:
         Exception. The user is not found.
     """
     user_settings = get_user_settings(user_id)
-    # Ruling out the possibility of None for mypy type checking.
-    assert user_settings is not None
     return user_settings.email
 
 
@@ -147,7 +145,7 @@ def get_user_settings_from_username(
     if user_model is None:
         return None
     else:
-        return get_user_settings(user_model.id)
+        return get_user_settings(user_model.id, strict=False)
 
 
 def get_user_settings_from_email(
@@ -166,13 +164,14 @@ def get_user_settings_from_email(
     if user_model is None:
         return None
     else:
-        return get_user_settings(user_model.id)
+        return get_user_settings(user_model.id, strict=False)
 
 
 @overload
 def get_users_settings(
     user_ids: Sequence[Optional[str]],
-    strict: Literal[True] = ...,
+    *,
+    strict: Literal[True],
     include_marked_deleted: bool = False
 ) -> Sequence[user_domain.UserSettings]: ...
 
@@ -180,7 +179,8 @@ def get_users_settings(
 @overload
 def get_users_settings(
     user_ids: Sequence[Optional[str]],
-    strict: Literal[False] = ...,
+    *,
+    strict: Literal[False],
     include_marked_deleted: bool = False
 ) -> Sequence[Optional[user_domain.UserSettings]]: ...
 
@@ -188,7 +188,8 @@ def get_users_settings(
 @overload
 def get_users_settings(
     user_ids: Sequence[Optional[str]],
-    strict: bool = False,
+    *,
+    strict: bool = ...,
     include_marked_deleted: bool = False
 ) -> Sequence[Optional[user_domain.UserSettings]]: ...
 
@@ -310,18 +311,24 @@ def fetch_gravatar(email: str) -> str:
 
 @overload
 def get_user_settings(
-    user_id: str, strict: Literal[True] = ...
+    user_id: str
 ) -> user_domain.UserSettings: ...
 
 
 @overload
 def get_user_settings(
-    user_id: str, strict: Literal[False] = ...
+    user_id: str, *, strict: Literal[True]
+) -> user_domain.UserSettings: ...
+
+
+@overload
+def get_user_settings(
+    user_id: str, *, strict: Literal[False]
 ) -> Optional[user_domain.UserSettings]: ...
 
 
 def get_user_settings(
-    user_id: str, strict: bool = False
+    user_id: str, strict: bool = True
 ) -> Optional[user_domain.UserSettings]:
     """Return the user settings for a single user.
 
@@ -348,13 +355,19 @@ def get_user_settings(
 
 @overload
 def get_user_settings_by_auth_id(
-    auth_id: str, strict: Literal[True] = ...
+    auth_id: str, *, strict: Literal[True]
 ) -> user_domain.UserSettings: ...
 
 
 @overload
 def get_user_settings_by_auth_id(
-    auth_id: str, strict: Literal[False] = ...
+    auth_id: str
+) -> Optional[user_domain.UserSettings]: ...
+
+
+@overload
+def get_user_settings_by_auth_id(
+    auth_id: str, *, strict: Literal[False]
 ) -> Optional[user_domain.UserSettings]: ...
 
 
@@ -818,7 +831,8 @@ def has_fully_registered_account(user_id: Optional[str]) -> bool:
     return bool(
         user_settings.username and user_settings.last_agreed_to_terms and (
         user_settings.last_agreed_to_terms >=
-        feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC))
+        feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
+    )
 
 
 def get_all_profiles_auth_details_by_parent_user_id(
@@ -1102,13 +1116,19 @@ def get_multiple_user_auth_details(
 
 @overload
 def get_auth_details_by_user_id(
-    user_id: str, strict: Literal[True] = ...
+    user_id: str, *, strict: Literal[True]
 ) -> auth_domain.UserAuthDetails: ...
 
 
 @overload
 def get_auth_details_by_user_id(
-    user_id: str, strict: Literal[False] = ...
+    user_id: str
+) -> Optional[auth_domain.UserAuthDetails]: ...
+
+
+@overload
+def get_auth_details_by_user_id(
+    user_id: str, *, strict: Literal[False]
 ) -> Optional[auth_domain.UserAuthDetails]: ...
 
 
@@ -1171,13 +1191,19 @@ def get_username(user_id: str) -> str:
 
 @overload
 def get_usernames(
-    user_ids: List[str], strict: Literal[True] = ...
+    user_ids: List[str], *, strict: Literal[True]
 ) -> Sequence[str]: ...
 
 
 @overload
 def get_usernames(
-    user_ids: List[str], strict: Literal[False] = ...
+    user_ids: List[str]
+) -> Sequence[Optional[str]]: ...
+
+
+@overload
+def get_usernames(
+    user_ids: List[str], *, strict: Literal[False]
 ) -> Sequence[Optional[str]]: ...
 
 
@@ -1606,7 +1632,7 @@ def record_user_edited_an_exploration(user_id: str) -> None:
     Args:
         user_id: str. The unique ID of the user.
     """
-    user_settings = get_user_settings(user_id)
+    user_settings = get_user_settings(user_id, strict=False)
     if user_settings:
         user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
         _save_user_settings(user_settings)
@@ -1619,7 +1645,7 @@ def record_user_created_an_exploration(user_id: str) -> None:
     Args:
         user_id: str. The unique ID of the user.
     """
-    user_settings = get_user_settings(user_id)
+    user_settings = get_user_settings(user_id, strict=False)
     if user_settings:
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
         _save_user_settings(user_settings)
@@ -1834,13 +1860,19 @@ def get_users_email_preferences_for_exploration(
 
 @overload
 def get_user_contributions(
-    user_id: str, strict: Literal[True] = ...
+    user_id: str, *, strict: Literal[True]
 ) -> user_domain.UserContributions: ...
 
 
 @overload
 def get_user_contributions(
-    user_id: str, strict: Literal[False] = ...
+    user_id: str
+) -> Optional[user_domain.UserContributions]: ...
+
+
+@overload
+def get_user_contributions(
+    user_id: str, *, strict: Literal[False]
 ) -> Optional[user_domain.UserContributions]: ...
 
 
@@ -2064,7 +2096,7 @@ def get_user_impact_score(user_id: str) -> float:
 
 def get_weekly_dashboard_stats(
     user_id: str
-) -> Optional[List[Dict[str, DashboardStatsDict]]]:
+) -> List[Dict[str, DashboardStatsDict]]:
     """Gets weekly dashboard stats for a given user_id.
 
     Args:
@@ -2108,7 +2140,7 @@ def get_weekly_dashboard_stats(
         ] = model.weekly_creator_stats_list
         return weekly_creator_stats_list
     else:
-        return None
+        return []
 
 
 def get_last_week_dashboard_stats(
@@ -2473,7 +2505,7 @@ def get_contributor_usernames(
     else:
         raise Exception('Invalid category: %s' % category)
 
-    usernames = list(get_usernames(user_ids))
+    usernames = list(get_usernames(user_ids, strict=True))
     return usernames
 
 

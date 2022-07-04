@@ -439,6 +439,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(auth_id, email).user_id
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_settings = user_services.get_user_settings_by_auth_id(auth_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_settings is not None
         self.assertEqual(user_settings_model.id, user_settings.user_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
 
@@ -489,6 +491,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         greater_than_time = datetime.datetime.utcnow()
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert admin_settings is not None
         self.assertEqual(admin_settings.user_id, user_id)
         self.assertEqual(admin_settings.email, feconf.SYSTEM_EMAIL_ADDRESS)
         self.assertEqual(admin_settings.roles, roles)
@@ -1350,6 +1354,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(auth_id, email).user_id
         user_auth_details_model = auth_models.UserAuthDetailsModel.get(user_id)
         user_auth_details = user_services.get_auth_details_by_user_id(user_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_auth_details is not None
         self.assertEqual(
             user_auth_details.user_id, user_auth_details_model.id)
         self.assertEqual(
@@ -1701,11 +1707,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
 
         user_settings = user_services.get_user_settings_by_auth_id(auth_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_settings is not None
         self.assertFalse(user_settings.deleted)
 
         user_services.mark_user_for_deletion(user_id)
 
         user_settings = user_services.get_user_settings_by_auth_id(auth_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_settings is not None
         self.assertTrue(user_settings.deleted)
 
     def test_mark_user_for_deletion_deletes_user_auth_details_entry(
@@ -1871,7 +1881,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         auth_id = 'someUser'
         user_email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
         # Check that the user contributions for this user ID already exist.
         # (Note that user contributions are created automatically when a new
         # user is created.)
@@ -1896,7 +1908,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
 
-        pre_add_contributions = user_services.get_user_contributions(user_id)
+        pre_add_contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
 
         self.assertEqual(
             [],
@@ -1911,7 +1925,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         for edited_exp_id in edited_exp_ids:
             user_services.add_edited_exploration_id(user_id, edited_exp_id)
 
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
 
         self.assertEqual(
             ['exp1', 'exp2', 'exp3'],
@@ -1928,7 +1944,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(
             'someUser',
             'user@example.com').user_id
-        pre_add_contributions = user_services.get_user_contributions(user_id)
+        pre_add_contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
         self.assertEqual(
             [],
             pre_add_contributions.created_exploration_ids)
@@ -1940,7 +1958,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id,
             created_exp_ids,
             edited_exp_ids)
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
         self.assertEqual(
             ['exp1', 'exp2', 'exp3'],
             contributions.created_exploration_ids)
@@ -1966,21 +1986,29 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
         self.assertNotIn('exp1', contributions.created_exploration_ids)
 
         user_services.add_created_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
         self.assertIn('exp1', contributions.created_exploration_ids)
 
     def test_add_created_exploration_id_creates_user_contribution(self) -> None:
         user_id = 'id_x'
 
-        pre_add_contributions = user_services.get_user_contributions(user_id)
+        pre_add_contributions = user_services.get_user_contributions(
+            user_id, strict=False
+        )
         self.assertIsNone(pre_add_contributions)
 
         user_services.add_created_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
 
         self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertIn('exp1', contributions.created_exploration_ids)
@@ -1990,11 +2018,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
         self.assertNotIn('exp1', contributions.edited_exploration_ids)
 
         user_services.add_edited_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
         self.assertIn('exp1', contributions.edited_exploration_ids)
 
     def test_add_edited_exploration_id_creates_user_contribution(self) -> None:
@@ -2004,7 +2036,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(pre_add_contributions)
 
         user_services.add_edited_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(user_id)
+        contributions = user_services.get_user_contributions(
+            user_id, strict=True
+        )
 
         self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertEqual(
@@ -2764,7 +2798,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(
-            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+            user_services.get_weekly_dashboard_stats(self.owner_id), [])
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
@@ -2798,14 +2832,14 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+            user_services.get_weekly_dashboard_stats(self.owner_id), [])
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
 
         self.assertEqual(
-            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+            user_services.get_weekly_dashboard_stats(self.owner_id), [])
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 

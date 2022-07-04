@@ -142,7 +142,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
         user_settings = user_services.get_user_settings(self.owner_id)
-        assert user_settings is not None
         self.user_settings = user_settings
         self.user_settings.validate()
         self.assertEqual(self.owner.roles, [feconf.ROLE_ID_FULL_USER])
@@ -507,7 +506,8 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.user_contributions = user_services.get_user_contributions(
-            self.owner_id)
+            self.owner_id, strict=True
+        )
         self.user_contributions.validate()
 
     # TODO(#13059): After we fully type the codebase we plan to get
@@ -572,7 +572,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
     def test_update_user_contributions(self) -> None:
         user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])
 
-        contributions = user_services.get_user_contributions(self.owner_id)
+        contributions = user_services.get_user_contributions(
+            self.owner_id, strict=True
+        )
         self.assertEqual(contributions.user_id, self.owner_id)
         self.assertEqual(contributions.created_exploration_ids, ['e1'])
         self.assertEqual(contributions.edited_exploration_ids, ['e2'])

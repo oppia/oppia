@@ -34,7 +34,7 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Callable, Dict, List, Optional, Set, Tuple, Union
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -141,7 +141,13 @@ EMAIL_HTML_BODY_SCHEMA: Dict[str, Union[str, Dict[str, int]]] = {
     }
 }
 
-EMAIL_CONTENT_SCHEMA: Dict[str, Union[str, List[Dict[str, Any]]]] = {
+EMAIL_CONTENT_SCHEMA: Dict[
+    str,
+    Union[
+        str,
+        List[Dict[str, Union[str, Dict[str, Union[str, Dict[str, int]]]]]]
+    ]
+] = {
     'type': schema_utils.SCHEMA_TYPE_DICT,
     'properties': [{
         'name': 'subject',
@@ -551,7 +557,9 @@ def _send_bulk_mail(
     """
     require_sender_id_is_valid(intent, sender_id)
 
-    recipients_settings = user_services.get_users_settings(recipient_ids)
+    recipients_settings = user_services.get_users_settings(
+        recipient_ids, strict=True
+    )
     recipient_emails = [user.email for user in recipients_settings]
 
     cleaned_html_body = html_cleaner.clean(email_html_body)
@@ -906,7 +914,9 @@ def send_emails_to_subscribers(
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(
         creator_id)
-    recipients_usernames = user_services.get_usernames(recipient_list)
+    recipients_usernames = user_services.get_usernames(
+        recipient_list, strict=True
+    )
     recipients_preferences = user_services.get_users_email_preferences(
         recipient_list)
     for index, username in enumerate(recipients_usernames):
