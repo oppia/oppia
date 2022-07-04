@@ -67,6 +67,11 @@
   transition: width 500ms;
 }
 
+.mat-checkbox p {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
 .oppia-learner-view-card-top-content p:not(:last-child) {
   line-height: 1.5;
   margin-bottom: 18px;
@@ -165,6 +170,8 @@
   border-bottom-left-radius: 2px;
   padding: 8px 20px 25px;
   position: relative;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .conversation-skin-inline-interaction .conversation-skin-user-avatar {
