@@ -1,0 +1,1184 @@
+# coding: utf-8
+#
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Job for computation of exploration version history data."""
+
+from __future__ import annotations
+
+import copy
+
+from apache_beam import utils
+from core import feconf
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
+from core.domain import html_cleaner
+from core.domain import param_domain
+from core.domain import state_domain
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
+from core.jobs.types import job_run_result
+from core.platform import models
+from typing import List, Optional
+from typing_extensions import TypedDict
+
+import apache_beam as beam
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
+    from mypy_imports import exp_models
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+datastore_services = models.Registry.import_datastore_services()
+
+
+class UnformattedModelGroupDict(TypedDict):
+    """Dictionary representing an unformatted model group."""
+
+    exp_models_v1: List[exp_models.ExplorationModel]
+    exp_models_vlatest: List[exp_models.ExplorationModel]
+    commit_log_models: List[exp_models.ExplorationCommitLogEntryModel]
+    version_history_models: (
+        List[Optional[exp_models.ExplorationVersionHistoryModel]]
+    )
+
+
+class FormattedModelGroupDict(TypedDict):
+    """Dictionary representing a formatted model group."""
+
+    exp_v1: exp_domain.Exploration
+    exp_vlatest: exp_domain.Exploration
+    commit_log_models: List[exp_models.ExplorationCommitLogEntryModel]
+    version_history_models: (
+        List[Optional[exp_models.ExplorationVersionHistoryModel]]
+    )
+
+
+class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
+    """Computes and populates the version history data for an exploration."""
+
+    def _apply_change_list_to_exploration(
+        self,
+        old_exploration: exp_domain.Exploration,
+        change_list: List[exp_domain.ExplorationChange]
+    ) -> exp_domain.Exploration:
+        """Applies a changelist to a pristine exploration and returns the result.
+
+        Args:
+            old_exploration: Exploration. The exploration object on which we need
+                to apply the changelist.
+            change_list: list(ExplorationChange). The list of changes to apply.
+
+        Returns:
+            Exploration. The exploration domain object that results from applying
+            the given changelist to the existing version of the exploration.
+
+        Raises:
+            Exception. Any entries in the changelist are invalid.
+        """
+        exploration = copy.deepcopy(old_exploration)
+        to_param_domain = param_domain.ParamChange.from_dict
+        for change in change_list:
+            if change.cmd == exp_domain.CMD_ADD_STATE:
+                exploration.add_states([change.state_name])
+            elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                exploration.rename_state(
+                    change.old_state_name, change.new_state_name)
+            elif change.cmd == exp_domain.CMD_DELETE_STATE:
+                exploration.delete_state(change.state_name)
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                state = exploration.states[change.state_name]
+                if (change.property_name ==
+                        exp_domain.STATE_PROPERTY_PARAM_CHANGES):
+                    state.update_param_changes(list(map(
+                            to_param_domain, change.new_value)))
+                elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                    content = (
+                        state_domain.SubtitledHtml.from_dict(change.new_value))
+                    content.validate()
+                    state.update_content(content)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    state.update_interaction_id(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    next_content_id_index = max(
+                        change.new_value, state.next_content_id_index)
+                    state.update_next_content_id_index(next_content_id_index)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    state.update_linked_skill_id(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    state.update_interaction_customization_args(
+                        change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                    raise utils.InvalidInputException(
+                        'Editing interaction handlers is no longer supported')
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    new_answer_groups = [
+                        state_domain.AnswerGroup.from_dict(answer_groups)
+                        for answer_groups in change.new_value
+                    ]
+                    state.update_interaction_answer_groups(new_answer_groups)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                    new_outcome = None
+                    if change.new_value:
+                        new_outcome = state_domain.Outcome.from_dict(
+                            change.new_value
+                        )
+                    state.update_interaction_default_outcome(new_outcome)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                    state.update_interaction_confirmed_unclassified_answers(
+                        change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    if not isinstance(change.new_value, list):
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
+                    new_hints_list = [
+                        state_domain.Hint.from_dict(hint_dict)
+                        for hint_dict in change.new_value
+                    ]
+                    state.update_interaction_hints(new_hints_list)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    new_solution = None
+                    if change.new_value is not None:
+                        new_solution = state_domain.Solution.from_dict(
+                            state.interaction.id, change.new_value)
+                    state.update_interaction_solution(new_solution)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected solicit_answer_details to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_solicit_answer_details(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected card_is_checkpoint to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_card_is_checkpoint(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected recorded_voiceovers to be a dict, '
+                            'received %s' % change.new_value)
+                    new_voiceovers_mapping = (
+                        change.new_value['voiceovers_mapping'])
+                    language_codes_to_audio_metadata = (
+                        new_voiceovers_mapping.values())
+                    for language_codes in language_codes_to_audio_metadata:
+                        for audio_metadata in language_codes.values():
+                            audio_metadata['duration_secs'] = (
+                                float(audio_metadata['duration_secs'])
+                            )
+                    recorded_voiceovers = (
+                        state_domain.RecordedVoiceovers.from_dict(
+                            change.new_value))
+                    state.update_recorded_voiceovers(recorded_voiceovers)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected written_translations to be a dict, '
+                            'received %s' % change.new_value)
+                    cleaned_written_translations_dict = (
+                        state_domain.WrittenTranslations
+                        .convert_html_in_written_translations(
+                            change.new_value, html_cleaner.clean))
+                    written_translations = (
+                        state_domain.WrittenTranslations.from_dict(
+                            cleaned_written_translations_dict))
+                    state.update_written_translations(written_translations)
+            elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
+                exploration.states[change.state_name].add_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html)
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                exploration.states[change.state_name].add_written_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html, change.data_format)
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translation_as_needing_update(
+                    change.content_id,
+                    change.language_code
+                )
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translations_as_needing_update(change.content_id)
+            elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+                if change.property_name == 'title':
+                    exploration.update_title(change.new_value)
+                elif change.property_name == 'category':
+                    exploration.update_category(change.new_value)
+                elif change.property_name == 'objective':
+                    exploration.update_objective(change.new_value)
+                elif change.property_name == 'language_code':
+                    exploration.update_language_code(change.new_value)
+                elif change.property_name == 'tags':
+                    exploration.update_tags(change.new_value)
+                elif change.property_name == 'blurb':
+                    exploration.update_blurb(change.new_value)
+                elif change.property_name == 'author_notes':
+                    exploration.update_author_notes(change.new_value)
+                elif change.property_name == 'param_specs':
+                    exploration.update_param_specs(change.new_value)
+                elif change.property_name == 'param_changes':
+                    exploration.update_param_changes(list(
+                        map(to_param_domain, change.new_value)))
+                elif change.property_name == 'init_state_name':
+                    exploration.update_init_state_name(change.new_value)
+                elif change.property_name == 'auto_tts_enabled':
+                    exploration.update_auto_tts_enabled(change.new_value)
+                elif change.property_name == 'correctness_feedback_enabled':
+                    exploration.update_correctness_feedback_enabled(
+                        change.new_value)
+            elif (change.cmd ==
+                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+                target_version_is_current_state_schema_version = (
+                    change.to_version ==
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                if not target_version_is_current_state_schema_version:
+                    raise Exception(
+                        'Expected to migrate to the latest state schema '
+                        'version %s, received %s' % (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION,
+                            change.to_version))
+        return exploration
+
+    def _filter_valid_model_group(
+        self, model_group: UnformattedModelGroupDict
+    ) -> bool:
+        """Returns True if the given model group is valid.
+
+        Args:
+            model_group: UnformattedModelGroupDict. The model group to be
+                checked.
+
+        Returns:
+            bool. Whether the given model group is valid or not.
+        """
+        exp_models_v1 = model_group['exp_models_v1']
+        exp_models_vlatest = model_group['exp_models_vlatest']
+        commit_log_models = model_group['commit_log_models']
+
+        model_group_is_valid = (
+            len(exp_models_v1) == 1 and len(exp_models_vlatest) == 1
+        )
+        if model_group_is_valid:
+            exp_model_vlatest = exp_models_vlatest[0]
+            model_group_is_valid = (
+                len(commit_log_models) == exp_model_vlatest.version
+            )
+        return model_group_is_valid
+
+    def _convert_to_formatted_model_group_dict(
+        self, model_group: UnformattedModelGroupDict
+    ) -> FormattedModelGroupDict:
+        """Returns a formatted version of the given valid model group.
+
+        Args:
+            model_group: UnformattedModelGroupDict. The model group to be
+                formatted.
+
+        Returns:
+            FormattedModelGroupDict. The formatted version of the given valid
+                model group dict.
+        """
+        exp_v1 = exp_fetchers.get_exploration_from_model(
+            model_group['exp_models_v1'][0]
+        )
+        exp_vlatest = exp_fetchers.get_exploration_from_model(
+            model_group['exp_models_vlatest'][0]
+        )
+
+        # Rearranging the commit log models in sorted manner as they might
+        # not be sorted while using CoGroupByKey.
+        commit_log_models: List[exp_models.ExplorationCommitLogEntryModel] = (
+            [None] * exp_vlatest.version
+        )
+        for commit_log in model_group['commit_log_models']:
+            commit_log_models[commit_log.version - 1] = commit_log
+
+        # Rearranging the already existing version history models for the
+        # given exploration.
+        version_history_models: List[Optional[
+            exp_models.ExplorationVersionHistoryModel
+        ]] = [None] * exp_vlatest.version
+        for version_history in list(model_group['version_history_models']):
+            version_history_models[version_history.exploration_version - 1] = (
+              version_history
+            )
+
+        return {
+            'exp_v1': exp_v1,
+            'exp_vlatest': exp_vlatest,
+            'commit_log_models': commit_log_models,
+            'version_history_models': version_history_models
+        }
+
+    def _get_updated_version_history_model(
+        self, vh_model, exp_id, current_version, committer_id,
+        updated_states_vh, updated_metadata_vh, updated_committer_ids
+    ):
+        """Updates the version history model or creates one for the given
+        version of the exploration.
+
+        Args:
+            vh_model: Optional[ExplorationVersionHistoryModel]. The version
+                history model for the given version of the exploration. It is
+                None if the model does not exist.
+            exp_id: str. The id of the exploration.
+            current_version: int. The version number for which we want to
+                create the version history model.
+            committer_id: str. The user id of the user who committed the
+                changes in the exploration from versions (current_version - 1)
+                to (current_version).
+            updated_states_vh: dict(str, StateVersionHistory). The updated
+                states version history data for the given version of the
+                exploration.
+            updated_metadata_vh: MetadataVersionHistory. The updated metadata
+                version history data for the given version of the exploration.
+            updated_committer_ids: list[str]. A list of user ids who made the
+                'previous commit' on each state and the exploration metadata.
+
+        Returns:
+            ExplorationVersionHistoryModel. The updated version history model.
+        """
+        # If the model is not already existing, then create it.
+        if vh_model is None:
+            vh_model = exp_models.ExplorationVersionHistoryModel(
+                id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    exp_id, current_version
+                ),
+                exploration_id=exp_id,
+                exploration_version=current_version,
+                state_version_history={},
+                metadata_last_edited_version_number=None,
+                metadata_last_edited_committer_id=committer_id,
+                committer_ids=[committer_id]
+            )
+        # Update the required fields in the model.
+        vh_model.state_version_history = {
+            state_name: vh.to_dict()
+            for state_name, vh in updated_states_vh.items()
+        }
+        vh_model.metadata_last_edited_version_number = (
+            updated_metadata_vh.last_edited_version_number
+        )
+        vh_model.metadata_last_edited_committer_id = (
+            updated_metadata_vh.last_edited_committer_id
+        )
+        vh_model.committer_ids = updated_committer_ids
+        return vh_model
+
+    def _get_reverted_version_history_model(
+        self, revert_to_vh_model, current_vh_model, exp_id, current_version
+    ):
+        """Updates the version history model for the current version of the
+        exploration with the model data of the reverted version.
+
+        Args:
+            revert_to_vh_model: ExplorationVersionHistoryModel. The exploration
+                version history model at the version to which the exploration
+                is reverted.
+            current_vh_model: Optional[ExplorationVersionHistoryModel]. The version
+                history model for the current version of the exploration. It is
+                None if the model does not exist.
+            exp_id: str. The id of the exploration.
+            current_version: int. The version number for which we want to
+                create the version history model.
+        """
+        if current_vh_model is None:
+            current_vh_model = exp_models.ExplorationVersionHistoryModel(
+                id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    exp_id, current_version
+                ),
+                exploration_id=exp_id,
+                exploration_version=current_version,
+                state_version_history=revert_to_vh_model.state_version_history,
+                metadata_last_edited_version_number=(
+                    revert_to_vh_model.metadata_last_edited_version_number
+                ),
+                metadata_last_edited_committer_id=(
+                    revert_to_vh_model.metadata_last_edited_committer_id
+                ),
+                committer_ids=revert_to_vh_model.committer_ids
+            )
+        else:
+            current_vh_model.state_version_history = (
+                revert_to_vh_model.state_version_history
+            )
+            current_vh_model.metadata_last_edited_version_number = (
+                revert_to_vh_model.metadata_last_edited_version_number
+            )
+            current_vh_model.metadata_last_edited_committer_id = (
+                revert_to_vh_model.metadata_last_edited_committer_id
+            )
+            current_vh_model.committer_ids = revert_to_vh_model.committer_ids
+
+        return current_vh_model
+
+    def _check_for_revert_commit(self, change_list):
+        """Checks if revert commit is present in the change list and returns
+        the version number (if present).
+
+        Args:
+            change_list: list(ExplorationChange). The list of changes to check.
+
+        Returns:
+            Optional[int]. The revert version number (if present) or None.
+        """
+        for change in change_list:
+            if change.cmd == feconf.CMD_REVERT_COMMIT:
+                return change.version_number
+        return None
+
+    def _create_version_history_models(self, model_group):
+        """Creates the version history models for a particular exploration.
+
+        Args:
+            model_group: dict. The formatted model group.
+
+        Returns:
+            list[ExplorationVersionHistoryModel]. The created version history
+            models.
+        """
+        with datastore_services.get_ndb_context():
+            exp_v1 = model_group['exp_v1']
+            exp_vlatest = model_group['exp_vlatest']
+            commit_log_models = model_group['commit_log_models']
+            version_history_models = model_group['version_history_models']
+
+            exp_version = exp_vlatest.version
+            exp_id = exp_vlatest.id
+
+            versioned_explorations = [None] * exp_version
+            versioned_explorations[0] = exp_v1
+            versioned_explorations[exp_version - 1] = exp_vlatest
+
+            for version in range(1, exp_version + 1):
+                commit_log_model = commit_log_models[version - 1]
+                committer_id = commit_log_model.user_id
+                change_list = []
+                for change_dict in commit_log_model.commit_cmds:
+                    change_list.append(exp_domain.ExplorationChange(change_dict))
+
+                if (version == 1):
+                    new_states_vh = {
+                        state_name: state_domain.StateVersionHistory(
+                            None, None, committer_id
+                        )
+                        for state_name in exp_v1.states
+                    }
+                    new_metadata_vh = exp_domain.MetadataVersionHistory(
+                        None, committer_id
+                    )
+                    new_committer_ids = [committer_id]
+                    new_vh_model = self._get_updated_version_history_model(
+                        version_history_models[version - 1],
+                        exp_id, version, committer_id,
+                        new_states_vh, new_metadata_vh, new_committer_ids
+                    )
+                    new_vh_model.update_timestamps()
+                    version_history_models[version - 1] = new_vh_model
+                else:
+                    old_exploration = versioned_explorations[version - 2]
+
+                    # If the change list contains evert commit, we have to
+                    # handle it separately.
+                    revert_to_version = self._check_for_revert_commit(change_list)
+                    if revert_to_version is not None:
+                        new_exploration = copy.deepcopy(
+                            versioned_explorations[revert_to_version - 1]
+                        )
+                        new_exploration.version = version
+                        revert_to_vh_model = (
+                            version_history_models[revert_to_version - 1]
+                        )
+                        new_vh_model = self._get_reverted_version_history_model(
+                            revert_to_vh_model,
+                            version_history_models[version - 1],
+                            exp_id, version
+                        )
+                        new_vh_model.update_timestamps()
+                        version_history_models[version - 1] = new_vh_model
+                        versioned_explorations[version - 1] = new_exploration
+                    else:
+                        # The generation of the new exploration is placed under
+                        # a try/except block because sometimes the change list
+                        # may be invalid for some explorations and in those cases,
+                        # we cannot compute the version history for those
+                        # explorations. If we have an invalid change list in any
+                        # version of the exploration, we cannot show its version
+                        # history to the users.
+                        try:
+                            new_exploration = (
+                                self._apply_change_list_to_exploration(
+                                    old_exploration, change_list
+                                )
+                            )
+                            new_exploration.version = version
+                        except:
+                            # If any error is thrown while applying the change
+                            # list, we just return an empty array indicating that
+                            # no models were created for this exploration.
+                            return []
+
+                        old_states = old_exploration.states
+                        new_states = new_exploration.states
+                        old_metadata = old_exploration.get_metadata()
+                        new_metadata = new_exploration.get_metadata()
+
+                        old_vh_model = version_history_models[version - 2]
+                        old_states_vh = {
+                            state_name: state_domain.StateVersionHistory.from_dict(
+                                state_vh_dict
+                            )
+                            for state_name, state_vh_dict in
+                            old_vh_model.state_version_history.items()
+                        }
+                        old_metadata_vh = exp_domain.MetadataVersionHistory(
+                            old_vh_model.metadata_last_edited_version_number,
+                            old_vh_model.metadata_last_edited_committer_id
+                        )
+
+                        new_states_vh = exp_services.update_states_version_history(
+                            old_states_vh, change_list, old_states, new_states,
+                            version, committer_id
+                        )
+                        new_metadata_vh = exp_services.update_metadata_version_history(
+                            old_metadata_vh, change_list, old_metadata, new_metadata,
+                            version, committer_id
+                        )
+                        new_committer_ids = exp_services.get_updated_committer_ids(
+                            new_states_vh, new_metadata_vh.last_edited_committer_id
+                        )
+
+                        new_vh_model = self._get_updated_version_history_model(
+                          version_history_models[version - 1],
+                          exp_id, version, committer_id,
+                          new_states_vh, new_metadata_vh, new_committer_ids
+                        )
+                        new_vh_model.update_timestamps()
+                        version_history_models[version - 1] = new_vh_model
+                        versioned_explorations[version - 1] = new_exploration
+
+        return version_history_models
+
+    def _get_exploration_model_at_v1(self, exp_id):
+        """Returns the exploration model with given id at version 1.
+
+        Args:
+            exp_id: str. The id of the exploration.
+
+        Returns:
+            ExplorationModel. The exploration model at version 1.
+        """
+        with datastore_services.get_ndb_context():
+            exp_model_at_v1 = exp_models.ExplorationModel.get_version(
+                exp_id, 1
+            )
+            return exp_model_at_v1
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        all_explorations_vlatest = (
+            self.pipeline
+            | 'Get all ExplorationModels' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False)
+            )
+            | 'Create key-value pairs with id and exp models' >>
+                beam.Map(lambda model: (model.id, model))
+        )
+
+        all_explorations_v1 = (
+            all_explorations_vlatest
+            | 'Get the exploration ids' >>
+                beam.Map(lambda model: model[0])
+            | 'Get the ExplorationModels at v1' >>
+                beam.Map(self._get_exploration_model_at_v1)
+            | 'Filter the exploration models at v1' >> beam.Filter(
+                lambda model: (
+                    feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION
+                    <= model.states_schema_version
+                    <= feconf.CURRENT_STATE_SCHEMA_VERSION
+                )
+            )
+            | 'Create key-value pairs with id and exp models at v1' >>
+                beam.Map(lambda model: (model.id, model))
+        )
+
+        all_commit_logs = (
+            all_explorations_vlatest
+            | 'Get all ExplorationCommitLogEntryModels' >> ndb_io.GetModels(
+                exp_models.ExplorationCommitLogEntryModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Create key-value pairs with id and commit log models' >>
+                beam.Map(lambda model: (model.exploration_id, model))
+        )
+
+        all_version_history_models = (
+            all_commit_logs
+            | 'Get already existing ExplorationVersionHistoryModels' >>
+                ndb_io.GetModels(
+                    exp_models.ExplorationVersionHistoryModel.get_all(
+                        include_deleted=False
+                    )
+                )
+            | 'Create key-value pairs with id and version history models' >>
+                beam.Map(lambda model: (model.exploration_id, model))
+        )
+
+        model_groups = (
+            ({
+                'exp_models_v1': all_explorations_v1,
+                'exp_models_vlatest': all_explorations_vlatest,
+                'commit_log_models': all_commit_logs,
+                'version_history_models': all_version_history_models
+            })
+            | 'Group by key' >> beam.CoGroupByKey()
+            | 'Get rid of exploration id' >> beam.Values()
+            | 'Filter valid model groups' >> beam.Filter(
+                self._filter_valid_model_group
+            )
+            | 'Format valid model groups' >> beam.Map(
+                self._convert_to_formatted_model_group_dict
+            )
+        )
+
+        version_history_models = (
+            model_groups
+            | 'Create the version history models for each valid exploration' >>
+                beam.Map(self._create_version_history_models)
+            | 'Flatten the models' >> beam.FlatMap(lambda x: x)
+        )
+
+        unused_put_result = (
+            version_history_models
+            | 'Save the models to the datastore' >> ndb_io.PutModels()
+        )
+
+        report_number_of_exps_queried = (
+            all_explorations_vlatest
+            | 'Count queried explorations' >>
+                job_result_transforms.CountObjectsToJobRunResult('ALL EXPS')
+        )
+
+        report_number_of_valid_exps_queried = (
+            all_explorations_v1
+            | 'Count valid queried explorations' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'ALL VALID EXPS'
+                )
+        )
+
+        report_number_of_models_created = (
+            version_history_models
+            | 'Count number of models created' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'CREATED VERSION HISTORY MODELS'
+                )
+        )
+
+        return (
+            (
+                report_number_of_exps_queried,
+                report_number_of_valid_exps_queried,
+                report_number_of_models_created
+            )
+            | 'Flatten' >> beam.Flatten()
+        )
+
+
+class CreateVersionHistoryModels(beam.DoFn):
+    """DoFn to compute and create the version history models for a particular
+    exploration.
+    """
+
+    def _apply_change_list_to_exploration(
+        self,
+        old_exploration: exp_domain.Exploration,
+        change_list: List[exp_domain.ExplorationChange]
+    ) -> exp_domain.Exploration:
+        """Applies a changelist to a pristine exploration and returns the result.
+
+        Args:
+            old_exploration: Exploration. The exploration object on which we need
+                to apply the changelist.
+            change_list: list(ExplorationChange). The list of changes to apply.
+
+        Returns:
+            Exploration. The exploration domain object that results from applying
+            the given changelist to the existing version of the exploration.
+
+        Raises:
+            Exception. Any entries in the changelist are invalid.
+        """
+        exploration = copy.deepcopy(old_exploration)
+        to_param_domain = param_domain.ParamChange.from_dict
+        for change in change_list:
+            if change.cmd == exp_domain.CMD_ADD_STATE:
+                exploration.add_states([change.state_name])
+            elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                exploration.rename_state(
+                    change.old_state_name, change.new_state_name)
+            elif change.cmd == exp_domain.CMD_DELETE_STATE:
+                exploration.delete_state(change.state_name)
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                state = exploration.states[change.state_name]
+                if (change.property_name ==
+                        exp_domain.STATE_PROPERTY_PARAM_CHANGES):
+                    state.update_param_changes(list(map(
+                            to_param_domain, change.new_value)))
+                elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                    content = (
+                        state_domain.SubtitledHtml.from_dict(change.new_value))
+                    content.validate()
+                    state.update_content(content)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    state.update_interaction_id(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    next_content_id_index = max(
+                        change.new_value, state.next_content_id_index)
+                    state.update_next_content_id_index(next_content_id_index)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    state.update_linked_skill_id(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    state.update_interaction_customization_args(
+                        change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                    raise utils.InvalidInputException(
+                        'Editing interaction handlers is no longer supported')
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    new_answer_groups = [
+                        state_domain.AnswerGroup.from_dict(answer_groups)
+                        for answer_groups in change.new_value
+                    ]
+                    state.update_interaction_answer_groups(new_answer_groups)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                    new_outcome = None
+                    if change.new_value:
+                        new_outcome = state_domain.Outcome.from_dict(
+                            change.new_value
+                        )
+                    state.update_interaction_default_outcome(new_outcome)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                    state.update_interaction_confirmed_unclassified_answers(
+                        change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    if not isinstance(change.new_value, list):
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
+                    new_hints_list = [
+                        state_domain.Hint.from_dict(hint_dict)
+                        for hint_dict in change.new_value
+                    ]
+                    state.update_interaction_hints(new_hints_list)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    new_solution = None
+                    if change.new_value is not None:
+                        new_solution = state_domain.Solution.from_dict(
+                            state.interaction.id, change.new_value)
+                    state.update_interaction_solution(new_solution)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected solicit_answer_details to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_solicit_answer_details(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected card_is_checkpoint to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_card_is_checkpoint(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected recorded_voiceovers to be a dict, '
+                            'received %s' % change.new_value)
+                    new_voiceovers_mapping = (
+                        change.new_value['voiceovers_mapping'])
+                    language_codes_to_audio_metadata = (
+                        new_voiceovers_mapping.values())
+                    for language_codes in language_codes_to_audio_metadata:
+                        for audio_metadata in language_codes.values():
+                            audio_metadata['duration_secs'] = (
+                                float(audio_metadata['duration_secs'])
+                            )
+                    recorded_voiceovers = (
+                        state_domain.RecordedVoiceovers.from_dict(
+                            change.new_value))
+                    state.update_recorded_voiceovers(recorded_voiceovers)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected written_translations to be a dict, '
+                            'received %s' % change.new_value)
+                    cleaned_written_translations_dict = (
+                        state_domain.WrittenTranslations
+                        .convert_html_in_written_translations(
+                            change.new_value, html_cleaner.clean))
+                    written_translations = (
+                        state_domain.WrittenTranslations.from_dict(
+                            cleaned_written_translations_dict))
+                    state.update_written_translations(written_translations)
+            elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
+                exploration.states[change.state_name].add_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html)
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                exploration.states[change.state_name].add_written_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html, change.data_format)
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translation_as_needing_update(
+                    change.content_id,
+                    change.language_code
+                )
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translations_as_needing_update(change.content_id)
+            elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+                if change.property_name == 'title':
+                    exploration.update_title(change.new_value)
+                elif change.property_name == 'category':
+                    exploration.update_category(change.new_value)
+                elif change.property_name == 'objective':
+                    exploration.update_objective(change.new_value)
+                elif change.property_name == 'language_code':
+                    exploration.update_language_code(change.new_value)
+                elif change.property_name == 'tags':
+                    exploration.update_tags(change.new_value)
+                elif change.property_name == 'blurb':
+                    exploration.update_blurb(change.new_value)
+                elif change.property_name == 'author_notes':
+                    exploration.update_author_notes(change.new_value)
+                elif change.property_name == 'param_specs':
+                    exploration.update_param_specs(change.new_value)
+                elif change.property_name == 'param_changes':
+                    exploration.update_param_changes(list(
+                        map(to_param_domain, change.new_value)))
+                elif change.property_name == 'init_state_name':
+                    exploration.update_init_state_name(change.new_value)
+                elif change.property_name == 'auto_tts_enabled':
+                    exploration.update_auto_tts_enabled(change.new_value)
+                elif change.property_name == 'correctness_feedback_enabled':
+                    exploration.update_correctness_feedback_enabled(
+                        change.new_value)
+            elif (change.cmd ==
+                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+                target_version_is_current_state_schema_version = (
+                    change.to_version ==
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                if not target_version_is_current_state_schema_version:
+                    raise Exception(
+                        'Expected to migrate to the latest state schema '
+                        'version %s, received %s' % (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION,
+                            change.to_version))
+        return exploration
+
+    def _check_for_revert_commit(self, change_list):
+        """Checks if revert commit is present in the change list and returns
+        the version number (if present).
+
+        Args:
+            change_list: list(ExplorationChange). The list of changes to check.
+
+        Returns:
+            Optional[int]. The revert version number (if present) or None.
+        """
+        for change in change_list:
+            if change.cmd == feconf.CMD_REVERT_COMMIT:
+                return change.version_number
+        return None
+
+    def _get_reverted_version_history_model(
+        self, revert_to_vh_model, current_vh_model, exp_id, current_version
+    ):
+        """Updates the version history model for the current version of the
+        exploration with the model data of the reverted version.
+
+        Args:
+            revert_to_vh_model: ExplorationVersionHistoryModel. The exploration
+                version history model at the version to which the exploration
+                is reverted.
+            current_vh_model: Optional[ExplorationVersionHistoryModel]. The version
+                history model for the current version of the exploration. It is
+                None if the model does not exist.
+            exp_id: str. The id of the exploration.
+            current_version: int. The version number for which we want to
+                create the version history model.
+        """
+        if current_vh_model is None:
+            current_vh_model = exp_models.ExplorationVersionHistoryModel(
+                id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    exp_id, current_version
+                ),
+                exploration_id=exp_id,
+                exploration_version=current_version,
+                state_version_history=revert_to_vh_model.state_version_history,
+                metadata_last_edited_version_number=(
+                    revert_to_vh_model.metadata_last_edited_version_number
+                ),
+                metadata_last_edited_committer_id=(
+                    revert_to_vh_model.metadata_last_edited_committer_id
+                ),
+                committer_ids=revert_to_vh_model.committer_ids
+            )
+        else:
+            current_vh_model.state_version_history = (
+                revert_to_vh_model.state_version_history
+            )
+            current_vh_model.metadata_last_edited_version_number = (
+                revert_to_vh_model.metadata_last_edited_version_number
+            )
+            current_vh_model.metadata_last_edited_committer_id = (
+                revert_to_vh_model.metadata_last_edited_committer_id
+            )
+            current_vh_model.committer_ids = revert_to_vh_model.committer_ids
+
+        return current_vh_model
+
+    def _get_updated_version_history_model(
+        self, vh_model, exp_id, current_version, committer_id,
+        updated_states_vh, updated_metadata_vh, updated_committer_ids
+    ):
+        """Updates the version history model or creates one for the given
+        version of the exploration.
+
+        Args:
+            vh_model: Optional[ExplorationVersionHistoryModel]. The version
+                history model for the given version of the exploration. It is
+                None if the model does not exist.
+            exp_id: str. The id of the exploration.
+            current_version: int. The version number for which we want to
+                create the version history model.
+            committer_id: str. The user id of the user who committed the
+                changes in the exploration from versions (current_version - 1)
+                to (current_version).
+            updated_states_vh: dict(str, StateVersionHistory). The updated
+                states version history data for the given version of the
+                exploration.
+            updated_metadata_vh: MetadataVersionHistory. The updated metadata
+                version history data for the given version of the exploration.
+            updated_committer_ids: list[str]. A list of user ids who made the
+                'previous commit' on each state and the exploration metadata.
+
+        Returns:
+            ExplorationVersionHistoryModel. The updated version history model.
+        """
+        # If the model is not already existing, then create it.
+        if vh_model is None:
+            vh_model = exp_models.ExplorationVersionHistoryModel(
+                id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    exp_id, current_version
+                ),
+                exploration_id=exp_id,
+                exploration_version=current_version,
+                state_version_history={},
+                metadata_last_edited_version_number=None,
+                metadata_last_edited_committer_id=committer_id,
+                committer_ids=[committer_id]
+            )
+        # Update the required fields in the model.
+        vh_model.state_version_history = {
+            state_name: vh.to_dict()
+            for state_name, vh in updated_states_vh.items()
+        }
+        vh_model.metadata_last_edited_version_number = (
+            updated_metadata_vh.last_edited_version_number
+        )
+        vh_model.metadata_last_edited_committer_id = (
+            updated_metadata_vh.last_edited_committer_id
+        )
+        vh_model.committer_ids = updated_committer_ids
+        return vh_model
+
+    def process(
+        self,
+        model_group
+    ):
+        """Compute and create the exploration version history models.
+
+        Args:
+            model_group: dict. The formatted model group.
+
+        Returns:
+            list[ExplorationVersionHistoryModel]. The created version history
+            models.
+        """
+        with datastore_services.get_ndb_context():
+            exp_v1 = model_group['exp_v1']
+            exp_vlatest = model_group['exp_vlatest']
+            commit_log_models = model_group['commit_log_models']
+            version_history_models = model_group['version_history_models']
+
+            exp_version = exp_vlatest.version
+            exp_id = exp_vlatest.id
+
+            versioned_explorations = [None] * exp_version
+            versioned_explorations[0] = exp_v1
+            versioned_explorations[exp_version - 1] = exp_vlatest
+
+            for version in range(1, exp_version + 1):
+                commit_log_model = commit_log_models[version - 1]
+                committer_id = commit_log_model.user_id
+                change_list = []
+                for change_dict in commit_log_model.commit_cmds:
+                    change_list.append(exp_domain.ExplorationChange(change_dict))
+
+                if (version == 1):
+                    new_states_vh = {
+                        state_name: state_domain.StateVersionHistory(
+                            None, None, committer_id
+                        )
+                        for state_name in exp_v1.states
+                    }
+                    new_metadata_vh = exp_domain.MetadataVersionHistory(
+                        None, committer_id
+                    )
+                    new_committer_ids = [committer_id]
+                    new_vh_model = self._get_updated_version_history_model(
+                        version_history_models[version - 1],
+                        exp_id, version, committer_id,
+                        new_states_vh, new_metadata_vh, new_committer_ids
+                    )
+                    new_vh_model.update_timestamps()
+                    version_history_models[version - 1] = new_vh_model
+                else:
+                    old_exploration = versioned_explorations[version - 2]
+
+                    # If the change list contains evert commit, we have to
+                    # handle it separately.
+                    revert_to_version = self._check_for_revert_commit(change_list)
+                    if revert_to_version is not None:
+                        new_exploration = copy.deepcopy(
+                            versioned_explorations[revert_to_version - 1]
+                        )
+                        new_exploration.version = version
+                        revert_to_vh_model = (
+                            version_history_models[revert_to_version - 1]
+                        )
+                        new_vh_model = self._get_reverted_version_history_model(
+                            revert_to_vh_model,
+                            version_history_models[version - 1],
+                            exp_id, version
+                        )
+                        new_vh_model.update_timestamps()
+                        version_history_models[version - 1] = new_vh_model
+                        versioned_explorations[version - 1] = new_exploration
+                    else:
+                        # The generation of the new exploration is placed under
+                        # a try/except block because sometimes the change list
+                        # may be invalid for some explorations and in those cases,
+                        # we cannot compute the version history for those
+                        # explorations. If we have an invalid change list in any
+                        # version of the exploration, we cannot show its version
+                        # history to the users.
+                        try:
+                            new_exploration = (
+                                self._apply_change_list_to_exploration(
+                                    old_exploration, change_list
+                                )
+                            )
+                            new_exploration.version = version
+                        except:
+                            # If any error is thrown while applying the change
+                            # list, we just return an empty array indicating that
+                            # no models were created for this exploration.
+                            return []
+
+                        old_states = old_exploration.states
+                        new_states = new_exploration.states
+                        old_metadata = old_exploration.get_metadata()
+                        new_metadata = new_exploration.get_metadata()
+
+                        old_vh_model = version_history_models[version - 2]
+                        old_states_vh = {
+                            state_name: state_domain.StateVersionHistory.from_dict(
+                                state_vh_dict
+                            )
+                            for state_name, state_vh_dict in
+                            old_vh_model.state_version_history.items()
+                        }
+                        old_metadata_vh = exp_domain.MetadataVersionHistory(
+                            old_vh_model.metadata_last_edited_version_number,
+                            old_vh_model.metadata_last_edited_committer_id
+                        )
+
+                        new_states_vh = exp_services.update_states_version_history(
+                            old_states_vh, change_list, old_states, new_states,
+                            version, committer_id
+                        )
+                        new_metadata_vh = exp_services.update_metadata_version_history(
+                            old_metadata_vh, change_list, old_metadata, new_metadata,
+                            version, committer_id
+                        )
+                        new_committer_ids = exp_services.get_updated_committer_ids(
+                            new_states_vh, new_metadata_vh.last_edited_committer_id
+                        )
+
+                        new_vh_model = self._get_updated_version_history_model(
+                          version_history_models[version - 1],
+                          exp_id, version, committer_id,
+                          new_states_vh, new_metadata_vh, new_committer_ids
+                        )
+                        new_vh_model.update_timestamps()
+                        version_history_models[version - 1] = new_vh_model
+                        versioned_explorations[version - 1] = new_exploration
+
+        return version_history_models
