@@ -32,6 +32,7 @@ var SkillEditorPage = require(
   '../protractor_utils/SkillEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 
 describe('Contributor dashboard page', function() {
   const TOPIC_NAMES = [
@@ -54,6 +55,7 @@ describe('Contributor dashboard page', function() {
   let explorationEditorMainTab = null;
   let adminPage = null;
   let contributorDashboardAdminPage = null;
+  let storyEditorPage = null;
 
   beforeAll(async function() {
     contributorDashboardPage = (
@@ -69,6 +71,7 @@ describe('Contributor dashboard page', function() {
     adminPage = new AdminPage.AdminPage();
     contributorDashboardAdminPage = (
       new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
 
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
@@ -90,6 +93,8 @@ describe('Contributor dashboard page', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
+    await storyEditorPage.createNewChapter(
+      `Chapter ${i}`, TOPIC_NAMES[0], Constants.TEST_SVG_PATH);
 
     await adminPage.get();
     await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
