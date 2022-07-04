@@ -164,7 +164,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
     await waitFor.visibilityOf(
       modal.$('.e2e-test-saved-diagram-container'),
       'Diagram container not visible');
-    await action.keys('Alt text input', altTextInputElement, altText);
+    await action.setValue('Alt text input', altTextInputElement, altText);
   }
 };
 
@@ -178,7 +178,7 @@ var expectComponentDetailsToMatch = async function(
       'SVG Diagram input element takes too long to load.');
     var src = await svgDiagramInputElement.getAttribute('src');
     var alt = await svgDiagramInputElement.getAttribute('alt');
-    aexpect(alt).toEqual(altText);
+    expect(alt).toEqual(altText);
     await request(src, function(error, response, body) {
       expect(body.replace(/(\r\n|\n|\r|\t)/gm, '')).toBe(SVGTAGS[svgName]);
     });

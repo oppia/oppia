@@ -22,10 +22,9 @@ var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
-  var waitingForResponseElem = $(
-    '.e2e-test-input-response-loading-dots');
-  var explorationHeader = $('.e2e-test-exploration-header');
   var conversationInput = $('.e2e-test-conversation-input');
+  var explorationHeader = $('.e2e-test-exploration-header');
+  var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be

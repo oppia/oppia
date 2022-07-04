@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Multiple Choice
- * interaction.
+ * interaction in protractor.
  */
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');

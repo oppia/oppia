@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Multiple Choice
- * interaction.
+ * interaction in webdriverio.
  */
 
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');

@@ -23,26 +23,24 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
+  var audioLanguageSelector = $('.e2e-test-audio-language-selector');
+  var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+  var customProfilePhoto = $('.e2e-test-custom-photo');
+  var deleteAccountButton = $('.e2e-test-delete-account-button');
+  var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
   var emailUpdatesCheckbox = $('.e2e-test-email-updates-checkbox');
-  var editorRoleEmailsCheckbox = $(
-    '.e2e-test-editor-role-email-checkbox');
+  var exportAccountButton = $('.e2e-test-export-account-button');
   var feedbackMessageEmailsCheckbox = $(
     '.e2e-test-feedback-message-email-checkbox');
+  var languageSelector = $('.e2e-test-site-language-selector');
+  var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
   var navBar = $('.e2e-test-navbar-dropdown-toggle');
   var pageHeader = $('.e2e-test-preferences-title');
-  var audioLanguageSelector = (
-    $('.e2e-test-audio-language-selector'));
-  var userBioElement = $('.e2e-test-user-bio');
-  var userInterestsInput = $('.e2e-test-subject-interests-input');
-  var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
-  var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
   var profilePhotoClickable = $('.e2e-test-photo-clickable');
-  var customProfilePhoto = $('.e2e-test-custom-photo');
   var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
   var profilePhotoUploadError = $('.e2e-test-upload-error');
-  var deleteAccountButton = $('.e2e-test-delete-account-button');
-  var exportAccountButton = $('.e2e-test-export-account-button');
-  var languageSelector = $('.e2e-test-site-language-selector');
+  var userBioElement = $('.e2e-test-user-bio');
+  var userInterestsInput = $('.e2e-test-subject-interests-input');
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);
@@ -76,7 +74,7 @@ var PreferencesPage = function() {
   };
 
   this.editUserBio = async function(bio) {
-    await action.keys('User bio field', userBioElement, bio);
+    await action.setValue('User bio field', userBioElement, bio);
     await saveNewChanges('User Bio');
   };
 
@@ -114,7 +112,7 @@ var PreferencesPage = function() {
     var inputFieldName = 'User bio input field';
     await action.clear(inputFieldName, userBioElement);
     await saveNewChanges('User Bio');
-    await action.keys(inputFieldName, userBioElement, bio);
+    await action.setValue(inputFieldName, userBioElement, bio);
     await saveNewChanges('User Bio');
   };
 
@@ -122,7 +120,7 @@ var PreferencesPage = function() {
   this.setUserInterests = async function(interests) {
     await action.click('User Interest Input', userInterestsInput);
     for (var i = 0; i < interests.length; i++) {
-      await action.keys(
+      await action.setValue(
         'User Interest Input', userInterestsInput, interests[i] + '\n');
       await saveNewChanges('User Interests');
     }

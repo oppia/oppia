@@ -23,24 +23,23 @@ var action = require('./action.js');
 var CollectionEditorPage = function() {
   var addExplorationButton = $('.e2e-test-add-exploration-button');
   var addExplorationInput = $('.e2e-test-add-exploration-input');
+  var categoryFilterDropdown = $(
+    '.e2e-test-collection-editor-category-dropdown');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var collectionEditorObjectiveInput = $(
     '.e2e-test-collection-editor-objective-input');
   var commitMessageInput = $('.e2e-test-commit-message-input');
-  var categoryFilterDropdown = $(
-    '.e2e-test-collection-editor-category-dropdown');
   var editorPublishButton = $('.e2e-test-editor-publish-button');
   var editorTitleInput = $('.e2e-test-collection-editor-title-input');
   var saveChangesButton = $('.e2e-test-collection-save-changes-button');
   var saveDraftButton = $('.e2e-test-save-draft-button');
+  var saveInProgressLabel = $('.e2e-test-save-in-progress-label');
   var saveModal = $('.e2e-test-save-modal');
-  var saveInProgressLabel = $(
-    '.e2e-test-save-in-progress-label');
 
   this.addExistingExploration = async function(explorationId) {
     await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
-    await action.keys(
+    await action.setValue(
       'Add Exploration Input', addExplorationInput, explorationId);
     // Waits until the button becomes active after debouncing.
     await waitFor.elementToBeClickable(
@@ -61,7 +60,7 @@ var CollectionEditorPage = function() {
     await waitFor.elementToBeClickable(
       commitMessageInput, 'Commit Message input takes too long to appear');
     await action.click('Commit Message Input', commitMessageInput);
-    await action.keys(
+    await action.setValue(
       'Commit Message Input', commitMessageInput, message);
   };
 
@@ -102,12 +101,12 @@ var CollectionEditorPage = function() {
 
   // Set collection title.
   this.setTitle = async function(title) {
-    await action.keys('Editor Title Input', editorTitleInput, title);
+    await action.setValue('Editor Title Input', editorTitleInput, title);
   };
 
   // Set collection objective.
   this.setObjective = async function(objective) {
-    await action.keys(
+    await action.setValue(
       'Collection Editor Objective Input',
       collectionEditorObjectiveInput, objective);
   };

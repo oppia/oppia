@@ -188,7 +188,7 @@ var PositiveIntEditor = function(elem) {
     setValue: async function(value) {
       await action.clear(
         'Positive Int Editor Input', elem.$('<input>'));
-      await action.keys(
+      await action.setValue(
         'Positive Int Editor Input', elem.$('<input>'), value);
     },
     expectValueToBe: async function(expectedValue) {

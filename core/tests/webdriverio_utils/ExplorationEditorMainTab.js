@@ -32,34 +32,28 @@ var ExplorationEditorMainTab = function() {
   /*
    * Interactive elements
    */
+  var addOrUpdateSolutionModal = $('.e2e-test-add-or-update-solution-modal');
   var addResponseDetails = $('.e2e-test-add-response-details');
   var addResponseHeader = $('.e2e-test-add-response-modal-header');
-  var multipleChoiceAnswerOptions = function(optionNum) {
-    return $(
-      `.e2e-test-html-multiple-select-option=${optionNum}`);
-  };
-  var itemSelectionAnswerOptions = function(optionNum) {
-    return $(
-      `.e2e-test-html-item-select-option=${optionNum}`);
-  };
+  var answerDescription = $('.e2e-test-answer-description');
+  var answerTab = $('.e2e-test-answer-tab');
+  var ckEditorElement = $('.e2e-test-ck-editor');
   var defaultResponseTab = $('.e2e-test-default-response-tab');
-  var editorWelcomeModal = $('.e2e-test-welcome-modal');
-  var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
-  var editOutcomeDestStateIn = '.e2e-test-add-state-input';
+  var deleteNodeLocator = '.e2e-test-delete-node';
   var editOutcomeDestAddExplorationId = $(
     '.e2e-test-add-refresher-exploration-id');
-  var editOutcomeDestDropdownOptions = $(
-    '.e2e-destination-selector-dropdown');
+  var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
+  var editOutcomeDestDropdownOptions = $('.e2e-destination-selector-dropdown');
+  var editorWelcomeModal = $('.e2e-test-welcome-modal');
+  var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
+  var explorationGraph = $('.e2e-test-exploration-graph');
+  var fadeIn = $('.e2e-test-editor-cards-container');
   var feedbackBubble = $('.e2e-test-feedback-bubble');
   var feedbackEditor = $('.e2e-test-open-feedback-editor');
-  var fadeIn = $('.e2e-test-editor-cards-container');
+  var hintTextElement = $('.e2e-test-hint-text');
   var interaction = $('.e2e-test-interaction');
   var interactionEditor = $('.e2e-test-interaction-editor');
-  var explorationGraph = $('.e2e-test-exploration-graph');
-  var nodeLabelLocator = '.e2e-test-node-label';
-  var stateNodeLabel = function(nodeElement) {
-    return nodeElement.$(nodeLabelLocator);
-  };
+  var interactionHtmlElement = $('.e2e-test-interaction-html');
   var interactionTab = function(tabId) {
     return $('.e2e-test-interaction-tab-' + tabId);
   };
@@ -67,47 +61,48 @@ var ExplorationEditorMainTab = function() {
     return $(
       '.e2e-test-interaction-tile-' + interactionId);
   };
+  var itemSelectionAnswerOptions = function(optionNum) {
+    return $(
+      `.e2e-test-html-item-select-option=${optionNum}`);
+  };
+  var multipleChoiceAnswerOptions = function(optionNum) {
+    return $(
+      `.e2e-test-html-multiple-select-option=${optionNum}`);
+  };
+  var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
-  var openOutcomeFeedBackEditor = $(
-    '.e2e-test-open-outcome-feedback-editor');
+  var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
   var postTutorialPopover = $('.ng-joyride .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
+  var ruleDetails = $('.e2e-test-rule-details');
   var stateContentDisplay = $('.e2e-test-state-content-display');
+  var stateContentEditorLocator = '.e2e-test-state-content-editor';
   var stateEditButton = $('.e2e-test-edit-content-pencil-button');
+  var stateEditorTag = $('.e2e-test-state-content-editor');
   var stateNameContainer = $('.e2e-test-state-name-container');
   var stateNameInput = $('.e2e-test-state-name-input');
-  var ruleDetails = $('.e2e-test-rule-details');
-  var stateContentEditorLocator =
-    '.e2e-test-state-content-editor';
-  var addOrUpdateSolutionModal = $(
-    '.e2e-test-add-or-update-solution-modal');
-  var answerDescription = $('.e2e-test-answer-description');
-  var deleteNodeLocator = '.e2e-test-delete-node';
+  var stateNodeLabel = function(nodeElement) {
+    return nodeElement.$(nodeLabelLocator);
+  };
   var titleElement = $('.ng-joyride-title');
-  var ckEditorElement = $('.e2e-test-ck-editor');
-  var interactionHtmlElement = $('.e2e-test-interaction-html');
-  var answerTab = $('.e2e-test-answer-tab');
-  var hintTextElement = $('.e2e-test-hint-text');
-  var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
-  var stateEditorTag = $('.e2e-test-state-content-editor');
 
   /*
    * Buttons
    */
   var addAnswerButton = $('.e2e-test-add-answer');
   var addHintButton = $('.e2e-test-oppia-add-hint-button');
+  var addInteractionButton = $('.e2e-test-open-add-interaction-modal');
   var addNewResponseButton = $('.e2e-test-add-new-response');
   var addResponseButton = $('.e2e-test-open-add-response-modal');
   var addSolutionButton = $('.e2e-test-oppia-add-solution-button');
-  var addInteractionButton = $('.e2e-test-open-add-interaction-modal');
+  var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
   var cancelOutcomeDestButton = $('.e2e-test-cancel-outcome-dest');
   var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
   var confirmDeleteInteractionButton = $(
     '.e2e-test-confirm-delete-interaction');
-  var confirmDeleteResponseButton = $(
-    '.e2e-test-confirm-delete-response');
+  var confirmDeleteResponseButton = $('.e2e-test-confirm-delete-response');
   var confirmDeleteStateButton = $('.e2e-test-confirm-delete-state');
   var deleteAnswerButton = $('.e2e-test-delete-answer');
   var deleteInteractionButton = $('.e2e-test-delete-interaction');
@@ -119,7 +114,6 @@ var ExplorationEditorMainTab = function() {
   var saveOutcomeDestButton = $('.e2e-test-save-outcome-dest');
   var saveOutcomeFeedbackButton = $('.e2e-test-save-outcome-feedback');
   var saveStateContentButton = $('.e2e-test-save-state-content');
-  var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
   var startTutorialButton = $('.e2e-test-start-tutorial');
   var submitSolutionButton = $('.e2e-test-submit-solution-button');
 
@@ -154,11 +148,11 @@ var ExplorationEditorMainTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButtons = $$('button=Finish');
+    var finishTutorialButtons = await $$('button=Finish');
     await waitFor.elementToBeClickable(
       finishTutorialButtons[0],
       'Finish Tutorial Stage button is not clickable');
-    if (await finishTutorialButtons.count() === 1) {
+    if (finishTutorialButtons.length === 1) {
       await action.click(
         'Finish Tutorial Stage button', finishTutorialButtons[0]);
     } else {
@@ -185,7 +179,7 @@ var ExplorationEditorMainTab = function() {
       await waitFor.elementToBeClickable(
         nextTutorialStageButtons[0],
         'Next Tutorial Stage button is not clickable');
-      if (await nextTutorialStageButtons.length === 1) {
+      if (nextTutorialStageButtons.length === 1) {
         await action.click(
           'Next Tutorial Stage button', nextTutorialStageButtons[0]);
         await waitFor.invisibilityOf(
@@ -442,11 +436,11 @@ var ExplorationEditorMainTab = function() {
 
     if (createNewDest) {
       var editOutcomeDestStateInput = editOutcomeDestBubble.$(
-        editOutcomeDestStateIn);
-      await action.keys(
+        '.e2e-test-add-state-input');
+      await action.setValue(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
     } else if (refresherExplorationId) {
-      await action.keys(
+      await action.setValue(
         'Edit Outcome Add Exploration Id',
         editOutcomeDestAddExplorationId, refresherExplorationId);
     }
@@ -509,9 +503,9 @@ var ExplorationEditorMainTab = function() {
     var hintTextButton = await hintTextElement.$$('<p>');
     var lastHintElement = hintTextButton.length - 1;
     await action.click('Hint Text Button', hintTextButton[lastHintElement]);
-    var CKEditor = ckEditorElement.$$(
-      'oppia-rte-resizer')[0];
-    await action.keys('Text CKEditor', CKEditor, hint);
+    var CKEditor = await ckEditorElement.$$(
+      '.oppia-rte-resizer')[0];
+    await action.setValue('Text CKEditor', CKEditor, hint);
     await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
@@ -526,11 +520,11 @@ var ExplorationEditorMainTab = function() {
     var interaction = await interactions.getInteraction(interactionId);
     await interaction.submitAnswer(
       interactionHtmlElement, solution.correctAnswer);
-    var explanationTextArea = explanationTextAreaElement.$$('<p>')[0];
+    var explanationTextArea = await explanationTextAreaElement.$$('<p>')[0];
     await action.click('Explanation Text Area', explanationTextArea);
-    var CKEditor = ckEditorElement.$$(
+    var CKEditor = await ckEditorElement.$$(
       'oppia-rte-resizer')[0];
-    await action.keys(
+    await action.setValue(
       'Text CKEditor', CKEditor, solution.explanation);
     await action.click('Submit Solution Button', submitSolutionButton);
     await waitFor.invisibilityOf(
@@ -799,7 +793,7 @@ var ExplorationEditorMainTab = function() {
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     await action.click('Answer Description', answerDescription);
-    var ruleDropdownElement = $$(
+    var ruleDropdownElement = await $$(
       `.select2-results__option=${ruleDescriptionInDropdown}`)[0];
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
@@ -825,7 +819,7 @@ var ExplorationEditorMainTab = function() {
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = async function(names) {
-    var stateNodes = await explorationGraph.$$('.e2e-test-node');
+    var stateNodes = explorationGraph.$$('.e2e-test-node');
     var stateNames = await stateNodes.map(async function(stateElement) {
       return await action.getText(
         'State node label', stateNodeLabel(stateElement));
@@ -871,7 +865,7 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await action.click('State Name Container', stateNameContainer);
     await action.clear('State Name input', stateNameInput);
-    await action.keys('State Name input', stateNameInput, name);
+    await action.setValue('State Name input', stateNameInput, name);
 
     var stateNameSubmitButton = stateNameContainer.$(
       '.e2e-test-state-name-submit');

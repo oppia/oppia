@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Algebraic Expression Input
- * interaction
+ * interaction in webdriverio.
  */
 
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
@@ -38,8 +38,8 @@ var customizeInteraction = async function(elem, customLetters) {
 
 var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.$(
-      '<oppia-interactive-algebraic-expression-input>').isPresent()
+    await elem.$(
+      '<oppia-interactive-algebraic-expression-input>').isExisting()
   ).toBe(true);
   // Testing editor's value in default state.
   expect(
@@ -49,8 +49,8 @@ var expectInteractionDetailsToMatch = async function(elem) {
 };
 
 var submitAnswer = async function(elem, answer) {
-  await objects.MathEditor(elem.element(by.tagName(
-    'oppia-interactive-algebraic-expression-input'))).setValue(answer);
+  await objects.MathEditor(elem.$(
+    '<oppia-interactive-algebraic-expression-input>')).setValue(answer);
   var submitBtn = $('.e2e-test-submit-answer-button');
   await action.click('Submit Buttom', submitBtn);
 };

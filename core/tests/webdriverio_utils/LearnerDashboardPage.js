@@ -22,33 +22,22 @@ var action = require('./action.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
-  var homeSection = $('.e2e-test-home-section');
-  var goalsSection =
-    $('.e2e-test-goals-section');
-  var progressSection =
-    $('.e2e-test-progress-section');
-  var communityLessonsSection =
-    $('.e2e-test-community-lessons-section');
-  var feedbackSection =
-    $('.e2e-test-feedback-section');
-  var feedbackThread =
-    $('.e2e-test-feedback-thread');
-  var feedbackMessage =
-   $$('.e2e-test-feedback-message');
-  var addToLearnerGoalsButton =
-    $('.e2e-test-add-topic-to-current-goals-button');
-  var currentGoalsTopicName =
-    $('.e2e-test-topic-name-in-current-goals');
-  var editGoalsTopicName =
-    $('.e2e-test-topic-name-in-edit-goals');
-  var skillProficiencyTopicTitle =
-    $('.e2e-test-skill-proficiency-topic-title');
-  var completedGoalsTopicName =
-    $('.e2e-test-completed-goals-topic-name');
-  var incompleteCommunityLessonsSection = $(
-    '.e2e-test-incomplete-community-lessons-section');
+  var addToLearnerGoalsButton = $(
+    '.e2e-test-add-topic-to-current-goals-button');
+  var communityLessonsSection = $('.e2e-test-community-lessons-section');
   var completeCommunityLessonsSection = $(
     '.e2e-test-completed-community-lessons-section');
+  var completedGoalsTopicName = $('.e2e-test-completed-goals-topic-name');
+  var currentGoalsTopicName = $('.e2e-test-topic-name-in-current-goals');
+  var editGoalsTopicName = $('.e2e-test-topic-name-in-edit-goals');
+  var feedbackSection = $('.e2e-test-feedback-section');
+  var feedbackThread = $('.e2e-test-feedback-thread');
+  var goalsSection = $('.e2e-test-goals-section');
+  var homeSection = $('.e2e-test-home-section');
+  var incompleteCommunityLessonsSection = $(
+    '.e2e-test-incomplete-community-lessons-section');
+  var progressSection = $('.e2e-test-progress-section');
+  var skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
 
   this.get = async function() {
     await browser.url(LEARNER_DASHBOARD_URL);
@@ -216,6 +205,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectFeedbackMessageToMatch = async function(message) {
+    var feedbackMessage = await $$('.e2e-test-feedback-message');
     await waitFor.visibilityOf(
       feedbackMessage[0], 'Feedback Message takes too long to appear');
     expect(await feedbackMessage[0].getText()).toMatch(message);

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Numeric
- * interaction.
+ * interaction in webdriverio.
  */
 
 var action = require(

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Ratio Expression
- * Interaction.
+ * Interaction in webdriverio.
  */
 
 var waitFor = require(

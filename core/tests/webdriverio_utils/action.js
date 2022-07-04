@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for performing actions on element.
+ * @fileoverview Utilities for performing actions on element in webdriverio.
  */
 
 var waitFor = require('./waitFor.js');
 
 // Waits for the invisibility of the autosave message.
 var waitForAutosave = async function() {
-  var autoSaveIndicatorElement = await $('.e2e-test-autosave-indicator');
+  var autoSaveIndicatorElement = $('.e2e-test-autosave-indicator');
   await waitFor.invisibilityOf(
     autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
 };
@@ -69,20 +69,20 @@ var select = async function(selectorName, selectorElement, optionToSelect) {
 
 var matSelect = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
-  var optionElement = await $(`.mat-option-text=${optionToSelect}`);
+  var optionElement = $(`.mat-option-text=${optionToSelect}`);
   await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
 var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
-  var select2Results = await $('.select2-results');
+  var select2Results = $('.select2-results');
   await waitFor.visibilityOf(
     select2Results, `${selectorName} options are not visible.`);
-  var option = await $(`li=${optionToSelect}`);
+  var option = select2Results.$(`li=${optionToSelect}`);
   await click(`${optionToSelect} in ${selectorName}`, option);
 };
 
-var keys = async function(
+var setValue = async function(
     inputName, inputElement, keys, clickInputElement = true) {
   if (clickInputElement) {
     await click(inputName, inputElement);
@@ -97,5 +97,5 @@ exports.getAttribute = getAttribute;
 exports.select = select;
 exports.select2 = select2;
 exports.matSelect = matSelect;
-exports.keys = keys;
+exports.setValue = setValue;
 exports.waitForAutosave = waitForAutosave;
