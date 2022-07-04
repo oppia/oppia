@@ -222,7 +222,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             questionskilllink_model.skill_difficulty, skill_difficulty)
 
     def test_get_all_question_ids_linked_to_skill_id(self) -> None:
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
 
         # Testing that no question is linked to a skill.
@@ -367,9 +367,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 0)
 
     def test_get_total_question_count_for_skill_ids(self) -> None:
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
-        skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_2, 'user', description='Description 2') # type: ignore[no-untyped-call]
 
         questionskilllink_model1 = (
@@ -420,9 +420,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_count, 3)
 
     def test_get_question_skill_links_by_skill_ids(self) -> None:
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
-        skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_2, 'user', description='Description 2') # type: ignore[no-untyped-call]
 
         questionskilllink_model1 = (
@@ -463,13 +463,13 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_question_skill_links_by_skill_ids_many_skills(self) -> None:
         # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
-        skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_2, 'user', description='Description 2') # type: ignore[no-untyped-call]
-        skill_id_3 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_3 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_3, 'user', description='Description 3') # type: ignore[no-untyped-call]
-        skill_id_4 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        skill_id_4 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_4, 'user', description='Description 4') # type: ignore[no-untyped-call]
 
         questionskilllink_model1 = (
