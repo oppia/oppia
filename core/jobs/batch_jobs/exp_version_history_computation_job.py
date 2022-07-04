@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import copy
 
-from apache_beam import utils
 from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -33,10 +32,11 @@ from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-from typing import Dict, List, Optional
-from typing_extensions import TypedDict
 
 import apache_beam as beam
+from apache_beam import utils
+from typing import Dict, List, Optional
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -80,13 +80,14 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         """Applies a changelist to an exploration and returns the result.
 
         Args:
-            old_exploration: Exploration. The exploration object on which we need
-                to apply the changelist.
+            old_exploration: Exploration. The exploration object on which we
+                need to apply the change list.
             change_list: list(ExplorationChange). The list of changes to apply.
 
         Returns:
-            Exploration. The exploration domain object that results from applying
-            the given changelist to the existing version of the exploration.
+            Exploration. The exploration domain object that results from
+            applying the given changelist to the existing version of the
+            exploration.
 
         Raises:
             Exception. Any entries in the changelist are invalid.
@@ -313,7 +314,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         Returns:
             FormattedModelGroupDict. The formatted version of the given valid
-                model group dict.
+            model group dict.
         """
         exp_v1 = exp_fetchers.get_exploration_from_model(
             model_group['exp_models_v1'][0]
@@ -422,12 +423,15 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             revert_to_vh_model: ExplorationVersionHistoryModel. The exploration
                 version history model at the version to which the exploration
                 is reverted.
-            current_vh_model: Optional[ExplorationVersionHistoryModel]. The version
-                history model for the current version of the exploration. It is
-                None if the model does not exist.
+            current_vh_model: Optional[ExplorationVersionHistoryModel]. The
+                version history model for the current version of the
+                exploration. It is None if the model does not exist.
             exp_id: str. The id of the exploration.
             current_version: int. The version number for which we want to
                 create the version history model.
+
+        Returns:
+            ExplorationVersionHistoryModel. The updated version history model.
         """
         # If the model does not exist, create it with the data from the
         # reverted model. Otherwise, just update the data of the already
@@ -515,7 +519,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         change_dict
                     ))
 
-                if (version == 1):
+                if version == 1:
                     new_states_vh = {
                         state_name: state_domain.StateVersionHistory(
                             None, None, committer_id
@@ -537,16 +541,18 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     old_exploration = versioned_explorations[version - 2]
                     # If the change list contains evert commit, we have to
                     # handle it separately.
-                    revert_to_version = self._check_for_revert_commit(change_list)
+                    revert_to_version = self._check_for_revert_commit(
+                        change_list
+                    )
                     if revert_to_version is not None:
                         # If the revert to version number is invalid, we cannot
                         # generate the further version history models
                         # correctly. Hence, an empty list is returned
                         # indicating that the version history of this
                         # exploration cannot be shown to the user.
-                        if not(
-                            revert_to_version > 0 and
-                            revert_to_version < version
+                        if (
+                            revert_to_version <= 0 or
+                            revert_to_version >= version
                         ):
                             return []
                         new_exploration = copy.deepcopy(
@@ -567,11 +573,11 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     else:
                         # The generation of the new exploration is placed under
                         # a try/except block because sometimes the change list
-                        # may be invalid for some explorations and in those cases,
-                        # we cannot compute the version history for those
-                        # explorations. If we have an invalid change list in any
-                        # version of the exploration, we cannot show its version
-                        # history to the users.
+                        # may be invalid for some explorations and in those
+                        # cases, we cannot compute the version history for
+                        # those explorations. If we have an invalid change list
+                        # in any version of the exploration, we cannot show its
+                        # version history to the users.
                         try:
                             new_exploration = (
                                 self._apply_change_list_to_exploration(
@@ -579,10 +585,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                 )
                             )
                             new_exploration.version = version
-                        except:
+                        except Exception:
                             # If any error is thrown while applying the change
-                            # list, we just return an empty array indicating that
-                            # no models were created for this exploration.
+                            # list, we just return an empty array indicating
+                            # that no models were created for this exploration.
                             return []
 
                         old_states = old_exploration.states
@@ -592,8 +598,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
                         old_vh_model = version_history_models[version - 2]
                         old_states_vh = {
-                            state_name: state_domain.StateVersionHistory.from_dict(
-                                state_vh_dict
+                            state_name: (
+                                state_domain.StateVersionHistory.from_dict(
+                                    state_vh_dict
+                                )
                             )
                             for state_name, state_vh_dict in
                             old_vh_model.state_version_history.items()
@@ -603,22 +611,29 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             old_vh_model.metadata_last_edited_committer_id
                         )
 
-                        new_states_vh = exp_services.update_states_version_history(
-                            old_states_vh, change_list, old_states, new_states,
-                            version, committer_id
+                        new_states_vh = (
+                            exp_services.update_states_version_history(
+                                old_states_vh, change_list, old_states,
+                                new_states, version, committer_id
+                            )
                         )
-                        new_metadata_vh = exp_services.update_metadata_version_history(
-                            old_metadata_vh, change_list, old_metadata, new_metadata,
-                            version, committer_id
+                        new_metadata_vh = (
+                            exp_services.update_metadata_version_history(
+                                old_metadata_vh, change_list, old_metadata,
+                                new_metadata, version, committer_id
+                            )
                         )
-                        new_committer_ids = exp_services.get_updated_committer_ids(
-                            new_states_vh, new_metadata_vh.last_edited_committer_id
+                        new_committer_ids = (
+                            exp_services.get_updated_committer_ids(
+                                new_states_vh,
+                                new_metadata_vh.last_edited_committer_id
+                            )
                         )
 
                         new_vh_model = self._get_updated_version_history_model(
-                          version_history_models[version - 1],
-                          exp_id, version, committer_id,
-                          new_states_vh, new_metadata_vh, new_committer_ids
+                            version_history_models[version - 1],
+                            exp_id, version, committer_id,
+                            new_states_vh, new_metadata_vh, new_committer_ids
                         )
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
@@ -701,7 +716,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 'version_history_models': all_version_history_models
             })
             | 'Group by key' >> beam.CoGroupByKey()
-            | 'Get rid of exploration id' >> beam.Values()
+            | 'Get rid of exploration id' >>
+                beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter valid model groups' >> beam.Filter(
                 self._filter_valid_model_group
             )
