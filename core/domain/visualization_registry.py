@@ -22,15 +22,17 @@ import inspect
 
 from extensions.visualizations import models
 
+from typing import Dict, List, Type
+
 
 class Registry:
     """Registry of all visualizations."""
 
     # Dict mapping visualization class names to their classes.
-    visualizations_dict = {}
+    visualizations_dict: Dict[str, Type[models.BaseVisualization]] = {}
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Clears and adds new visualization instances to the registry."""
         cls.visualizations_dict.clear()
 
@@ -46,7 +48,9 @@ class Registry:
                 cls.visualizations_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_visualization_class(cls, visualization_id):
+    def get_visualization_class(
+        cls, visualization_id: str
+    ) -> Type[models.BaseVisualization]:
         """Gets a visualization class by its id (which is also its class name).
 
         The registry will refresh if the desired class is not found. If it's
@@ -60,7 +64,7 @@ class Registry:
         return cls.visualizations_dict[visualization_id]
 
     @classmethod
-    def get_all_visualization_ids(cls):
+    def get_all_visualization_ids(cls) -> List[str]:
         """Gets a visualization class by its id
         (which is also its class name).
         """
