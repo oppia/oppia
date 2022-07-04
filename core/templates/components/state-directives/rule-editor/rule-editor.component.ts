@@ -16,7 +16,7 @@
  * @fileoverview Component for the rule editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, AfterViewChecked } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -44,7 +44,8 @@ interface Choice {
   selector: 'oppia-rule-editor',
   templateUrl: './rule-editor.component.html'
 })
-export class RuleEditorComponent implements OnInit {
+export class RuleEditorComponent
+  implements OnInit, OnDestroy, AfterViewChecked {
   @Input() isEditable: boolean;
   @Input() isEditingRuleInline: boolean;
   @Output() onCancelRuleEdit = new EventEmitter<void>();
@@ -54,7 +55,7 @@ export class RuleEditorComponent implements OnInit {
 
   ruleDescriptionFragments: unknown[];
   currentInteractionId: string;
-  ruleDescriptionChoices: Choice[];
+  ruleDescriptionChoices: any[];
   isInvalid: boolean;
   eventBusGroup: EventBusGroup;
   editRuleForm: object;
@@ -71,6 +72,7 @@ export class RuleEditorComponent implements OnInit {
 
   rajesh(): void {
     console.error(this.rule);
+    console.error(this.ruleDescriptionChoices);
   }
 
   computeRuleDescriptionFragments(): string {

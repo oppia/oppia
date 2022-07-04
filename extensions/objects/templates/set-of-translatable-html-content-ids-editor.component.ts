@@ -15,7 +15,7 @@
 /**
  * @fileoverview Component for set of translatable html content id editor.
  */
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface Choice {
@@ -27,7 +27,8 @@ interface Choice {
   templateUrl: './set-of-translatable-html-content-ids-editor.component.html',
   styleUrls: []
 })
-export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
+export class SetOfTranslatableHtmlContentIdsEditorComponent
+  implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -36,6 +37,7 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   @Input() value!: string[];
   @Output() valueChanged = new EventEmitter();
   choices!: Choice[];
+  viewUpdateConrol: boolean;
   selections!: boolean[];
   SCHEMA = {
     type: 'list',
@@ -48,6 +50,15 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
   ) { }
 
+  ngOnChanges(): void {
+    if (this.viewUpdateConrol) {
+      this.selections = this.choices.map(
+        choice => this.value.indexOf(choice.val) !== -1
+      );
+      this.viewUpdateConrol = false;
+    }
+  }
+
   ngOnInit(): void {
     if (!this.value) {
       this.value = [];
@@ -56,6 +67,8 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
     this.selections = this.choices.map(
       choice => this.value.indexOf(choice.val) !== -1
     );
+
+    this.viewUpdateConrol = true;
   }
 
   toggleSelection(choiceListIndex: number): void {
