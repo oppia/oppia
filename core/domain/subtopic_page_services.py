@@ -21,14 +21,25 @@ from __future__ import annotations
 import copy
 
 from core import feconf
+from core.domain import change_domain
 from core.domain import subtopic_page_domain
 from core.platform import models
 
+from typing import List, Optional, overload
+from typing_extensions import Literal
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import subtopic_models
+
 (subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
-datastore_services = models.Registry.import_datastore_services()
 
 
-def _migrate_page_contents_to_latest_schema(versioned_page_contents):
+def _migrate_page_contents_to_latest_schema(
+    versioned_page_contents: (
+        subtopic_page_domain.VersionedSubtopicPageContentsDict
+    )
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the page contents structure based on the schema version of the input
     page contents dictionary. If the current page_contents schema changes, a
@@ -53,12 +64,14 @@ def _migrate_page_contents_to_latest_schema(versioned_page_contents):
 
     while (page_contents_schema_version <
            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
-        subtopic_page_domain.SubtopicPage.update_page_contents_from_model(
+        subtopic_page_domain.SubtopicPage.update_page_contents_from_model(  # type: ignore[no-untyped-call]
             versioned_page_contents, page_contents_schema_version)
         page_contents_schema_version += 1
 
 
-def get_subtopic_page_from_model(subtopic_page_model):
+def get_subtopic_page_from_model(
+    subtopic_page_model: subtopic_models.SubtopicPageModel
+) -> subtopic_page_domain.SubtopicPage:
     """Returns a domain object for an SubtopicPage given a subtopic page model.
 
     Args:
@@ -68,7 +81,9 @@ def get_subtopic_page_from_model(subtopic_page_model):
     Returns:
         SubtopicPage. The domain object corresponding to the given model object.
     """
-    versioned_page_contents = {
+    versioned_page_contents: (
+        subtopic_page_domain.VersionedSubtopicPageContentsDict
+    ) = {
         'schema_version': subtopic_page_model.page_contents_schema_version,
         'page_contents': copy.deepcopy(subtopic_page_model.page_contents)
     }
@@ -86,7 +101,44 @@ def get_subtopic_page_from_model(subtopic_page_model):
     )
 
 
-def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str, subtopic_id: int
+) -> subtopic_page_domain.SubtopicPage: ...
+
+
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    *,
+    strict: Literal[True]
+) -> subtopic_page_domain.SubtopicPage: ...
+
+
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    *,
+    strict: Literal[False]
+) -> Optional[subtopic_page_domain.SubtopicPage]: ...
+
+
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    *,
+    strict: bool = ...
+) -> Optional[subtopic_page_domain.SubtopicPage]: ...
+
+
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: bool = True
+) -> Optional[subtopic_page_domain.SubtopicPage]:
     """Returns a domain object representing a subtopic page.
 
     Args:
@@ -110,7 +162,10 @@ def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
         return None
 
 
-def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
+def get_subtopic_pages_with_ids(
+    topic_id: str,
+    subtopic_ids: List[int]
+) -> List[Optional[subtopic_page_domain.SubtopicPage]]:
     """Returns a list of domain objects with given ids.
 
     Args:
@@ -128,7 +183,7 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
                 topic_id, subtopic_id))
     subtopic_page_models = subtopic_models.SubtopicPageModel.get_multi(
         subtopic_page_ids)
-    subtopic_pages = []
+    subtopic_pages: List[Optional[subtopic_page_domain.SubtopicPage]] = []
     for subtopic_page_model in subtopic_page_models:
         if subtopic_page_model is None:
             subtopic_pages.append(subtopic_page_model)
@@ -138,7 +193,35 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
     return subtopic_pages
 
 
-def get_subtopic_page_contents_by_id(topic_id, subtopic_id, strict=True):
+@overload
+def get_subtopic_page_contents_by_id(
+    topic_id: str, subtopic_id: int
+) -> subtopic_page_domain.SubtopicPageContents: ...
+
+
+@overload
+def get_subtopic_page_contents_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    *,
+    strict: Literal[True]
+) -> subtopic_page_domain.SubtopicPageContents: ...
+
+
+@overload
+def get_subtopic_page_contents_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    *,
+    strict: Literal[False]
+) -> Optional[subtopic_page_domain.SubtopicPageContents]: ...
+
+
+def get_subtopic_page_contents_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    strict: bool = True
+) -> Optional[subtopic_page_domain.SubtopicPageContents]:
     """Returns the page contents of a subtopic
 
     Args:
@@ -160,7 +243,11 @@ def get_subtopic_page_contents_by_id(topic_id, subtopic_id, strict=True):
 
 
 def save_subtopic_page(
-        committer_id, subtopic_page, commit_message, change_list):
+    committer_id: str,
+    subtopic_page: subtopic_page_domain.SubtopicPage,
+    commit_message: str,
+    change_list: List[change_domain.BaseChange]
+) -> None:
     """Validates a subtopic page and commits it to persistent storage. If
     successful, increments the version number of the incoming subtopic page
     domain object by 1.
@@ -182,7 +269,7 @@ def save_subtopic_page(
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (subtopic_page.id, change_list))
-    subtopic_page.validate()
+    subtopic_page.validate()  # type: ignore[no-untyped-call]
 
     subtopic_page_model = subtopic_models.SubtopicPageModel.get(
         subtopic_page.id, strict=False)
@@ -213,7 +300,11 @@ def save_subtopic_page(
 
 
 def delete_subtopic_page(
-        committer_id, topic_id, subtopic_id, force_deletion=False):
+    committer_id: str,
+    topic_id: str,
+    subtopic_id: int,
+    force_deletion: bool = False
+) -> None:
     """Delete a topic summary model.
 
     Args:
