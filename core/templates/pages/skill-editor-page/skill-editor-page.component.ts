@@ -51,14 +51,15 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
-    '$rootScope', 'BottomNavbarStatusService', 'LocalStorageService',
+    '$location', '$rootScope', 'BottomNavbarStatusService',
+    'LocalStorageService',
     'NgbModal', 'PreventPageUnloadEventService',
     'SkillEditorRoutingService',
     'SkillEditorStalenessDetectionService', 'SkillEditorStateService',
     'UndoRedoService', 'UrlService', 'WindowRef',
     'MAX_COMMIT_MESSAGE_LENGTH',
     function(
-        $rootScope, BottomNavbarStatusService, LocalStorageService,
+        $location, $rootScope, BottomNavbarStatusService, LocalStorageService,
         NgbModal, PreventPageUnloadEventService,
         SkillEditorRoutingService,
         SkillEditorStalenessDetectionService, SkillEditorStateService,
@@ -68,6 +69,16 @@ angular.module('oppia').component('skillEditorPage', {
       let skillIsInitialized = false;
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       ctrl.directiveSubscriptions = new Subscription();
+
+      // When the URL path changes, reroute to the appropriate tab in the
+      // Skill editor page if back and forward button pressed in browser.
+      $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
+        if (newPath !== '') {
+          SkillEditorRoutingService._changeTab(newPath);
+          $rootScope.$applyAsync();
+        }
+      });
+
       ctrl.getActiveTabName = function() {
         return SkillEditorRoutingService.getActiveTabName();
       };

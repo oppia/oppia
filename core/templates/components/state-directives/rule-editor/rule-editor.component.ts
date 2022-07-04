@@ -19,6 +19,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -236,13 +237,13 @@ export class RuleEditorComponent implements OnInit {
       // depending on the interaction. This varName would take its
       // default value from answerChoices, but other variables would
       // take their default values from the DEFAULT_OBJECT_VALUES dict.
-      if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
+      if (isEqual(DEFAULT_OBJECT_VALUES[varType], [])) {
         this.rule.inputs[varName] = [];
       } else if (answerChoices && answerChoices.length > 0) {
-        this.rule.inputs[varName] = angular.copy(
+        this.rule.inputs[varName] = cloneDeep(
           answerChoices[0].val);
       } else {
-        this.rule.inputs[varName] = angular.copy(
+        this.rule.inputs[varName] = cloneDeep(
           DEFAULT_OBJECT_VALUES[varType]);
       }
 
