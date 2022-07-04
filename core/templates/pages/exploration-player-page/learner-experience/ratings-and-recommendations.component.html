@@ -22,7 +22,7 @@
 
   <div *ngIf="!collectionSummary && !inStoryMode && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
-    <div *ngIf="recommendedExplorationSummaries.length > 0" class="test">
+    <div *ngIf="recommendedExplorationSummaries.length > 0">
       <div class="conversation-skin-final-recommendations-header-container">
         <span *ngIf="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
               translate="I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE">
