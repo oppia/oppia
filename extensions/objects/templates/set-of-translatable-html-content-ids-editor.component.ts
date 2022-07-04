@@ -36,7 +36,6 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   @Input() value!: string[];
   @Output() valueChanged = new EventEmitter();
   choices!: Choice[];
-  viewUpdateConrol: boolean;
   selections!: boolean[];
   SCHEMA = {
     type: 'list',
