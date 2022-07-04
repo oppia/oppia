@@ -101,7 +101,8 @@ export class ContentTranslationManagerService {
    */
   displayTranslations(languageCode: string): void {
     if (languageCode === this.explorationLanguageCode) {
-      this.playerTranscriptService.restoreImmutably(this.originalTranscript);
+      this.playerTranscriptService.restoreImmutably(
+        cloneDeep(this.originalTranscript));
     } else if (
       !this.languageCodeToEntityTranslations.hasOwnProperty(languageCode)) {
       this.fetchAndDisplayTranslations(languageCode);

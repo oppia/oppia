@@ -283,6 +283,9 @@ URLS = [
         r'%s/<opportunity_type>' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
         contributor_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
+        r'/preferredtranslationlanguage',
+        contributor_dashboard.TranslationPreferenceHandler),
+    get_redirect_route(
         r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
         contributor_dashboard.ReviewableOpportunitiesHandler),
     get_redirect_route(
@@ -534,11 +537,20 @@ URLS = [
         '/explorehandler/solution_hit_event/<exploration_id>',
         reader.SolutionHitEventHandler),
     get_redirect_route(
+        '/sync_logged_out_and_logged_in_progress/<exploration_id>',
+        reader.SyncLoggedOutLearnerProgressHandler),
+    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
         r'/explorehandler/state_complete_event/<exploration_id>',
         reader.StateCompleteEventHandler),
+    get_redirect_route(
+        r'/explorehandler/checkpoint_reached_by_logged_out_user/<exploration_id>', # pylint: disable=line-too-long
+        reader.SaveTransientCheckpointProgressHandler),
+    get_redirect_route(
+        '/progress/<unique_progress_url_id>',
+        reader.TransientCheckpointUrlPage),
     get_redirect_route(
         r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
         reader.LeaveForRefresherExpEventHandler),

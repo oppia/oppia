@@ -200,6 +200,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': self.user_1_id,
         }
         new_user_data_dict = {
@@ -209,6 +210,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -584,7 +586,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
 
@@ -4386,6 +4388,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': self.user_1_id,
         }
         new_user_data_dict = {
@@ -4395,6 +4398,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -4699,6 +4703,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': self.user_1_id,
         }
         new_user_data_dict = {
@@ -4708,6 +4713,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
+            'preferred_translation_language_code': None,
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -5424,3 +5430,82 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])
+
+
+class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
+    """Provides testing of the deletion part of wipeout service."""
+
+    USER_1_EMAIL = 'user1@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'user2@email.com'
+    USER_2_USERNAME = 'username2'
+    EXPLORATION_ID_0 = 'An_exploration_0_id'
+    EXPLORATION_ID_1 = 'An_exploration_1_id'
+    EXPLORATION_ID_2 = 'An_exploration_2_id'
+    VERSION_1 = 1
+    VERSION_2 = 2
+    VERSION_3 = 3
+
+    def setUp(self):
+        super(WipeoutServiceDeleteVersionHistoryModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.version_history_model_class = (
+            exp_models.ExplorationVersionHistoryModel)
+        self.save_new_valid_exploration(self.EXPLORATION_ID_0, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_0)
+        self.save_new_valid_exploration(self.EXPLORATION_ID_1, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_1)
+        self.save_new_valid_exploration(self.EXPLORATION_ID_2, self.user_2_id)
+        self.publish_exploration(self.user_2_id, self.EXPLORATION_ID_2)
+
+    def test_one_version_history_model_is_pseudonymized(self):
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+
+        pseudonymizable_user_id_mapping = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.exploration.value])
+        pseudonymized_id = pseudonymizable_user_id_mapping[
+            self.EXPLORATION_ID_2]
+        pseudonymized_model = exp_models.ExplorationVersionHistoryModel.get(
+            self.version_history_model_class.get_instance_id(
+                self.EXPLORATION_ID_2, self.VERSION_1))
+
+        self.assertNotIn(
+            self.user_2_id, pseudonymized_model.committer_ids)
+        self.assertIn(
+            pseudonymized_id, pseudonymized_model.committer_ids)
+
+    def test_multiple_version_history_models_are_pseudonymized(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        pseudonymizable_user_id_mapping = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id).pseudonymizable_entity_mappings[
+                  models.NAMES.exploration.value])
+        version_history_ids = [
+            self.version_history_model_class.get_instance_id(
+                self.EXPLORATION_ID_0, self.VERSION_1),
+            self.version_history_model_class.get_instance_id(
+                self.EXPLORATION_ID_1, self.VERSION_1)
+        ]
+        pseudonymized_models = (
+            exp_models.ExplorationVersionHistoryModel.get_multi(
+                version_history_ids))
+
+        for model in pseudonymized_models:
+            pseudonymized_id = pseudonymizable_user_id_mapping[
+                model.exploration_id]
+            self.assertNotIn(
+                self.user_1_id, model.committer_ids)
+            self.assertIn(
+                pseudonymized_id, model.committer_ids)

@@ -73,7 +73,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, List, Optional # isort: skip
+from typing import Any, Dict, List, Mapping, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -1356,6 +1356,34 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
+    # Here we used Mapping[str, Any] because, in Oppia codebase TypedDict is
+    # used to define strict dictionaries and those strict dictionaries are not
+    # compatible with Dict[str, Any] type because of the invariant property of
+    # Dict type. Also, here value of Mapping is annotated as Any because this
+    # method can accept any kind of dictionaries for testing purposes. So, to
+    # make this method generalized for all test cases, we used Any here.
+    def assertDictEqual(
+        self,
+        dict_one: Mapping[str, Any],
+        dict_two: Mapping[str, Any],
+        msg: Optional[str] = None
+    ) -> None:
+        """Checks whether the given two dictionaries are populated with same
+        key-value pairs or not. If any difference occurred then the Assertion
+        error is raised.
+
+        Args:
+            dict_one: Mapping[Any, Any]. A dictionary which we have to check
+                against.
+            dict_two: Mapping[Any, Any]. A dictionary which we have to check
+                for.
+            msg: Optional[str]. Message displayed when test fails.
+
+        Raises:
+            AssertionError. When dictionaries doesn't match.
+        """
+        super(TestBase, self).assertDictEqual(dict_one, dict_two, msg=msg)
+
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
         """Compares unordered sequences if they contain the same elements,
         regardless of order. If the same element occurs more than once,
@@ -2163,7 +2191,7 @@ title: Title
         # because those are always valid auth IDs.
         return str(abs(hash(email)))
 
-    def get_all_python_files(self):
+    def get_all_python_files(self) -> List[str]:
         """Recursively collects all Python files in the core/ and extensions/
         directory.
 

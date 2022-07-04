@@ -34,6 +34,9 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+from typing import Dict, List, Union
+from typing_extensions import TypedDict
+
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -1559,10 +1562,19 @@ class Outcome(translation_domain.BaseTranslatableObject):
         return outcome_dict
 
 
+class VoiceoverDict(TypedDict):
+    """Dictionary representing the Voiceover object."""
+
+    filename: str
+    file_size_bytes: int
+    needs_update: bool
+    duration_secs: float
+
+
 class Voiceover:
     """Value object representing an voiceover."""
 
-    def to_dict(self):
+    def to_dict(self) -> VoiceoverDict:
         """Returns a dict representing this Voiceover domain object.
 
         Returns:
@@ -1592,7 +1604,13 @@ class Voiceover:
             voiceover_dict['needs_update'],
             voiceover_dict['duration_secs'])
 
-    def __init__(self, filename, file_size_bytes, needs_update, duration_secs):
+    def __init__(
+        self,
+        filename: str,
+        file_size_bytes: int,
+        needs_update: bool,
+        duration_secs: float
+    ) -> None:
         """Initializes a Voiceover domain object.
 
         Args:
@@ -1667,7 +1685,9 @@ class RecordedVoiceovers:
     through their content_id.
     """
 
-    def __init__(self, voiceovers_mapping):
+    def __init__(
+        self, voiceovers_mapping: Dict[str, Dict[str, Voiceover]]
+    ) -> None:
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
@@ -1677,7 +1697,7 @@ class RecordedVoiceovers:
         """
         self.voiceovers_mapping = voiceovers_mapping
 
-    def to_dict(self):
+    def to_dict(self) -> RecordedVoiceoversDict:
         """Returns a dict representing this RecordedVoiceovers domain object.
 
         Returns:
@@ -1698,7 +1718,9 @@ class RecordedVoiceovers:
         return recorded_voiceovers_dict
 
     @classmethod
-    def from_dict(cls, recorded_voiceovers_dict):
+    def from_dict(
+        cls, recorded_voiceovers_dict: RecordedVoiceoversDict
+    ) -> RecordedVoiceovers:
         """Return a RecordedVoiceovers domain object from a dict.
 
         Args:
@@ -2055,10 +2077,21 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         return rule_spec_dict
 
 
+class SubtitledHtmlDict(TypedDict):
+    """Dictionary representing the SubtitledHtml object."""
+
+    content_id: str
+    html: str
+
+
 class SubtitledHtml:
     """Value object representing subtitled HTML."""
 
-    def __init__(self, content_id, html):
+    def __init__(
+        self,
+        content_id: str,
+        html: str
+    ) -> None:
         """Initializes a SubtitledHtml domain object. Note that initializing
         the SubtitledHtml object does not clean the html. This is because we
         sometimes need to initialize SubtitledHtml and migrate the contained
@@ -2079,7 +2112,7 @@ class SubtitledHtml:
         self.content_id = content_id
         self.html = html
 
-    def to_dict(self):
+    def to_dict(self) -> SubtitledHtmlDict:
         """Returns a dict representing this SubtitledHtml domain object.
 
         Returns:
@@ -2091,7 +2124,7 @@ class SubtitledHtml:
         }
 
     @classmethod
-    def from_dict(cls, subtitled_html_dict):
+    def from_dict(cls, subtitled_html_dict: SubtitledHtmlDict) -> SubtitledHtml:
         """Return a SubtitledHtml domain object from a dict.
 
         Args:
