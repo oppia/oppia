@@ -26,8 +26,6 @@ from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -35,6 +33,7 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
+from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -45,7 +44,8 @@ if MYPY: # pragma: no cover
     [models.NAMES.exploration, models.NAMES.opportunity])
 
 
-class MigrateExplorationJobTests(job_test_utils.JobTestBase):
+class MigrateExplorationJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase):
 
     JOB_CLASS = exp_migration_jobs.MigrateExplorationJob
 
@@ -162,17 +162,6 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                1, topic_id))
-        subtopic_page_services.save_subtopic_page(
-            feconf.SYSTEM_COMMITTER_ID, subtopic_page, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 1,
-                'title': 'Sample'
-            })]
-        )
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
 
