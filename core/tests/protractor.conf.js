@@ -398,6 +398,9 @@ exports.config = {
       displaySpecDuration: true
     }));
 
+    // If the tests are running in debug mode, '--inspect-brk' is inserted
+    // as the 2nd argument and the mobile viewport information is passed as
+    // the 8th argument, else it is passed as the 7th argument.
     mobileViewportArg = (args[1] == '--inspect-brk') ? args[7] : args[6];
     
     if(mobileViewportArg == '--params.mobile=False'){
