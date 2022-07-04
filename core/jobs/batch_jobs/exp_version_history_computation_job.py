@@ -429,6 +429,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             current_version: int. The version number for which we want to
                 create the version history model.
         """
+        # If the model does not exist, create it with the data from the
+        # reverted model. Otherwise, just update the data of the already
+        # existing model with the data from the reverted model.
         if current_vh_model is None:
             current_vh_model = exp_models.ExplorationVersionHistoryModel(
                 id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
