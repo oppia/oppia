@@ -189,8 +189,7 @@
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/scripts/check_frontend_test_coverage*.py @oppia/automated-qa-reviewers
+/scripts/check_frontend_test_coverage*.py @oppia/automated-qa-reviewers @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
 /scripts/linters/ @oppia/dev-workflow-reviewers
@@ -255,11 +254,10 @@
 
 
 # Google-app-engine configurations
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/app_dev.yaml @vojtechjelinek
-/cron.yaml @vojtechjelinek
-/index.yaml @vojtechjelinek
-/queue.yaml @vojtechjelinek
+/app_dev.yaml @nithusha21 @vojtechjelinek
+/cron.yaml @nithusha21 @vojtechjelinek
+/index.yaml @nithusha21 @vojtechjelinek
+/queue.yaml @nithusha21 @vojtechjelinek
 
 
 # Global components and filters.
@@ -395,13 +393,12 @@
 
 
 # Navigation bar project.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/templates/components/button-directives/create-activity-button.component.ts @oppia/lace-frontend-reviewers
-/core/templates/components/button-directives/create-activity-button.component.html @oppia/lace-frontend-reviewers
-/core/templates/components/common-layout-directives/navigation-bars/ @oppia/lace-frontend-reviewers
-/core/templates/services/bottom-navbar-status.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/navigation.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/sidebar-status.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/button-directives/create-activity-button.component.ts @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.html @nithusha21
+/core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
+/core/templates/services/bottom-navbar-status.service*.ts @nithusha21
+/core/templates/services/navigation.service*.ts @nithusha21
+/core/templates/services/sidebar-status.service*.ts @nithusha21
 
 
 # New structures team.
@@ -489,16 +486,12 @@
 /core/domain/beam_job*.py @oppia/data-and-stability-reviewers
 
 # Infrastructure.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/controllers/cron*.py @vojtechjelinek
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/domain/cron_services*.py @vojtechjelinek
+/core/controllers/cron*.py @nithusha21
+/core/domain/cron_services*.py @nithusha21
 /main*.py @oppia/data-and-stability-reviewers
 /core/feconf.py @oppia/data-and-stability-reviewers @seanlip
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/constants*.py @vojtechjelinek
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/assets/constants.ts @vojtechjelinek
+/core/constants*.py @nithusha21
+/assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @oppia/lace-backend-reviewers
 /core/domain/email*.py @oppia/lace-backend-reviewers
 /core/domain/image_service*.py @oppia/lace-backend-reviewers
@@ -507,10 +500,8 @@
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/templates/pages/interaction-specs.constants.ajs.ts @oppia/interaction-and-rte-reviewers
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/templates/pages/interaction-specs.constants.ts @oppia/interaction-and-rte-reviewers
+/core/templates/pages/interaction-specs.constants.ajs.ts @nithusha21
+/core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @vojtechjelinek
 /core/templates/pages/logout-page/ @vojtechjelinek
 /core/templates/app-events/ @srijanreddy98
@@ -519,26 +510,23 @@
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/interaction-and-rte-reviewers
 /core/templates/services/interaction-specs.service*.ts @oppia/interaction-and-rte-reviewers
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/templates/services/translation-file-hash-loader-backend-api.service.ts @srijanreddy98
+/core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
 /redis.conf @seanlip @vojtechjelinek
 /.firebase.json @seanlip @vojtechjelinek
 
 
 # Miscellaneous.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01, line 527-530
 /__init__.py @vojtechjelinek
 /core/__init__.py @vojtechjelinek
 /core/controllers/__init__.py @vojtechjelinek
 /core/domain/__init__.py @vojtechjelinek
 /core/domain/config*.py @oppia/lace-backend-reviewers
 /core/domain/change_domain.py @oppia/lace-backend-reviewers
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/templates/tests/ @oppia/automated-qa-reviewers
-/core/templates/domain/utilities/ @oppia/lace-frontend-reviewers
-/core/templates/Polyfills.ts @srijanreddy98
-/extensions/extensions.module.ts @vojtechjelinek
-/core/schema_utils*.py @oppia/data-and-stability-reviewers
+/core/templates/tests/ @nithusha21
+/core/templates/domain/utilities/ @nithusha21
+/core/templates/Polyfills.ts @srijanreddy98 @nithusha21
+/extensions/extensions.module.ts @nithusha21
+/core/schema_utils*.py @nithusha21
 /core/utils*.py @oppia/lace-backend-reviewers
 
 
@@ -564,12 +552,11 @@
 
 
 # Release team.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/.gcloudignore @ankita240796 @vojtechjelinek
-/core/controllers/release_coordinator*.py @ankita240796 @vojtechjelinek
-/core/templates/pages/release-coordinator-page/ @ankita240796 @vojtechjelinek
-/scripts/release_scripts/ @ankita240796 @vojtechjelinek
-/assets/release_constants.json @ankita240796 @vojtechjelinek
+/.gcloudignore @nithusha21 @vojtechjelinek
+/core/controllers/release_coordinator*.py @nithusha21 @vojtechjelinek
+/core/templates/pages/release-coordinator-page/ @nithusha21 @vojtechjelinek
+/scripts/release_scripts/ @nithusha21 @vojtechjelinek
+/assets/release_constants.json @nithusha21 @vojtechjelinek
 
 
 # Rich text editor team.
@@ -600,23 +587,21 @@
 
 # Suggestion and feedback team.
 # Suggestion project.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/controllers/suggestion*.py @oppia/contributor-experience-team
-/core/domain/suggestion*.py @oppia/contributor-experience-team
-/core/templates/domain/suggestion/ @oppia/contributor-experience-team
-/core/templates/services/suggestion-modal.service*.ts @oppia/contributor-experience-team
-/core/templates/services/suggestions.service*.ts @oppia/contributor-experience-team
+/core/controllers/suggestion*.py @nithusha21
+/core/domain/suggestion*.py @nithusha21
+/core/templates/domain/suggestion/ @nithusha21
+/core/templates/services/suggestion-modal.service*.ts @nithusha21
+/core/templates/services/suggestions.service*.ts @nithusha21
 
 
 # Feedback project.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
-/core/controllers/feedback*.py @oppia/contributor-experience-team
-/core/domain/feedback*.py @oppia/contributor-experience-team
-/core/templates/components/ratings/rating-display/rating-display.component.html @oppia/contributor-experience-team
-/core/templates/components/ratings/ @oppia/contributor-experience-team
-/core/templates/domain/feedback_message/ @oppia/contributor-experience-team
-/core/templates/domain/feedback_thread/ @oppia/contributor-experience-team
-/core/templates/pages/exploration-editor-page/feedback-tab/ @oppia/contributor-experience-team
+/core/controllers/feedback*.py @nithusha21
+/core/domain/feedback*.py @nithusha21
+/core/templates/components/ratings/rating-display/rating-display.component.html @nithusha21
+/core/templates/components/ratings/ @nithusha21
+/core/templates/domain/feedback_message/ @nithusha21
+/core/templates/domain/feedback_thread/ @nithusha21
+/core/templates/pages/exploration-editor-page/feedback-tab/ @nithusha21
 
 
 # Simple pages.
@@ -642,19 +627,18 @@
 
 
 # Speed Improvement team.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01
 /core/templates/google-analytics.initializer.ts @vojtechjelinek
-/core/templates/base-components/ @vojtechjelinek
-/core/templates/pages/Base.ts @vojtechjelinek
-/core/templates/pages/footer_js_libs.html @vojtechjelinek
-/core/templates/pages/header_css_libs.html @vojtechjelinek
-/core/templates/pages/header_js_libs.html @vojtechjelinek
-/core/templates/services/csrf-token.service*.ts @vojtechjelinek
-/core/templates/third-party-imports/ @vojtechjelinek
+/core/templates/base-components/ @nithusha21
+/core/templates/pages/Base.ts @nithusha21
+/core/templates/pages/footer_js_libs.html @nithusha21
+/core/templates/pages/header_css_libs.html @nithusha21
+/core/templates/pages/header_js_libs.html @nithusha21
+/core/templates/services/csrf-token.service*.ts @nithusha21
+/core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
 /.lighthouserc*.js @jimbyo @vojtechjelinek
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
 /scripts/run_lighthouse_tests.py @vojtechjelinek
-/webpack.*.ts @vojtechjelinek
+/webpack.*.ts @nithusha21 @vojtechjelinek
 
 
 # User Data Takeout.
@@ -704,10 +688,9 @@
 
 
 # QA team.
-# TODO(#15381): Add @nithusha21 as owner after 2022-05-01, lines 706-708
-/core/tests/ @oppia/automated-qa-reviewers
-/assets/ @kevintab95
-/data/ @oppia/automated-qa-reviewers
+/core/tests/ @nithusha21
+/assets/ @nithusha21
+/data/ @nithusha21
 /core/templates/karma.module.ts @vojtechjelinek
 /core/tests/protractor_utils/ @oppia/automated-qa-reviewers
 /core/tests/protractor_desktop/ @oppia/automated-qa-reviewers
