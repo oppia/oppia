@@ -500,7 +500,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self.transient_checkpoint_url.exploration_id = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'Expected exploration_id to be a str'):
+            'Expected exploration_id to be a str'
+        ):
             self.transient_checkpoint_url.validate()
 
     def test_furthest_reached_checkpoint_state_name_incorrect_type(
@@ -509,7 +510,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self.transient_checkpoint_url.furthest_reached_checkpoint_state_name = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'Expected furthest_reached_checkpoint_state_name to be a str'):
+            'Expected furthest_reached_checkpoint_state_name to be a str'
+        ):
             self.transient_checkpoint_url.validate()
 
     def test_furthest_reached_checkpoint_exp_version_incorrect_type(
@@ -518,7 +520,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self.transient_checkpoint_url.furthest_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'Expected furthest_reached_checkpoint_exp_version to be an int'):
+            'Expected furthest_reached_checkpoint_exp_version to be an int'
+        ):
             self.transient_checkpoint_url.validate()
 
     def test_most_recently_reached_checkpoint_state_name_incorrect_type(
@@ -527,7 +530,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self.transient_checkpoint_url.most_recently_reached_checkpoint_state_name = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'Expected most_recently_reached_checkpoint_state_name to be a str'):
+            'Expected most_recently_reached_checkpoint_state_name to be a str'
+        ):
             self.transient_checkpoint_url.validate()
 
     def test_most_recently_reached_checkpoint_exp_version_incorrect_type(
@@ -537,7 +541,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected most_recently_reached_checkpoint_exp_version to be an int'
-            ):
+        ):
             self.transient_checkpoint_url.validate()
 
 
