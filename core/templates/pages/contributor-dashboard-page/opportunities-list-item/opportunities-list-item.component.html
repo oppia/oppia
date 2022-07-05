@@ -235,7 +235,7 @@
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span class="protractor-test-opportunity-list-item-heading" 
+      <span class="protractor-test-opportunity-list-item-heading"
             title="{{ opportunity?.heading }}"
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
@@ -444,7 +444,8 @@
     -o-animation: fadein 0.5s linear 1 normal forwards; /* Opera < 12.1 */
     animation: fadein 0.5s linear 1 normal forwards;
   }
-
+  /* This breakpoint must be the same value as the one specified in */
+  /* constants.CONTRIBUTOR_DASHBOARD_MOBILE_BREAKPOINT. */
   @media only screen and (max-width: 700px) {
     .oppia-opportunities-button {
       font-size: 18px;

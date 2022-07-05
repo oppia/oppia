@@ -55,7 +55,6 @@ export class OpportunitiesListItemComponent {
 
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
-
   @Input() showOpportunityButton: boolean = true;
 
   labelText!: string;
@@ -66,6 +65,7 @@ export class OpportunitiesListItemComponent {
   inReviewProgressStyle!: { width: string };
   untranslatedProgressStyle!: { width: string };
   targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
+  mobileBreakpoint: number = constants.CONTRIBUTOR_DASHBOARD_MOBILE_BREAKPOINT;
   cardsAvailable: number = 0;
   onMobile!: boolean;
   resizeSubscription!: Subscription;
@@ -79,10 +79,12 @@ export class OpportunitiesListItemComponent {
   opportunityButtonDisabled: boolean = false;
 
   ngOnInit(): void {
-    this.onMobile = this.windowDimensionsService.getWidth() <= 700;
+    this.onMobile = (
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
       .subscribe(event => {
-        this.onMobile = this.windowDimensionsService.getWidth() <= 700;
+        this.onMobile = (
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
       });
 
     if (this.opportunity && this.labelRequired) {
