@@ -23,6 +23,7 @@ var action = require('./action.js');
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
+  var activityCreationModal = $('.e2e-test-creation-modal');
   var averageRating = $('.e2e-test-oppia-average-rating');
   var collectionCard = $('.e2e-test-collection-card');
   var collectionEditorContainer = $(
@@ -34,19 +35,16 @@ var CreatorDashboardPage = function() {
   var explorationDashboardCard = $('.e2e-test-exploration-dashboard-card');
   var explorationFeedbackCount = $('.e2e-test-exp-summary-tile-open-feedback');
   var listViewButton = $('.e2e-test-oppia-list-view-btn');
-  var subscriptionTab = $('.e2e-test-subscription-tab');
-  var titleMaskLocator = '.e2e-test-title-mask';
-  var activityCreationModal = $('.e2e-test-creation-modal');
   // Dashboard stat elements.
   var openFeedbacks = $('.e2e-test-oppia-open-feedback');
+  var subscriptionTab = $('.e2e-test-subscription-tab');
   var subscribers = $('.e2e-test-oppia-total-subscribers');
   var totalPlays = $('.e2e-test-oppia-total-plays');
 
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    var allExplorationCards = $$(
-      '.e2e-test-exploration-dashboard-card');
+    var allExplorationCards = $$('.e2e-test-exploration-dashboard-card');
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
       // Tile text contains title, possibly followed by newline and text.
@@ -112,7 +110,7 @@ var CreatorDashboardPage = function() {
       throw new Error(
         'Could not find exploration tile with name ' + explorationTitle);
     }
-    var explorationElement = elems[0].$(titleMaskLocator);
+    var explorationElement = elems[0].$('.e2e-test-title-mask');
     await action.click('Exploration Element', explorationElement);
     await waitFor.pageToFullyLoad();
   };
