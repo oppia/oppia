@@ -41,6 +41,7 @@ export class OutcomeEditorComponent implements OnInit {
   EventEmitter<string[]> = new EventEmitter();
 
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveDestIfStuck: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
   directiveSubscriptions = new Subscription();
@@ -48,6 +49,7 @@ export class OutcomeEditorComponent implements OnInit {
   canAddPrerequisiteSkill: boolean;
   correctnessLabelEditorIsOpen: boolean;
   destinationEditorIsOpen: boolean;
+  destinationIfStuckEditorIsOpen: boolean;
   feedbackEditorIsOpen: boolean;
   savedOutcome: Outcome;
 
@@ -96,6 +98,10 @@ export class OutcomeEditorComponent implements OnInit {
         this.cancelThisDestinationEdit();
       }
     }
+
+    if (this.destinationIfStuckEditorIsOpen) {
+      this.saveThisDestination();
+    }
   }
 
   isFeedbackLengthExceeded(): boolean {
@@ -143,6 +149,12 @@ export class OutcomeEditorComponent implements OnInit {
     }
   }
 
+  openDestinationIfStuckEditor(): void {
+    if (this.isEditable) {
+      this.destinationIfStuckEditorIsOpen = true;
+    }
+  }
+
   saveThisFeedback(fromClickSaveFeedbackButton: boolean): void {
     this.feedbackEditorIsOpen = false;
     let contentHasChanged = (
@@ -184,6 +196,13 @@ export class OutcomeEditorComponent implements OnInit {
     this.saveDest.emit(this.savedOutcome);
   }
 
+  saveThisIfStuckDestination(): void {
+    this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
+    this.destinationIfStuckEditorIsOpen = false;
+    this.savedOutcome.destIfReallyStuck = cloneDeep(this.outcome.destIfReallyStuck);
+    this.saveDest.emit(this.savedOutcome);
+  }
+
   onChangeCorrectnessLabel(): void {
     this.savedOutcome.labelledAsCorrect = (
       this.outcome.labelledAsCorrect);
@@ -203,6 +222,12 @@ export class OutcomeEditorComponent implements OnInit {
       this.savedOutcome.refresherExplorationId);
     this.outcome.missingPrerequisiteSkillId =
       this.savedOutcome.missingPrerequisiteSkillId;
+    this.destinationEditorIsOpen = false;
+  }
+
+  cancelThisIfStuckDestinationEdit(): void {
+    this.outcome.destIfReallyStuck = (
+      cloneDeep(this.savedOutcome.destIfReallyStuck));
     this.destinationEditorIsOpen = false;
   }
 

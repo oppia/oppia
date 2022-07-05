@@ -153,15 +153,42 @@
   </div>
 </div>
 
-<div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
+<br *ngIf="displayFeedback">
+
+<div *ngIf="!destinationIfStuckEditorIsOpen && !isInQuestionMode()"
+     class="h-100"
+     title="{{ isEditable ? 'Change the if stuck destination card' : '' }}">
+  <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-if-stuck-button"
+       [ngClass]="{'oppia-editable-section': isEditable}">
+    <div class="oppia-rule-preview oppia-transition-200">
+      <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-if-stuck-editor"
+           *ngIf="isEditable" (click)="openDestinationIfStuckEditor()">
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
+           title="Edit If Stuck Destination">&#xE254;
+        </i>
+      </div>
+
+      <div>
+        <strong *ngIf="displayFeedback">And afterwards, directs the stuck learner
+        to...</strong>
+        <strong *ngIf="!displayFeedback">Oppia directs the stuck learner to...</strong>
+        <span *ngIf="outcome" class="position-relative">
+          {{ outcome.destIfReallyStuck }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isEditable && destinationIfStuckEditorIsOpen && !isInQuestionMode()">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest-if-stuck"
         name="editOutcomeForm.editDestIfStuckForm"
         (submit)="saveThisIfStuckDestination()">
-    <oppia-outcome-destination-editor [outcome]="outcome"
+    <oppia-outcome-if-stuck-destination-editor [outcome]="outcome"
                                       [outcomeHasFeedback]="displayFeedback"
                                       (addState)="addState($event)">
-    </oppia-outcome-destination-editor>
+    </oppia-outcome-if-stuck-destination-editor>
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">
@@ -173,7 +200,6 @@
       </button>
       <button type="button"
               class="btn btn-success protractor-test-save-outcome-dest-if-stuck"
-              [disabled]="invalidStateAfterIfStuckDestinationSave()"
               (click)="saveThisIfStuckDestination()">
         Save Destination
       </button>
