@@ -137,6 +137,7 @@ import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selec
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { AnswerGroupEditor } from './state-directives/answer-group-editor/answer-group-editor.component';
 import { StateResponsesComponent } from './state-editor/state-responses-editor/state-responses.component';
+import { StateEditorComponent } from './state-editor/state-editor.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -300,7 +301,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
-    StateResponsesComponent
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 
   entryComponents: [
@@ -407,7 +409,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
-    StateResponsesComponent
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 
   exports: [
@@ -523,7 +526,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
-    StateResponsesComponent
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 })
 
