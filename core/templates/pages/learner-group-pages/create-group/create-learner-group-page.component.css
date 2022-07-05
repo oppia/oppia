@@ -42,7 +42,7 @@
 .oppia-create-learner-group-progress {
   margin: auto;
   margin-top: 40px;
-  width: 1120px;
+  max-width: 1120px;
   margin-left: -40px;
 }
 
@@ -112,12 +112,14 @@
   color: #27635C;
 }
 
-.cdt-step-progressbar li.finished .indicator {
+.cdt-step-progressbar li.completed .indicator {
   background-color: #27635C;
+  border-color: #27635C;
   color: #fff;
 }
 
-.cdt-step-progressbar li.active .title {
+.cdt-step-progressbar li.active .title,
+.cdt-step-progressbar li.completed .title {
   color: #27635C;
 }
 
@@ -128,4 +130,81 @@
   min-height: 440px;
   margin-top: -30px;
   padding: 32px 30px 30px 40px;
+  position: relative;
+}
+
+.oppia-create-learner-group-tab-container .required-field {
+  color: #C55F45;
+}
+
+.oppia-create-learner-group-tab-container .form-group {
+  display: grid;
+  grid-gap: 10px;
+}
+
+.oppia-learner-group-details {
+  display: grid;
+  grid-gap: 40px;
+}
+
+.oppia-learner-group-details .oppia-long-text textarea {
+  resize: none;
+}
+
+.oppia-next-section-button {
+  position: absolute;
+  right: 30px;
+  bottom: 30px;
+  cursor: pointer;
+  padding: 6px 28px;
+  background: #D9D9D9;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.oppia-next-section-button.active {
+  background: #00645C;
+  color: #fff;
+  pointer-events: auto;
+}
+
+/**
+ * The following style rules are for the learner group add syllabus section.
+ */
+.learner-group-syllabus-filters-title {
+  font-size: 18px;
+  margin-top: 30px;
+  margin-bottom: 5px;
+}
+
+.add-learner-group-syllabus-desc-text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.9;
+  color: #00645C;
+}
+
+.search-bar-float-left {
+  margin-top: 10px;
+  border: 0.5px solid #bdbdbc
+}
+
+.oppia-add-learner-group-syllabus .form-group {
+  margin-bottom: 0;
+}
+
+.oppia-search-bar-icon {
+  padding: 5px;
+}
+
+.oppia-same-row-container.oppia-search-box-container {
+  width: 49%;
+}
+
+.oppia-same-row-container {
+  width: 17%;
+}
+
+.oppia-search-bar-dropdown-toggle {
+  width: 100%;
 }

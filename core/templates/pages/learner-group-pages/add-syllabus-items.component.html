@@ -1,0 +1,143 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css" as="style">
+
+<div class="oppia-add-learner-group-syllabus">
+  <div class="add-learner-group-syllabus-desc-text">
+    Add skills or stories to your syllabus to automatically send them to your students.
+  </div>
+  <div class="learner-group-syllabus-filters-title">
+    Search by keyword, topic, language, or skill name
+  </div>
+  <div class="learner-group-syllabus-filters-container">
+    <div class="oppia-same-row-container oppia-search-box-container">
+      <form class="search-bar-float-left oppia-search-bar-form" role="search">
+        <div class="form-group">
+          <div class="input-group oppia-input-group">
+            <div class="input-group-addon oppia-search-bar-icon">
+              <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
+              <span *ngIf="isSearchInProgress()">
+                <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+              </span>
+            </div>
+            <input type="text"
+                   class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
+                   [placeholder]="searchBarPlaceholder"
+                   [(ngModel)]="searchQuery"
+                   (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
+                   [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+                   aria-label="Search bar"
+                   (keydown.enter)="$event.target.blur()"
+                   (input)="searchToBeExec($event)">
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="oppia-same-row-container">
+      <div [ngClass]="{'open' : activeMenuName === 'type', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
+        <button ngbDropdownToggle
+                (click)="openSubmenu($event, 'type')"
+                (keydown)="onMenuKeypress($event, 'type', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+                type="button"
+                class="btn oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-type-input dropdown-toggle"
+                title="{{ selectionDetails.types.description | translate }}">
+          <i *ngIf="isMobileViewActive()" class="material-icons md-18 type-selector-icon">&#xE574;</i>
+          {{ typeButtonText | truncate:14 }}
+        </button>
+        <ul ngbDropdownMenu
+            class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+            role="menu">
+          <ng-container *ngFor="let item of selectionDetails.types.masterList; trackBy: index">
+            <li ngbDropdownItem>
+              <a (click)="toggleSelection('types', item.id)" *ngIf="!first && !last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('types', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'type', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('types', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'type', {tab: ACTION_CLOSE})"
+                 class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="oppia-same-row-container">
+      <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-search-bar-category-selector dropdown" autoClose="outside">
+        <button ngbDropdownToggle
+                (click)="openSubmenu($event, 'category')"
+                (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+                type="button"
+                class="btn oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
+                title="{{ selectionDetails.categories.description | translate }}">
+          <i *ngIf="isMobileViewActive()" class="material-icons md-18 category-selector-icon">&#xE574;</i>
+          {{ categoryButtonText | truncate:14 }}
+        </button>
+        <ul ngbDropdownMenu
+            class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+            role="menu">
+          <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
+            <li ngbDropdownItem>
+              <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('categories', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
+                 class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="oppia-same-row-container">
+      <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="search-bar-float-left oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
+        <button ngbDropdownToggle
+                (click)="openSubmenu($event, 'language')"
+                (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+                type="button"
+                class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle"
+                title="{{selectionDetails.languageCodes.description | translate}}">
+          <i *ngIf="isMobileViewActive()" class="material-icons md-18 language-selector-icon">&#xe8e2;</i>
+          {{ languageButtonText | truncate:14 }}
+        </button>
+        <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+            role="menu">
+          <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList trackBy: index">
+            <li ngbDropdownItem>
+              <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
+                 class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>    
+  </div>
+</div>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css">

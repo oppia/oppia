@@ -16,7 +16,7 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
- import { Component, OnDestroy, OnInit } from '@angular/core';
+ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
  import { downgradeComponent } from '@angular/upgrade/static';
  import { TranslateService } from '@ngx-translate/core';
  import { Subscription } from 'rxjs';
@@ -32,61 +32,70 @@
  import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
  import { LoaderService } from 'services/loader.service';
  import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
  
- @Component({
-   selector: 'oppia-learner-group-details',
-   templateUrl: './learner-group-details.component.html',
-   styleUrls: []
- })
- export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
-   directiveSubscriptions = new Subscription();
- 
-   constructor(
-     private alertsService: AlertsService,
-     private contextService: ContextService,
-     private i18nLanguageCodeService: I18nLanguageCodeService,
-     private loaderService: LoaderService,
-     private pageTitleService: PageTitleService,
-     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
-     private urlService: UrlService,
-     private windowDimensionsService: WindowDimensionsService,
-     private translateService: TranslateService
-   ) {}
- 
-   checkMobileView(): boolean {
-     return (this.windowDimensionsService.getWidth() < 500);
-   }
- 
-   isLanguageRTL(): boolean {
-     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-   }
- 
-   subscribeToOnLangChange(): void {
-     this.directiveSubscriptions.add(
-       this.translateService.onLangChange.subscribe(() => {
-         this.setPageTitle();
-       })
-     );
-   }
- 
-   setPageTitle(): void {
-     let translatedTitle = this.translateService.instant(
-       'I18N_TOPNAV_TEACHER_DASHBOARD');
-     this.pageTitleService.setDocumentTitle(translatedTitle);
-   }
- 
-   ngOnInit(): void {
-     console.log('testing')
-     // this.loaderService.showLoadingScreen('Loading');
-   }
- 
-   ngOnDestroy(): void {
-     this.directiveSubscriptions.unsubscribe();
-     this.contextService.removeCustomEntityContext();
-   }
- }
- 
- angular.module('oppia').directive(
-   'oppiaCreateLearnerGroupPage',
-   downgradeComponent({component: CreateLearnerGroupPageComponent}));
- 
+@Component({
+  selector: 'oppia-learner-group-details',
+  templateUrl: './learner-group-details.component.html'
+})
+export class LearnerGroupDetailsComponent implements OnInit, OnDestroy {
+  @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
+  @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
+  learnerGroupTitle: string;
+  learnerGroupDescription: string;
+  directiveSubscriptions = new Subscription();
+
+  constructor(
+    private alertsService: AlertsService,
+    private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private loaderService: LoaderService,
+    private pageTitleService: PageTitleService,
+    private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
+    private urlService: UrlService,
+    private windowDimensionsService: WindowDimensionsService,
+    private translateService: TranslateService
+  ) {}
+
+  checkMobileView(): boolean {
+    return (this.windowDimensionsService.getWidth() < 500);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_TOPNAV_TEACHER_DASHBOARD');
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  ngOnInit(): void {
+    console.log('testing')
+    // this.loaderService.showLoadingScreen('Loading');
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+    this.contextService.removeCustomEntityContext();
+  }
+
+  updateLearnerGroupDetails(): void {
+    this.updateLearnerGroupTitle.emit(this.learnerGroupTitle);
+    this.updateLearnerGroupDesc.emit(this.learnerGroupDescription);
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaLearnerGroupDetails',
+  downgradeComponent({component: LearnerGroupDetailsComponent}));

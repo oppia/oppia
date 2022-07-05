@@ -1,0 +1,252 @@
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the subtopic viewer.
+ */
+
+ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+ import { downgradeComponent } from '@angular/upgrade/static';
+ import { TranslateService } from '@ngx-translate/core';
+ import { Subject, Subscription } from 'rxjs';
+ 
+ import { AppConstants } from 'app.constants';
+ import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+ import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
+ import { Subtopic } from 'domain/topic/subtopic.model';
+ import { AlertsService } from 'services/alerts.service';
+ import { ContextService } from 'services/context.service';
+ import { UrlService } from 'services/contextual/url.service';
+ import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+ import { LoaderService } from 'services/loader.service';
+ import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { LearnerGroupPagesConstants } from './learner-group-pages.constants';
+import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
+import { SearchService, SelectionDetails } from 'services/search.service';
+import { NavigationService } from 'services/navigation.service';
+import constants from 'assets/constants';
+import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+
+interface SearchDropDownItems {
+  id: string;
+  text: string;
+}
+ 
+@Component({
+  selector: 'oppia-add-syllabus-items',
+  templateUrl: './add-syllabus-items.component.html'
+})
+export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
+  @Output() updateLearnerGroupStories: EventEmitter<string[]> = new EventEmitter();
+  @Output() updateLearnerGroupSubtopics: EventEmitter<string[]> = new EventEmitter();
+  syllabusStoryIds: string[];
+  syllabusSubtopicPageIds: string[];
+  searchBarPlaceholder!: string;
+  categoryButtonText!: string;
+  languageButtonText!: string;
+  typeButtonText!: string;
+  ACTION_OPEN!: string;
+  ACTION_CLOSE!: string;
+  SUPPORTED_CONTENT_LANGUAGES!: LanguageIdAndText[];
+  SEARCH_DROPDOWN_TYPES!: SearchDropDownItems[];
+  selectionDetails;
+  SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownItems[];
+  KEYBOARD_EVENT_TO_KEY_CODES!: {};
+  directiveSubscriptions: Subscription = new Subscription();
+  classroomPageIsActive: boolean = false;
+  searchButtonIsActive: boolean = false;
+  searchQuery: string = '';
+  searchQueryChanged: Subject<string> = new Subject<string>();
+  translationData: Record<string, number> = {};
+  activeMenuName: string = '';
+
+  constructor(
+    private alertsService: AlertsService,
+    private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private loaderService: LoaderService,
+    private urlService: UrlService,
+    private windowDimensionsService: WindowDimensionsService,
+    private translateService: TranslateService,
+    private navigationService: NavigationService,
+    private languageUtilService: LanguageUtilService,
+    private constructTranslationIdsService: ConstructTranslationIdsService,
+    private searchService: SearchService
+  ) {}
+
+  checkMobileView(): boolean {
+    return (this.windowDimensionsService.getWidth() < 500);
+  }
+
+  isMobileViewActive(): boolean {
+    return this.windowDimensionsService.getWidth() <= 766;
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  ngOnInit(): void {
+    console.log('testing')
+    this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
+    this.KEYBOARD_EVENT_TO_KEY_CODES = (
+      this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES);
+    this.ACTION_OPEN = this.navigationService.ACTION_OPEN;
+    this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
+    this.SUPPORTED_CONTENT_LANGUAGES = (
+      this.languageUtilService.getLanguageIdsAndTexts());
+    this.SEARCH_DROPDOWN_TYPES = [
+      {
+        id: 'Skill',
+        text: 'Skill'
+      },
+      {
+        id: 'Story',
+        text: 'Story'
+      }
+    ]
+    this.selectionDetails = {
+      types: {
+        description: '',
+        itemsName: 'types',
+        masterList: this.SEARCH_DROPDOWN_TYPES,
+        selection: '',
+        summary: '',
+        default: 'Type'
+      },
+      categories: {
+        description: '',
+        itemsName: 'categories',
+        masterList: this.SEARCH_DROPDOWN_CATEGORIES,
+        selection: '',
+        summary: '',
+        default: 'Category'
+      },
+      languageCodes: {
+        description: '',
+        itemsName: 'languages',
+        masterList: this.SUPPORTED_CONTENT_LANGUAGES,
+        selection: '',
+        summary: '',
+        default: 'Language'
+      }
+    };
+    // this.loaderService.showLoadingScreen('Loading');
+    // Initialize the selection descriptions and summaries.
+    for (let itemsType in this.selectionDetails) {
+      this.updateSelectionDetails(itemsType);
+    }
+
+    this.refreshSearchBarLabels();
+
+    console.log(this.selectionDetails, "selection details");
+  }
+
+  // Update the description field of the relevant entry of selectionDetails.
+  updateSelectionDetails(itemsType: string): void {
+    let masterList = this.selectionDetails[itemsType].masterList;
+
+    let selectedItemText = '';
+    for (let i = 0; i < masterList.length; i++) {
+      if (this.selectionDetails[itemsType].selection === masterList[i].id) {
+        selectedItemText = masterList[i].text;
+      }
+    }
+
+    // TODO(milit): When the language changes, the translations won't
+    // change until the user changes the selection and this function is
+    // re-executed.
+    if (selectedItemText.length > 0) {
+      this.selectionDetails[itemsType].description = (
+        this.translateService.instant(selectedItemText));
+    } else {
+      this.selectionDetails[itemsType].description = (
+        this.selectionDetails[itemsType].default
+      );
+    }
+  }
+
+  isSearchInProgress(): boolean {
+    return this.searchService.isSearchInProgress();
+  }
+
+  searchDropdownCategories(): SearchDropDownItems[] {
+    return constants.SEARCH_DROPDOWN_CLASSROOMS.map((classroomName) => {
+      return {
+        id: classroomName,
+        text: this.constructTranslationIdsService.getClassroomTitleId(
+          classroomName)
+      };
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+    this.contextService.removeCustomEntityContext();
+  }
+
+  updateLearnerGroupSyllabus(): void {
+    this.updateLearnerGroupStories.emit(this.syllabusStoryIds);
+    this.updateLearnerGroupSubtopics.emit(this.syllabusSubtopicPageIds);
+  }
+
+  toggleSelection(itemsType: string, optionName: string): void {
+    let selection = this.selectionDetails[itemsType].selection;
+    if (selection !== optionName) {
+      this.selectionDetails[itemsType].selection = optionName;
+    } else {
+      this.selectionDetails[itemsType].selection = '';
+    }
+
+    this.updateSelectionDetails(itemsType);
+    this.refreshSearchBarLabels();
+  }
+
+  refreshSearchBarLabels(): void {
+    // If you translate these strings in the html, then you must use a
+    // filter because only the first 14 characters are displayed. That
+    // would generate FOUC for languages other than English. As an
+    // exception, we translate them here and update the translation
+    // every time the language is changed.
+    this.searchBarPlaceholder = this.translateService.instant(
+      'I18N_ADD_SYLLABUS_SEARCH_PLACEHOLDER');
+    // 'messageformat' is the interpolation method for plural forms.
+    // http://angular-translate.github.io/docs/#/guide/14_pluralization.
+    this.categoryButtonText = this.translateService.instant(
+      this.selectionDetails.categories.description,
+      {...this.translationData, messageFormat: true});
+    this.languageButtonText = this.translateService.instant(
+      this.selectionDetails.languageCodes.description,
+      {...this.translationData, messageFormat: true});
+    this.typeButtonText = this.translateService.instant(
+      this.selectionDetails.types.description,
+      {...this.translationData, messageFormat: true});
+  }
+
+  /**
+   * Opens the submenu.
+   * @param {KeyboardEvent} evt
+   * @param {String} menuName - name of menu, on which
+   * open/close action to be performed (category,language).
+   */
+   openSubmenu(evt: KeyboardEvent, menuName: string): void {
+    this.navigationService.openSubmenu(evt, menuName);
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaLearnerGroupDetails',
+  downgradeComponent({component: AddSyllabusItemsComponent}));

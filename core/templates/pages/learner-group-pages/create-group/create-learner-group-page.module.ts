@@ -28,6 +28,8 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { CreateLearnerGroupPageComponent } from
   './create-learner-group-page.component';
+import { LearnerGroupDetailsComponent } from
+  './learner-group-details.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
@@ -45,10 +47,14 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    CreateLearnerGroupPageComponent
+    CreateLearnerGroupPageComponent,
+    LearnerGroupDetailsComponent,
+    AddSyllabusItemsComponent
   ],
   entryComponents: [
-    CreateLearnerGroupPageComponent
+    CreateLearnerGroupPageComponent,
+    LearnerGroupDetailsComponent,
+    AddSyllabusItemsComponent
   ],
   providers: [
     {
@@ -84,6 +90,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { AddSyllabusItemsComponent } from '../add-syllabus-items.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

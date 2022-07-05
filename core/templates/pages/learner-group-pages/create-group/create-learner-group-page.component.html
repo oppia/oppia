@@ -7,22 +7,36 @@
   </div>
   <div class="oppia-create-learner-group-progress">
     <ul class="cdt-step-progressbar horizontal">
-      <li class="active">
+      <li [ngClass]="getProgressTabStatusClass(1)">
         <span class="indicator">1</span>
         <span class="title">Add Group Details</span>
       </li>
-      <li>
+      <li [ngClass]="getProgressTabStatusClass(2)">
         <span class="indicator">2</span>
         <span class="title">Add Syllabus Items</span>
       </li>
-      <li>
+      <li [ngClass]="getProgressTabStatusClass(3)">
         <span class="indicator">3</span>
         <span class="title">Add Members</span>
       </li>
     </ul>
   </div>
   <div class="oppia-create-learner-group-tab-container">
-    
+    <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS">
+      <oppia-learner-group-details (updateLearnerGroupTitle)="updateLearnerGroupTitle($event)"
+                                   (updateLearnerGroupDesc)="updateLearnerGroupDesc($event)">
+      </oppia-learner-group-details>
+      <div class="oppia-next-section-button"
+           [ngClass]="{'active': !isGroupDetailsNextButtonDisabled()}"
+           (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS, 2)">
+        Next
+      </div>
+    </div>
+    <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS">
+      <oppia-add-syllabus-items></oppia-add-syllabus-items>
+      <div class="oppia-next-section-button"
+           [ngClass]="{'active': !isGroupDetailsNextButtonDisabled()}">Next</div>
+    </div>
   </div>
 </div>
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->

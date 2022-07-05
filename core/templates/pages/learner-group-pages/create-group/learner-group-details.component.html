@@ -1,0 +1,30 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css" as="style">
+
+<div class="oppia-learner-group-details">
+  <div class="form-group">
+    <b>Group Title<span class="required-field">*</span></b>
+    <input  class="form-control"
+            type="text"
+            [(ngModel)]="learnerGroupTitle"
+            (ngModelChange)="updateLearnerGroupDetails()"
+            tabindex="0"
+            [attr.aria-invalid]="false"
+            required="true">
+  </div>
+  <div class="form-group oppia-long-text">
+    <b>Group Description (Describe the group objectives in 2-4 lines)<span class="required-field">*</span></b>
+    <textarea rows="3"
+              cols="50"
+              [maxlength]="250"
+              [(ngModel)]="learnerGroupDescription"
+              (ngModelChange)="updateLearnerGroupDetails()"
+              class="form-control"
+              autofocus
+              required="true">
+    </textarea>
+  </div>
+</div>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css">
