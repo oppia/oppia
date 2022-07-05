@@ -39,13 +39,13 @@
       </md-card>
       <button class="btn btn-success btn-sm" ng-click="$ctrl.addSkill()">Link Another Skill</button>
     </div>
-    <question-editor question-id="$ctrl.questionId"
-                     misconceptions-by-skill="$ctrl.misconceptionsBySkill"
-                     question-state-data="$ctrl.questionStateData"
-                     question="$ctrl.question"
-                     can-edit-question="$ctrl.canEditQuestion"
-                     question-changed="$ctrl.questionChanged">
-    </question-editor>
+    <oppia-question-editor [question-id]="$ctrl.questionId"
+                           [misconceptions-by-skill]="$ctrl.misconceptionsBySkill"
+                           [question-state-data]="$ctrl.questionStateData"
+                           [question]="$ctrl.question"
+                           [can-edit-question]="$ctrl.canEditQuestion"
+                           [question-changed]="$ctrl.questionChanged">
+    </oppia-question-editor>
     <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
       <[$ctrl.question.getValidationErrorMessage()]>
     </div>

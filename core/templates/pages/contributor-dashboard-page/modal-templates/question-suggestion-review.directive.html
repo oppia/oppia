@@ -24,13 +24,13 @@
           </ul>
         </div>
       </div>
-      <question-editor question-id="questionId"
-                       misconceptions-by-skill="misconceptionsBySkill"
-                       question-state-data="questionStateData"
-                       question="question"
-                       can-edit-question="canEditQuestion"
-                       question-changed="questionChanged">
-      </question-editor>
+      <oppia-question-editor [question-id]="questionId"
+                             [misconceptions-by-skill]="misconceptionsBySkill"
+                             [question-state-data]="questionStateData"
+                             [question]="question"
+                             [can-edit-question]="canEditQuestion"
+                             [question-changed]="questionChanged">
+      </oppia-question-editor>
     </div>
   </section>
   <section ng-show="reviewable" class="oppia-reviewer-actions">
