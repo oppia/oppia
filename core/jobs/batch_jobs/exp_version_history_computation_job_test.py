@@ -362,11 +362,30 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_job_can_run_when_version_history_already_exists(self):
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit messages.')
+        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
                 exp_models.ExplorationVersionHistoryModel.get_instance_id(
                     self.EXP_ID_1, 1
+                )
+            ),
+            datastore_services.Key(
+                exp_models.ExplorationVersionHistoryModel,
+                exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    self.EXP_ID_1, 2
+                )
+            ),
+            datastore_services.Key(
+                exp_models.ExplorationVersionHistoryModel,
+                exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    self.EXP_ID_1, 3
                 )
             ),
             datastore_services.Key(
@@ -389,7 +408,7 @@ class ComputeExplorationVersionHistoryJobTests(
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 2'),
             job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 2'),
             job_run_result.JobRunResult.as_stdout(
-                'CREATED VERSION HISTORY MODELS SUCCESS: 2'
+                'CREATED VERSION HISTORY MODELS SUCCESS: 4'
             )
         ])
 
