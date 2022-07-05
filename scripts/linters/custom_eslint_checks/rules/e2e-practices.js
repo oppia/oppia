@@ -35,9 +35,9 @@ module.exports = {
         'Please make sure that constant name “{{constName}}” are in all-caps'),
       disallowedActiveElementMethod: (
         'Please do not use browser.switchTo().activeElement()' +
-        ' in protractor files'),
+        ' in e2e files'),
       disallowedBrowserMethods: (
-        'Please do not use browser.{{methodName}}() in protractor files'),
+        'Please do not use browser.{{methodName}}() in e2e files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
       disallowForEach: (
         'Please do not use .forEach(), consider using a' +
@@ -59,7 +59,7 @@ module.exports = {
       '[object.callee.property.name=switchTo]' +
       '[object.callee.object.name=browser]');
     var disallowedBrowserMethods = [
-      'sleep', 'explore', 'pause', 'waitForAngular'];
+      'sleep', 'explore', 'pause', 'waitForAngular', 'debug'];
     var disallowedBrowserMethodsRegex = (
       `/^(${disallowedBrowserMethods.join('|')})$/`);
     var disallowedBrowserMethodsSelector = (

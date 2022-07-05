@@ -69,7 +69,6 @@
     "eslint-plugin-html": "^6.0.0",
     "eslint-plugin-oppia": "file:./scripts/linters/custom_eslint_checks",
     "eslint-plugin-unused-imports": "^2.0.0",
-    "eslint-plugin-wdio": "^7.19.4",
     "file-loader": "^6.0.0",
     "firebase-admin": "^10.0.0",
     "firebase-tools": "https://github.com/oppia/firebase-tools/releases/download/v9.6.0-PATCH/firebase-tools-9.6.0-PATCH.tgz",
