@@ -52,7 +52,6 @@ export class OpportunitiesListItemComponent {
   @Input() opportunity!: ExplorationOpportunity;
   @Input() opportunityHeadingTruncationLength!: number;
   @Input() opportunityType!: string;
-
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
   @Input() showOpportunityButton: boolean = true;
