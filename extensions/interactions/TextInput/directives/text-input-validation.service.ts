@@ -193,7 +193,8 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.Equals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -204,7 +205,8 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -218,7 +220,8 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
