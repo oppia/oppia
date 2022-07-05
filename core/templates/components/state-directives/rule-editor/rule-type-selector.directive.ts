@@ -71,7 +71,10 @@ export class RuleTypeSelector implements OnInit {
         this.choices[equalToIndex], this.choices[0]];
     }
 
-    this.localValue = this.choices[0].id;
+    if (this.localValue === null || this.localValue === undefined) {
+      this.localValue = this.choices[0].id;
+    }
+
     this.onSelectionChange.emit(this.localValue);
   }
 }

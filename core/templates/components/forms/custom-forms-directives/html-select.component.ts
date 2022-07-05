@@ -30,7 +30,9 @@ export class HtmlSelectComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectionAsString = String(this.selection);
-    this.selection = Number(this.options[0].id);
+    if (this.selection === null || this.selection === undefined) {
+      this.selection = Number(this.options[0].id);
+    }
   }
 
   updatedSelection(): void {
