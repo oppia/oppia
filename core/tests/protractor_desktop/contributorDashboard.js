@@ -21,6 +21,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ContributorDashboardPage = require(
@@ -42,14 +43,6 @@ var ExplorationEditorPage = require(
 var CreatorDashboardPage = require(
   '../protractor_utils/CreatorDashboardPage.js'
 );
-
-let delay = function() {
-  return new Promise((resolve)=>{
-    setTimeout(()=>{
-      resolve();
-    }, 150000);
-  });
-};
 
 describe('Contributor dashboard page', function() {
   const TOPIC_NAMES = [
@@ -161,7 +154,7 @@ describe('Contributor dashboard page', function() {
       await users.logout();
     });
 
-  fit('should allow users to cancel copy opertation', async function() {
+  it('should allow the users to use the copy tool', async function() {
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -169,6 +162,8 @@ describe('Contributor dashboard page', function() {
       ExplorationEditorPage();
 
     await users.login(ADMIN_EMAIL);
+
+    // Creating an exploration with an image.
     await creatorDashboardPage.get();
     await workflow.createExploration(true);
     let explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -192,6 +187,7 @@ describe('Contributor dashboard page', function() {
     await workflow.publishExploration();
     let dummyExplorationId = await general.getExplorationIdFromEditor();
 
+    // Adding the exploration to a curated lesson.
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.waitForTopicsToLoad();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
@@ -200,21 +196,47 @@ describe('Contributor dashboard page', function() {
       Constants.TEST_SVG_PATH);
     await storyEditorPage.createNewChapter(
       'Chapter 1', dummyExplorationId, Constants.TEST_SVG_PATH);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
     await storyEditorPage.saveStory('Saving Story');
+    await storyEditorPage.publishStory();
     await storyEditorPage.returnToTopic();
-    await users.logout();
+
+    // Testing the copy tool.
+    let images = element.all(by.css('.protractor-test-image'));
+    let opportunityActionButtonCss = element(by.css(
+      '.protractor-test-opportunity-list-item-button'));
+    let copyButton = element(by.css('.protractor-test-copy-button'));
+    let doneButton = element(
+      by.css('.protractor-test-close-rich-text-component-editor'));
+    let cancelButton = element(
+      by.css('.protractor-test-cancel-rich-text-editor'));
 
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(
       GERMAN_LANGUAGE);
-
     await contributorDashboardPage.waitForOpportunitiesToLoad();
-    let opportunityActionButtonCss = by.css(
-      '.protractor-test-opportunity-list-item-button');
     await action.click('Opportunity button', opportunityActionButtonCss);
+    await waitFor.visibilityOf(
+      images.first(),
+      'Test image taking too long to appear.');
+    expect(await images.count()).toEqual(1);
 
-    await delay();
+    // Copy tool should copy image on pressing 'Done'.
+    await waitFor.visibilityOf(
+      copyButton, 'Copy button taking too long to appear');
+    await action.click('Copy button', copyButton);
+    await action.click('Image', images.first());
+    await action.click('Done', doneButton);
+    expect(await images.count()).toEqual(2);
+
+    // Copy tool should not copy image on pressing 'Cancel'.
+    await waitFor.visibilityOf(
+      copyButton, 'Copy button taking too long to appear');
+    await action.click('Image', images.first());
+    await action.click('Cancel', cancelButton);
+    expect(await images.count()).toEqual(2);
+    await users.logout();
   });
 
   it('should allow reviewer to accept question suggestions', async function() {
