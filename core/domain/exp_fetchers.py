@@ -492,3 +492,39 @@ def get_logged_out_user_progress(unique_progress_url_id: str):
         logged_out_user_progress_model.
             most_recently_reached_checkpoint_exp_version
     )
+
+
+def get_exploration_version_history(exp_id, exp_version):
+    """Returns an ExplorationVersionHistory domain object by fetching the
+    ExplorationVersionHistoryModel for the given exploration id and version.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        exp_version: int. The version number of the exploration.
+
+    Returns:
+        ExplorationVersionHistory. The exploration version history domain
+        object for the ExplorationVersionHistoryModel corresponding to the
+        given exploration id and version.
+    """
+    version_history_model_id = (
+        exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exp_id, exp_version
+        )
+    )
+    version_history_model = (
+        exp_models.ExplorationVersionHistoryModel.get(
+            version_history_model_id, strict=False
+        )
+    )
+
+    if version_history_model is None:
+        return None
+
+    return exp_domain.ExplorationVersionHistory(
+        exp_id, exp_version,
+        version_history_model.state_version_history,
+        version_history_model.metadata_last_edited_version_number,
+        version_history_model.metadata_last_edited_committer_id,
+        version_history_model.committer_ids
+    )
