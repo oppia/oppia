@@ -50,7 +50,7 @@ def generate_signature(
 
     Args:
         secret: bytes. The secret used to communicate with Oppia-ml.
-        message: bytes|str. The message payload data.
+        message: bytes. The message payload data.
         vm_id: str. The ID of the VM that generated the message.
 
     Returns:
