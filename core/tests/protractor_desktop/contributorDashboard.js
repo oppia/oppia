@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the contributor dashboard page.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -33,6 +34,22 @@ var SkillEditorPage = require(
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js'
+);
+var CreatorDashboardPage = require(
+  '../protractor_utils/CreatorDashboardPage.js'
+);
+
+let delay = function() {
+  return new Promise((resolve)=>{
+    setTimeout(()=>{
+      resolve();
+    }, 150000);
+  });
+};
 
 describe('Contributor dashboard page', function() {
   const TOPIC_NAMES = [
@@ -56,6 +73,8 @@ describe('Contributor dashboard page', function() {
   let adminPage = null;
   let contributorDashboardAdminPage = null;
   let storyEditorPage = null;
+  let topicEditorPage = null;
+  let creatorDashboardPage = null;
 
   beforeAll(async function() {
     contributorDashboardPage = (
@@ -71,7 +90,6 @@ describe('Contributor dashboard page', function() {
     adminPage = new AdminPage.AdminPage();
     contributorDashboardAdminPage = (
       new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
-    storyEditorPage = new StoryEditorPage.StoryEditorPage();
 
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
@@ -93,8 +111,6 @@ describe('Contributor dashboard page', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
-    await storyEditorPage.createNewChapter(
-      `Chapter ${i}`, TOPIC_NAMES[0], Constants.TEST_SVG_PATH);
 
     await adminPage.get();
     await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
@@ -144,6 +160,62 @@ describe('Contributor dashboard page', function() {
         GERMAN_LANGUAGE);
       await users.logout();
     });
+
+  fit('should allow users to cancel copy opertation', async function() {
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    let explorationEditorPage = new ExplorationEditorPage.
+      ExplorationEditorPage();
+
+    await users.login(ADMIN_EMAIL);
+    await creatorDashboardPage.get();
+    await workflow.createExploration(true);
+    let explorationEditorMainTab = explorationEditorPage.getMainTab();
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.addRteComponent(
+        'Image',
+        'create',
+        ['rectangle', 'bezier', 'piechart', 'svgupload'],
+        'An svg diagram.');
+    });
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('exp1');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorSettingsTab.setObjective(
+      'Dummy exploration for testing images'
+    );
+    await explorationEditorSettingsTab.setCategory('Algebra');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    let dummyExplorationId = await general.getExplorationIdFromEditor();
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.waitForTopicsToLoad();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicEditorPage.createStory(
+      'Story Title', 'topicandstoryeditorone', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await storyEditorPage.createNewChapter(
+      'Chapter 1', dummyExplorationId, Constants.TEST_SVG_PATH);
+    await storyEditorPage.saveStory('Saving Story');
+    await storyEditorPage.returnToTopic();
+    await users.logout();
+
+    await contributorDashboardPage.get();
+    await contributorDashboardPage.navigateToTranslateTextTab();
+    await contributorDashboardTranslateTextTab.changeLanguage(
+      GERMAN_LANGUAGE);
+
+    await contributorDashboardPage.waitForOpportunitiesToLoad();
+    let opportunityActionButtonCss = by.css(
+      '.protractor-test-opportunity-list-item-button');
+    await action.click('Opportunity button', opportunityActionButtonCss);
+
+    await delay();
+  });
 
   it('should allow reviewer to accept question suggestions', async function() {
     // Baseline verification.
