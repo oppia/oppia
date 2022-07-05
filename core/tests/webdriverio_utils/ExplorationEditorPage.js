@@ -47,6 +47,7 @@ var ExplorationEditorPage = function() {
    */
   var closeButton = $('.e2e-test-share-publish-close');
   var commitChangesButton = $('.e2e-test-save-draft-button');
+  var navigateToSettingsTabButton = $('.e2e-test-settings-tab');
   var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
   var publishExplorationButton = $('.e2e-test-publish-exploration');
   var saveChangesButton = $('.e2e-test-save-changes');
@@ -152,7 +153,6 @@ var ExplorationEditorPage = function() {
   // ---- NAVIGATION ----
 
   this.navigateToSettingsTab = async function() {
-    var navigateToSettingsTabButton = $('.e2e-test-settings-tab');
     await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
   };

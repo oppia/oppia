@@ -25,6 +25,9 @@ var ProfilePage = function() {
   var createdExplorationStat = $('.e2e-test-profile-created-stat');
   var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
   var interestPlaceholder = $('.e2e-test-profile-no-interest');
+  var interestsSelector = function() {
+    return $$('.e2e-test-profile-interest');
+  };
   var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
 
   this.get = async function(userName) {
@@ -52,13 +55,13 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveNoInterests = async function() {
-    var interests = await $$('.e2e-test-profile-interest');
+    var interests = await interestsSelector();
     var numInterests = interests.length;
     expect(numInterests).toEqual(0);
   };
 
   this.expectUserToHaveInterests = async function(expectedInterests) {
-    var interests = await $$('.e2e-test-profile-interest');
+    var interests = await interestsSelector();
     var numInterests = interests.length;
     expect(numInterests).toEqual(expectedInterests.length);
 

@@ -38,6 +38,9 @@ var LearnerDashboardPage = function() {
     '.e2e-test-incomplete-community-lessons-section');
   var progressSection = $('.e2e-test-progress-section');
   var skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
+  var subscriptionNameSelector = function() {
+    return $$('.e2e-test-subscription-name');
+  };
 
   this.get = async function() {
     await browser.url(LEARNER_DASHBOARD_URL);
@@ -179,7 +182,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
-    var subscriptionName = await $$('.e2e-test-subscription-name');
+    var subscriptionName = await subscriptionNameSelector();
     await waitFor.visibilityOf(
       subscriptionName[0],
       'Subscription First Name takes too long to appear');
@@ -187,7 +190,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionLastNameToMatch = async function(name) {
-    var subscriptionName = await $$('.e2e-test-subscription-name');
+    var subscriptionName = await subscriptionNameSelector();
     var lastElement = subscriptionName.length - 1;
     await waitFor.visibilityOf(
       subscriptionName[lastElement],
