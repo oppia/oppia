@@ -20,6 +20,18 @@
         <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
           {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
         </h4>
+        <h4 class="progress-bar-label-text">
+          Learning Progress
+        </h4>
+        <div class="progress-bar-container" [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
+          <div class="progress-bar" [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
+            <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth()"></div>
+          </div>
+          <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
+               [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+            {{ idx + 1 }}
+          </div>
+        </div>
         <p *ngIf="explorationIsPrivate" class="private-card-info">{{ 'I18N_PLAYER_IS_PRIVATE' | translate }}</p>
 
         <ul *ngIf="!explorationIsPrivate" class="card-metrics row space-between center">

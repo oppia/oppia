@@ -50,8 +50,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   contributorNames!: string[];
   checkpointCount!: number;
   expInfo: LearnerExplorationSummaryBackendDict;
-  completedWidth!: number;
-  separatorArray: number[] = [];
+  completedCheckpointsCount!: number;
+  checkpointStatusArray: string[];
   userIsLoggedIn: boolean = false;
   infoCardBackgroundCss!: {'background-color': string};
   infoCardBackgroundImageUrl!: string;
@@ -98,10 +98,36 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
 
-    // Rendering the separators in the progress bar requires
-    // the number of separators.The purpose of separatorArray
-    // is to provide the number of checkpoints in the template file.
-    this.separatorArray = new Array(this.checkpointCount);
+    // This array is used to keep track of the status of each checkpoint,
+    // i.e. whether it is completed, in-progress, or yet-to-be-completed by the
+    // learner. This information is then used to display the progress bar
+    // in the lesson info card.
+    this.checkpointStatusArray = new Array(this.checkpointCount);
+    for (let i = 0; i < this.completedCheckpointsCount; i++) {
+      this.checkpointStatusArray[i] = 'completed';
+    }
+    // If not all checkpoints are completed, then the checkpoint immediately
+    // following the last completed checkpoint is labeled 'in-progress'.
+    if (this.checkpointCount > this.completedCheckpointsCount) {
+      this.checkpointStatusArray[this.completedCheckpointsCount] = (
+        'in-progress');
+    }
+    for (
+      let i = this.completedCheckpointsCount + 1;
+      i < this.checkpointCount;
+      i++) {
+      this.checkpointStatusArray[i] = 'incomplete';
+    }
+  }
+
+  getCompletedProgressBarWidth(): number {
+    if (this.completedCheckpointsCount === 0) {
+      return 0;
+    }
+    let spaceBetweenEachNode = 100 / (this.checkpointCount - 1);
+    return (
+      ((this.completedCheckpointsCount - 1) * spaceBetweenEachNode) +
+      (spaceBetweenEachNode / 2));
   }
 
   getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {

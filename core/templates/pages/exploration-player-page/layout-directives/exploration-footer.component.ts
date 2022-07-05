@@ -61,7 +61,6 @@ export class ExplorationFooterComponent {
   // and decide the completed width of the progress bar.
   checkpointArray: number[] = [0];
   expInfo: LearnerExplorationSummaryBackendDict;
-  completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
   completedCheckpointsCount: number = 0;
   lastCheckpointWasCompleted: boolean = false;
@@ -176,15 +175,12 @@ export class ExplorationFooterComponent {
       this.lastCheckpointWasCompleted = true;
     }
 
-    this.completedWidth = (
-      (100 / (this.checkpointCount)) * this.completedCheckpointsCount
-    );
-
     if (this.lastCheckpointWasCompleted) {
-      this.completedWidth = 100;
+      this.completedCheckpointsCount = this.checkpointCount;
     }
 
-    modalRef.componentInstance.completedWidth = this.completedWidth;
+    modalRef.componentInstance.completedCheckpointsCount = (
+      this.completedCheckpointsCount);
     modalRef.componentInstance.contributorNames = this.contributorNames;
     modalRef.componentInstance.expInfo = this.expInfo;
     modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;

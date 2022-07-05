@@ -59,6 +59,7 @@
   align-self: center;
   max-width: 90%;
 }
+
 .oppia-info-card-logo-thumbnail {
   background-position: center;
   background-repeat: no-repeat;
@@ -130,13 +131,12 @@
   margin: 5px
 }
 
-
-
 .oppia-lesson-exploration-progress-info .card-metrics li .far {
   font-size: 24px;
   margin: 5px;
   vertical-align: middle;
 }
+
 .oppia-info-card-bottom-row ul li a img {
   height: 20px;
   width: 20px;
@@ -158,7 +158,7 @@
   box-sizing: border-box;
   font-size: 14px;
   list-style-type: none;
-  margin-top: 10px;
+  margin-top: 15px;
   max-width: 100%;
   padding: 0;
   text-align: center;
@@ -208,4 +208,90 @@
   display: flex;
   flex-direction: row;
   width: 36px;
+}
+
+.progress-bar-container {
+  align-items: center;
+  display: flex;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  position: relative;
+  width: 100%;
+}
+
+.single-checkpoint-bar {
+  justify-content: center;
+}
+
+.multiple-checkpoints-bar {
+  justify-content: space-between;
+}
+
+.reverse-checkpoint-order {
+  flex-direction: row-reverse;
+}
+
+.progress-bar {
+  background-color: #bbb;
+  border-radius: 5px;
+  display: flex;
+  height: 5px;
+  justify-content: flex-start;
+  margin-right: 14px;
+  position: absolute;
+  width: 92%;
+}
+
+.completed-progress-bar {
+  background-color: #00645c;
+  border-radius: 5px;
+  height: 100%;
+  max-width: 100%;
+}
+
+.completed-checkpoint-node {
+  background-color: #00645c;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  height: 25px;
+  justify-content: center;
+  text-align: center;
+  width: 25px;
+  z-index: 2;
+}
+
+.in-progress-checkpoint-node {
+  align-items: flex-start;
+  background-color: #fff;
+  border: 3.5px solid #00645c;
+  border-radius: 50%;
+  color: #00645c;
+  display: flex;
+  font-size: 1.1em;
+  height: 35px;
+  justify-content: center;
+  text-align: center;
+  width: 35px;
+  z-index: 2;
+}
+
+.incomplete-checkpoint-node {
+  align-items: flex-end;
+  background-color: #fff;
+  border: 3.5px solid #bbb;
+  border-radius: 50%;
+  color: #bbb;
+  display: flex;
+  font-size: 0.9em;
+  height: 25px;
+  justify-content: center;
+  text-align: center;
+  width: 25px;
+  z-index: 2;
+}
+
+.progress-bar-label-text {
+  color: #00645c;
+  font-size: 0.9em;
+  margin-bottom: 15px;
 }
