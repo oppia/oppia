@@ -132,7 +132,7 @@ var ExplorationEditorPage = function() {
     }
     await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.pause from e2e files.
-    // eslint-disable-next-line wdio/no-pause
+    // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2500);
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
