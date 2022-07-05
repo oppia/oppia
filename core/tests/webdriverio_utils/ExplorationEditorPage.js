@@ -53,6 +53,16 @@ var ExplorationEditorPage = function() {
   var saveDraftButtonTextContainer = $('.e2e-test-save-draft-message');
 
   /*
+   * Components
+   */
+  this.getMainTab = function() {
+    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
+  };
+  this.getSettingsTab = function() {
+    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
+
+  /*
    * Workflows
    */
   // ---- CONTROLS ----
@@ -137,16 +147,6 @@ var ExplorationEditorPage = function() {
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
       'Changes could not be saved');
-  };
-
-  /*
-   * Components
-   */
-  this.getMainTab = function() {
-    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
-  };
-  this.getSettingsTab = function() {
-    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
   };
 
   // ---- NAVIGATION ----
