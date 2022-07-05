@@ -187,7 +187,12 @@ var acceptPrompt = async function(promptResponse) {
 };
 
 var acceptAlert = async function() {
+  var screenshotPath = '../webdriverio-screenshots';
+  var filePath = path.join(screenshotPath, 'testing3.png');
+  await browser.saveScreenshot(filePath);
   await waitFor.alertToBePresent();
+  var filePath = path.join(screenshotPath, 'testing4.png');
+  await browser.saveScreenshot(filePath);
   await browser.acceptAlert();
   await waitFor.pageToFullyLoad();
 };

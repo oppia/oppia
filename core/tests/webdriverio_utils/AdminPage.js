@@ -21,6 +21,7 @@ var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
+var path = require('path');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
@@ -46,9 +47,15 @@ var AdminPage = function() {
     if (title.match(propertyName)) {
       await editingInstructions(
         await forms.getEditor(objectType)(configProperty));
-      await action.clickAndSkipRelease(
-        'Save All Configs Button', saveAllConfigs);
+      await action.click('Save All Configs Button', saveAllConfigs);
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.pause(2500);
+      var screenshotPath = '../webdriverio-screenshots';
+      var filePath = path.join(screenshotPath, 'testing1.png');
+      await browser.saveScreenshot(filePath);
       await general.acceptAlert();
+      var filePath = path.join(screenshotPath, 'testing2.png');
+      await browser.saveScreenshot(filePath);
       // Waiting for success message.
       await waitFor.textToBePresentInElement(
         statusMessage, 'saved successfully',
