@@ -160,7 +160,7 @@ var ensurePageHasNoTranslationIds = async function() {
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
 
-  // We are using getHTML for getting the innerHTML by passing 
+  // We are using getHTML for getting the innerHTML by passing
   // false argument to it.
   let promiseValue = await oppiaBaseContainer.getHTML(false);
 

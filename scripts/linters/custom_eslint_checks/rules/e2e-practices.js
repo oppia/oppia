@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Lint to ensure that follow good practices
- * for writing proractor e2e test.
+ * for writing proractor and webdriverio e2e test.
  */
 
 'use strict';

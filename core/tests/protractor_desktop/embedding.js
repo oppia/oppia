@@ -133,7 +133,7 @@ describe('Embedding', function() {
       // iframes. see: https://github.com/angular/protractor/issues/4678
       // Current, work-around is to use browser.sleep() before executing
       // functions that require angular to be present inside the iframe.
-      // eslint-disable-next-line oppia/protractor-practices
+      // eslint-disable-next-line oppia/e2e-practices
       await browser.sleep(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
@@ -278,7 +278,7 @@ describe('Embedding', function() {
         // iframes. see: https://github.com/angular/protractor/issues/4678
         // Current, work-around is to use browser.sleep() before executing
         // functions that require angular to be present inside the iframe.
-        // eslint-disable-next-line oppia/protractor-practices
+        // eslint-disable-next-line oppia/e2e-practices
         await browser.sleep(5000);
         await waitFor.pageToFullyLoad();
 

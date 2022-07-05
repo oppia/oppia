@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the protractor-practices.js file.
+ * @fileoverview Tests for the e2e-practices.js file.
  */
 
 'use strict';
 
-var rule = require('./protractor-practices');
+var rule = require('./e2e-practices');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester({
@@ -28,7 +28,7 @@ var ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser')
 });
 
-ruleTester.run('protractor-practices', rule, {
+ruleTester.run('e2e-practices', rule, {
   valid: [{
     code:
     `expSummaryRowTitleElements.first()
