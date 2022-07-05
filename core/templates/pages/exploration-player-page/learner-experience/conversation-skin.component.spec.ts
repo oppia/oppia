@@ -866,6 +866,7 @@ describe('Conversation skin component', () => {
 
     componentInstance.ngOnInit();
     tick(100);
+
     expect(
       editableExplorationBackendApiService
         .changeLoggedOutProgressToLoggedInProgressAsync).toHaveBeenCalled();

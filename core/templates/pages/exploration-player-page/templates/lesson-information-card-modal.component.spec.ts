@@ -252,7 +252,9 @@ describe('Lesson Information card modal component', () => {
         new StoryPlaythrough(storyId, [], 'storyTitle', '', '', '')));
     spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
       .and.returnValue('abcdef');
+
     componentInstance.ngOnInit();
+
     expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
       'https://oppia.org/progress/abcdef');
   }));
@@ -292,6 +294,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.saveLoggedOutProgress();
     tick(100);
+
     expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
       'https://oppia.org/progress/abcdef');
     expect(componentInstance.loggedOutProgressUniqueUrlId).toEqual('abcdef');
@@ -301,7 +304,9 @@ describe('Lesson Information card modal component', () => {
     spyOn(clipboard, 'copy');
     let loggedOutProgressUrl = 'https://oppia.org/progress/abcdef';
     componentInstance.loggedOutProgressUniqueUrl = loggedOutProgressUrl;
+
     componentInstance.copyProgressUrl();
+
     expect(clipboard.copy).toHaveBeenCalledWith(
       loggedOutProgressUrl);
   });
@@ -312,8 +317,10 @@ describe('Lesson Information card modal component', () => {
         Promise.resolve('https://oppia.org/login'));
       spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
       componentInstance.loggedOutProgressUniqueUrlId = 'abcdef';
+
       componentInstance.onLoginButtonClicked();
       tick(100);
+
       expect(localStorageService.updateUniqueProgressIdOfLoggedOutLearner)
         .toHaveBeenCalledWith('abcdef');
     })
@@ -321,7 +328,9 @@ describe('Lesson Information card modal component', () => {
 
   it('should correctly close save progress menu', () => {
     componentInstance.saveProgressMenuIsShown = true;
+
     componentInstance.closeSaveProgressMenu();
+
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
 });
