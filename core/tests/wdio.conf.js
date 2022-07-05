@@ -84,11 +84,6 @@ if ((process.env.GITHUB_ACTIONS &&
     ' have been disabled for it (using environment variables) or' +
     ' because it\'s on CircleCI');
 }
-var dirPath = path.resolve('__dirname', '..', '..', 'webdriverio-screenshots/');
-try {
-  fs.mkdirSync(dirPath, { recursive: true });
-  var screenshotPath = '../webdriverio-screenshots';
-} catch (err) {}
 
 // A reference configuration file.
 exports.config = {
@@ -230,6 +225,11 @@ exports.config = {
       // If a test fails then only the error will be defined and
       // the screenshot will be taken and saved.
       if (error) {
+        var dirPath = path.resolve('__dirname', '..', '..', 'webdriverio-screenshots/');
+        try {
+          fs.mkdirSync(dirPath, { recursive: true });
+          var screenshotPath = '../webdriverio-screenshots';
+        } catch (err) {}
 
         var testName = encodeURIComponent(test.fullName.replace(/\s+/g, '-'));
         var fileName = testName + '.png';
