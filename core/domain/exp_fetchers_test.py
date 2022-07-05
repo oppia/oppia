@@ -68,6 +68,11 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             exp_fetchers.get_new_exploration_id()
         )
 
+    def test_get_new_unique_progress_url_id(self):
+        self.assertIsNotNone(
+            exp_fetchers.get_new_unique_progress_url_id()
+        )
+
     def test_get_exploration_summary_by_id(self):
         fake_eid = 'fake_eid'
         fake_exp = exp_fetchers.get_exploration_summary_by_id(
@@ -289,6 +294,56 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             user_id, self.EXP_1_ID)
         self.assertIsNotNone(exp_user_data)
         self.assertEqual(expected_user_data_dict, exp_user_data.to_dict())
+
+
+class LoggedOutUserProgressTests(test_utils.GenericTestBase):
+    """Tests the fetching of the logged-out user progress."""
+
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
+    EXP_1_ID = 'exploration_1_id'
+
+    def setUp(self):
+        super(LoggedOutUserProgressTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exploration_1 = self.save_new_default_exploration(
+            self.EXP_1_ID, self.owner_id, title='Aa')
+
+    def test_get_logged_out_user_progress(self):
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertIsNone(logged_out_user_data)
+
+        exp_services.update_logged_out_user_progress(
+            self.EXP_1_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
+
+        expected_progress_dict = {
+            'exploration_id': self.EXP_1_ID,
+            'furthest_reached_checkpoint_state_name': 'Introduction',
+            'furthest_reached_checkpoint_exp_version': 1,
+            'most_recently_reached_checkpoint_state_name': 'Introduction',
+            'most_recently_reached_checkpoint_exp_version': 1,
+            'last_updated': None
+        }
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertIsNotNone(logged_out_user_data)
+        self.assertEqual(
+            expected_progress_dict['exploration_id'],
+            logged_out_user_data.exploration_id)
+        self.assertEqual(
+            expected_progress_dict['furthest_reached_checkpoint_state_name'],
+            logged_out_user_data.furthest_reached_checkpoint_state_name)
+        self.assertEqual(
+            expected_progress_dict['furthest_reached_checkpoint_exp_version'],
+            logged_out_user_data.furthest_reached_checkpoint_exp_version)
+        self.assertEqual(
+            expected_progress_dict['most_recently_reached_checkpoint_state_name'], # pylint: disable=line-too-long
+            logged_out_user_data.most_recently_reached_checkpoint_state_name)
+        self.assertEqual(
+            expected_progress_dict['most_recently_reached_checkpoint_exp_version'], # pylint: disable=line-too-long
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version)
 
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):

@@ -416,7 +416,9 @@ def delete_user(pending_deletion_request):
             feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
             ('manager_ids',))
         _pseudonymize_blog_post_models(pending_deletion_request)
+        _pseudonymize_version_history_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.email)
+    _delete_models(user_id, models.NAMES.learner_group)
 
 
 def verify_user_deleted(user_id, include_delete_at_end_models=False):
@@ -1417,3 +1419,71 @@ def _pseudonymize_blog_post_models(pending_deletion_request):
             _pseudonymize_models_transactional(
                 [m for m in transaction_slice if m is not None],
                 pseudonymized_id)
+
+
+def _pseudonymize_version_history_models(pending_deletion_request):
+    """Pseudonymizes the version history models for the user with the given
+    user_id.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending
+            deletion request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
+
+    version_history_model_class = exp_models.ExplorationVersionHistoryModel
+    version_history_models = version_history_model_class.query(
+        user_id == version_history_model_class.committer_ids
+    ).fetch()
+
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+        version_history_models, exp_ids_to_pids):
+        """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        version_history_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
+        Args:
+            version_history_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            exp_ids_to_pids: dict(str, str). A mapping of exploration ids to
+                pseudonymous ids.
+        """
+        for model in version_history_models:
+            # Pseudonymize user id from state_version_history.
+            for state_name in model.state_version_history:
+                state_version_history = (
+                    model.state_version_history[state_name])
+                if state_version_history['committer_id'] == user_id:
+                    state_version_history['committer_id'] = (
+                        exp_ids_to_pids[model.exploration_id])
+
+            # Pseudonymize user id from metadata_last_edited_committer_id.
+            if model.metadata_last_edited_committer_id == user_id:
+                model.metadata_last_edited_committer_id = (
+                    exp_ids_to_pids[model.exploration_id])
+
+            # Pseudonymize user id from committer_ids.
+            for idx, committer_id in enumerate(model.committer_ids):
+                if committer_id == user_id:
+                    model.committer_ids[idx] = (
+                        exp_ids_to_pids[model.exploration_id])
+
+        version_history_model_class.update_timestamps_multi(
+            version_history_models)
+        version_history_model_class.put_multi(version_history_models)
+
+    exp_ids_to_pids = (
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.exploration.value])
+
+    for i in range(
+            0,
+            len(version_history_models),
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+    ):
+        _pseudonymize_models_transactional(
+            version_history_models[
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+            exp_ids_to_pids)
