@@ -134,8 +134,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs/transforms/validation/config_validation_test.py',
     'core/jobs/transforms/validation/exp_validation.py',
     'core/jobs/transforms/validation/exp_validation_test.py',
-    'core/jobs/transforms/validation/feedback_validation.py',
-    'core/jobs/transforms/validation/feedback_validation_test.py',
     'core/jobs/transforms/validation/improvements_validation.py',
     'core/jobs/transforms/validation/improvements_validation_test.py',
     'core/jobs/transforms/validation/question_validation.py',
