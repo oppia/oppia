@@ -844,7 +844,8 @@ var ExplorationEditorMainTab = function() {
     await action.click('Answer Description', answerDescription);
 
     var ruleDropdownElement = element.all(by.cssContainingText(
-      '.protractor-rule-type-selector', ruleDescriptionInDropdown)).first();
+      '.protractor-test-rule-type-selector',
+      ruleDescriptionInDropdown)).first();
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 
