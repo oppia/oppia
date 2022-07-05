@@ -4,16 +4,14 @@
     "sourceType": "module"
   },
   "extends": [
-    "eslint:recommended",
-    "plugin:wdio/recommended"
+    "eslint:recommended"
   ],
   "plugins": [
     "angular",
     "html",
     "unused-imports",
     "@typescript-eslint",
-    "oppia",
-    "wdio"
+    "oppia"
   ],
   "overrides": [
     {
