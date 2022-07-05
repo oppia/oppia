@@ -142,7 +142,10 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
     return versioned_exp_interaction_ids_mapping
 
 
-def get_exploration_from_model(exploration_model, run_conversion=True):
+def get_exploration_from_model(
+    exploration_model: exp_models.ExplorationModel,
+    run_conversion: bool = True
+) -> exp_domain.Exploration:
     """Returns an Exploration domain object given an exploration model loaded
     from the datastore.
 

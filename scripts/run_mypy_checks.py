@@ -130,8 +130,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs/batch_jobs',
     'core/jobs/transforms/validation/auth_validation.py',
     'core/jobs/transforms/validation/auth_validation_test.py',
-    'core/jobs/transforms/validation/base_validation.py',
-    'core/jobs/transforms/validation/base_validation_test.py',
     'core/jobs/transforms/validation/base_validation_registry.py',
     'core/jobs/transforms/validation/base_validation_registry_test.py',
     'core/jobs/transforms/validation/blog_validation.py',

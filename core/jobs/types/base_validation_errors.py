@@ -169,7 +169,13 @@ class ModelExpiredError(BaseAuditError):
 class InvalidCommitTypeError(BaseAuditError):
     """Error class for commit_type validation errors."""
 
-    def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
+    def __init__(
+        self,
+        model: Union[
+            base_models.BaseCommitLogEntryModel,
+            base_models.BaseSnapshotMetadataModel
+        ]
+    ) -> None:
         message = 'Commit type %s is not allowed' % model.commit_type
         super(InvalidCommitTypeError, self).__init__(message, model)
 
@@ -208,7 +214,11 @@ class CommitCmdsNoneError(BaseAuditError):
     """Error class for None Commit Cmds."""
 
     def __init__(
-        self, model: base_models.BaseCommitLogEntryModel
+        self,
+        model: Union[
+            base_models.BaseCommitLogEntryModel,
+            base_models.BaseSnapshotMetadataModel
+        ]
     ) -> None:
         message = (
             'No commit command domain object defined for entity with commands: '
@@ -221,7 +231,10 @@ class CommitCmdsValidateError(BaseAuditError):
 
     def __init__(
         self,
-        model: base_models.BaseCommitLogEntryModel,
+        model: Union[
+            base_models.BaseCommitLogEntryModel,
+            base_models.BaseSnapshotMetadataModel
+        ],
         commit_cmd_dict: Dict[str, str],
         e: str
     ) -> None:
