@@ -70,7 +70,7 @@ var LibraryPage = function() {
   this.addSelectedExplorationToPlaylist = async function() {
     // We need to wait till the cards are loaded else it will
     // throw element out of bond error.
-    // eslint-disable-next-line wdio/no-pause
+    // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(5000);
     await expHoverElement.moveTo();
 

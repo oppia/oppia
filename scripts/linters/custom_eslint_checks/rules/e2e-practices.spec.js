@@ -95,7 +95,7 @@ ruleTester.run('e2e-practices', rule, {
       });`,
       errors: [{
         message: 'Please do not use browser.switchTo().activeElement()' +
-          ' in protractor files',
+          ' in e2e files',
         type: 'MemberExpression',
       }],
     },
@@ -105,7 +105,7 @@ ruleTester.run('e2e-practices', rule, {
         browser.sleep();
       });`,
       errors: [{
-        message: 'Please do not use browser.sleep() in protractor files',
+        message: 'Please do not use browser.sleep() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -115,7 +115,7 @@ ruleTester.run('e2e-practices', rule, {
         browser.explore();
       });`,
       errors: [{
-        message: 'Please do not use browser.explore() in protractor files',
+        message: 'Please do not use browser.explore() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -125,7 +125,7 @@ ruleTester.run('e2e-practices', rule, {
         browser.pause();
       });`,
       errors: [{
-        message: 'Please do not use browser.pause() in protractor files',
+        message: 'Please do not use browser.pause() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -136,7 +136,7 @@ ruleTester.run('e2e-practices', rule, {
       });`,
       errors: [{
         message: (
-          'Please do not use browser.waitForAngular() in protractor files'),
+          'Please do not use browser.waitForAngular() in e2e files'),
         type: 'CallExpression',
       }],
     },
