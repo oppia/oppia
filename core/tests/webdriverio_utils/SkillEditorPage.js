@@ -109,7 +109,7 @@ var SkillEditorPage = function() {
     await action.click(
       'Add rubric explanation button',
       addRubricExplanationButton);
-    await action.keys(
+    await action.setValue(
       'Rubric explanation editor input',
       rubricExplanationEditorInput, explanation, true);
     await action.click(
@@ -128,7 +128,7 @@ var SkillEditorPage = function() {
     await action.click(
       'Add rubric explanation button',
       addRubricExplanationButton);
-    await action.keys(
+    await action.setValue(
       'Rubric explanation editor input',
       rubricExplanationEditorInput, explanation, true);
     await action.click(
@@ -170,7 +170,7 @@ var SkillEditorPage = function() {
     await action.click(
       `Edit rubric explanation button ${explIndex}`,
       editRubricExplanationButtons[explIndex]);
-    await action.keys(
+    await action.setValue(
       'Rubric explanation editor input',
       rubricExplanationEditorInput, explanation, true);
     await action.click(
@@ -221,7 +221,7 @@ var SkillEditorPage = function() {
 
   this.changeSkillDescription = async function(description) {
     await action.clear('Skill description', skillDescriptionField);
-    await action.keys(
+    await action.setValue(
       'Skill description', skillDescriptionField, description);
   };
 
@@ -237,7 +237,7 @@ var SkillEditorPage = function() {
   this.saveOrPublishSkill = async function(commitMessage) {
     await action.click(
       'Save or Publish Skill button', saveOrPublishSkillButton);
-    await action.keys('Commit message', commitMessageField, commitMessage);
+    await action.setValue('Commit message', commitMessageField, commitMessage);
     await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.invisibilityOf(
       closeSaveModalButton, 'Save modal takes too long to disappear.');
@@ -251,7 +251,7 @@ var SkillEditorPage = function() {
     await action.click(
       'Edit concept card explanation', editConceptCardExplanationButton);
 
-    await action.keys(
+    await action.setValue(
       'Concept card explanation editor input',
       conceptCardExplanationEditorInput, explanation, true);
 
@@ -277,11 +277,11 @@ var SkillEditorPage = function() {
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
 
-    await action.keys(
+    await action.setValue(
       'Worked example question',
       workedExampleQuestionInput, question, true);
 
-    await action.keys(
+    await action.setValue(
       'Worked example question',
       workedExampleExplanationInput, explanation, true);
 
@@ -339,17 +339,17 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       addMisconceptionModal,
       'Add Misconception Modal takes too long to appear');
-    await action.keys(
+    await action.setValue(
       'Misconception name field',
       misconceptionNameField,
       name, true);
 
-    await action.keys(
+    await action.setValue(
       'Misconception notes field',
       misconceptionNotesField,
       notes, true);
 
-    await action.keys(
+    await action.setValue(
       'Misconception notes field',
       misconceptionFeedbackField,
       feedback, true);

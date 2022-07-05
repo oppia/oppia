@@ -35,11 +35,10 @@ var CreatorDashboardPage = function() {
   var explorationDashboardCard = $('.e2e-test-exploration-dashboard-card');
   var explorationFeedbackCount = $('.e2e-test-exp-summary-tile-open-feedback');
   var listViewButton = $('.e2e-test-oppia-list-view-btn');
-  var openFeedbacks = $('.e2e-test-oppia-open-feedback');
   var subscriptionTab = $('.e2e-test-subscription-tab');
-  var subscribers = $('.e2e-test-oppia-total-subscribers');
-  var titleMaskLocator = '.e2e-test-title-mask';
   // Dashboard stat elements.
+  var openFeedbacks = $('.e2e-test-oppia-open-feedback');
+  var subscribers = $('.e2e-test-oppia-total-subscribers');
   var totalPlays = $('.e2e-test-oppia-total-plays');
 
   // Returns all exploration card elements with the given name.
@@ -112,7 +111,7 @@ var CreatorDashboardPage = function() {
       throw new Error(
         'Could not find exploration tile with name ' + explorationTitle);
     }
-    var explorationElement = elems[0].$(titleMaskLocator);
+    var explorationElement = elems[0].$('.e2e-test-title-mask');
     await action.click('Exploration Element', explorationElement);
     await waitFor.pageToFullyLoad();
   };

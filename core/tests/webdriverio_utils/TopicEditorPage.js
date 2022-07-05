@@ -117,12 +117,12 @@ var TopicEditorPage = function() {
     await general.scrollToTop();
     await action.click('Create Story Button', createStoryButton);
 
-    await action.keys(
+    await action.setValue(
       'Create new story title', newStoryTitleField, storyTitle);
-    await action.keys(
+    await action.setValue(
       'Create new story description', newStoryDescriptionField,
       storyDescription);
-    await action.keys(
+    await action.setValue(
       'Create new story url fragment', newStoryUrlFragmentField,
       storyUrlFragment);
 
@@ -135,7 +135,7 @@ var TopicEditorPage = function() {
   };
 
   this.updatePageTitleFragment = async function(newPageTitleFragment) {
-    await action.keys(
+    await action.setValue(
       'Update Page Title Fragment',
       topicPageTitleFragmentField, newPageTitleFragment);
     await action.click(
@@ -144,10 +144,10 @@ var TopicEditorPage = function() {
 
   this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
     await action.click('Add subtopic button', addSubtopicButton);
-    await action.keys(
+    await action.setValue(
       'New subtopic title field', newSubtopicTitlefield, title);
 
-    await action.keys(
+    await action.setValue(
       'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
 
     await action.click(
@@ -203,7 +203,7 @@ var TopicEditorPage = function() {
     await action.click('Save Topic Button', saveTopicButton);
     await waitFor.visibilityOf(
       commitMessageField, 'Commit Message field taking too long to appear.');
-    await action.keys(
+    await action.setValue(
       'commit message field', commitMessageField, commitMessage);
 
     await action.click('Close save modal button', closeSaveModalButton);
@@ -212,7 +212,7 @@ var TopicEditorPage = function() {
   };
 
   this.updateMetaTagContent = async function(newMetaTagContent) {
-    await action.keys(
+    await action.setValue(
       'Update Meta Tag Content', topicMetaTagContentField, newMetaTagContent);
     await action.click('Meta Tag Content label', topicMetaTagContentLabel);
   };

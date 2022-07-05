@@ -105,7 +105,7 @@ var ExplorationPlayerPage = function() {
   this.submitFeedback = async function(feedback) {
     await waitFor.elementToBeClickable(feedbackPopupLink);
     await action.click('Feedback Popup Link', feedbackPopupLink);
-    await action.keys('Feedback Text Area', feedbackTextArea, feedback);
+    await action.setValue('Feedback Text Area', feedbackTextArea, feedback);
     await waitFor.elementToBeClickable(feedbackSubmitButton);
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(

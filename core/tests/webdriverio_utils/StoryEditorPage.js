@@ -63,7 +63,7 @@ var StoryEditorPage = function() {
   };
 
   this.updateMetaTagContent = async function(newMetaTagContent) {
-    await action.keys(
+    await action.setValue(
       'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
     await action.click('Meta Tag Content label', storyMetaTagContentLabel);
   };
@@ -103,9 +103,9 @@ var StoryEditorPage = function() {
     await action.click(
       'Create chapter button takes too long to be clickable.',
       createChapterButton);
-    await action.keys(
+    await action.setValue(
       'New chapter title field', newChapterTitleField, title);
-    await action.keys(
+    await action.setValue(
       'New chapter exploration ID', newChapterExplorationField, explorationId);
     await workflow.submitImage(
       createChapterThumbnailButton, thumbnailContainer, imgPath, false);

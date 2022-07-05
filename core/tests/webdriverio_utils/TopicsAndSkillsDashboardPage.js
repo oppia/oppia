@@ -134,12 +134,12 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       topicNameField,
       'Create Topic modal takes too long to appear.');
-    await action.keys('Topic name field', topicNameField, topicName);
-    await action.keys(
+    await action.setValue('Topic name field', topicNameField, topicName);
+    await action.setValue(
       'Topic URL fragment field', topicUrlFragmentField, topicUrlFragment);
-    await action.keys(
+    await action.setValue(
       'Topic description field', topicDescriptionField, description);
-    await action.keys(
+    await action.setValue(
       'Topic page title fragment field',
       topicPageTitleFragmentField, description);
     await workflow.submitImage(
@@ -209,7 +209,7 @@ var TopicsAndSkillsDashboardPage = function() {
     var filterKeywordInput = topicFilterKeywordField.$(
       '.e2e-test-multi-selection-input');
 
-    await action.keys(
+    await action.setValue(
       'Topic Dashboard keyword filter: ' + keyword,
       filterKeywordInput, keyword + '\n');
   };
@@ -235,14 +235,14 @@ var TopicsAndSkillsDashboardPage = function() {
       await action.click('Create Skill button', createSkillButtonSecondary);
     }
 
-    await action.keys('Skill Name Field', skillNameField, description);
+    await action.setValue('Skill Name Field', skillNameField, description);
     await action.click(
       'Open Concept Card button', openConceptCardExplanationButton);
 
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
     var skillReviewMaterialInput = editor.$('.e2e-test-rte');
-    await action.keys(
+    await action.setValue(
       'Skill Review Material Field', skillReviewMaterialInput,
       reviewMaterial, true);
 
