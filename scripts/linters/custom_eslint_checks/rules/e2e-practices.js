@@ -59,7 +59,7 @@ module.exports = {
       '[object.callee.property.name=switchTo]' +
       '[object.callee.object.name=browser]');
     var disallowedBrowserMethods = [
-      'sleep', 'explore', 'pause', 'waitForAngular'];
+      'sleep', 'explore', 'pause', 'waitForAngular', 'debug'];
     var disallowedBrowserMethodsRegex = (
       `/^(${disallowedBrowserMethods.join('|')})$/`);
     var disallowedBrowserMethodsSelector = (

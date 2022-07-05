@@ -396,8 +396,6 @@
       }
     ],
     "unused-imports/no-unused-imports-ts": "error",
-    "wdio/no-debug": "error",
-    "wdio/no-pause": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
     "@typescript-eslint/ban-types": [

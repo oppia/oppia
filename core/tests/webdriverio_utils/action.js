@@ -46,6 +46,7 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
       '$(arguments[0]).click()', clickableElement);
   } else {
     await clickableElement.click();
+    await browser.debug();
   }
 };
 
