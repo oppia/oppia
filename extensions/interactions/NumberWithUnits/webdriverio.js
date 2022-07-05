@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Number with Units
- * Interaction.
+ * Interaction in webdriverio.
  */
 
 var customizeInteraction = function() {

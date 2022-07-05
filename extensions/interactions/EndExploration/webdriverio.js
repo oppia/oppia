@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the End Exploration
- * interaction.
+ * interaction in webdriverio.
  */
 
 var action = require(
@@ -43,8 +43,8 @@ var customizeInteraction = async function(
 
 var expectInteractionDetailsToMatch = async function(elem) {
   await expect(
-    elem.$(
-      '<oppia-interactive-end-exploration>').isPresent()
+    await elem.$(
+      '<oppia-interactive-end-exploration>').isExisting()
   ).toBe(true);
 };
 

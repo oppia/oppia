@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the Text interaction.
+ * @fileoverview End-to-end testing utilities for the Text interaction
+ * in protractor.
  */
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');

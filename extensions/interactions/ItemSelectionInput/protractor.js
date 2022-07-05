@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Item Selection
- * interaction.
+ * interaction in protractor.
  */
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');

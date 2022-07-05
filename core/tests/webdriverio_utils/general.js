@@ -65,7 +65,7 @@ var checkForConsoleErrors = async function(
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
-  if (browser.config.isMobile) {
+  if (browser.isMobile) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
@@ -160,6 +160,8 @@ var ensurePageHasNoTranslationIds = async function() {
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
 
+  // We are using getHTML for getting the innerHTML by passing
+  // false argument to it.
   let promiseValue = await oppiaBaseContainer.getHTML(false);
 
   // First remove all the attributes translate and variables that are

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Continue Button
- * interaction.
+ * interaction in protractor.
  */
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');

@@ -30,27 +30,27 @@ var ExplorationEditorPage = function() {
   /*
   * Interactive elements
   */
-  var expTitle = $('.e2e-test-exploration-title-input');
-  var expObjective = $('.e2e-test-exploration-objective-input');
-  var expTags = $('.e2e-test-tags');
+  var commitMessageInput = $('.e2e-test-commit-message-input');
+  var confirmPublish = $('.e2e-test-confirm-publish');
   var expCategoryDropdownElement = $('.e2e-test-exploration-category-dropdown');
   var expLanguageSelectorElement = $('.e2e-test-exploration-language-select');
+  var expObjective = $('.e2e-test-exploration-objective-input');
+  var expTags = $('.e2e-test-tags');
+  var expTitle = $('.e2e-test-exploration-title-input');
   var explorationMetadataModalHeaderElement = $(
     '.e2e-test-metadata-modal-header');
-  var confirmPublish = $('.e2e-test-confirm-publish');
   var modalContentElement = $('.modal-content');
-  var commitMessageInput = $('.e2e-test-commit-message-input');
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
 
   /*
    * Buttons
    */
-  var publishExplorationButton = $('.e2e-test-publish-exploration');
-  var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
   var closeButton = $('.e2e-test-share-publish-close');
+  var commitChangesButton = $('.e2e-test-save-draft-button');
+  var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
+  var publishExplorationButton = $('.e2e-test-publish-exploration');
   var saveChangesButton = $('.e2e-test-save-changes');
   var saveDraftButtonTextContainer = $('.e2e-test-save-draft-message');
-  var commitChangesButton = $('.e2e-test-save-draft-button');
 
   /*
    * Workflows
@@ -62,13 +62,13 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
-    await action.keys('Exploration title', expTitle, title);
+    await action.setValue('Exploration title', expTitle, title);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.keys('Exploration objective', expObjective, objective);
+    await action.setValue('Exploration objective', expObjective, objective);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
@@ -96,7 +96,7 @@ var ExplorationEditorPage = function() {
     for (var elem of tags) {
       var expInput = expTags.$('<input>');
       await action.click('Exploration input', expInput);
-      await action.keys('Exploration input', expInput, elem + '\n');
+      await action.setValue('Exploration input', expInput, elem + '\n');
       await action.click(
         'Exploration metadata modal header',
         explorationMetadataModalHeaderElement);
@@ -127,7 +127,7 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
-      await action.keys(
+      await action.setValue(
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', commitChangesButton);
@@ -152,7 +152,7 @@ var ExplorationEditorPage = function() {
   // ---- NAVIGATION ----
 
   this.navigateToSettingsTab = async function() {
-    var navigateToSettingsTabButton = await $('.e2e-test-settings-tab');
+    var navigateToSettingsTabButton = $('.e2e-test-settings-tab');
     await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
   };

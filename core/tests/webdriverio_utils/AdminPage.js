@@ -24,18 +24,15 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var configTab = $('.e2e-test-admin-config-tab');
-  var saveAllConfigs = $('.e2e-test-save-all-configs');
   var adminRolesTab = $('.e2e-test-admin-roles-tab');
   var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
-  var usernameInputFieldForRolesEditing = $(
-    '.e2e-test-username-for-role-editor');
-  var editUserRoleButton = $('.e2e-test-role-edit-button');
-  var roleEditorContainer = $('.e2e-test-roles-editor-card-container');
-  var addNewRoleButton = $('.e2e-test-add-new-role-button');
-  var progressSpinner = $('.e2e-test-progress-spinner');
-  var roleSelector = $('.e2e-test-new-role-selector');
+  var configTab = $('.e2e-test-admin-config-tab');
   var configTitleLocator = '.e2e-test-config-title';
+  var editUserRoleButton = $('.e2e-test-role-edit-button');
+  var progressSpinner = $('.e2e-test-progress-spinner');
+  var roleEditorContainer = $('.e2e-test-roles-editor-card-container');
+  var roleSelector = $('.e2e-test-new-role-selector');
+  var saveAllConfigs = $('.e2e-test-save-all-configs');
   var statusMessage = $('.e2e-test-status-message');
 
   var saveConfigProperty = async function(
@@ -71,10 +68,15 @@ var AdminPage = function() {
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
+  this.get = async function() {
+    await browser.url(ADMIN_URL_SUFFIX);
+    await waitFor.pageToFullyLoad();
+  };
+
   this._editUserRole = async function(username) {
     await this.get();
     await _switchToRolesTab();
-    await action.keys(
+    await action.setValue(
       'Username input field', usernameInputFieldForRolesEditing, username);
     await action.click('Edit user role button', editUserRoleButton);
     await waitFor.visibilityOf(

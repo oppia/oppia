@@ -3915,11 +3915,11 @@ div.oppia-issues-learner-action {
   are used for correctly stacking AngularJS modals on top of Angular modals.
 */
 .forced-modal-stack-over {
-  z-index: 1060 !important;
+  z-index: 1080 !important;
 }
 
 .forced-modal-backdrop-stack-over {
-  z-index: 1055 !important;
+  z-index: 1075 !important;
 }
 
 .oppia-profile-picture {

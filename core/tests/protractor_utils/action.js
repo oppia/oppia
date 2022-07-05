@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for performing actions on element.
+ * @fileoverview Utilities for performing actions on element in protractor.
  */
 
 var waitFor = require('./waitFor.js');

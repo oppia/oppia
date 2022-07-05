@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the GraphInput interaction.
+ * @fileoverview End-to-end testing utilities for the GraphInput interaction
+ * in protractor.
  */
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
