@@ -39,10 +39,12 @@
       + Add Another Possible Answer
     </button>
 
-    <div *ngIf="isEditable && isCurrentInteractionTrainable() && isMLEnabled() && !isInQuestionMode()">
-      <button type="button" class="btn btn-secondary btn-lg oppia-modify-training-data-button" (click)="openTrainingDataEditor()">
-        <i class="material-icons md-24">playlist_add</i> Modify Training Data
-      </button>
+    <div *ngIf="isEditable && isMLEnabled() && !isInQuestionMode()">
+      <div *ngIf="isCurrentInteractionTrainable()">
+        <button type="button" class="btn btn-secondary btn-lg oppia-modify-training-data-button" (click)="openTrainingDataEditor()">
+          <i class="material-icons md-24">playlist_add</i> Modify Training Data
+        </button>
+      </div>
     </div>
   </div>
 

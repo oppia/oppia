@@ -16,9 +16,10 @@
  * @fileoverview Component for the rule editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, AfterViewChecked } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -43,7 +44,8 @@ interface Choice {
   selector: 'oppia-rule-editor',
   templateUrl: './rule-editor.component.html'
 })
-export class RuleEditorComponent implements OnInit {
+export class RuleEditorComponent
+  implements OnInit, OnDestroy, AfterViewChecked {
   @Input() isEditable: boolean;
   @Input() isEditingRuleInline: boolean;
   @Output() onCancelRuleEdit = new EventEmitter<void>();
@@ -66,6 +68,11 @@ export class RuleEditorComponent implements OnInit {
      private readonly changeDetectorRef: ChangeDetectorRef,
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
+  }
+
+  shivam(): void {
+    console.error(this.rule);
+    console.error(this.ruleDescriptionChoices);
   }
 
   computeRuleDescriptionFragments(): string {
@@ -203,6 +210,8 @@ export class RuleEditorComponent implements OnInit {
 
   onSelectionChangeHtmlSelect(selection: number, item: SelectItem): void {
     this.rule.inputs[item.varName] = selection;
+
+    this.changeDetectorRef.detectChanges();
   }
 
   onSelectNewRuleType(newRuleType: string): void {
@@ -236,13 +245,13 @@ export class RuleEditorComponent implements OnInit {
       // depending on the interaction. This varName would take its
       // default value from answerChoices, but other variables would
       // take their default values from the DEFAULT_OBJECT_VALUES dict.
-      if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
+      if (isEqual(DEFAULT_OBJECT_VALUES[varType], [])) {
         this.rule.inputs[varName] = [];
       } else if (answerChoices && answerChoices.length > 0) {
-        this.rule.inputs[varName] = angular.copy(
+        this.rule.inputs[varName] = cloneDeep(
           answerChoices[0].val);
       } else {
-        this.rule.inputs[varName] = angular.copy(
+        this.rule.inputs[varName] = cloneDeep(
           DEFAULT_OBJECT_VALUES[varType]);
       }
 
@@ -255,6 +264,8 @@ export class RuleEditorComponent implements OnInit {
         this.rule.inputs[key] = oldRuleInputs[key];
       }
     }
+
+    this.changeDetectorRef.detectChanges();
   }
 
   cancelThisEdit(): void {
@@ -295,6 +306,19 @@ export class RuleEditorComponent implements OnInit {
       this.onSelectNewRuleType(this.rule.type);
     }
     this.computeRuleDescriptionFragments();
+
+    // List-of-sets-of-translatable-html-content-ids-editor
+    // could not able to assign this.rule.inputTypes.x default values.
+    if (this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds') {
+      if (this.rule.inputs.x[0] === undefined ||
+          this.rule.inputs.x[0].length === 0) {
+        let box = [];
+        (this.ruleDescriptionChoices).map(choice => {
+          box.push([choice.val]);
+        });
+        this.rule.inputs.x = box;
+      }
+    }
   }
 
   ngOnDestroy(): void {

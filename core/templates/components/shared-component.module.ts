@@ -136,7 +136,6 @@ import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select
 import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selector.directive';
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { AnswerGroupEditor } from './state-directives/answer-group-editor/answer-group-editor.component';
-import { QuestionEditorModalComponent } from './question-directives/modal-templates/question-editor-modal.component';
 import { StateResponsesComponent } from './state-editor/state-responses-editor/state-responses.component';
 
 // Pipes.
@@ -296,7 +295,6 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel,
-    QuestionEditorModalComponent,
     RuleEditorComponent,
     HtmlSelectComponent,
     RuleTypeSelector,
@@ -404,7 +402,6 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel,
-    QuestionEditorModalComponent,
     RuleEditorComponent,
     HtmlSelectComponent,
     RuleTypeSelector,
@@ -521,7 +518,6 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
     TestInteractionPanel,
-    QuestionEditorModalComponent,
     RuleEditorComponent,
     HtmlSelectComponent,
     RuleTypeSelector,

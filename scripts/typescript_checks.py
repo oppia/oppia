@@ -119,8 +119,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/forms/validators/schema-validators.spec.ts',
     'core/templates/components/oppia-angular-root.component.spec.ts',
     'core/templates/components/oppia-angular-root.component.ts',
-    'core/templates/components/question-directives/modal-templates/question-editor-modal.component.spec.ts',
-    'core/templates/components/question-directives/modal-templates/question-editor-modal.component.ts',
     'core/templates/components/question-directives/modal-templates/question-editor-save-modal.component.ts',
     'core/templates/components/question-directives/question-editor/question-editor.component.spec.ts',
     'core/templates/components/question-directives/question-editor/question-editor.component.ts',

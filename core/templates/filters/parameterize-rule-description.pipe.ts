@@ -38,9 +38,9 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
   ) { }
 
   transform(
-      rule: Rule | null, interactionId: string,
+      rule: Rule | null, interactionId: string | null,
       choices: AnswerChoice[] | null): string {
-    if (!rule) {
+    if (!rule || !interactionId) {
       return '';
     }
 
@@ -80,7 +80,7 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
       if (choices) {
         if (varType === 'SetOfTranslatableHtmlContentIds') {
           replacementText = '[';
-          const key = Object.keys(inputs[varName]);
+          const key = inputs[varName] as string[];
           const contentIds = choices.map(choice => choice.val);
 
           for (var i = 0; i < key.length; i++) {
@@ -98,7 +98,7 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
           replacementText += ']';
         } else if (varType === 'ListOfSetsOfTranslatableHtmlContentIds') {
           replacementText = '[';
-          const key = Object.keys(inputs[varName]);
+          const key = inputs[varName] as string[];
           const contentIds = choices.map(choice => choice.val);
 
           for (var i = 0; i < key.length; i++) {

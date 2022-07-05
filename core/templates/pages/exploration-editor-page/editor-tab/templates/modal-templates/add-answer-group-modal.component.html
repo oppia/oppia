@@ -11,14 +11,14 @@
 
     <oppia-rule-editor class="rule-editor-add-answer"
                        [modalId]="modalId"
-                       [rule]="tmpRule"
+                       [(rule)]="tmpRule"
                        [isEditable]="isEditable"
                        [isEditingRuleInline]="false">
     </oppia-rule-editor>
 
     <br>
 
-    <div *ngIf="!feedbackEditorIsOpen && true"
+    <div *ngIf="!feedbackEditorIsOpen"
          title="Edit feedback" class="oppia-edit-feedback">
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">

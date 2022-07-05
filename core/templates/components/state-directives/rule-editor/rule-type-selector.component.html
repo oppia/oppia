@@ -1,7 +1,7 @@
 <mat-form-field appearance="fill" class="rule-type-selector">
   <mat-label>Rule:</mat-label>
   <mat-select [(value)]="localValue" disableRipple>
-    <mat-option class="protractor-rule-type-selector"
+    <mat-option class="protractor-test-rule-type-selector"
                 *ngFor="let choice of choices; index as index"
                 value="{{choice.id}}"
                 (click)="selectedRule($event)">{{choice.text}}

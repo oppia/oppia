@@ -30,8 +30,7 @@ var ExplorationEditorPage =
 
 var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Full exploration editor', function() {
+describe('Full exploration editor', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
