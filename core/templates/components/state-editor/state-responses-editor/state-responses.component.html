@@ -17,9 +17,9 @@
       <div class="state-response-container oppia-mobile-collapsible-card-content" *ngIf="responseCardIsShown">
         <div *ngIf="answerGroups?.length > 0">
           <div cdkDropList
-              (cdkDropListDropped)="drop($event)"
-              class="nav oppia-option-list nav-stacked nav-pills"
-              role="tablist">
+               (cdkDropListDropped)="drop($event)"
+               class="nav oppia-option-list nav-stacked nav-pills"
+               role="tablist">
             <div [cdkDragDisabled]="activeAnswerGroupIndex === index ? true : false"
                  cdkDrag
                  *ngFor="let answerGroup of answerGroups; let index = index"
