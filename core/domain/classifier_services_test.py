@@ -681,7 +681,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         invalid_signature = 'invalid signature'
         invalid_vm_id = 'invalid vm_id'
         oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
-            message,
+            message.encode('utf-8'),
             vm_id,
             expected_signature
         )
@@ -690,7 +690,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         # Check if an invalid signature causes verify_signature to fail.
         oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
-            message,
+            message.encode('utf-8'),
             vm_id,
             invalid_signature
         )
@@ -699,7 +699,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         # Check if an invalid vm_id causes verify_signature to fail.
         oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
-            message,
+            message.encode('utf-8'),
             invalid_vm_id,
             expected_signature
         )

@@ -43,14 +43,14 @@ if MYPY: # pragma: no cover
 # in Oppia-ml.
 def generate_signature(
     secret: bytes,
-    message: Union[str, bytes],
+    message: bytes,
     vm_id: str
 ) -> str:
     """Generates digital signature for given data.
 
     Args:
         secret: bytes. The secret used to communicate with Oppia-ml.
-        message: bytes|str. The message payload data.
+        message: bytes. The message payload data.
         vm_id: str. The ID of the VM that generated the message.
 
     Returns:
