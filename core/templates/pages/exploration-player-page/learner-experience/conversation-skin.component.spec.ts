@@ -82,11 +82,11 @@ class MockWindowRef {
       pathname: '/path/name',
       reload: () => {}
     },
+    onresize: null,
     addEventListener(event: string, callback) {
       callback({returnValue: null});
     },
-    scrollTo: (x, y) => {},
-    onresize: (evt) => {}
+    scrollTo: (x, y) => {}
   };
 }
 
