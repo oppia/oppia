@@ -446,7 +446,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         """
         with datastore_services.get_ndb_context():
             exp_model_at_v1 = exp_models.ExplorationModel.get_version(
-                exp_id, 1
+                exp_id, 1, strict=False
             )
             return exp_model_at_v1
 

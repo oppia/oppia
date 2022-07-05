@@ -358,3 +358,43 @@ class ComputeExplorationVersionHistoryJobTests(
         )
         for model in version_history_models:
             assert model is not None
+
+    def test_job_can_run_when_version_history_already_exists(self):
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
+        version_history_keys = [
+            datastore_services.Key(
+                exp_models.ExplorationVersionHistoryModel,
+                exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    self.EXP_ID_1, 1
+                )
+            ),
+            datastore_services.Key(
+                exp_models.ExplorationVersionHistoryModel,
+                exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    self.EXP_ID_2, 1
+                )
+            )
+        ]
+
+        # We are not deleting the version history models this time. Also,
+        # they will be created while updating the exploration by exp_services.
+        version_history_models = datastore_services.get_multi(
+            version_history_keys
+        )
+        for model in version_history_models:
+            assert model is not None
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stdout(
+                'CREATED VERSION HISTORY MODELS SUCCESS: 2'
+            )
+        ])
+
+        version_history_models = datastore_services.get_multi(
+            version_history_keys
+        )
+        for model in version_history_models:
+            assert model is not None
