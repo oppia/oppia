@@ -6,9 +6,9 @@
     <ng-template ngbNavContent>
       <span>
         <br>
-        <oppia-interaction-display [classStr]="'protractor-test-tab-content-' + idx"
-                                   [htmlData]="tabContent.content">
-        </oppia-interaction-display>
+        <oppia-rte-output-display [class]="'protractor-test-tab-content-' + idx"
+                                  [rteString]="tabContent.content">
+        </oppia-rte-output-display>
       </span>
     </ng-template>
   </ng-container>

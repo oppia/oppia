@@ -4,9 +4,9 @@
 <div class="oppia-shadow-preview-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
-      <oppia-interaction-display classStr="oppia-rte-viewer oppia-learner-view-card-top-content"
-                                 [htmlData]="stateContentService.displayed._html">
-      </oppia-interaction-display>
+      <oppia-rte-output-display class="oppia-rte-viewer oppia-learner-view-card-top-content"
+                                [rteString]="stateContentService.displayed._html">
+      </oppia-rte-output-display>
     </div>
   </div>
 </div>

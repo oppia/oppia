@@ -28,6 +28,7 @@ import { ShortResponseDragAndDropSortInputComponent } from './directives/oppia-s
 import { ResponseDragAndDropSortInputComponent } from './directives/oppia-response-drag-and-drop-sort-input.component';
 import { TranslateModule } from '@ngx-translate/core';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [
@@ -37,6 +38,7 @@ import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
     MatIconModule,
     FormsModule,
     MaterialModule,
+    RichTextComponentsModule,
     TranslateModule,
   ],
   declarations: [

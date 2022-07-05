@@ -30,8 +30,8 @@
                         tabindex="0"
                         [ngModelOptions]="{standalone: true}">
             <span dir="auto">
-              <oppia-interaction-display classStr="protractor-test-item-selection-option" [htmlData]="choice">
-              </oppia-interaction-display>
+              <oppia-rte-output-display class="protractor-test-item-selection-option" [rteString]="choice">
+              </oppia-rte-output-display>
             </span>
           </mat-checkbox>
         </label>
@@ -46,8 +46,8 @@
           </div>
           <div class="multiple-choice-content-container">
             <span>
-              <oppia-interaction-display classStr="protractor-test-multiple-choice-option" [htmlData]="choice">
-              </oppia-interaction-display>
+              <oppia-rte-output-display class="protractor-test-multiple-choice-option" [rteString]="choice">
+              </oppia-rte-output-display>
             </span>
           </div>
         </button>

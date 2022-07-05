@@ -55,7 +55,7 @@ export class StateContentEditorComponent implements OnInit {
   isEditable: boolean;
   HTML_SCHEMA: HTMLSchema;
 
-  limitIsReached = false;
+  cardHeightLimitReached = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -108,9 +108,9 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   ngAfterViewChecked(): void {
-    let limitIsReached = this.isCardHeightLimitReached();
-    if (limitIsReached !== this.limitIsReached) {
-      this.limitIsReached = limitIsReached;
+    let cardHeightLimitReached = this.isCardHeightLimitReached();
+    if (cardHeightLimitReached !== this.cardHeightLimitReached) {
+      this.cardHeightLimitReached = cardHeightLimitReached;
       this.changeDetectorRef.detectChanges();
     }
   }

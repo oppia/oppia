@@ -1,9 +1,9 @@
 <div class="oppia-concept-card-viewer" *ngIf="!loadingMessage">
   <div class="concept-card-explanation">
     <div class="oppia-concept-card-explanation-container">
-      <oppia-interaction-display classStr="protractor-test-concept-card-explanation"
-                                 [htmlData]="currentConceptCard.getExplanation().html">
-      </oppia-interaction-display>
+      <oppia-rte-output-display class="protractor-test-concept-card-explanation"
+                                [rteString]="currentConceptCard.getExplanation().html">
+      </oppia-rte-output-display>
       <div *ngIf="skillDeletedMessage">
         <div class="oppia-align-center">{{ skillDeletedMessage }}</div>
       </div>
