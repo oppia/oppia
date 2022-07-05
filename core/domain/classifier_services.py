@@ -43,7 +43,7 @@ if MYPY: # pragma: no cover
 # in Oppia-ml.
 def generate_signature(
     secret: bytes,
-    message: Union[str, bytes],
+    message: bytes,
     vm_id: str
 ) -> str:
     """Generates digital signature for given data.
@@ -88,7 +88,7 @@ def verify_signature(
         return False
 
     generated_signature = generate_signature(
-        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
+        secret, oppia_ml_auth_info.message.encode('utf-8'), oppia_ml_auth_info.vm_id)
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True

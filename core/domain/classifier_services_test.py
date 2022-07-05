@@ -665,7 +665,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         message = 'test message'
         signature = classifier_services.generate_signature(
             secret.encode('utf-8'),
-            message,
+            message.encode('utf-8'),
             vm_id)
         expected_signature = (
             '9c2f9f607c0eefc2b8ba153bad9331843a6efc71c82e690f5f0341bbc38b7fa7')
