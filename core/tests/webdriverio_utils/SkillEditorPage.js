@@ -23,74 +23,71 @@ var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
   var EDITOR_URL_PREFIX = '/skill_editor/';
-  var confirmSkillDifficultyButton = $(
-    '.e2e-test-confirm-skill-difficulty-button');
-  var editConceptCardExplanationButton = $('.e2e-test-edit-concept-card');
-  var saveConceptCardExplanationButton = $('.e2e-test-save-concept-card');
-  var conceptCardExplanationText = $('.e2e-test-concept-card-explanation');
+  var addMisconceptionButton = $('.e2e-test-add-misconception-modal-button');
+  var addMisconceptionModal = $('.e2e-test-add-misconception-modal');
   var addWorkedExampleButton = $('.e2e-test-add-worked-example');
-  var saveWorkedExampleButton = $('.e2e-test-save-worked-example-button');
-  var deleteExampleButtonLocator = '.e2e-test-delete-example-button';
-  var workedExampleSummary = function(index) {
-    return $(`.e2e-test-worked-example-${index}`);
-  };
-  var workedExampleQuestionInput = $(
-    '.e2e-test-worked-example-question .e2e-test-rte');
-  var workedExampleExplanationInput = $(
-    '.e2e-test-worked-example-explanation .e2e-test-rte');
-  var workedExampleQuestionField = $(
-    '.e2e-test-worked-example-question-field');
-  var workedExampleExplanationField = $(
-    '.e2e-test-worked-example-explanation-field');
-  var deleteWorkedExampleButton = function(index) {
-    return $(`.e2e-test-worked-example-${index}`)
-      .$(deleteExampleButtonLocator);
-  };
+  var addWorkedExampleModal = $('.e2e-test-add-worked-example-modal');
+  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
+  var commitMessageField = $('.e2e-test-commit-message-input');
+  var conceptCardExplanationEditorInput = $(
+    '.e2e-test-concept-card-text .e2e-test-rte');
+  var conceptCardExplanationText = $('.e2e-test-concept-card-explanation');
+  var conceptCardTextElement = $('.e2e-test-concept-card-text');
+  var confirmAddMisconception = $('.e2e-test-confirm-add-misconception-button');
+  var confirmDeleteMisconception = $(
+    '.e2e-test-confirm-delete-misconception-button');
   var confirmDeleteWorkedExample = $(
     '.e2e-test-confirm-delete-worked-example-button');
-  var addMisconceptionButton = $('.e2e-test-add-misconception-modal-button');
-  var misconceptionNameField = $('.e2e-test-misconception-name-field');
-  var misconceptionNotesField = $('.e2e-test-notes-textarea .e2e-test-rte');
-  var misconceptionFeedbackField = $(
-    '.e2e-test-feedback-textarea .e2e-test-rte');
-  var confirmAddMisconception = $('.e2e-test-confirm-add-misconception-button');
-  var misconceptionListContainer = $('.e2e-test-misconception-list-container');
+  var confirmSkillDifficultyButton = $(
+    '.e2e-test-confirm-skill-difficulty-button');
+  var createQuestionButton = $('.e2e-test-create-question-button');
+  var deleteExampleButtonLocator = '.e2e-test-delete-example-button';
   var deleteMisconceptionButton = function(index) {
     return $(`.e2e-test-misconception-${index}`)
       .$(deleteExampleButtonLocator);
   };
-  var confirmDeleteMisconception = $(
-    '.e2e-test-confirm-delete-misconception-button');
-  var saveOrPublishSkillButton = $('.e2e-test-save-or-publish-skill');
-  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
-  var commitMessageField = $('.e2e-test-commit-message-input');
-  var skillDescriptionField = $('.e2e-test-skill-description-field');
-  var questionsTab = $('.e2e-test-questions-tab');
-  var createQuestionButton = $('.e2e-test-create-question-button');
-  var saveQuestionButton = $('.e2e-test-save-question-button');
-  var questionItem = $('.e2e-test-question-list-item');
-
-  var saveRubricExplanationButton = $(
-    '.e2e-test-save-rubric-explanation-button');
+  var deleteMisconceptionModal = $('.e2e-test-delete-misconception-modal');
   var deleteRubricExplanationButton = $(
     '.e2e-test-delete-rubric-explanation-button');
+  var deleteWorkedExampleButton = function(index) {
+    return $(`.e2e-test-worked-example-${index}`)
+      .$(deleteExampleButtonLocator);
+  };
+
+  var deleteWorkedExampleModal = $('.e2e-test-delete-worked-example-modal');
   var easyRubricDifficulty = $('.e2e-test-skill-difficulty-easy');
-  var skillChangeCount = $('.e2e-test-changes-count-text');
-  var selectRubricDifficulty = $('.e2e-test-select-rubric-difficulty');
+  var editConceptCardExplanationButton = $('.e2e-test-edit-concept-card');
+  var misconceptionFeedbackField = $(
+    '.e2e-test-feedback-textarea .e2e-test-rte');
+  var misconceptionListContainer = $('.e2e-test-misconception-list-container');
+  var misconceptionNameField = $('.e2e-test-misconception-name-field');
+  var misconceptionNotesField = $('.e2e-test-notes-textarea .e2e-test-rte');
+  var questionItem = $('.e2e-test-question-list-item');
+  var questionsTab = $('.e2e-test-questions-tab');
   var rubricExplanationEditorElement = $('.e2e-test-rubric-explanation-text');
   var rubricExplanationEditorInput = $(
     '.e2e-test-rubric-explanation-text .e2e-test-rte');
-  var addWorkedExampleModal = $('.e2e-test-add-worked-example-modal');
-  var deleteWorkedExampleModal = $('.e2e-test-delete-worked-example-modal');
-  var addMisconceptionModal = $('.e2e-test-add-misconception-modal');
-  var deleteMisconceptionModal = $('.e2e-test-delete-misconception-modal');
-  var conceptCardTextElement = $('.e2e-test-concept-card-text');
-  var conceptCardExplanationEditorInput = $(
-    '.e2e-test-concept-card-text .e2e-test-rte');
-
+  var saveConceptCardExplanationButton = $('.e2e-test-save-concept-card');
+  var saveOrPublishSkillButton = $('.e2e-test-save-or-publish-skill');
+  var saveQuestionButton = $('.e2e-test-save-question-button');
+  var saveRubricExplanationButton = $(
+    '.e2e-test-save-rubric-explanation-button');
+  var saveWorkedExampleButton = $('.e2e-test-save-worked-example-button');
+  var selectRubricDifficulty = $('.e2e-test-select-rubric-difficulty');
+  var skillChangeCount = $('.e2e-test-changes-count-text');
+  var skillDescriptionField = $('.e2e-test-skill-description-field');
   var staleTabInfoModal = $('.e2e-test-stale-tab-info-modal');
   var unsavedChangesStatusInfoModal = $('.e2e-test-unsaved-changes-info-modal');
-
+  var workedExampleExplanationField = $(
+    '.e2e-test-worked-example-explanation-field');
+  var workedExampleExplanationInput = $(
+    '.e2e-test-worked-example-explanation .e2e-test-rte');
+  var workedExampleQuestionField = $('.e2e-test-worked-example-question-field');
+  var workedExampleQuestionInput = $(
+    '.e2e-test-worked-example-question .e2e-test-rte');
+  var workedExampleSummary = function(index) {
+    return $(`.e2e-test-worked-example-${index}`);
+  };
 
   this.get = async function(skillId) {
     await browser.url(EDITOR_URL_PREFIX + skillId);

@@ -23,13 +23,13 @@ var waitFor = require('./waitFor.js');
 var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
-  var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
-  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
-  var mainHeader = $('.e2e-test-library-main-header');
-  var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
-  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
   var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
+  var allCollectionSummaryTile = $('.e2e-test- collection-summary-tile');
+  var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
+  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
+  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
   var expHoverElement = $('.e2e-test-exploration-dashboard-card');
+  var mainHeader = $('.e2e-test-library-main-header');
   var searchButton = $('.e2e-test-search-button');
   var allExplorationsTitled = function(explorationName) {
     return $$(
