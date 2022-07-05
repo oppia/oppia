@@ -88,7 +88,8 @@ def verify_signature(
         return False
 
     generated_signature = generate_signature(
-        secret, oppia_ml_auth_info.message.encode('utf-8'),
+        secret,
+        oppia_ml_auth_info.message.encode('utf-8'),
         oppia_ml_auth_info.vm_id
     )
     if generated_signature != oppia_ml_auth_info.signature:
