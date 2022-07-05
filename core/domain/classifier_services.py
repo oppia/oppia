@@ -699,10 +699,11 @@ def get_classifier_training_job_maps(
     state_to_algorithm_id_job_id_maps: List[Optional[Dict[str, str]]] = []
     for state_mapping_model in state_training_jobs_mapping_models:
         if state_mapping_model:
-            # TODO(#15621): Here, `.algorithm_ids_to_job_ids` is an instance of
-            # ndb's JsonProperty and currently all the ndb properties are annotated
-            # with Any return type. So, once we have proper return type for ndb
-            # properties, this explicit declaration of type should be removed.
+            # TODO(#15621): Here, `.algorithm_ids_to_job_ids` is an instance
+            # of ndb's JsonProperty and currently all the ndb properties are
+            # annotated with Any return type. So, once we have proper return
+            # type for ndb properties, this explicit declaration of type
+            # should be removed.
             algo_ids_to_job_ids: Dict[
                 str, str
             ] = state_mapping_model.algorithm_ids_to_job_ids
