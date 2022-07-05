@@ -14,8 +14,10 @@
         <div class="state-hints-content-container oppia-mobile-collapsible-card-content" *ngIf="hintCardIsShown">
           <div class="oppia-add-hint-button-container">
             <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && editabilityService.isEditable()">
-              <button type="button" class="btn btn-primary oppia-add-hint-button protractor-test-oppia-add-hint-button"
-                (click)="openAddHintModal()" [disabled]="stateHintsService.displayed.length >= 5">
+              <button type="button" 
+                      class="btn btn-primary oppia-add-hint-button protractor-test-oppia-add-hint-button"
+                      (click)="openAddHintModal()"
+                      [disabled]="stateHintsService.displayed.length >= 5">
                 {{getHintButtonText()}}
               </button>
             </div>
@@ -28,30 +30,39 @@
               class="nav oppia-option-list-hint nav-stacked nav-pills">
               <!-- Note that adding "track by index" here seems to mess up the final
               index in the stop() event handler. -->
-              <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false" cdkDrag
-                *ngFor="let hint of stateHintsService.displayed; let index = index"
-                ngClass="{'active': stateHintsService.getActiveHintIndex() === index}"
-                class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
-                <span class="oppia-hint-sort-handle" *ngIf="stateHintsService.displayed.length > 1"
-                  (mousedown)="changeActiveHintIndex(null)">
+              <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false"
+                   cdkDrag
+                   *ngFor="let hint of stateHintsService.displayed; let index = index"
+                   ngClass="{'active': stateHintsService.getActiveHintIndex() === index}"
+                   class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
+                <span class="oppia-hint-sort-handle"
+                      *ngIf="stateHintsService.displayed.length > 1"
+                      (mousedown)="changeActiveHintIndex(null)">
                   <picture *ngIf="editabilityService.isEditable()">
                     <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
                     <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
                     <img [src]="getStaticImageUrl('/general/drag_dots.png')" width="10">
                   </picture>
                 </span>
-                <a (click)="changeActiveHintIndex(index)" class="oppia-rule-tab protractor-test-hint-tab"
-                  ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
-                  <oppia-response-header class="oppia-response-header-center" [defaultOutcome]="false" [index]="index"
-                    [summary]="getHintSummary(hint)" [shortSummary]="getHintSummary(hint)"
-                    [isActive]="index === stateHintsService.getActiveHintIndex()" (delete)="deleteHint($event)">
+                <a (click)="changeActiveHintIndex(index)"
+                   class="oppia-rule-tab protractor-test-hint-tab"
+                   ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
+                  <oppia-response-header class="oppia-response-header-center"
+                                         [defaultOutcome]="false"
+                                         [index]="index"
+                                         [summary]="getHintSummary(hint)"
+                                         [shortSummary]="getHintSummary(hint)"
+                                         [isActive]="index === stateHintsService.getActiveHintIndex()"
+                                         (delete)="deleteHint($event)">
                   </oppia-response-header>
                 </a>
 
                 <div *ngIf="stateHintsService.getActiveHintIndex() === index">
                   <div class="oppia-editor-card-section protractor-test-hint-body-{{index}}">
-                    <oppia-hint-editor [hint]="hint" [indexPlusOne]="index + 1" (saveHint)="onSaveInlineHint()"
-                      (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                    <oppia-hint-editor [hint]="hint"
+                                       [indexPlusOne]="index + 1"
+                                       (saveHint)="onSaveInlineHint()"
+                                       (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </oppia-hint-editor>
                   </div>
                 </div>
