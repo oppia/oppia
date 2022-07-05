@@ -36,11 +36,17 @@ if MYPY: # pragma: no cover
     [models.NAMES.question, models.NAMES.skill])
 
 
+QuestionAndSkillDescriptionsType = Tuple[
+    List[Optional[question_domain.Question]],
+    List[List[Optional[str]]]
+]
+
+
 def get_questions_and_skill_descriptions_by_skill_ids(
     question_count: int,
     skill_ids: List[str],
     offset: int
-) -> Tuple[List[Optional[question_domain.Question]], List[List[Optional[str]]]]:
+) -> QuestionAndSkillDescriptionsType:
     """Returns the questions linked to the given skill ids.
 
     Args:

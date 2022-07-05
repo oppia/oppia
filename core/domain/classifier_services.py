@@ -413,29 +413,30 @@ def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
     if timed_out_job_ids:
         mark_training_jobs_failed(timed_out_job_ids)
 
-    if valid_jobs:
-        next_job_model = valid_jobs[0]
-        # Assuming that a pending job has empty classifier data as it has not
-        # been trained yet.
-        # Here, next_job_model is an instance of `ClassifierTrainingJobModel`
-        # and `ClassifierTrainingJobModel` does not contain any classifier_data
-        # attribute but here we are defining, and assigning `None` value to this
-        # attribute which causes MyPy to throw error `class has no attribute
-        # "classifier_data"`. So, to silent the error, we used ignore
-        # statement here.
-        next_job_model.classifier_data = None  # type: ignore[attr-defined]
-        next_job = get_classifier_training_job_from_model(next_job_model)
-        _update_scheduled_check_time_for_new_training_job(next_job.job_id)
-    else:
+    if not valid_jobs:
         return None
+
+    next_job_model = valid_jobs[0]
+    # Assuming that a pending job has empty classifier data as it has not
+    # been trained yet.
+    # Here, next_job_model is an instance of `ClassifierTrainingJobModel`
+    # and `ClassifierTrainingJobModel` does not contain any classifier_data
+    # attribute but here we are defining, and assigning `None` value to this
+    # attribute which causes MyPy to throw error `class has no attribute
+    # "classifier_data"`. So, to silent the error, we used ignore
+    # statement here.
+    next_job_model.classifier_data = None  # type: ignore[attr-defined]
+    next_job = get_classifier_training_job_from_model(next_job_model)
+    _update_scheduled_check_time_for_new_training_job(next_job.job_id)
     return next_job
 
 
-# TODO(#15451): Add stubs for protobuf once we have enough info regarding
-# protobuf's library.
+# TODO(#15451): Add stubs for protobuf once we have enough type info regarding
+# protobuf's library. Because currently, the stubs in typeshed is not fully
+# type annotated yet and the main repository is also not type annotated yet.
 # The argument classifier_data_proto can accept instances of
-# `TextClassifierFrozenModel` class. But since, we excluded
-# proto_files/ from the static type annotations. This argument
+# `TextClassifierFrozenModel` class. But since we excluded
+# proto_files/ from the static type annotations, this argument
 # is annotated as general object type.
 def store_classifier_data(job_id: str, classifier_data_proto: object) -> None:
     """Checks for the existence of the model and then updates it.
@@ -698,10 +699,10 @@ def get_classifier_training_job_maps(
     state_to_algorithm_id_job_id_maps: List[Optional[Dict[str, str]]] = []
     for state_mapping_model in state_training_jobs_mapping_models:
         if state_mapping_model:
-            # TODO(#15621): The explicit declaration of type for ndb properties
-            # should be removed. Currently, these ndb properties are annotated
-            # with Any return type. Once we have proper return type we can
-            # remove this.
+            # TODO(#15621): Here, `.algorithm_ids_to_job_ids` is an instance of
+            # ndb's JsonProperty and currently all the ndb properties are annotated
+            # with Any return type. So, once we have proper return type for ndb
+            # properties, this explicit declaration of type should be removed.
             algo_ids_to_job_ids: Dict[
                 str, str
             ] = state_mapping_model.algorithm_ids_to_job_ids

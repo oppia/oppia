@@ -448,10 +448,9 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_domain.StateTrainingJobsMapping(
                 u'1', 2, 'Home', {'algorithm_id': 'job_id2'}))
 
-        state_training_jobs_mappings_model = state_training_jobs_mappings
         mapping_ids = (
             classifier_models.StateTrainingJobsMappingModel.create_multi(
-                state_training_jobs_mappings_model
+                state_training_jobs_mappings
             )
         )
         self.assertEqual(len(mapping_ids), 2)
