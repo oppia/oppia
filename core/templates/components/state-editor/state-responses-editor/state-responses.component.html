@@ -190,12 +190,12 @@
 
 <style>
   .option-list-default {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
     border: solid 1px #ccc;
     border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
   }
 
   .cdk-drag-placeholder {
@@ -207,18 +207,16 @@
   }
 
   .oppia-sortable-rule-block {
-    cursor: pointer;
-    justify-content: space-between;
-    position: relative;
     border: solid 1px #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
     color: rgba(0, 0, 0, 0.87);
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    width: 100%;
     justify-content: space-between;
-    box-sizing: border-box;
-    cursor: move;
+    position: relative;
+    width: 100%;
   }
 
   .oppia-rule-sort-handle {
@@ -228,11 +226,11 @@
   }
 
   .oppia-option-list {
-    width: 500px;
+    display: block;
     max-width: 100%;
     min-height: 60px;
-    display: block;
     overflow: hidden;
+    width: 500px;
   }
 
   .oppia-option-list.cdk-drop-list-dragging .oppia-sortable-rule-block:not(.cdk-drag-placeholder) {
