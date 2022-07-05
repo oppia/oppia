@@ -90,6 +90,48 @@ describe('Rule Editor Component', () => {
     component.ngOnDestroy();
   });
 
+  it('should intitialize properties of ListOfSetsOfTranslatableHtmlContentIds',
+    fakeAsync(() => {
+      spyOn(component, 'computeRuleDescriptionFragments').and.stub();
+      component.rule = {
+        type: 'Equals',
+        inputs: {
+          x: [],
+        },
+        inputTypes: {
+          x: 'ListOfSetsOfTranslatableHtmlContentIds'
+        }
+      } as unknown as Rule;
+      component.ruleDescriptionChoices = [
+        {
+          id: '1',
+          val: 'data 1',
+        },
+        {
+          id: '2',
+          val: 'data 2',
+        },
+        {
+          id: '3',
+          val: 'data 3',
+        }
+      ];
+      stateInteractionIdService.savedMemento = 'DragAndDropSortInput';
+
+      tick();
+      component.ngOnInit();
+
+      expect(component.currentInteractionId).toBe('DragAndDropSortInput');
+      expect(component.editRuleForm).toEqual({});
+      expect(component.rule.inputs.x).toEqual(
+        [
+          ['data 1'],
+          ['data 2'],
+          ['data 3']
+        ]
+      );
+    }));
+
   it('should set component properties on initialization', () => {
     component.rule = {
       type: null

@@ -275,12 +275,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   it('should correctly parameterize for SetOfTranslatableHtmlContentIds' +
    ' with INVALID', () => {
     var rules = ruleObjectFactory.createNew('Equals', {
-      x: {
-        1: '1',
-        2: '2',
-        3: '3',
-        4: '4'
-      }
+      x: ['1', '2', '3', '4']
     }, {
       x: 'data'
     });
@@ -295,16 +290,13 @@ describe('ParameterizeRuleDescriptionPipe', () => {
         label: 'string'
       }]);
 
-    expect(result).toEqual('is equal to []');
+    expect(result).toEqual('is equal to [INVALID,INVALID,INVALID,INVALID]');
   });
 
   it('should correctly parameterize for SetOfTranslatableHtmlContentIds',
     () => {
       var rules = ruleObjectFactory.createNew('Equals', {
-        x: {
-          1: '1',
-          2: '2',
-        }
+        x: ['1', '2']
       }, {
         x: 'data'
       });
@@ -325,10 +317,10 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   it('should correctly parameterize for ListOfSetsOfTranslatableHtmlContentIds',
     () => {
       var rules = ruleObjectFactory.createNew('IsEqualToOrdering', {
-        x: {
-          1: ['1', '12', '4', '2'],
-          2: ['1', '12', '4', '2'],
-        }
+        x: [
+          ['1'],
+          ['2'],
+        ]
       }, {
         x: 'data'
       });
@@ -349,12 +341,10 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   it('should correctly parameterize for' +
    'ListOfSetsOfTranslatableHtmlContentIds with INVALID', () => {
     var rules = ruleObjectFactory.createNew('IsEqualToOrdering', {
-      x: {
-        1: '1',
-        2: '2',
-        3: '3',
-        4: '4'
-      }
+      x: [
+        ['1'],
+        ['5'],
+      ]
     }, {
       x: 'data'
     });
@@ -370,7 +360,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
       }]);
 
     expect(result).toEqual(
-      'is equal to ordering [[INVALID],[INVALID],[INVALID],[INVALID]]');
+      'is equal to ordering [[INVALID],[INVALID]]');
   });
 
   it('should correctly parameterize for' +

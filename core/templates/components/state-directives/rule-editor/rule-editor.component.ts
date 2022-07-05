@@ -70,11 +70,6 @@ export class RuleEditorComponent
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  shivam(): void {
-    console.error(this.rule);
-    console.error(this.ruleDescriptionChoices);
-  }
-
   computeRuleDescriptionFragments(): string {
     if (!this.rule.type) {
       this.ruleDescriptionFragments = [];
@@ -311,7 +306,7 @@ export class RuleEditorComponent
     // could not able to assign this.rule.inputTypes.x default values.
     if (this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds') {
       if (this.rule.inputs.x[0] === undefined ||
-          this.rule.inputs.x[0].length === 0) {
+          this.rule.inputs.x[0]?.length === 0) {
         let box = [];
         (this.ruleDescriptionChoices).map(choice => {
           box.push([choice.val]);
