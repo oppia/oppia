@@ -83,9 +83,6 @@ require(
   'components/question-directives/question-player/' +
   'question-player.constants.ajs.ts');
 require(
-  'components/question-directives/question-player/' +
-  'question-player-concept-card-modal.controller.ts');
-require(
   'components/question-directives/question-player/services/' +
   'question-player-state.service.ts');
 require(
@@ -123,6 +120,7 @@ require(
 require('pages/exploration-player-page/services/player-position.service.ts');
 
 import { Subscription } from 'rxjs';
+import { QuestionPlayerConceptCardModalComponent } from './question-player-concept-card-modal.component';
 
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/prevent-page-unload-event.service.ts');
@@ -134,7 +132,8 @@ angular.module('oppia').component('questionPlayer', {
   template: require('./question-player.component.html'),
   controller: [
     '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
-    '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
+    '$window', 'ExplorationPlayerStateService', 'NgbModal',
+    'PlayerPositionService',
     'PreventPageUnloadEventService', 'QuestionPlayerStateService',
     'SkillMasteryBackendApiService', 'UserService',
     'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
@@ -144,7 +143,7 @@ angular.module('oppia').component('questionPlayer', {
     'WRONG_ANSWER_PENALTY_FOR_MASTERY',
     function(
         $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
-        $window, ExplorationPlayerStateService, PlayerPositionService,
+        $window, ExplorationPlayerStateService, NgbModal, PlayerPositionService,
         PreventPageUnloadEventService, QuestionPlayerStateService,
         SkillMasteryBackendApiService, UserService,
         COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
@@ -222,17 +221,16 @@ angular.module('oppia').component('questionPlayer', {
           skills.push(
             ctrl.scorePerSkillMapping[skillId].description);
         });
-        $uibModal.open({
-          template: require(
-            'components/concept-card/concept-card-modal.template.html'
-          ),
-          backdrop: true,
-          resolve: {
-            skills: () => skills,
-            skillIds: () => skillIds,
-          },
-          controller: 'QuestionPlayerConceptCardModalController'
-        }).result.then(function() {}, function() {
+
+        const modelRef = NgbModal.open(
+          QuestionPlayerConceptCardModalComponent, {
+            backdrop: true,
+          });
+
+        modelRef.componentInstance.skills = skills;
+        modelRef.componentInstance.skillIds = skillIds;
+
+        modelRef.result.then(function() {}, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

@@ -62,9 +62,9 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     private editabilityService: EditabilityService,
     private solutionValidityService: SolutionValidityService,
     private loaderService: LoaderService,
-    private questionUpdateService: QuestionUpdateService,
     private ngbModal: NgbModal,
     private changeDetectionRef: ChangeDetectorRef,
+    private questionUpdateService: QuestionUpdateService,
   ) { }
 
   showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: string[]): void {

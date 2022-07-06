@@ -128,7 +128,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/question-directives/question-misconception-editor/tag-misconception-modal-component.ts',
     'core/templates/components/question-directives/question-misconception-selector/question-misconception-selector.component.spec.ts',
     'core/templates/components/question-directives/question-misconception-selector/question-misconception-selector.component.ts',
-    'core/templates/components/question-directives/question-player/question-player-concept-card-modal.controller.spec.ts',
+    'core/templates/components/question-directives/question-player/question-player-concept-card-modal.component.spec.ts',
     'core/templates/components/question-directives/question-player/question-player.component.spec.ts',
     'core/templates/components/question-directives/question-player/question-player.component.ts',
     'core/templates/components/question-directives/question-player/skill-mastery-modal.controller.spec.ts',

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for QuestionPlayerConceptCardModalController.
+ * @fileoverview Unit tests for QuestionPlayerConceptCardModalComponent.
  */
 
 
