@@ -23,7 +23,7 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var addNewRoleButton = $('.new-test-add-new-role-button');
+  var addNewRoleButton = $('.e2e-test-add-new-role-button');
   var adminRolesTab = $('.e2e-test-admin-roles-tab');
   var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
   var editUserRoleButton = $('.e2e-test-role-edit-button');
