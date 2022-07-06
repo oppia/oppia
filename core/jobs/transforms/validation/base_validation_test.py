@@ -280,11 +280,17 @@ class MockValidateModelDomainObjectInstancesWithNeutral(
     def _get_model_domain_object_instance(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
     def _get_domain_object_validation_type(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> base_validation.ValidationModes:
+        """Method redefined for testing purpose returning neutral mode
+        of validation.
+        """
         return base_validation.ValidationModes.NEUTRAL
 
 
@@ -294,11 +300,17 @@ class MockValidateModelDomainObjectInstancesWithStrict(
     def _get_model_domain_object_instance(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
     def _get_domain_object_validation_type(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> base_validation.ValidationModes:
+        """Method redefined for testing purpose returning strict mode
+        of validation.
+        """
         return base_validation.ValidationModes.STRICT
 
 
@@ -308,11 +320,17 @@ class MockValidateModelDomainObjectInstancesWithNonStrict(
     def _get_model_domain_object_instance(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
     def _get_domain_object_validation_type(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> base_validation.ValidationModes:
+        """Method redefined for testing purpose returning non-strict mode
+        of validation.
+        """
         return base_validation.ValidationModes.NON_STRICT
 
 
@@ -322,6 +340,9 @@ class MockValidateModelDomainObjectInstancesWithInvalid(
     def _get_model_domain_object_instance(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
     # We have ignored [override] here because the signature of this method
@@ -330,6 +351,9 @@ class MockValidateModelDomainObjectInstancesWithInvalid(
     def _get_domain_object_validation_type(  # type: ignore[override]
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> str:
+        """Method redefined for testing purpose returning string literal,
+        to check error 'Invalid validation type for domain object'.
+        """
         return 'invalid'
 
 
@@ -341,6 +365,9 @@ class MockValidateExplorationModelDomainObjectInstances(
     def _get_model_domain_object_instance(
         self, item: exp_models.ExplorationModel
     ) -> exp_domain.Exploration:
+        """Returns an Exploration domain object given an exploration
+        model loaded from the datastore.
+        """
         return exp_fetchers.get_exploration_from_model(item)
 
 
@@ -515,6 +542,10 @@ class MockValidateCommitCmdsSchema(
     def process(  # type: ignore[override]
         self, input_model: base_models.BaseModel
     ) -> None:
+        """Method defined to check that error is displayed when
+        _get_change_domain_class() method is missing from the
+        derived class.
+        """
         self._get_change_domain_class(input_model)
 
 
@@ -525,6 +556,7 @@ class MockValidateCommitCmdsSchemaChangeDomain(
     # We have ignored [override] here because the signature of this method
     # doesn't match with super class's `_get_change_domain_class()` method.
     def _get_change_domain_class(self, item: base_models.BaseModel) -> None:  # type: ignore[override]
+        """Method defined for testing purpose."""
         pass
 
 
@@ -535,6 +567,7 @@ class MockValidateWrongSchema(
     def _get_change_domain_class(
         self, item: base_models.BaseModel  # pylint: disable=unused-argument
     ) -> Type[change_domain.BaseChange]:
+        """Method defined for testing purpose returning BaseChange class."""
         return change_domain.BaseChange
 
 
