@@ -130,8 +130,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs/batch_jobs',
     'core/jobs/transforms/validation/exp_validation.py',
     'core/jobs/transforms/validation/exp_validation_test.py',
-    'core/jobs/transforms/validation/improvements_validation.py',
-    'core/jobs/transforms/validation/improvements_validation_test.py',
     'core/jobs/transforms/validation/question_validation.py',
     'core/jobs/transforms/validation/question_validation_test.py',
     'core/jobs/transforms/validation/skill_validation.py',
