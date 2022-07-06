@@ -37,6 +37,7 @@ import { LearnerGroupPagesConstants } from './learner-group-pages.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
 import { SearchService, SelectionDetails } from 'services/search.service';
 import { NavigationService } from 'services/navigation.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LearnerGroupSyllabusFilter, LearnerGroupSyllabusBackendApiService } 
@@ -74,6 +75,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
+  searchIsInProgress = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -156,6 +158,13 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
     this.refreshSearchBarLabels();
 
+    this.searchQueryChanged
+      .pipe(debounceTime(1000), distinctUntilChanged())
+      .subscribe(model => {
+        this.searchQuery = model;
+        this.onSearchQueryChangeExec();
+      });
+
     console.log(this.selectionDetails, "selection details");
   }
 
@@ -212,6 +221,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
+    this.onSearchQueryChangeExec();
   }
 
   refreshSearchBarLabels(): void {
@@ -246,6 +256,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   }
 
   onSearchQueryChangeExec(): void {
+    this.searchIsInProgress = true;
     let syllabusFilter: LearnerGroupSyllabusFilter = {
       keyword: this.searchQuery,
       type: (
@@ -264,8 +275,15 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.learnerGroupSyllabusBackendApiService.searchNewSyllabusItemsAsync(
       'newId', syllabusFilter
     ).then((syllabusItems) => {
+      this.searchIsInProgress = false;
         console.log(syllabusItems, "syllabus items");
     });
+  }
+
+  searchToBeExec(e: {target: {value: string}}): void {
+    if (!this.searchButtonIsActive) {
+      this.searchQueryChanged.next(e.target.value);
+    }
   }
 
   ngOnDestroy(): void {
