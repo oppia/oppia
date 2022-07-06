@@ -38,8 +38,7 @@ class MockNgbModal {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Question Editor Component', () => {
+describe('Question Editor Component', () => {
   let component: QuestionEditorComponent;
   let fixture: ComponentFixture<QuestionEditorComponent>;
   let ngbModal: NgbModal;

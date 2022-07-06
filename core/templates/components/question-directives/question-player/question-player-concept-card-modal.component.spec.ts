@@ -16,131 +16,111 @@
  * @fileoverview Unit tests for QuestionPlayerConceptCardModalComponent.
  */
 
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { QuestionPlayerConceptCardModalComponent } from './question-player-concept-card-modal.component';
 
-describe('Question Player Concept Card Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var urlService: UrlService = null;
-  var SkillObjectFactory = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  var skillIds = ['skill1', 'skill2'];
-  var skills = null;
-  var skillsObject = null;
-  var mockWindow = {
-    location: {
-      replace: jasmine.createSpy('replace')
+  dismiss(): void {
+    return;
+  }
+}
+
+class MockUrlService {
+  getPathname() {
+    return 'pathname';
+  }
+
+  getUrlParams() {
+    return 'getUrlParams';
+  }
+}
+
+describe('Question Player Concept Card Modal component', () => {
+  let component: QuestionPlayerConceptCardModalComponent;
+  let fixture: ComponentFixture<QuestionPlayerConceptCardModalComponent>;
+  let urlService: UrlService;
+
+  let mockWindow = {
+    nativeWindow: {
+      location: {
+        replace: jasmine.createSpy('replace')
+      }
     }
   };
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
-    $provide.value('UrlService', {
-      getPathname: () => 'pathname',
-      getUrlParams: () => 'getUrlParams'
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-    SkillObjectFactory = $injector.get('SkillObjectFactory');
-    var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
-
-    urlService = $injector.get('UrlService');
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    var misconceptionDict1 = {
-      id: '2',
-      name: 'test name',
-      notes: 'test notes',
-      feedback: 'test feedback',
-      must_be_addressed: true
-    };
-    var rubricDict = {
-      difficulty: skillDifficulties[0],
-      explanations: ['explanation']
-    };
-    var skillContentsDict = {
-      explanation: {
-        html: 'test explanation',
-        content_id: 'explanation',
-      },
-      worked_examples: [],
-      recorded_voiceovers: {
-        voiceovers_mapping: {}
-      }
-    };
-    skills = [{
-      id: 'skill1',
-      description: 'test description 1',
-      misconceptions: [misconceptionDict1],
-      rubrics: [rubricDict],
-      skill_contents: skillContentsDict,
-      language_code: 'en',
-      version: 3,
-      prerequisite_skill_ids: ['skill_1']
-    }, {
-      id: 'skill2',
-      description: 'test description 2',
-      misconceptions: [misconceptionDict1],
-      rubrics: [rubricDict],
-      skill_contents: skillContentsDict,
-      language_code: 'en',
-      version: 3,
-      prerequisite_skill_ids: ['skill_1']
-    }];
-
-    skillsObject = skills.map(skill => (
-      SkillObjectFactory.createFromBackendDict(skill)));
-
-    $scope = $rootScope.$new();
-    $controller('QuestionPlayerConceptCardModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      skillIds: skillIds,
-      skills: skillsObject
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        QuestionPlayerConceptCardModalComponent
+      ],
+      providers: [
+        SkillObjectFactory,
+        UrlService,
+        {
+          provide: UrlService,
+          useClass: MockUrlService
+        },
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        {
+          provide: WindowRef,
+          useValue: mockWindow
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.skillIds).toEqual(skillIds);
-      expect($scope.skills).toEqual(skillsObject);
-      expect($scope.index).toBe(0);
-      expect($scope.modalHeader).toEqual(skillsObject[0]);
-      expect($scope.isInTestMode).toBe(true);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(QuestionPlayerConceptCardModalComponent);
+    component = fixture.componentInstance;
+
+    urlService = TestBed.inject(UrlService);
+
+    fixture.detectChanges();
+  });
+
+  it('should initialize component properties after controller is initialized',
+    () => {
+      component.skills = ['name1', 'name2'];
+      component.ngOnInit();
+
+      expect(component.index).toBe(0);
+      expect(component.modalHeader).toEqual('name1');
     });
 
   it('should go to next concept card, and identify when it is the last' +
-    ' concept card.', function() {
-    expect($scope.isLastConceptCard()).toBe(false);
-    $scope.goToNextConceptCard();
-    expect($scope.index).toBe(1);
-    expect($scope.modalHeader).toEqual(skillsObject[1]);
-    expect($scope.isLastConceptCard()).toBe(true);
+    ' concept card.', fakeAsync(() => {
+    component.index = 1;
+    component.skills = ['name1', 'name2'];
 
-    $scope.goToNextConceptCard();
-    expect($scope.index).toBe(2);
-    expect($scope.modalHeader).toBe(undefined);
-  });
+    component.goToNextConceptCard();
+    tick();
 
-  it('should refresh page when retrying a practice test', function() {
+    expect(component.index).toEqual(2);
+    expect(component.isLastConceptCard()).toBe(false);
+  }));
+
+  it('should refresh page when retrying a practice test', () => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       selected_subtopic_ids: 'selected_subtopic_ids'
     });
-    $scope.retryTest();
-    expect(mockWindow.location.replace).toHaveBeenCalledWith(
-      'pathname?selected_subtopic_ids=selected_subtopic_ids');
+    spyOn(urlService, 'getPathname').and.returnValue('pathName');
+
+    component.retryTest();
+
+    expect(urlService.getPathname).toHaveBeenCalled();
+    expect(urlService.getUrlParams).toHaveBeenCalled();
   });
 });
