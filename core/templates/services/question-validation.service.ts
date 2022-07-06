@@ -35,8 +35,8 @@ export class QuestionValidationService {
       question: Question,
       misconceptionsBySkill: MisconceptionSkillMap): boolean {
     return !(
-      question.getValidationErrorMessage() ||
-      question.getUnaddressedMisconceptionNames(
+      question?.getValidationErrorMessage() ||
+      question?.getUnaddressedMisconceptionNames(
         misconceptionsBySkill
       ).length > 0 ||
       !this.stateEditorService.isCurrentSolutionValid());
