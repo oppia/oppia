@@ -602,7 +602,8 @@ def get_reviewable_translation_suggestions_by_offset(
             suggestions are fetched. If the list consists of some
             valid number of ids, suggestions corresponding to the
             IDs are fetched.
-        limit: int. The maximum number of results to return.
+        limit: int|None. The maximum number of results to return. If None,
+            all available results are returned.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
 
@@ -617,9 +618,12 @@ def get_reviewable_translation_suggestions_by_offset(
         user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
+    # The user cannot review any translations, so return early.
+    if len(language_codes) == 0:
+        return [], offset
 
     in_review_translation_suggestions = []
-    next_offset = 0
+    next_offset = offset
     if opportunity_summary_exp_ids is None:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
@@ -753,6 +757,58 @@ def get_translation_suggestions_in_review_by_exp_ids(exp_ids, language_code):
         get_suggestion_from_model(model) if model else None
         for model in suggestion_models_in_review
     ]
+
+
+def get_suggestions_with_translatable_explorations(suggestions):
+    """Filters the supplied suggestions for those suggestions that have
+    translatable exploration content. That is, the following are true:
+    - The suggestion's change content corresponds to an existing exploration
+    content card.
+    - The suggestion's corresponding exploration allows edits.
+
+    Args:
+        suggestions: list(Suggestion). List of translation suggestions to
+            filter.
+
+    Returns:
+        list(Suggestion). List of filtered translation suggestions.
+    """
+
+    def _has_translatable_exploration(suggestion, suggestion_exp_id_to_exp):
+        """Returns whether the supplied suggestion corresponds to a translatable
+        exploration content card.
+
+        Args:
+            suggestion: Suggestion. Translation suggestion domain object to
+                check.
+            suggestion_exp_id_to_exp: dict(str, Exploration). Dictionary mapping
+                suggestion target exploration IDs to their corresponding
+                Exploration domain objects.
+
+        Returns:
+            bool. Whether the supplied suggestion corresponds to a translatable
+            exploration content card.
+        """
+        exploration = suggestion_exp_id_to_exp[suggestion.target_id]
+        content_id_exists = False
+
+        # Checks whether the suggestion's change content still exists in the
+        # corresponding exploration.
+        # For more details, see https://github.com/oppia/oppia/issues/14339.
+        if suggestion.change.state_name in exploration.states:
+            content_id_exists = exploration.states[
+                suggestion.change.state_name].has_content_id(
+                    suggestion.change.content_id)
+        return content_id_exists and exploration.edits_allowed
+
+    suggestion_exp_ids = {
+        suggestion.target_id for suggestion in suggestions}
+    suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
+        list(suggestion_exp_ids))
+    return list(filter(
+        lambda suggestion: _has_translatable_exploration(
+            suggestion, suggestion_exp_id_to_exp),
+        suggestions))
 
 
 def _get_plain_text_from_html_content_string(html_content_string):

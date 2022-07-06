@@ -62,6 +62,7 @@ import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { OutcomeEditorComponent } from './state-directives/outcome-editor/outcome-editor.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
@@ -102,6 +103,8 @@ import { SavePendingChangesModalComponent } from './save-pending-changes/save-pe
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
+import { EndChapterCheckMarkComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-confetti.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
 import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
@@ -124,6 +127,10 @@ import { SolutionEditor } from './state-directives/solution-editor/solution-edit
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
+import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
+import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
+import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
+import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -134,7 +141,7 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 
@@ -147,9 +154,9 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
@@ -184,6 +191,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -212,6 +221,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -264,7 +274,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 
   entryComponents: [
@@ -278,6 +292,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -311,6 +327,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -358,7 +375,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
     StaleTabInfoModalComponent,
-    UnsavedChangesStatusInfoModalComponent
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 
   exports: [
@@ -389,6 +410,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -421,6 +444,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     RubricsEditorComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     StateContentEditorComponent,
@@ -462,6 +486,10 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel
   ],
 })
 

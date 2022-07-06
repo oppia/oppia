@@ -34,6 +34,9 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+from typing import Dict, List, Union
+from typing_extensions import TypedDict
+
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -1544,10 +1547,19 @@ class Outcome(translation_domain.BaseTranslatableObject):
         return outcome_dict
 
 
+class VoiceoverDict(TypedDict):
+    """Dictionary representing the Voiceover object."""
+
+    filename: str
+    file_size_bytes: int
+    needs_update: bool
+    duration_secs: float
+
+
 class Voiceover:
     """Value object representing an voiceover."""
 
-    def to_dict(self):
+    def to_dict(self) -> VoiceoverDict:
         """Returns a dict representing this Voiceover domain object.
 
         Returns:
@@ -1577,7 +1589,13 @@ class Voiceover:
             voiceover_dict['needs_update'],
             voiceover_dict['duration_secs'])
 
-    def __init__(self, filename, file_size_bytes, needs_update, duration_secs):
+    def __init__(
+        self,
+        filename: str,
+        file_size_bytes: int,
+        needs_update: bool,
+        duration_secs: float
+    ) -> None:
         """Initializes a Voiceover domain object.
 
         Args:
@@ -1646,6 +1664,14 @@ class Voiceover:
                 self.duration_secs)
 
 
+class WrittenTranslationDict(TypedDict):
+    """Dictionary representing the WrittenTranslation object."""
+
+    data_format: str
+    translation: Union[str, List[str]]
+    needs_update: bool
+
+
 class WrittenTranslation:
     """Value object representing a written translation for a content.
 
@@ -1685,7 +1711,12 @@ class WrittenTranslation:
             cls.DATA_FORMAT_SET_OF_UNICODE_STRING
         )
 
-    def __init__(self, data_format, translation, needs_update):
+    def __init__(
+        self,
+        data_format: str,
+        translation: Union[str, List[str]],
+        needs_update: bool
+    ) -> None:
         """Initializes a WrittenTranslation domain object.
 
         Args:
@@ -1701,7 +1732,7 @@ class WrittenTranslation:
         self.translation = translation
         self.needs_update = needs_update
 
-    def to_dict(self):
+    def to_dict(self) -> WrittenTranslationDict:
         """Returns a dict representing this WrittenTranslation domain object.
 
         Returns:
@@ -1714,7 +1745,9 @@ class WrittenTranslation:
         }
 
     @classmethod
-    def from_dict(cls, written_translation_dict):
+    def from_dict(
+        cls, written_translation_dict: WrittenTranslationDict
+    ) -> WrittenTranslation:
         """Return a WrittenTranslation domain object from a dict.
 
         Args:
@@ -1757,13 +1790,22 @@ class WrittenTranslation:
                 self.needs_update)
 
 
+class WrittenTranslationsDict(TypedDict):
+    """Dictionary representing the WrittenTranslations object."""
+
+    translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]]
+
+
 class WrittenTranslations:
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
     different languages linked through their content_id.
     """
 
-    def __init__(self, translations_mapping):
+    def __init__(
+        self,
+        translations_mapping: Dict[str, Dict[str, WrittenTranslation]]
+    ) -> None:
         """Initializes a WrittenTranslations domain object.
 
         Args:
@@ -1773,7 +1815,7 @@ class WrittenTranslations:
         """
         self.translations_mapping = translations_mapping
 
-    def to_dict(self):
+    def to_dict(self) -> WrittenTranslationsDict:
         """Returns a dict representing this WrittenTranslations domain object.
 
         Returns:
@@ -1794,7 +1836,9 @@ class WrittenTranslations:
         return written_translations_dict
 
     @classmethod
-    def from_dict(cls, written_translations_dict):
+    def from_dict(
+        cls, written_translations_dict: WrittenTranslationsDict
+    ) -> WrittenTranslations:
         """Return a WrittenTranslations domain object from a dict.
 
         Args:
@@ -2051,13 +2095,21 @@ class WrittenTranslations:
         return written_translations_dict
 
 
+class RecordedVoiceoversDict(TypedDict):
+    """Dictionary representing the RecordedVoiceovers object."""
+
+    voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]]
+
+
 class RecordedVoiceovers:
     """Value object representing a recorded voiceovers which stores voiceover of
     all state contents (like hints, feedback etc.) in different languages linked
     through their content_id.
     """
 
-    def __init__(self, voiceovers_mapping):
+    def __init__(
+        self, voiceovers_mapping: Dict[str, Dict[str, Voiceover]]
+    ) -> None:
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
@@ -2067,7 +2119,7 @@ class RecordedVoiceovers:
         """
         self.voiceovers_mapping = voiceovers_mapping
 
-    def to_dict(self):
+    def to_dict(self) -> RecordedVoiceoversDict:
         """Returns a dict representing this RecordedVoiceovers domain object.
 
         Returns:
@@ -2088,7 +2140,9 @@ class RecordedVoiceovers:
         return recorded_voiceovers_dict
 
     @classmethod
-    def from_dict(cls, recorded_voiceovers_dict):
+    def from_dict(
+        cls, recorded_voiceovers_dict: RecordedVoiceoversDict
+    ) -> RecordedVoiceovers:
         """Return a RecordedVoiceovers domain object from a dict.
 
         Args:
@@ -2439,10 +2493,21 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         return rule_spec_dict
 
 
+class SubtitledHtmlDict(TypedDict):
+    """Dictionary representing the SubtitledHtml object."""
+
+    content_id: str
+    html: str
+
+
 class SubtitledHtml:
     """Value object representing subtitled HTML."""
 
-    def __init__(self, content_id, html):
+    def __init__(
+        self,
+        content_id: str,
+        html: str
+    ) -> None:
         """Initializes a SubtitledHtml domain object. Note that initializing
         the SubtitledHtml object does not clean the html. This is because we
         sometimes need to initialize SubtitledHtml and migrate the contained
@@ -2463,7 +2528,7 @@ class SubtitledHtml:
         self.content_id = content_id
         self.html = html
 
-    def to_dict(self):
+    def to_dict(self) -> SubtitledHtmlDict:
         """Returns a dict representing this SubtitledHtml domain object.
 
         Returns:
@@ -2475,7 +2540,7 @@ class SubtitledHtml:
         }
 
     @classmethod
-    def from_dict(cls, subtitled_html_dict):
+    def from_dict(cls, subtitled_html_dict: SubtitledHtmlDict) -> SubtitledHtml:
         """Return a SubtitledHtml domain object from a dict.
 
         Args:
@@ -3789,3 +3854,70 @@ class State(translation_domain.BaseTranslatableObject):
             self.interaction.get_all_html_content_strings() + [
                 self.content.html])
         return html_list
+
+
+class StateVersionHistory:
+    """Class to represent an element of the version history list of a state.
+    The version history list of a state is the list of exploration versions
+    in which the state has been edited.
+
+    Attributes:
+        previously_edited_in_version: int. The version number of the
+            exploration in which the state was previously edited.
+        state_name_in_previous_version: str. The name of the state in the
+            previously edited version. It is useful in case of state renames.
+        committer_id: str. The id of the user who committed the changes in the
+            previously edited version.
+    """
+
+    def __init__(
+        self, previously_edited_in_version,
+        state_name_in_previous_version, committer_id
+    ):
+        """Initializes the StateVersionHistory domain object.
+
+        Args:
+            previously_edited_in_version: int. The version number of the
+                exploration on which the state was previously edited.
+            state_name_in_previous_version: str. The name of the state in the
+                previously edited version. It is useful in case of state
+                renames.
+            committer_id: str. The id of the user who committed the changes in
+                the previously edited version.
+        """
+        self.previously_edited_in_version = previously_edited_in_version
+        self.state_name_in_previous_version = state_name_in_previous_version
+        self.committer_id = committer_id
+
+    def to_dict(self):
+        """Returns a dict representation of the StateVersionHistory domain
+        object.
+
+        Returns:
+            dict. The dict representation of the StateVersionHistory domain
+            object.
+        """
+        return {
+            'previously_edited_in_version': self.previously_edited_in_version,
+            'state_name_in_previous_version': (
+                self.state_name_in_previous_version),
+            'committer_id': self.committer_id
+        }
+
+    @classmethod
+    def from_dict(cls, state_version_history_dict):
+        """Return a StateVersionHistory domain object from a dict.
+
+        Args:
+            state_version_history_dict: dict. The dict representation of
+                StateVersionHistory object.
+
+        Returns:
+            StateVersionHistory. The corresponding StateVersionHistory domain
+            object.
+        """
+        return cls(
+            state_version_history_dict['previously_edited_in_version'],
+            state_version_history_dict['state_name_in_previous_version'],
+            state_version_history_dict['committer_id']
+        )

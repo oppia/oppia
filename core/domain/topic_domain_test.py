@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -491,6 +492,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected subtopic title to be less than 64 characters')
 
+    def test_subtopic_url_fragment_validation(self) -> None:
+        self.topic.subtopics[0].url_fragment = 'a' * 26
+        self._assert_validation_error(
+            'Expected subtopic url fragment to be less '
+            'than or equal to %d characters' %
+            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+
+        self.topic.subtopics[0].url_fragment = ''
+        self._assert_validation_error(
+            'Expected subtopic url fragment to be non '
+            'empty')
+
+        self.topic.subtopics[0].url_fragment = 'invalidFragment'
+        self._assert_validation_error(
+            'Invalid url fragment: %s' % self.topic.subtopics[0].url_fragment)
+
     def test_thumbnail_filename_validation_for_subtopic(self) -> None:
         self._assert_valid_thumbnail_filename_for_subtopic(
             'Thumbnail filename should not start with a dot.', '.name')
@@ -562,6 +579,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
+
+    def test_validation_fails_with_story_is_published_set_to_non_bool_value(
+        self
+    ) -> None:
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id')
+        ]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        # Here, a bool value is expected but for test purpose we're assigning it
+        # a string type. Thus to avoid MyPy error, we added an ignore here.
+        self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore[assignment]
+        self._assert_validation_error(
+            'story_is_published value should be boolean type')
 
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.topic.url_fragment = ''
@@ -833,6 +866,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
                 'cmd': 'add_subtopic',
                 'title': 'title',
                 'subtopic_id': 'subtopic_id',
+                'url_fragment': 'url-fragment',
                 'invalid': 'invalid'
             })
 
@@ -880,12 +914,14 @@ class TopicChangeTests(test_utils.GenericTestBase):
         topic_change_object = topic_domain.TopicChange({
             'cmd': 'add_subtopic',
             'subtopic_id': 'subtopic_id',
-            'title': 'title'
+            'title': 'title',
+            'url_fragment': 'url-fragment'
         })
 
         self.assertEqual(topic_change_object.cmd, 'add_subtopic')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
         self.assertEqual(topic_change_object.title, 'title')
+        self.assertEqual(topic_change_object.url_fragment, 'url-fragment')
 
     def test_topic_change_object_with_delete_subtopic(self) -> None:
         topic_change_object = topic_domain.TopicChange({

@@ -275,8 +275,12 @@ describe('Full exploration editor', function() {
       await responseEditor.setDestination('final card', true, null);
 
       // Now, set multiple rules to a single answer group.
-      responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-      await responseEditor.addRule('TextInput', 'Contains', ['meh', 'okay']);
+      // Function scrollToTop is added to prevent top response from being
+      // hidden and become easily clickable.
+      await general.scrollToTop();
+      await (
+        await explorationEditorMainTab.getResponseEditor(0)
+      ).addRule('TextInput', 'Contains', ['meh', 'okay']);
 
       // Ensure that the only rule for this group cannot be deleted.
       await (

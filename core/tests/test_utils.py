@@ -72,7 +72,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, List, Optional # isort: skip
+from typing import Any, Dict, List, Mapping, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -1355,6 +1355,34 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
+    # Here we used Mapping[str, Any] because, in Oppia codebase TypedDict is
+    # used to define strict dictionaries and those strict dictionaries are not
+    # compatible with Dict[str, Any] type because of the invariant property of
+    # Dict type. Also, here value of Mapping is annotated as Any because this
+    # method can accept any kind of dictionaries for testing purposes. So, to
+    # make this method generalized for all test cases, we used Any here.
+    def assertDictEqual(
+        self,
+        dict_one: Mapping[str, Any],
+        dict_two: Mapping[str, Any],
+        msg: Optional[str] = None
+    ) -> None:
+        """Checks whether the given two dictionaries are populated with same
+        key-value pairs or not. If any difference occurred then the Assertion
+        error is raised.
+
+        Args:
+            dict_one: Mapping[Any, Any]. A dictionary which we have to check
+                against.
+            dict_two: Mapping[Any, Any]. A dictionary which we have to check
+                for.
+            msg: Optional[str]. Message displayed when test fails.
+
+        Raises:
+            AssertionError. When dictionaries doesn't match.
+        """
+        super(TestBase, self).assertDictEqual(dict_one, dict_two, msg=msg)
+
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
         """Compares unordered sequences if they contain the same elements,
         regardless of order. If the same element occurs more than once,
@@ -2171,7 +2199,7 @@ title: Title
         # because those are always valid auth IDs.
         return str(abs(hash(email)))
 
-    def get_all_python_files(self):
+    def get_all_python_files(self) -> List[str]:
         """Recursively collects all Python files in the core/ and extensions/
         directory.
 
@@ -2833,6 +2861,44 @@ title: Title
         """
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
+
+    def create_story_for_translation_opportunity(
+            self, owner_id, admin_id, story_id, topic_id, exploration_id):
+        """Creates a story and links it to the supplied topic and exploration.
+
+        Args:
+            owner_id: str. User ID of the story owner.
+            admin_id: str. User ID of the admin that will publish the story.
+            story_id: str. The ID of new story.
+            topic_id: str. The ID of the topic for which to link the story.
+            exploration_id: str. The ID of the exploration that will be added
+                as a node to the story.
+        """
+        story = story_domain.Story.create_default_story(
+            story_id,
+            'title %s' % story_id,
+            'description',
+            topic_id,
+            'url-fragment')
+
+        story.language_code = 'en'
+        story_services.save_new_story(owner_id, story)
+        topic_services.add_canonical_story(
+            owner_id, topic_id, story.id)
+        topic_services.publish_story(
+            topic_id, story.id, admin_id)
+        story_services.update_story(
+            owner_id, story.id, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': exploration_id
+            })], 'Changes.')
 
     def save_new_story(
             self, story_id, owner_id, corresponding_topic_id,
