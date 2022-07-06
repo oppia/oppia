@@ -112,6 +112,8 @@ angular.module('oppia').component('questionEditor', {
         }
         QuestionUpdateService.setQuestionStateData(
           ctrl.question, updateFunction);
+
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveStateContent = function(displayedValue) {
