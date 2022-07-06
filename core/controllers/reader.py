@@ -1870,3 +1870,65 @@ class StateVersionHistoryHandler(base.BaseHandler):
             ),
             'last_edited_committer_username': last_edited_committer_username
         })
+
+
+class MetadataVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for the exploration metadata
+    at the given version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+        metadata_version_history = version_history.metadata_version_history
+        metadata_in_previous_version = None
+
+        # If the metadata has not been updated after the exploration was
+        # created, the value of last_edited_version_number will be None.
+        if metadata_version_history.last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                version=metadata_version_history.last_edited_version_number
+            )
+            metadata_in_previous_version = exploration.get_metadata()
+
+        self.render_json({
+            'last_edited_version_number': (
+                metadata_version_history.last_edited_version_number
+            ),
+            'last_edited_committer_username': user_services.get_username(
+                metadata_version_history.last_edited_committer_id
+            ),
+            'metadata_dict_in_previous_version': (
+                metadata_in_previous_version.to_dict()
+                if metadata_in_previous_version is not None else None
+            )
+        })

@@ -3282,7 +3282,7 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
             })
         ], 'A commit message.')
 
-    def test_version_history_data_for_a_state_is_fetched_correctly(self):
+    def test_version_history_for_a_state_is_fetched_correctly(self):
         self.login(self.OWNER_EMAIL)
         exploration_v1 = exp_fetchers.get_exploration_by_id(
             self.EXP_ID, version=1
@@ -3315,6 +3315,52 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
                 'state_name_in_previous_version': None,
                 'state_dict_in_previous_version': None,
                 'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+
+        self.logout()
+
+
+class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of the exploration metadata."""
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super(MetadataVersionHistoryHandlerUnitTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })
+        ], 'A commit message.')
+
+    def test_version_history_for_exploration_metadata_is_fetched_correctly(
+        self
+    ):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            )
+        )
+
+        self.assertEqual(
+            response, {
+                'last_edited_version_number': 1,
+                'last_edited_committer_username': self.OWNER_USERNAME,
+                'metadata_dict_in_previous_version': (
+                    exploration_v1.get_metadata().to_dict()
+                )
             }
         )
 
