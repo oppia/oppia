@@ -943,8 +943,8 @@ URLS = [
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
         learner_group.FacilitatorLearnerGroupViewHandler),
     get_redirect_route(
-        r'/search_learner_group_syllabus_handler/<learner_group_id>',
-        learner_group.SearchLearnerGroupSyllabusHandler),
+        r'/learner_group_search_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupStudentProgressHandler)

@@ -338,7 +338,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         })
 
 
-class SearchLearnerGroupSyllabusHandler(base.BaseHandler):
+class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
     """Handles operations related to the learner group syllabus."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

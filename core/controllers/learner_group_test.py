@@ -226,7 +226,7 @@ class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
+class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
 
     LEARNER_GROUP_ID = None
     STUDENT_ID = 'student_user_1'
@@ -236,7 +236,7 @@ class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     STORY_ID_1 = 'story_id_1'
 
     def setUp(self):
-        super(SearchLearnerGroupSyllabusHandlerTests, self).setUp()
+        super(LearnerGroupSearchSyllabusHandlerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -313,7 +313,7 @@ class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/search_learner_group_syllabus_handler/%s' % (
+            '/learner_group_search_syllabus_handler/%s' % (
                 self.LEARNER_GROUP_ID),
             params=params
         )
