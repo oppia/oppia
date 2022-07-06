@@ -39,6 +39,8 @@ import { SearchService, SelectionDetails } from 'services/search.service';
 import { NavigationService } from 'services/navigation.service';
 import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+import { LearnerGroupSyllabusFilter, LearnerGroupSyllabusBackendApiService } 
+  from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 
 interface SearchDropDownItems {
   id: string;
@@ -84,7 +86,9 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     private navigationService: NavigationService,
     private languageUtilService: LanguageUtilService,
     private constructTranslationIdsService: ConstructTranslationIdsService,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private learnerGroupSyllabusBackendApiService:
+      LearnerGroupSyllabusBackendApiService
   ) {}
 
   checkMobileView(): boolean {
@@ -124,24 +128,24 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         itemsName: 'types',
         masterList: this.SEARCH_DROPDOWN_TYPES,
         selection: '',
-        summary: '',
-        default: 'Type'
+        default: 'All',
+        summary: 'Type'
       },
       categories: {
         description: '',
         itemsName: 'categories',
         masterList: this.SEARCH_DROPDOWN_CATEGORIES,
         selection: '',
-        summary: '',
-        default: 'Category'
+        default: 'All',
+        summary: 'Category'
       },
       languageCodes: {
         description: '',
         itemsName: 'languages',
         masterList: this.SUPPORTED_CONTENT_LANGUAGES,
         selection: '',
-        summary: '',
-        default: 'Language'
+        default: 'All',
+        summary: 'Language'
       }
     };
     // this.loaderService.showLoadingScreen('Loading');
@@ -174,7 +178,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         this.translateService.instant(selectedItemText));
     } else {
       this.selectionDetails[itemsType].description = (
-        this.selectionDetails[itemsType].default
+        this.selectionDetails[itemsType].summary
       );
     }
   }
@@ -191,11 +195,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
           classroomName)
       };
     });
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
-    this.contextService.removeCustomEntityContext();
   }
 
   updateLearnerGroupSyllabus(): void {
@@ -244,6 +243,34 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
    */
    openSubmenu(evt: KeyboardEvent, menuName: string): void {
     this.navigationService.openSubmenu(evt, menuName);
+  }
+
+  onSearchQueryChangeExec(): void {
+    let syllabusFilter: LearnerGroupSyllabusFilter = {
+      keyword: this.searchQuery,
+      type: (
+        this.selectionDetails.types.selection ||
+        this.selectionDetails.types.default
+      ),
+      category: (
+        this.selectionDetails.categories.selection ||
+        this.selectionDetails.categories.default
+      ),
+      languageCode: (
+        this.selectionDetails.languageCodes.selection ||
+        this.selectionDetails.languageCodes.default
+      )
+    };
+    this.learnerGroupSyllabusBackendApiService.searchNewSyllabusItemsAsync(
+      'newId', syllabusFilter
+    ).then((syllabusItems) => {
+        console.log(syllabusItems, "syllabus items");
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+    this.contextService.removeCustomEntityContext();
   }
 }
 

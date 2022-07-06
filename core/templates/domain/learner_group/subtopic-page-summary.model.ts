@@ -18,13 +18,13 @@
  */
 
 export interface SubtopicPageSummaryBackendDict {
-  'subtopic_id': number;
-  'subtopic_title': string;
-  'parent_topic_id': string;
-  'parent_topic_name': string;
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'subtopic_mastery'?: number;
+  subtopic_id: number;
+  subtopic_title: string;
+  parent_topic_id: string;
+  parent_topic_name: string;
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+  subtopic_mastery?: number;
 }
 
 export class SubtopicPageSummary {

@@ -23,10 +23,10 @@ import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
  */
 
 export interface LearnerGroupUserProgressBackendDict {
-  'username': string ;
-  'progress_sharing_is_turned_on': boolean;
-  'stories_progress': StorySummaryBackendDict[];
-  'subtopic_page_progress': SubtopicPageSummaryBackendDict[];
+  username: string ;
+  progress_sharing_is_turned_on: boolean;
+  stories_progress: StorySummaryBackendDict[];
+  subtopic_page_progress: SubtopicPageSummaryBackendDict[];
 }
 
 export class LearnerGroupUserProgress {

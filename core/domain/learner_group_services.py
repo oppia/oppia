@@ -257,11 +257,18 @@ def get_matching_learner_group_syllabus_to_add(
         list(dict). The matching syllabus items to add to the learner group.
     """
     keyword = keyword.lower()
+
+    # Default case when syllabus is being added to a new group.
+    group_subtopic_page_ids: List[str] = []
+    group_story_ids: List[str] = []
+
     learner_group = learner_group_fetchers.get_learner_group_by_id(
         learner_group_id)
 
-    group_subtopic_page_ids = learner_group.subtopic_page_ids
-    group_story_ids = learner_group.story_ids
+    # Case when syllabus is being added to an existing group.
+    if learner_group:
+        group_subtopic_page_ids = learner_group.subtopic_page_ids
+        group_story_ids = learner_group.story_ids
 
     matching_topics: List[topic_domain.Topic] = []
 
@@ -280,8 +287,13 @@ def get_matching_learner_group_syllabus_to_add(
     else:
         matching_topics = topic_fetchers.get_all_topics()
 
+    print(matching_topics, '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&77')
+
     for topic in matching_topics:
-        if language_code and language_code != topic.language_code:
+        if (
+            language_code != constants.DEFAULT_ADD_SYLLABUS_FILTER
+            and language_code != topic.language_code
+        ):
             continue
 
         # If the keyword matches a topic name.

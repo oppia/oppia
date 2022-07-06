@@ -18,14 +18,14 @@
  */
 
 export interface LearnerGroupBackendDict {
-  'id': string ;
-  'title': string;
-  'description': string;
-  'facilitator_usernames': string[];
-  'student_usernames': string[];
-  'invited_student_usernames': string[];
-  'subtopic_page_ids': string[];
-  'story_ids': string[];
+  id: string ;
+  title: string;
+  description: string;
+  facilitator_usernames: string[];
+  student_usernames: string[];
+  invited_student_usernames: string[];
+  subtopic_page_ids: string[];
+  story_ids: string[];
 }
 
 export class LearnerGroupData {

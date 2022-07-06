@@ -23,9 +23,9 @@ import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
  */
 
 export interface LearnerGroupSyllabusBackendDict {
-  'learner_group_id': string;
-  'stories_summaries': StorySummaryBackendDict[];
-  'subtopic_page_summaries': SubtopicPageSummaryBackendDict[];
+  learner_group_id: string;
+  story_summaries: StorySummaryBackendDict[];
+  subtopic_summaries: SubtopicPageSummaryBackendDict[];
 }
 
 export class LearnerGroupSyllabus {
@@ -57,14 +57,29 @@ export class LearnerGroupSyllabus {
   static createFromBackendDict(
       backendDict: LearnerGroupSyllabusBackendDict
   ): LearnerGroupSyllabus {
+    let storiesSummaries: StorySummary[] = [];
+    if (backendDict.story_summaries.length > 0) {
+      storiesSummaries = backendDict.story_summaries.map(
+        storySummaryBackendDict => StorySummary.createFromBackendDict(
+          storySummaryBackendDict
+        )
+      );
+    }
+    let subtopicsSummaries: SubtopicPageSummary[] = [];
+    if (backendDict.subtopic_summaries.length > 0) {
+      subtopicsSummaries = (
+        backendDict.subtopic_summaries.map(
+          (subtopicProgressBackendDict) => (
+            SubtopicPageSummary.createFromBackendDict(
+              subtopicProgressBackendDict)
+          )
+        )
+      );
+    }
     return new LearnerGroupSyllabus(
       backendDict.learner_group_id,
-      backendDict.stories_summaries.map(
-        (storySummary) => StorySummary.createFromBackendDict(storySummary)),
-      backendDict.subtopic_page_summaries.map(
-        (subtopicPageSummary) => SubtopicPageSummary.createFromBackendDict(
-          subtopicPageSummary)
-      )
+      storiesSummaries,
+      subtopicsSummaries
     );
   }
 }

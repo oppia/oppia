@@ -27,7 +27,7 @@ import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
   from './learner-group-syllabus.model';
 
 
-interface LearnerGroupSyllabusFilter {
+export interface LearnerGroupSyllabusFilter {
   keyword: string;
   type: string;
   category: string;
@@ -50,7 +50,7 @@ export class LearnerGroupSyllabusBackendApiService {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/search_learner_group_syllabus_handler', {
+          '/search_learner_group_syllabus_handler/<learner_group_id>', {
             learner_group_id: learnerGroupId
           }
         )
