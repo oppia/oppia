@@ -36,7 +36,6 @@ from core.domain import user_domain
 from core.platform import models
 
 import requests
-from typing import List
 
 auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(

@@ -1895,6 +1895,10 @@ class StorySummary:
 
 
 class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
+    """Dictionary representation of a StorySummary object for learner
+    groups syllabus
+    """
+
     story_is_published: bool
     completed_node_titles: List[str]
     all_node_dicts: List[StoryNodeDict]

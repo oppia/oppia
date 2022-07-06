@@ -319,19 +319,19 @@ class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(response['learner_group_id'], self.LEARNER_GROUP_ID)
-        story_summaries = response['story_summaries']
-        self.assertEqual(len(story_summaries), 1)
-        self.assertEqual(story_summaries[0]['id'], self.STORY_ID_0)
-        self.assertEqual(story_summaries[0]['title'], 'Story test 0')
-        self.assertEqual(story_summaries[0]['topic_name'], 'Place Values')
+        story_summary_dicts = response['story_summary_dicts']
+        self.assertEqual(len(story_summary_dicts), 1)
+        self.assertEqual(story_summary_dicts[0]['id'], self.STORY_ID_0)
+        self.assertEqual(story_summary_dicts[0]['title'], 'Story test 0')
+        self.assertEqual(story_summary_dicts[0]['topic_name'], 'Place Values')
 
-        subtopic_summaries = response['subtopic_summaries']
-        self.assertEqual(len(subtopic_summaries), 1)
-        self.assertEqual(subtopic_summaries[0]['subtopic_id'], 1)
+        subtopic_summary_dicts = response['subtopic_summary_dicts']
+        self.assertEqual(len(subtopic_summary_dicts), 1)
+        self.assertEqual(subtopic_summary_dicts[0]['subtopic_id'], 1)
         self.assertEqual(
-            subtopic_summaries[0]['subtopic_title'], 'Naming Numbers')
+            subtopic_summary_dicts[0]['subtopic_title'], 'Naming Numbers')
         self.assertEqual(
-            subtopic_summaries[0]['parent_topic_id'], self.TOPIC_ID_0)
+            subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID_0)
 
         self.logout()
 

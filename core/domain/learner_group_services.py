@@ -30,7 +30,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Union
+from typing import List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -422,16 +422,30 @@ def get_matching_story_syllabus_item_dicts(
 
     for ind, story in enumerate(matching_stories):
         if keyword is None or story.title.lower().find(keyword) != -1:
-            syllabus_story_dict: story_domain.LearnerGroupSyllabusStorySummaryDict = {} # pylint: disable=line-too-long
-            # Add all key value pairs from the story summary dict object.
-            syllabus_story_dict.update(story.to_dict()) # type: ignore[arg-type]
-            syllabus_story_dict['story_is_published'] = True
-            syllabus_story_dict['completed_node_titles'] = []
-            syllabus_story_dict['all_node_dicts'] = [
-                node.to_dict() for node in stories[ind].story_contents.nodes # type: ignore[union-attr]
-            ]
-            syllabus_story_dict['topic_name'] = topic.name
-            syllabus_story_dict['topic_url_fragment'] = topic.url_fragment
+            summary_dict = story.to_dict()
+            syllabus_story_dict: story_domain.LearnerGroupSyllabusStorySummaryDict = { # pylint: disable=line-too-long
+                'id': summary_dict['id'],
+                'title': summary_dict['title'],
+                'description': summary_dict['description'],
+                'language_code': summary_dict['language_code'],
+                'version': summary_dict['version'],
+                'node_titles': summary_dict['node_titles'],
+                'thumbnail_filename': summary_dict['thumbnail_filename'],
+                'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
+                'url_fragment': summary_dict['url_fragment'],
+                'story_model_created_on':
+                    summary_dict['story_model_created_on'],
+                'story_model_last_updated':
+                    summary_dict['story_model_last_updated'],
+                'story_is_published': True,
+                'completed_node_titles': [],
+                'all_node_dicts': [
+                    node.to_dict() for node in
+                    stories[ind].story_contents.nodes # type: ignore[union-attr]
+                ],
+                'topic_name': topic.name,
+                'topic_url_fragment': topic.url_fragment
+            }
             matching_story_syllabus_item_dicts.append(syllabus_story_dict)
 
     return matching_story_syllabus_item_dicts
@@ -611,7 +625,7 @@ def get_learner_group_from_model(
 
     Args:
         learner_group_model: LearnerGroupModel. The learner group model
-        from the datastore.
+            from the datastore.
 
     Returns:
         LearnerGroup. The learner group domain object corresponding to the
