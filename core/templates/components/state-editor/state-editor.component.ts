@@ -48,7 +48,7 @@ import { Hint } from 'domain/exploration/HintObjectFactory';
 export class StateEditorComponent implements OnInit, OnDestroy {
   @Input() addState: (value: string) => void;
   @Input() explorationIsLinkedToStory: boolean;
-  @Input() interactionIsShown: boolean;
+  @Input() interactionIsShown: boolean = true;
   @Input() stateContentSaveButtonPlaceholder: string;
   @Input() stateContentPlaceholder: string;
 
