@@ -2,7 +2,20 @@
   <div>
     <h3><[questionHeader]></h3>
     <h4 class="author-header">Submitted by <[authorName]></h4>
-  </div>
+    <div class="oppia-question-details">
+      <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
+      <div ng-if="skillRubricExplanations.length > 0">
+        <strong title="Use these notes to make sure your question is at the right difficulty.">
+          Notes from Skill Rubric
+        </strong>
+        <ul>
+          <li ng-repeat="explanation in skillRubricExplanations">
+            <span ng-bind-html="explanation"></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>  
   <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -10,20 +23,7 @@
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-suggestion">
-      <div>
-        <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
-        <div ng-if="skillRubricExplanations.length > 0">
-          <strong title="Use these notes to make sure your question is at the right difficulty.">
-            Notes from Skill Rubric
-          </strong>
-          <ul>
-            <li ng-repeat="explanation in skillRubricExplanations">
-              <span ng-bind-html="explanation"></span>
-            </li>
-          </ul>
-        </div>
-      </div>
+    <div class="oppia-question-suggestion">      
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"
                        question-state-data="questionStateData"
@@ -59,6 +59,7 @@
 
 <style>
   .author-header {
+    display: block;
     margin-top: -12px;
   }
   .oppia-question-suggestion-rubric {
@@ -81,5 +82,14 @@
   .oppia-suggestion-review-message {
     margin-left: 10px;
     margin-top: 20px;
+  }
+
+  @media only screen and (max-width: 700px) {
+    .oppia-question-details {
+      margin-top: -12px;
+    }
+    .author-header {
+      display: none;
+    }
   }
 </style>
