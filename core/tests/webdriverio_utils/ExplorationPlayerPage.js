@@ -76,7 +76,6 @@ var ExplorationPlayerPage = function() {
 
   this.rateExploration = async function(ratingValue) {
     var ratingStars = await $$('.e2e-test-rating-star');
-    await waitFor.elementToBeClickable(ratingStars[ratingValue - 1]);
     await action.click('Submit Button', ratingStars[ratingValue - 1]);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
