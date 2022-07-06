@@ -26,8 +26,6 @@ from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import user_services
 
-from typing import List
-
 
 LEARNER_GROUP_SCHEMA = {
     'group_title': {
@@ -276,10 +274,15 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                 subtopic_page_ids))
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
 
-        all_skill_ids: List[str] = []
-        all_skill_ids.extend([topic.get_all_skill_ids() for topic in topics])
-        # Get all unique skill ids.
-        all_skill_ids = list(set(all_skill_ids))
+        all_skill_ids_lists = [
+            topic.get_all_skill_ids() for topic in topics if topic
+        ]
+        all_skill_ids = list(
+            {
+                skill_id for skill_list in all_skill_ids_lists
+                for skill_id in skill_list
+            }
+        )
 
         all_students_progress = []
 
