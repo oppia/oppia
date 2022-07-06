@@ -20,12 +20,13 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.domain import change_domain
 from core.jobs import job_utils
 from core.jobs.types import job_run_result
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Dict, Optional, Union
+from typing import Mapping, Optional, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -235,7 +236,7 @@ class CommitCmdsValidateError(BaseAuditError):
             base_models.BaseCommitLogEntryModel,
             base_models.BaseSnapshotMetadataModel
         ],
-        commit_cmd_dict: Dict[str, str],
+        commit_cmd_dict: Mapping[str, change_domain.AcceptableChangeDictTypes],
         e: str
     ) -> None:
         message = (
