@@ -16,7 +16,7 @@
  * @fileoverview Component for the questions editor component.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -43,12 +43,12 @@ import { State } from 'domain/state/StateObjectFactory';
   templateUrl: './question-editor.component.html'
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
-  @Input() getQuestionId;
-  @Input() getMisconceptionsBySkill;
+  @Input() questionId;
+  @Input() misconceptionsBySkill;
   @Input() canEditQuestion;
   @Input() question: Question;
   @Input() questionStateData: State;
-  @Input() questionChanged: boolean;
+  @Output() questionChanged = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
   oppiaBlackImgUrl: string;
@@ -64,16 +64,17 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private questionUpdateService: QuestionUpdateService,
     private ngbModal: NgbModal,
+    private changeDetectionRef: ChangeDetectorRef,
   ) { }
 
-  showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: any): void {
-    let state = this.question.getStateData();
+  showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: string[]): void {
+    let state = this.question?.getStateData();
     let recordedVoiceovers = state.recordedVoiceovers;
     let writtenTranslations = state.writtenTranslations;
     let updateQuestion = this._updateQuestion;
 
     const shouldPrompt = contentIds.some(
-      contentId =>
+      (contentId) =>
         recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
     if (shouldPrompt) {
       this.ngbModal.open(
@@ -132,7 +133,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
   saveNextContentIdIndex(displayedValue: number): void {
     this._updateQuestion(() => {
-      let stateData = this.question.getStateData();
+      let stateData = this.question?.getStateData();
       stateData.nextContentIdIndex = cloneDeep(displayedValue);
     });
   }
@@ -142,6 +143,8 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.setInteractionSolution(
         cloneDeep(displayedValue));
     });
+
+    this.changeDetectionRef.detectChanges();
   }
 
   saveHints(displayedValue: Hint[]): void {
@@ -184,9 +187,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   }
 
   _updateQuestion(updateFunction: Function): void {
-    if (this.questionChanged) {
-      this.questionChanged();
-    }
+    this.questionChanged.emit();
     this.questionUpdateService.setQuestionStateData(
       this.question, updateFunction);
   }
@@ -195,10 +196,12 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     // Show the interaction when the text content is saved, even if no
     // content is entered.
     this._updateQuestion(() => {
-      let stateData = this.question.getStateData();
+      let stateData = this.question?.getStateData();
       stateData.content = cloneDeep(displayedValue);
       this.interactionIsShown = true;
     });
+
+    // Shivam PTAL.
   }
 
   _init(): void {
@@ -206,7 +209,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.stateEditorService.setCorrectnessFeedbackEnabled(true);
     this.stateEditorService.setInQuestionMode(true);
     this.stateEditorService.setInapplicableSkillMisconceptionIds(
-      this.question.getInapplicableSkillMisconceptionIds());
+      this.question?.getInapplicableSkillMisconceptionIds());
     this.solutionValidityService.init(['question']);
     let stateData = this.questionStateData;
     stateData.interaction.defaultOutcome.setDestination(null);
@@ -246,7 +249,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     }
     this.stateEditorService.setActiveStateName('question');
     this.stateEditorService.setMisconceptionsBySkill(
-      this.getMisconceptionsBySkill());
+      this.misconceptionsBySkill);
     this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
 

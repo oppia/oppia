@@ -136,6 +136,11 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
         // No further action is needed.
       });
     };
+
+    $scope.questionChanged = function() {
+      $rootScope.$applyAsync();
+    };
+
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
         NgbModal.open(ConfirmQuestionExitModalComponent, {

@@ -115,6 +115,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
     $scope.questionChanged = function() {
       $scope.validationError = null;
+      $rootScope.$applyAsync();
     };
 
     $scope.accept = function() {

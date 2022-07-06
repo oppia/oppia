@@ -152,6 +152,10 @@ angular.module('oppia').component('questionsList', {
         );
       };
 
+      ctrl.questionChanged = function() {
+        $rootScope.$applyAsync();
+      };
+
       ctrl.showUnaddressedSkillMisconceptionWarning = function(
           skillMisconceptionIds) {
         var skillId = ctrl.getSelectedSkillId();

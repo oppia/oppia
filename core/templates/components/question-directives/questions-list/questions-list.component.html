@@ -44,7 +44,7 @@
                            [question-state-data]="$ctrl.questionStateData"
                            [question]="$ctrl.question"
                            [can-edit-question]="$ctrl.canEditQuestion"
-                           [question-changed]="$ctrl.questionChanged">
+                           (question-changed)="$ctrl.questionChanged()">
     </oppia-question-editor>
     <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
       <[$ctrl.question.getValidationErrorMessage()]>

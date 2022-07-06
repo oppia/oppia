@@ -29,7 +29,7 @@
                              [question-state-data]="questionStateData"
                              [question]="question"
                              [can-edit-question]="canEditQuestion"
-                             [question-changed]="questionChanged">
+                             (question-changed)="questionChanged()">
       </oppia-question-editor>
     </div>
   </section>

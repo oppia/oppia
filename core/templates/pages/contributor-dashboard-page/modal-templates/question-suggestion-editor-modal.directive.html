@@ -27,6 +27,7 @@
                              [misconceptions-by-skill]="misconceptionsBySkill"
                              [question-state-data]="questionStateData"
                              [question]="question"
+                             (question-changed)="questionChanged()"
                              [can-edit-question]="canEditQuestion">
       </oppia-question-editor>
     </div>
