@@ -1899,7 +1899,7 @@ def get_user_contributions(
     result = user_domain.UserContributions(
         model.id, model.created_exploration_ids,
         model.edited_exploration_ids)
-        
+
     return result
 
 
