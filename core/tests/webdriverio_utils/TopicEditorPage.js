@@ -194,6 +194,9 @@ var TopicEditorPage = function() {
     await action.click('RTE input', subtopicPageContentButton);
     var conceptCardButton = await cKEditorElement.$(
       '.cke_button=Insert Concept Card Link');
+    console.log(await conceptCardButton.isExisting());
+    console.log(conceptCardButton);
+    await browser.debug();
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = $(
       '.e2e-test-rte-skill-selector-item=', skillName);

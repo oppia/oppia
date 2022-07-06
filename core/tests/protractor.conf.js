@@ -120,6 +120,10 @@ var suites = {
       'protractor_desktop/topicAndStoryEditor.js'
     ],
 
+    topicAndStoryViewer: [
+      'protractor_desktop/topicAndStoryViewer.js'
+    ],
+
     topicAndStoryEditorFileUploadFeatures: [
       'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
     ],

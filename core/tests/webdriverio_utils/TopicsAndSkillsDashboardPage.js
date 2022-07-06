@@ -23,35 +23,31 @@ var workflow = require('./workflow.js');
 var general = require('../webdriverio_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
-  var topicsTable = $('.e2e-test-topics-table');
+  var confirmMoveButton = $('.e2e-test-confirm-move-button');
+  var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
+  var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
+  var confirmTopicCreationButton = $('.e2e-test-confirm-topic-creation-button');
   var createSkillButton = $('.e2e-test-create-skill-button');
   var createSkillButtonSecondary = $('.e2e-test-create-skill-button-circle');
-  var skillsTabButton = $('.e2e-test-skills-tab');
+  var createTopicButton = $('.e2e-test-create-topic-button');
   var editTopicButton = $('.e2e-test-edit-topic-button');
-  var skillNameField = $('.e2e-test-new-skill-description-field');
-  var retLocator = '.e2e-test-rte';
-  var noSkillsPresentMessage = $('.e2e-test-no-skills-present-message');
-  var openConceptCardExplanationButton = $('.e2e-test-open-concept-card');
-  var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
-  var skillDescriptionField = $('.e2e-test-skill-description-field');
   var editor = $('.e2e-test-concept-card-text');
   var mergeSkillsButton = $('.e2e-test-merge-skills-button');
-  var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
-  var createTopicButton = $('.e2e-test-create-topic-button');
+  var noSkillsPresentMessage = $('.e2e-test-no-skills-present-message');
+  var openConceptCardExplanationButton = $('.e2e-test-open-concept-card');
+  var skillDescriptionField = $('.e2e-test-skill-description-field');
+  var skillNameField = $('.e2e-test-new-skill-description-field');
+  var skillsTabButton = $('.e2e-test-skills-tab');
+  var skillsTable = $('.e2e-test-skills-table');
+  var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var topicDescriptionField = $('.e2e-test-new-topic-description-field');
+  var topicFilterKeywordField = $('.e2e-test-select-keyword-dropdown');
   var topicNameField = $('.e2e-test-new-topic-name-field');
   var topicNameFieldElement = $('.e2e-test-topic-name-field');
-  var topicUrlFragmentField = $('.e2e-test-new-topic-url-fragment-field');
-  var topicDescriptionField = $('.e2e-test-new-topic-description-field');
   var topicPageTitleFragmentField = $('.e2e-test-new-page-title-fragm-field');
   var topicThumbnailButton = $('.e2e-test-photo-button');
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
-  var confirmTopicCreationButton = $(
-    '.e2e-test-confirm-topic-creation-button');
-  var skillsTable = $('.e2e-test-skills-table');
-  var confirmMoveButton = $('.e2e-test-confirm-move-button');
-  var topicFilterKeywordField = $(
-    '.e2e-test-select-keyword-dropdown');
-  var keywordFieldInput = '.e2e-test-multi-selection-input';
+  var topicUrlFragmentField = $('.e2e-test-new-topic-url-fragment-field');
+  var topicsTable = $('.e2e-test-topics-table');
 
   this.get = async function() {
     await waitFor.clientSideRedirection(async() => {
@@ -211,7 +207,7 @@ var TopicsAndSkillsDashboardPage = function() {
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.');
     var filterKeywordInput = topicFilterKeywordField.$(
-      keywordFieldInput);
+      '.e2e-test-multi-selection-input');
 
     await action.keys(
       'Topic Dashboard keyword filter: ' + keyword,
@@ -245,7 +241,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-    var skillReviewMaterialInput = editor.$(retLocator);
+    var skillReviewMaterialInput = editor.$('.e2e-test-rte');
     await action.keys(
       'Skill Review Material Field', skillReviewMaterialInput,
       reviewMaterial, true);
