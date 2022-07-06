@@ -46,6 +46,9 @@ var TopicEditorPage = function() {
   var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
   var saveTopicButton = $('.e2e-test-save-topic-button');
   var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var storyListItemsSelector = function() {
+    return $$('.e2e-test-story-list-item');
+  };
   var storyListTable = $('.e2e-test-story-list-table');
   var storyThumbnailButton = $(
     '.e2e-test-thumbnail-editor .e2e-test-photo-button');
@@ -62,6 +65,9 @@ var TopicEditorPage = function() {
     '.e2e-test-topic-page-title-fragment-field');
   var topicPageTitleFragmentLabel = $(
     '.e2e-test-topic-page-title-fragment-label');
+  var uncategorizedSkillsSelector = function() {
+    return $$('.e2e-test-uncategorized-skill-card');
+  };
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.execute(dragAndDropScript, fromElement, toElement);
@@ -77,18 +83,18 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
-    var storyListItems = $$('.e2e-test-story-list-item');
+    var storyListItems = await storyListItemsSelector();
     if (count) {
       await waitFor.visibilityOf(
         storyListTable, 'Story list table takes too long to appear.');
     }
-    expect(await storyListItems.length).toEqual(count);
+    expect(storyListItems.length).toEqual(count);
   };
 
   this.navigateToStoryWithIndex = async function(index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
-    var storyListItems = await $$('.e2e-test-story-list-item');
+    var storyListItems = await storyListItemsSelector();
     var storyItem = storyListItems[index];
     await action.click('Story Item', storyItem);
     await waitFor.pageToFullyLoad();
@@ -105,7 +111,7 @@ var TopicEditorPage = function() {
   this.expectStoryPublicationStatusToBe = async function(status, index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
-    var storyListItems = await $$('.e2e-test-story-list-item');
+    var storyListItems = await storyListItemsSelector();
     var text = await action.getText(
       'Story List Text',
       await storyListItems[index].$$('.e2e-test-story-publication-status')[0]);
@@ -173,7 +179,7 @@ var TopicEditorPage = function() {
   };
 
   this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
-    var uncategorizedSkills = await $$('.e2e-test-uncategorized-skill-card');
+    var uncategorizedSkills = await uncategorizedSkillsSelector();
     await waitFor.visibilityOf(
       uncategorizedSkills[0],
       'Uncategorized skills taking too long to appear.');
@@ -236,7 +242,7 @@ var TopicEditorPage = function() {
   };
 
   this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
-    var uncategorizedSkills = await $$('.e2e-test-uncategorized-skill-card');
+    var uncategorizedSkills = await uncategorizedSkillsSelector();
     await waitFor.visibilityOf(
       uncategorizedSkills[0],
       'Uncategorized skills taking too long to appear.');

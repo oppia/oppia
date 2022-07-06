@@ -23,6 +23,9 @@ var waitFor = require('./waitFor.js');
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = $('.e2e-test-subscription-button');
   var subscribeLabel = $('.e2e-test-subscribe-label');
+  var subscriptionNameSelector = function() {
+    return $$('.e2e-test-subscription-name');
+  };
   var unsubscribeLabel = $('.e2e-test-unsubscribe-label');
 
   this.navigateToUserSubscriptionPage = async function(userName) {
@@ -31,7 +34,7 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
-    var subscriptionName = await $$('.e2e-test-subscription-name');
+    var subscriptionName = await subscriptionNameSelector();
     var firstSubscriberNameElem = subscriptionName[0];
     await waitFor.visibilityOf(
       firstSubscriberNameElem, 'First Subscriber Name is not visible');
@@ -39,7 +42,7 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.expectSubscriptionLastNameToMatch = async function(name) {
-    var subscriptionName = await $$('.e2e-test-subscription-name');
+    var subscriptionName = await subscriptionNameSelector();
     var lastElement = subscriptionName.length - 1;
     var lastSubscriberNameElem = subscriptionName[lastElement];
     await waitFor.visibilityOf(
@@ -48,7 +51,7 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.expectSubscriptionCountToEqual = async function(value) {
-    var subscriptionName = await $$('.e2e-test-subscription-name');
+    var subscriptionName = await subscriptionNameSelector();
     await waitFor.visibilityOf(
       subscriptionName[0],
       'Subscriber Name Card takes too long to appear');
