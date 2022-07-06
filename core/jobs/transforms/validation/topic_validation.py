@@ -27,14 +27,26 @@ from core.platform import models
 
 import apache_beam as beam
 
+from typing import Iterator, List, Optional, Tuple, Type, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import topic_models
+
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 @validation_decorators.AuditsExisting(topic_models.TopicModel)
-class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
+class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate canonical name matching with lower case name."""
 
-    def process(self, input_model):
+    def process(
+        self, input_model: topic_models.TopicModel
+    ) -> Iterator[topic_validation_errors.ModelCanonicalNameMismatchError]:
         """Function that validate that canonical name of the model is same as
         name of the model in lowercase.
 
@@ -54,10 +66,15 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
 @validation_decorators.AuditsExisting(
     topic_models.TopicSnapshotMetadataModel)
 class ValidateTopicSnapshotMetadataModel(
-        base_validation.BaseValidateCommitCmdsSchema):
+    base_validation.BaseValidateCommitCmdsSchema[
+        topic_models.TopicSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for TopicSnapshotMetadataModel."""
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+    def _get_change_domain_class(
+        self, input_model: topic_models.TopicSnapshotMetadataModel  # pylint: disable=unused-argument
+    ) -> Type[topic_domain.TopicChange]:
         """Returns a change domain class.
 
         Args:
@@ -73,11 +90,16 @@ class ValidateTopicSnapshotMetadataModel(
 @validation_decorators.AuditsExisting(
     topic_models.TopicRightsSnapshotMetadataModel)
 class ValidateTopicRightsSnapshotMetadataModel(
-        base_validation.BaseValidateCommitCmdsSchema):
+    base_validation.BaseValidateCommitCmdsSchema[
+        topic_models.TopicRightsSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for TopicRightsSnapshotMetadataModel.
     """
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+    def _get_change_domain_class(
+        self, input_model: topic_models.TopicRightsSnapshotMetadataModel
+    ) -> Type[topic_domain.TopicRightsChange]: # pylint: disable=unused-argument
         """Returns a change domain class.
 
         Args:
@@ -92,11 +114,20 @@ class ValidateTopicRightsSnapshotMetadataModel(
 
 @validation_decorators.AuditsExisting(topic_models.TopicCommitLogEntryModel)
 class ValidateTopicCommitLogEntryModel(
-        base_validation.BaseValidateCommitCmdsSchema):
+    base_validation.BaseValidateCommitCmdsSchema[
+        topic_models.TopicCommitLogEntryModel
+    ]
+):
     """Overrides _get_change_domain_class for TopicCommitLogEntryModel.
     """
 
-    def _get_change_domain_class(self, input_model):
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with super class's _get_change_domain_class() method.
+    def _get_change_domain_class(  # type: ignore[override]
+        self, input_model: topic_models.TopicCommitLogEntryModel
+    ) -> Optional[
+        Type[Union[topic_domain.TopicRightsChange, topic_domain.TopicChange]]
+    ]:
         """Returns a change domain class.
 
         Args:
@@ -117,7 +148,16 @@ class ValidateTopicCommitLogEntryModel(
 
 
 @validation_decorators.RelationshipsOf(topic_models.TopicSummaryModel)
-def topic_summary_model_relationships(model):
+def topic_summary_model_relationships(
+    model: topic_models.TopicSummaryModel
+) -> Iterator[
+    Tuple[
+        str,
+        List[
+            Type[Union[topic_models.TopicModel, topic_models.TopicRightsModel]]
+        ]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [topic_models.TopicModel]
