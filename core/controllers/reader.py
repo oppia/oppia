@@ -1794,3 +1794,79 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
             )
 
         self.render_json(self.values)
+
+
+class StateVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for a state at the given
+    version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'state_name': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, state_name, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+        state_version_history = (
+            version_history.state_version_history[state_name]
+        )
+        last_edited_version_number = (
+            state_version_history.previously_edited_in_version
+        )
+        state_name_in_previous_version = (
+            state_version_history.state_name_in_previous_version
+        )
+        state_in_previous_version = None
+        last_edited_committer_username = user_services.get_username(
+            state_version_history.committer_id
+        )
+
+        # If the state has not been updated after it was added for the
+        # first time, the value of last_edited_version_number will be None.
+        if last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=last_edited_version_number
+            )
+            state_in_previous_version = (
+                exploration.states[state_name_in_previous_version]
+            )
+
+        self.render_json({
+            'last_edited_version_number': last_edited_version_number,
+            'state_name_in_previous_version': state_name_in_previous_version,
+            'state_dict_in_previous_version': (
+                state_in_previous_version.to_dict()
+                if state_in_previous_version is not None else None
+            ),
+            'last_edited_committer_username': last_edited_committer_username
+        })

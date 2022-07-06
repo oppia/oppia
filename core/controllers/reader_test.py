@@ -3255,3 +3255,67 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'Welcome!')
 
         self.logout()
+
+
+class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of a particular state of an
+    exploration.
+    """
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super(StateVersionHistoryHandlerUnitTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'b'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': 'a'
+            })
+        ], 'A commit message.')
+
+    def test_version_history_data_for_a_state_is_fetched_correctly(self):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response_for_state_a = self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            )
+        )
+        response_for_state_b = self.get_json(
+            '/version_history/state/%s/%s/%s' % (self.EXP_ID, 'b', 2)
+        )
+
+        self.assertEqual(
+            response_for_state_a, {
+                'last_edited_version_number': 1,
+                'state_name_in_previous_version': (
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ),
+                'state_dict_in_previous_version': exploration_v1.states[
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ].to_dict(),
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+        self.assertEqual(
+            response_for_state_b, {
+                'last_edited_version_number': None,
+                'state_name_in_previous_version': None,
+                'state_dict_in_previous_version': None,
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+
+        self.logout()
