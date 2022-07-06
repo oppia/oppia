@@ -23,6 +23,9 @@ from core import utils
 from typing import List
 from typing_extensions import TypedDict
 
+from core.domain import story_domain
+from core.domain import subtopic_page_domain
+
 
 class LearnerGroupDict(TypedDict):
     """Dictionary for LearnerGroup domain object."""
@@ -126,3 +129,9 @@ class LearnerGroup:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be invited to '
                 'join the group.')
+
+
+class LearnerGroupSyllabusDict(TypedDict):
+    story_summary_dicts: List[
+        story_domain.LearnerGroupSyllabusStorySummaryDict]
+    subtopic_summary_dicts: List[subtopic_page_domain.SubtopicPageSummaryDict]

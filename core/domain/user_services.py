@@ -114,10 +114,8 @@ def get_multi_user_ids_from_usernames(usernames):
         list(str|None). Return the list of user ids corresponding to given
         usernames.
         """
-    user_ids: List[str] = []
-
     if len(usernames) == 0:
-        return user_ids
+        return []
 
     normalized_usernames = [
         user_domain.UserSettings.normalize_username(username)
@@ -130,16 +128,14 @@ def get_multi_user_ids_from_usernames(usernames):
         )
     ).fetch()
 
-    username_to_user_id_map = {}
-    for model in found_models:
-        username_to_user_id_map[model.normalized_username] = model.id
+    username_to_user_id_map = {
+        model.normalized_username: model.id for model in found_models
+    }
 
-    user_ids = [
+    return [
         username_to_user_id_map.get(username)
         for username in normalized_usernames
     ]
-
-    return user_ids
 
 
 def get_user_settings_from_username(username):

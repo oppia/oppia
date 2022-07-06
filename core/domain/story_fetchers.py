@@ -388,19 +388,20 @@ def get_progress_in_stories(
     all_stories = get_stories_by_ids(story_ids)
 
     for story in all_stories:
-        if story is not None:
-            completed_node_ids = get_completed_node_ids(user_id, story.id)
-            completed_node_titles = [
-                node.title for node in story.story_contents.nodes
-                if node.id in completed_node_ids
-            ]
-            all_stories_progress.append(
-                story_domain.StoryProgress(
-                    story.id,
-                    completed_node_titles,
-                    story.story_contents.nodes
-                )
+        if story is None:
+            continue
+        completed_node_ids = get_completed_node_ids(user_id, story.id)
+        completed_node_titles = [
+            node.title for node in story.story_contents.nodes
+            if node.id in completed_node_ids
+        ]
+        all_stories_progress.append(
+            story_domain.StoryProgress(
+                story.id,
+                completed_node_titles,
+                story.story_contents.nodes
             )
+        )
 
     return all_stories_progress
 

@@ -192,8 +192,12 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_progress_in_stories(self) -> None:
         all_stories_progress = story_fetchers.get_progress_in_stories(
-            self.USER_ID, [self.story_id])
-        all_stories = story_fetchers.get_stories_by_ids([self.story_id])
+            self.USER_ID, [self.story_id, 'invalid_story_id'])
+        all_stories = story_fetchers.get_stories_by_ids(
+            [self.story_id, 'invalid_story_id'])
+
+        # Should return None for invalid story ID.
+        self.assertIsNone(all_stories[1])
 
         self.assertEqual(len(all_stories_progress), 1)
         # Ruling out the possibility of None for mypy type checking.

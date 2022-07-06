@@ -24,7 +24,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import List
+from typing import List, Optional
 from typing_extensions import TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -450,9 +450,9 @@ class SubtopicPageSummaryDict(TypedDict):
     subtopic_title: str
     parent_topic_id: str
     parent_topic_name: str
-    thumbnail_filename: str
-    thumbnail_bg_color: str
-    subtopic_mastery: float
+    thumbnail_filename: Optional[str]
+    thumbnail_bg_color: Optional[str]
+    subtopic_mastery: Optional[float]
 
 
 class SubtopicPageSummary:
@@ -464,9 +464,9 @@ class SubtopicPageSummary:
         subtopic_title: str,
         parent_topic_id: str,
         parent_topic_name: str,
-        thumbnail_filename: str,
-        thumbnail_bg_color: str,
-        subtopic_mastery: float
+        thumbnail_filename: Optional[str],
+        thumbnail_bg_color: Optional[str],
+        subtopic_mastery: Optional[float]
     ):
         """Initialize a SubtopicPageSummary object.
 

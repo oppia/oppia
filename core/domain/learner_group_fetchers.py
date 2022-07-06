@@ -19,9 +19,15 @@
 from __future__ import annotations
 
 from core.domain import learner_group_domain
+from core.domain import learner_group_services
 from core.platform import models
 
 from typing import List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import learner_group_models
+    from mypy_imports import user_models
 
 (learner_group_models, user_models) = models.Registry.import_models(
     [models.NAMES.learner_group, models.NAMES.user])
@@ -37,8 +43,8 @@ def get_new_learner_group_id() -> str:
 
 
 def get_learner_group_by_id(
-        group_id: str
-    ) -> Optional[learner_group_domain.LearnerGroup]:
+    group_id: str
+) -> Optional[learner_group_domain.LearnerGroup]:
     """Returns the learner group domain object given the learner group id.
 
     Args:
@@ -54,20 +60,13 @@ def get_learner_group_by_id(
     if not learner_group_model:
         return None
 
-    return learner_group_domain.LearnerGroup(
-        learner_group_model.id,
-        learner_group_model.title,
-        learner_group_model.description,
-        learner_group_model.facilitator_user_ids,
-        learner_group_model.student_user_ids,
-        learner_group_model.invited_student_user_ids,
-        learner_group_model.subtopic_page_ids,
-        learner_group_model.story_ids)
+    return learner_group_services.get_learner_group_from_model(
+        learner_group_model)
 
 
 def get_learner_groups_of_facilitator(
-        user_id: str
-    ) -> List[learner_group_domain.LearnerGroup]:
+    user_id: str
+) -> List[learner_group_domain.LearnerGroup]:
     """Returns a list of learner groups of the given facilitator.
 
     Args:
@@ -82,20 +81,10 @@ def get_learner_groups_of_facilitator(
     if not learner_grp_models:
         return []
 
-    learner_groups: List[learner_group_domain.LearnerGroup] = []
-    for learner_grp_model in learner_grp_models:
-        learner_groups.append(
-            learner_group_domain.LearnerGroup(
-                learner_grp_model.id,
-                learner_grp_model.title,
-                learner_grp_model.description,
-                learner_grp_model.facilitator_user_ids,
-                learner_grp_model.student_user_ids,
-                learner_grp_model.invited_student_user_ids,
-                learner_grp_model.subtopic_page_ids,
-                learner_grp_model.story_ids))
-
-    return learner_groups
+    return [
+        learner_group_services.get_learner_group_from_model(model)
+        for model in learner_grp_models
+    ]
 
 
 def get_progress_sharing_permission(user_id: str, group_id: str) -> bool:
@@ -110,11 +99,15 @@ def get_progress_sharing_permission(user_id: str, group_id: str) -> bool:
         bool. True if the user has progress sharing permission of the given
         group as True, False otherwise.
     """
-    learner_group_user_model = user_models.LearnerGroupsUserModel.get_by_id(
-        user_id)
+    learner_group_user_model = user_models.LearnerGroupsUserModel.get(
+        user_id, strict=False
+    )
+
+    # Ruling out the possibility of None for mypy type checking.
+    assert learner_group_user_model is not None
 
     for group_details in learner_group_user_model.learner_groups_user_details:
         if group_details['group_id'] == group_id:
-            return group_details['progress_sharing_is_turned_on']
+            return bool(group_details['progress_sharing_is_turned_on'])
 
     return False

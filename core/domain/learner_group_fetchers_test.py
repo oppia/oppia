@@ -21,21 +21,16 @@ from __future__ import annotations
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 
-from core.platform import models
 from core.tests import test_utils
-
-(learner_group_models,) = models.Registry.import_models(
-    [models.NAMES.learner_group])
 
 
 class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for skill fetchers."""
 
-    LEARNER_GROUP_ID = None
     FACILITATOR_ID = 'facilitator_user_1'
     STUDENT_ID = 'student_user_1'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(LearnerGroupFetchersUnitTests, self).setUp()
 
         self.LEARNER_GROUP_ID = (
@@ -47,10 +42,10 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
             [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
-    def test_get_new_learner_group_id(self):
+    def test_get_new_learner_group_id(self) -> None:
         self.assertIsNotNone(learner_group_fetchers.get_new_learner_group_id())
 
-    def test_get_learner_group_by_id(self):
+    def test_get_learner_group_by_id(self) -> None:
         fake_learner_group_id = 'fake_learner_group_id'
         fake_learner_group = learner_group_fetchers.get_learner_group_by_id(
             fake_learner_group_id)
@@ -59,10 +54,12 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             self.LEARNER_GROUP_ID
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert learner_group is not None
         self.assertIsNotNone(learner_group)
         self.assertEqual(learner_group.group_id, self.LEARNER_GROUP_ID)
 
-    def test_get_learner_groups_of_facilitator(self):
+    def test_get_learner_groups_of_facilitator(self) -> None:
         fake_facilitator_id = 'fake_facilitator_id'
         fake_learner_groups = (
             learner_group_fetchers.get_learner_groups_of_facilitator(
@@ -79,7 +76,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(learner_groups), 1)
         self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)
 
-    def test_get_progress_sharing_permission(self):
+    def test_get_progress_sharing_permission(self) -> None:
         learner_group_services.add_student_to_learner_group(
             self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
 
