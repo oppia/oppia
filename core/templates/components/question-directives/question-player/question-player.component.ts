@@ -121,6 +121,7 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 
 import { Subscription } from 'rxjs';
 import { QuestionPlayerConceptCardModalComponent } from './question-player-concept-card-modal.component';
+import { SkillMasteryModalComponent } from './skill-mastery-modal.component';
 
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/prevent-page-unload-event.service.ts');
@@ -131,7 +132,7 @@ angular.module('oppia').component('questionPlayer', {
   },
   template: require('./question-player.component.html'),
   controller: [
-    '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
+    '$location', '$rootScope', '$sanitize', '$sce', '$scope',
     '$window', 'ExplorationPlayerStateService', 'NgbModal',
     'PlayerPositionService',
     'PreventPageUnloadEventService', 'QuestionPlayerStateService',
@@ -142,7 +143,7 @@ angular.module('oppia').component('questionPlayer', {
     'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
     'WRONG_ANSWER_PENALTY_FOR_MASTERY',
     function(
-        $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
+        $location, $rootScope, $sanitize, $sce, $scope,
         $window, ExplorationPlayerStateService, NgbModal, PlayerPositionService,
         PreventPageUnloadEventService, QuestionPlayerStateService,
         SkillMasteryBackendApiService, UserService,
@@ -514,19 +515,22 @@ angular.module('oppia').component('questionPlayer', {
 
       ctrl.openSkillMasteryModal = function(skillId) {
         var masteryPerSkillMapping = ctrl.masteryPerSkillMapping;
-        $uibModal.open({
-          template: require(
-            'components/question-directives/question-player/' +
-            'skill-mastery-modal.template.html'),
+
+        let modelRef = NgbModal.open(SkillMasteryModalComponent, {
           backdrop: true,
-          resolve: {
-            masteryPerSkillMapping: () => masteryPerSkillMapping,
-            openConceptCardModal: () => ctrl.openConceptCardModal,
-            skillId: () => skillId,
-            userIsLoggedIn: () => ctrl.userIsLoggedIn,
-          },
-          controller: 'SkillMasteryModalController'
-        }).result.then(function() {}, function() {
+        });
+
+        modelRef.componentInstance.masteryPerSkillMapping = (
+          masteryPerSkillMapping);
+        modelRef.componentInstance.skillId = skillId;
+        modelRef.componentInstance.userIsLoggedIn = ctrl.userIsLoggedIn;
+        modelRef.componentInstance.openConceptCardModal.subscribe(
+          (value) => {
+            ctrl.openConceptCardModal(value);
+          }
+        );
+
+        modelRef.result.then(function() {}, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

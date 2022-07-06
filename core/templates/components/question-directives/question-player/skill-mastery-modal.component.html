@@ -1,0 +1,14 @@
+<div class="modal-header">
+  <h3> Learning Tips Based on Your Skill Mastery </h3>
+</div>
+
+<div class="modal-body">
+  <skill-mastery-viewer [skillId]="skillId"
+                        [masteryChange]="masteryChange">
+  </skill-mastery-viewer>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" (click)="cancel()"> Close </button>
+  <button class="btn btn-success" (click)="conceptCardModalOpen()"> View Concept Card </button>
+</div>

@@ -22,6 +22,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { UrlService } from 'services/contextual/url.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 
 @Component({
   selector: 'oppia-question-player-concept-card-modal',
@@ -29,8 +30,8 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class QuestionPlayerConceptCardModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() skillIds;
-  @Input() skills;
+  @Input() skillIds!: string[];
+  @Input() skills: Skill[] | unknown[];
 
   index: number;
   modalHeader: unknown;
