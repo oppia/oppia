@@ -43,7 +43,7 @@
                            [misconceptions-by-skill]="$ctrl.misconceptionsBySkill"
                            [question-state-data]="$ctrl.questionStateData"
                            [question]="$ctrl.question"
-                           [can-edit-question]="$ctrl.canEditQuestion"
+                           [can-edit-question]="$ctrl.canEditQuestion()"
                            (question-changed)="$ctrl.questionChanged()">
     </oppia-question-editor>
     <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">

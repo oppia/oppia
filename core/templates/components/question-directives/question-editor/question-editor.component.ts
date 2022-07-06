@@ -43,9 +43,9 @@ import { State } from 'domain/state/StateObjectFactory';
   templateUrl: './question-editor.component.html'
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
-  @Input() questionId;
-  @Input() misconceptionsBySkill;
-  @Input() canEditQuestion;
+  @Input() questionId: unknown;
+  @Input() misconceptionsBySkill: object;
+  @Input() canEditQuestion: boolean;
   @Input() question: Question;
   @Input() questionStateData: State;
   @Output() questionChanged = new EventEmitter();
@@ -71,7 +71,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     let state = this.question?.getStateData();
     let recordedVoiceovers = state.recordedVoiceovers;
     let writtenTranslations = state.writtenTranslations;
-    let updateQuestion = this._updateQuestion;
 
     const shouldPrompt = contentIds.some(
       (contentId) =>
@@ -81,7 +80,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
         MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
           backdrop: 'static'
         }).result.then(() => {
-        updateQuestion(() => {
+        this._updateQuestion(() => {
           contentIds.forEach(contentId => {
             if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
               recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
@@ -242,7 +241,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
       )
     );
 
-    if (this.canEditQuestion()) {
+    if (this.canEditQuestion) {
       this.editabilityService.markEditable();
     } else {
       this.editabilityService.markNotEditable();
