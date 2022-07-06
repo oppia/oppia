@@ -17,6 +17,8 @@
  * interaction in webdriverio.
  */
 
+var action = require(
+  process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
@@ -37,7 +39,7 @@ var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = await elem.$$(
     '.e2e-test-multiple-choice-option-container');
-  var optionsCount = await optionElements.length;
+  var optionsCount = optionElements.length;
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   var promises = [];
   for (var i = 0; i < optionsCount; i++) {
@@ -54,8 +56,9 @@ var expectInteractionDetailsToMatch = async function(
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' {String} is the text on the multiple-choice item to select.
 var submitAnswer = async function(elem, answer) {
-  await elem.$('oppia-interactive-multiple-choice-input').
-    $(`button=${answer}`).click();
+  var submitBtn = elem.$('oppia-interactive-multiple-choice-input')
+    .$(`button=${answer}`);
+  await action.click('Submit Buttom', submitBtn);
 };
 
 var answerObjectType = 'NonnegativeInt';

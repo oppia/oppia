@@ -31,14 +31,15 @@ var MathEditor = function(elem) {
     setValue: async function(text) {
       await waitFor.elementToBeClickable(
         elem, `"${elem.getTagName()}" takes too long to be clickable`);
-      await elem.click();
+      await action.click('Maths Editor', elem);
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
-      var mathInputElem = $$('.e2e-test-guppy-div');
+      var mathInputElem = await $$('.e2e-test-guppy-div');
       lastElement = mathInputElem.length - 1;
       var present = await mathInputElem[lastElement].isExisting();
       if (present) {
-        await mathInputElem.setValue(text);
+        await action.setValue(
+          'Maths Input Element', mathInputElem, text);
       }
     },
     getValue: async function() {
@@ -54,7 +55,7 @@ var MathEditor = function(elem) {
         var contentElem = mathInputElem.$('<annotation>');
         present = await contentElem.isExisting();
         if (present) {
-          return await contentElem.getText();
+          return await action.getText('Maths Input Element', contentElem);
         }
       }
     }
@@ -66,7 +67,7 @@ var BooleanEditor = function(elem) {
     setValue: async function(value) {
       currentValue = await elem.$('<input>').isSelected();
       if (value !== currentValue) {
-        await elem.$('<input>').click();
+        await action.click('Boolean Editor', elem.$('<input>'));
       }
     }
   };
@@ -77,11 +78,16 @@ var CoordTwoDim = function(elem) {
     // The 'coordinates' arg is a two-element list whose elements represent
     // latitude and longitude respectively.
     setValue: async function(coordinates) {
-      var count = await elem.$$('<input>').length;
-      await elem.$$('<input>')[0].clearValue();
-      await elem.$$('<input>')[0].setValue(coordinates[0]);
-      await elem.$$('<input>')[count - 1].clearValue();
-      await elem.$$('<input>')[count - 1].setValue(coordinates[1]);
+      var coordTwoDimInput = await elem.$$('<input>');
+      var count = coordTwoDimInput.length;
+      await action.clear(
+        'Coord Two Dim Input', coordTwoDimInput[0]);
+      await action.setValue(
+        'Coord Two Dim Input', coordTwoDimInput[0], coordinates[0]);
+      await action.clear(
+        'Coord Two Dim Input', coordTwoDimInput[count - 1]);
+      await action.setValue(
+        'Coord Two Dim Input', coordTwoDimInput[count - 1], coordinates[1]);
     }
   };
 };
@@ -90,13 +96,16 @@ var FilepathEditor = function(elem) {
   return {
     upload: async function(filepath) {
       // TODO(Jacob): Modify filepath relative to the directory from which the
-      // protractor code is operating.
-      await elem.$('.e2e-test-file-upload')
-        .setValue(filepath);
+      // webdriverio code is operating.
+      await action.setValue(
+        'Filepath Editor Input', elem.$('.e2e-test-file-upload'), filepath);
     },
     setName: async function(name) {
-      await elem.$('.e2e-test-file-name').clearValue();
-      await elem.$('.e2e-test-file-name').setValue(name);
+      var fileNameInput = elem.$('.e2e-test-file-name');
+      await action.clear(
+        'Filepath Editor Input', fileNameInput);
+      await action.setValue(
+        'Filepath Editor Input', fileNameInput, name);
     }
   };
 };
@@ -104,11 +113,14 @@ var FilepathEditor = function(elem) {
 var FractionEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(value);
+      await action.clear(
+        'Fraction Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Fraction Editor Input', elem.$('<input>'), value);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Fraction Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -117,11 +129,14 @@ var FractionEditor = function(elem) {
 var IntEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(value);
+      await action.clear(
+        'Int Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Int Editor Input', elem.$('<input>'), value);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Int Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -130,8 +145,10 @@ var IntEditor = function(elem) {
 var MathExpressionContentEditor = function(elem) {
   return {
     setValue: async function(rawLatex) {
-      await elem.$('<textarea>').clearValue();
-      await elem.$('<textarea>').setValue(rawLatex);
+      await action.clear(
+        'MathExpression Content Editor Input', elem.$('<textarea>'));
+      await action.setValue(
+        'MathExpression Content Editor Input', elem.$('<textarea>'), rawLatex);
     }
   };
 };
@@ -139,11 +156,14 @@ var MathExpressionContentEditor = function(elem) {
 var NonnegativeIntEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(value);
+      await action.clear(
+        'Nonnegative Int Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Nonnegative Int Editor Input', elem.$('<input>'), value);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Nonnegative Int Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -152,11 +172,14 @@ var NonnegativeIntEditor = function(elem) {
 var NormalizedStringEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(value);
+      await action.clear(
+        'Normalized String Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Normalized String Editor Input', elem.$('<input>'), value);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Normalized String Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -165,11 +188,14 @@ var NormalizedStringEditor = function(elem) {
 var NumberWithUnitsEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(value);
+      await action.clear(
+        'Number With Units Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Number With Units Editor Input', elem.$('<input>'), value);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Number With Units Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -178,7 +204,7 @@ var NumberWithUnitsEditor = function(elem) {
 var ParameterNameEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.$(`option=${text}`).click();
+      await elem.selectByVisibleText(text);
     }
   };
 };
@@ -194,7 +220,8 @@ var PositiveIntEditor = function(elem) {
     expectValueToBe: async function(expectedValue) {
       await waitFor.visibilityOf(
         elem, `"${elem.getTagName()}" takes too long to be visible`);
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Positive Int Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -203,11 +230,14 @@ var PositiveIntEditor = function(elem) {
 var RatioExpressionEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(value);
+      await action.clear(
+        'Ratio Expression Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Ratio Expression Editor Input', elem.$('<input>'), value);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Ratio Expression Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -216,11 +246,14 @@ var RatioExpressionEditor = function(elem) {
 var SanitizedUrlEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(text);
+      await action.clear(
+        'Sanitized Url Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Sanitized Url Editor Input', elem.$('<input>'), text);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Sanitized Url Editor Input', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -243,11 +276,12 @@ var TranslatableSetOfNormalizedStringEditor = function(elem) {
 var SkillSelector = function(elem) {
   return {
     setValue: async function(skillDescription) {
-      await elem.$(
-        '.e2e-test-skill-name-input').setValue(skillDescription);
-      await waitFor.visibilityOf(elem.$(
-        '.e2e-test-rte-skill-selector-item'));
-      await elem.$('.e2e-test-rte-skill-selector-item').click();
+      var skillSelectorInput = elem.$('.e2e-test-skill-name-input');
+      var skillSelectorItem = elem.$('.e2e-test-rte-skill-selector-item');
+      await action.setValue(
+        'Skill Selector', skillSelectorInput, skillDescription);
+      await waitFor.visibilityOf(skillSelectorItem);
+      await action.click('Skill Selector', skillSelectorItem);
     }
   };
 };
@@ -255,11 +289,14 @@ var SkillSelector = function(elem) {
 var UnicodeStringEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.$('<input>').clearValue();
-      await elem.$('<input>').setValue(text);
+      await action.clear(
+        'Unicode String Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Unicode String Editor Input', elem.$('<input>'), text);
     },
     expectValueToBe: async function(expectedValue) {
-      var value = await elem.$('<input>').getAttribute('value');
+      var value = await action.getAttribute(
+        'Unicode Input Element', elem.$('<input>'), 'value');
       expect(value).toEqual(expectedValue);
     }
   };

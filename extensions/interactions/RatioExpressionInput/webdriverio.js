@@ -17,6 +17,8 @@
  * Interaction in webdriverio.
  */
 
+var action = require(
+  process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var waitFor = require(
   process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
@@ -54,8 +56,10 @@ var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
 };
 
 var submitAnswer = async function(elem, answer) {
-  await elem.$('<oppia-interactive-ratio-expression-input>').
-    $('<input>').setValue(answer + '\n');
+  var ratioExpressInput = elem.$('<oppia-interactive-ratio-expression-input>').
+    $('<input>');
+  await action.setValue(
+    'Ratio Express Input', ratioExpressInput, answer + '\n');
 };
 
 var answerObjectType = 'RatioExpression';
