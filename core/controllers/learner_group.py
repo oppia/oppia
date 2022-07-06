@@ -304,7 +304,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             # Fetch the progress of the student in all the stories assigned
             # in the group syllabus.
             stories_progress = story_fetchers.get_progress_in_stories(
-                    user_id, story_ids)
+                user_id, story_ids)
             story_summaries = story_fetchers.get_story_summaries_by_ids(
                 story_ids)
 

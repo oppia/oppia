@@ -54,8 +54,8 @@ def get_learner_group_by_id(
         LearnerGroup or None. The learner group domain object corresponding to
         the given id or None if no learner group exists for the given group id.
     """
-    learner_group_model = learner_group_models.LearnerGroupModel.get_by_id(
-        group_id)
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=False)
 
     if not learner_group_model:
         return None
