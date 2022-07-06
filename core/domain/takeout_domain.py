@@ -67,7 +67,10 @@ class TakeoutImageReplacementInstruction:
     """
 
     def __init__(
-        self, dictionary_path: Tuple[str], export_filename: str, new_key: str
+        self,
+        dictionary_path: Tuple[str, ...],
+        export_filename: str,
+        new_key: str
     ) -> None:
         """Constructs a TakeoutImageReplacementInstruction object.
 
