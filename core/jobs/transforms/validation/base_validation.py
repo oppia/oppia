@@ -295,7 +295,9 @@ class ValidateModelDomainObjectInstances(
     """DoFn to check whether the model instance passes the validation of the
     domain object for model.
     """
-
+    # Here, return type is annotated as `Any` type because in child classes
+    # this method can be redefined with domain objects as return type. So,
+    # to allow every domain object as return type, we used Any here.
     def _get_model_domain_object_instance(
         self, unused_item: ModelInstanceType
     ) -> Any:

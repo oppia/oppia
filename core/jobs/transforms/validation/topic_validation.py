@@ -98,8 +98,8 @@ class ValidateTopicRightsSnapshotMetadataModel(
     """
 
     def _get_change_domain_class(
-        self, input_model: topic_models.TopicRightsSnapshotMetadataModel
-    ) -> Type[topic_domain.TopicRightsChange]: # pylint: disable=unused-argument
+        self, input_model: topic_models.TopicRightsSnapshotMetadataModel  # pylint: disable=unused-argument
+    ) -> Type[topic_domain.TopicRightsChange]:
         """Returns a change domain class.
 
         Args:

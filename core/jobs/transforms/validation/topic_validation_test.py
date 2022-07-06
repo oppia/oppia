@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core.domain import topic_domain
 from core.jobs import job_test_utils
 from core.jobs.decorators import validation_decorators
