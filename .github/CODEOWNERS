@@ -474,7 +474,7 @@
 
 # Learner group project.
 /core/domain/learner_group*.py @oppia/lace-backend-reviewers
-/core/templates/domain/learner_group/ @oppia/lace-front end-reviewers
+/core/templates/domain/learner_group/ @oppia/lace-frontend-reviewers
 
 # Beam jobs
 /setup.py @vojtechjelinek
