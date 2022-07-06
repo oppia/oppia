@@ -16,12 +16,12 @@
     Close
   </button>
   <button class="btn btn-success"
-          *ngIf="isInTestMode && !isLastConceptCard()"
+          *ngIf="!isLastConceptCard()"
           (click)="goToNextConceptCard()">
     Next
   </button>
   <button class="btn btn-success"
-          *ngIf="isInTestMode && isLastConceptCard()"
+          *ngIf="isLastConceptCard()"
           (click)="retryTest()">
     Retry Test
   </button>

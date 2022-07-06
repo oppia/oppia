@@ -27,12 +27,15 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class SkillMasteryModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() skillId!: string;
-  @Input() userIsLoggedIn: boolean;
-  @Input() masteryPerSkillMapping: unknown;
+  @Input() skillId: string = '';
+  @Input() userIsLoggedIn: boolean = false;
+  @Input() masteryPerSkillMapping: {
+    [key: string]: number;
+  } = {};
+
   @Output() openConceptCardModal = new EventEmitter();
 
-  masteryChange: number;
+  masteryChange: number = 0;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -46,7 +49,8 @@ export class SkillMasteryModalComponent
 
   ngOnInit(): void {
     if (this.userIsLoggedIn) {
-      this.masteryChange = this.masteryPerSkillMapping[this.skillId];
+      this.masteryChange = this.masteryPerSkillMapping[(
+        this.skillId as string)];
     }
   }
 }

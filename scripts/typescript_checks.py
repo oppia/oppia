@@ -131,7 +131,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/question-directives/question-player/question-player-concept-card-modal.component.spec.ts',
     'core/templates/components/question-directives/question-player/question-player.component.spec.ts',
     'core/templates/components/question-directives/question-player/question-player.component.ts',
-    'core/templates/components/question-directives/question-player/skill-mastery-modal.controller.spec.ts',
+    'core/templates/components/question-directives/question-player/skill-mastery-modal.component.spec.ts',
     'core/templates/components/question-directives/questions-list/questions-list.component.spec.ts',
     'core/templates/components/question-directives/questions-list/questions-list.component.ts',
     'core/templates/components/ratings/rating-display/rating-display.component.ts',

@@ -22,7 +22,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { UrlService } from 'services/contextual/url.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
 
 @Component({
   selector: 'oppia-question-player-concept-card-modal',
@@ -30,12 +29,11 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 })
 export class QuestionPlayerConceptCardModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() skillIds!: string[];
-  @Input() skills: Skill[] | unknown[];
+  @Input() skillIds: string[] = [];
+  @Input() skills: string[] = [];
 
-  index: number;
-  modalHeader: unknown;
-  isInTestMode: boolean;
+  index: number = 0;
+  modalHeader: string = '';
 
   constructor(
       private ngbActiveModal: NgbActiveModal,
@@ -48,7 +46,6 @@ export class QuestionPlayerConceptCardModalComponent
   ngOnInit(): void {
     this.index = 0;
     this.modalHeader = this.skills[this.index];
-    this.isInTestMode = true;
   }
 
   isLastConceptCard(): boolean {
