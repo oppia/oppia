@@ -27,7 +27,7 @@
   </div>
 </mat-card>
 
-<div *ngIf="interactionIsShown">
+<div [hidden]="!interactionIsShown">
   <oppia-state-interaction-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
                                   (onSaveInteractionId)="sendOnSaveInteractionId($event)"
                                   (onSaveInteractionCustomizationArgs)="sendOnSaveInteractionCustomizationArgs($event)"
