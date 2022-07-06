@@ -14,8 +14,8 @@
 
 import { StorySummary, StorySummaryBackendDict }
   from 'domain/story/story-summary.model';
-import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
-  from './subtopic-page-summary.model';
+import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
+  from './learner-group-subtopic-summary.model';
 
 /**
  * @fileoverview Model for displaying short summaries of learner group
@@ -23,20 +23,20 @@ import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
  */
 
 export interface LearnerGroupSyllabusBackendDict {
-  'learner_group_id': string;
-  'stories_summaries': StorySummaryBackendDict[];
-  'subtopic_page_summaries': SubtopicPageSummaryBackendDict[];
+  learner_group_id: string;
+  story_summary_dicts: StorySummaryBackendDict[];
+  subtopic_summary_dicts: LearnerGroupSubtopicSummaryBackendDict[];
 }
 
 export class LearnerGroupSyllabus {
   _learnerGroupId: string;
   _storySummaries: StorySummary[];
-  _subtopicPageSummaries: SubtopicPageSummary[];
+  _subtopicPageSummaries: LearnerGroupSubtopicSummary[];
 
   constructor(
       learnerGroupId: string,
       storySummaries: StorySummary[],
-      subtopicPageSummaries: SubtopicPageSummary[]) {
+      subtopicPageSummaries: LearnerGroupSubtopicSummary[]) {
     this._learnerGroupId = learnerGroupId;
     this._storySummaries = storySummaries;
     this._subtopicPageSummaries = subtopicPageSummaries;
@@ -50,21 +50,36 @@ export class LearnerGroupSyllabus {
     return this._storySummaries;
   }
 
-  get subtopicPageSummaries(): SubtopicPageSummary[] {
+  get subtopicPageSummaries(): LearnerGroupSubtopicSummary[] {
     return this._subtopicPageSummaries;
   }
 
   static createFromBackendDict(
       backendDict: LearnerGroupSyllabusBackendDict
   ): LearnerGroupSyllabus {
+    let storiesSummaries: StorySummary[] = [];
+    if (backendDict.story_summary_dicts.length > 0) {
+      storiesSummaries = backendDict.story_summary_dicts.map(
+        (storySummaryDict) => StorySummary.createFromBackendDict(
+          storySummaryDict
+        )
+      );
+    }
+
+    let subtopicsSummaries: LearnerGroupSubtopicSummary[] = [];
+    if (backendDict.subtopic_summary_dicts.length > 0) {
+      subtopicsSummaries = backendDict.subtopic_summary_dicts.map(
+        (learnerGroupSubtopicSummaryDict) => (
+          LearnerGroupSubtopicSummary.createFromBackendDict(
+            learnerGroupSubtopicSummaryDict
+          )
+        )
+      );
+    }
     return new LearnerGroupSyllabus(
       backendDict.learner_group_id,
-      backendDict.stories_summaries.map(
-        (storySummary) => StorySummary.createFromBackendDict(storySummary)),
-      backendDict.subtopic_page_summaries.map(
-        (subtopicPageSummary) => SubtopicPageSummary.createFromBackendDict(
-          subtopicPageSummary)
-      )
+      storiesSummaries,
+      subtopicsSummaries
     );
   }
 }

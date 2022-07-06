@@ -20,7 +20,7 @@ import { LearnerGroupUserProgress } from './learner-group-user-progress.model';
 
 describe('Learner Group User Progress', () => {
   it('should correctly convert backend dict to object', () => {
-    const sampleSubtopicPageSummaryDict = {
+    const sampleLearnerGroupSubtopicSummaryDict = {
       subtopic_id: 1,
       subtopic_title: 'subtopicTitle',
       parent_topic_id: 'parentTopicId',
@@ -64,7 +64,7 @@ describe('Learner Group User Progress', () => {
       username: 'user1',
       progress_sharing_is_turned_on: true,
       stories_progress: [sampleStorySummaryBackendDict],
-      subtopic_page_progress: [sampleSubtopicPageSummaryDict]
+      subtopic_page_progress: [sampleLearnerGroupSubtopicSummaryDict]
     };
 
     let sampleLearnerGroupUserProg = (

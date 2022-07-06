@@ -80,7 +80,7 @@ describe('Learner Group Backend API Service', () => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    const LEARNER_GROUP_UPDATE_URL = '/update_learner_group_handler';
+    const LEARNER_GROUP_UPDATE_URL = '/update_learner_group_handler/groupId';
 
     var sampleLearnerGroupData = {
       id: 'groupId',
@@ -116,7 +116,7 @@ describe('Learner Group Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      const LEARNER_GROUP_UPDATE_URL = '/update_learner_group_handler';
+      const LEARNER_GROUP_UPDATE_URL = '/update_learner_group_handler/groupId';
 
       var sampleLearnerGroupData = {
         id: 'groupId',
@@ -155,7 +155,7 @@ describe('Learner Group Backend API Service', () => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    const LEARNER_GROUP_DELETE_URL = '/delete_learner_group_handler';
+    const LEARNER_GROUP_DELETE_URL = '/delete_learner_group_handler/groupId';
 
     learnerGroupBackendApiService.deleteLearnerGroupAsync(
       'groupId').then(successHandler, failHandler);
@@ -177,7 +177,7 @@ describe('Learner Group Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      const LEARNER_GROUP_DELETE_URL = '/delete_learner_group_handler';
+      const LEARNER_GROUP_DELETE_URL = '/delete_learner_group_handler/groupId';
 
       learnerGroupBackendApiService.deleteLearnerGroupAsync(
         'groupId').then(successHandler, failHandler);
@@ -203,7 +203,9 @@ describe('Learner Group Backend API Service', () => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    const LEARNER_GROUP_GET_URL = '/facilitator_view_of_learner_group_handler';
+    const LEARNER_GROUP_GET_URL = (
+      '/facilitator_view_of_learner_group_handler/groupId'
+    );
 
     learnerGroupBackendApiService.fetchLearnerGroupInfoAsync(
       'groupId').then(successHandler, failHandler);
@@ -226,7 +228,7 @@ describe('Learner Group Backend API Service', () => {
       var failHandler = jasmine.createSpy('fail');
 
       const LEARNER_GROUP_GET_URL = (
-        '/facilitator_view_of_learner_group_handler'
+        '/facilitator_view_of_learner_group_handler/groupId'
       );
 
       learnerGroupBackendApiService.fetchLearnerGroupInfoAsync(

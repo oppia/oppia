@@ -25,7 +25,7 @@ import { ShortLearnerGroupSummary, ShortLearnerGroupSummaryBackendDict }
   from './short-learner-group-summary.model';
 
 interface TeacherDashboardBackendResponse {
-  'learner_groups_list': ShortLearnerGroupSummaryBackendDict[];
+  learner_groups_list: ShortLearnerGroupSummaryBackendDict[];
 }
 
 @Injectable({

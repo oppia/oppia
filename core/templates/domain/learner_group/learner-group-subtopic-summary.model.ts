@@ -17,17 +17,17 @@
  * subtopic page summary domain objects.
  */
 
-export interface SubtopicPageSummaryBackendDict {
-  'subtopic_id': number;
-  'subtopic_title': string;
-  'parent_topic_id': string;
-  'parent_topic_name': string;
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'subtopic_mastery'?: number;
+export interface LearnerGroupSubtopicSummaryBackendDict {
+  subtopic_id: number;
+  subtopic_title: string;
+  parent_topic_id: string;
+  parent_topic_name: string;
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+  subtopic_mastery?: number;
 }
 
-export class SubtopicPageSummary {
+export class LearnerGroupSubtopicSummary {
   _parentTopicId: string;
   _parentTopicName: string;
   _subtopicId: number;
@@ -87,15 +87,16 @@ export class SubtopicPageSummary {
   }
 
   static createFromBackendDict(
-      SubtopicPageSummaryBackendDict: SubtopicPageSummaryBackendDict
-  ): SubtopicPageSummary {
-    return new SubtopicPageSummary(
-      SubtopicPageSummaryBackendDict.parent_topic_id,
-      SubtopicPageSummaryBackendDict.parent_topic_name,
-      SubtopicPageSummaryBackendDict.subtopic_id,
-      SubtopicPageSummaryBackendDict.subtopic_title,
-      SubtopicPageSummaryBackendDict.thumbnail_filename,
-      SubtopicPageSummaryBackendDict.thumbnail_bg_color,
-      SubtopicPageSummaryBackendDict.subtopic_mastery);
+      LearnerGroupSubtopicSummaryBackendDict:
+        LearnerGroupSubtopicSummaryBackendDict
+  ): LearnerGroupSubtopicSummary {
+    return new LearnerGroupSubtopicSummary(
+      LearnerGroupSubtopicSummaryBackendDict.parent_topic_id,
+      LearnerGroupSubtopicSummaryBackendDict.parent_topic_name,
+      LearnerGroupSubtopicSummaryBackendDict.subtopic_id,
+      LearnerGroupSubtopicSummaryBackendDict.subtopic_title,
+      LearnerGroupSubtopicSummaryBackendDict.thumbnail_filename,
+      LearnerGroupSubtopicSummaryBackendDict.thumbnail_bg_color,
+      LearnerGroupSubtopicSummaryBackendDict.subtopic_mastery);
   }
 }

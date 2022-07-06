@@ -14,8 +14,8 @@
 
 import { StorySummary, StorySummaryBackendDict }
   from 'domain/story/story-summary.model';
-import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
-  from './subtopic-page-summary.model';
+import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
+  from './learner-group-subtopic-summary.model';
 
 /**
  * @fileoverview Model for displaying instances of frontend learner group
@@ -23,23 +23,23 @@ import { SubtopicPageSummary, SubtopicPageSummaryBackendDict }
  */
 
 export interface LearnerGroupUserProgressBackendDict {
-  'username': string ;
-  'progress_sharing_is_turned_on': boolean;
-  'stories_progress': StorySummaryBackendDict[];
-  'subtopic_page_progress': SubtopicPageSummaryBackendDict[];
+  username: string ;
+  progress_sharing_is_turned_on: boolean;
+  stories_progress: StorySummaryBackendDict[];
+  subtopic_page_progress: LearnerGroupSubtopicSummaryBackendDict[];
 }
 
 export class LearnerGroupUserProgress {
   _username: string;
   _progressSharingIsTurnedOn: boolean;
   _storiesProgress: StorySummary[];
-  _subtopicsProgress: SubtopicPageSummary[];
+  _subtopicsProgress: LearnerGroupSubtopicSummary[];
 
   constructor(
       username: string,
       progressSharingIsTurnedOn: boolean,
       storiesProgress: StorySummary[],
-      subtopicsProgress: SubtopicPageSummary[]) {
+      subtopicsProgress: LearnerGroupSubtopicSummary[]) {
     this._username = username;
     this._progressSharingIsTurnedOn = progressSharingIsTurnedOn;
     this._storiesProgress = storiesProgress;
@@ -58,7 +58,7 @@ export class LearnerGroupUserProgress {
     return this._storiesProgress;
   }
 
-  get subtopicsProgress(): SubtopicPageSummary[] {
+  get subtopicsProgress(): LearnerGroupSubtopicSummary[] {
     return this._subtopicsProgress;
   }
 
@@ -74,14 +74,12 @@ export class LearnerGroupUserProgress {
       );
     }
 
-    let subtopicsProgress: SubtopicPageSummary[] = [];
+    let subtopicsProgress: LearnerGroupSubtopicSummary[] = [];
     if (progBackendDict.subtopic_page_progress.length > 0) {
-      subtopicsProgress = (
-        progBackendDict.subtopic_page_progress.map(
-          (subtopicProgressBackendDict) => (
-            SubtopicPageSummary.createFromBackendDict(
-              subtopicProgressBackendDict)
-          )
+      subtopicsProgress = progBackendDict.subtopic_page_progress.map(
+        (subtopicProgressBackendDict) => (
+          LearnerGroupSubtopicSummary.createFromBackendDict(
+            subtopicProgressBackendDict)
         )
       );
     }
