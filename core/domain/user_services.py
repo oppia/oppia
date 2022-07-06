@@ -791,7 +791,7 @@ def is_user_registered(user_id: Optional[str]) -> bool:
     """Checks if a user is registered with the given user_id.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_id: str|None. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id is registered.
@@ -806,7 +806,7 @@ def has_ever_registered(user_id: str) -> bool:
     """Checks if a user has ever been registered with given user_id.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_id: str|None. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id has ever been registered.
@@ -830,8 +830,9 @@ def has_fully_registered_account(user_id: Optional[str]) -> bool:
     user_settings = get_user_settings(user_id, strict=True)
     return bool(
         user_settings.username and user_settings.last_agreed_to_terms and (
-        user_settings.last_agreed_to_terms >=
-        feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
+            user_settings.last_agreed_to_terms >=
+            feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC
+        )
     )
 
 
@@ -1633,7 +1634,7 @@ def record_user_edited_an_exploration(user_id: str) -> None:
         user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id, strict=False)
-    if user_settings:
+    if user_settings is not None:
         user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
         _save_user_settings(user_settings)
 
@@ -1646,7 +1647,7 @@ def record_user_created_an_exploration(user_id: str) -> None:
         user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id, strict=False)
-    if user_settings:
+    if user_settings is not None:
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
         _save_user_settings(user_settings)
 
@@ -1892,12 +1893,13 @@ def get_user_contributions(
         object.
     """
     model = user_models.UserContributionsModel.get(user_id, strict=strict)
-    if model is not None:
-        result = user_domain.UserContributions(
-            model.id, model.created_exploration_ids,
-            model.edited_exploration_ids)
-    else:
+    if model is None:
         return None
+
+    result = user_domain.UserContributions(
+        model.id, model.created_exploration_ids,
+        model.edited_exploration_ids)
+        
     return result
 
 
