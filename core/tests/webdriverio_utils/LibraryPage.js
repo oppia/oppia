@@ -23,12 +23,14 @@ var waitFor = require('./waitFor.js');
 var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
-  var searchButton = $('.e2e-test-search-button');
-  var mainHeader = $('.e2e-test-library-main-header');
+  var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
+  var allCollectionSummaryTile = $('.e2e-test- collection-summary-tile');
   var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
   var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
-  var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
+  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
   var expHoverElement = $('.e2e-test-exploration-dashboard-card');
+  var mainHeader = $('.e2e-test-library-main-header');
+  var searchButton = $('.e2e-test-search-button');
   var allExplorationsTitled = function(explorationName) {
     return $$(
       `.e2e-test-exp-summary-tile-title=${explorationName}`);
@@ -52,7 +54,7 @@ var LibraryPage = function() {
       browser.isMobile ? searchInputs[1] :
       searchInputs[0]);
     await action.clear('Search input', searchInput);
-    await action.keys('Search input', searchInput, searchQuery);
+    await action.setValue('Search input', searchInput, searchQuery);
     let searchButtonExists = await searchButton.isExisting();
     if (searchButtonExists) {
       await action.click('Search button', searchButton);
@@ -68,7 +70,7 @@ var LibraryPage = function() {
   this.addSelectedExplorationToPlaylist = async function() {
     // We need to wait till the cards are loaded else it will
     // throw element out of bond error.
-    // eslint-disable-next-line wdio/no-pause
+    // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(5000);
     await expHoverElement.moveTo();
 

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Pencil Code
- * Editor.
+ * Editor in protractor.
  */
 
 var waitFor = require(

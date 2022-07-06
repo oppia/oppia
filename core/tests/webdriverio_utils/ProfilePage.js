@@ -20,15 +20,12 @@
 var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
-  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
-  var createdExplorationStat = $(
-    '.e2e-test-profile-created-stat');
-  var allExplorationCardElements = $(
-    '.e2e-test-exploration-dashboard-card');
-  var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
+  var allExplorationCardElement = $('.e2e-test-exploration-dashboard-card');
   var bio = $('.e2e-test-profile-bio');
+  var createdExplorationStat = $('.e2e-test-profile-created-stat');
+  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
   var interestPlaceholder = $('.e2e-test-profile-no-interest');
-  var interestPlaceholder = $('.e2e-test-profile-no-interest');
+  var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
 
   this.get = async function(userName) {
     await browser.url('/profile/' + userName);
@@ -90,7 +87,7 @@ var ProfilePage = function() {
 
   this.expectToHaveExplorationCards = async function() {
     await waitFor.visibilityOf(
-      allExplorationCardElements,
+      allExplorationCardElement,
       'Exploration cards is not present or taking time to display');
   };
 

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the GraphInput interaction.
+ * @fileoverview End-to-end testing utilities for the GraphInput interaction
+ * in webdriverio.
  */
 
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');

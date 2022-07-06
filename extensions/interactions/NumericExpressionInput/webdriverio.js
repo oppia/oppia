@@ -15,7 +15,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Numeric Expression Input
- * interaction
+ * interaction in webdriverio.
  */
 
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');

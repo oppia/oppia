@@ -23,15 +23,14 @@ var action = require('./action.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
-  var waitingForResponseElem = $(
-    '.e2e-test-input-response-loading-dots');
-  var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
-  var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
-  var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
-  var explorationHeader = $('.e2e-test-exploration-header');
   var conversationInput = $('.e2e-test-conversation-input');
+  var explorationHeader = $('.e2e-test-exploration-header');
   var feedbackCloseButton = $('.e2e-test-exploration-feedback-close-button');
+  var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
+  var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
+  var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
   var lessonCompleteMessage = $('.e2e-test-exploration-checkpoints-message');
+  var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
@@ -77,7 +76,6 @@ var ExplorationPlayerPage = function() {
 
   this.rateExploration = async function(ratingValue) {
     var ratingStars = await $$('.e2e-test-rating-star');
-    await waitFor.elementToBeClickable(ratingStars[ratingValue - 1]);
     await action.click('Submit Button', ratingStars[ratingValue - 1]);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
@@ -106,7 +104,7 @@ var ExplorationPlayerPage = function() {
   this.submitFeedback = async function(feedback) {
     await waitFor.elementToBeClickable(feedbackPopupLink);
     await action.click('Feedback Popup Link', feedbackPopupLink);
-    await action.keys('Feedback Text Area', feedbackTextArea, feedback);
+    await action.setValue('Feedback Text Area', feedbackTextArea, feedback);
     await waitFor.elementToBeClickable(feedbackSubmitButton);
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(

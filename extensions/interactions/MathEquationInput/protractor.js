@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Math Equation Input
- * interaction
+ * interaction in protractor.
  */
 
 var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');

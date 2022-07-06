@@ -72,9 +72,6 @@ reportersArray = [
   }]
 ];
 
-// Only running videos recorder on Github Action when its enabled
-// using environment variables, since running it on Github Actions
-// can introduce flakiness due to increase RAM usage.
 if ((process.env.GITHUB_ACTIONS &&
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
     LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
@@ -149,7 +146,7 @@ exports.config = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'info',
+    logLevel: 'warn',
 
     // Set a base URL in order to shorten url command calls. If your `url` parameter starts
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.

@@ -250,7 +250,7 @@ var ExplorationEditorPage = function() {
     }
     await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.sleep from e2e files.
-    /* eslint-disable-next-line oppia/protractor-practices */
+    /* eslint-disable-next-line oppia/e2e-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
@@ -264,7 +264,7 @@ var ExplorationEditorPage = function() {
       'Commit message input', commitMessageInput, commitMessage);
     await action.click('Publish changes button', commitChangesButton);
     // TODO(#13096): Remove browser.sleep from e2e files.
-    /* eslint-disable-next-line oppia/protractor-practices */
+    /* eslint-disable-next-line oppia/e2e-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
       publishChangesButtonTextContainer, 'Publish Changes',

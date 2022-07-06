@@ -138,7 +138,10 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    var deleteItemFieldElem = elem.$(
+    var item = await $$(
+      '.e2e-test-schema-based-list-editor-table-data')[index];
+
+    var deleteItemFieldElem = item.$(
       deleteListEntryLocator);
     await action.click('Delete Item Field Elem', deleteItemFieldElem);
   };
@@ -171,7 +174,7 @@ var RealEditor = function(elem) {
   return {
     setValue: async function(value) {
       await action.clear('Text Input', elem.$('<input>'));
-      await action.keys(
+      await action.setValue(
         'Text Input', elem.$('<input>'), value);
     }
   };
@@ -270,14 +273,14 @@ var RichTextEditor = async function(elem) {
           'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
         // RteElementFirst can be found in beginning of RichTextEditor function.
-        await action.keys(
+        await action.setValue(
           'First RTE Element',
           rteElements[0],
           'PageDown');
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      await action.keys(
+      await action.setValue(
         'First RTE Element',
         rteElements[0],
         ['Control', 'End']);
@@ -302,8 +305,8 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await action.clear('Input Field', elem.$('<input>'));
-      await action.keys(
+      await action.clear('Input Field', await elem.$('<input>'));
+      await action.setValue(
         'Input Field',
         elem.$('<input>'), text);
     }
@@ -321,7 +324,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      await action.keys(
+      await action.setValue(
         'Dropdown Element',
         $(dropdownElement).$(searchInputLocator),
         text + '\n');
@@ -335,7 +338,7 @@ var AutocompleteDropdownEditor = function(elem) {
       );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      await action.keys(
+      await action.setValue(
         'Dropdown Element',
         $(dropdownElement).$(searchInputLocator),
         '\n');
@@ -364,7 +367,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       for (var i = 0; i < texts.length; i++) {
         await action.click('Container Element', elem.$(containerLocator));
         var searchFieldElement = elem.$('.select2-search__field');
-        await action.keys(
+        await action.setValue(
           'Search Field Element',
           searchFieldElement,
           texts[i] + '\n');
@@ -733,7 +736,7 @@ var CodeStringEditor = function(elem) {
     setValue: async function(code) {
       var stringEditorTextArea = await elem.$('textarea');
       await action.clear('String Editor Text Area', stringEditorTextArea);
-      await action.keys(
+      await action.setValue(
         'String Editor Text Area',
         stringEditorTextArea,
         code);

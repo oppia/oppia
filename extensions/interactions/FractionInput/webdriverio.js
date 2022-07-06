@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the Fraction interaction.
+ * @fileoverview End-to-end testing utilities for the Fraction interaction
+ * in webdriverio.
  */
 
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');

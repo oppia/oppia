@@ -26,21 +26,20 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
+  var explorationCategoryInput = $('.e2e-test-exploration-category-input');
+  var explorationLanguageInput = $('.e2e-test-exploration-language-select');
+  var explorationObjectiveInput = $('.e2e-test-exploration-objective-input');
+  var explorationTitleInput = $('.e2e-test-exploration-title-input');
   var neutralElement = $('.e2e-test-settings-container');
-  var explorationCategoryInput = $(
-    '.e2e-test-exploration-category-input');
-  var explorationLanguageInput = $(
-    '.e2e-test-exploration-language-select');
-  var explorationObjectiveInput = $(
-    '.e2e-test-exploration-objective-input');
-  var explorationTitleInput = $(
-    '.e2e-test-exploration-title-input');
-  var disableCorrectnessFeedbackButton = $(
-    '.e2e-test-enable-mark-correctness-feedback');
-  var deleteExplorationButton = $(
-    '.e2e-test-delete-exploration-button');
+
+  /*
+   * Buttons
+   */
   var confirmDeleteExplorationButton = $(
     '.e2e-test-really-delete-exploration-button');
+  var deleteExplorationButton = $('.e2e-test-delete-exploration-button');
+  var disableCorrectnessFeedbackButton = $(
+    '.e2e-test-enable-mark-correctness-feedback');
 
   /*
    * Workflows
@@ -82,7 +81,7 @@ var ExplorationEditorSettingsTab = function() {
   this.setObjective = async function(objective) {
     await action.clear(
       'Exploration Objective input', explorationObjectiveInput);
-    await action.keys(
+    await action.setValue(
       'Exploration Objective input', explorationObjectiveInput, objective);
   };
 
@@ -90,7 +89,7 @@ var ExplorationEditorSettingsTab = function() {
     await action.waitForAutosave();
     await general.scrollToTop();
     await action.clear('Exploration Title Input', explorationTitleInput);
-    await action.keys(
+    await action.setValue(
       'Exploration Title Input', explorationTitleInput, title);
   };
 };

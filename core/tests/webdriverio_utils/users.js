@@ -65,7 +65,7 @@ var login = async function(email, useManualNavigation = true) {
   await waitFor.presenceOf(loginPage, 'Login page did not load');
 
   var emailInput = $('.e2e-test-sign-in-email-input');
-  await action.keys('Email input', emailInput, email);
+  await action.setValue('Email input', emailInput, email);
 
   var signInButton = $('.e2e-test-sign-in-button');
 
@@ -111,7 +111,7 @@ var _completeSignup = async function(username) {
   await waitFor.presenceOf(signupPage, 'Signup page did not load');
 
   var usernameInput = $('.e2e-test-username-input');
-  await action.keys('Username input', usernameInput, username);
+  await action.setValue('Username input', usernameInput, username);
 
   var agreeToTermsCheckbox = await (
     $('.e2e-test-agree-to-terms-checkbox'));

@@ -14,12 +14,12 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Pencil Code
- * Editor.
+ * Editor in webdriverio..
  */
 
 var waitFor = require(
   process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
-var waitFor = require(
+var action = require(
   process.cwd() + '/core/tests/webdriverio_utils/action.js');
 
 var customizeInteraction = async function(interactionEditor, placeHolderText) {

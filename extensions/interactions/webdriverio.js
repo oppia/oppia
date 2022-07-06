@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Clearing-house for webdriverio test utilities for interactions.
+ * @fileoverview Clearing-house for webdriverio test utilities for interactions
+ *  in webdriverio.
  */
 
 /* Each interaction's webdriverio file must implement the following:

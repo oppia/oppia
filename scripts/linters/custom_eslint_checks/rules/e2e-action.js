@@ -19,7 +19,7 @@
 
 'use strict';
 
-let ACTION_FUNCTIONS_TO_ENFORCE = ['click', 'sendKeys', 'setValue', 'keys'];
+let ACTION_FUNCTIONS_TO_ENFORCE = ['click', 'sendKeys', 'setValue'];
 
 module.exports = {
   meta: {

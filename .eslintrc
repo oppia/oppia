@@ -4,16 +4,14 @@
     "sourceType": "module"
   },
   "extends": [
-    "eslint:recommended",
-    "plugin:wdio/recommended"
+    "eslint:recommended"
   ],
   "plugins": [
     "angular",
     "html",
     "unused-imports",
     "@typescript-eslint",
-    "oppia",
-    "wdio"
+    "oppia"
   ],
   "overrides": [
     {
@@ -118,14 +116,18 @@
       }
     },
     {
-      // We only run the protractor practices checks on protractor end-to-end test files.
+      // We only run the e2e practices checks on protractor and webdriverio
+      // end-to-end test files.
       "files": [
         "core/tests/protractor/*.js",
         "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js"
+        "core/tests/protractor_desktop/*.js",
+        "core/tests/webdriverio/*.js",
+        "core/tests/webdriverio_utils/*.js",
+        "core/tests/webdriverio_desktop/*.js"
       ],
       "rules": {
-        "oppia/protractor-practices": "error"
+        "oppia/e2e-practices": "error"
       }
     },
     {
@@ -392,8 +394,6 @@
       }
     ],
     "unused-imports/no-unused-imports-ts": "error",
-    "wdio/no-debug": "error",
-    "wdio/no-pause": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
     "@typescript-eslint/ban-types": [

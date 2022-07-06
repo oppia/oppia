@@ -24,31 +24,29 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var configTab = $('.e2e-test-admin-config-tab');
-  var saveAllConfigs = $('.e2e-test-save-all-configs');
+  var addNewRoleButton = $('.e2e-test-add-new-role-button');
   var adminRolesTab = $('.e2e-test-admin-roles-tab');
   var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
+  var configTab = $('.e2e-test-admin-config-tab');
+  var editUserRoleButton = $('.e2e-test-role-edit-button');
+  var progressSpinner = $('.e2e-test-progress-spinner');
+  var roleEditorContainer = $('.e2e-test-roles-editor-card-container');
+  var roleSelector = $('.e2e-test-new-role-selector');
+  var saveAllConfigs = $('.e2e-test-save-all-configs');
+  var statusMessage = $('.e2e-test-status-message');
   var usernameInputFieldForRolesEditing = $(
     '.e2e-test-username-for-role-editor');
-  var editUserRoleButton = $('.e2e-test-role-edit-button');
-  var roleEditorContainer = $('.e2e-test-roles-editor-card-container');
-  var addNewRoleButton = $('.e2e-test-add-new-role-button');
-  var progressSpinner = $('.e2e-test-progress-spinner');
-  var roleSelector = $('.e2e-test-new-role-selector');
-  var configTitleLocator = '.e2e-test-config-title';
-  var statusMessage = $('.e2e-test-status-message');
 
   var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
     await waitFor.visibilityOf(
-      configProperty.$(configTitleLocator),
+      configProperty.$('.e2e-test-config-title'),
       'Config Title taking too long too appear');
-    var title = await configProperty.$(configTitleLocator).getText();
+    var title = await configProperty.$('.e2e-test-config-title').getText();
     if (title.match(propertyName)) {
       await editingInstructions(
         await forms.getEditor(objectType)(configProperty));
-      await action.click(
-        'Save All Configs Button', saveAllConfigs);
+      await action.click('Save All Configs Button', saveAllConfigs);
       await general.acceptAlert();
       // Waiting for success message.
       await waitFor.textToBePresentInElement(
@@ -71,10 +69,15 @@ var AdminPage = function() {
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
+  this.get = async function() {
+    await browser.url(ADMIN_URL_SUFFIX);
+    await waitFor.pageToFullyLoad();
+  };
+
   this._editUserRole = async function(username) {
     await this.get();
     await _switchToRolesTab();
-    await action.keys(
+    await action.setValue(
       'Username input field', usernameInputFieldForRolesEditing, username);
     await action.click('Edit user role button', editUserRoleButton);
     await waitFor.visibilityOf(

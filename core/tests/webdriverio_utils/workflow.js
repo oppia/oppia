@@ -26,18 +26,18 @@ var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
-  return $('.e2e-test-save-role').isEnabled();
+  return await $('.e2e-test-save-role').isEnabled();
 };
 
 // Check if exploration is community owned.
 var isExplorationCommunityOwned = async function() {
-  return $('.e2e-test-is-community-owned').isExisting();
+  return await $('.e2e-test-is-community-owned').isExisting();
 };
 
 
 // Check if the warning message is visible when the title is ''.
 var checkForAddTitleWarning = async function() {
-  return $('.e2e-test-title-warning').isDisplayed();
+  return await $('.e2e-test-title-warning').isDisplayed();
 };
 
 // Trigger onblur event for title.
@@ -53,7 +53,7 @@ var triggerTitleOnBlurEvent = async function() {
 var openEditRolesForm = async function() {
   var testEditRoles = $('.e2e-test-edit-roles');
   await action.click('Test edit roles', testEditRoles);
-  await action.keys('Test Role Username', $(
+  await action.setValue('Test Role Username', $(
     '.e2e-test-role-username'), 'Chuck Norris');
 };
 
@@ -120,11 +120,10 @@ var createExplorationAsAdmin = async function() {
 var publishExploration = async function() {
   await waitFor.elementToBeClickable(
     $('.e2e-test-publish-exploration'));
-  $('.e2e-test-publish-exploration').isDisplayed();
+  await $('.e2e-test-publish-exploration').isDisplayed();
   var testPublishExploration = $('.e2e-test-publish-exploration');
   await action.click('Test Publish Exploration', testPublishExploration);
-  var prePublicationButtonElem = $(
-    '.e2e-test-confirm-pre-publication');
+  var prePublicationButtonElem = $('.e2e-test-confirm-pre-publication');
   await action.click(
     'Pre Publication Button Element', prePublicationButtonElem);
 
@@ -214,7 +213,7 @@ var createAndPublishTwoCardExploration = async function(
 var _addExplorationRole = async function(roleName, username) {
   await action.click(
     'Edit roles', $('.e2e-test-edit-roles'));
-  await action.keys(
+  await action.setValue(
     'Username input',
     $('.e2e-test-role-username'),
     username);
@@ -235,7 +234,7 @@ var addExplorationCollaborator = async function(username) {
 var addExplorationVoiceArtist = async function(username) {
   await action.click('Edit voice artist role button', $(
     '.e2e-test-edit-voice-artist-roles'));
-  await action.keys(
+  await action.setValue(
     'New voice artist username input',
     $('.e2e-test-new-voice-artist-username'), username);
   await action.click('Add voice artist button', $(
@@ -284,7 +283,7 @@ var uploadImage = async function(
 
   absPath = path.resolve(__dirname, imgPath);
   var imageUploadInput = $('.e2e-test-photo-upload-input');
-  return await action.keys(
+  return await action.setValue(
     'Image Upload Input', imageUploadInput, absPath, clickInputElement = false);
 };
 

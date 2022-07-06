@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the protractor-practices.js file.
+ * @fileoverview Tests for the e2e-practices.js file.
  */
 
 'use strict';
 
-var rule = require('./protractor-practices');
+var rule = require('./e2e-practices');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester({
@@ -28,7 +28,7 @@ var ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser')
 });
 
-ruleTester.run('protractor-practices', rule, {
+ruleTester.run('e2e-practices', rule, {
   valid: [{
     code:
     `expSummaryRowTitleElements.first()
@@ -95,7 +95,7 @@ ruleTester.run('protractor-practices', rule, {
       });`,
       errors: [{
         message: 'Please do not use browser.switchTo().activeElement()' +
-          ' in protractor files',
+          ' in e2e files',
         type: 'MemberExpression',
       }],
     },
@@ -105,7 +105,7 @@ ruleTester.run('protractor-practices', rule, {
         browser.sleep();
       });`,
       errors: [{
-        message: 'Please do not use browser.sleep() in protractor files',
+        message: 'Please do not use browser.sleep() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -115,7 +115,7 @@ ruleTester.run('protractor-practices', rule, {
         browser.explore();
       });`,
       errors: [{
-        message: 'Please do not use browser.explore() in protractor files',
+        message: 'Please do not use browser.explore() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -125,7 +125,7 @@ ruleTester.run('protractor-practices', rule, {
         browser.pause();
       });`,
       errors: [{
-        message: 'Please do not use browser.pause() in protractor files',
+        message: 'Please do not use browser.pause() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -136,7 +136,7 @@ ruleTester.run('protractor-practices', rule, {
       });`,
       errors: [{
         message: (
-          'Please do not use browser.waitForAngular() in protractor files'),
+          'Please do not use browser.waitForAngular() in e2e files'),
         type: 'CallExpression',
       }],
     },

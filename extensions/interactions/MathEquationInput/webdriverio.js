@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Math Equation Input
- * interaction
+ * interaction in webdriverio.
  */
 
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');

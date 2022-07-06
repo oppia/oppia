@@ -26,18 +26,16 @@ var forms = require('../webdriverio_utils/forms.js');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
-  var createStoryButton = $('.e2e-test-create-story-button');
-  var saveTopicButton = $('.e2e-test-save-topic-button');
-  var practiceTabCheckbox = $('.e2e-test-toggle-practice-tab');
+  var addSubtopicButton = $('.e2e-test-add-subtopic-button');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
-  var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
-  var confirmStoryCreationButton = $('.e2e-test-confirm-story-creation-button');
-  var newStoryTitleField = $('.e2e-test-new-story-title-field');
-  var storyListTable = $('.e2e-test-story-list-table');
-  var newStoryDescriptionField = $('.e2e-test-new-story-description-field');
-  var newStoryUrlFragmentField = $('.e2e-test-new-story-url-fragment-field');
   var commitMessageField = $('.e2e-test-commit-message-input');
+  var confirmStoryCreationButton = $('.e2e-test-confirm-story-creation-button');
+  var confirmSubtopicCreationButton = $(
+    '.e2e-test-confirm-subtopic-creation-button');
+  var createStoryButton = $('.e2e-test-create-story-button');
+  var newStoryDescriptionField = $('.e2e-test-new-story-description-field');
+  var newStoryTitleField = $('.e2e-test-new-story-title-field');
+  var newStoryUrlFragmentField = $('.e2e-test-new-story-url-fragment-field');
   var newSubtopicEditorElement = $('.e2e-test-new-subtopic-editor');
   var topicEditorTab = $('.e2e-test-edit-topic-tab');
   var topicThumbnailImageElement = $(
@@ -56,18 +54,29 @@ var TopicEditorPage = function() {
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var storyThumbnailButton = $(
     '.e2e-test-thumbnail-editor .e2e-test-photo-button');
-  var storyPublicationStatusLocator = '.e2e-test-story-publication-status';
   var addSubtopicButton = $('.e2e-test-add-subtopic-button');
   var newSubtopicTitlefield = $('.e2e-test-new-subtopic-title-field');
   var newSubtopicUrlFragmentField = $(
     '.e2e-test-new-subtopic-url-fragment-field');
-  var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var practiceTabCheckbox = $('.e2e-test-toggle-practice-tab');
+  var publishTopicButton = $('.e2e-test-publish-topic-button');
   var reassignSkillButton = $('.e2e-test-reassign-skill-button');
+  var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
+  var saveTopicButton = $('.e2e-test-save-topic-button');
+  var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var storyListTable = $('.e2e-test-story-list-table');
+  var storyThumbnailButton = $(
+    '.e2e-test-thumbnail-editor .e2e-test-photo-button');
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
   var subtopicThumbnailImageElement = $(
     '.e2e-test-subtopic-thumbnail .e2e-test-custom-photo');
   var subtopicThumbnailButton = $(
     '.e2e-test-subtopic-thumbnail .e2e-test-photo-button');
+  var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var topicEditorTab = $('.e2e-test-edit-topic-tab');
+  var topicMetaTagContentField = $('.e2e-test-topic-meta-tag-content-field');
+  var topicMetaTagContentLabel = $('.e2e-test-topic-meta-tag-content-label');
   var topicPageTitleFragmentField = $(
     '.e2e-test-topic-page-title-fragment-field');
   var topicPageTitleFragmentLabel = $(
@@ -134,7 +143,7 @@ var TopicEditorPage = function() {
     var storyListItems = await $$('.e2e-test-story-list-item');
     var text = await action.getText(
       'Story List Text',
-      await storyListItems[index].$$(storyPublicationStatusLocator)[0]);
+      await storyListItems[index].$$('.e2e-test-story-publication-status')[0]);
     expect(text).toEqual(status);
   };
 
@@ -143,12 +152,12 @@ var TopicEditorPage = function() {
     await general.scrollToTop();
     await action.click('Create Story Button', createStoryButton);
 
-    await action.keys(
+    await action.setValue(
       'Create new story title', newStoryTitleField, storyTitle);
-    await action.keys(
+    await action.setValue(
       'Create new story description', newStoryDescriptionField,
       storyDescription);
-    await action.keys(
+    await action.setValue(
       'Create new story url fragment', newStoryUrlFragmentField,
       storyUrlFragment);
 
@@ -161,7 +170,7 @@ var TopicEditorPage = function() {
   };
 
   this.updatePageTitleFragment = async function(newPageTitleFragment) {
-    await action.keys(
+    await action.setValue(
       'Update Page Title Fragment',
       topicPageTitleFragmentField, newPageTitleFragment);
     await action.click(
@@ -170,10 +179,10 @@ var TopicEditorPage = function() {
 
   this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
     await action.click('Add subtopic button', addSubtopicButton);
-    await action.keys(
+    await action.setValue(
       'New subtopic title field', newSubtopicTitlefield, title);
 
-    await action.keys(
+    await action.setValue(
       'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
 
     await action.click(
@@ -192,11 +201,7 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    var conceptCardButton = await cKEditorElement.$(
-      '.cke_button=Insert Concept Card Link');
-    console.log(await conceptCardButton.isExisting());
-    console.log(conceptCardButton);
-    await browser.debug();
+    var conceptCardButton = await $('.cke_button=Insert Concept Card Link');
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = $(
       '.e2e-test-rte-skill-selector-item=', skillName);
@@ -251,7 +256,7 @@ var TopicEditorPage = function() {
     await action.click('Save Topic Button', saveTopicButton);
     await waitFor.visibilityOf(
       commitMessageField, 'Commit Message field taking too long to appear.');
-    await action.keys(
+    await action.setValue(
       'commit message field', commitMessageField, commitMessage);
 
     await action.click('Close save modal button', closeSaveModalButton);
@@ -260,7 +265,7 @@ var TopicEditorPage = function() {
   };
 
   this.updateMetaTagContent = async function(newMetaTagContent) {
-    await action.keys(
+    await action.setValue(
       'Update Meta Tag Content', topicMetaTagContentField, newMetaTagContent);
     await action.click('Meta Tag Content label', topicMetaTagContentLabel);
   };
