@@ -125,6 +125,7 @@ import { QuestionMisconceptionEditorComponent } from './question-directives/ques
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
+import { OutcomeIfStuckDestinationEditorComponent } from './state-directives/outcome-editor/outcome-if-stuck-destination-editor.component'
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
@@ -221,6 +222,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeIfStuckDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
@@ -327,6 +329,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeIfStuckDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
@@ -444,6 +447,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     RubricsEditorComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeIfStuckDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,

@@ -70,7 +70,7 @@
      }
    }
  
-   onDestSelectorChange(): void {
+   onDestIfStuckSelectorChange(): void {
      if (this.outcome.destIfReallyStuck === this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
        this.focusManagerService.setFocus('newStateNameInputField');
      } else {
@@ -165,7 +165,7 @@
  
    ngOnInit(): void {
      this.directiveSubscriptions.add(
-       this.stateEditorService.onSaveOutcomeDestDetails.subscribe(() => {          //Here
+       this.stateEditorService.onSaveOutcomeDestIfStuckDetails.subscribe(() => {
          // Create new state if specified.
          if (this.outcome.destIfReallyStuck === this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
            this.editorFirstTimeEventsService

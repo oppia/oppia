@@ -122,6 +122,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.saveResponse = function(reopen) {
       PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);
       StateEditorService.onSaveOutcomeDestDetails.emit();
+      StateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
       // Close the modal and save it afterwards.

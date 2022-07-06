@@ -100,7 +100,7 @@ export class OutcomeEditorComponent implements OnInit {
     }
 
     if (this.destinationIfStuckEditorIsOpen) {
-      this.saveThisDestination();
+      this.saveThisIfStuckDestination();
     }
   }
 
@@ -200,7 +200,7 @@ export class OutcomeEditorComponent implements OnInit {
     this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
     this.destinationIfStuckEditorIsOpen = false;
     this.savedOutcome.destIfReallyStuck = cloneDeep(this.outcome.destIfReallyStuck);
-    this.saveDest.emit(this.savedOutcome);
+    this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
   onChangeCorrectnessLabel(): void {
