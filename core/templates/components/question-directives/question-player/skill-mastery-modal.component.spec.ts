@@ -16,49 +16,74 @@
  * @fileoverview Unit tests for SkillMasteryModalController.
  */
 
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { SkillMasteryModalComponent } from './skill-mastery-modal.component';
 
-describe('Skill Mastery Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var masteryPerSkillMapping = {
-    skill1: 'mastery change'
-  };
-  var openConceptCardModal = jasmine.createSpy('openConceptCardModal');
-  var skillId = 'skill1';
-  var userIsLoggedIn = true;
-  importAllAngularServices();
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+  dismiss(): void {
+    return;
+  }
+}
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+describe('Skill Mastery Modal Controller', () => {
+  let component: SkillMasteryModalComponent;
+  let fixture: ComponentFixture<SkillMasteryModalComponent>;
 
-    $scope = $rootScope.$new();
-    $controller('SkillMasteryModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      masteryPerSkillMapping: masteryPerSkillMapping,
-      openConceptCardModal: openConceptCardModal,
-      skillId: skillId,
-      userIsLoggedIn: userIsLoggedIn
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        SkillMasteryModalComponent
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SkillMasteryModalComponent);
+    component = fixture.componentInstance;
+
+    fixture.detectChanges();
+  });
+
   it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.userIsLoggedIn).toEqual(userIsLoggedIn);
-      expect($scope.skillId).toEqual(skillId);
-      expect($scope.masteryChange).toEqual('mastery change');
+    () => {
+      spyOn(component.openConceptCardModal, 'emit').and.stub();
+
+      expect(component.userIsLoggedIn).toEqual(false);
+      expect(component.skillId).toEqual('');
+      expect(component.masteryChange).toEqual(0);
+
+      component.conceptCardModalOpen();
+
+      expect(component.openConceptCardModal.emit).toHaveBeenCalledWith(['']);
     });
 
   it('should open concept card with the skill id when clicking button to' +
-    ' open concept card', function() {
-    $scope.openConceptCardModal();
-    expect(openConceptCardModal).toHaveBeenCalledWith([skillId]);
+    ' open concept card', () => {
+    spyOn(component.openConceptCardModal, 'emit').and.stub();
+
+    component.userIsLoggedIn = true;
+    component.skillId = 'skillId';
+    component.masteryPerSkillMapping = {
+      skillId: 2
+    };
+
+    component.ngOnInit();
+    component.conceptCardModalOpen();
+
+    expect(component.openConceptCardModal.emit).toHaveBeenCalledWith(
+      ['skillId']);
   });
 });
