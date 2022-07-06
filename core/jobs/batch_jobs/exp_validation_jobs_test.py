@@ -210,6 +210,53 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
                 '</oppia-noninteractive-video></p>'
             )
         )
+        self.INVALID_STATE_5.update_interaction_id('DragAndDropSortInput')
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
+                ]
+            },
+            'allowMultipleItemsInSamePosition': {
+                'value': False
+            }
+        }
+        self.INVALID_STATE_5.update_interaction_customization_args(
+            customization_args_dict)
+        self.INVALID_STATE_5.update_next_content_id_index(4)
+        hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1',
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2',
+                    '<p><oppia-noninteractive-video '
+                    'autoplay-with-value="false" '
+                    'end-with-value="0" start-with-value="0">'
+                    '</oppia-noninteractive-video></p>'
+                )
+            )
+        ]
+        self.INVALID_STATE_5.update_interaction_hints(hint_list)
 
         self.INVALID_STATE_6.update_content(
             state_domain.SubtitledHtml(
@@ -808,8 +855,28 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult.as_stdout(
                 'VIDEOS OR LINKS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stderr(
-                'The id of exp is %s and the number of video '
-                'or link tags is %s' % (self.EXPLORATION_ID_12, 2)
+                'The id of exp is %s and the details of video '
+                'or link tags are %s' % (
+                    self.EXPLORATION_ID_12, [
+                      {
+                          'type': 'video',
+                          'location': 'content',
+                          'state_name': 'state 5'
+                      }, {
+                          'type': 'link',
+                          'location': 'interaction',
+                          'state_name': 'state 5'
+                      }, {
+                          'type': 'video',
+                          'location': 'interaction',
+                          'state_name': 'state 5'
+                      }, {
+                          'type': 'link',
+                          'location': 'content',
+                          'state_name': 'state 6'
+                      }
+                    ]
+                )
             )
         ])
 

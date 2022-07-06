@@ -89,26 +89,60 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             state.classifier_model_id is not None for state in states.values()
         )
 
-    def get_number_of_videos_or_links(
+    def get_details_of_video_or_link_tags(
         self, exploration: exp_domain.Exploration
-    ) -> int:
-        """Returns the number of videos or links in the exploration.
+    ):
+        """Checks through the html tags and returns details of states having
+        video or link tags.
 
         Args:
             exploration: Exploration. Exploration to be checked.
 
         Returns:
-            int. Returns the number of videos or links in the exploration.
+            List[dict]. The list containing details of each video or link tag.
+            The detail contains the type of tag, its location and the state
+            name.
         """
-        count = 0
-        html_list: List[str] = exploration.get_all_html_content_strings()
+        list_of_video_or_link_tags = []
+        states: List[Tuple[str, state_domain.State]] = (
+            exploration.states.items())
         video_tag = 'oppia-noninteractive-video'
         link_tag = 'oppia-noninteractive-link'
 
-        for html_string in html_list:
-            if video_tag in html_string or link_tag in html_string:
-                count += 1
-        return count
+        for state_name, state in states:
+
+            content_html = state.content.html
+            if video_tag in content_html:
+                list_of_video_or_link_tags.append({
+                    'type': 'video',
+                    'location': 'content',
+                    'state_name': state_name
+                })
+            if link_tag in content_html:
+                list_of_video_or_link_tags.append({
+                    'type': 'link',
+                    'location': 'content',
+                    'state_name': state_name
+                })
+
+            interaction_html_list = (
+                state.interaction.get_all_html_content_strings()
+            )
+            for html_string in interaction_html_list:
+                if video_tag in html_string:
+                    list_of_video_or_link_tags.append({
+                        'type': 'video',
+                        'location': 'interaction',
+                        'state_name': state_name
+                    })
+                if link_tag in html_string:
+                    list_of_video_or_link_tags.append({
+                        'type': 'link',
+                        'location': 'interaction',
+                        'state_name': state_name
+                    })
+
+        return list_of_video_or_link_tags
 
     def get_states_having_invalid_training_data(
         self, exploration: exp_domain.Exploration
@@ -457,7 +491,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             curated_explorations
             | 'Filter explorations having videos or links' >>
                 beam.Filter(lambda exp: (
-                    self.get_number_of_videos_or_links(exp) > 0))
+                    len(self.get_details_of_video_or_link_tags(exp)) > 0))
         )
 
         report_number_of_exps_having_videos_or_links = (
@@ -471,10 +505,10 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             curated_exp_having_videos_or_links
             | 'Save info on exps having videos or links' >> beam.Map(
                 lambda exp: job_run_result.JobRunResult.as_stderr(
-                    'The id of exp is %s and the number of video '
-                    'or link tags is %s' % (
+                    'The id of exp is %s and the details of video '
+                    'or link tags are %s' % (
                         exp.id,
-                        self.get_number_of_videos_or_links(exp)
+                        self.get_details_of_video_or_link_tags(exp)
                     )
                 )
             )
