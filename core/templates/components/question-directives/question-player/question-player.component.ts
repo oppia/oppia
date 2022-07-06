@@ -85,9 +85,6 @@ require(
 require(
   'components/question-directives/question-player/services/' +
   'question-player-state.service.ts');
-require(
-  'components/question-directives/question-player/' +
-  'skill-mastery-modal.controller.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
