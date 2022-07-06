@@ -33,7 +33,8 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   profilePictureDataUrl!: string;
-  username!: string;
+  // User name is null if the user is not logged in.
+  username!: string | null;
   profileUrl!: string;
   logoWebpImageSrc!: string;
   logoPngImageSrc!: string;
@@ -65,16 +66,16 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
 
-    let userName = userInfo.getUsername();
-    if (userName === null) {
+    this.username = userInfo.getUsername();
+    if (this.username === null) {
       throw new Error('User name is null.');
+    } else {
+      this.profileUrl = (
+        this.urlInterpolationService.interpolateUrl('/profile/<username>', {
+          username: this.username
+        })
+      );
     }
-    this.username = userName;
-    this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl('/profile/<username>', {
-        username: this.username
-      })
-    );
   }
 
   ngOnInit(): void {

@@ -56,8 +56,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   ) {}
 
   getStoryLink(): string {
-    let classroomUrlFragment = this.storySummary.getClassroomUrlFragment();
-    let topicUrlFragment = this.storySummary.getTopicUrlFragment();
+    const classroomUrlFragment = this.storySummary.getClassroomUrlFragment();
+    const topicUrlFragment = this.storySummary.getTopicUrlFragment();
     if (classroomUrlFragment === undefined || topicUrlFragment === undefined) {
       return '#';
     }

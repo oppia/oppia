@@ -55,7 +55,7 @@ export class SubtopicSummaryTileComponent implements OnInit {
   openSubtopicPage(): void {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
-    let urlFragment = this.subtopic.getUrlFragment();
+    const urlFragment = this.subtopic.getUrlFragment();
     if (!this.classroomUrlFragment || !this.topicUrlFragment || !urlFragment) {
       return;
     }
@@ -79,7 +79,7 @@ export class SubtopicSummaryTileComponent implements OnInit {
         this.assetsBackendApiService.getThumbnailUrlForPreview(
           AppConstants.ENTITY_TYPE.TOPIC, this.topicId, thumbnailFileName));
     }
-    let urlFragment = this.subtopic.getUrlFragment();
+    const urlFragment = this.subtopic.getUrlFragment();
     if (urlFragment === null) {
       throw new Error('Expected subtopic to have a URL fragment');
     }

@@ -80,10 +80,10 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   }
 
   getStoryNodeLink(): string {
-    let classroomUrlFragment = (
+    const classroomUrlFragment = (
       this.storySummaryToDisplay.getClassroomUrlFragment());
-    let topicUrlFragment = this.storySummaryToDisplay.getTopicUrlFragment();
-    let explorationId = this.storyNodeToDisplay.getExplorationId();
+    const topicUrlFragment = this.storySummaryToDisplay.getTopicUrlFragment();
+    const explorationId = this.storyNodeToDisplay.getExplorationId();
     if (classroomUrlFragment === undefined || topicUrlFragment === undefined ||
       explorationId === null) {
       return '#';
