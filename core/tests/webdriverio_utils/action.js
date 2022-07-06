@@ -49,14 +49,6 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
   }
 };
 
-var clickAndSkipRelease = async function(elementName, clickableElement) {
-  await waitFor.visibilityOf(
-    clickableElement, `${elementName} is not visible.`);
-  await waitFor.elementToBeClickable(
-    clickableElement, `${elementName} is not clickable.`);
-  await clickableElement.click({skipRelease: true});
-};
-
 var getText = async function(elementName, element) {
   await waitFor.visibilityOf(
     element, `${elementName} is not visible for getText()`);
@@ -108,7 +100,6 @@ var addValue = async function(
 
 exports.clear = clear;
 exports.click = click;
-exports.clickAndSkipRelease = clickAndSkipRelease;
 exports.getText = getText;
 exports.getAttribute = getAttribute;
 exports.select = select;
