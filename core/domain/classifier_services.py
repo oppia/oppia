@@ -30,7 +30,7 @@ from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Union
+from typing import Dict, List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
