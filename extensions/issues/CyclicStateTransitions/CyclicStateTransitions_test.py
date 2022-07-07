@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.issues.CyclicStateTransitions import CyclicStateTransitions # pylint: disable=unused-import, line-too-long
+from extensions.issues.CyclicStateTransitions import CyclicStateTransitions # pylint: disable=unused-import, isort: skip
 
 
 class CyclicStateTransitionsTests(test_utils.GenericTestBase):
