@@ -370,6 +370,104 @@ class ExplorationChange(change_domain.BaseChange):
         'delete_gadget', 'rename_gadget']
 
 
+class TransientCheckpointUrl:
+    """Domain object representing the checkpoint progress of a
+    logged-out user.
+    """
+
+    def __init__(
+        self,
+        exploration_id,
+        furthest_reached_checkpoint_state_name,
+        furthest_reached_checkpoint_exp_version,
+        most_recently_reached_checkpoint_state_name,
+        most_recently_reached_checkpoint_exp_version
+    ):
+        """Initializes a TransientCheckpointUrl domain object.
+
+        Args:
+            exploration_id: str. Id of the exploration.
+            furthest_reached_checkpoint_state_name: str. State name of the
+                furthest reached checkpoint in the exploration.
+            furthest_reached_checkpoint_exp_version: int. Exploration version
+                in which the user has completed most checkpoints.
+            most_recently_reached_checkpoint_state_name: str. State name of
+                the most recently reached checkpoint in the exploration.
+            most_recently_reached_checkpoint_exp_version: int. Exploration
+                version in which a checkpoint was most recently reached.
+        """
+        self.exploration_id = exploration_id
+        self.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_state_name)
+        self.furthest_reached_checkpoint_exp_version = (
+            furthest_reached_checkpoint_exp_version)
+        self.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_state_name)
+        self.most_recently_reached_checkpoint_exp_version = (
+            most_recently_reached_checkpoint_exp_version)
+
+    def to_dict(self):
+        """Convert the TransientCheckpointUrl domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the TransientCheckpointUrl class
+            information in a dictionary form.
+        """
+
+        return {
+            'exploration_id': self.exploration_id,
+            'furthest_reached_checkpoint_exp_version': (
+                self.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                self.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                self.most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                self.most_recently_reached_checkpoint_state_name)
+        }
+
+    def validate(self):
+        """Validates properties of the TransientCheckpointUrl object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                TransientCheckpointUrl are invalid.
+        """
+        if not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+            'Expected exploration_id to be a str, received %s'
+                % self.exploration_id)
+
+        if not isinstance(self.furthest_reached_checkpoint_state_name, str):
+            raise utils.ValidationError(
+                'Expected furthest_reached_checkpoint_state_name to be a str,'
+                'received %s' % self.furthest_reached_checkpoint_state_name
+            )
+
+        if not isinstance(self.furthest_reached_checkpoint_exp_version, int):
+            raise utils.ValidationError(
+                'Expected furthest_reached_checkpoint_exp_version to be an int'
+            )
+
+        if not isinstance(
+            self.most_recently_reached_checkpoint_state_name, str
+        ):
+            raise utils.ValidationError(
+                'Expected most_recently_reached_checkpoint_state_name to be a'
+                ' str, received %s'
+                % self.most_recently_reached_checkpoint_state_name
+            )
+
+        if not isinstance(
+            self.most_recently_reached_checkpoint_exp_version, int
+        ):
+            raise utils.ValidationError(
+                'Expected most_recently_reached_checkpoint_exp_version'
+                ' to be an int'
+            )
+
+
 class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
@@ -3392,3 +3490,57 @@ class ExplorationMetadata:
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'edits_allowed': self.edits_allowed
         }
+
+
+class MetadataVersionHistory:
+    """Class to represent an element of the version history list of the
+    exploration metadata.
+
+    Attributes:
+        last_edited_version_number: int. The version number of the
+            exploration in which the metadata was last edited.
+        last_edited_committer_id: str. The user id of the user who committed
+            the latest changes to the exploration metadata.
+    """
+
+    def __init__(self, last_edited_version_number, last_edited_committer_id):
+        """Initializes the MetadataVersionHistory domain object.
+
+        Args:
+            last_edited_version_number: int. The version number of the
+                exploration in which the metadata was last edited.
+            last_edited_committer_id: str. The user id of the user who
+                committed the latest changes to the exploration metadata.
+        """
+        self.last_edited_version_number = last_edited_version_number
+        self.last_edited_committer_id = last_edited_committer_id
+
+    def to_dict(self):
+        """Returns a dict representation of the MetadataVersionHistory domain
+        object.
+
+        Returns:
+            dict. The dict representation of the MetadataVersionHistory domain
+            object.
+        """
+        return {
+            'last_edited_version_number': self.last_edited_version_number,
+            'last_edited_committer_id': self.last_edited_committer_id
+        }
+
+    @classmethod
+    def from_dict(cls, metadata_version_history_dict):
+        """Returns an MetadataVersionHistory domain object from a dict.
+
+        Args:
+            metadata_version_history_dict: dict. The dict representation of
+                MetadataVersionHistory object.
+
+        Returns:
+            MetadataVersionHistory. The corresponding MetadataVersionHistory
+            domain object.
+        """
+        return cls(
+            metadata_version_history_dict['last_edited_version_number'],
+            metadata_version_history_dict['last_edited_committer_id']
+        )

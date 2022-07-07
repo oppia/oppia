@@ -203,7 +203,9 @@
         "core.domain.caching_domain_test",
         "core.domain.change_domain_test",
         "core.domain.app_feedback_report_constants_test",
-        "scripts.linters.warranted_angular_security_bypasses_test"
+        "scripts.linters.warranted_angular_security_bypasses_test",
+        "scripts.create_expression_parser_test",
+        "scripts.run_frontend_tests_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
