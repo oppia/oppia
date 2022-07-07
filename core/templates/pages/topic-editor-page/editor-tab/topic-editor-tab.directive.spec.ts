@@ -21,6 +21,7 @@ import { EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { StoryReference } from 'domain/topic/story-reference-object.model';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -48,7 +49,6 @@ describe('Topic editor tab directive', function() {
   var EntityCreationService = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
-  var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
@@ -99,7 +99,6 @@ describe('Topic editor tab directive', function() {
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
     EntityCreationService = $injector.get('EntityCreationService');
-    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     mockTasdReinitializedEventEmitter = new EventEmitter();
 
@@ -139,8 +138,8 @@ describe('Topic editor tab directive', function() {
     subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
-    story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
-    story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    story1 = StoryReference.createFromStoryId('storyId1');
+    story2 = StoryReference.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');
