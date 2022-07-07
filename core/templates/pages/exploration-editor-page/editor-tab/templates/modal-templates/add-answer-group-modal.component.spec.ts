@@ -89,27 +89,29 @@ describe('Add Answer Group Modal Component', () => {
   });
 
   it('should initialize component properties after controller is initialized',
-    () => {
+    fakeAsync(() => {
       expect(component.feedbackEditorIsOpen).toBe(false);
       expect(component.questionModeEnabled).toBe(true);
       expect(component.tmpTaggedSkillMisconceptionId).toBe(null);
       expect(component.addAnswerGroupForm).toEqual({});
-      expect(component.validation).toBeFalse();
+      expect(component.validation).toBe(false);
 
       component.validateChanges({
         isCreatingNewState: true,
         value: ''
       });
+      tick();
 
-      expect(component.questionModeEnabled).toBe(true);
+      expect(component.validation).toBe(true);
 
       component.validateChanges({
         isCreatingNewState: true,
         value: 'newState'
       });
+      tick();
 
-      expect(component.questionModeEnabled).toBe(false);
-    });
+      expect(component.validation).toBe(false);
+    }));
 
   it('should update answer group feedback', () => {
     expect(component.feedbackEditorIsOpen).toBe(false);

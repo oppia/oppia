@@ -319,6 +319,7 @@ describe('Outcome Destination Editor', () => {
   });
 
   it('should update outcomeNewStateName', () => {
+    component.outcome.dest = '/';
     component.outcomeNewStateName = 'Introduction';
 
     expect(component.outcomeNewStateName).toBe('Introduction');
