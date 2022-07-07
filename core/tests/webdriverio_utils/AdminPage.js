@@ -17,7 +17,6 @@
  * tests.
  */
 
-const { browser } = require('protractor');
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
