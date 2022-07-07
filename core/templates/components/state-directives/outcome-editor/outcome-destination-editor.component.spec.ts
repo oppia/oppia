@@ -68,6 +68,7 @@ describe('Outcome Destination Editor', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
     userService = TestBed.inject(UserService);
+    component.outcome.dest = '/';
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -319,7 +320,6 @@ describe('Outcome Destination Editor', () => {
   });
 
   it('should update outcomeNewStateName', () => {
-    component.outcome.dest = '/';
     component.outcomeNewStateName = 'Introduction';
 
     expect(component.outcomeNewStateName).toBe('Introduction');
