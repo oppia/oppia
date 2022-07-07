@@ -1275,7 +1275,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(user_services.is_user_registered(user_id))
 
     def test_is_user_registered_for_non_user_id_returns_false(self) -> None:
-        user_id = None
+        user_id = 'just_random_id'
         self.assertFalse(user_services.is_user_registered(user_id))
 
     def test_has_fully_registered_account_for_properly_registered_user(

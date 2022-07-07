@@ -177,9 +177,9 @@ def _create_evaluation_context_for_server() -> (
     """
     # TODO(#11208): Due to missing `browser_type` key MyPy throwing missing
     # key error. Also, `app_version` key is set as none which forces us to
-    # use `.get()` method while fetching the values from dictionaries. So, to
-    # remove 'type ignore' from here and '.get()' method from '.from_dict'
-    # method. Properly set app version and browser type key below using GAE
+    # use `.get()` method while fetching the values from dictionaries. So,
+    # to remove 'type ignore' from here and '.get()' method from '.from_dict'
+    # method, properly set app version and browser type key below using GAE
     # app version as part of the server & client context.
     return platform_parameter_domain.EvaluationContext.from_dict(
         {  # type: ignore[typeddict-item]

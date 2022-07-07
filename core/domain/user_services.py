@@ -787,17 +787,15 @@ def _get_user_settings_from_model(
     )
 
 
-def is_user_registered(user_id: Optional[str]) -> bool:
+def is_user_registered(user_id: str) -> bool:
     """Checks if a user is registered with the given user_id.
 
     Args:
-        user_id: str|None. The unique ID of the user.
+        user_id: str. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id is registered.
     """
-    if user_id is None:
-        return False
     user_settings = user_models.UserSettingsModel.get(user_id, strict=False)
     return bool(user_settings)
 
@@ -819,7 +817,7 @@ def has_fully_registered_account(user_id: Optional[str]) -> bool:
     """Checks if a user has fully registered.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_id: str|None. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id has fully registered.
@@ -997,20 +995,20 @@ def update_multiple_users_data(
             not found.
     """
     user_ids = [user.user_id for user in modifiable_user_data_list]
-    user_settings_list = get_users_settings(user_ids, strict=False)
-    strict_user_settings_list = []
+    user_settings_list_with_none = get_users_settings(user_ids, strict=False)
+    user_settings_list = []
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
     for modifiable_user_data, user_settings in zip(
-            modifiable_user_data_list, user_settings_list):
+            modifiable_user_data_list, user_settings_list_with_none):
         user_id = modifiable_user_data.user_id
         if user_id is None:
             raise Exception('Missing user ID.')
         if not user_settings:
             raise Exception('User not found.')
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
-        strict_user_settings_list.append(user_settings)
+        user_settings_list.append(user_settings)
 
-    _save_existing_users_settings(strict_user_settings_list)
+    _save_existing_users_settings(user_settings_list)
     _save_existing_users_auth_details(user_auth_details_list)
 
 
@@ -1024,19 +1022,19 @@ def _save_existing_users_settings(
             objects to be saved.
     """
     user_ids = [user.user_id for user in user_settings_list]
-    user_settings_models = user_models.UserSettingsModel.get_multi(
+    user_settings_models_with_none = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=True)
-    strict_users_model = []
+    user_settings_models = []
     for user_model, user_settings in zip(
-            user_settings_models, user_settings_list):
+            user_settings_models_with_none, user_settings_list):
         # Ruling out the possibility of None for mypy type checking.
         assert user_model is not None
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
-        strict_users_model.append(user_model)
+        user_settings_models.append(user_model)
 
-    user_models.UserSettingsModel.update_timestamps_multi(strict_users_model)
-    user_models.UserSettingsModel.put_multi(strict_users_model)
+    user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
+    user_models.UserSettingsModel.put_multi(user_settings_models)
 
 
 def _save_existing_users_auth_details(
@@ -1050,21 +1048,21 @@ def _save_existing_users_auth_details(
             UserAuthDetails objects to be saved.
     """
     user_ids = [user.user_id for user in user_auth_details_list]
-    user_auth_models = auth_models.UserAuthDetailsModel.get_multi(
+    user_auth_models_with_none = auth_models.UserAuthDetailsModel.get_multi(
         user_ids, include_deleted=True)
-    strict_user_auth_models = []
+    user_auth_models = []
     for user_auth_details_model, user_auth_details in zip(
-            user_auth_models, user_auth_details_list):
+            user_auth_models_with_none, user_auth_details_list):
         # Ruling out the possibility of None for mypy type checking.
         assert user_auth_details_model is not None
         user_auth_details.validate()
         user_auth_details_model.populate(**user_auth_details.to_dict())
-        strict_user_auth_models.append(user_auth_details_model)
+        user_auth_models.append(user_auth_details_model)
 
     auth_models.UserAuthDetailsModel.update_timestamps_multi(
-        strict_user_auth_models
+        user_auth_models
     )
-    auth_models.UserAuthDetailsModel.put_multi(strict_user_auth_models)
+    auth_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
 
 def _save_user_auth_details(
@@ -2507,7 +2505,9 @@ def get_contributor_usernames(
     else:
         raise Exception('Invalid category: %s' % category)
 
-    usernames = list(get_usernames(user_ids, strict=True))
+    usernames = get_usernames(user_ids, strict=True)
+    # # Ruling out the possibility of Sequence for mypy type checking.
+    assert isinstance(usernames, list)
     return usernames
 
 
