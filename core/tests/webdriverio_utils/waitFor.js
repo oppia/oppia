@@ -25,7 +25,7 @@ var Constants = require('./WebdriverioConstants');
 // server since the mobile tests are run on a real
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
-var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 30000;
+var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var alertToBePresent = async() => {
   await browser.waitUntil(
@@ -241,7 +241,7 @@ var clientSideRedirection = async function(
     return check(decodeURIComponent(url));
   },
   {
-    timeout: 30000
+    timeout: DEFAULT_WAIT_TIME_MSECS
   });
 
   // Waiting for caller specified conditions.
