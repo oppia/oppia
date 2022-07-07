@@ -43,8 +43,7 @@ export interface ExplorationOpportunity {
 export class OpportunitiesListItemComponent {
   constructor(
     private windowDimensionsService: WindowDimensionsService
-  ) {
-  }
+  ) {}
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
