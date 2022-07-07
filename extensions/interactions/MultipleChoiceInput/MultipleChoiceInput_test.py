@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import MultipleChoiceInput # pylint: disable=unused-import
+from extensions.interactions.MultipleChoiceInput import MultipleChoiceInput # pylint: disable=unused-import # isort: skip
 
 
 class MultipleChoiceInputTests(test_utils.GenericTestBase):

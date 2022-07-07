@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import MathEquationInput # pylint: disable=unused-import
+from extensions.interactions.MathEquationInput import MathEquationInput # pylint: disable=unused-import # isort: skip
 
 
 class MathEquationInputTests(test_utils.GenericTestBase):

@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/interactions/InteractiveMap/InteractiveMap.py"""
+"""Unit tests for InteractiveMap.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import InteractiveMap # pylint: disable=unused-import
+from extensions.interactions.InteractiveMap import InteractiveMap # pylint: disable=unused-import # isort: skip
 
 
 class InteractiveMapTests(test_utils.GenericTestBase):

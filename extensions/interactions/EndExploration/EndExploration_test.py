@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/interactions/EndExploration/EndExploration.py"""
+"""Unit tests for EndExploration.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import EndExploration # pylint: disable=unused-import
+from extensions.interactions.EndExploration import EndExploration # pylint: disable=unused-import # isort: skip
 
 
 class EndExplorationTests(test_utils.GenericTestBase):

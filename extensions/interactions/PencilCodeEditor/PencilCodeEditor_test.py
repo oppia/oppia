@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import PencilCodeEditor # pylint: disable=unused-import
+from extensions.interactions.PencilCodeEditor import PencilCodeEditor # pylint: disable=unused-import # isort: skip
 
 
 class PencilCodeEditorTests(test_utils.GenericTestBase):

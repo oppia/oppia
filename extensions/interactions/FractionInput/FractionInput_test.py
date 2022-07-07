@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/interactions/FractionInput/FractionInput.py"""
+"""Unit tests for FractionInput.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import FractionInput # pylint: disable=unused-import
+from extensions.interactions.FractionInput import FractionInput # pylint: disable=unused-import # isort: skip
 
 
 class FractionInputTests(test_utils.GenericTestBase):

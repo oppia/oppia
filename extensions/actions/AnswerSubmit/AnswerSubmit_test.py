@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.actions.AnswerSubmit import (
-    AnswerSubmit) # pylint: disable=unused-import
+from extensions.actions.AnswerSubmit import AnswerSubmit # pylint: disable=unused-import # isort: skip
 
 
 class AnswerSubmitTests(test_utils.GenericTestBase):

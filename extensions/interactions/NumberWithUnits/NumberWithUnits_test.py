@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/interactions/NumberWithUnits/NumberWithUnits.py"""
+"""Unit tests for NumberWithUnits.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import NumberWithUnits # pylint: disable=unused-import
+from extensions.interactions.NumberWithUnits import NumberWithUnits # pylint: disable=unused-import # isort: skip
 
 
 class NumberWithUnitsTests(test_utils.GenericTestBase):

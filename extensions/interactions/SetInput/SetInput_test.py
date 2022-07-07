@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/interactions/SetInput/SetInput.py"""
+"""Unit tests for SetInput.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import SetInput # pylint: disable=unused-import
+from extensions.interactions.SetInput import SetInput # pylint: disable=unused-import # isort: skip
 
 
 class SetInputTests(test_utils.GenericTestBase):

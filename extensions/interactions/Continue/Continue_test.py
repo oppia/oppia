@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/interactions/Continue/Continue.py"""
+"""Unit tests for Continue.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import Continue # pylint: disable=unused-import
+from extensions.interactions.Continue import Continue # pylint: disable=unused-import # isort: skip
 
 
 class ContinueTests(test_utils.GenericTestBase):

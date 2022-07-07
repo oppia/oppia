@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for extensions/issues/EarlyQuit/EarlyQuit.py"""
+"""Unit tests for EarlyQuit.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import EarlyQuit # pylint: disable=unused-import
+from extensions.issues.EarlyQuit import EarlyQuit # pylint: disable=unused-import # isort: skip
 
 
 class EarlyQuitTests(test_utils.GenericTestBase):
