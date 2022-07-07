@@ -241,7 +241,7 @@ var clientSideRedirection = async function(
     return check(decodeURIComponent(url));
   },
   {
-    timeout: 30000
+    timeout: DEFAULT_WAIT_TIME_MSECS
   });
 
   // Waiting for caller specified conditions.
