@@ -41,6 +41,11 @@ import cloneDeep from 'lodash/cloneDeep';
    misconceptionId: number;
  }
 
+ interface DestValidation {
+   isCreatingNewState: boolean;
+   value: string;
+ }
+
  @Component({
    selector: 'oppia-add-answer-group-modal-component',
    templateUrl: './add-answer-group-modal.component.html'
@@ -61,6 +66,7 @@ export class AddAnswerGroupModalComponent
    questionModeEnabled: boolean;
    isInvalid: boolean;
    modalId = Symbol();
+   validation: boolean = false;
 
    constructor(
      private ngbActiveModal: NgbActiveModal,
@@ -115,6 +121,18 @@ export class AddAnswerGroupModalComponent
    isFeedbackLengthExceeded(tmpOutcome: Outcome): boolean {
      // TODO(#13764): Edit this check after appropriate limits are found.
      return (tmpOutcome.feedback._html.length > 10000);
+   }
+
+   validateChanges(value: DestValidation): void {
+     if (value.isCreatingNewState === true) {
+       if (value.value === '' ||
+           value.value === undefined || value.value === null) {
+         this.validation = true;
+         return;
+       }
+     }
+
+     this.validation = false;
    }
 
    saveResponse(reopen: boolean): void {

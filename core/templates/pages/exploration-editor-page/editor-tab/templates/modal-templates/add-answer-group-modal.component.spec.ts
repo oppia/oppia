@@ -94,6 +94,21 @@ describe('Add Answer Group Modal Component', () => {
       expect(component.questionModeEnabled).toBe(true);
       expect(component.tmpTaggedSkillMisconceptionId).toBe(null);
       expect(component.addAnswerGroupForm).toEqual({});
+      expect(component.validation).toBeFalse();
+
+      component.validateChanges({
+        isCreatingNewState: true,
+        value: ''
+      });
+
+      expect(component.questionModeEnabled).toBe(true);
+
+      component.validateChanges({
+        isCreatingNewState: true,
+        value: 'newState'
+      });
+
+      expect(component.questionModeEnabled).toBe(false);
     });
 
   it('should update answer group feedback', () => {

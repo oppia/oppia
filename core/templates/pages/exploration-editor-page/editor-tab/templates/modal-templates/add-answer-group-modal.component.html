@@ -47,6 +47,7 @@
     <oppia-outcome-destination-editor [outcome]="tmpOutcome"
                                       *ngIf="!questionModeEnabled"
                                       [outcomeHasFeedback]="true"
+                                      (getChanges)="validateChanges($event)"
                                       (addState)="updateState($event)">
     </oppia-outcome-destination-editor>
   </form>
@@ -67,8 +68,8 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary protractor-test-close-add-response-modal" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-add-new-response" (click)="saveResponse(false)" [disabled]="isInvalid || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
-  <button class="btn btn-success" (click)="saveResponse(true)" [disabled]="isInvalid || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
+  <button class="btn btn-success protractor-test-add-new-response" (click)="saveResponse(false)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
+  <button class="btn btn-success" (click)="saveResponse(true)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
 </div>
 
 <style>
