@@ -1837,6 +1837,10 @@ class StateVersionHistoryHandler(base.BaseHandler):
         version_history = exp_fetchers.get_exploration_version_history(
             exploration_id, version
         )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
         state_version_history = (
             version_history.state_version_history[state_name]
         )
@@ -1908,6 +1912,10 @@ class MetadataVersionHistoryHandler(base.BaseHandler):
         version_history = exp_fetchers.get_exploration_version_history(
             exploration_id, version
         )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
         metadata_version_history = version_history.metadata_version_history
         metadata_in_previous_version = None
 

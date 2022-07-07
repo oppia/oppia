@@ -44,8 +44,9 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(classifier_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.classifier, models.NAMES.statistics])
+(classifier_models, exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.classifier, models.NAMES.exploration, models.NAMES.statistics
+])
 
 
 def _get_change_list(state_name, property_name, new_value):
@@ -3282,6 +3283,25 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
             })
         ], 'A commit message.')
 
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            ), expected_status_int=404
+        )
+
+        self.logout()
+
     def test_version_history_for_a_state_is_fetched_correctly(self):
         self.login(self.OWNER_EMAIL)
         exploration_v1 = exp_fetchers.get_exploration_by_id(
@@ -3340,6 +3360,23 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New title'
             })
         ], 'A commit message.')
+
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            ), expected_status_int = 404)
+
+        self.logout()
 
     def test_version_history_for_exploration_metadata_is_fetched_correctly(
         self

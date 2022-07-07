@@ -6736,5 +6736,7 @@ export default {
   "ASSET_TYPE_IMAGE": "image",
   "ASSET_TYPE_THUMBNAIL": "thumbnail",
 
-  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
+
+  "CAN_FETCH_VERSION_HISTORY_DATA": false
 } as const;
