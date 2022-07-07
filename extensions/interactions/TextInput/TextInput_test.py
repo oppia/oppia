@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.TextInput import TextInput # pylint: disable=unused-import
+from extensions.interactions.TextInput import TextInput # pylint: disable=unused-import # isort: skip
 
 
 class TextInputTests(test_utils.GenericTestBase):
