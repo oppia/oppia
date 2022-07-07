@@ -99,15 +99,18 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def test_get_exploration_summaries_from_models(self) -> None:
         exp_ids = [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID]
-        strict_exp_summary_models = []
-        exp_summary_models = exp_models.ExpSummaryModel.get_multi(exp_ids)
-        for model in exp_summary_models:
+        exp_summary_models = []
+        exp_summary_models_with_none = exp_models.ExpSummaryModel.get_multi(
+            exp_ids
+        )
+        for model in exp_summary_models_with_none:
             # Ruling out the possibility of None for mypy type checking.
             assert model is not None
-            strict_exp_summary_models.append(model)
+            exp_summary_models.append(model)
+
         exp_summary_dict = (
             exp_fetchers.get_exploration_summaries_from_models(
-                strict_exp_summary_models
+                exp_summary_models
             )
         )
         for key in exp_summary_dict:

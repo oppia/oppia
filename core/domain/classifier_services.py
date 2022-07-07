@@ -306,14 +306,16 @@ def _update_classifier_training_jobs_status(
         Exception. The ClassifierTrainingJobModel corresponding to the job_id
             of the ClassifierTrainingJob does not exist.
     """
-    classifier_training_job_models = (
+    classifier_training_job_models_with_none = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
-    strict_classifier_training_job_models: List[
+    classifier_training_job_models: List[
         classifier_models.ClassifierTrainingJobModel
     ] = []
 
     for index in range(len(job_ids)):
-        classifier_training_job_model = classifier_training_job_models[index]
+        classifier_training_job_model = (
+            classifier_training_job_models_with_none[index]
+        )
         if classifier_training_job_model is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '
@@ -326,15 +328,15 @@ def _update_classifier_training_jobs_status(
         classifier_training_job.validate()
 
         classifier_training_job_model.status = status
-        strict_classifier_training_job_models.append(
+        classifier_training_job_models.append(
             classifier_training_job_model
         )
 
     classifier_models.ClassifierTrainingJobModel.update_timestamps_multi(
-        strict_classifier_training_job_models
+        classifier_training_job_models
     )
     classifier_models.ClassifierTrainingJobModel.put_multi(
-        strict_classifier_training_job_models
+        classifier_training_job_models
     )
 
 
