@@ -56,9 +56,9 @@ def generate_signature(
     Returns:
         str. The signature of the payload data.
     """
-    converted_vm_id: Union[str, bytes] = vm_id
-    if isinstance(converted_vm_id, str):
-        converted_vm_id = converted_vm_id.encode('utf-8')
+    # Ruling out the possibility of Any other type for vm_id.
+    assert isinstance(vm_id, str)
+    converted_vm_id = vm_id.encode('utf-8')
     if isinstance(message, str):
         message = message.encode('utf-8')
     message = b'%s|%s' % (base64.b64encode(message), converted_vm_id)
