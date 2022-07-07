@@ -20,7 +20,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Pipe, PipeTransform, SecurityContext } from '@angular/core';
 
-@Pipe({name: 'wrapTextWithEllipsis'})
+@Pipe({name: 'convertUnicodeToHtml'})
 export class ConvertUnicodeToHtml implements PipeTransform {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
