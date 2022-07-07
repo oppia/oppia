@@ -62,10 +62,12 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   // with a status of 405", this happens when the HTTP method used for a
   // network call is refused by the server. The network call is triggered
   // automatically by the gtag script, so we have no control over it. The 405
-  // error was observed on other websites that use gtag and it does not affect
-  // the user experience in anyway. Considering these reasons, the error may be
-  // ignored.
-  _.escapeRegExp('https://www.googletagmanager.com/a')
+  // error was observed on other websites (e.g. https://edu.google.com/) that
+  // use gtag and it does not affect the user experience in anyway. Considering
+  // these reasons, the error may be ignored.
+  _.escapeRegExp(
+    'https://www.googletagmanager.com/a.* Failed to load resource: ' +
+    'the server responded with a status of 405 ()')
 ];
 
 var checkForConsoleErrors = async function(
