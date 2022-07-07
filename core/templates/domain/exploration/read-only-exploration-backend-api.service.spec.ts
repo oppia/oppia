@@ -134,6 +134,24 @@ describe('Read only exploration backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch an existing exploration from a unique' +
+    ' URL progress id', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    roebas.fetchExplorationAsync('0', null, '123456').then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/init/0?pid=123456');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should load an existing exploration from the backend',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
@@ -296,4 +314,47 @@ describe('Read only exploration backend API service', () => {
     roebas.deleteExplorationFromCache('0');
     expect(roebas.isCached('0')).toBe(false);
   }));
+
+  it('should handle successCallback for fetch checkpoints feature status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      roebas.fetchCheckpointsFeatureIsEnabledStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/checkpoints_feature_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({checkpoints_feature_is_enabled: false});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should handle errorCallback for fetch checkpoints feature status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      roebas.fetchCheckpointsFeatureIsEnabledStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/checkpoints_feature_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });

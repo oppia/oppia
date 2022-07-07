@@ -1794,3 +1794,21 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
             )
 
         self.render_json(self.values)
+
+
+class CheckpointsFeatureStatusHandler(base.BaseHandler):
+    """The handler for checking whether the checkpoints feature is enabled."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        self.render_json({
+            'checkpoints_feature_is_enabled': (
+                config_domain.CHECKPOINTS_FEATURE_IS_ENABLED.value)
+        })

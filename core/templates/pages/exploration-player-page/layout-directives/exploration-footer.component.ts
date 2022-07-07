@@ -68,6 +68,7 @@ export class ExplorationFooterComponent {
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
   footerIsInQuestionPlayerMode: boolean = false;
+  CHECKPOINTS_FEATURE_IS_ENABLED = false;
 
   constructor(
     private contextService: ContextService,
@@ -141,9 +142,17 @@ export class ExplorationFooterComponent {
         });
       this.footerIsInQuestionPlayerMode = true;
     } else if (this.explorationId) {
-      // Fetching the number of checkpoints.
-      this.getCheckpointCount();
-      this.setLearnerHasViewedLessonInfoTooltip();
+      this.readOnlyExplorationBackendApiService
+        .fetchCheckpointsFeatureIsEnabledStatus().then(
+          (checkpointsFeatureIsEnabled) => {
+            this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
+            if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+              // Fetching the number of checkpoints.
+              this.getCheckpointCount();
+              this.setLearnerHasViewedLessonInfoTooltip();
+            }
+          }
+        );
     }
   }
 
@@ -273,8 +282,10 @@ export class ExplorationFooterComponent {
 
   learnerHasViewedLessonInfo(): void {
     this.learnerHasViewedLessonInfoTooltip = true;
-    this.editableExplorationBackendApiService
-      .recordLearnerHasViewedLessonInfoModalOnce();
+    if (this.userIsLoggedIn) {
+      this.editableExplorationBackendApiService
+        .recordLearnerHasViewedLessonInfoModalOnce();
+    }
   }
 
   hasLearnerHasViewedLessonInfoTooltip(): boolean {

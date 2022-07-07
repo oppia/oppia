@@ -200,6 +200,26 @@ export class LocalStorageService {
     return null;
   }
 
+  updateUniqueProgressIdOfLoggedOutLearner(uniqueProgressUrlId: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        'unique_progress_id', uniqueProgressUrlId);
+    }
+  }
+
+  getUniqueProgressIdOfLoggedOutLearner(): string | null {
+    if (this.isStorageAvailable()) {
+      return (this.storage as Storage).getItem('unique_progress_id');
+    }
+    return null;
+  }
+
+  removeUniqueProgressIdOfLoggedOutLearner(): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).removeItem('unique_progress_id');
+    }
+  }
+
   /**
    * Retrieves the entity editor browser tabs info stored in the local storage
    * for opened tabs of a particular entity type depending upon the

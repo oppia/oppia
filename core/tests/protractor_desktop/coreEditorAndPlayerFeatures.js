@@ -261,12 +261,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
     await explorationPlayerPage.clickThroughToNextCard();
 
-    // Lesson info tooltip should appear when the 2nd checkpoint is reached.
-    var closeLessonInfoTooltipElement = element(by.css(
-      '.protractor-test-close-lesson-info-tooltip'));
-    await explorationPlayerPage.clickCloseLessonInfoTooltip(
-      closeLessonInfoTooltipElement
-    );
     await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();
