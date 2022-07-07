@@ -21,6 +21,9 @@ var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
   var allExplorationCardElement = $('.e2e-test-exploration-dashboard-card');
+  var allExplorationCardSelector = function() {
+    return $$('.e2e-test-exploration-dashboard-card');
+  };
   var bio = $('.e2e-test-profile-bio');
   var createdExplorationStat = $('.e2e-test-profile-created-stat');
   var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
@@ -95,8 +98,7 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
-    var allExplorationCardElements = $$(
-      '.e2e-test-exploration-dashboard-card');
+    var allExplorationCardElements = allExplorationCardSelector();
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
         var cardTitle = await card.$('.e2e-test-exp-summary-tile-title');
