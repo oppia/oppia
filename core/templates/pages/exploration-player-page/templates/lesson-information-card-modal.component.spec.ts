@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -25,6 +26,7 @@ import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -32,6 +34,7 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from './lesson-information-card-modal.component';
+import { LocalStorageService } from 'services/local-storage.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -72,12 +75,15 @@ describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
   let urlService: UrlService;
+  let userService: UserService;
   let mockWindowRef: MockWindowRef;
   let editableExplorationBackendApiService:
   EditableExplorationBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
+  let localStorageService: LocalStorageService;
+  let clipboard: Clipboard;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -143,11 +149,14 @@ describe('Lesson Information card modal component', () => {
 
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlService = TestBed.inject(UrlService);
+    userService = TestBed.inject(UserService);
+    localStorageService = TestBed.inject(LocalStorageService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
+    clipboard = TestBed.inject(Clipboard);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(true, true, false);
@@ -164,6 +173,7 @@ describe('Lesson Information card modal component', () => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('');
+    spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
     spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       Promise.resolve(
@@ -228,6 +238,27 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.storyTitleIsPresent).toBe(false);
   }));
 
+  it('should correctly set logged-out progress learner URL ' +
+    'when unique progress URL ID exists', fakeAsync (() => {
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('');
+    spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(
+        new StoryPlaythrough(storyId, [], 'storyTitle', '', '', '')));
+    spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
+      .and.returnValue('abcdef');
+
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
+      'https://oppia.org/progress/abcdef');
+  }));
+
   it('should restart the exploration and reset the progress', fakeAsync(() => {
     let resetSpy = spyOn(
       editableExplorationBackendApiService, 'resetExplorationProgressAsync')
@@ -252,5 +283,54 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(true);
     componentInstance.toggleLessonAuthorsSubmenu();
     expect(componentInstance.lessonAuthorsSubmenuIsShown).toEqual(false);
+  });
+
+  it('should save logged-out learner progress correctly', fakeAsync(() => {
+    spyOn(explorationPlayerStateService, 'setUniqueProgressUrlId')
+      .and.returnValue(Promise.resolve());
+    spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
+      .and.returnValue('abcdef');
+    spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
+
+    componentInstance.saveLoggedOutProgress();
+    tick(100);
+
+    expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
+      'https://oppia.org/progress/abcdef');
+    expect(componentInstance.loggedOutProgressUniqueUrlId).toEqual('abcdef');
+  }));
+
+  it('should correctly copy progress URL', () => {
+    spyOn(clipboard, 'copy');
+    let loggedOutProgressUrl = 'https://oppia.org/progress/abcdef';
+    componentInstance.loggedOutProgressUniqueUrl = loggedOutProgressUrl;
+
+    componentInstance.copyProgressUrl();
+
+    expect(clipboard.copy).toHaveBeenCalledWith(
+      loggedOutProgressUrl);
+  });
+
+  it('should store unique progress URL ID when login button is clicked',
+    fakeAsync(() => {
+      spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+        Promise.resolve('https://oppia.org/login'));
+      spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
+      componentInstance.loggedOutProgressUniqueUrlId = 'abcdef';
+
+      componentInstance.onLoginButtonClicked();
+      tick(100);
+
+      expect(localStorageService.updateUniqueProgressIdOfLoggedOutLearner)
+        .toHaveBeenCalledWith('abcdef');
+    })
+  );
+
+  it('should correctly close save progress menu', () => {
+    componentInstance.saveProgressMenuIsShown = true;
+
+    componentInstance.closeSaveProgressMenu();
+
+    expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
 });
