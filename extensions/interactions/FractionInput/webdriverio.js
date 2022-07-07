@@ -17,6 +17,8 @@
  * in webdriverio.
  */
 
+var action = require(
+  process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 
 var customizeInteraction = async function(elem, requireSimplestForm) {
@@ -32,8 +34,10 @@ var expectInteractionDetailsToMatch = async function(elem) {
 };
 
 var submitAnswer = async function(elem, answer) {
-  await elem.$('<oppia-interactive-fraction-input>')
-    .$('<input>').keys(answer + '\n');
+  var interactiveFractionInput = elem.$('<oppia-interactive-fraction-input>')
+    .$('<input>');
+  await action.setValue(
+    'Interactive Fraction Input', interactiveFractionInput, answer + '\n');
 };
 
 var answerObjectType = 'Fraction';

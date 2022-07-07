@@ -43,7 +43,8 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestAddExplorationId = $(
     '.e2e-test-add-refresher-exploration-id');
   var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
-  var editOutcomeDestDropdownOptions = $('.e2e-destination-selector-dropdown');
+  var editOutcomeDestDropdownOptions = $(
+    '.e2e-test-destination-selector-dropdown');
   var editorWelcomeModal = $('.e2e-test-welcome-modal');
   var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
   var explorationGraph = $('.e2e-test-exploration-graph');

@@ -67,6 +67,7 @@ module.exports = {
       disallowedBrowserMethodsRegex + ']');
     var byCssSelector = (
       'CallExpression[callee.object.name=by][callee.property.name=css]');
+    var cssSelector = 'CallExpression[callee.name=$]';
     var elementAllIdName = [];
 
     var reportDisallowInvalidAwait = function(node) {
@@ -131,7 +132,32 @@ module.exports = {
       }
     };
 
-    var checkElementSelector = function(node) {
+    var checkElementSelectorProtractor = function(node) {
+      var thirdPartySelectorPrefixes = (
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+      for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
+        if ((node.arguments[0].type === 'Literal') &&
+          (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {
+          return;
+        }
+        if ((node.arguments[0].type === 'Literal') &&
+         (node.arguments[0].value.startsWith('option'))) {
+          return;
+        }
+      }
+      if ((node.arguments[0].type === 'Literal') &&
+        (!node.arguments[0].value.startsWith('.e2e-test-'))) {
+        context.report({
+          node: node.arguments[0],
+          messageId: 'useE2ETest',
+          data: {
+            incorrectClassname: node.arguments[0].value
+          }
+        });
+      }
+    };
+
+    var checkElementSelectorWebdriverio = function(node) {
       var thirdPartySelectorPrefixes = (
         ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
@@ -187,7 +213,10 @@ module.exports = {
         });
       },
       [byCssSelector]: function(node) {
-        checkElementSelector(node);
+        checkElementSelectorProtractor(node);
+      },
+      [cssSelector]: function(node) {
+        checkElementSelectorWebdriverio(node);
       }
     };
   }

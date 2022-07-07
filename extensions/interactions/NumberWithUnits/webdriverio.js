@@ -17,6 +17,9 @@
  * Interaction in webdriverio.
  */
 
+var action = require(
+  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+
 var customizeInteraction = function() {
   // There are no customizations.
 };
@@ -29,8 +32,9 @@ var expectInteractionDetailsToMatch = async function(elem) {
 };
 
 var submitAnswer = async function(elem, answer) {
-  await elem.$('<oppia-interactive-number-with-units>').
-    $('<input>').setValue(answer + '\n');
+  var submitBtn = elem.$('<oppia-interactive-number-with-units>').
+    $('<input>');
+  await action.setValue('Submit Button', submitBtn, answer + '\n');
 };
 
 var answerObjectType = 'NumberWithUnits';

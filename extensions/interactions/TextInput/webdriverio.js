@@ -64,7 +64,7 @@ var submitAnswer = async function(elem, answer) {
   var textAreaElem = textInputElem.$('<textarea>');
   var inputElem = textInputElem.$('<input>');
   if (await textAreaElem.isExisting()) {
-    await textAreaElem.setValue(answer);
+    await action.setValue('Text Area Input', textAreaElem, answer);
     var submitAnswerBtn = $('.e2e-test-submit-answer-button');
     await action.click('Submit Answer Button', submitAnswerBtn);
   } else {
@@ -73,8 +73,8 @@ var submitAnswer = async function(elem, answer) {
     // of this promise object to throw a validation error due to it referring
     // to an element which does not exist.
     if (await inputElem.isExisting()) {
-      await inputElem.clearValue();
-      await inputElem.setValue(answer);
+      await action.clear('Text Input Element', inputElem);
+      await action.setValue('Text Input Element', inputElem, answer);
       var submitAnswerBtn = $('.e2e-test-submit-answer-button');
       await action.click('Submit Answer Button', submitAnswerBtn);
     }

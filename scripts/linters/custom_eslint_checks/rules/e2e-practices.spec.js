@@ -64,11 +64,18 @@ ruleTester.run('e2e-practices', rule, {
     code: `var profileLink = element(by.css(
           '.e2e-test-profile-link'));`
   }, {
+    code: `var profileLink = $(
+          '.e2e-test-profile-link');`
+  }, {
     code: 'const SKILL_DESCRIPTIONS = 1;'
   }, {
     code: 'var modal = element.all(by.css(".modal-dialog")).last();'
   }, {
+    code: 'var modal = $(".modal-dialog")[0];'
+  }, {
     code: 'var modal = element(by.css("option:checked"));'
+  }, {
+    code: 'var modal = $("option:checked");'
   }, {
     code: ` var items = ['item1', 'item2', 'item3'];
             for (let i=0; i < items.length; i++) {
@@ -82,6 +89,16 @@ ruleTester.run('e2e-practices', rule, {
       code:
       `var hideHeightWarningIcon = element(
         by.css('.oppia-hide-card-height-warning-icon'));`,
+      errors: [{
+        message: (
+          'Please use “.e2e-test-” prefix classname selector instead ' +
+          'of “.oppia-hide-card-height-warning-icon”'),
+      }],
+    },
+    {
+      code:
+      `var hideHeightWarningIcon = $(
+        '.oppia-hide-card-height-warning-icon');`,
       errors: [{
         message: (
           'Please use “.e2e-test-” prefix classname selector instead ' +
@@ -126,6 +143,16 @@ ruleTester.run('e2e-practices', rule, {
       });`,
       errors: [{
         message: 'Please do not use browser.pause() in e2e files',
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        browser.debug();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.debug() in e2e files',
         type: 'CallExpression',
       }],
     },

@@ -23,7 +23,6 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
-var splashPage = '.e2e-test-splash-page';
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -90,8 +89,9 @@ var logout = async function() {
     // Wait until the URL has changed to something that is not /logout.
     return !(/logout/.test(url));
   }, async() => {
+    var splashPage = $('.e2e-test-splash-page');
     await waitFor.visibilityOf(
-      $(splashPage), 'Splash page takes too long to appear');
+      splashPage, 'Splash page takes too long to appear');
     await waitFor.pageToFullyLoad();
   });
 };
@@ -147,6 +147,8 @@ var createAndLoginUser = async function(
 };
 
 var createAndLoginCurriculumAdminUser = async function(email, username) {
+  // We cannot declare this as a global variable because this
+  // fails the test with error '$ is not defined for Admin.js file'.
   var adminPage = new AdminPage.AdminPage();
   await _createFirebaseAccount(email, true);
   await login(email);
@@ -177,6 +179,8 @@ var createUser = async function(email, username) {
 };
 
 var createUserWithRole = async function(email, username, role) {
+  // We cannot declare this as a global variable because this
+  // fails the test with error '$ is not defined for Admin.js file'.
   var adminPage = new AdminPage.AdminPage();
   await _createFirebaseAccount(email, true);
   await login(email);
