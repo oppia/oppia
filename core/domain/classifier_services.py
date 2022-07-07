@@ -422,15 +422,6 @@ def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
         return None
 
     next_job_model = valid_jobs[0]
-    # Assuming that a pending job has empty classifier data as it has not
-    # been trained yet.
-    # Here, next_job_model is an instance of `ClassifierTrainingJobModel`
-    # and `ClassifierTrainingJobModel` does not contain any classifier_data
-    # attribute but here we are defining, and assigning `None` value to this
-    # attribute which causes MyPy to throw error `class has no attribute
-    # "classifier_data"`. So, to silent the error, we used ignore
-    # statement here.
-    next_job_model.classifier_data = None  # type: ignore[attr-defined]
     next_job = get_classifier_training_job_from_model(next_job_model)
     _update_scheduled_check_time_for_new_training_job(next_job.job_id)
     return next_job
