@@ -23,11 +23,19 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict, List, Mapping, Union, cast
+from core.domain import state_domain
+
+from typing import Any, Dict, List, Mapping, Union, cast
 
 # Union type defined from allowed types that a Dict can contain for its values.
 AcceptableChangeDictTypes = Union[
-    str, int, List[str]
+    int,
+    str,
+    None,
+    List[str],
+    List[Dict[str, Any]],
+    Dict[str, Any],
+    state_domain.SubtitledHtmlDict
 ]
 
 

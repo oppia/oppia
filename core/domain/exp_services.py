@@ -2341,7 +2341,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                         draft_change_list,
                         exp_user_data.draft_change_list_exp_version,
                         exploration.version, exploration.id))
-                if new_draft_change_list is not None:
+                if new_draft_change_list:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
     updated_exploration = None

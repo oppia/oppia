@@ -70,7 +70,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             'The following extra attributes are present: invalid'):
             parameter_domain.PlatformParameterChange({
                 'cmd': self.CMD_EDIT_RULES,
-                'new_rules': [],
+                'new_rules': ['new rule'],
                 'invalid': 'invalid'
             })
 
@@ -78,13 +78,13 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
         param_change_object = (
             parameter_domain.PlatformParameterChange({
                 'cmd': self.CMD_EDIT_RULES,
-                'new_rules': []
+                'new_rules': ['new rule']
             }))
 
         self.assertEqual(
             param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(
-            param_change_object.new_rules, [])
+            param_change_object.new_rules, ['new rule'])
 
     def test_to_dict_returns_correct_dict(self) -> None:
         param_change_dict: Dict[str, Union[str, List[str]]] = {
