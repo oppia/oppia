@@ -53,7 +53,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         super(SubtopicPageServicesUnitTests, self).setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
         self.subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(  # type: ignore[no-untyped-call]
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Added subtopic',
@@ -142,12 +142,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.subtopic_page.update_page_contents_html(  # type: ignore[no-untyped-call]
+        self.subtopic_page.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
                 'content_id': 'content'
             }))
-        self.subtopic_page.update_page_contents_audio(  # type: ignore[no-untyped-call]
+        self.subtopic_page.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers))
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
@@ -170,7 +170,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_save_subtopic_page(self) -> None:
         subtopic_page_1 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(  # type: ignore[no-untyped-call]
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, 'topic_id_1'))
         subtopic_page_services.save_subtopic_page(
             self.user_id, subtopic_page_1, 'Added subtopic',

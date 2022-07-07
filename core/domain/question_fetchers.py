@@ -25,12 +25,28 @@ from core.domain import question_domain
 from core.domain import state_domain
 from core.platform import models
 
+from typing import List, Optional, Tuple
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import question_models
+    from mypy_imports import skill_models
+
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
 
 
+QuestionAndSkillDescriptionsType = Tuple[
+    List[Optional[question_domain.Question]],
+    List[List[Optional[str]]]
+]
+
+
 def get_questions_and_skill_descriptions_by_skill_ids(
-        question_count, skill_ids, offset):
+    question_count: int,
+    skill_ids: List[str],
+    offset: int
+) -> QuestionAndSkillDescriptionsType:
     """Returns the questions linked to the given skill ids.
 
     Args:
@@ -40,9 +56,9 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         offset: int. Number of query results to skip.
 
     Returns:
-        list(Question), list(list(str)). The list of questions and the
-        corresponding linked skill descriptions which are linked to the
-        given skill ids.
+        list(Question|None), list(list(str|None)). The list of questions, and
+        the corresponding linked skill descriptions which are linked to the
+        given skill ids and None when skill are not available.
     """
     if not skill_ids:
         return [], []
@@ -70,7 +86,9 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     return questions, grouped_skill_descriptions
 
 
-def get_questions_by_ids(question_ids):
+def get_questions_by_ids(
+    question_ids: List[str]
+) -> List[Optional[question_domain.Question]]:
     """Returns a list of domain objects representing questions.
 
     Args:
@@ -81,7 +99,7 @@ def get_questions_by_ids(question_ids):
         with the given ids or None when the id is not valid.
     """
     question_model_list = question_models.QuestionModel.get_multi(question_ids)
-    questions = []
+    questions: List[Optional[question_domain.Question]] = []
     for question_model in question_model_list:
         if question_model is not None:
             questions.append(get_question_from_model(question_model))
@@ -90,7 +108,9 @@ def get_questions_by_ids(question_ids):
     return questions
 
 
-def get_question_from_model(question_model):
+def get_question_from_model(
+    question_model: question_models.QuestionModel
+) -> question_domain.Question:
     """Returns domain object representing the given question model.
 
     Args:
@@ -102,7 +122,7 @@ def get_question_from_model(question_model):
     """
 
     # Ensure the original question model does not get altered.
-    versioned_question_state = {
+    versioned_question_state: question_domain.VersionedQuestionStateDict = {
         'state_schema_version': (
             question_model.question_state_data_schema_version),
         'state': copy.deepcopy(
@@ -114,7 +134,7 @@ def get_question_from_model(question_model):
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 
-    return question_domain.Question(
+    return question_domain.Question(  # type: ignore[no-untyped-call]
         question_model.id,
         state_domain.State.from_dict(versioned_question_state['state']),
         versioned_question_state['state_schema_version'],
@@ -124,7 +144,9 @@ def get_question_from_model(question_model):
         question_model.created_on, question_model.last_updated)
 
 
-def _migrate_state_schema(versioned_question_state):
+def _migrate_state_schema(
+    versioned_question_state: question_domain.VersionedQuestionStateDict
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
     state dictionary. If the current State schema changes, a new
@@ -153,6 +175,6 @@ def _migrate_state_schema(versioned_question_state):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
-        question_domain.Question.update_state_from_model(
+        question_domain.Question.update_state_from_model(  # type: ignore[no-untyped-call]
             versioned_question_state, state_schema_version)
         state_schema_version += 1

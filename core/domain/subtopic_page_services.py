@@ -64,7 +64,7 @@ def _migrate_page_contents_to_latest_schema(
 
     while (page_contents_schema_version <
            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
-        subtopic_page_domain.SubtopicPage.update_page_contents_from_model(  # type: ignore[no-untyped-call]
+        subtopic_page_domain.SubtopicPage.update_page_contents_from_model(
             versioned_page_contents, page_contents_schema_version)
         page_contents_schema_version += 1
 
@@ -269,7 +269,7 @@ def save_subtopic_page(
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (subtopic_page.id, change_list))
-    subtopic_page.validate()  # type: ignore[no-untyped-call]
+    subtopic_page.validate()
 
     subtopic_page_model = subtopic_models.SubtopicPageModel.get(
         subtopic_page.id, strict=False)

@@ -25,17 +25,27 @@ import logging
 from core import feconf
 from core.domain import classifier_domain
 from core.domain import config_domain
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.platform import models
 
-(classifier_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.classifier, models.NAMES.exploration])
+from typing import Dict, List, Optional, Sequence
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import classifier_models
+
+(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
 # in Oppia-ml.
-def generate_signature(secret, message, vm_id):
+def generate_signature(
+    secret: bytes,
+    message: bytes,
+    vm_id: str
+) -> str:
     """Generates digital signature for given data.
 
     Args:
@@ -46,17 +56,20 @@ def generate_signature(secret, message, vm_id):
     Returns:
         str. The signature of the payload data.
     """
-    if isinstance(vm_id, str):
-        vm_id = vm_id.encode('utf-8')
+    # Ruling out the possibility of Any other type for vm_id.
+    assert isinstance(vm_id, str)
+    converted_vm_id = vm_id.encode('utf-8')
     if isinstance(message, str):
         message = message.encode('utf-8')
-    message = b'%s|%s' % (base64.b64encode(message), vm_id)
+    message = b'%s|%s' % (base64.b64encode(message), converted_vm_id)
     return hmac.new(
         secret, msg=message, digestmod=hashlib.sha256
     ).hexdigest()
 
 
-def verify_signature(oppia_ml_auth_info):
+def verify_signature(
+    oppia_ml_auth_info: classifier_domain.OppiaMLAuthInfo
+) -> bool:
     """Function that checks if the signature received from the VM is valid.
 
     Args:
@@ -75,13 +88,19 @@ def verify_signature(oppia_ml_auth_info):
         return False
 
     generated_signature = generate_signature(
-        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
+        secret,
+        oppia_ml_auth_info.message,
+        oppia_ml_auth_info.vm_id
+    )
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True
 
 
-def handle_trainable_states(exploration, state_names):
+def handle_trainable_states(
+    exploration: exp_domain.Exploration,
+    state_names: List[str]
+) -> None:
     """Creates ClassifierTrainingJobModel instances for all the state names
     passed into the function. If this function is called with version number 1,
     we are creating jobs for all trainable states in the exploration. Otherwise,
@@ -96,7 +115,7 @@ def handle_trainable_states(exploration, state_names):
     exp_version = exploration.version
     for state_name in state_names:
         state = exploration.states[state_name]
-        training_data = state.get_training_data()
+        training_data = state.get_training_data()  # type: ignore[no-untyped-call]
         interaction_id = state.interaction.id
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
@@ -147,7 +166,11 @@ def handle_trainable_states(exploration, state_names):
         state_training_jobs_mappings)
 
 
-def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
+def handle_non_retrainable_states(
+    exploration: exp_domain.Exploration,
+    state_names: List[str],
+    exp_versions_diff: exp_domain.ExplorationVersionsDiff
+) -> List[str]:
     """Creates new StateTrainingJobsMappingModel instances for all the
     state names passed into the function. The mapping is created from the
     state in the new version of the exploration to the ClassifierTrainingJob of
@@ -219,7 +242,9 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     return state_names_without_classifier
 
 
-def get_classifier_training_job_from_model(classifier_training_job_model):
+def get_classifier_training_job_from_model(
+    classifier_training_job_model: classifier_models.ClassifierTrainingJobModel
+) -> classifier_domain.ClassifierTrainingJob:
     """Gets a classifier training job domain object from a classifier
     training job model.
 
@@ -244,7 +269,9 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.algorithm_version)
 
 
-def get_classifier_training_job_by_id(job_id):
+def get_classifier_training_job_by_id(
+    job_id: str
+) -> classifier_domain.ClassifierTrainingJob:
     """Gets a classifier training job by a job_id.
 
     Args:
@@ -265,7 +292,9 @@ def get_classifier_training_job_by_id(job_id):
     return classifier_training_job
 
 
-def _update_classifier_training_jobs_status(job_ids, status):
+def _update_classifier_training_jobs_status(
+    job_ids: List[str], status: str
+) -> None:
     """Checks for the existence of the model and then updates it.
 
     Args:
@@ -277,29 +306,41 @@ def _update_classifier_training_jobs_status(job_ids, status):
         Exception. The ClassifierTrainingJobModel corresponding to the job_id
             of the ClassifierTrainingJob does not exist.
     """
-    classifier_training_job_models = (
+    classifier_training_job_models_with_none = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
+    classifier_training_job_models: List[
+        classifier_models.ClassifierTrainingJobModel
+    ] = []
 
     for index in range(len(job_ids)):
-        if classifier_training_job_models[index] is None:
+        classifier_training_job_model = (
+            classifier_training_job_models_with_none[index]
+        )
+        if classifier_training_job_model is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '
                 'of the ClassifierTrainingJob does not exist.')
 
         classifier_training_job = get_classifier_training_job_from_model(
-            classifier_training_job_models[index])
+            classifier_training_job_model
+        )
         classifier_training_job.update_status(status)
         classifier_training_job.validate()
 
-        classifier_training_job_models[index].status = status
+        classifier_training_job_model.status = status
+        classifier_training_job_models.append(
+            classifier_training_job_model
+        )
 
     classifier_models.ClassifierTrainingJobModel.update_timestamps_multi(
-        classifier_training_job_models)
+        classifier_training_job_models
+    )
     classifier_models.ClassifierTrainingJobModel.put_multi(
-        classifier_training_job_models)
+        classifier_training_job_models
+    )
 
 
-def mark_training_job_complete(job_id):
+def mark_training_job_complete(job_id: str) -> None:
     """Updates the training job's status to complete.
 
     Args:
@@ -309,7 +350,7 @@ def mark_training_job_complete(job_id):
         [job_id], feconf.TRAINING_JOB_STATUS_COMPLETE)
 
 
-def mark_training_jobs_failed(job_ids):
+def mark_training_jobs_failed(job_ids: List[str]) -> None:
     """Updates the training job's status to failed.
 
     Args:
@@ -319,7 +360,7 @@ def mark_training_jobs_failed(job_ids):
         job_ids, feconf.TRAINING_JOB_STATUS_FAILED)
 
 
-def mark_training_job_pending(job_id):
+def mark_training_job_pending(job_id: str) -> None:
     """Updates the training job's status to pending.
 
     Args:
@@ -329,7 +370,7 @@ def mark_training_job_pending(job_id):
         [job_id], feconf.TRAINING_JOB_STATUS_PENDING)
 
 
-def _update_scheduled_check_time_for_new_training_job(job_id):
+def _update_scheduled_check_time_for_new_training_job(job_id: str) -> None:
     """Updates the next scheduled check time of job with status NEW.
 
     Args:
@@ -344,16 +385,19 @@ def _update_scheduled_check_time_for_new_training_job(job_id):
     classifier_training_job_model.put()
 
 
-def fetch_next_job():
+def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
     """Gets next job model in the job queue.
 
     Returns:
-        ClassifierTrainingJob. Domain object of the next training Job.
+        ClassifierTrainingJob | None. Domain object of the next training Job,
+        and None if no ClassifierTrainingJobModel is found.
     """
-    classifier_training_jobs = []
+    classifier_training_jobs: Sequence[
+        classifier_models.ClassifierTrainingJobModel
+    ] = []
     # Initially the offset for query is set to None.
     offset = 0
-    valid_jobs = []
+    valid_jobs: List[classifier_models.ClassifierTrainingJobModel] = []
     timed_out_job_ids = []
 
     while len(valid_jobs) == 0:
@@ -374,19 +418,23 @@ def fetch_next_job():
     if timed_out_job_ids:
         mark_training_jobs_failed(timed_out_job_ids)
 
-    if valid_jobs:
-        next_job_model = valid_jobs[0]
-        # Assuming that a pending job has empty classifier data as it has not
-        # been trained yet.
-        next_job_model.classifier_data = None
-        next_job = get_classifier_training_job_from_model(next_job_model)
-        _update_scheduled_check_time_for_new_training_job(next_job.job_id)
-    else:
-        next_job = None
+    if not valid_jobs:
+        return None
+
+    next_job_model = valid_jobs[0]
+    next_job = get_classifier_training_job_from_model(next_job_model)
+    _update_scheduled_check_time_for_new_training_job(next_job.job_id)
     return next_job
 
 
-def store_classifier_data(job_id, classifier_data_proto):
+# TODO(#15451): Add stubs for protobuf once we have enough type info regarding
+# protobuf's library. Because currently, the stubs in typeshed is not fully
+# type annotated yet and the main repository is also not type annotated yet.
+# The argument classifier_data_proto can accept instances of
+# `TextClassifierFrozenModel` class. But since we excluded
+# proto_files/ from the static type annotations, this argument
+# is annotated as general object type.
+def store_classifier_data(job_id: str, classifier_data_proto: object) -> None:
     """Checks for the existence of the model and then updates it.
 
     Args:
@@ -412,7 +460,7 @@ def store_classifier_data(job_id, classifier_data_proto):
         classifier_data_proto)
 
 
-def delete_classifier_training_job(job_id):
+def delete_classifier_training_job(job_id: str) -> None:
     """Deletes classifier training job model in the datastore given job_id.
 
     Args:
@@ -426,7 +474,12 @@ def delete_classifier_training_job(job_id):
         classifier_training_job_model.delete()
 
 
-def get_classifier_training_job(exp_id, exp_version, state_name, algorithm_id):
+def get_classifier_training_job(
+    exp_id: str,
+    exp_version: int,
+    state_name: str,
+    algorithm_id: str
+) -> Optional[classifier_domain.ClassifierTrainingJob]:
     """Gets classifier training job object for given algorithm_id for the
     given <exploration, version, state> triplet.
 
@@ -451,7 +504,11 @@ def get_classifier_training_job(exp_id, exp_version, state_name, algorithm_id):
     return get_classifier_training_job_by_id(job_id)
 
 
-def get_state_training_jobs_mapping(exp_id, exp_version, state_name):
+def get_state_training_jobs_mapping(
+    exp_id: str,
+    exp_version: int,
+    state_name: str
+) -> Optional[classifier_domain.StateTrainingJobsMapping]:
     """Gets training job exploration mapping model for given exploration state
     combination.
 
@@ -462,8 +519,8 @@ def get_state_training_jobs_mapping(exp_id, exp_version, state_name):
             is to be retrieved.
 
     Returns:
-        StateTrainingJobsMapping. A domain object containing exploration
-        mapping model information.
+        StateTrainingJobsMapping | None. A domain object containing exploration
+        mapping model information. None, if no such instance is found.
     """
     state_training_jobs_mapping_model = (
         classifier_models.StateTrainingJobsMappingModel.get_model(
@@ -478,7 +535,9 @@ def get_state_training_jobs_mapping(exp_id, exp_version, state_name):
         state_training_jobs_mapping_model.algorithm_ids_to_job_ids)
 
 
-def migrate_state_training_jobs(state_training_jobs_mapping):
+def migrate_state_training_jobs(
+    state_training_jobs_mapping: classifier_domain.StateTrainingJobsMapping
+) -> None:
     """Migrate exploration training jobs to latest version of algorithm_id
     and algorithm_version.
 
@@ -548,7 +607,7 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
 
         for algorithm_id in algorithm_ids_to_add:
             next_scheduled_check_time = datetime.datetime.utcnow()
-            training_data = exploration.states[state_name].get_training_data()
+            training_data = exploration.states[state_name].get_training_data()  # type: ignore[no-untyped-call]
 
             classifier_domain.ClassifierTrainingJob(
                 'job_id_dummy', algorithm_id, interaction_id, exp_id,
@@ -601,13 +660,19 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
         classifier_models.StateTrainingJobsMappingModel.get_model(
             exp_id, exp_version, state_name))
     state_training_jobs_mapping.validate()
+    # Ruling out the possibility of None for mypy type checking.
+    assert state_training_jobs_mapping_model is not None
     state_training_jobs_mapping_model.algorithm_ids_to_job_ids = (
         state_training_jobs_mapping.algorithm_ids_to_job_ids)
     state_training_jobs_mapping_model.update_timestamps()
     state_training_jobs_mapping_model.put()
 
 
-def get_classifier_training_job_maps(exp_id, exp_version, state_names):
+def get_classifier_training_job_maps(
+    exp_id: str,
+    exp_version: int,
+    state_names: List[str]
+) -> List[Optional[Dict[str, str]]]:
     """Gets the list of algorithm-id-to-classifier-training-job mappings for
     each of the given state names.
 
@@ -618,24 +683,39 @@ def get_classifier_training_job_maps(exp_id, exp_version, state_names):
             mappings.
 
     Returns:
-        list(dict(str: str)). A list of dicts, each mapping
+        list(dict(str: str)|None). A list of dicts, each mapping
         algorithm IDs to the corresponding job IDs. Each element
         in the list corresponds to the corresponding state name in the
-        state_names input argument.
+        state_names input argument. None, if no StateMappingModel exists
+        for corresponding exploration id.
     """
     state_training_jobs_mapping_models = (
         classifier_models.StateTrainingJobsMappingModel.get_models(
             exp_id, exp_version, state_names))
-    state_to_algorithm_id_job_id_maps = []
+    state_to_algorithm_id_job_id_maps: List[Optional[Dict[str, str]]] = []
     for state_mapping_model in state_training_jobs_mapping_models:
-        state_to_algorithm_id_job_id_maps.append(
-            None if state_mapping_model is None
-            else state_mapping_model.algorithm_ids_to_job_ids)
+        if state_mapping_model:
+            # TODO(#15621): Here, `.algorithm_ids_to_job_ids` is an instance
+            # of ndb's JsonProperty and currently all the ndb properties are
+            # annotated with Any return type. So, once we have proper return
+            # type for ndb properties, this explicit declaration of type
+            # should be removed.
+            algo_ids_to_job_ids: Dict[
+                str, str
+            ] = state_mapping_model.algorithm_ids_to_job_ids
+            state_to_algorithm_id_job_id_maps.append(
+                algo_ids_to_job_ids
+            )
+        else:
+            state_to_algorithm_id_job_id_maps.append(None)
+
     return state_to_algorithm_id_job_id_maps
 
 
 def create_classifier_training_job_for_reverted_exploration(
-        exploration, exploration_to_revert_to):
+    exploration: exp_domain.Exploration,
+    exploration_to_revert_to: exp_domain.Exploration
+) -> None:
     """Create classifier training job model when an exploration is reverted.
 
     Args:
