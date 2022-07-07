@@ -655,4 +655,27 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService.init();
     expect(explorationPlayerStateService.version).toBe(1);
   });
+
+  it('should tell if logged out learner progress is tracked', () => {
+    expect(explorationPlayerStateService.isLoggedOutLearnerProgressTracked())
+      .toBeFalse();
+    explorationPlayerStateService.trackLoggedOutLearnerProgress();
+    expect(explorationPlayerStateService.isLoggedOutLearnerProgressTracked())
+      .toBeTrue();
+  });
+
+  it('should set unique progress URL id correctly', fakeAsync(() => {
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue(Promise.resolve({
+        unique_progress_url_id: '123456'
+      }));
+    expect(explorationPlayerStateService.getUniqueProgressUrlId()).toBeNull();
+    explorationPlayerStateService.setLastCompletedCheckpoint('abc');
+    explorationPlayerStateService.setUniqueProgressUrlId();
+    tick(100);
+    expect(explorationPlayerStateService.getUniqueProgressUrlId()).toEqual(
+      '123456');
+  }));
 });
