@@ -1772,6 +1772,7 @@ class CuratedExplorationValidationHandler(base.BaseHandler):
         'GET': {}
     }
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         exploration = exp_fetchers.get_exploration_by_id(
@@ -1780,12 +1781,12 @@ class CuratedExplorationValidationHandler(base.BaseHandler):
         if exploration is None:
             raise self.PageNotFoundException
 
-        exp_can_be_curated = (
+        error_message = (
             exp_services.can_exploration_be_curated(exploration))
 
-        self.values.update({
-            'can_be_curated': exp_can_be_curated[0],
-            'error_message': exp_can_be_curated[1]
+        self.render_json({
+            'can_be_curated': len(error_message) == 0,
+            'error_message': error_message
         })
 
 

@@ -7546,10 +7546,9 @@ class CuratedExplorationValidationUnitTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME
         ].classifier_model_id = '2'
 
-        exp_is_curated, error_message = (
+        error_message = (
             exp_services.can_exploration_be_curated(exploration))
 
-        self.assertFalse(exp_is_curated)
         self.assertEqual(
             error_message,
             'The exploration should not have classifier model for any state.'
@@ -7569,10 +7568,9 @@ class CuratedExplorationValidationUnitTests(test_utils.GenericTestBase):
             ).to_dict()
         ]
 
-        exp_is_curated, error_message = (
+        error_message = (
             exp_services.can_exploration_be_curated(exploration))
 
-        self.assertFalse(exp_is_curated)
         self.assertEqual(
             error_message,
             'The exploration should not have any parameter changes.'
@@ -7587,10 +7585,9 @@ class CuratedExplorationValidationUnitTests(test_utils.GenericTestBase):
             'ExampleParamOne': param_domain.ParamSpec('UnicodeString')
         }
 
-        exp_is_curated, error_message = (
+        error_message = (
             exp_services.can_exploration_be_curated(exploration))
 
-        self.assertFalse(exp_is_curated)
         self.assertEqual(
             error_message,
             'The exploration should not have any parameter specs.'
@@ -7634,10 +7631,9 @@ class CuratedExplorationValidationUnitTests(test_utils.GenericTestBase):
             None
         )]
 
-        exp_is_curated, error_message = (
+        error_message = (
             exp_services.can_exploration_be_curated(exploration))
 
-        self.assertFalse(exp_is_curated)
         self.assertEqual(
             error_message,
             'The exploration should not have training data ' +
@@ -7666,10 +7662,9 @@ class CuratedExplorationValidationUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        exp_is_curated, error_message = (
+        error_message = (
             exp_services.can_exploration_be_curated(exploration))
 
-        self.assertFalse(exp_is_curated)
         self.assertEqual(
             error_message,
             'The exploration should not have any parameter changes ' +
@@ -7692,10 +7687,9 @@ class CuratedExplorationValidationUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        exp_is_curated, error_message = (
+        error_message = (
             exp_services.can_exploration_be_curated(exploration))
 
-        self.assertFalse(exp_is_curated)
         self.assertEqual(
             error_message,
             'The exploration should not have any video or link ' +

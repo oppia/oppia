@@ -207,7 +207,7 @@ describe('Create New Chapter Modal Controller', function() {
           'The exploration should not have training data ' +
           'for any answer group in any state.')
       });
-      $scope.save();
+      $scope.saveAsync();
       flushMicrotasks();
       $rootScope.$apply();
 
@@ -225,7 +225,7 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(
       curatedExplorationValidationService, 'canExplorationBeCurated'
     ).and.resolveTo(canExplorationBeCuratedResponse);
-    $scope.save();
+    $scope.saveAsync();
     flushMicrotasks();
     $rootScope.$apply();
 
@@ -259,7 +259,7 @@ describe('Create New Chapter Modal Controller', function() {
 
   it('should not save when the chapter title is already used', function() {
     $scope.title = nodeTitles[0];
-    $scope.save();
+    $scope.saveAsync();
     expect($scope.errorMsg).toBe('A chapter with this title already exists');
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
@@ -276,7 +276,7 @@ describe('Create New Chapter Modal Controller', function() {
       spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled');
     const categorySpy =
       spyOn(explorationIdValidationService, 'isDefaultCategoryAsync');
-    $scope.save();
+    $scope.saveAsync();
     flushMicrotasks();
     $rootScope.$apply();
     expect($scope.invalidExpId).toEqual(true);
@@ -295,7 +295,7 @@ describe('Create New Chapter Modal Controller', function() {
       .and.resolveTo(true);
     spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
       .and.resolveTo(false);
-    $scope.save();
+    $scope.saveAsync();
     flushMicrotasks();
     $rootScope.$apply();
     expect($scope.correctnessFeedbackDisabled).toBe(true);
@@ -316,7 +316,7 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
       .and.resolveTo(false);
 
-    $scope.save();
+    $scope.saveAsync();
     flushMicrotasks();
     $rootScope.$apply();
 
@@ -338,7 +338,7 @@ describe('Create New Chapter Modal Controller', function() {
         .and.resolveTo(true);
       const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
       const updateTitleSpy = spyOn($scope, 'updateTitle');
-      $scope.save();
+      $scope.saveAsync();
       flushMicrotasks();
       $rootScope.$apply();
 
@@ -348,7 +348,7 @@ describe('Create New Chapter Modal Controller', function() {
 
   it('should clear error message when changing exploration id', function() {
     $scope.title = nodeTitles[0];
-    $scope.save();
+    $scope.saveAsync();
     expect($scope.errorMsg).toBe('A chapter with this title already exists');
     expect($uibModalInstance.close).not.toHaveBeenCalled();
 

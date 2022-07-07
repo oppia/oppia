@@ -2956,22 +2956,45 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
 class CuratedExplorationValidationHandlerTests(test_utils.GenericTestBase):
     """Tests for curated exploration validation handler."""
 
+    EXP_ID = '0'
+
     def setUp(self):
         super(CuratedExplorationValidationHandlerTests, self).setUp()
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'myParam': {'obj_type': 'UnicodeString'}
+                }
+            })
+        ], 'A commit message.')
 
-    def test_curated_exp_validation_with_invalid_exp_id(self):
-        self.login(self.NEW_USER_EMAIL)
+    def test_raise_error_if_exploration_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(
-            '/explorehandler/curated_exploration_validation/exploration_1',
-            expected_status_int=400)
-
-        self.assertIn(
-            'Schema validation for \'exploration_id\' failed: ' +
-            'Validation failed: is_regex_matched',
-            response['error']
+        self.get_json(
+            '/explorehandler/curated_exploration_validation/1',
+            expected_status_int=404
         )
+
+        self.logout()
+
+    def test_curated_exploration_status_is_fetched_correctly(self):
+        self.login(self.OWNER_EMAIL)
+        response_dict = self.get_json(
+            '/explorehandler/curated_exploration_validation/0')
+
+        self.assertFalse(response_dict['can_be_curated'])
+        self.assertEqual(
+            response_dict['error_message'],
+            'The exploration should not have any parameter specs.'
+        )
+
+        self.logout()
 
 
 class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):

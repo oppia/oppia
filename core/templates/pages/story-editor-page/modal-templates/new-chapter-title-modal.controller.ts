@@ -130,7 +130,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         $scope.editableThumbnailFilename);
     };
 
-    $scope.save = async function() {
+    $scope.saveAsync = async function() {
       if ($scope.nodeTitles.indexOf($scope.title) !== -1) {
         $scope.errorMsg = 'A chapter with this title already exists';
         return;

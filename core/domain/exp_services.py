@@ -2899,4 +2899,4 @@ def can_exploration_be_curated(exploration):
                 )
                 break
 
-    return (not bool(error_message), error_message)
+    return error_message
