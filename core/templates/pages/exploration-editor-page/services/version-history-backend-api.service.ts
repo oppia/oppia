@@ -19,6 +19,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationMetadata, ExplorationMetadataBackendDict, ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -127,3 +128,7 @@ export class VersionHistoryBackendApiService {
       });
   }
 }
+
+angular.module('oppia').factory(
+  'VersionHistoryBackendApiService',
+  downgradeInjectable(VersionHistoryBackendApiService));

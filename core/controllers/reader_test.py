@@ -3374,7 +3374,7 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.get_json(
             '%s/%s/%s' % (
                 feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
-            ), expected_status_int = 404)
+            ), expected_status_int=404)
 
         self.logout()
 
