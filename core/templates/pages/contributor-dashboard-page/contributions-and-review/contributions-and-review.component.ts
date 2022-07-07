@@ -199,7 +199,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var _showQuestionSuggestionModal = function(
           suggestion, contributionDetails, reviewable,
-          misconceptionsBySkill, question) {
+          misconceptionsBySkill, question, suggestionIdToContribution) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'question-suggestion-review.directive.html');
@@ -212,6 +212,9 @@ angular.module('oppia').component('contributionsAndReview', {
         var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
         var skillDifficulty = suggestion.change.skill_difficulty;
+        var suggestionIdToContribution = suggestionIdToContribution;
+
+        // console.log(suggestionIdToContribution);
 
         $uibModal.open({
           templateUrl: _templateUrl,
@@ -232,6 +235,9 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             question: function() {
               return question;
+            },
+            suggestionIdToContribution: function() {
+              return cloneDeep(suggestionIdToContribution);
             },
             questionHeader: function() {
               return questionHeader;
@@ -317,9 +323,14 @@ angular.module('oppia').component('contributionsAndReview', {
           var misconceptionsBySkill = {};
           var skill = skillDict.skill;
           misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+          const suggestionIdToContribution = {};
+          for (let suggestionId in ctrl.contributions) {
+            var contribution = ctrl.contributions[suggestionId];
+            suggestionIdToContribution[suggestionId] = contribution;
+          }
           _showQuestionSuggestionModal(
             suggestion, contributionDetails, reviewable,
-            misconceptionsBySkill, question);
+            misconceptionsBySkill, question, suggestionIdToContribution);
           $rootScope.$apply();
         });
       };

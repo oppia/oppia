@@ -37,7 +37,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   'SiteAnalyticsService', 'SuggestionModalService',
   'ThreadDataBackendApiService', 'UrlInterpolationService',
   'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
-  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
+  'suggestionIdToContribution', 'questionHeader',
+  'reviewable', 'skillDifficulty', 'skillRubrics',
   'suggestion', 'suggestionId', 'editSuggestionCallback',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
@@ -46,7 +47,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       ContributionOpportunitiesService, SkillBackendApiService,
       SiteAnalyticsService, SuggestionModalService,
       ThreadDataBackendApiService, UrlInterpolationService,
-      authorName, contentHtml, misconceptionsBySkill, question, questionHeader,
+      authorName, contentHtml, misconceptionsBySkill, question,
+      suggestionIdToContribution, questionHeader,
       reviewable, skillDifficulty, skillRubrics,
       suggestion, suggestionId, editSuggestionCallback,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
@@ -75,6 +77,9 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         {}
       );
     };
+
+    console.log(suggestion);
+    console.log(suggestionIdToContribution);
 
     $scope.authorName = authorName;
     $scope.contentHtml = contentHtml;
