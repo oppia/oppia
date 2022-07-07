@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.CodeRepl import CodeRepl # pylint: disable=unused-import # isort: skip
+from extensions.interactions.CodeRepl import CodeRepl # pylint: disable=unused-import, line-too-long
 
 
 class CodeReplTests(test_utils.GenericTestBase):
