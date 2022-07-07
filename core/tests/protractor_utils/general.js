@@ -57,6 +57,15 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
+  // These errors are related to the gtag script that is used to track events.
+  // They are of the form "Failed to load resource: the server responded
+  // with a status of 405", this happens when the HTTP method used for a
+  // network call is refused by the server. The network call is triggered
+  // automatically by the gtag script, so we have no control over it. The 405
+  // error was observed on other websites that use gtag and it does not affect
+  // the user experience in anyway. Considering these reasons, the error may be
+  // ignored.
+  _.escapeRegExp('https://www.googletagmanager.com/a')
 ];
 
 var checkForConsoleErrors = async function(
