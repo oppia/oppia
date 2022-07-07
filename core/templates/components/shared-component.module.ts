@@ -140,6 +140,7 @@ import { StateResponsesComponent } from './state-editor/state-responses-editor/s
 import { StateEditorComponent } from './state-editor/state-editor.component';
 import { QuestionEditorComponent } from './question-directives/question-editor/question-editor.component';
 import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
+import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -306,7 +307,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     StateResponsesComponent,
     StateEditorComponent,
     QuestionEditorComponent,
-    QuestionPlayerConceptCardModalComponent
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent
   ],
 
   entryComponents: [
@@ -416,7 +418,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     StateResponsesComponent,
     StateEditorComponent,
     QuestionEditorComponent,
-    QuestionPlayerConceptCardModalComponent
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent
   ],
 
   exports: [
@@ -535,7 +538,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     StateResponsesComponent,
     StateEditorComponent,
     QuestionEditorComponent,
-    QuestionPlayerConceptCardModalComponent
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent
   ],
 })
 
