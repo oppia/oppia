@@ -33,11 +33,15 @@ var StoryEditorPage = function() {
   var createChapterButton = $('.e2e-test-add-chapter-button');
   var newChapterTitleField = $('.e2e-test-new-chapter-title-field');
   var newChapterExplorationField = $('.e2e-test-chapter-exploration-input');
+  var notesEditor = $('.e2e-test-story-notes-rte');
+  var openStoryNotesEditorButton = $(
+    '.e2e-test-open-story-notes-editor-button');
   var confirmChapterCreationButton = $(
     '.e2e-test-confirm-chapter-creation-button');
   var publishStoryButton = $('.e2e-test-publish-story-button');
   var unpublishStoryButton = $('.e2e-test-unpublish-story-button');
   var backToStoryEditorButton = $('.e2e-test-back-to-story-editor-button');
+  var saveStoryNotesEditorButton = $('.e2e-test-save-story-notes-button');
   var storyMetaTagContentField = $('.e2e-test-story-meta-tag-content-field');
   var storyMetaTagContentLabel = $('.e2e-test-story-meta-tag-content-label');
 
@@ -69,6 +73,17 @@ var StoryEditorPage = function() {
     await action.setValue(
       'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
     await action.click('Meta Tag Content label', storyMetaTagContentLabel);
+  };
+
+  this.changeStoryNotes = async function(richTextInstructions) {
+    await action.click(
+      'Open Story Editor Notes Button', openStoryNotesEditorButton);
+    var storyNotesEditor = await forms.RichTextEditor(
+      notesEditor);
+    await storyNotesEditor.clear();
+    await richTextInstructions(storyNotesEditor);
+    await action.click(
+      'Save Story Notes Editor Button', saveStoryNotesEditorButton);
   };
 
   this.saveStory = async function(commitMessage) {

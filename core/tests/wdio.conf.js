@@ -56,6 +56,10 @@ var suites = {
     './core/tests/webdriverio/subscriptionsFlow.js'
   ],
 
+  topicAndStoryEditor: [
+    './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
+  ],
+
   topicAndStoryViewer: [
     './core/tests/webdriverio_desktop/topicAndStoryViewer.js'
   ],

@@ -23,6 +23,8 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
+var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('./SkillEditorPage');
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
