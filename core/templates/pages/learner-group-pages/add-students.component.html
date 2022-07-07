@@ -1,0 +1,20 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css" as="style">
+
+<div class="oppia-learner-group-details">
+  <div class="form-group">
+    <b>Invite students through Username</b>
+    <input type="text"
+           class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
+           [placeholder]="searchBarPlaceholder"
+           [(ngModel)]="searchQuery"
+           (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
+           [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+           aria-label="Search bar"
+           (keydown.enter)="$event.target.blur()"
+           (input)="searchToBeExec($event)">
+  </div>
+</div>
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css">

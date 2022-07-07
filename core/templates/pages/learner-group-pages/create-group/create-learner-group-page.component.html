@@ -33,9 +33,23 @@
       </div>
     </div>
     <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS">
-      <oppia-add-syllabus-items></oppia-add-syllabus-items>
+      <oppia-add-syllabus-items (updateLearnerGroupStories)="updateLearnerGroupStories($event)"
+                                (updateLearnerGroupSubtopics)="updateLearnerGroupSubtopics($event)">
+      </oppia-add-syllabus-items>
       <div class="oppia-next-section-button"
-           [ngClass]="{'active': !isGroupDetailsNextButtonDisabled()}">Next</div>
+           [ngClass]="{'active': !isAddSyllabusNextButtonDisabled()}"
+           (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_STUDENTS, 3)">
+        Next
+      </div>
+    </div>
+    <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_STUDENTS">
+      <oppia-add-students (updateLearnerGroupStories)="updateLearnerGroupStories($event)"
+                          (updateLearnerGroupSubtopics)="updateLearnerGroupSubtopics($event)">
+      </oppia-add-students>
+      <div class="oppia-next-section-button active"
+           (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_STUDENTS, 3)">
+        Create Group
+      </div>
     </div>
   </div>
 </div>

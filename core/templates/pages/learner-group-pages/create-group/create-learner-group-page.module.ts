@@ -49,12 +49,14 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   declarations: [
     CreateLearnerGroupPageComponent,
     LearnerGroupDetailsComponent,
-    AddSyllabusItemsComponent
+    AddSyllabusItemsComponent,
+    AddStudentsComponent
   ],
   entryComponents: [
     CreateLearnerGroupPageComponent,
     LearnerGroupDetailsComponent,
-    AddSyllabusItemsComponent
+    AddSyllabusItemsComponent,
+    AddStudentsComponent
   ],
   providers: [
     {
@@ -91,6 +93,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { AddSyllabusItemsComponent } from '../add-syllabus-items.component';
+import { AddStudentsComponent } from '../add-students.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

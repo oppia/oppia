@@ -42,6 +42,9 @@ import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LearnerGroupSyllabusFilter, LearnerGroupSyllabusBackendApiService } 
   from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { SubtopicPageSummary } from 'domain/learner_group/subtopic-page-summary.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 interface SearchDropDownItems {
   id: string;
@@ -55,8 +58,10 @@ interface SearchDropDownItems {
 export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   @Output() updateLearnerGroupStories: EventEmitter<string[]> = new EventEmitter();
   @Output() updateLearnerGroupSubtopics: EventEmitter<string[]> = new EventEmitter();
-  syllabusStoryIds: string[];
-  syllabusSubtopicPageIds: string[];
+  syllabusStoryIds: string[] = [];
+  syllabusSubtopicPageIds: string[] = [];
+  syllabusStorySummaries: StorySummary[] = [];
+  syllabusSubtopicSummaries: SubtopicPageSummary[] = [];
   searchBarPlaceholder!: string;
   categoryButtonText!: string;
   languageButtonText!: string;
@@ -76,6 +81,8 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
   searchIsInProgress = false;
+  storySummaries: StorySummary[];
+  subtopicSummaries: SubtopicPageSummary[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -90,7 +97,8 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     private constructTranslationIdsService: ConstructTranslationIdsService,
     private searchService: SearchService,
     private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService
+      LearnerGroupSyllabusBackendApiService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   checkMobileView(): boolean {
@@ -206,11 +214,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateLearnerGroupSyllabus(): void {
-    this.updateLearnerGroupStories.emit(this.syllabusStoryIds);
-    this.updateLearnerGroupSubtopics.emit(this.syllabusSubtopicPageIds);
-  }
-
   toggleSelection(itemsType: string, optionName: string): void {
     let selection = this.selectionDetails[itemsType].selection;
     if (selection !== optionName) {
@@ -277,6 +280,8 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     ).then((syllabusItems) => {
       this.searchIsInProgress = false;
         console.log(syllabusItems, "syllabus items");
+        this.storySummaries = syllabusItems.storySummaries;
+        this.subtopicSummaries = syllabusItems.subtopicPageSummaries;
     });
   }
 
@@ -284,6 +289,53 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     if (!this.searchButtonIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
+  }
+
+  getCompleteThumbnailIconUrl(thumbnailFilename: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(
+      '/' + thumbnailFilename);
+  }
+
+  updateLearnerGroupSyllabus(): void {
+    this.updateLearnerGroupStories.emit(this.syllabusStoryIds);
+    this.updateLearnerGroupSubtopics.emit(this.syllabusSubtopicPageIds);
+  }
+
+  addStoryToSyllabus(storySummary: StorySummary): void {
+    this.syllabusStorySummaries.push(storySummary);
+    this.syllabusStoryIds.push(storySummary.getId());
+    this.updateLearnerGroupSyllabus();
+  }
+
+  addSubtopicToSyllabus(subtopicSummary: SubtopicPageSummary): void {
+    this.syllabusSubtopicSummaries.push(subtopicSummary);
+    this.syllabusSubtopicPageIds.push(subtopicSummary.subtopicPageId);
+    this.updateLearnerGroupSyllabus();
+  }
+
+  removeStoryFromSyllabus(storySummary: StorySummary): void {
+    this.syllabusStorySummaries = this.syllabusStorySummaries.filter(
+      (s) => s.getId() !== storySummary.getId());
+    this.syllabusStoryIds = this.syllabusStoryIds.filter(
+      (id) => id !== storySummary.getId());
+    this.updateLearnerGroupSyllabus();
+  }
+
+  removeSubtopicFromSyllabus(subtopicSummary: SubtopicPageSummary): void {
+    this.syllabusSubtopicSummaries = this.syllabusSubtopicSummaries.filter(
+      (s) => s.subtopicPageId !== subtopicSummary.subtopicPageId);
+    this.syllabusSubtopicPageIds = this.syllabusSubtopicPageIds.filter(
+      (id) => id !== subtopicSummary.subtopicPageId);
+    this.updateLearnerGroupSyllabus();
+  }
+
+  isStoryPartOfSyllabus(storySummary: StorySummary): boolean {
+    return this.syllabusStoryIds.indexOf(storySummary.getId()) !== -1;
+  }
+
+  isSubtopicPartOfSyllabus(subtopicSummary: SubtopicPageSummary): boolean {
+    return this.syllabusSubtopicPageIds.indexOf(
+      subtopicSummary.subtopicPageId) !== -1;
   }
 
   ngOnDestroy(): void {

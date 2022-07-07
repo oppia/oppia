@@ -48,6 +48,8 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   furthestReachedSectionNumber: number = 2;
   learnerGroupTitle: string = '';
   learnerGroupDescription: string = '';
+  learnerGroupSubtopicPageIds: string[] = [];
+  learnerGroupStoryIds: string[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -105,6 +107,21 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.learnerGroupDescription = description;
   }
 
+  updateLearnerGroupSubtopics(subtopicPageId: string): void {
+    this.learnerGroupSubtopicPageIds.push(subtopicPageId);
+  }
+
+  updateLearnerGroupStories(storyId: string): void {
+    this.learnerGroupStoryIds.push(storyId);
+  }
+
+  isAddSyllabusNextButtonDisabled(): boolean {
+    return (
+      !this.learnerGroupStoryIds.length &&
+      !this.learnerGroupSubtopicPageIds.length
+    );
+  }
+
   getProgressTabStatusClass(sectionNumber: number): string {
     if (sectionNumber < this.furthestReachedSectionNumber) {
       return 'completed';
@@ -117,7 +134,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('testing')
     this.activeSection = (
-      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS
+      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_STUDENTS
     );
     // this.loaderService.showLoadingScreen('Loading');
   }

@@ -5,6 +5,41 @@
   <div class="add-learner-group-syllabus-desc-text">
     Add skills or stories to your syllabus to automatically send them to your students.
   </div>
+  <div class="added-syllabus-container" *ngIf="syllabusStorySummaries.length > 0 || syllabusSubtopicSummaries.length > 0">
+    <div>Added lessons</div>
+    <div class="filtered-syllabus-items-container">
+      <div class="syllabus-item-card" *ngFor="let storySummary of syllabusStorySummaries; trackBy: index">
+        <div class="syllabus-item-image-desc-container">
+          <img class="thumbnail-image syllabus-item-image" [src]="storySummary.getThumbnailFilename() && getCompleteThumbnailIconUrl(storySummary.getThumbnailFilename())">
+          <div class="syllabus-item-des">{{ storySummary.getTitle() }}</div>
+        </div>
+        <div class="syllabus-item-cta-buttons-container">
+          <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
+            View Details
+          </button>
+          <button class="btn btn-primary syllabus-item-remove-cta-button"
+                  (click)="removeStoryFromSyllabus(storySummary)">
+            Remove
+          </button>
+        </div>
+      </div>
+      <div class="syllabus-item-card" *ngFor="let subtopicSummary of syllabusSubtopicSummaries; trackBy: index">
+        <div class="syllabus-item-image-desc-container">
+          <img class="thumbnail-image syllabus-item-image" [src]="getCompleteThumbnailIconUrl(subtopicSummary.thumbnailFilename)">
+          <div class="syllabus-item-des">{{ subtopicSummary.subtopicTitle }}</div>
+        </div>
+        <div class="syllabus-item-cta-buttons-container">
+          <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
+            View Details
+          </button>
+          <button class="btn btn-primary syllabus-item-remove-cta-button"
+                  (click)="removeSubtopicFromSyllabus(subtopicSummary)">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="learner-group-syllabus-filters-title">
     Search by keyword, topic, language, or skill name
   </div>
@@ -136,6 +171,46 @@
         </ul>
       </div>
     </div>    
+  </div>
+  <div class="filtered-syllabus-items-container">
+    <div class="syllabus-item-card" *ngFor="let storySummary of storySummaries; trackBy: index">
+      <div class="syllabus-item-image-desc-container">
+        <img class="thumbnail-image syllabus-item-image" [src]="storySummary.getThumbnailFilename() && getCompleteThumbnailIconUrl(storySummary.getThumbnailFilename())">
+        <div class="syllabus-item-des">{{ storySummary.getTitle() }}</div>
+      </div>
+      <div class="syllabus-item-cta-buttons-container">
+        <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
+          View Details
+        </button>
+        <button *ngIf="!isStoryPartOfSyllabus(storySummary)"
+                class="btn btn-primary syllabus-item-add-cta-button"
+                (click)="addStoryToSyllabus(storySummary)">
+          Add to syllabus
+        </button>
+        <button *ngIf="isStoryPartOfSyllabus(storySummary)" class="btn btn-secondary syllabus-item-add-cta-button disabled">
+          Added
+        </button>
+      </div>
+    </div>
+    <div class="syllabus-item-card" *ngFor="let subtopicSummary of subtopicSummaries; trackBy: index">
+      <div class="syllabus-item-image-desc-container">
+        <img class="thumbnail-image syllabus-item-image" [src]="getCompleteThumbnailIconUrl(subtopicSummary.thumbnailFilename)">
+        <div class="syllabus-item-des">{{ subtopicSummary.subtopicTitle }}</div>
+      </div>
+      <div class="syllabus-item-cta-buttons-container">
+        <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
+          View Details
+        </button>
+        <button *ngIf="!isSubtopicPartOfSyllabus(subtopicSummary)"
+                class="btn btn-primary syllabus-item-add-cta-button"
+                (click)="addSubtopicToSyllabus(subtopicSummary)">
+          Add to syllabus
+        </button>
+        <button *ngIf="isSubtopicPartOfSyllabus(subtopicSummary)" class="btn btn-secondary syllabus-item-add-cta-button disabled">
+          Added
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
