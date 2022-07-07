@@ -239,4 +239,3 @@ exports.config = {
     }
   },
 };
-
