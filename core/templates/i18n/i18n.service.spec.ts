@@ -47,7 +47,8 @@ describe('I18n service', () => {
       location: {
         toString: () => {
           return '';
-        }
+        },
+        reload: () => {}
       },
       history: {
         pushState: () => {}
@@ -189,6 +190,60 @@ describe('I18n service', () => {
 
     expect(userBackendApiService.updatePreferredSiteLanguageAsync)
       .toHaveBeenCalledWith(newLangCode);
+    expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
+  }));
+
+  it(
+    'should update user preferred language to arabic and reload',
+    fakeAsync(() => {
+      let userInfo = new UserInfo(
+        [], true, true, true, true, true, 'es', '', '', true);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo));
+      spyOn(
+        userBackendApiService, 'updatePreferredSiteLanguageAsync'
+      ).and.returnValue(Promise.resolve({
+        site_language_code: 'es'
+      }));
+      spyOn(i18nService, 'removeUrlLangParam');
+      spyOn(windowRef.nativeWindow.location, 'reload');
+
+      let newLangCode = 'ar';
+
+      i18nLanguageCodeService.setI18nLanguageCode('es');
+      expect(userInfo.getPreferredSiteLanguageCode()).toBe('es');
+
+      i18nService.updateUserPreferredLanguage(newLangCode);
+      tick();
+
+      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+      expect(userBackendApiService.updatePreferredSiteLanguageAsync)
+        .toHaveBeenCalledWith(newLangCode);
+      expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
+    })
+  );
+
+  it('should update to arabic and refresh', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      [], true, true, true, true, true, 'es', '', '', false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo));
+    spyOn(
+      userBackendApiService, 'updatePreferredSiteLanguageAsync'
+    ).and.returnValue(Promise.resolve({
+      site_language_code: 'es'
+    }));
+    spyOn(i18nService, 'removeUrlLangParam');
+    spyOn(windowRef.nativeWindow.location, 'reload');
+
+    let newLangCode = 'ar';
+
+    i18nLanguageCodeService.setI18nLanguageCode('es');
+
+    i18nService.updateUserPreferredLanguage(newLangCode);
+    tick();
+
+    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
     expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
   }));
 

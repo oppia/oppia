@@ -157,13 +157,13 @@ export class I18nService {
           newLangCode
         ).then(() => {
           if (reloadPage) {
-            window.location.reload();
+            this.windowRef.nativeWindow.location.reload();
             return;
           }
         });
       } else {
         if (reloadPage) {
-          window.location.reload();
+          this.windowRef.nativeWindow.location.reload();
           return;
         }
       }
