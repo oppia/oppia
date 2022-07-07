@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.actions.ExplorationQuit import ExplorationQuit # pylint: disable=unused-import, line-too-long
+from extensions.actions.ExplorationQuit import ExplorationQuit # pylint: disable=unused-import # isort: skip
 
 
 class ExplorationQuitTests(test_utils.GenericTestBase):
