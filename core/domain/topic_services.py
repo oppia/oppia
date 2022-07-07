@@ -202,7 +202,11 @@ def apply_change_list(topic_id, change_list):
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
-                topic.add_subtopic(change.subtopic_id, change.title)
+                topic.add_subtopic(
+                    change.subtopic_id,
+                    change.title,
+                    change.url_fragment
+                )
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))

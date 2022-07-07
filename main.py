@@ -516,6 +516,9 @@ URLS = [
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
+        '/checkpoints_feature_status_handler',
+        reader.CheckpointsFeatureStatusHandler),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
@@ -540,11 +543,20 @@ URLS = [
         '/explorehandler/solution_hit_event/<exploration_id>',
         reader.SolutionHitEventHandler),
     get_redirect_route(
+        '/sync_logged_out_and_logged_in_progress/<exploration_id>',
+        reader.SyncLoggedOutLearnerProgressHandler),
+    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
         r'/explorehandler/state_complete_event/<exploration_id>',
         reader.StateCompleteEventHandler),
+    get_redirect_route(
+        r'/explorehandler/checkpoint_reached_by_logged_out_user/<exploration_id>', # pylint: disable=line-too-long
+        reader.SaveTransientCheckpointProgressHandler),
+    get_redirect_route(
+        '/progress/<unique_progress_url_id>',
+        reader.TransientCheckpointUrlPage),
     get_redirect_route(
         r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
         reader.LeaveForRefresherExpEventHandler),
