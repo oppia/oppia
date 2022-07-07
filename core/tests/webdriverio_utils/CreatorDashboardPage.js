@@ -35,17 +35,16 @@ var CreatorDashboardPage = function() {
   var explorationDashboardCard = $('.e2e-test-exploration-dashboard-card');
   var explorationFeedbackCount = $('.e2e-test-exp-summary-tile-open-feedback');
   var listViewButton = $('.e2e-test-oppia-list-view-btn');
-  var subscriptionTab = $('.e2e-test-subscription-tab');
   // Dashboard stat elements.
   var openFeedbacks = $('.e2e-test-oppia-open-feedback');
+  var subscriptionTab = $('.e2e-test-subscription-tab');
   var subscribers = $('.e2e-test-oppia-total-subscribers');
   var totalPlays = $('.e2e-test-oppia-total-plays');
 
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    var allExplorationCards = $$(
-      '.e2e-test-exploration-dashboard-card');
+    var allExplorationCards = $$('.e2e-test-exploration-dashboard-card');
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
       // Tile text contains title, possibly followed by newline and text.

@@ -47,10 +47,21 @@ var ExplorationEditorPage = function() {
    */
   var closeButton = $('.e2e-test-share-publish-close');
   var commitChangesButton = $('.e2e-test-save-draft-button');
+  var navigateToSettingsTabButton = $('.e2e-test-settings-tab');
   var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
   var publishExplorationButton = $('.e2e-test-publish-exploration');
   var saveChangesButton = $('.e2e-test-save-changes');
   var saveDraftButtonTextContainer = $('.e2e-test-save-draft-message');
+
+  /*
+   * Components
+   */
+  this.getMainTab = function() {
+    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
+  };
+  this.getSettingsTab = function() {
+    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
 
   /*
    * Workflows
@@ -132,27 +143,16 @@ var ExplorationEditorPage = function() {
     }
     await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.pause from e2e files.
-    /* eslint-disable-next-line oppia/e2e-practices */
+    // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2500);
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
       'Changes could not be saved');
   };
 
-  /*
-   * Components
-   */
-  this.getMainTab = function() {
-    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
-  };
-  this.getSettingsTab = function() {
-    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
-  };
-
   // ---- NAVIGATION ----
 
   this.navigateToSettingsTab = async function() {
-    var navigateToSettingsTabButton = $('.e2e-test-settings-tab');
     await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
   };

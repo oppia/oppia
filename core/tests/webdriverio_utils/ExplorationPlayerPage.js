@@ -24,6 +24,9 @@ var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
   var conversationInput = $('.e2e-test-conversation-input');
+  var conversationContentSelector = function() {
+    return $$('.e2e-test-conversation-content');
+  };
   var explorationHeader = $('.e2e-test-exploration-header');
   var feedbackCloseButton = $('.e2e-test-exploration-feedback-close-button');
   var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
@@ -38,7 +41,7 @@ var ExplorationPlayerPage = function() {
   //   handler.readItalicText('slanted');
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
-    var conversationContent = await $$('.e2e-test-conversation-content');
+    var conversationContent = await conversationContentSelector();
     var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
       conversationContent[0], 'Conversation not visible');
@@ -86,8 +89,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationToNotBeOver = async function() {
-    var conversationContent = await $$(
-      '.e2e-test-conversation-content');
+    var conversationContent = await conversationContentSelector();
     var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
       conversationContent[lastElement], 'Ending message not visible');

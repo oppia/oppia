@@ -21,10 +21,16 @@ var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
   var allExplorationCardElement = $('.e2e-test-exploration-dashboard-card');
+  var allExplorationCardSelector = function() {
+    return $$('.e2e-test-exploration-dashboard-card');
+  };
   var bio = $('.e2e-test-profile-bio');
   var createdExplorationStat = $('.e2e-test-profile-created-stat');
   var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
   var interestPlaceholder = $('.e2e-test-profile-no-interest');
+  var interestsSelector = function() {
+    return $$('.e2e-test-profile-interest');
+  };
   var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
 
   this.get = async function(userName) {
@@ -52,13 +58,13 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveNoInterests = async function() {
-    var interests = await $$('.e2e-test-profile-interest');
+    var interests = await interestsSelector();
     var numInterests = interests.length;
     expect(numInterests).toEqual(0);
   };
 
   this.expectUserToHaveInterests = async function(expectedInterests) {
-    var interests = await $$('.e2e-test-profile-interest');
+    var interests = await interestsSelector();
     var numInterests = interests.length;
     expect(numInterests).toEqual(expectedInterests.length);
 
@@ -92,8 +98,7 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
-    var allExplorationCardElements = $$(
-      '.e2e-test-exploration-dashboard-card');
+    var allExplorationCardElements = allExplorationCardSelector();
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
         var cardTitle = await card.$('.e2e-test-exp-summary-tile-title');

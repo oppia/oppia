@@ -55,9 +55,9 @@ var customizeInteraction = async function(
 // function would be readPlainText).
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
-  var optionElements = $$(
+  var optionElements = await $$(
     '.e2e-test-item-selection-input-container');
-  var optionsCount = await optionElements.count();
+  var optionsCount = optionElements.length;
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   for (var i = 0; i < optionsCount; i++) {
     await forms.expectRichText((await optionElements[i]).$(
@@ -76,10 +76,11 @@ var submitAnswer = async function(elem, answer) {
 
   for (var i = 0; i < answerArray.length; i++) {
     var desiredAnswer = answerArray[i];
-    await elem.$(
+    var selectionInputItem = elem.$(
       `.e2e-test-item-selection-input-item=${desiredAnswer}`)
       .$(
-        '.e2e-test-item-selection-input-checkbox').click();
+        '.e2e-test-item-selection-input-checkbox');
+    await action.click('Selection Input Item', selectionInputItem);
   }
 
   var submitAnswerButton = $(

@@ -44,6 +44,9 @@ var StoryEditorPage = function() {
   /*
    * CHAPTER
    */
+  var chapterTitlesSelector = function() {
+    return $$('.e2e-test-chapter-title');
+  };
   var nodeDescriptionInputField = $('.e2e-test-add-chapter-description');
   var nodeOutlineEditor = $('.e2e-test-add-chapter-outline');
   var nodeOutlineFinalizeCheckbox = $('.e2e-test-finalize-outline');
@@ -118,7 +121,7 @@ var StoryEditorPage = function() {
     var chapterNameSelector = $(`span=${chapterName}`);
     await waitFor.visibilityOf(
       chapterNameSelector, 'Chapter name is taking too lon to appear');
-    var chapterTitles = await $$('.e2e-test-chapter-title');
+    var chapterTitles = await chapterTitlesSelector();
     var chapterIndex = -1;
     var chapterText = '';
     for (var i = 0; i < chapterTitles.length; i++) {
@@ -147,7 +150,7 @@ var StoryEditorPage = function() {
   };
 
   this.expectNumberOfChaptersToBe = async function(count) {
-    var chapterTitles = await $$('.e2e-test-chapter-title');
+    var chapterTitles = await chapterTitlesSelector();
     expect(await chapterTitles.length).toEqual(count);
   };
 

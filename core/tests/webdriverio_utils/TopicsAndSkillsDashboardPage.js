@@ -42,12 +42,16 @@ var TopicsAndSkillsDashboardPage = function() {
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var topicDescriptionField = $('.e2e-test-new-topic-description-field');
   var topicFilterKeywordField = $('.e2e-test-select-keyword-dropdown');
+  var topicsListItemsSelector = function() {
+    return $$('.e2e-test-topics-list-item');
+  };
   var topicNameField = $('.e2e-test-new-topic-name-field');
   var topicNameFieldElement = $('.e2e-test-topic-name-field');
   var topicPageTitleFragmentField = $('.e2e-test-new-page-title-fragm-field');
   var topicThumbnailButton = $('.e2e-test-photo-button');
   var topicUrlFragmentField = $('.e2e-test-new-topic-url-fragment-field');
   var topicsTable = $('.e2e-test-topics-table');
+
 
   this.get = async function() {
     await waitFor.clientSideRedirection(async() => {
@@ -76,7 +80,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.waitForTopicsToLoad = async function() {
     await waitFor.visibilityOf(
       topicsTable, 'Topics table taking too long to appear');
-    var topicsListItems = await $$('.e2e-test-topics-list-item');
+    var topicsListItems = await topicsListItemsSelector();
     await waitFor.visibilityOf(
       topicsListItems[0], 'Topics list taking too long to appear');
   };
@@ -215,7 +219,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.expectNumberOfTopicsToBe = async function(number) {
-    var topicsListItems = await $$('.e2e-test-topics-list-item');
+    var topicsListItems = await topicsListItemsSelector();
     let topicsTableIsPresent = await topicsTable.isExisting();
     if (topicsTableIsPresent) {
       expect(topicsListItems.length).toBe(number);
