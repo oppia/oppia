@@ -33,11 +33,11 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   profilePictureDataUrl!: string;
-  // User name is null if the user is not logged in.
-  username!: string | null;
   profileUrl!: string;
   logoWebpImageSrc!: string;
   logoPngImageSrc!: string;
+  // User name is null if the user is not logged in.
+  username: string | null = null;
   logoutUrl: string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
 
