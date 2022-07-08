@@ -142,31 +142,8 @@ export class LearnerGroupData {
     this._storyIds.splice(index, 1);
   }
 
-  validate(): string[] {
-    let issues = [];
-    if (this._title === '') {
-      issues.push(
-        'Learner Group title should not be empty.');
-    }
-    if (this._description === '') {
-      issues.push(
-        'Learner Group description should not be empty.');
-    }
-    if (this._facilitatorUsernames.length === 0) {
-      issues.push(
-        'Learner Group should have at least one facilitator.');
-    }
-    const commonUsernames = this.studentUsernames.filter(
-      username => this.invitedStudentUsernames.includes(username)
-    );
-    if (commonUsernames.length > 0) {
-      issues.push('Students can not be invited to join the same group again.');
-    }
-
-    return issues;
-  }
-
-  preCreationValidate(): string[] {
+  // Creation mode is true if the learner group is being created.
+  validate(creationMode: boolean): string[] {
     let issues = [];
     if (this._title === '') {
       issues.push(
@@ -184,9 +161,19 @@ export class LearnerGroupData {
       issues.push(
         'Learner Group should have at least one syllabus item.');
     }
-    if (this._studentUsernames.length > 0) {
+    if (creationMode && this._studentUsernames.length > 0) {
       issues.push(
         'Learner Group cannot have any students while creation.');
+    }
+    if (!creationMode) {
+      const commonUsernames = this.studentUsernames.filter(
+        username => this.invitedStudentUsernames.includes(username)
+      );
+      if (commonUsernames.length > 0) {
+        issues.push(
+          'Students can not be invited to join the same group again.'
+        );
+      }
     }
     return issues;
   }

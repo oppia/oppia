@@ -69,7 +69,7 @@ export class LearnerGroupBackendApiService {
     return new Promise((resolve, reject) => {
       const learnerGroupUpdationUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/update_learner_group_handler', {
+          '/update_learner_group_handler/<learner_group_id>', {
             learner_group_id: learnerGroupData.id
           }
         )
@@ -77,7 +77,7 @@ export class LearnerGroupBackendApiService {
       const putData = {
         group_title: learnerGroupData.title,
         group_description: learnerGroupData.description,
-        studdent_usernames: learnerGroupData.studentUsernames,
+        student_usernames: learnerGroupData.studentUsernames,
         invited_student_usernames: learnerGroupData.invitedStudentUsernames,
         subtopic_page_ids: learnerGroupData.subtopicPageIds,
         story_ids: learnerGroupData.storyIds
@@ -98,7 +98,7 @@ export class LearnerGroupBackendApiService {
     return new Promise((resolve, reject) => {
       const learnerGroupDeletionUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/delete_learner_group_handler', {
+          '/delete_learner_group_handler/<learner_group_id>', {
             learner_group_id: learnerGroupId
           }
         )
@@ -113,14 +113,14 @@ export class LearnerGroupBackendApiService {
     });
   }
 
-  async _fetchLearnerGroupinfoAsync(
+  async _fetchLearnerGroupInfoAsync(
       learnerGroupId: string
   ):
   Promise<LearnerGroupData> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
-          '/facilitator_view_of_learner_group_handler', {
+          '/facilitator_view_of_learner_group_handler/<learner_group_id>', {
             learner_group_id: learnerGroupId
           }
         )
@@ -139,7 +139,7 @@ export class LearnerGroupBackendApiService {
       learnerGroupId: string
   ):
   Promise<LearnerGroupData> {
-    return this._fetchLearnerGroupinfoAsync(learnerGroupId);
+    return this._fetchLearnerGroupInfoAsync(learnerGroupId);
   }
 
   async searchNewStudentToAddAsync(

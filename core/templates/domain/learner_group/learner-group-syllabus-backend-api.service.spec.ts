@@ -23,12 +23,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { LearnerGroupSyllabusBackendApiService } from
   './learner-group-syllabus-backend-api.service';
 
-describe('Teacher Dashboard Backend API Service', () => {
+describe('Learner Group Syllabus Backend API Service', () => {
   var learnerGroupSyllabusBackendApiService:
     LearnerGroupSyllabusBackendApiService;
   let httpTestingController: HttpTestingController;
 
-  const sampleSubtopicPageSummaryDict = {
+  const sampleLearnerGroupSubtopicSummaryDict = {
     subtopic_id: 'subtopicId',
     subtopic_title: 'subtopicTitle',
     parent_topic_id: 'parentTopicId',
@@ -69,11 +69,13 @@ describe('Teacher Dashboard Backend API Service', () => {
 
   let sampleLearnerGroupSyllabusDict = {
     learner_group_id: 'groupId',
-    stories_summaries: [sampleStorySummaryBackendDict],
-    subtopic_page_summaries: [sampleSubtopicPageSummaryDict]
+    story_summary_dicts: [sampleStorySummaryBackendDict],
+    subtopic_summary_dicts: [sampleLearnerGroupSubtopicSummaryDict]
   };
 
-  const SEARCH_NEW_SYLLABUS_URL = '/search_learner_group_syllabus_handler';
+  const SEARCH_NEW_SYLLABUS_URL = (
+    '/learner_group_search_syllabus_handler/groupId'
+  );
 
   beforeEach(() => {
     TestBed.configureTestingModule({

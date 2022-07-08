@@ -20,7 +20,7 @@ import { LearnerGroupSyllabus } from './learner-group-syllabus.model';
 
 describe('Learner Group Syllabus', () => {
   it('should correctly convert backend dict to object', () => {
-    const sampleSubtopicPageSummaryDict = {
+    const sampleLearnerGroupSubtopicSummaryDict = {
       subtopic_id: 1,
       subtopic_title: 'subtopicTitle',
       parent_topic_id: 'parentTopicId',
@@ -61,8 +61,8 @@ describe('Learner Group Syllabus', () => {
 
     let sampleLearnerGroupSyllabusDict = {
       learner_group_id: 'groupId',
-      stories_summaries: [sampleStorySummaryBackendDict],
-      subtopic_page_summaries: [sampleSubtopicPageSummaryDict]
+      story_summary_dicts: [sampleStorySummaryBackendDict],
+      subtopic_summary_dicts: [sampleLearnerGroupSubtopicSummaryDict]
     };
 
     let sampleLearnerGroupSyllabus = (
@@ -78,10 +78,10 @@ describe('Learner Group Syllabus', () => {
     expect(storySummary.getId()).toEqual('sample_story_id');
     expect(storySummary.getCompletedNodeTitles()).toEqual([]);
 
-    let subtopicPageSummary = (
+    let learnerGroupSubtopicSummary = (
       sampleLearnerGroupSyllabus.subtopicPageSummaries[0]
     );
-    expect(subtopicPageSummary.subtopicId).toEqual(1);
-    expect(subtopicPageSummary.subtopicMastery).toBeUndefined();
+    expect(learnerGroupSubtopicSummary.subtopicId).toEqual(1);
+    expect(learnerGroupSubtopicSummary.subtopicMastery).toBeUndefined();
   });
 });

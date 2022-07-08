@@ -473,9 +473,9 @@
 /core/templates/pages/topics-and-skills-dashboard-page/ @oppia/lace-frontend-reviewers
 
 # Learner group project.
-/core/controllers/learner_group*.py @aks681
-/core/domain/learner_group*.py @aks681 @paprajapati9
-/core/templates/domain/learner_group/ @aks681
+/core/controllers/learner_group*.py @oppia/lace-backend-reviewers
+/core/domain/learner_group*.py @oppia/lace-backend-reviewers
+/core/templates/domain/learner_group/ @oppia/lace-frontend-reviewers
 
 # Beam jobs
 /setup.py @vojtechjelinek

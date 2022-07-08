@@ -37,7 +37,7 @@ describe('Learner Group Object', () => {
   });
 
   it('should not find issues with a valid learner group', () => {
-    expect(sampleLearnerGroupData.validate()).toEqual([]);
+    expect(sampleLearnerGroupData.validate(false)).toEqual([]);
   });
 
   it('should raise correct validation issues', () => {
@@ -46,7 +46,7 @@ describe('Learner Group Object', () => {
     sampleLearnerGroupData.removeFacilitator('username1');
     sampleLearnerGroupData.addStudent('sampleUsername');
 
-    expect(sampleLearnerGroupData.validate()).toEqual([
+    expect(sampleLearnerGroupData.validate(false)).toEqual([
       'Learner Group title should not be empty.',
       'Learner Group description should not be empty.',
       'Learner Group should have at least one facilitator.',
@@ -55,7 +55,7 @@ describe('Learner Group Object', () => {
   });
 
   it('should not find issues with a valid creatable learner group', () => {
-    expect(sampleLearnerGroupData.preCreationValidate()).toEqual([]);
+    expect(sampleLearnerGroupData.validate(true)).toEqual([]);
   });
 
   it('should raise correct validation issues for pre creation' +
@@ -66,7 +66,7 @@ describe('Learner Group Object', () => {
     sampleLearnerGroupData.addStudent('sampleUsername2');
     sampleLearnerGroupData.removeSubtopicPageId('sampleSubtopicPageId');
 
-    expect(sampleLearnerGroupData.preCreationValidate()).toEqual([
+    expect(sampleLearnerGroupData.validate(true)).toEqual([
       'Learner Group title should not be empty.',
       'Learner Group description should not be empty.',
       'Learner Group should have at least one facilitator.',

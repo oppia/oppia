@@ -18,11 +18,11 @@
  */
 
 export interface ShortLearnerGroupSummaryBackendDict {
-  'id': string;
-  'title': string;
-  'description': string;
-  'facilitator_usernames': string[];
-  'students_count': number;
+  id: string;
+  title: string;
+  description: string;
+  facilitator_usernames: string[];
+  students_count: number;
 }
 
 export class ShortLearnerGroupSummary {
