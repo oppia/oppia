@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,47 +13,33 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for Collection Editor Page, for use in Protractor
+ * @fileoverview Page object for Collection Editor Page, for use in WebdriverIO
  * tests.
  */
+
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var CollectionEditorPage = function() {
-  var addExplorationButton = element(
-    by.css('.protractor-test-add-exploration-button'));
-  var addExplorationInput = element(
-    by.css('.protractor-test-add-exploration-input'));
-  var closeSaveModalButton = element(
-    by.css('.protractor-test-close-save-modal-button'));
-  var collectionEditorObjectiveInput = element(
-    by.css('.protractor-test-collection-editor-objective-input'));
-  var commitMessageInput = element(
-    by.css('.protractor-test-commit-message-input'));
-  var categoryFilterDropdown = element(
-    by.css('.protractor-test-collection-editor-category-dropdown'));
-  var editorDeleteNode = element.all(
-    by.css('.protractor-test-editor-delete-node'));
-  var editorPublishButton = element(
-    by.css('.protractor-test-editor-publish-button'));
-  var editorShiftLeft = element.all(
-    by.css('.protractor-test-editor-shift-left'));
-  var editorShiftRight = element.all(
-    by.css('.protractor-test-editor-shift-right'));
-  var editorTitleInput = element(
-    by.css('.protractor-test-collection-editor-title-input'));
-  var saveChangesButton = element(
-    by.css('.protractor-test-collection-save-changes-button'));
-  var saveDraftButton = element(
-    by.css('.protractor-test-save-draft-button'));
-  var saveModal = element(by.css('.protractor-test-save-modal'));
-  var saveInProgressLabel = element(by.css(
-    '.protractor-test-save-in-progress-label'));
+  var addExplorationButton = $('.e2e-test-add-exploration-button');
+  var addExplorationInput = $('.e2e-test-add-exploration-input');
+  var categoryFilterDropdown = $(
+    '.e2e-test-collection-editor-category-dropdown');
+  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
+  var collectionEditorObjectiveInput = $(
+    '.e2e-test-collection-editor-objective-input');
+  var commitMessageInput = $('.e2e-test-commit-message-input');
+  var editorPublishButton = $('.e2e-test-editor-publish-button');
+  var editorTitleInput = $('.e2e-test-collection-editor-title-input');
+  var saveChangesButton = $('.e2e-test-collection-save-changes-button');
+  var saveDraftButton = $('.e2e-test-save-draft-button');
+  var saveInProgressLabel = $('.e2e-test-save-in-progress-label');
+  var saveModal = $('.e2e-test-save-modal');
 
   this.addExistingExploration = async function(explorationId) {
     await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
-    await action.sendKeys(
+    await action.setValue(
       'Add Exploration Input', addExplorationInput, explorationId);
     // Waits until the button becomes active after debouncing.
     await waitFor.elementToBeClickable(
@@ -64,7 +50,8 @@ var CollectionEditorPage = function() {
 
   // Shift a node left in the node graph.
   this.shiftNodeLeft = async function(number) {
-    await action.click('Editor Shift Left', editorShiftLeft.get(number));
+    var editorShiftLeft = await $$('.e2e-test-editor-shift-right');
+    await action.click('Editor Shift Left', editorShiftLeft[number]);
   };
 
   this.setCommitMessage = async function(message) {
@@ -73,18 +60,20 @@ var CollectionEditorPage = function() {
     await waitFor.elementToBeClickable(
       commitMessageInput, 'Commit Message input takes too long to appear');
     await action.click('Commit Message Input', commitMessageInput);
-    await action.sendKeys(
+    await action.setValue(
       'Commit Message Input', commitMessageInput, message);
   };
 
   // Shift a node right in the node graph.
   this.shiftNodeRight = async function(number) {
-    await action.click('Editor Shift Right', editorShiftRight.get(number));
+    var editorShiftRight = await $$('.e2e-test-editor-shift-right');
+    await action.click('Editor Shift Right', editorShiftRight[number]);
   };
 
   // Delete a node in the node graph.
   this.deleteNode = async function(number) {
-    await action.click('Editor Delete Node', editorDeleteNode.get(number));
+    var editorDeleteNode = await $$('.e2e-test-editor-delete-node');
+    await action.click('Editor Delete Node', editorDeleteNode[number]);
   };
 
   // Save draft of the collection.
@@ -112,12 +101,12 @@ var CollectionEditorPage = function() {
 
   // Set collection title.
   this.setTitle = async function(title) {
-    await action.sendKeys('Editor Title Input', editorTitleInput, title);
+    await action.setValue('Editor Title Input', editorTitleInput, title);
   };
 
   // Set collection objective.
   this.setObjective = async function(objective) {
-    await action.sendKeys(
+    await action.setValue(
       'Collection Editor Objective Input',
       collectionEditorObjectiveInput, objective);
   };
@@ -125,8 +114,7 @@ var CollectionEditorPage = function() {
   // Set collection category.
   this.setCategory = async function(category) {
     await action.click('Category filter', categoryFilterDropdown);
-    var dropdownOption = element(
-      by.cssContainingText('mat-option .mat-option-text', category));
+    var dropdownOption = await $(`.mat-option-text=${category}`);
     await action.click(
       'category option: ' + category, dropdownOption);
   };

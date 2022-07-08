@@ -202,14 +202,14 @@ describe('Contributor dashboard page', function() {
     await storyEditorPage.returnToTopic();
 
     // Testing the copy tool.
-    let images = element.all(by.css('.protractor-test-image'));
+    let images = element.all(by.css('.e2e-test-image'));
     let opportunityActionButtonCss = element(by.css(
-      '.protractor-test-opportunity-list-item-button'));
-    let copyButton = element(by.css('.protractor-test-copy-button'));
+      '.e2e-test-opportunity-list-item-button'));
+    let copyButton = element(by.css('.e2e-test-copy-button'));
     let doneButton = element(
-      by.css('.protractor-test-close-rich-text-component-editor'));
+      by.css('.e2e-test-close-rich-text-component-editor'));
     let cancelButton = element(
-      by.css('.protractor-test-cancel-rich-text-editor'));
+      by.css('.e2e-test-cancel-rich-text-editor'));
 
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
