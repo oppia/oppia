@@ -22,6 +22,7 @@ import copy
 
 from core import feconf
 from core import utils
+from core.domain import state_domain
 
 from typing import Any, Dict, List, Mapping, Union, cast
 
@@ -31,6 +32,8 @@ AcceptableChangeDictTypes = Union[
     bool,
     int,
     List[str],
+    List[state_domain.AnswerGroupDict],
+    state_domain.RecordedVoiceoversDict,
     # This Dict type is added to allow BaseChange to accept customization_args.
     Dict[str, Dict[str, Any]]
 ]

@@ -40,6 +40,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 
 from typing import Dict, List
+from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -441,26 +442,31 @@ class TransientCheckpointUrl:
 
         if not isinstance(self.furthest_reached_checkpoint_state_name, str):
             raise utils.ValidationError(
-            'Expected furthest_reached_checkpoint_state_name to be a str,' +
-            'received %s' % self.furthest_reached_checkpoint_state_name)
+                'Expected furthest_reached_checkpoint_state_name to be a str,'
+                'received %s' % self.furthest_reached_checkpoint_state_name
+            )
 
         if not isinstance(self.furthest_reached_checkpoint_exp_version, int):
             raise utils.ValidationError(
-            'Expected furthest_reached_checkpoint_exp_version to be an int')
+                'Expected furthest_reached_checkpoint_exp_version to be an int'
+            )
 
         if not isinstance(
             self.most_recently_reached_checkpoint_state_name, str
         ):
             raise utils.ValidationError(
-            'Expected most_recently_reached_checkpoint_state_name to be a' +
-            ' str, received %s'
-            % self.most_recently_reached_checkpoint_state_name)
+                'Expected most_recently_reached_checkpoint_state_name to be a'
+                ' str, received %s'
+                % self.most_recently_reached_checkpoint_state_name
+            )
 
         if not isinstance(
             self.most_recently_reached_checkpoint_exp_version, int
         ):
             raise utils.ValidationError(
-            'Expected most_recently_reached_checkpoint_exp_version to be an int') # pylint: disable=line-too-long
+                'Expected most_recently_reached_checkpoint_exp_version'
+                ' to be an int'
+            )
 
 
 class ExplorationCommitLogEntry:
@@ -653,6 +659,13 @@ class VersionedExplorationInteractionIdsMapping:
         """
         self.version = version
         self.state_interaction_ids_dict = state_interaction_ids_dict
+
+
+class VersionedExplorationStatesDict(TypedDict):
+    """Dictionary representing the versioned State objects for Exploration."""
+
+    states_schema_version: int
+    states: Dict[str, state_domain.StateDict]
 
 
 class Exploration(translation_domain.BaseTranslatableObject):
