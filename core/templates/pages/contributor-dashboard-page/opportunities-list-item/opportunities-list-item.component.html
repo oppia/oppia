@@ -68,7 +68,7 @@
       <span title="{{ opportunity?.subheading }}"
             class="protractor-test-opportunity-list-item-subheading oppia-subheading-small"
             [hidden]="opportunityDataIsLoading">
-        {{ opportunity?.subheading | wrapTextWithEllipsis : 20 }}
+        {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
@@ -275,7 +275,7 @@
     animation: fadein 0.5s linear 1 normal forwards;
   }
   /* This breakpoint must be the same value as the one specified in */
-  /* constants.CONTRIBUTOR_DASHBOARD_MOBILE_BREAKPOINT. */
+  /* constants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT. */
   @media only screen and (max-width: 700px) {
     .oppia-opportunities-button {
       font-size: 18px;

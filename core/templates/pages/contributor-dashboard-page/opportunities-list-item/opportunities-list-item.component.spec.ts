@@ -32,7 +32,8 @@ class MockWindowDimensionsService {
   }
 
   getWidth(): number {
-    return 530;
+    // Screen width of iPhone 12 Pro (to simulate a mobile viewport).
+    return 390;
   }
 }
 

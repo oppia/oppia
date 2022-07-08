@@ -5902,7 +5902,7 @@ export default {
   // The breakpoint for mobile view for contributor dashboard in px.
   // This value must be the same as the one specified in
   // opportunities-list-item.component.html.
-  "CONTRIBUTOR_DASHBOARD_MOBILE_BREAKPOINT": 700,
+  "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
 
   // Represents the string value indicating "All topics" in the Contributor
   // Dashboard topic selector.
