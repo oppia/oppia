@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for interaction display component.
  */
 
-import { ComponentFactoryResolver, ComponentRef, ViewContainerRef } from '@angular/core';
+import { ComponentFactoryResolver, ComponentRef, SimpleChange, ViewContainerRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { InteractionDisplayComponent } from './interaction-display.component';
 
@@ -39,7 +39,7 @@ describe('Interaction display', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should create interaction using htmlData', () => {
+  it('should build interaction using htmlData', () => {
     componentInstance.htmlData = (
       '<oppia-interactive-text-input rows-with-value="1" ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;}"' +
@@ -67,14 +67,14 @@ describe('Interaction display', () => {
     spyOn(componentInstance.viewContainerRef, 'createComponent')
       .and.returnValue(mockComponentRef as ComponentRef<unknown>);
 
-    componentInstance.ngAfterViewInit();
+    componentInstance.buildInteraction();
 
     expect(setAttributeSpy).toHaveBeenCalled();
     expect(mockComponentRef.instance.placeholderWithValue.length)
       .toBeGreaterThan(0);
   });
 
-  it('should create interaction using htmlData and parentScope', () => {
+  it('should build interaction using htmlData and parentScope', () => {
     let lastAnswer = 'last-answer';
     componentInstance.htmlData = (
       '<oppia-interactive-text-input rows-with-value="1" ' +
@@ -108,11 +108,32 @@ describe('Interaction display', () => {
     spyOn(componentInstance.viewContainerRef, 'createComponent')
       .and.returnValue(mockComponentRef as ComponentRef<unknown>);
 
-    componentInstance.ngAfterViewInit();
+    componentInstance.buildInteraction();
 
     expect(setAttributeSpy).toHaveBeenCalled();
     expect(mockComponentRef.instance.placeholderWithValue.length)
       .toBeGreaterThan(0);
     expect(mockComponentRef.instance.lastAnswer).toEqual(lastAnswer);
+  });
+
+  it('should invoke interactioni after view is initialized', () => {
+    spyOn(componentInstance, 'buildInteraction');
+
+    componentInstance.ngAfterViewInit();
+
+    expect(componentInstance.buildInteraction).toHaveBeenCalled();
+  });
+
+  it('should rebuild interaction if htmlData is updated', () => {
+    componentInstance.viewContainerRef = {
+      clear: () => {}
+    };
+    spyOn(componentInstance, 'buildInteraction');
+
+    componentInstance.ngOnChanges({
+      htmlData: new SimpleChange('previousValue', 'newValue', true)
+    });
+
+    expect(componentInstance.buildInteraction).toHaveBeenCalled();
   });
 });

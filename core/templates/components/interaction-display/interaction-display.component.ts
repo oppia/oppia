@@ -17,6 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component, ComponentFactoryResolver, Input,
+  SimpleChange,
   ViewChild, ViewContainerRef }
   from '@angular/core';
 import camelCaseFromHyphen from 'utility/string-utility';
@@ -47,6 +48,10 @@ export class InteractionDisplayComponent {
   ) {}
 
   ngAfterViewInit(): void {
+    this.buildInteraction();
+  }
+
+  buildInteraction(): void {
     if (this.htmlData) {
       let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
@@ -88,6 +93,14 @@ export class InteractionDisplayComponent {
         componentRef.changeDetectorRef.detectChanges();
         this.changeDetectorRef.detectChanges();
       }
+    }
+  }
+
+  ngOnChanges(changes: { htmlData: SimpleChange }): void {
+    if (changes.htmlData.currentValue !== changes.htmlData.previousValue &&
+      this.viewContainerRef) {
+      this.viewContainerRef.clear();
+      this.buildInteraction();
     }
   }
 }
