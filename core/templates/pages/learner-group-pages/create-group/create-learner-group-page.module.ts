@@ -17,7 +17,8 @@
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from
+  '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -30,6 +31,8 @@ import { CreateLearnerGroupPageComponent } from
   './create-learner-group-page.component';
 import { LearnerGroupDetailsComponent } from
   './learner-group-details.component';
+import { AddSyllabusItemsComponent } from './add-syllabus-items.component';
+import { InviteStudentsComponent } from './invite-students.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
@@ -91,9 +94,8 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { AddSyllabusItemsComponent } from '../add-syllabus-items.component';
-import { InviteStudentsComponent } from '../invite-students.component';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

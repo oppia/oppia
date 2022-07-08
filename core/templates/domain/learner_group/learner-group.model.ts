@@ -46,7 +46,8 @@ export class LearnerGroupData {
       studentUsernames: string[],
       invitedStudentUsernames: string[],
       subtopicPageIds: string[],
-      storyIds: string[]) {
+      storyIds: string[]
+  ) {
     this._id = id;
     this._title = title;
     this._description = description;

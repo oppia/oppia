@@ -295,8 +295,6 @@ def get_matching_learner_group_syllabus_to_add(
     else:
         matching_topics = topic_fetchers.get_all_topics() # type: ignore[no-untyped-call]
 
-    print(matching_topics, '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&77')
-
     for topic in matching_topics:
         if (
             language_code != constants.DEFAULT_ADD_SYLLABUS_FILTER

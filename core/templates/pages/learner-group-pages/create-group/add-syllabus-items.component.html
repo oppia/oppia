@@ -102,7 +102,7 @@
         </ul>
       </div>
     </div>
-    
+
     <div class="oppia-same-row-container">
       <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-search-bar-category-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
@@ -137,7 +137,7 @@
         </ul>
       </div>
     </div>
-    
+
     <div class="oppia-same-row-container">
       <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="search-bar-float-left oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
@@ -170,7 +170,7 @@
           </ng-container>
         </ul>
       </div>
-    </div>    
+    </div>
   </div>
   <div class="filtered-syllabus-items-container">
     <div class="syllabus-item-card" *ngFor="let storySummary of storySummaries; trackBy: index">

@@ -32,7 +32,7 @@ export interface LearnerGroupUserProgressBackendDict {
   username: string ;
   progress_sharing_is_turned_on: boolean;
   stories_progress: StorySummaryBackendDict[];
-  subtopic_page_progress: LearnerGroupSubtopicSummaryBackendDict[];
+  subtopic_pages_progress: LearnerGroupSubtopicSummaryBackendDict[];
 }
 
 export class LearnerGroupUserProgress {
@@ -45,7 +45,8 @@ export class LearnerGroupUserProgress {
       username: string,
       progressSharingIsTurnedOn: boolean,
       storiesProgress: StorySummary[],
-      subtopicsProgress: LearnerGroupSubtopicSummary[]) {
+      subtopicsProgress: LearnerGroupSubtopicSummary[]
+  ) {
     this._username = username;
     this._progressSharingIsTurnedOn = progressSharingIsTurnedOn;
     this._storiesProgress = storiesProgress;
@@ -81,8 +82,8 @@ export class LearnerGroupUserProgress {
     }
 
     let subtopicsProgress: LearnerGroupSubtopicSummary[] = [];
-    if (progBackendDict.subtopic_page_progress.length > 0) {
-      subtopicsProgress = progBackendDict.subtopic_page_progress.map(
+    if (progBackendDict.subtopic_pages_progress.length > 0) {
+      subtopicsProgress = progBackendDict.subtopic_pages_progress.map(
         (subtopicProgressBackendDict) => (
           LearnerGroupSubtopicSummary.createFromBackendDict(
             subtopicProgressBackendDict)

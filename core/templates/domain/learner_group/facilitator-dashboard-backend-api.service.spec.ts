@@ -13,18 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TeacherDashboardBackendApiService.
+ * @fileoverview Unit tests for FacilitatorDashboardBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TeacherDashboardBackendApiService } from
-  './teacher-dashboard-backend-api.service';
+import { FacilitatorDashboardBackendApiService } from
+  './facilitator-dashboard-backend-api.service';
 
 describe('Teacher Dashboard Backend API Service', () => {
-  var teacherDashboardBackendApiService: TeacherDashboardBackendApiService;
+  var facilitatorDashboardBackendApiService:
+    FacilitatorDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var sampleShortLearnerGroupData = {
@@ -40,10 +41,10 @@ describe('Teacher Dashboard Backend API Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [TeacherDashboardBackendApiService]
+      providers: [FacilitatorDashboardBackendApiService]
     });
-    teacherDashboardBackendApiService = TestBed.inject(
-      TeacherDashboardBackendApiService);
+    facilitatorDashboardBackendApiService = TestBed.inject(
+      FacilitatorDashboardBackendApiService);
 
     httpTestingController = TestBed.inject(HttpTestingController);
   });
@@ -57,7 +58,7 @@ describe('Teacher Dashboard Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      teacherDashboardBackendApiService
+      facilitatorDashboardBackendApiService
         .fetchTeacherDashboardLearnerGroupsAsync()
         .then(successHandler, failHandler);
 

@@ -27,7 +27,7 @@ import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
 import { FacilitatorDashboardPageComponent } from
-  './teacher-dashboard-page.component';
+  './facilitator-dashboard-page.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';

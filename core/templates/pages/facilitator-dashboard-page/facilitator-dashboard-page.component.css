@@ -8,13 +8,13 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-teacher-dashboard-container {
+.oppia-facilitator-dashboard-container {
   margin: 0 auto 0 auto;
   max-width: 1160px;
   text-align: left;
 }
 
-.oppia-teacher-dashboard-title {
+.oppia-facilitator-dashboard-title {
   padding-top: 80px;
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;

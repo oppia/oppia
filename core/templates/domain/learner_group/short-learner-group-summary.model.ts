@@ -37,7 +37,8 @@ export class ShortLearnerGroupSummary {
       title: string,
       description: string,
       facilitatorUsernames: string[],
-      studentsCount: number) {
+      studentsCount: number
+  ) {
     this._id = id;
     this._title = title;
     this._description = description;

@@ -506,7 +506,7 @@ class FacilitatorDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests."""
-        self.render_template('teacher-dashboard-page.mainpage.html')
+        self.render_template('facilitator-dashboard-page.mainpage.html')
 
 
 class CreateLearnerGroupPage(base.BaseHandler):

@@ -34,8 +34,8 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
-  selector: 'oppia-teacher-dashboard-page',
-  templateUrl: './teacher-dashboard-page.component.html',
+  selector: 'oppia-facilitator-dashboard-page',
+  templateUrl: './facilitator-dashboard-page.component.html',
   styleUrls: []
 })
 export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {

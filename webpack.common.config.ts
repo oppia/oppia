@@ -97,8 +97,8 @@ module.exports = {
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
     teacher_dashboard:
-      commonPrefix + '/pages/teacher-dashboard-page/' +
-      'teacher-dashboard-page.import.ts',
+      commonPrefix + '/pages/facilitator-dashboard-page/' +
+      'facilitator-dashboard-page.import.ts',
     learner_group_creator:
       commonPrefix + '/pages/learner-group-pages/create-group/' +
       'create-learner-group-page.import.ts',
@@ -482,12 +482,12 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['teacher_dashboard'],
-      filename: 'teacher-dashboard-page.mainpage.html',
+      filename: 'facilitator-dashboard-page.mainpage.html',
       hybrid: true,
       meta: defaultMeta,
       template:
-        commonPrefix + '/pages/teacher-dashboard-page/' +
-        'teacher-dashboard-page.mainpage.html',
+        commonPrefix + '/pages/facilitator-dashboard-page/' +
+        'facilitator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -16,35 +16,32 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
- import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+ import { Component, EventEmitter, OnDestroy, OnInit, Output } from
+  '@angular/core';
  import { downgradeComponent } from '@angular/upgrade/static';
  import { TranslateService } from '@ngx-translate/core';
  import { Subject, Subscription } from 'rxjs';
- 
- import { AppConstants } from 'app.constants';
- import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
- import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
- import { Subtopic } from 'domain/topic/subtopic.model';
+
  import { AlertsService } from 'services/alerts.service';
  import { ContextService } from 'services/context.service';
  import { UrlService } from 'services/contextual/url.service';
- import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
- import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+ import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
  import { LoaderService } from 'services/loader.service';
- import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupPagesConstants } from './learner-group-pages.constants';
-import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
-import { SearchService, SelectionDetails } from 'services/search.service';
+import { LanguageIdAndText, LanguageUtilService } from
+  'domain/utilities/language-util.service';
 import { NavigationService } from 'services/navigation.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import constants from 'assets/constants';
-import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+import { ConstructTranslationIdsService } from
+  'services/construct-translation-ids.service';
 import { LearnerGroupSyllabusFilter, LearnerGroupSyllabusBackendApiService } 
   from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { SubtopicPageSummary } from 'domain/learner_group/subtopic-page-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerGroupSubtopicSummary } from
+  'domain/learner_group/learner-group-subtopic-summary.model';
 
 interface SearchDropDownItems {
   id: string;
@@ -56,12 +53,14 @@ interface SearchDropDownItems {
   templateUrl: './add-syllabus-items.component.html'
 })
 export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
-  @Output() updateLearnerGroupStories: EventEmitter<string[]> = new EventEmitter();
-  @Output() updateLearnerGroupSubtopics: EventEmitter<string[]> = new EventEmitter();
+  @Output() updateLearnerGroupStories:
+    EventEmitter<string[]> = new EventEmitter();
+  @Output() updateLearnerGroupSubtopics:
+    EventEmitter<string[]> = new EventEmitter();
   syllabusStoryIds: string[] = [];
   syllabusSubtopicPageIds: string[] = [];
   syllabusStorySummaries: StorySummary[] = [];
-  syllabusSubtopicSummaries: SubtopicPageSummary[] = [];
+  syllabusSubtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   searchBarPlaceholder!: string;
   categoryButtonText!: string;
   languageButtonText!: string;
@@ -82,10 +81,9 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   activeMenuName: string = '';
   searchIsInProgress = false;
   storySummaries: StorySummary[];
-  subtopicSummaries: SubtopicPageSummary[] = [];
+  subtopicSummaries: LearnerGroupSubtopicSummary[] = [];
 
   constructor(
-    private alertsService: AlertsService,
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
@@ -95,7 +93,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     private navigationService: NavigationService,
     private languageUtilService: LanguageUtilService,
     private constructTranslationIdsService: ConstructTranslationIdsService,
-    private searchService: SearchService,
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService,
     private urlInterpolationService: UrlInterpolationService
@@ -198,10 +195,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         this.selectionDetails[itemsType].summary
       );
     }
-  }
-
-  isSearchInProgress(): boolean {
-    return this.searchService.isSearchInProgress();
   }
 
   searchDropdownCategories(): SearchDropDownItems[] {
@@ -307,7 +300,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.updateLearnerGroupSyllabus();
   }
 
-  addSubtopicToSyllabus(subtopicSummary: SubtopicPageSummary): void {
+  addSubtopicToSyllabus(subtopicSummary: LearnerGroupSubtopicSummary): void {
     this.syllabusSubtopicSummaries.push(subtopicSummary);
     this.syllabusSubtopicPageIds.push(subtopicSummary.subtopicPageId);
     this.updateLearnerGroupSyllabus();
@@ -321,7 +314,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.updateLearnerGroupSyllabus();
   }
 
-  removeSubtopicFromSyllabus(subtopicSummary: SubtopicPageSummary): void {
+  removeSubtopicFromSyllabus(subtopicSummary: LearnerGroupSubtopicSummary): void {
     this.syllabusSubtopicSummaries = this.syllabusSubtopicSummaries.filter(
       (s) => s.subtopicPageId !== subtopicSummary.subtopicPageId);
     this.syllabusSubtopicPageIds = this.syllabusSubtopicPageIds.filter(
@@ -333,7 +326,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     return this.syllabusStoryIds.indexOf(storySummary.getId()) !== -1;
   }
 
-  isSubtopicPartOfSyllabus(subtopicSummary: SubtopicPageSummary): boolean {
+  isSubtopicPartOfSyllabus(subtopicSummary: LearnerGroupSubtopicSummary): boolean {
     return this.syllabusSubtopicPageIds.indexOf(
       subtopicSummary.subtopicPageId) !== -1;
   }
