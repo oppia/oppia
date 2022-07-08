@@ -24,7 +24,7 @@ import math
 
 from core.domain import exp_fetchers
 from core.domain import rte_component_registry
-from core.domain import state_domain
+from core.domain import state_domain, exp_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -33,15 +33,17 @@ from core.platform import models
 
 import apache_beam as beam
 import bs4
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
 
 datastore_services = models.Registry.import_datastore_services()
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, opportunity_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.opportunity])
 
 
 class ExpStateValidationJob(base_jobs.JobBase):
@@ -85,6 +87,56 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 }
                 components.append(component)
         return components
+
+    @staticmethod
+    def filter_invalid_state_image_rte_values(
+        states_dict: dict[str, state_domain.State]
+    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
+        """Returns the errored state RTE values, Validates curated
+        explorations having image tag and filepath-with-value attribute
+        have SVG extension.
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The dictionary
+                containing state name as key and State object as value.
+
+        Returns:
+            states_with_values: List[Dict[str, List[Dict[str, List[str]]]]].
+            The list of dictionaries containing the errored values.
+        """
+        states_with_values = []
+        for key, value in states_dict.items():
+            rte_image_errors = []
+            rte_components = ExpStateValidationJob._get_rte_components(
+                value.content.html)
+            for rte_component in rte_components:
+                # RTE image validations for filepath image extension.
+                if rte_component['id'] == 'oppia-noninteractive-image':
+                    try:
+                        file_with_value = rte_component['customization_args'][
+                            'filepath-with-value']
+                    except Exception:
+                        file_with_value = 'Not found'
+
+                    # Validates filepath extension is svg.
+                    if (
+                        file_with_value != 'Not found' and
+                        len(file_with_value) > 0 and
+                        file_with_value[-3:] != 'svg'
+                    ):
+                        rte_image_errors.append(
+                            f'State - {key} Image tag filepath value '
+                            f'does not have svg extension '
+                            f'having value {file_with_value}.'
+                        )
+
+            states_with_values.append(
+                {
+                    'state_name': key,
+                    'rte_image_errors': rte_image_errors
+                }
+            )
+        return states_with_values
 
     @staticmethod
     def filter_invalid_state_rte_values(
@@ -153,18 +205,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                         rte_components_errors.append(
                             f'State - {key} Image tag alt value '
                             f'is less than 5 '
-                            f'having value {file_with_value}.'
-                        )
-
-                    # Validates if filepath extension is svg.
-                    if (
-                        file_with_value != 'Not found' and
-                        len(file_with_value) > 0 and
-                        file_with_value[-3:] != 'svg'
-                    ):
-                        rte_components_errors.append(
-                            f'State - {key} Image tag filepath value '
-                            f'does not have svg extension '
                             f'having value {file_with_value}.'
                         )
 
@@ -580,6 +620,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         """
         selected_equals_choices = []
         mc_interaction_invalid_values = []
+        rule_spec_list = []
 
         answer_groups = state.interaction.answer_groups
         for answer_group in answer_groups:
@@ -599,6 +640,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     else:
                         selected_equals_choices.append(
                             rule_spec.inputs['x'])
+
+                rule_spec_list.append(rule_spec.inputs['x'])
 
         choices = (
             state.interaction.customization_args['choices'].value)
@@ -623,8 +666,14 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 'choices'
             )
         # Validates if all MC have feedbacks do not ask for def feedback.
+        print("**********************************************")
+        print(choices)
+        print("**********************************************")
+        print(rule_spec_list)
+        print("**********************************************")
+        print(set(rule_spec_list))
         if (
-                len(choices) == len(state.interaction.answer_groups)
+                len(choices) == len(set(rule_spec_list))
                 and state.interaction.default_outcome is not None
         ):
             mc_interaction_invalid_values.append(
@@ -1159,8 +1208,56 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         return errored_values
 
+    def filter_curated_explorations(self, model_pair: Tuple[
+        Optional[exp_models.ExplorationModel],
+        Optional[opportunity_models.ExplorationOpportunitySummaryModel]
+    ]) -> bool:
+        """Returns whether the exp model is curated or not.
+        Args:
+            model_pair: tuple. The pair of exp and opportunity models.
+        Returns:
+            bool. Returns whether the exp model is curated or not.
+        """
+        return (model_pair[0] is not None) and (model_pair[1] is not None)
+
+    def get_exploration_from_models(self, model_pair: Tuple[
+        exp_models.ExplorationModel,
+        opportunity_models.ExplorationOpportunitySummaryModel
+    ]) -> exp_domain.Exploration:
+        """Returns the exploration domain object from the curated
+        exploration model.
+        Args:
+            model_pair: tuple. The pair of exp and opportunity models.
+        Returns:
+            bool. Returns whether the exp model is curated or not.
+        """
+        return exp_fetchers.get_exploration_from_model(model_pair[0])
+
+    def convert_into_model_pair(
+      self, models_list_pair: Tuple[
+          List[exp_models.ExplorationModel],
+          List[opportunity_models.ExplorationOpportunitySummaryModel]
+    ]) -> Tuple[
+        Optional[exp_models.ExplorationModel],
+        Optional[opportunity_models.ExplorationOpportunitySummaryModel]
+    ]:
+        """Returns the pair of exp and opportunity models.
+        Args:
+            models_list_pair: tuple. The pair of models list.
+        Returns:
+            tuple. The pair of exp and opportunity models.
+        """
+        exp_model = None
+        opportunity_model = None
+        if len(models_list_pair[0]) == 1:
+            exp_model = models_list_pair[0][0]
+        if len(models_list_pair[1]) == 1:
+            opportunity_model = models_list_pair[1][0]
+        model_pair = (exp_model, opportunity_model)
+        return model_pair
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        total_explorations = (
+        all_explorations = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
@@ -1168,10 +1265,79 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 exp_fetchers.get_exploration_from_model)
         )
 
+        exps_with_id_and_models = (
+            self.pipeline
+            | 'Get all ExplorationModels again' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False))
+            | 'Map id and exp model' >> beam.Map(
+                lambda exp: (exp.id, exp)
+            )
+        )
+
+        all_exp_opportunities = (
+            all_explorations
+            | 'Get all ExplorationOpportunitySummaryModels' >>
+                ndb_io.GetModels(
+                    opportunity_models.ExplorationOpportunitySummaryModel
+                        .get_all(include_deleted=False))
+            | 'Create key-value pairs for opportunity models' >> beam.Map(
+                lambda exp_opportunity_model: (
+                    exp_opportunity_model.id, exp_opportunity_model))
+        )
+
+        # Curated exp code is taken from the PR #15298.
+        curated_explorations = (
+            (exps_with_id_and_models, all_exp_opportunities)
+            | 'Combine the PCollections s' >> beam.CoGroupByKey()
+            | 'Drop off the exp ids' >>
+                beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Get tuple pairs from both models' >> beam.Map(
+                self.convert_into_model_pair)
+            | 'Filter curated explorations' >> beam.Filter(
+                self.filter_curated_explorations)
+            | 'Get exploration from the model' >> beam.Map(
+                self.get_exploration_from_models)
+            | 'Combine curated exp id and states' >> beam.Map(
+                lambda exp: (exp.id, exp.states, exp.created_on))
+        )
+
         combine_exp_ids_and_states = (
-            total_explorations
+            all_explorations
             | 'Combine exp id and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states, exp.created_on))
+        )
+
+        invalid_curated_exps_with_errored_image_rte = (
+            curated_explorations
+            | 'Get invalid state image rte values' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.filter_invalid_state_image_rte_values(exp_states),
+                    exp_created_on))
+            | 'Remove empty values for image rte' >> beam.MapTuple(
+                lambda exp_id, exp_states_img_rte_errors, exp_created_on: (
+                    exp_id, self.remove_empty_values(
+                        exp_states_img_rte_errors),
+                    exp_created_on.date()
+                )
+            )
+            | 'Filter invalid exps for image RTE' >> beam.Filter(
+                lambda exp_values: len(exp_values[1]) > 0
+            )
+        )
+
+        report_invalid_state_rte_image_values = (
+            invalid_curated_exps_with_errored_image_rte
+            | 'Show info for rte image tag' >> beam.MapTuple(
+                lambda exp_id, exp_states_rte_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of curated exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the state'
+                       f' RTE image having non svg '
+                       f'extension {exp_states_rte_errors}'
+                    )
+                )
+            )
         )
 
         invalid_exps_with_errored_state_rte_values = (
@@ -1330,6 +1496,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
         return (
             (
+                report_invalid_state_rte_image_values,
                 report_invalid_state_rte_values,
                 show_invalid_state_frac_numeric_num_with_unit_interactions,
                 show_invalid_state_multi_choice_and_item_selc_interac_values,

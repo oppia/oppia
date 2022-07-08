@@ -28,7 +28,10 @@ from core.jobs.batch_jobs import exp_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, opportunity_models) = models.Registry.import_models([
+  models.NAMES.exploration,
+  models.NAMES.opportunity
+])
 
 
 class ExpStateValidationJobTests(
@@ -41,6 +44,7 @@ class ExpStateValidationJobTests(
     EXPLORATION_ID_3 = '3'
     EXPLORATION_ID_4 = '4'
     EXPLORATION_ID_5 = '5'
+    EXPLORATION_ID_6 = '6'
 
     EXP_1_STATE_1 = state_domain.State.create_default_state(
         'EXP_1_STATE_1', is_initial_state=True).to_dict()
@@ -326,15 +330,15 @@ class ExpStateValidationJobTests(
         'choices': {
           'value': [
             {
-              'content_id': 'ca_choices_14',
+              'content_id': 'ca_choices_0',
               'html': '<p>1</p>'
             },
             {
-              'content_id': 'ca_choices_15',
+              'content_id': 'ca_choices_1',
               'html': '<p>1</p>'
             },
             {
-              'content_id': 'ca_choices_16',
+              'content_id': 'ca_choices_2',
               'html': '<p></p>'
             }
           ]
@@ -349,7 +353,7 @@ class ExpStateValidationJobTests(
             {
               'rule_type': 'Equals',
               'inputs': {
-                'x': 3
+                'x': 0
               }
             }
           ],
@@ -372,7 +376,7 @@ class ExpStateValidationJobTests(
             {
               'rule_type': 'Equals',
               'inputs': {
-                'x': 2
+                'x': 1
               }
             }
           ],
@@ -395,13 +399,13 @@ class ExpStateValidationJobTests(
             {
               'rule_type': 'Equals',
               'inputs': {
-                'x': 2
+                'x': 1
               }
             },
             {
               'rule_type': 'Equals',
               'inputs': {
-                'x': 4
+                'x': 2
               }
             }
           ],
@@ -1056,6 +1060,18 @@ class ExpStateValidationJobTests(
       'solution': None
     }
 
+    EXP_6_STATE_1 = state_domain.State.create_default_state(
+        'EXP_6_STATE_1', is_initial_state=True).to_dict()
+    EXP_6_STATE_1['content']['html'] = (
+      '<oppia-noninteractive-image '
+      'filepath-with-value="&quot;img.svgg&quot;" caption-with-value='
+      '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+      '</oppia-noninteractive-image><oppia-noninteractive-image '
+      'filepath-with-value="&quot;img2.svg&quot;" caption-with-value='
+      '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+      '</oppia-noninteractive-image>'
+    )
+
     TODAY_DATE = datetime.datetime.utcnow()
     YEAR_AGO_DATE = (TODAY_DATE - datetime.timedelta(weeks=52)).date()
 
@@ -1169,6 +1185,41 @@ class ExpStateValidationJobTests(
             }
         )
 
+        self.exp_6 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_6,
+            title='titles',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={'EXP_6_STATE_1': self.EXP_6_STATE_1
+            }
+        )
+
+        self.opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_6,
+            topic_id='topic_id',
+            topic_name='a_topic name',
+            story_id='story_id',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
@@ -1176,31 +1227,43 @@ class ExpStateValidationJobTests(
         self.put_multi([self.exp_4])
         self.assert_job_output_is([])
 
-    def test_run_with_state_validation(self) -> None:
-        self.put_multi([self.exp_1])
+    def test_run_with_state_rte_image_validation(self) -> None:
+        self.put_multi([self.exp_6, self.opportunity_model])
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stderr(
-              f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-              f', and the state erroneous data are '
-              f'[{{\'state_name\': \'EXP_1_STATE_1\', '
-              f'\'tagged_skill_misconception_ids\': [\'The '
-              f'tagged_skill_misconception_id of answer group 0 is not None.\']'
-              f', \'not_single_rule_spec\': '
-              f'[\'There is no rule present in answer group 0, atleast one '
-              f'is required.\'], \'invalid_refresher_exploration_id\': '
-              f'[\'The refresher_exploration_id of answer group 0 is not '
-              f'None.\', \'The refresher_exploration_id of default '
-              f'outcome is not None.\'], '
-              f'\'invalid_destinations\': [\'The destination '
-              f'Not valid state of answer group 0 is not valid.\'], '
-              f'\'invalid_default_outcome_dest\': [\'The destination of default'
-              f' outcome is not valid, the value is Not valid state\']}}, '
-              f'{{\'state_name\': \'EXP_1_STATE_2\','
-              f' \'wrong_labelled_as_correct_values\': [\'The value of '
-              f'labelled_as_correct of answer group 0 is True but the '
-              f'destination is the state itself.\']}}]'
-            )
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of curated exp is 6, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state RTE image having non svg extension '
+            f'[{{\'state_name\': \'EXP_6_STATE_1\', \'rte_image_errors\': '
+            f'[\'State - EXP_6_STATE_1 Image tag filepath value does not '
+            f'have svg extension having value img.svgg.\']}}]'
+          )
         ])
+
+    def test_run_with_state_validation(self) -> None:
+      self.put_multi([self.exp_1])
+      self.assert_job_output_is([
+        job_run_result.JobRunResult.as_stderr(
+          f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
+          f', and the state erroneous data are '
+          f'[{{\'state_name\': \'EXP_1_STATE_1\', '
+          f'\'tagged_skill_misconception_ids\': [\'The '
+          f'tagged_skill_misconception_id of answer group 0 is not None.\']'
+          f', \'not_single_rule_spec\': '
+          f'[\'There is no rule present in answer group 0, atleast one '
+          f'is required.\'], \'invalid_refresher_exploration_id\': '
+          f'[\'The refresher_exploration_id of answer group 0 is not '
+          f'None.\', \'The refresher_exploration_id of default '
+          f'outcome is not None.\'], '
+          f'\'invalid_destinations\': [\'The destination '
+          f'Not valid state of answer group 0 is not valid.\'], '
+          f'\'invalid_default_outcome_dest\': [\'The destination of default'
+          f' outcome is not valid, the value is Not valid state\']}}, '
+          f'{{\'state_name\': \'EXP_1_STATE_2\','
+          f' \'wrong_labelled_as_correct_values\': [\'The value of '
+          f'labelled_as_correct of answer group 0 is True but the '
+          f'destination is the state itself.\']}}]'
+        )
+      ])
 
     def test_run_with_state_drag_frac_interaction_validation(self) -> None:
         self.put_multi([self.exp_5])
@@ -1315,8 +1378,6 @@ class ExpStateValidationJobTests(
               f'than 160 having value img_1.svgg.\', \'State - '
               f'EXP_3_STATE_1 Image tag alt value is '
               f'less than 5 having value img_1.svgg.\', '
-              f'\'State - EXP_3_STATE_1 Image tag filepath value does '
-              f'not have svg extension having value img_1.svgg.\', '
               f'\'State - EXP_3_STATE_1 Link tag text value is either empty '
               f'or None having url http://www.example.com\', '
               f'\'State - EXP_3_STATE_1 Math tag svg_filename'
@@ -1457,8 +1518,6 @@ class ExpStateValidationJobTests(
             f'than 160 having value img_1.svgg.\', \'State - '
             f'EXP_3_STATE_1 Image tag alt value is '
             f'less than 5 having value img_1.svgg.\', '
-            f'\'State - EXP_3_STATE_1 Image tag filepath value does '
-            f'not have svg extension having value img_1.svgg.\', '
             f'\'State - EXP_3_STATE_1 Link tag text value is either empty '
             f'or None having url http://www.example.com\', '
             f'\'State - EXP_3_STATE_1 Math tag svg_filename'
