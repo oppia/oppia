@@ -17,14 +17,14 @@
     <div dir="auto" *ngIf="getShortAnswerHtml()"
          [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
          class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
-      <oppia-rte-output-display class="oppia-rte-viewer conversation-skin-learner-answer-content"
-                                [rteString]="getShortAnswerHtml()">
-      </oppia-rte-output-display>
+      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getShortAnswerHtml()">
+      </oppia-interaction-display>
     </div>
     <div dir="auto" *ngIf="!getShortAnswerHtml()">
-      <oppia-rte-output-display class="oppia-rte-viewer conversation-skin-learner-answer-content"
-                                [rteString]="getAnswerHtml()">
-      </oppia-rte-output-display>
+      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getAnswerHtml()">
+      </oppia-interaction-display>
     </div>
   </div>
   <div *ngIf="data.isHint">

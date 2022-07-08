@@ -52,7 +52,7 @@ describe('ShortResponseCodeRepl', () => {
   });
 
   it('should response when user submits answer', () => {
-    component.answerWithValue = '{' +
+    component.answer = '{' +
       '  "code": "# Type your code here.\\nprint(\'hello\')",' +
       '  "error": "",' +
       '  "evaluation": "",' +

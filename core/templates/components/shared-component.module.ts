@@ -165,6 +165,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
+    RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
     StringUtilityPipesModule,

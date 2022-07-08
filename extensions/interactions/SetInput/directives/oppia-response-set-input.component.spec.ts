@@ -55,7 +55,7 @@ describe('ResponseSetInputComponent', () => {
     fixture = TestBed.createComponent(ResponseSetInputComponent);
     component = fixture.componentInstance;
 
-    component.answerWithValue = '["answer1"]';
+    component.answer = '["answer1"]';
   });
 
   it('should initialise component when user submits answer', () => {

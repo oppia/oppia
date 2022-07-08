@@ -18,11 +18,10 @@
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-help-card-content e2e-test-conversation-feedback-latest"
-                                 [htmlData]="helpCardHtml"
-                                 [parentScope]="this"
-                                 [ngClass]="getFeedbackAudioHighlightClass()">
-      </oppia-interaction-display>
+      <oppia-rte-output-display class="oppia-rte-viewer conversation-skin-help-card-content e2e-test-conversation-feedback-latest"
+                                [rteString]="helpCardHtml"
+                                [ngClass]="getFeedbackAudioHighlightClass()">
+      </oppia-rte-output-display>
     </div>
     <br>
     <oppia-continue-button *ngIf="helpCardHasContinueButton"

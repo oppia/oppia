@@ -49,7 +49,7 @@ describe('ShortResponseTextInputComponent', () => {
     fixture = TestBed.createComponent(ShortResponseTextInputComponent);
     component = fixture.componentInstance;
 
-    component.answerWithValue = 'answer';
+    component.answer = 'answer';
   });
 
   it('should initialise when users submits answer', () => {
