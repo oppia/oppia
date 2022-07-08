@@ -517,3 +517,75 @@ class CreateLearnerGroupPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template('create-learner-group-page.mainpage.html')
+
+
+class LearnerGroupSearchStudentHandler(base.BaseHandler):
+    """Handles searching of students to invite in learner group."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': ''
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id):
+        """Handles GET requests for learner group syllabus views."""
+
+        username: str = self.normalized_request.get('username')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            self.render_json({
+                'username': username,
+                'profile_picture_data_url': '',
+                'error': ('User with username %s does not exist.' % username)
+            })
+            return
+
+        if self.username.lower() == username.lower():
+            self.render_json({
+                'username': user_settings.username,
+                'profile_picture_data_url': '',
+                'error': ('You cannot invite yourself to the group')
+            })
+            return
+
+        (valid_invitation, error) = learner_group_services.can_user_be_invited(
+            user_settings.user_id, user_settings.username, learner_group_id
+        )
+
+        if not valid_invitation:
+            self.render_json({
+                'username': user_settings.username,
+                'profile_picture_data_url': '',
+                'error': error
+            })
+            return
+
+        self.render_json({
+            'username': user_settings.username,
+            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'error': ''
+        })

@@ -23,6 +23,7 @@ import { Injectable } from '@angular/core';
 
 import { LearnerGroupBackendDict, LearnerGroupData } from './learner-group.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerGroupInvitedUserInfo } from './learner-group-user-progress.model';
 
 
 interface DeleteLearnerGroupBackendResponse {
@@ -139,6 +140,31 @@ export class LearnerGroupBackendApiService {
   ):
   Promise<LearnerGroupData> {
     return this._fetchLearnerGroupinfoAsync(learnerGroupId);
+  }
+
+  async searchNewStudentToAddAsync(
+      learnerGroupId: string,
+      username: string
+  ): Promise<LearnerGroupInvitedUserInfo> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_search_student_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+      const filterData = {
+        username: username
+      };
+      this.http.get<LearnerGroupInvitedUserInfo>(
+        learnerGroupUrl, {
+          params: filterData
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      });
+    });
   }
 }
 

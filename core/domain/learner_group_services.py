@@ -17,6 +17,7 @@
 """Services for the learner groups."""
 
 from __future__ import annotations
+from ctypes import Union
 
 from core.constants import constants
 from core.domain import config_domain
@@ -585,3 +586,50 @@ def get_subtopic_page_progress(
                 )
 
     return subtopic_prog_summary
+
+
+def can_user_be_invited(
+    user_id: str, username: str, group_id: str
+) -> Union[bool, str]:
+    """Checks if the user can be invited to the learner group.
+
+    Args:
+        user_id: str. The id of the user.
+        username: str. The username of the user.
+        group_id: str. The id of the learner group.
+
+    Returns:
+        bool. True if the user can be invited to the learner group. False
+        otherwise.
+        str. Error message if the user cannot be invited to the learner group.
+    """
+    learner_group = learner_group_fetchers.get_learner_group_by_id(group_id)
+
+    # Case of inviting to new learner group.
+    if not learner_group:
+        return (True, '')
+
+    if user_id in learner_group.student_user_ids:
+        return (
+            False, ('User with username %s is already a student.' % username)
+        )
+
+    if user_id in learner_group.invited_student_user_ids:
+        return (
+            False,
+            (
+                'User with username %s has already be invited to join the '
+                'learner group' % username
+            )
+        )
+
+    if user_id in learner_group.facilitator_user_ids:
+        return (
+            False,
+            (
+                'User with username %s is already a facilitator of the '
+                'learner group' % username
+            )
+        )
+
+    return (True, '')

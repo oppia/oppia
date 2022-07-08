@@ -168,6 +168,15 @@
   pointer-events: auto;
 }
 
+.oppia-learner-group-created-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin-top: 200px;
+  min-height: 260px;
+  padding: 32px 30px 30px 40px;
+}
+
 /**
  * The following style rules are for the learner group add syllabus section.
  */
@@ -288,4 +297,44 @@
 
 .added-syllabus-container .filtered-syllabus-items-container {
   background: rgba(39, 99, 92, 0.05);
+}
+
+/** Invite Students **/
+
+.oppia-learner-group-invite-students  {
+  display: grid;
+  grid-gap: 20px;
+}
+
+.oppia-learner-group-invite-students .oppia-search-bar-input {
+  max-width: 560px;
+}
+
+.invited-students-inner-container {
+  background: rgba(39, 99, 92, 0.05);
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+}
+
+.invited-students-title {
+  color: #00645C;
+}
+
+.invited-student-card {
+  background: #FFFFFF;
+  border: 1px solid #27635C;
+  border-radius: 5px;
+  display: flex;
+  flex-basis: 17%;
+  gap: 15px;
+  padding: 10px;
+  width: max-content;
+}
+
+.invited-student-card .close-button {
+  align-items: center;
+  display: grid;
 }

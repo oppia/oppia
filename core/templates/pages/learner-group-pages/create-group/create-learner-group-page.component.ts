@@ -34,6 +34,7 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 
 @Component({
   selector: 'oppia-create-learner-group-page',
@@ -45,11 +46,13 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS);
 
   activeSection: string;
-  furthestReachedSectionNumber: number = 2;
+  furthestReachedSectionNumber: number = 1;
   learnerGroupTitle: string = '';
   learnerGroupDescription: string = '';
   learnerGroupSubtopicPageIds: string[] = [];
   learnerGroupStoryIds: string[] = [];
+  learnerGroupInvitedStudents: string[] = [];
+  learnerGroup!: LearnerGroupData;
 
   constructor(
     private alertsService: AlertsService,
@@ -60,7 +63,8 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
 
   checkMobileView(): boolean {
@@ -107,12 +111,16 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.learnerGroupDescription = description;
   }
 
-  updateLearnerGroupSubtopics(subtopicPageId: string): void {
-    this.learnerGroupSubtopicPageIds.push(subtopicPageId);
+  updateLearnerGroupSubtopics(subtopicPageIds: string[]): void {
+    this.learnerGroupSubtopicPageIds = subtopicPageIds;
   }
 
-  updateLearnerGroupStories(storyId: string): void {
-    this.learnerGroupStoryIds.push(storyId);
+  updateLearnerGroupStories(storyIds: string[]): void {
+    this.learnerGroupStoryIds = storyIds;
+  }
+
+  updateLearnerGroupInvitedStudents(invitedUsernames: string[]): void {
+    this.learnerGroupInvitedStudents = invitedUsernames;
   }
 
   isAddSyllabusNextButtonDisabled(): boolean {
@@ -134,10 +142,24 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('testing')
     this.activeSection = (
-      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_STUDENTS
+      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS
     );
     // this.loaderService.showLoadingScreen('Loading');
   }
+
+  createLearnerGroup(): void {
+    this.learnerGroupBackendApiService.createNewLearnerGroupAsync(
+      this.learnerGroupTitle,
+      this.learnerGroupDescription,
+      this.learnerGroupInvitedStudents,
+      this.learnerGroupSubtopicPageIds,
+      this.learnerGroupStoryIds
+    ).then((responseLearnerGroup: LearnerGroupData) => {
+      this.learnerGroup = responseLearnerGroup;
+      console.log(this.learnerGroup, "learnerGroupCreated");
+    });
+  }
+
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();

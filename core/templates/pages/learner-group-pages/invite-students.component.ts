@@ -34,17 +34,24 @@
  import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupPagesConstants } from './learner-group-pages.constants';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { LearnerGroupInvitedUserInfo } from 'domain/learner_group/learner-group-user-progress.model';
  
 @Component({
-  selector: 'oppia-add-students',
-  templateUrl: './add-students.component.html'
+  selector: 'oppia-invite-students',
+  templateUrl: './invite-students.component.html'
 })
-export class AddStudentsComponent implements OnInit, OnDestroy {
-  @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
-  @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
+export class InviteStudentsComponent implements OnInit, OnDestroy {
+  @Output() updateLearnerGroupInvitedStudents:
+    EventEmitter<string[]> = new EventEmitter();
   learnerGroupTitle: string;
   learnerGroupDescription: string;
   directiveSubscriptions = new Subscription();
+
+  searchedUsername: string;
+  placeholderMessage: string;
+  invitedUsersInfo: LearnerGroupInvitedUserInfo[] = [];
+  invitedUsernames: string[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -55,7 +62,8 @@ export class AddStudentsComponent implements OnInit, OnDestroy {
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
 
   checkMobileView(): boolean {
@@ -66,23 +74,8 @@ export class AddStudentsComponent implements OnInit, OnDestroy {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  subscribeToOnLangChange(): void {
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
-  }
-
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_TOPNAV_TEACHER_DASHBOARD');
-    this.pageTitleService.setDocumentTitle(translatedTitle);
-  }
-
   ngOnInit(): void {
-    console.log('testing')
-    // this.loaderService.showLoadingScreen('Loading');
+    this.placeholderMessage = 'Add username of the student to invite and press enter';
   }
 
   ngOnDestroy(): void {
@@ -90,12 +83,44 @@ export class AddStudentsComponent implements OnInit, OnDestroy {
     this.contextService.removeCustomEntityContext();
   }
 
-  updateLearnerGroupDetails(): void {
-    this.updateLearnerGroupTitle.emit(this.learnerGroupTitle);
-    this.updateLearnerGroupDesc.emit(this.learnerGroupDescription);
+  updateInvitedStudents(): void {
+    this.updateLearnerGroupInvitedStudents.emit(
+      this.invitedUsernames);
+  }
+
+  onSearchQueryChangeExec(username: string): void {
+    if (username) {
+      if (this.invitedUsernames.includes(username)) {
+        this.alertsService.addWarning(
+          'User with username ' + username + ' has been already invited.'
+        );
+        return
+      }
+      this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
+        'newId', username
+      ).then((userInfo) => {
+        if (!userInfo.error) {
+          this.invitedUsersInfo.push(userInfo);
+          this.invitedUsernames.push(userInfo.username);
+          this.alertsService.clearWarnings();
+          this.updateInvitedStudents();
+        } else {
+          this.alertsService.addWarning(userInfo.error);
+        }
+      });
+    }
+    
+  }
+
+  removeInvitedStudent(username: string): void {
+    this.invitedUsersInfo = this.invitedUsersInfo.filter(
+      (userInfo) => userInfo.username !== username);
+    this.invitedUsernames = this.invitedUsernames.filter(
+      (username) => username !== username);
+    this.updateInvitedStudents();
   }
 }
 
 angular.module('oppia').directive(
   'oppiaLearnerGroupDetails',
-  downgradeComponent({component: AddStudentsComponent}));
+  downgradeComponent({component: InviteStudentsComponent}));
