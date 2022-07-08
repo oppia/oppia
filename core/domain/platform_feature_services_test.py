@@ -36,7 +36,7 @@ class ParamNames(enum.Enum):
     FEATURE_B = 'feature_b'
 
 
-ServerModes = platform_parameter_domain.ServerModes
+ServerMode = platform_parameter_domain.ServerMode
 FeatureStages = platform_parameter_domain.FeatureStages
 
 
@@ -71,7 +71,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', ServerModes.DEV.value]
+                                ['=', ServerMode.DEV.value]
                             ]
                         }
                     ],
@@ -88,9 +88,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', ServerModes.DEV.value],
-                                ['=', ServerModes.TEST.value],
-                                ['=', ServerModes.PROD.value]
+                                ['=', ServerMode.DEV.value],
+                                ['=', ServerMode.TEST.value],
+                                ['=', ServerMode.PROD.value]
                             ]
                         }
                     ],
@@ -209,7 +209,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', ServerModes.PROD.value]
+                                ['=', ServerMode.PROD.value]
                             ],
                         },
                         {

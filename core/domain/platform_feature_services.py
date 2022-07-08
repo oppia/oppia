@@ -153,7 +153,7 @@ def update_feature_flag_rules(
 # dev or prod. There should be another mode 'test' added for QA testing,
 # once it is added, this function needs to be updated to take that into
 # consideration.
-def _get_server_mode() -> platform_parameter_domain.ServerModes:
+def _get_server_mode() -> platform_parameter_domain.ServerMode:
     """Returns the running mode of Oppia.
 
     Returns:
@@ -161,9 +161,9 @@ def _get_server_mode() -> platform_parameter_domain.ServerModes:
         in development mode, prod if in production mode.
     """
     return (
-        platform_parameter_domain.ServerModes.DEV
+        platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE
-        else platform_parameter_domain.ServerModes.PROD
+        else platform_parameter_domain.ServerMode.PROD
     )
 
 
