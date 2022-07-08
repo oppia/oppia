@@ -27,6 +27,9 @@ import shutil
 import subprocess
 import threading
 
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
 from scripts import common # isort:skip pylint: disable=wrong-import-position
 from core import utils # isort:skip pylint: disable=wrong-import-position
 from scripts import servers # isort:skip pylint: disable=wrong-import-position
