@@ -814,13 +814,13 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         rubrics = [
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'])]
 
@@ -936,7 +936,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [platform_parameter_id]),
             {})
 
-        default_parameter = parameter_domain.PlatformParameter.from_dict({ # type: ignore[no-untyped-call]
+        default_parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a 😍',
             'description': '😍😍😍😍',
             'data_type': 'bool',
@@ -967,4 +967,4 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_parameter.to_dict(),
-            platform_parameters[platform_parameter_id].to_dict()) # type: ignore[no-untyped-call]
+            platform_parameters[platform_parameter_id].to_dict())

@@ -44,7 +44,7 @@ from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
 
-def get_new_story_id():
+def get_new_story_id() -> str:
     """Returns a new story id.
 
     Returns:

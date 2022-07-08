@@ -1898,7 +1898,7 @@ def delete_demo(exploration_id):
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
-def load_demo(exploration_id):
+def load_demo(exploration_id: str) -> None:
     """Loads a demo exploration.
 
     The resulting exploration will have two commits in its history (one for
@@ -2436,7 +2436,7 @@ def update_logged_out_user_progress(
             exploration_id, unique_progress_url_id)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, True, exp_version)
+        exploration_id, strict=True, version=exp_version)
 
     # If the exploration is being visited the first time.
     if checkpoint_url_model.furthest_reached_checkpoint_state_name is None:
@@ -2589,12 +2589,17 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
 
 
 def sync_logged_out_learner_progress_with_logged_in_progress(
-    user_id, exploration_id, unique_progress_url_id):
+    user_id, exploration_id, unique_progress_url_id
+):
 
     """Syncs logged out and logged in learner's checkpoints progress."""
 
     logged_out_user_data = (
         exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+
+    # If logged out progress has been cleared by the cron job.
+    if logged_out_user_data is None:
+        return
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_user_data = exp_fetchers.get_exploration_user_data(
@@ -2668,19 +2673,18 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         logged_in_user_model.most_recently_reached_checkpoint_exp_version <
         logged_out_user_data.most_recently_reached_checkpoint_exp_version
     ):
-
         most_recently_interacted_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
-                True,
-                exp_user_data.most_recently_reached_checkpoint_exp_version
+                strict=True,
+                version=exp_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
             )
         )
         furthest_reached_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
-                True,
-                exp_user_data.furthest_reached_checkpoint_exp_version
+                strict=True,
+                version=exp_user_data.furthest_reached_checkpoint_exp_version
             )
         )
 
@@ -2736,7 +2740,8 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
                 latest_exploration.states
             ).index(
                 exp_user_data.most_recently_reached_checkpoint_state_name
-                ))
+            )
+        )
 
         most_recently_reached_checkpoint_index_in_logged_out_progress = (
             user_services.get_checkpoints_in_order(
