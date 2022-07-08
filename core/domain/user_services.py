@@ -2702,8 +2702,9 @@ def update_learner_checkpoint_progress(
         exp_user_model = user_models.ExplorationUserDataModel.create(
             user_id, exploration_id)
 
-    current_exploration = exp_fetchers.get_exploration_by_id(  # type: ignore[no-untyped-call]
-        exploration_id, True, exp_version)
+    current_exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=True, version=exp_version
+    )
 
     # If the exploration is being visited the first time.
     if exp_user_model.furthest_reached_checkpoint_state_name is None:
@@ -2711,7 +2712,7 @@ def update_learner_checkpoint_progress(
         exp_user_model.furthest_reached_checkpoint_state_name = state_name
     elif exp_user_model.furthest_reached_checkpoint_exp_version < exp_version:
         furthest_reached_checkpoint_exp = (
-            exp_fetchers.get_exploration_by_id(  # type: ignore[no-untyped-call]
+            exp_fetchers.get_exploration_by_id(
                 exploration_id,
                 strict=True,
                 version=exp_user_model.furthest_reached_checkpoint_exp_version
@@ -2806,18 +2807,18 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     if exp_user_model is None:
         return None
 
-    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)  # type: ignore[no-untyped-call]
+    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     most_recently_interacted_exploration = (
-        exp_fetchers.get_exploration_by_id(  # type: ignore[no-untyped-call]
+        exp_fetchers.get_exploration_by_id(
             exploration_id,
-            True,
-            exp_user_model.most_recently_reached_checkpoint_exp_version
+            strict=True,
+            version=exp_user_model.most_recently_reached_checkpoint_exp_version
         ))
     furthest_reached_exploration = (
-        exp_fetchers.get_exploration_by_id(  # type: ignore[no-untyped-call]
+        exp_fetchers.get_exploration_by_id(
             exploration_id,
-            True,
-            exp_user_model.furthest_reached_checkpoint_exp_version
+            strict=True,
+            version=exp_user_model.furthest_reached_checkpoint_exp_version
         ))
 
     most_recently_reached_checkpoint_in_current_exploration = (

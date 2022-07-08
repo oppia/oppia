@@ -2290,7 +2290,7 @@ title: Title
 
         exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
             self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
-        self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)  # type: ignore[no-untyped-call]
+        self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
     def test_user_checkpoint_progress_is_updated_correctly(self) -> None:
         self.login(self.VIEWER_EMAIL)
@@ -2303,6 +2303,8 @@ title: Title
             self.viewer_id, self.EXP_ID, 'Introduction', 1)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
@@ -2328,6 +2330,8 @@ title: Title
             self.viewer_id, self.EXP_ID, 'New state', 2)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
@@ -2344,6 +2348,8 @@ title: Title
             self.viewer_id, self.EXP_ID)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
@@ -2371,6 +2377,8 @@ title: Title
             self.viewer_id, self.EXP_ID, 'Introduction', 3)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 3)
         self.assertEqual(
@@ -2398,6 +2406,8 @@ title: Title
             self.viewer_id, self.EXP_ID, 'Intro', 4)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 4)
         self.assertEqual(
@@ -2423,6 +2433,8 @@ title: Title
             self.viewer_id, self.EXP_ID, 'Introduction', 1)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
