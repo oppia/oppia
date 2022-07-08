@@ -1,8 +1,8 @@
-<div class="thumbnail-editor protractor-test-thumbnail-editor form-group">
+<div class="thumbnail-editor e2e-test-thumbnail-editor form-group">
   <div>
     <div class="oppia-editable-section float-left" title="Change Thumbnail"
          [ngStyle]="{background: bgColor}">
-      <div class="oppia-click-to-start-editing protractor-test-photo-button"
+      <div class="oppia-click-to-start-editing e2e-test-photo-button"
            (click)="showEditThumbnailModal()"
            aria-label="upload or edit thumbnail">
       </div>
@@ -14,13 +14,13 @@
                                [hidden]="thumbnailIsLoading"
                                [imgSrc]="editableThumbnailDataUrl"
                                [aspectRatio]="aspectRatio"
-                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [classes]="['img-thumbnail', 'e2e-test-custom-photo']"
                                [background]="bgColor">
       </oppia-thumbnail-display>
       <oppia-thumbnail-display *ngIf="useLocalStorage && newThumbnailDataUrl"
                                [imgSrc]="newThumbnailDataUrl"
                                [aspectRatio]="aspectRatio"
-                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [classes]="['img-thumbnail', 'e2e-test-custom-photo']"
                                [background]="localStorageBgcolor">
       </oppia-thumbnail-display>
     </div>

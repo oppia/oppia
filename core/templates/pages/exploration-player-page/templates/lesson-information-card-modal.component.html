@@ -48,13 +48,22 @@
                  [style.width.%]="0">
             </div>
           </div>
-          <button type="button"
-                  class="btn btn-secondary restart-lesson-btn"
-                  *ngIf="userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
-                  (click)="restartExploration()">
-            {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
-          </button>
+          <div class="oppia-lesson-info-card-buttons">
+            <button type="button"
+                    class="btn btn-secondary restart-lesson-btn"
+                    *ngIf="userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="restartExploration()">
+              {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+            </button>
+            <button type="button"
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="!userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="saveLoggedOutProgress()">
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
+            </button>
+          </div>
         </div>
         <div class="oppia-lesson-info-card-authors">
           <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
@@ -103,13 +112,22 @@
                  [style.width.%]="0">
             </div>
           </div>
-          <button type="button"
-                  class="btn btn-secondary restart-lesson-btn"
-                  *ngIf="userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
-                  (click)="restartExploration()">
-            {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
-          </button>
+          <div class="oppia-lesson-info-card-buttons">
+            <button type="button"
+                    class="btn btn-secondary restart-lesson-btn"
+                    *ngIf="userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="restartExploration()">
+              {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+            </button>
+            <button type="button"
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="!userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="saveLoggedOutProgress()">
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
+            </button>
+          </div>
         </div>
         <div class="oppia-lesson-info-card-authors">
           <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
@@ -125,6 +143,36 @@
   <i class="material-icons md-18">&#xE5CD;</i>
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
+<div class="save-progress-menu"
+     *ngIf="saveProgressMenuIsShown && !userIsLoggedIn">
+  <h3>{{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}</h3>
+  <div class="sign-in-box">
+    <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1' | translate }}</p>
+    <button type="button"
+            class="btn btn-secondary create-account-btn"
+            (click)="onLoginButtonClicked()">
+          {{ 'I18N_CREATE_ACCOUNT' | translate }}
+    </button>
+    <p class="sign-in-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2' | translate }}<a class="sign-in-link" (click)="onLoginButtonClicked()">{{ 'I18N_TOPNAV_SIGN_IN' | translate }}</a></p>
+  </div>
+  <div class="separator">
+    <div class="bars"></div>
+    <div class="mid">or</div>
+    <div class="bars"></div>
+  </div>
+  <div class="uid-box">
+    <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3' | translate }}<br>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4' | translate }}</p>
+    <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
+    <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
+      <div class="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
+      <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
+    </div>
+  </div>
+  <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
+    <i class="material-icons md-24">&#xE5CD;</i>
+    <span class="oppia-icon-accessibility-label">Close</span>
+  </button>
+</div>
 
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/templates/lesson-information-card-modal.component.css">
