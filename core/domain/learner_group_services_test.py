@@ -136,18 +136,6 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             learner_group_services.is_learner_group_feature_enabled())
 
-    def test_updating_invalid_learner_group_id_raises_exception(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception,
-            'The learner group with the given group id does not exist.'
-        ):
-            learner_group_services.update_learner_group(
-                'invalid_group_id', 'Updated Group Name', 'Updated Description',
-                [self.FACILITATOR_ID], [], ['new_student_id'],
-                ['subtopic_id_1', 'subtopic_id_2'],
-                ['story_id_1', 'story_id_2']
-            )
-
     def test_update_learner_group(self) -> None:
         updated_group = learner_group_services.update_learner_group(
             self.LEARNER_GROUP_ID, 'Updated Group Name', 'Updated Description',
@@ -178,14 +166,6 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             learner_group_services.is_user_facilitator(
                 self.STUDENT_ID, self.LEARNER_GROUP_ID))
-
-    def test_get_topic_ids_from_subtopic_page_ids(self) -> None:
-        topic_ids = (
-            learner_group_services.get_topic_ids_from_subtopic_page_ids(
-            ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3'])
-        )
-
-        self.assertEqual(topic_ids, ['topic1', 'topic2'])
 
     def test_get_matching_syllabus_to_add_with_default_filters(self) -> None:
         # Test 1: Default filters with topic name matching.
@@ -283,9 +263,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         assert learner_group is not None
 
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=False)
-        # Ruling out the possibility of None for mypy type checking.
-        assert learner_grps_user_model is not None
+            self.STUDENT_ID, strict=True)
         self.assertEqual(
             learner_group.invited_student_user_ids, [self.STUDENT_ID])
         self.assertEqual(
@@ -302,9 +280,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         assert learner_group is not None
 
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=False)
-        # Ruling out the possibility of None for mypy type checking.
-        assert learner_grps_user_model is not None
+            self.STUDENT_ID, strict=True)
 
         self.assertEqual(
             learner_group.invited_student_user_ids, [])
@@ -348,9 +324,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         new_student_id = 'new_student_id'
         user_model_1 = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=False)
-        # Ruling out the possibility of None for mypy type checking.
-        assert user_model_1 is not None
+            self.STUDENT_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
             [self.LEARNER_GROUP_ID])
@@ -362,40 +336,40 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             'group_id_2', [self.STUDENT_ID, new_student_id])
 
         user_model_1 = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=False)
-        # Ruling out the possibility of None for mypy type checking.
-        assert user_model_1 is not None
+            self.STUDENT_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
             [self.LEARNER_GROUP_ID, 'group_id_2'])
 
         user_model_2 = user_models.LearnerGroupsUserModel.get(
-            new_student_id, strict=False)
-        # Ruling out the possibility of None for mypy type checking.
-        assert user_model_2 is not None
+            new_student_id, strict=True)
         self.assertEqual(
             user_model_2.invited_to_learner_groups_ids,
             ['group_id_2'])
 
-    def test_get_subtopic_page_progress(self) -> None:
+    def test_get_subtopic_pages_progress(self) -> None:
         degree_of_mastery = 0.5
 
         # Add some subtopic progress for the student.
         skill_ids = ['skill_id_1']
         skill_services.create_user_skill_mastery( # type: ignore[no-untyped-call]
-            self.STUDENT_ID, 'skill_id_1', degree_of_mastery)
+            self.STUDENT_ID, 'skill_id_1', degree_of_mastery
+        )
 
         topics = topic_fetchers.get_topics_by_ids( # type: ignore[no-untyped-call]
-            [self.TOPIC_ID_0, self.TOPIC_ID_1])
+            [self.TOPIC_ID_0, self.TOPIC_ID_1]
+        )
 
-        subtopic_page_id = self.TOPIC_ID_1 + ':1'
+        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
 
-        progress = learner_group_services.get_subtopic_page_progress(
+        progress = learner_group_services.get_subtopic_pages_progress(
             self.STUDENT_ID, [subtopic_page_id], topics, skill_ids
         )
 
-        self.assertEqual(progress.subtopic_id, 1)
-        self.assertEqual(progress.subtopic_title, 'Intro to negative numbers')
-        self.assertEqual(progress.parent_topic_id, self.TOPIC_ID_1)
-        self.assertEqual(progress.parent_topic_name, 'Negative Numbers')
-        self.assertEqual(progress.subtopic_mastery, degree_of_mastery)
+        self.assertEqual(progress[0].subtopic_id, 1)
+        self.assertEqual(
+            progress[0].subtopic_title, 'Intro to negative numbers'
+        )
+        self.assertEqual(progress[0].parent_topic_id, self.TOPIC_ID_1)
+        self.assertEqual(progress[0].parent_topic_name, 'Negative Numbers')
+        self.assertEqual(progress[0].subtopic_mastery, degree_of_mastery)

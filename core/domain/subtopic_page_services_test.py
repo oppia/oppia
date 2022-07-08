@@ -601,3 +601,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             assert_raises_regexp_context_manager):
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)
+
+    def test_get_topic_ids_from_subtopic_page_ids(self) -> None:
+        topic_ids = (
+            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
+                ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
+            )
+        )
+
+        self.assertEqual(topic_ids, ['topic1', 'topic2'])

@@ -581,8 +581,8 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         students_prog = response['students_progress']
         student1_stories_prog = students_prog[0]['stories_progress']
         student2_stories_prog = students_prog[1]['stories_progress']
-        student1_subtopics_prog = students_prog[0]['subtopic_page_progress']
-        student2_subtopics_prog = students_prog[1]['subtopic_page_progress']
+        student1_subtopics_prog = students_prog[0]['subtopic_pages_progress']
+        student2_subtopics_prog = students_prog[1]['subtopic_pages_progress']
         story_summary = story_fetchers.get_story_summaries_by_ids(
             [self.STORY_ID_1])[0]
         story = story_fetchers.get_story_by_id(self.STORY_ID_1)

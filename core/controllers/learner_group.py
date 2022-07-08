@@ -23,6 +23,7 @@ from core.controllers import base
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import story_fetchers
+from core.domain import subtopic_page_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 
@@ -270,8 +271,10 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         subtopic_page_ids = learner_group.subtopic_page_ids
         story_ids = learner_group.story_ids
         topic_ids = (
-            learner_group_services.get_topic_ids_from_subtopic_page_ids(
-                subtopic_page_ids))
+            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
+                subtopic_page_ids
+            )
+        )
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
 
         all_skill_ids_lists = [
@@ -295,7 +298,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                 'username': user_services.get_username(user_id),
                 'progress_sharing_is_turned_on': progress_sharing_permission,
                 'stories_progress': [],
-                'subtopic_page_progress': []
+                'subtopic_pages_progress': []
             }
 
             # If progress sharing is turned off, then we don't need to
@@ -321,14 +324,16 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
                     progress_dict['all_node_dicts'])
                 student_progress['stories_progress'].append(story_prog_dict)
 
-            subtopic_page_progress = (
-                learner_group_services.get_subtopic_page_progress(
+            subtopic_pages_progress = (
+                learner_group_services.get_subtopic_pages_progress(
                     user_id, subtopic_page_ids, topics, all_skill_ids
                 )
             )
 
-            student_progress['subtopic_page_progress'].append(
-                subtopic_page_progress.to_dict())
+            student_progress['subtopic_pages_progress'] = [
+                subtopic_page_progress.to_dict() for subtopic_page_progress in
+                subtopic_pages_progress
+            ]
 
             # Add current student's progress to all students progress.
             all_students_progress.append(student_progress)

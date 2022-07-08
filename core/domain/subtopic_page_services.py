@@ -322,3 +322,24 @@ def delete_subtopic_page(
     subtopic_models.SubtopicPageModel.get(subtopic_page_id).delete(
         committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED,
         force_deletion=force_deletion)
+
+
+def get_topic_ids_from_subtopic_page_ids(
+    subtopic_page_ids: List[str]
+) -> List[str]:
+    """Returns the topic ids corresponding to the given subtopic page ids.
+
+    Args:
+        subtopic_page_ids: list(str). The ids of the subtopic pages.
+
+    Returns:
+        list(str). The topic ids corresponding to the given subtopic page ids.
+    """
+    topic_ids: List[str] = []
+
+    for subtopic_page_id in subtopic_page_ids:
+        topic_id = subtopic_page_id.split(':')[0]
+        if topic_id not in topic_ids:
+            topic_ids.append(topic_id)
+
+    return topic_ids

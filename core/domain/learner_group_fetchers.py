@@ -100,11 +100,8 @@ def get_progress_sharing_permission(user_id: str, group_id: str) -> bool:
         group as True, False otherwise.
     """
     learner_group_user_model = user_models.LearnerGroupsUserModel.get(
-        user_id, strict=False
+        user_id, strict=True
     )
-
-    # Ruling out the possibility of None for mypy type checking.
-    assert learner_group_user_model is not None
 
     for group_details in learner_group_user_model.learner_groups_user_details:
         if group_details['group_id'] == group_id:

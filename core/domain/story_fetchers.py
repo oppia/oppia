@@ -373,8 +373,8 @@ def get_completed_nodes_in_story(
 
 
 def get_progress_in_stories(
-        user_id: str, story_ids: List[str]
-    ) -> List[story_domain.StoryProgress]:
+    user_id: str, story_ids: List[str]
+) -> List[story_domain.StoryProgress]:
     """Returns the progress of the user in all given stories.
 
     Args:
