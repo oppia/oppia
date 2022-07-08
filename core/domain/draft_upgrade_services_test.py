@@ -74,7 +74,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
             len(
@@ -88,7 +88,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
             len(
@@ -104,7 +104,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
             len(
@@ -168,7 +168,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
 
             # Assert that the update was applied and that the exploration state
             # schema was successfully updated.
-            exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)  # type: ignore[no-untyped-call]
+            exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
             self.assertEqual(exploration.version, 2)
             self.assertEqual(
                 str(exploration.states_schema_version), target_schema_version)
@@ -1512,9 +1512,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'voiceovers_mapping': {
                         'content': {
                             'en': {
-                                'file_size_name': 100,
+                                'file_size_bytes': 100,
                                 'filename': 'atest.mp3',
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.0
                             }
                         }
                     }
@@ -1531,7 +1532,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'voiceovers_mapping': {
                         'content': {
                             'en': {
-                                'file_size_name': 100,
+                                'file_size_bytes': 100,
                                 'filename': 'atest.mp3',
                                 'needs_update': False,
                                 'duration_secs': 0.0
@@ -1688,7 +1689,16 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'content_ids_to_audio_translations',
                 'state_name': 'State B',
-                'new_value': 'new value',
+                'new_value': {
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'atest.mp3',
+                            'needs_update': False,
+                            'duration_secs': 0.0
+                        }
+                    }
+                },
             })
         ]
         # Version 28 adds voiceovers_mapping.
@@ -1697,7 +1707,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'recorded_voiceovers',
                 'state_name': 'State B',
-                'new_value': {'voiceovers_mapping': 'new value'}
+                'new_value': {'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'file_size_bytes': 100,
+                                'filename': 'atest.mp3',
+                                'needs_update': False,
+                                'duration_secs': 0.0
+                            }
+                        }
+                    }
+                }
             })
         ]
         # Migrate exploration to state schema version 28.

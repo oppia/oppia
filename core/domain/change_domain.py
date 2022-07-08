@@ -22,7 +22,6 @@ import copy
 
 from core import feconf
 from core import utils
-
 from core.domain import state_domain
 
 from typing import Any, Dict, List, Mapping, Union, cast
@@ -35,7 +34,9 @@ AcceptableChangeDictTypes = Union[
     List[str],
     List[Dict[str, Any]],
     Dict[str, Any],
-    state_domain.SubtitledHtmlDict
+    state_domain.SubtitledHtmlDict,
+    List[state_domain.AnswerGroupDict],
+    state_domain.RecordedVoiceoversDict
 ]
 
 

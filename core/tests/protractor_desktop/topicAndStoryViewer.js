@@ -193,7 +193,7 @@ describe('Topic and Story viewer functionality', function() {
 
     // Signing up with the login button should redirect the user back to the
     // exploration.
-    var loginButton = element(by.css('.protractor-test-login-button'));
+    var loginButton = element(by.css('.e2e-test-login-button'));
     await action.click('Login button', loginButton);
     await users.createAndLoginUser(
       'newStoryViewer@storyviewer.com', 'newStoryViewer', false);

@@ -1,4 +1,4 @@
-<div class="modal-header protractor-test-save-modal">
+<div class="modal-header e2e-test-save-modal">
   <h3>
     <span *ngIf="collectionIsPrivate">Save Draft</span>
     <span *ngIf="!collectionIsPrivate">Publish Changes</span>
@@ -13,14 +13,14 @@
               [maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
               [(ngModel)]="commitMessage"
               oppiaFocusOn="saveChangesModalOpened"
-              class="protractor-test-commit-message-input"
+              class="e2e-test-commit-message-input"
               autofocus>
     </textarea>
   </p>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-close-save-modal-button"
+  <button class="btn btn-success e2e-test-close-save-modal-button"
           (disabled)="!collectionIsPrivate && !commitMessage"
           (click)="confirm(commitMessage)">
     <span *ngIf="collectionIsPrivate">Save Draft</span>
