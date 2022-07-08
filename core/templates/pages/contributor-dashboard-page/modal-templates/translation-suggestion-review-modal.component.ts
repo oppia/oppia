@@ -293,8 +293,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     const threadMessageBackendDicts = response.messages;
     let threadMessages = threadMessageBackendDicts.map(
       m => ThreadMessage.createFromBackendDict(m));
-    this.reviewMessage = '';
-    if (threadMessages[1]) {
+    if (threadMessages[1] !== undefined) {
       this.reviewMessage = threadMessages[1].text;
     }
   }
