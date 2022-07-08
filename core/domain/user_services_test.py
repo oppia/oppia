@@ -1298,7 +1298,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_has_fully_registered_account_for_none_user_id_returns_false(
         self
     ) -> None:
-        user_id = None
+        user_id = 'non_existing_user'
         self.assertFalse(user_services.has_fully_registered_account(user_id))
 
     def test_mark_user_banned(self) -> None:
