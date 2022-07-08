@@ -64,7 +64,7 @@ describe('Learner Group User Progress', () => {
       username: 'user1',
       progress_sharing_is_turned_on: true,
       stories_progress: [sampleStorySummaryBackendDict],
-      subtopic_page_progress: [sampleLearnerGroupSubtopicSummaryDict]
+      subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
     };
 
     let sampleLearnerGroupUserProg = (

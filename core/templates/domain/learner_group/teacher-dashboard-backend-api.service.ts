@@ -32,8 +32,7 @@ interface TeacherDashboardBackendResponse {
   providedIn: 'root'
 })
 export class TeacherDashboardBackendApiService {
-  constructor(
-    private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   async _fetchTeacherDashboardLearnerGroupsAsync():
   Promise<ShortLearnerGroupSummary[]> {

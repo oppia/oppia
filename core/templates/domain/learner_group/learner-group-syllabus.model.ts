@@ -36,7 +36,8 @@ export class LearnerGroupSyllabus {
   constructor(
       learnerGroupId: string,
       storySummaries: StorySummary[],
-      subtopicPageSummaries: LearnerGroupSubtopicSummary[]) {
+      subtopicPageSummaries: LearnerGroupSubtopicSummary[]
+  ) {
     this._learnerGroupId = learnerGroupId;
     this._storySummaries = storySummaries;
     this._subtopicPageSummaries = subtopicPageSummaries;

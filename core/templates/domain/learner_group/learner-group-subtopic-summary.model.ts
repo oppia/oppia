@@ -34,7 +34,7 @@ export class LearnerGroupSubtopicSummary {
   _subtopicTitle: string;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
-  // Optional, if it's none, it means the subtopic is not started yet.
+  // Optional, if it's none, it means the subtopic has not started yet.
   _subtopicMastery?: number;
 
   constructor(
@@ -44,7 +44,8 @@ export class LearnerGroupSubtopicSummary {
       subtopicTitle: string,
       thumbnailFilename: string,
       thumbnailBgColor: string,
-      subtopicMastery?: number) {
+      subtopicMastery?: number
+  ) {
     this._parentTopicId = parentTopicId;
     this._parentTopicName = parentTopicName;
     this._subtopicId = subtopicId;
