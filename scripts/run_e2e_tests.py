@@ -201,6 +201,11 @@ SUITES_STILL_IN_PROTRACTOR = [
     'wipeout',
 ]
 
+MOBILE_SUITES = [
+    'contributorDashboard'
+]
+
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -398,6 +403,11 @@ def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
     policy = RERUN_POLICIES[parsed_args.suite.lower()]
+    suite = parsed_args.suite
+
+    if (parsed_args.mobile) and (suite not in MOBILE_SUITES):
+        print(f'The {suite} suite should not be run in the mobile viewport')
+        sys.exit(1)
 
     with servers.managed_portserver():
         for attempt_num in range(1, MAX_RETRY_COUNT + 1):
