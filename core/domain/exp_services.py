@@ -2597,6 +2597,10 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
     logged_out_user_data = (
         exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
 
+    # If logged out progress has been cleared by the cron job.
+    if logged_out_user_data is None:
+        return
+
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_user_data = exp_fetchers.get_exploration_user_data(
         user_id,
