@@ -28,6 +28,7 @@ import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory'
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
+import { UrlService } from 'services/contextual/url.service';
 
 export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
@@ -61,6 +62,10 @@ export interface FetchExplorationBackendResponse {
   'most_recently_reached_checkpoint_exp_version': number;
 }
 
+interface CheckpointsFeatureStatusBackendDict {
+  'checkpoints_feature_is_enabled': boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -72,15 +77,36 @@ export class ReadOnlyExplorationBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
     private versionedExplorationCachingService:
-      VersionedExplorationCachingService
+      VersionedExplorationCachingService,
+    private urlService: UrlService
   ) {}
 
+  _fetchCheckpointsFeatureIsEnabledStatus(
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void): void {
+    const checkpointsFeatureIsEnabledStatusHandlerUrl = (
+      '/checkpoints_feature_status_handler');
+
+    this.http.get<CheckpointsFeatureStatusBackendDict>(
+      checkpointsFeatureIsEnabledStatusHandlerUrl).toPromise().then(data => {
+      if (successCallback) {
+        successCallback(data.checkpoints_feature_is_enabled);
+      }
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
+  }
+
   private async _fetchExplorationAsync(
-      explorationId: string, version: number | null
+      explorationId: string,
+      version: number | null,
+      uniqueProgressUrlId: string | null = null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       const explorationDataUrl = this._getExplorationUrl(
-        explorationId, version);
+        explorationId, version, uniqueProgressUrlId);
 
       // If version is not null, then check whether the exploration data for
       // the given version is already cached. If so, then resolve the Promise
@@ -113,21 +139,27 @@ export class ReadOnlyExplorationBackendApiService {
     return this._explorationCache.hasOwnProperty(explorationId);
   }
 
-  private _getExplorationUrl(explorationId: string, version: number | null):
-    string {
+  private _getExplorationUrl(
+      explorationId: string,
+      version: number | null,
+      uniqueProgressUrlId: string | null = null): string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
           exploration_id: explorationId,
           version: String(version)
         });
+    } else if (uniqueProgressUrlId) {
+      return this.urlInterpolationService.interpolateUrl(
+        AppConstants.EXPLORATION_PROGRESS_PID_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          pid: uniqueProgressUrlId
+        });
     }
-
     return this.urlInterpolationService.interpolateUrl(
       AppConstants.EXPLORATION_DATA_URL_TEMPLATE, {
         exploration_id: explorationId
-      }
-    );
+      });
   }
 
   /**
@@ -141,9 +173,13 @@ export class ReadOnlyExplorationBackendApiService {
    * is called instead, if present. The rejection callback function is
    * passed any data returned by the backend in the case of an error.
    */
-  async fetchExplorationAsync(explorationId: string, version: number | null):
-    Promise<FetchExplorationBackendResponse> {
-    return this._fetchExplorationAsync(explorationId, version);
+  async fetchExplorationAsync(
+      explorationId: string,
+      version: number | null,
+      uniqueProgressUrlId: string | null = null):
+     Promise<FetchExplorationBackendResponse> {
+    return this._fetchExplorationAsync(
+      explorationId, version, uniqueProgressUrlId);
   }
 
   /**
@@ -156,7 +192,8 @@ export class ReadOnlyExplorationBackendApiService {
    * will store the exploration in the cache to avoid requests from the
    * backend in further function calls.
    */
-  async loadLatestExplorationAsync(explorationId: string):
+  async loadLatestExplorationAsync(
+      explorationId: string, uniqueProgressUrlId: string | null = null):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(explorationId)) {
@@ -164,13 +201,15 @@ export class ReadOnlyExplorationBackendApiService {
           resolve(this._explorationCache[explorationId]);
         }
       } else {
-        this._fetchExplorationAsync(explorationId, null).then(exploration => {
+        this._fetchExplorationAsync(
+          explorationId, null, uniqueProgressUrlId)
+          .then(exploration => {
           // Save the fetched exploration to avoid future fetches.
-          this._explorationCache[explorationId] = exploration;
-          if (resolve) {
-            resolve(exploration);
-          }
-        }, reject);
+            this._explorationCache[explorationId] = exploration;
+            if (resolve) {
+              resolve(exploration);
+            }
+          }, reject);
       }
     });
   }
@@ -216,6 +255,15 @@ export class ReadOnlyExplorationBackendApiService {
    */
   clearExplorationCache(): void {
     this._explorationCache = {};
+  }
+
+  /**
+   * Retrieves status of the checkpoints feature flag from the backend.
+   */
+  async fetchCheckpointsFeatureIsEnabledStatus(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._fetchCheckpointsFeatureIsEnabledStatus(resolve, reject);
+    });
   }
 
   /**
