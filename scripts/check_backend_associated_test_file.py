@@ -23,7 +23,7 @@ import sys
 TOPMOST_LEVEL_PATH = './'
 
 # NOTE TO DEVELOPERS: Do not add any new files to this list without asking
-# @U8NWXD first.
+# the Dev Workflow Team first.
 FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     # These are data files for testing and have no logic to be tested.
     'scripts/linters/test_files/invalid_annotations.py',
@@ -75,7 +75,7 @@ def main() -> None:
     """Finds the non-empty backend files that lack an associated test file."""
 
     all_backend_files = []
-    for (root, _, files) in os.walk(TOPMOST_LEVEL_PATH):
+    for root, _, files in os.walk(TOPMOST_LEVEL_PATH):
         for file in files:
             full_path = os.path.join(root, file)
             _, file_extension = os.path.splitext(full_path)
@@ -108,9 +108,8 @@ def main() -> None:
     for file in non_empty_files:
         if file not in FILES_WITHOUT_ASSOCIATED_TEST_FILES:
             errors += (
-                '\033[1m{}\033[0m does not have an associated test file.'
-                ' Make sure it\'s fully tested by its associated test'
-                ' file.\n'.format(file))
+                '\033[1m{}\033[0m needs an associated backend test file.\n'
+                .format(file))
 
     if errors:
         print('-------------------------------------------')
