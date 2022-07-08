@@ -43,7 +43,7 @@
          [src]="oppiaAvatarImageUrl" alt="">
   </a>
   <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
-       class="protractor-test-input-response-loading-dots">
+       class="e2e-test-input-response-loading-dots">
     <div class="conversation-skin-feedback-dot-one"></div>
     <div class="conversation-skin-feedback-dot-two"></div>
     <div class="conversation-skin-feedback-dot-three"></div>
@@ -52,7 +52,7 @@
   <div dir="auto">
     <oppia-rte-output-display *ngIf="data.oppiaResponse !== null"
                               [rteString]="data.oppiaResponse"
-                              [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'protractor-test-conversation-feedback-latest' : '')"
+                              [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
                               [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
                               [ngClass]="getFeedbackAudioHighlightClass()">
     </oppia-rte-output-display>

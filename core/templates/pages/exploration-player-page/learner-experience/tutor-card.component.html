@@ -28,7 +28,7 @@
            [oppiaFocusOn]="getContentFocusLabel($index)">
         <div tabindex="1">
           <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
-                                    class="protractor-test-conversation-content">
+                                    class="e2e-test-conversation-content">
           </oppia-rte-output-display>
         </div>
         <div *ngIf="isContentAudioTranslationAvailable()"
@@ -92,7 +92,7 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <oppia-interaction-display classStr="protractor-test-conversation-input"
+          <oppia-interaction-display classStr="e2e-test-conversation-input"
                                      [htmlData]="displayedCard.getInteractionHtml()">
           </oppia-interaction-display>
         </div>

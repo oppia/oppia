@@ -4,7 +4,7 @@
   <ng-container *ngFor="let rubric of skillIdToRubricsObject[skillWithDifficulty.getId()]; index as idx">
     <mat-radio-button *ngIf="rubric.getExplanations().length > 0"
                       [value]="availableDifficultyValues[idx]"
-                      class="protractor-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}} mat-radio-button">
+                      class="e2e-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}} mat-radio-button">
       <strong>{{ rubric.getDifficulty() }}</strong>
       <mat-list>
         <mat-list-item class="pl-0" *ngFor="let explanation of rubric.getExplanations()">
