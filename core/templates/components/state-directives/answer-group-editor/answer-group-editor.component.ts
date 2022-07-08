@@ -51,6 +51,7 @@ angular.module('oppia').component('answerGroupEditor', {
     addState: '=',
     displayFeedback: '=',
     getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
+    getOnSaveAnswerGroupDestIfStuckFn: '&onSaveAnswerGroupDestIfStuck',
     getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
     getOnSaveAnswerGroupCorrectnessLabelFn: (
       '&onSaveAnswerGroupCorrectnessLabel'),

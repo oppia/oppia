@@ -112,6 +112,7 @@
   <oppia-outcome-editor [is-editable]="$ctrl.isEditable"
                         [display-feedback]="$ctrl.displayFeedback"
                         (save-dest)="$ctrl.getOnSaveAnswerGroupDestFn()($event)"
+                        (save-dest-if-stuck)="$ctrl.getOnSaveAnswerGroupDestIfStuckFn()($event)"
                         (save-feedback)="$ctrl.getOnSaveAnswerGroupFeedbackFn()($event)"
                         (save-correctness-label)="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()($event)"
                         [outcome]="$ctrl.outcome"
