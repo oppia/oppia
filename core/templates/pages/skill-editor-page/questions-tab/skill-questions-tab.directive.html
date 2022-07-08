@@ -1,14 +1,14 @@
 <div ng-if="!questionEditorIsShown">
   <div class="questions">
-    <questions-list all-skill-summaries="[]"
-                    skill-descriptions-are-shown="false"
-                    select-skill-modal-is-shown="false"
-                    skill-ids="[skill.getId()]"
-                    can-edit-question="true"
-                    skill-id-to-rubrics-object="skillIdToRubricsObject"
-                    selected-skill-id="skill.getId()"
-                    grouped-skill-summaries="groupedSkillSummaries">
-    </questions-list>
+    <oppia-questions-list [all-skill-summaries]="[]"
+                          [skill-descriptions-are-shown]="false"
+                          [select-skill-modal-is-shown]="false"
+                          [skill-ids]="[skill.getId()]"
+                          [can-edit-question]="true"
+                          [skill-id-to-rubrics-object]="skillIdToRubricsObject"
+                          [selected-skill-id]="skill.getId()"
+                          [grouped-skill-summaries]="groupedSkillSummaries">
+    </oppia-questions-list>
   </div>
 </div>
 

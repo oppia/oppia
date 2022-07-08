@@ -34,6 +34,10 @@ import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backen
 import { Location } from '@angular/common';
 import { State } from 'domain/state/StateObjectFactory';
 
+interface QuestionData {
+  linkedSkillIds: string[];
+}
+
 interface ActionButton {
   type: string;
   url: string;
@@ -43,6 +47,10 @@ interface Answer {
   isCorrect: boolean;
   timestamp: number;
   taggedSkillMisconceptionId: string;
+}
+
+interface MasteryChangePerQuestion {
+  [skillID: string]: number;
 }
 
 interface ScorePerSkill {
@@ -140,7 +148,9 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   getMasteryChangeForWrongAnswers(
-      answers: Answer[], masteryChangePerQuestion: any): any {
+      answers: Answer[],
+      masteryChangePerQuestion: MasteryChangePerQuestion):
+      MasteryChangePerQuestion {
     answers.forEach((answer) => {
       if (!answer.isCorrect) {
         if (answer.taggedSkillMisconceptionId) {
@@ -162,7 +172,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   updateMasteryPerSkillMapping(
-      masteryChangePerQuestion: any): void {
+      masteryChangePerQuestion: MasteryChangePerQuestion): void {
     for (let skillId in masteryChangePerQuestion) {
       if (!(skillId in this.masteryPerSkillMapping)) {
         continue;
@@ -380,7 +390,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.masteryPerSkillMapping = masteryPerSkillMapping;
   }
 
-  createMasteryChangePerQuestion(questionData: any): object {
+  createMasteryChangePerQuestion(
+      questionData: QuestionData): MasteryChangePerQuestion {
     let masteryChangePerQuestion = {};
     for (let i = 0; i < questionData.linkedSkillIds.length; i++) {
       let skillId = questionData.linkedSkillIds[i];
