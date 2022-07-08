@@ -93,7 +93,7 @@ var expectComponentDetailsToMatch = async function(elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
   var mathComponent = await elem.getAttribute('math_content-with-value');
   expect(escapedJsonToObj(mathComponent).raw_latex).toBe(rawLatex);
-  var mathSvgImage = elem.element(by.css('.protractor-test-math-svg'));
+  var mathSvgImage = elem.element(by.css('.e2e-test-math-svg'));
   await waitFor.visibilityOf(
     mathSvgImage,
     'Math SVG takes too long to load.');
