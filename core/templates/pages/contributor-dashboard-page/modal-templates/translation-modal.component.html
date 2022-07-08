@@ -44,7 +44,7 @@
       </div>
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
-      <div class="protractor-test-state-translation-editor">
+      <div class="e2e-test-state-translation-editor">
         <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
         <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
                              [schema]="HTML_SCHEMA"

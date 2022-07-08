@@ -413,6 +413,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir, 'webdriverio.js')))
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir,
                     '%s-interactions.module.ts' % hyphenated_interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1

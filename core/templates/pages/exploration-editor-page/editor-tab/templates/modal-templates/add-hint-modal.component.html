@@ -1,4 +1,4 @@
-<div class="modal-header protractor-test-hint-modal">
+<div class="modal-header e2e-test-hint-modal">
   <h3>Add Hint</h3>
   <i class="fa fa-times" (click)="cancel()"></i>
 </div>
@@ -7,7 +7,7 @@
   <form class="form-inline">
     <div class="oppia-rule-details-header">
       <strong>Hint #{{ hintIndex }} is...</strong>
-      <schema-based-editor class="protractor-test-hint-text"
+      <schema-based-editor class="e2e-test-hint-text"
                            [schema]="getSchema()"
                            [localValue]="this.tmpHint"
                            (localValueChange)="this.updateLocalHint($event)">
@@ -20,8 +20,8 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary protractor-test-cancel-hint" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-save-hint" (click)="saveHint()" [disabled]="!this.tmpHint || this.isHintLengthExceeded(this.tmpHint)">Save Hint</button>
+  <button class="btn btn-secondary e2e-test-cancel-hint" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-save-hint" (click)="saveHint()" [disabled]="!this.tmpHint || this.isHintLengthExceeded(this.tmpHint)">Save Hint</button>
 </div>
 
 <style>

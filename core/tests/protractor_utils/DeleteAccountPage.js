@@ -20,16 +20,16 @@
 var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 var pendingAccountDeletionHeading =
-  element(by.css('.protractor-test-pending-account-deletion'));
+  element(by.css('.e2e-test-pending-account-deletion'));
 
 var DeleteAccountPage = function() {
   var DELETE_ACCOUNT_PAGE_URL = '/delete-account';
   var deleteMyAccountButton = element(
-    by.css('.protractor-test-delete-my-account-button'));
+    by.css('.e2e-test-delete-my-account-button'));
   var confirmDeletionUsernameField = element(
-    by.css('.protractor-test-confirm-username-field'));
+    by.css('.e2e-test-confirm-username-field'));
   var confirmDeletionButton = element(
-    by.css('.protractor-test-confirm-deletion-button'));
+    by.css('.e2e-test-confirm-deletion-button'));
 
   this.get = async function() {
     await browser.get(DELETE_ACCOUNT_PAGE_URL);

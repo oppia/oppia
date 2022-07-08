@@ -28,7 +28,7 @@
   </div>
   <div class="oppia-topic-summary-tiles" *ngIf="classroomData">
     <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
-         class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
+         class="oppia-topic-summary-tile e2e-test-topic-summary-tile">
       <oppia-topic-summary-tile [topicSummary]="topicSummary"
                                 [classroomUrlFragment]="classroomUrlFragment"
                                 [isPublished]="topicSummary.isTopicPublished()">

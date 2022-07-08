@@ -149,9 +149,9 @@ describe('Interactions', function() {
         // Delete any leftover rules that may remain from previous tests of the
         // same interaction, so they won't interfere with the current test.
         var deleteResponseButton = element(by.css(
-          '.protractor-test-delete-response'));
+          '.e2e-test-delete-response'));
         var confirmDeleteResponseButton = element(by.css(
-          '.protractor-test-confirm-delete-response'));
+          '.e2e-test-confirm-delete-response'));
         if (await deleteResponseButton.isPresent()) {
           await action.click('Delete Response button', deleteResponseButton);
           await action.click(
@@ -186,9 +186,9 @@ describe('Interactions', function() {
         }
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
-          '.protractor-test-close-help-card-button'));
+          '.e2e-test-close-help-card-button'));
         var helpCard = element(
-          by.css('.protractor-test-conversation-skin-help-card'));
+          by.css('.e2e-test-conversation-skin-help-card'));
         var isPresent = await clearHelpcardButton.isPresent();
         if (isPresent) {
           await action.click('Clear Helper Button', clearHelpcardButton);

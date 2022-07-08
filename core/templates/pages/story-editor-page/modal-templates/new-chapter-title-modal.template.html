@@ -15,7 +15,7 @@
           </i>
         </div>
       </div>
-      <input class="form-control protractor-test-new-chapter-title-field oppia-new-chapter-title-field"
+      <input class="form-control e2e-test-new-chapter-title-field oppia-new-chapter-title-field"
              placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
              ng-model="title" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_EXPLORATION_TITLE]>" autofocus>
       <span class="oppia-input-box-subtitle">
@@ -32,8 +32,8 @@
       <div class="chapter-input-header">
         <span>Exploration ID*</span>
       </div>
-      <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control protractor-test-chapter-exploration-input">
-      <span class="new-chapter-error-msg protractor-test-invalid-exp-id" ng-if="invalidExpId || explorationId && !validateExplorationId()">
+      <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control e2e-test-chapter-exploration-input">
+      <span class="new-chapter-error-msg e2e-test-invalid-exp-id" ng-if="invalidExpId || explorationId && !validateExplorationId()">
         <span><[invalidExpErrorString]></span>
       </span>
       <span class="new-chapter-error-msg" ng-if="correctnessFeedbackDisabled">
@@ -43,7 +43,7 @@
         <span>The category of this exploration is invalid. Curated lessons need to have their category to be one of the default categories.</span>
       </span>
     </div>
-    <div class="chapter-input chapter-input-thumbnail protractor-test-chapter-input-thumbnail">
+    <div class="chapter-input chapter-input-thumbnail e2e-test-chapter-input-thumbnail">
       <div class="chapter-input-header">
         <span>Thumbnail Image*</span>
       </div>
@@ -60,8 +60,8 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary protractor-test-cancel-chapter-creation-button" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-chapter-creation-button" type="submit" ng-disabled="!isValid()">
+    <button class="btn btn-secondary e2e-test-cancel-chapter-creation-button" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success e2e-test-confirm-chapter-creation-button" type="submit" ng-disabled="!isValid()">
       <span>Create Chapter</span>
     </button>
   </div>

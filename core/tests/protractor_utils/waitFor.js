@@ -29,7 +29,7 @@ var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
-var loadingMessage = element(by.css('.protractor-test-loading-message'));
+var loadingMessage = element(by.css('.e2e-test-loading-message'));
 
 var alertToBePresent = async function() {
   await browser.wait(
@@ -65,7 +65,7 @@ var pageToFullyLoad = async function() {
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
-  var loadingMessage = element(by.css('.protractor-test-loading-fullpage'));
+  var loadingMessage = element(by.css('.e2e-test-loading-fullpage'));
   await browser.driver.wait(
     until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');

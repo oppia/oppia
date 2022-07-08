@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for performing actions on element.
+ * @fileoverview Utilities for performing actions on element in protractor.
  */
 
 var waitFor = require('./waitFor.js');
 
 var autoSaveIndicatorElement = element(
-  by.css('.protractor-test-autosave-indicator'));
+  by.css('.e2e-test-autosave-indicator'));
 
 // Waits for the invisibility of the autosave message.
 var waitForAutosave = async function() {

@@ -26,106 +26,106 @@ var workflow = require('../protractor_utils/workflow.js');
 var StoryEditorPage = function() {
   var EDITOR_URL_PREFIX = '/story_editor/';
   var thumbnailContainer = element(
-    by.css('.protractor-test-thumbnail-container'));
-  var storyTitleField = element(by.css('.protractor-test-story-title-field'));
+    by.css('.e2e-test-thumbnail-container'));
+  var storyTitleField = element(by.css('.e2e-test-story-title-field'));
   var storyDescriptionField = element(
-    by.css('.protractor-test-story-description-field'));
-  var storyNotes = element(by.css('.protractor-test-story-notes'));
-  var notesEditor = element(by.css('.protractor-test-story-notes-rte'));
+    by.css('.e2e-test-story-description-field'));
+  var storyNotes = element(by.css('.e2e-test-story-notes'));
+  var notesEditor = element(by.css('.e2e-test-story-notes-rte'));
   var openStoryNotesEditorButton = element(
-    by.css('.protractor-test-open-story-notes-editor-button'));
+    by.css('.e2e-test-open-story-notes-editor-button'));
   var saveStoryNotesEditorButton = element(
-    by.css('.protractor-test-save-story-notes-button'));
+    by.css('.e2e-test-save-story-notes-button'));
   var returnToTopicButton = element(
-    by.css('.protractor-test-return-to-topic-button'));
+    by.css('.e2e-test-return-to-topic-button'));
   var saveStoryButton = element(
-    by.css('.protractor-test-save-story-button'));
+    by.css('.e2e-test-save-story-button'));
   var commitMessageField = element(
-    by.css('.protractor-test-commit-message-input'));
+    by.css('.e2e-test-commit-message-input'));
   var closeSaveModalButton = element(
-    by.css('.protractor-test-close-save-modal-button'));
+    by.css('.e2e-test-close-save-modal-button'));
   var createChapterButton = element(
-    by.css('.protractor-test-add-chapter-button'));
+    by.css('.e2e-test-add-chapter-button'));
   var newChapterTitleField = element(
-    by.css('.protractor-test-new-chapter-title-field'));
+    by.css('.e2e-test-new-chapter-title-field'));
   var newChapterExplorationField = element(
-    by.css('.protractor-test-chapter-exploration-input'));
+    by.css('.e2e-test-chapter-exploration-input'));
   var confirmChapterCreationButton = element(
-    by.css('.protractor-test-confirm-chapter-creation-button'));
+    by.css('.e2e-test-confirm-chapter-creation-button'));
   var cancelChapterCreationButton = element(
-    by.css('.protractor-test-cancel-chapter-creation-button'));
-  var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
+    by.css('.e2e-test-cancel-chapter-creation-button'));
+  var chapterTitles = element.all(by.css('.e2e-test-chapter-title'));
   var deleteChapterButton = element(
-    by.css('.protractor-test-delete-chapter-button'));
+    by.css('.e2e-test-delete-chapter-button'));
   var confirmDeleteChapterButton = element(
-    by.css('.protractor-test-confirm-delete-chapter-button'));
+    by.css('.e2e-test-confirm-delete-chapter-button'));
   var publishStoryButton = element(
-    by.css('.protractor-test-publish-story-button'));
+    by.css('.e2e-test-publish-story-button'));
   var unpublishStoryButton = element(
-    by.css('.protractor-test-unpublish-story-button'));
-  var chapterEditOptions = element.all(by.css('.protractor-test-edit-options'));
+    by.css('.e2e-test-unpublish-story-button'));
+  var chapterEditOptions = element.all(by.css('.e2e-test-edit-options'));
   var backToStoryEditorButton = element(
-    by.css('.protractor-test-back-to-story-editor-button'));
+    by.css('.e2e-test-back-to-story-editor-button'));
   var storyMetaTagContentField = element(
-    by.css('.protractor-test-story-meta-tag-content-field'));
+    by.css('.e2e-test-story-meta-tag-content-field'));
   var storyMetaTagContentLabel = element(
-    by.css('.protractor-test-story-meta-tag-content-label'));
+    by.css('.e2e-test-story-meta-tag-content-label'));
 
   /*
    * CHAPTER
    */
   var explorationIdInput = element(
-    by.css('.protractor-test-exploration-id-input'));
+    by.css('.e2e-test-exploration-id-input'));
   var explorationIdSaveButton = element(
-    by.css('.protractor-test-exploration-id-save-button'));
+    by.css('.e2e-test-exploration-id-save-button'));
   var nodeDescriptionInputField = element(
-    by.css('.protractor-test-add-chapter-description'));
+    by.css('.e2e-test-add-chapter-description'));
   var nodeOutlineEditor = element(
-    by.css('.protractor-test-add-chapter-outline'));
-  var nodeOutlineEditorRteContent = element.all(by.css('.protractor-test-rte'));
+    by.css('.e2e-test-add-chapter-outline'));
+  var nodeOutlineEditorRteContent = element.all(by.css('.e2e-test-rte'));
   var nodeOutlineFinalizeCheckbox = element(
-    by.css('.protractor-test-finalize-outline'));
+    by.css('.e2e-test-finalize-outline'));
   var nodeOutlineSaveButton = element(
-    by.css('.protractor-test-node-outline-save-button'));
+    by.css('.e2e-test-node-outline-save-button'));
   var addPrerequisiteSkillButton = element(
-    by.css('.protractor-test-add-prerequisite-skill'));
+    by.css('.e2e-test-add-prerequisite-skill'));
   var addAcquiredSkillButton = element(
-    by.css('.protractor-test-add-acquired-skill'));
+    by.css('.e2e-test-add-acquired-skill'));
   var selectSkillModalHeader = element(
-    by.css('.protractor-test-skill-select-header'));
+    by.css('.e2e-test-skill-select-header'));
   var skillNameInputField = element(
-    by.css('.protractor-test-skill-name-input'));
+    by.css('.e2e-test-skill-name-input'));
   var skillSaveButton = element(
-    by.css('.protractor-test-confirm-skill-selection-button'));
+    by.css('.e2e-test-confirm-skill-selection-button'));
   var skillListItems = element.all(
-    by.css('.protractor-test-skills-list-item'));
+    by.css('.e2e-test-skills-list-item'));
   var deletePrerequisiteSkillButton = element.all(
-    by.css('.protractor-test-remove-prerequisite-skill'));
+    by.css('.e2e-test-remove-prerequisite-skill'));
   var deleteAcquiredSkillButton = element.all(
-    by.css('.protractor-test-remove-acquired-skill'));
-  var nextChapterCard = element(by.css('.protractor-test-next-chapter-card'));
-  var warningIndicator = element(by.css('.protractor-test-warning-indicator'));
+    by.css('.e2e-test-remove-acquired-skill'));
+  var nextChapterCard = element(by.css('.e2e-test-next-chapter-card'));
+  var warningIndicator = element(by.css('.e2e-test-warning-indicator'));
   var warningTextElements = element.all(
-    by.css('.protractor-test-warnings-text'));
+    by.css('.e2e-test-warnings-text'));
   var storyThumbnailImageElement = element(
-    by.css('.protractor-test-story-thumbnail .protractor-test-custom-photo'));
+    by.css('.e2e-test-story-thumbnail .e2e-test-custom-photo'));
   var storyThumbnailButton = element(
-    by.css('.protractor-test-story-thumbnail .protractor-test-photo-button'));
+    by.css('.e2e-test-story-thumbnail .e2e-test-photo-button'));
   var chapterThumbnailImageElement = element(
     by.css(
-      '.protractor-test-story-node-thumbnail .protractor-test-custom-photo'));
+      '.e2e-test-story-node-thumbnail .e2e-test-custom-photo'));
   var chapterThumbnailButton = element(
     by.css(
-      '.protractor-test-story-node-thumbnail .protractor-test-photo-button'));
+      '.e2e-test-story-node-thumbnail .e2e-test-photo-button'));
   var createChapterThumbnailButton = element(
     by.css(
-      '.protractor-test-chapter-input-thumbnail .protractor-test-photo-button')
+      '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button')
   );
   var explorationAlreadyPresentMsg = element(
-    by.css('.protractor-test-invalid-exp-id'));
-  var discardOption = element(by.css('.protractor-test-show-discard-option'));
+    by.css('.e2e-test-invalid-exp-id'));
+  var discardOption = element(by.css('.e2e-test-show-discard-option'));
   var discardChangesButton = element(
-    by.css('.protractor-test-discard-story-changes'));
+    by.css('.e2e-test-discard-story-changes'));
 
   this.get = async function(storyId) {
     await browser.get(EDITOR_URL_PREFIX + storyId);
@@ -376,7 +376,7 @@ var StoryEditorPage = function() {
     );
     let desc = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-add-chapter-description')[0].value;
+        'e2e-test-add-chapter-description')[0].value;
     });
     await expect(desc).toMatch(nodeDescription);
   };
@@ -388,7 +388,7 @@ var StoryEditorPage = function() {
     );
     let explorationId = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-exploration-id-input')[0].value;
+        'e2e-test-exploration-id-input')[0].value;
     });
     await expect(explorationId).toEqual(id);
   };
@@ -486,7 +486,7 @@ var StoryEditorPage = function() {
   this.expectAcquiredSkillDescriptionCardCount = async function(number) {
     let count = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-acquired-skill-description-card').length;
+        'e2e-test-acquired-skill-description-card').length;
     });
     await expect(count).toEqual(number);
   };
@@ -494,7 +494,7 @@ var StoryEditorPage = function() {
   this.expectPrerequisiteSkillDescriptionCardCount = async function(number) {
     let count = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-prerequisite-skill-description-card').length;
+        'e2e-test-prerequisite-skill-description-card').length;
     });
     await expect(count).toEqual(number);
   };

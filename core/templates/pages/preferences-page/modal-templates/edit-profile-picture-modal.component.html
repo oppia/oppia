@@ -19,7 +19,7 @@
 
       <div *ngIf="uploadedImage">
         <span>{{ 'I18N_PREFERENCES_PROFILE_PICTURE_DRAG' | translate }}</span>
-        <div class="oppia-profile-picture-crop-area protractor-test-photo-crop">
+        <div class="oppia-profile-picture-crop-area e2e-test-photo-crop">
           <button class="btn btn-secondary oppia-profile-picture-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
@@ -38,7 +38,7 @@
             (click)="cancel()">
             {{ 'I18N_PREFERENCES_CANCEL_BUTTON' | translate }}
     </button>
-    <button class="btn btn-success protractor-test-photo-upload-submit"
+    <button class="btn btn-success e2e-test-photo-upload-submit"
             (click)="confirm()"
             [disabled]="!uploadedImage">
             {{ 'I18N_PREFERENCES_PROFILE_PICTURE_ADD' | translate }}

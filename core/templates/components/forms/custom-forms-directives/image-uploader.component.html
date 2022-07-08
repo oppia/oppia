@@ -3,7 +3,7 @@
      #dropArea>
   <div class="image-uploader-text" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
   <span *ngIf="errorMessage"
-        class="image-uploader-error-message protractor-test-upload-error">
+        class="image-uploader-error-message e2e-test-upload-error">
     <i class="material-icons">&#xE002;</i>
     {{ errorMessage }}
   </span>
@@ -16,7 +16,7 @@
   <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
   <input type="file" id="image-file-input" (click)="this.value = null"
          (change)="handleFile()"
-         class="image-uploader-file-input protractor-test-photo-upload-input"
+         class="image-uploader-file-input e2e-test-photo-upload-input"
          [ngClass]="fileInputClassName" #imageInput>
   <label *ngIf="isBlogPostThumbnailUploader"
          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"

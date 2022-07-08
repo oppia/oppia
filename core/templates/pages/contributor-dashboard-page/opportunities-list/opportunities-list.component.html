@@ -8,7 +8,7 @@
                              [opportunityType]="opportunityType">
     </oppia-opportunities-list-item>
   </div>
-  <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
+  <div [hidden]="!loadingOpportunityData" class="e2e-test-opportunity-loading-placeholder">
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
@@ -28,7 +28,7 @@
   </div>
   <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message e2e-test-opportunity-list-empty-availability-message">No opportunity available!</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>

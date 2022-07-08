@@ -2,7 +2,7 @@
 <p>For instructions: see the README file in /assets/scripts.</p>
 
 <style type="text/css">
-  .protractor-test-results {
+  .e2e-test-results {
     display: none;
   }
 </style>
@@ -11,11 +11,11 @@
 <script src="/assets/scripts/embedding_tests.js"></script>
 <script src="../../third_party/static/jquery-3.5.1/jquery.min.js"></script>
 
-<input class="protractor-test-exploration-id-input-field" type="text" placeholder="explorationId">
-<input class="protractor-test-exploration-id-submit-button" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
+<input class="e2e-test-exploration-id-input-field" type="text" placeholder="explorationId">
+<input class="e2e-test-exploration-id-submit-button" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
 
-<div class="protractor-test-results">
-  <div class="protractor-test-embedded-exploration">
+<div class="e2e-test-results">
+  <div class="e2e-test-embedded-exploration">
     <h3>Standard embedding of the latest version</h3>
     <oppia oppia-id="idToBeReplaced"></oppia>
   </div>
@@ -26,7 +26,7 @@
   var placeholderExplorationId = 'idToBeReplaced';
   var onChangeExpId = function() {
     var newExplorationId = $(
-      '.protractor-test-exploration-id-input-field').val();
+      '.e2e-test-exploration-id-input-field').val();
     $('div > iframe').each(function(index) {
       var src = $(this).attr('src');
       src = src.replace(placeholderExplorationId, newExplorationId);
@@ -35,6 +35,6 @@
     placeholderExplorationId = newExplorationId;
 
     // Show the contents.
-    $('.protractor-test-results').show();
+    $('.e2e-test-results').show();
   };
 </script>

@@ -6,10 +6,10 @@
     </h3>
   </div>
   <div class="modal-body oppia-long-text">
-    <p class="protractor-test-exploration-save-modal">
+    <p class="e2e-test-exploration-save-modal">
       <span ng-if="isExplorationPrivate">(Optional)</span>
       Please enter a brief description of what you have changed:
-      <textarea rows="3" cols="50" maxlength="<[MAX_COMMIT_MESSAGE_LENGTH]>" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="oppia-commit-message-input protractor-test-commit-message-input" autofocus></textarea>
+      <textarea rows="3" cols="50" maxlength="<[MAX_COMMIT_MESSAGE_LENGTH]>" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="oppia-commit-message-input e2e-test-commit-message-input" autofocus></textarea>
     </p>
     <button class="btn btn-secondary" ng-click="onClickToggleDiffButton()">
       <span ng-if="!showDiff">Show Changes</span>
@@ -22,7 +22,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-save-draft-button" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="confirm(commitMessage)">
+    <button class="btn btn-success e2e-test-save-draft-button" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="confirm(commitMessage)">
       <span ng-if="isExplorationPrivate">Save Draft</span>
       <span ng-if="!isExplorationPrivate">Publish Changes</span>
     </button>

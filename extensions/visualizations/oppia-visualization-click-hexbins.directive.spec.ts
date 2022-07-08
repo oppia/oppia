@@ -69,34 +69,34 @@ describe('Oppia click hexbins visualization', function() {
     });
 
     it('should appear after hovering a hexagon', () => {
-      el.find('.protractor-test-hexagon-0').trigger('mouseover');
+      el.find('.e2e-test-hexagon-0').trigger('mouseover');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
       expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
         .toEqual('2 clicks');
     });
 
     it('should switch focus when moving mouse between hexagons', () => {
-      el.find('.protractor-test-hexagon-0').trigger('mouseover');
+      el.find('.e2e-test-hexagon-0').trigger('mouseover');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
       expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
         .toEqual('2 clicks');
 
-      el.find('.protractor-test-hexagon-0').trigger('mouseout');
+      el.find('.e2e-test-hexagon-0').trigger('mouseout');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
 
-      el.find('.protractor-test-hexagon-1').trigger('mouseover');
+      el.find('.e2e-test-hexagon-1').trigger('mouseover');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
       expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
         .toEqual('1 click');
     });
 
     it('should stick to first hexagon hovered', () => {
-      el.find('.protractor-test-hexagon-0').trigger('mouseover');
+      el.find('.e2e-test-hexagon-0').trigger('mouseover');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
       expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
         .toEqual('2 clicks');
 
-      el.find('.protractor-test-hexagon-1').trigger('mouseover');
+      el.find('.e2e-test-hexagon-1').trigger('mouseover');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
       expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
         .toEqual('2 clicks');
@@ -105,10 +105,10 @@ describe('Oppia click hexbins visualization', function() {
     it('should handle mouseout of unfocused hexagons gracefully', () => {
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
 
-      el.find('.protractor-test-hexagon-0').trigger('mouseout');
+      el.find('.e2e-test-hexagon-0').trigger('mouseout');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
 
-      el.find('.protractor-test-hexagon-1').trigger('mouseout');
+      el.find('.e2e-test-hexagon-1').trigger('mouseout');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
     });
   });

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the protractor-practices.js file.
+ * @fileoverview Tests for the e2e-practices.js file.
  */
 
 'use strict';
 
-var rule = require('./protractor-practices');
+var rule = require('./e2e-practices');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester({
@@ -28,7 +28,7 @@ var ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser')
 });
 
-ruleTester.run('protractor-practices', rule, {
+ruleTester.run('e2e-practices', rule, {
   valid: [{
     code:
     `expSummaryRowTitleElements.first()
@@ -62,13 +62,20 @@ ruleTester.run('protractor-practices', rule, {
     code: 'sam.then.age;',
   }, {
     code: `var profileLink = element(by.css(
-          '.protractor-test-profile-link'));`
+          '.e2e-test-profile-link'));`
+  }, {
+    code: `var profileLink = $(
+          '.e2e-test-profile-link');`
   }, {
     code: 'const SKILL_DESCRIPTIONS = 1;'
   }, {
     code: 'var modal = element.all(by.css(".modal-dialog")).last();'
   }, {
+    code: 'var modal = $(".modal-dialog")[0];'
+  }, {
     code: 'var modal = element(by.css("option:checked"));'
+  }, {
+    code: 'var modal = $("option:checked");'
   }, {
     code: ` var items = ['item1', 'item2', 'item3'];
             for (let i=0; i < items.length; i++) {
@@ -84,7 +91,17 @@ ruleTester.run('protractor-practices', rule, {
         by.css('.oppia-hide-card-height-warning-icon'));`,
       errors: [{
         message: (
-          'Please use “.protractor-test-” prefix classname selector instead ' +
+          'Please use “.e2e-test-” prefix classname selector instead ' +
+          'of “.oppia-hide-card-height-warning-icon”'),
+      }],
+    },
+    {
+      code:
+      `var hideHeightWarningIcon = $(
+        '.oppia-hide-card-height-warning-icon');`,
+      errors: [{
+        message: (
+          'Please use “.e2e-test-” prefix classname selector instead ' +
           'of “.oppia-hide-card-height-warning-icon”'),
       }],
     },
@@ -95,7 +112,7 @@ ruleTester.run('protractor-practices', rule, {
       });`,
       errors: [{
         message: 'Please do not use browser.switchTo().activeElement()' +
-          ' in protractor files',
+          ' in e2e files',
         type: 'MemberExpression',
       }],
     },
@@ -105,7 +122,7 @@ ruleTester.run('protractor-practices', rule, {
         browser.sleep();
       });`,
       errors: [{
-        message: 'Please do not use browser.sleep() in protractor files',
+        message: 'Please do not use browser.sleep() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -115,7 +132,7 @@ ruleTester.run('protractor-practices', rule, {
         browser.explore();
       });`,
       errors: [{
-        message: 'Please do not use browser.explore() in protractor files',
+        message: 'Please do not use browser.explore() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -125,7 +142,17 @@ ruleTester.run('protractor-practices', rule, {
         browser.pause();
       });`,
       errors: [{
-        message: 'Please do not use browser.pause() in protractor files',
+        message: 'Please do not use browser.pause() in e2e files',
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        browser.debug();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.debug() in e2e files',
         type: 'CallExpression',
       }],
     },
@@ -136,7 +163,7 @@ ruleTester.run('protractor-practices', rule, {
       });`,
       errors: [{
         message: (
-          'Please do not use browser.waitForAngular() in protractor files'),
+          'Please do not use browser.waitForAngular() in e2e files'),
         type: 'CallExpression',
       }],
     },
@@ -159,7 +186,7 @@ ruleTester.run('protractor-practices', rule, {
     {
       code:
       `await element.all(
-      by.css(".protractor-test-collection-exploration")).first()`,
+      by.css(".e2e-test-collection-exploration")).first()`,
       errors: [{
         message: 'Please do not use await for "first()"',
       }],
@@ -167,7 +194,7 @@ ruleTester.run('protractor-practices', rule, {
     {
       code:
       `var oneOffJob = element.all(
-      by.css('.protractor-test-one-off-jobs-rows'));
+      by.css('.e2e-test-one-off-jobs-rows'));
       await oneOffJob.get()
       await invalid.get()`,
       errors: [{

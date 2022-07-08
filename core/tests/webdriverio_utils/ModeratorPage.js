@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the admin page, for use in Protractor
+ * @fileoverview Page object for the admin page, for use in WebdriverIO
  * tests.
  */
 
@@ -21,10 +21,10 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ModeratorPage = function() {
-  var moderatorPage = element(by.css('.protractor-test-moderator-page'));
+  var moderatorPage = $('.e2e-test-moderator-page');
 
   this.get = async function() {
-    await browser.get(general.MODERATOR_URL_SUFFIX);
+    await browser.url(general.MODERATOR_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
 

@@ -1,10 +1,10 @@
-<div class="modal-header protractor-test-add-response-modal-header">
+<div class="modal-header e2e-test-add-response-modal-header">
   <h3>Add Response</h3>
   <i class="fa fa-times" ng-click="cancel()"></i>
 </div>
 
 <div class="modal-body">
-  <form name="addAnswerGroupForm.outcomeDetailsForm" class="protractor-test-add-response-details">
+  <form name="addAnswerGroupForm.outcomeDetailsForm" class="e2e-test-add-response-details">
     <div class="oppia-rule-details-header">
       <strong>If the learner's answer...</strong>
     </div>
@@ -18,7 +18,7 @@
          title="Edit feedback" class="oppia-edit-feedback">
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">
-          <div class="oppia-click-to-start-editing protractor-test-open-feedback-editor" ng-click="openFeedbackEditor()">
+          <div class="oppia-click-to-start-editing e2e-test-open-feedback-editor" ng-click="openFeedbackEditor()">
             <i class="material-icons oppia-editor-edit-icon" title="Edit Feedback">&#xE254;</i>
           </div>
           <strong>Oppia tells the learner...</strong>
@@ -50,7 +50,7 @@
 
   <div class="oppia-correctness-label-editor" ng-if="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
     <strong>The answers in this group are correct</strong>
-    <input class="protractor-test-editor-correctness-toggle" type="checkbox" ng-model="tmpOutcome.labelledAsCorrect">
+    <input class="e2e-test-editor-correctness-toggle" type="checkbox" ng-model="tmpOutcome.labelledAsCorrect">
   </div>
   <oppia-question-misconception-editor ng-if="questionModeEnabled"
                                        (save-tagged-misconception)="updateTaggedMisconception($event)"
@@ -63,8 +63,8 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary protractor-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
+  <button class="btn btn-secondary e2e-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
   <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
 </div>
 <style>

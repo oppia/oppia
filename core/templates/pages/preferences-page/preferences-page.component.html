@@ -1,6 +1,6 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container ng-scope">
-  <h2 class="oppia-preferences-page-heading protractor-test-preferences-title">
+  <h2 class="oppia-preferences-page-heading e2e-test-preferences-title">
       {{ 'I18N_PREFERENCES_HEADING' | translate }}
   </h2>
   <em>
@@ -33,14 +33,14 @@
         <div class="col-lg-8 col-md-8 col-sm-8">
           <div class="oppia-editable-section oppia-profile-picture-container"
                title="{{ 'I18N_PREFERENCES_CHANGE_PICTURE' | translate }}">
-            <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
+            <div class="oppia-click-to-start-editing e2e-test-photo-clickable"
                  (click)="showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
             </div>
             <i class="material-icons oppia-editor-edit-icon oppia-editor-edit-icon-pos">&#xE254;</i>
             <img *ngIf="profilePictureDataUrl"
                  [src]="profilePictureDataUrl"
-                 class="img-thumbnail protractor-test-custom-photo"
+                 class="img-thumbnail e2e-test-custom-photo"
                  alt="Profile photo picture">
             <picture *ngIf="!profilePictureDataUrl">
               <source type="image/webp" [srcset]="getStaticImageUrl('/general/no_profile_picture.webp')">
@@ -59,7 +59,7 @@
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <textarea id="label-target-user-bio"
-                    class="oppia-bio-border protractor-test-user-bio oppia-autofocus"
+                    class="oppia-bio-border e2e-test-user-bio oppia-autofocus"
                     [(ngModel)]="userBio"
                     [attr.value]="userBio"
                     (blur)="saveUserBio(userBio)"
@@ -81,7 +81,7 @@
       <div class="col-lg-8 col-md-8 col-sm-8">
         <div class="checkbox oppia-checkbox">
           <label>
-            <input type="radio" [(ngModel)]="defaultDashboard" value="{{ DASHBOARD_TYPE_CREATOR }}" (change)="saveDefaultDashboard(defaultDashboard)" class="protractor-test-creator-dashboard-radio"
+            <input type="radio" [(ngModel)]="defaultDashboard" value="{{ DASHBOARD_TYPE_CREATOR }}" (change)="saveDefaultDashboard(defaultDashboard)" class="e2e-test-creator-dashboard-radio"
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}">
             <span>
               {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}
@@ -94,7 +94,7 @@
                    [(ngModel)]="defaultDashboard"
                    value="{{ DASHBOARD_TYPE_LEARNER }}"
                    (change)="saveDefaultDashboard(defaultDashboard)"
-                   class="protractor-test-learner-dashboard-radio"
+                   class="e2e-test-learner-dashboard-radio"
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
             <span>
               {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}
@@ -142,7 +142,7 @@
                 <img [src]="subscription.creator_picture_data_url" class="oppia-subscription-card-profile-picture rounded-circle">
                 <span class="oppia-subscription-card-summary">
                   <div class="oppia-subscription-card-summary-text-container">
-                    <strong class="protractor-test-subscription-name"
+                    <strong class="e2e-test-subscription-name"
                             [ngbPopover]="subscription.creator_username"
                             [triggers]="showUsernamePopover(subscription.creator_username)">
                       {{ subscription.creator_username| truncate:10 }}
@@ -254,7 +254,7 @@
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-email-updates-checkbox"
+                   class="e2e-test-email-updates-checkbox"
                    [(ngModel)]="canReceiveEmailUpdates"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
             <span>
@@ -276,7 +276,7 @@
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-editor-role-email-checkbox"
+                   class="e2e-test-editor-role-email-checkbox"
                    [(ngModel)]="canReceiveEditorRoleEmail"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
             <span>
@@ -287,7 +287,7 @@
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-subscription-email-checkbox"
+                   class="e2e-test-subscription-email-checkbox"
                    [(ngModel)]="canReceiveSubscriptionEmail"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
             <span>
@@ -298,7 +298,7 @@
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-feedback-message-email-checkbox"
+                   class="e2e-test-feedback-message-email-checkbox"
                    [(ngModel)]="canReceiveFeedbackMessageEmail"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
             <span>
@@ -317,7 +317,7 @@
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <a href="/delete-account" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
-          <button type="button" class="btn btn-danger protractor-test-delete-account-button">
+          <button type="button" class="btn btn-danger e2e-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>
         </a>
@@ -336,7 +336,7 @@
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
         <a href="/export-account-handler">
           <button type="button"
-                  class="btn btn-primary protractor-test-export-account-button"
+                  class="btn btn-primary e2e-test-export-account-button"
                   title="Export account"
                   (click)="handleExportDataClick()">
                   {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}

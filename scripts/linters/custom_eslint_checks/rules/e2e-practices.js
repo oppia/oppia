@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Lint to ensure that follow good practices
- * for writing proractor e2e test.
+ * for writing proractor and webdriverio e2e test.
  */
 
 'use strict';
@@ -35,16 +35,16 @@ module.exports = {
         'Please make sure that constant name “{{constName}}” are in all-caps'),
       disallowedActiveElementMethod: (
         'Please do not use browser.switchTo().activeElement()' +
-        ' in protractor files'),
+        ' in e2e files'),
       disallowedBrowserMethods: (
-        'Please do not use browser.{{methodName}}() in protractor files'),
+        'Please do not use browser.{{methodName}}() in e2e files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
       disallowForEach: (
         'Please do not use .forEach(), consider using a' +
         ' "for loop" instead'),
       disallowAwait: 'Please do not use await for "{{propertyName}}()"',
-      useProtractorTest: (
-        'Please use “.protractor-test-” prefix classname selector instead of ' +
+      useE2ETest: (
+        'Please use “.e2e-test-” prefix classname selector instead of ' +
         '“{{incorrectClassname}}”')
     },
   },
@@ -59,7 +59,7 @@ module.exports = {
       '[object.callee.property.name=switchTo]' +
       '[object.callee.object.name=browser]');
     var disallowedBrowserMethods = [
-      'sleep', 'explore', 'pause', 'waitForAngular'];
+      'sleep', 'explore', 'pause', 'waitForAngular', 'debug'];
     var disallowedBrowserMethodsRegex = (
       `/^(${disallowedBrowserMethods.join('|')})$/`);
     var disallowedBrowserMethodsSelector = (
@@ -67,6 +67,7 @@ module.exports = {
       disallowedBrowserMethodsRegex + ']');
     var byCssSelector = (
       'CallExpression[callee.object.name=by][callee.property.name=css]');
+    var cssSelector = 'CallExpression[callee.name=$]';
     var elementAllIdName = [];
 
     var reportDisallowInvalidAwait = function(node) {
@@ -131,7 +132,7 @@ module.exports = {
       }
     };
 
-    var checkElementSelector = function(node) {
+    var checkElementSelectorProtractor = function(node) {
       var thirdPartySelectorPrefixes = (
         ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
@@ -145,10 +146,35 @@ module.exports = {
         }
       }
       if ((node.arguments[0].type === 'Literal') &&
-        (!node.arguments[0].value.startsWith('.protractor-test-'))) {
+        (!node.arguments[0].value.startsWith('.e2e-test-'))) {
         context.report({
           node: node.arguments[0],
-          messageId: 'useProtractorTest',
+          messageId: 'useE2ETest',
+          data: {
+            incorrectClassname: node.arguments[0].value
+          }
+        });
+      }
+    };
+
+    var checkElementSelectorWebdriverio = function(node) {
+      var thirdPartySelectorPrefixes = (
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+      for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
+        if ((node.arguments[0].type === 'Literal') &&
+          (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {
+          return;
+        }
+        if ((node.arguments[0].type === 'Literal') &&
+         (node.arguments[0].value.startsWith('option'))) {
+          return;
+        }
+      }
+      if ((node.arguments[0].type === 'Literal') &&
+        (!node.arguments[0].value.startsWith('.e2e-test-'))) {
+        context.report({
+          node: node.arguments[0],
+          messageId: 'useE2ETest',
           data: {
             incorrectClassname: node.arguments[0].value
           }
@@ -187,7 +213,10 @@ module.exports = {
         });
       },
       [byCssSelector]: function(node) {
-        checkElementSelector(node);
+        checkElementSelectorProtractor(node);
+      },
+      [cssSelector]: function(node) {
+        checkElementSelectorWebdriverio(node);
       }
     };
   }

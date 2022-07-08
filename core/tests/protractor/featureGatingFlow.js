@@ -30,18 +30,18 @@ describe('Feature Gating Flow', function() {
   // is enabled, and the feature status is successfully loaded in the
   // Angular component.
   var agDummyFeatureIndicator = element(
-    by.css('.protractor-test-angular-dummy-feature-indicator'));
+    by.css('.e2e-test-angular-dummy-feature-indicator'));
 
   // Indicator in Angular component that is visible if the dummy_feature
   // is enabled, and the backend dummy handler is also enabled.
   var agDummyHandlerIndicator = agDummyFeatureIndicator.element(
-    by.css('.protractor-test-angular-dummy-handler-indicator'));
+    by.css('.e2e-test-angular-dummy-handler-indicator'));
 
   // Indicator in AngularJS directive that is visible if the dummy_feature
   // is enabled, and the feature status is successfully loaded in the
   // AngularJS directive.
   var ajsDummyFeatureIndicator = element(
-    by.css('.protractor-test-angularjs-dummy-feature-indicator'));
+    by.css('.e2e-test-angularjs-dummy-feature-indicator'));
 
   let adminPage = null;
 

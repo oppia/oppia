@@ -60,7 +60,7 @@
           There are no questions in this skill.
         </span>
       </div>
-      <div ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item protractor-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
+      <div ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item e2e-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
         <div ng-if="!$ctrl.deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
              ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
           <div class="question-data">
@@ -125,7 +125,7 @@
     <div class="save-question-button-container">
       <button class="btn question-edit-cancel-button" ng-click="$ctrl.cancel()">CANCEL</button>
       <button title="To Save please add: interaction, hint, solution and address all misconceptions"
-              class="btn add-question-btn question-edit-save-button protractor-test-save-question-button"
+              class="btn add-question-btn question-edit-save-button e2e-test-save-question-button"
               ng-click="$ctrl.saveQuestion()"
               ng-disabled="!$ctrl.isQuestionSavable()">
         SAVE
@@ -138,7 +138,7 @@
         <div class="list-header create-question-header">
           <h3>Create a new question</h3>
         </div>
-        <button class="btn add-question-btn protractor-test-create-question-button oppia-autofocus"
+        <button class="btn add-question-btn e2e-test-create-question-button oppia-autofocus"
                 ng-disabled="$ctrl.selectSkillModalIsShown() && !$ctrl.getSelectedSkillId()"
                 ng-click="$ctrl.createQuestion()" focus-on="newQuestionBtn">
           + ADD QUESTION

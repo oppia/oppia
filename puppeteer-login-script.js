@@ -22,19 +22,19 @@ const LOGIN_URL = 'http://127.0.0.1:8181/login';
 const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
-var emailInput = '.protractor-test-sign-in-email-input';
-var signInButton = '.protractor-test-sign-in-button';
-var usernameInput = '.protractor-test-username-input';
-var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
-var registerUser = '.protractor-test-register-user:not([disabled])';
+var emailInput = '.e2e-test-sign-in-email-input';
+var signInButton = '.e2e-test-sign-in-button';
+var usernameInput = '.e2e-test-username-input';
+var agreeToTermsCheckBox = '.e2e-test-agree-to-terms-checkbox';
+var registerUser = '.e2e-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var usernameInputFieldForRolesEditing = (
-  '.protractor-test-username-for-role-editor');
-var editUserRoleButton = '.protractor-test-role-edit-button';
-var roleEditorContainer = '.protractor-test-roles-editor-card-container';
-var addNewRoleButton = '.protractor-test-add-new-role-button';
-var roleSelect = '.protractor-test-new-role-selector';
+  '.e2e-test-username-for-role-editor');
+var editUserRoleButton = '.e2e-test-role-edit-button';
+var roleEditorContainer = '.e2e-test-roles-editor-card-container';
+var addNewRoleButton = '.e2e-test-add-new-role-button';
+var roleSelect = '.e2e-test-new-role-selector';
 
 module.exports = async(browser, context) => {
   const page = await browser.newPage();
@@ -139,7 +139,7 @@ const createExplorations = async function(context, page) {
     await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click(
-      '.protractor-test-reload-exploration-button');
+      '.e2e-test-reload-exploration-button');
     // eslint-disable-next-line no-console
     console.log('Exploration Created');
   } catch (e) {

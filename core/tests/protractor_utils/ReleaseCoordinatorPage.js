@@ -21,19 +21,19 @@ var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var ReleaseCoordinatorPage = function() {
-  var oneOffJobRows = element.all(by.css('.protractor-test-one-off-jobs-rows'));
+  var oneOffJobRows = element.all(by.css('.e2e-test-one-off-jobs-rows'));
   var unfinishedOneOffJobRows = element.all(by.css(
-    '.protractor-test-unfinished-one-off-jobs-rows'));
+    '.e2e-test-unfinished-one-off-jobs-rows'));
   var unfinishedOffJobIDClassName = (
-    '.protractor-test-unfinished-one-off-jobs-id');
+    '.e2e-test-unfinished-one-off-jobs-id');
   var oneOfJobsStartBtnLocator = by.css(
-    '.protractor-test-one-off-jobs-start-btn');
+    '.e2e-test-one-off-jobs-start-btn');
   var oneOffJobsStopBtnLocator = by.css(
-    '.protractor-test-one-off-jobs-stop-btn');
+    '.e2e-test-one-off-jobs-stop-btn');
   var unfinishedOneOffJobsIdElements = element.all(
-    by.css('.protractor-test-unfinished-one-off-jobs-id'));
+    by.css('.e2e-test-unfinished-one-off-jobs-id'));
   var unfinishedJobsCardElement = element(
-    by.css('.protractor-test-unfinished-jobs-card'));
+    by.css('.e2e-test-unfinished-jobs-card'));
 
   this.get = async function() {
     await browser.get('/release-coordinator');

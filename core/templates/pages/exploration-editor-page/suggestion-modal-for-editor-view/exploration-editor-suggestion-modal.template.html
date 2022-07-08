@@ -22,11 +22,11 @@
   </section>
   <div ng-show="canAccept" class="oppia-review-message-text">
     Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
+    <input class="e2e-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
   </div>
   <div class="oppia-review-message-text" ng-show="canAccept">
     Brief Description of Changes (required if accepting):
-    <input class="protractor-test-suggestion-commit-message w-100" type="text" ng-model="commitMessage" maxlength="<[MAX_COMMIT_MESSAGE_LENGTH]>">
+    <input class="e2e-test-suggestion-commit-message w-100" type="text" ng-model="commitMessage" maxlength="<[MAX_COMMIT_MESSAGE_LENGTH]>">
   </div>
 </div>
 
@@ -36,10 +36,10 @@
   </div>
   <button class="btn btn-secondary" ng-click="cancelReview()">Cancel</button>
   <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
-    <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
+    <button class="btn btn-danger e2e-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
   </span>
   <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
-    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+    <button class="btn btn-success e2e-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
   </span>
 </div>
 <style>

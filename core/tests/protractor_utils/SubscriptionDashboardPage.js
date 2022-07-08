@@ -21,11 +21,11 @@ var waitFor = require('./waitFor.js');
 
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = element(
-    by.css('.protractor-test-subscription-button'));
+    by.css('.e2e-test-subscription-button'));
   var subscriptionName = element.all(
-    by.css('.protractor-test-subscription-name'));
-  var subscribeLabel = element(by.css('.protractor-test-subscribe-label'));
-  var unsubscribeLabel = element(by.css('.protractor-test-unsubscribe-label'));
+    by.css('.e2e-test-subscription-name'));
+  var subscribeLabel = element(by.css('.e2e-test-subscribe-label'));
+  var unsubscribeLabel = element(by.css('.e2e-test-unsubscribe-label'));
 
   this.navigateToUserSubscriptionPage = async function(userName) {
     await browser.get('/profile/' + userName);

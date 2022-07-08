@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,27 +16,26 @@
  * @fileoverview End-to-end tests for user management.
  */
 
-var action = require('../protractor_utils/action.js');
+var action = require('../webdriverio_utils/action.js');
 var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
+  require('../webdriverio_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
+  require('../webdriverio_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var ModeratorPage = require('../protractor_utils/ModeratorPage.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+  '../webdriverio_utils/ExplorationEditorPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
+var ModeratorPage = require('../webdriverio_utils/ModeratorPage.js');
+var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
-  var languageDropdown = element(by.css('.protractor-test-language-dropdown'));
-  var languageOption = element(
-    by.css('.protractor-test-i18n-language-' + language));
+  var languageDropdown = $('.e2e-test-language-dropdown');
   await action.click('Language Dropdown', languageDropdown);
+  var languageOption = $('.e2e-test-i18n-language-' + language);
   await action.click('Language Option', languageOption);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();
@@ -151,7 +150,7 @@ describe('Site language', function() {
     await creatorDashboardPage.clickCreateActivityButton();
     await creatorDashboardPage.clickCreateCollectionButton();
     await waitFor.pageToFullyLoad();
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     var pathname = url.split('/');
     collectionId = pathname[5];
     // Add existing explorations.
@@ -168,7 +167,7 @@ describe('Site language', function() {
 
   beforeEach(async function() {
     // Starting language is English.
-    await browser.get('/about');
+    await browser.url('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('en');
     await libraryPage.get();
@@ -177,7 +176,7 @@ describe('Site language', function() {
   });
 
   it('should change after selecting a different language', async function() {
-    await browser.get('/about');
+    await browser.url('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('es');
 
@@ -216,7 +215,7 @@ describe('Site language', function() {
     async function() {
       await users.createUser('feanor@example.com', 'Feanor');
       await users.login('feanor@example.com');
-      await browser.get('/about');
+      await browser.url('/about');
       await waitFor.pageToFullyLoad();
       await _selectLanguage('es');
       await libraryPage.get();
@@ -233,14 +232,13 @@ describe('Site language', function() {
 
   it('should not change in an exploration', async function() {
     await users.login('langCreator@explorations.com');
-    await browser.get('/about');
+    await browser.url('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('es');
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
-    var placeholderElement = await element(
-      by.css('.protractor-test-float-form-input'));
+    var placeholderElement = await $('.e2e-test-float-form-input');
     await waitFor.visibilityOf(
       placeholderElement, 'Placeholder Element taking too long to appear');
     await waitFor.elementAttributeToBe(
@@ -252,15 +250,14 @@ describe('Site language', function() {
 
   it('should not change in exploration and collection player for guest users',
     async function() {
-      await browser.get('/about');
+      await browser.url('/about');
       await waitFor.pageToFullyLoad();
       await _selectLanguage('es');
 
       // Checking collection player page.
-      await browser.get('/collection/' + collectionId);
+      await browser.url('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-share-collection-footer')).getText())
+      expect(await $('.e2e-test-share-collection-footer').getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
     }
@@ -268,7 +265,7 @@ describe('Site language', function() {
 
   afterEach(async function() {
     // Reset language back to English.
-    await browser.get('/about');
+    await browser.url('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('en');
     await general.checkForConsoleErrors([]);

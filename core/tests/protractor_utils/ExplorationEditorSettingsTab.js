@@ -27,38 +27,38 @@ var ExplorationEditorSettingsTab = function() {
    * Interactive elements
    */
   var explorationCategoryInput = element(
-    by.css('.protractor-test-exploration-category-input'));
+    by.css('.e2e-test-exploration-category-input'));
   var explorationLanguageInput = element(
-    by.css('.protractor-test-exploration-language-select'));
+    by.css('.e2e-test-exploration-language-select'));
   var explorationObjectiveInput = element(
-    by.css('.protractor-test-exploration-objective-input'));
+    by.css('.e2e-test-exploration-objective-input'));
   var explorationObjectiveWarning = element(
-    by.css('.protractor-test-exploration-objective-warning'));
+    by.css('.e2e-test-exploration-objective-warning'));
   var explorationSummaryTile = element(
-    by.css('.protractor-test-exploration-summary-tile'));
+    by.css('.e2e-test-exploration-summary-tile'));
   var explorationTitleInput = element(
-    by.css('.protractor-test-exploration-title-input'));
+    by.css('.e2e-test-exploration-title-input'));
   var initialStateSelect = element(
-    by.css('.protractor-test-initial-state-select'));
+    by.css('.e2e-test-initial-state-select'));
   var initialStateSelectOption = function(stateName) {
     return initialStateSelect.element(
       by.cssContainingText('option', stateName));
   };
-  var neutralElement = element(by.css('.protractor-test-settings-container'));
+  var neutralElement = element(by.css('.e2e-test-settings-container'));
 
   /*
    * Buttons
    */
   var closePreviewSummaryButton = element(
-    by.css('.protractor-test-close-preview-summary-modal'));
+    by.css('.e2e-test-close-preview-summary-modal'));
   var openPreviewSummaryButton = element(
-    by.css('.protractor-test-open-preview-summary-modal'));
+    by.css('.e2e-test-open-preview-summary-modal'));
   var deleteExplorationButton = element(
-    by.css('.protractor-test-delete-exploration-button'));
+    by.css('.e2e-test-delete-exploration-button'));
   var confirmDeleteExplorationButton = element(
-    by.css('.protractor-test-really-delete-exploration-button'));
+    by.css('.e2e-test-really-delete-exploration-button'));
   var disableCorrectnessFeedbackButton = element(
-    by.css('.protractor-test-enable-mark-correctness-feedback'));
+    by.css('.e2e-test-enable-mark-correctness-feedback'));
 
   /*
    * Workflows

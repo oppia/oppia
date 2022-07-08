@@ -42,7 +42,10 @@
       "files": [
         "core/tests/protractor/*.js",
         "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js"
+        "core/tests/protractor_desktop/*.js",
+        "core/tests/webdriverio/*.js",
+        "core/tests/webdriverio_utils/*.js",
+        "core/tests/webdriverio_desktop/*.js"
       ],
       "excludedFiles": [
         "ClassroomPage.js",
@@ -113,14 +116,18 @@
       }
     },
     {
-      // We only run the protractor practices checks on protractor end-to-end test files.
+      // We only run the e2e practices checks on protractor and webdriverio
+      // end-to-end test files.
       "files": [
         "core/tests/protractor/*.js",
         "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js"
+        "core/tests/protractor_desktop/*.js",
+        "core/tests/webdriverio/*.js",
+        "core/tests/webdriverio_utils/*.js",
+        "core/tests/webdriverio_desktop/*.js"
       ],
       "rules": {
-        "oppia/protractor-practices": "error"
+        "oppia/e2e-practices": "error"
       }
     },
     {

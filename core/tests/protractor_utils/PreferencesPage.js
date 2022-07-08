@@ -24,37 +24,37 @@ var workflow = require('../protractor_utils/workflow.js');
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
   var emailUpdatesCheckbox = element(
-    by.css('.protractor-test-email-updates-checkbox'));
+    by.css('.e2e-test-email-updates-checkbox'));
   var editorRoleEmailsCheckbox = element(
-    by.css('.protractor-test-editor-role-email-checkbox'));
+    by.css('.e2e-test-editor-role-email-checkbox'));
   var feedbackMessageEmailsCheckbox = element(
-    by.css('.protractor-test-feedback-message-email-checkbox'));
-  var navBar = element(by.css('.protractor-test-navbar-dropdown-toggle'));
-  var pageHeader = element(by.css('.protractor-test-preferences-title'));
+    by.css('.e2e-test-feedback-message-email-checkbox'));
+  var navBar = element(by.css('.e2e-test-navbar-dropdown-toggle'));
+  var pageHeader = element(by.css('.e2e-test-preferences-title'));
   var audioLanguageSelector = (
-    element(by.css('.protractor-test-audio-language-selector')));
-  var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
-  var userBioElement = element(by.css('.protractor-test-user-bio'));
+    element(by.css('.e2e-test-audio-language-selector')));
+  var subscriptions = element.all(by.css('.e2e-test-subscription-name'));
+  var userBioElement = element(by.css('.e2e-test-user-bio'));
   var userInterestsInput = element(
-    by.css('.protractor-test-subject-interests-input'));
+    by.css('.e2e-test-subject-interests-input'));
   var createrDashboardRadio = element(
-    by.css('.protractor-test-creator-dashboard-radio'));
+    by.css('.e2e-test-creator-dashboard-radio'));
   var learnerDashboardRadio = element(
-    by.css('.protractor-test-learner-dashboard-radio'));
+    by.css('.e2e-test-learner-dashboard-radio'));
   var profilePhotoClickable = element(
-    by.css('.protractor-test-photo-clickable'));
+    by.css('.e2e-test-photo-clickable'));
   var customProfilePhoto = element(
-    by.css('.protractor-test-custom-photo'));
+    by.css('.e2e-test-custom-photo'));
   var profilePhotoCropper = element(
-    by.css('.protractor-test-photo-crop .cropper-container'));
+    by.css('.e2e-test-photo-crop .cropper-container'));
   var profilePhotoUploadError = element(
-    by.css('.protractor-test-upload-error'));
+    by.css('.e2e-test-upload-error'));
   var deleteAccountButton = element(
-    by.css('.protractor-test-delete-account-button'));
+    by.css('.e2e-test-delete-account-button'));
   var exportAccountButton = element(
-    by.css('.protractor-test-export-account-button'));
+    by.css('.e2e-test-export-account-button'));
   var languageSelector = element(
-    by.css('.protractor-test-site-language-selector'));
+    by.css('.e2e-test-site-language-selector'));
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);

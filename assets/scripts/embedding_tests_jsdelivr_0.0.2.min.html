@@ -13,27 +13,27 @@
 <script src="//cdn.jsdelivr.net/oppia/0.0.2/oppia-player.min.js"></script>
 <script src="/assets/scripts/embedding_tests.js"></script>
 
-<div class="protractor-test-standard">
+<div class="e2e-test-standard">
   <h3>Standard embedding of the latest version</h3>
   <oppia oppia-id="12"></oppia>
 </div>
 
-<div class="protractor-test-old-version">
+<div class="e2e-test-old-version">
   <h3>Standard embedding of version 1 of the exploration with deferred loading</h3>
   <oppia oppia-id="12" autoload="false" exploration-version="1"></oppia>
 </div>
 
-<div class="protractor-test-missing-id">
+<div class="e2e-test-missing-id">
   <h3>ERROR: No oppia id specified</h3>
   <oppia></oppia>
 </div>
 
-<div class="protractor-test-invalid-id">
+<div class="e2e-test-invalid-id">
   <h3>ERROR: 404 error</h3>
   <oppia oppia-id="fake_id"></oppia>
 </div>
 
-<div class="protractor-test-invalid-id-deferred">
+<div class="e2e-test-invalid-id-deferred">
   <h3>ERROR: 404 error with deferred loading</h3>
   <oppia oppia-id="fake_id" autoload="false"></oppia>
 </div>

@@ -49,6 +49,7 @@ GENERATED_FILE_PATHS = (
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
+    'core/tests/wdio.conf.js',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
@@ -532,7 +533,8 @@ class GeneralPurposeLinter:
                 ('.js')) and filepath.startswith(
                     ('core/templates', 'extensions')) and (
                         filepath not in build.JS_FILEPATHS_NOT_TO_BUILD
-                        ) and not filepath.endswith('protractor.js'):
+                        ) and not filepath.endswith(
+                        ('protractor.js', 'webdriverio.js')):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)

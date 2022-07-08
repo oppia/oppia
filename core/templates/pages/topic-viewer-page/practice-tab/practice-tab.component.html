@@ -19,7 +19,7 @@
         <div *ngFor="let subtopic of availableSubtopics; let i = index"
              class="practice-tab-subtopic-item">
           <mat-checkbox color="primary"
-                        class="practice-tab-mat-checkbox protractor-test-skill-checkbox"
+                        class="practice-tab-mat-checkbox e2e-test-skill-checkbox"
                         [(ngModel)]="selectedSubtopicIndices[i]"
                         (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
             <span [ngClass]="{'subtopic-title': displayArea === 'progressTab'}">
@@ -42,7 +42,7 @@
                   [disabled]="isStartButtonDisabled() && questionsStatusCallIsComplete"
                   [ngClass]="{'practice-button-background-status-pending': !questionsStatusCallIsComplete, 'practice-button-background-status-complete': questionsStatusCallIsComplete}"
                   (click)="checkSiteLanguageBeforeBeginningPracticeSession()"
-                  class="practice-session-button protractor-test-practice-start-button" >
+                  class="practice-session-button e2e-test-practice-start-button" >
             <span *ngIf="questionsStatusCallIsComplete"
                   class="font-heavy"
                   [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate">

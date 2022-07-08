@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Algebraic Expression Input
- * interaction
+ * interaction in protractor.
  */
 
 var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
@@ -24,7 +24,7 @@ var waitFor = require(
 
 var customizeInteraction = async function(elem, customLetters) {
   await waitFor.presenceOf(elem.element(by.css(
-    '.protractor-test-custom-letters-div')),
+    '.e2e-test-custom-letters-div')),
   'The custom letters div took too long to load.');
   for (let letter of customLetters) {
     if (letter.match(/[a-z]/)) {
@@ -51,7 +51,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.element(by.tagName(
     'oppia-interactive-algebraic-expression-input'))).setValue(answer);
-  await element(by.css('.protractor-test-submit-answer-button')).click();
+  await element(by.css('.e2e-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'AlgebraicExpression';

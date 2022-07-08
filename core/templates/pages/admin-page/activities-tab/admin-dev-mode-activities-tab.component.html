@@ -3,20 +3,20 @@
     <div class="container ml-0">
       <h3>Reload a single exploration</h3>
       <div *ngFor="let exploration of DEMO_EXPLORATIONS"
-           class="row oppia-reload-exploration-row protractor-test-reload-exploration-row">
-        <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
+           class="row oppia-reload-exploration-row e2e-test-reload-exploration-row">
+        <span class="col-lg-4 col-md-4 col-sm-4 e2e-test-reload-exploration-title">
           {{ exploration[1] }}
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
           <button type="button"
-                  class="btn btn-secondary protractor-test-reload-exploration-button float-right"
+                  class="btn btn-secondary e2e-test-reload-exploration-button float-right"
                   (click)="reloadExploration(exploration[0])">
           Reload
           </button>
         </span>
       </div>
       <button type="button"
-              class="btn btn-secondary protractor-test-reload-all-explorations-button"
+              class="btn btn-secondary e2e-test-reload-all-explorations-button"
               (click)="reloadAllExplorations()"
               [disabled]="!reloadingAllExplorationPossible">
         Reload All Explorations
@@ -60,13 +60,13 @@
     <div class="container ml-0">
       <h3>Reload a single collection</h3>
       <div *ngFor="let collection of DEMO_COLLECTIONS"
-           class="row oppia-reload-collection-row protractor-test-reload-collection-row">
-        <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
+           class="row oppia-reload-collection-row e2e-test-reload-collection-row">
+        <span class="col-lg-4 col-md-4 col-sm-4 e2e-test-reload-collection-title">
           {{ collection[1] }}
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
           <button type="button"
-                  class="btn btn-secondary protractor-test-reload-collection-button float-right"
+                  class="btn btn-secondary e2e-test-reload-collection-button float-right"
                   (click)="reloadCollection(collection[0])">
             Reload
           </button>

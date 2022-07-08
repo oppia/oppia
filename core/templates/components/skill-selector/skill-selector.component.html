@@ -1,9 +1,9 @@
 <div class="skill-selector">
-  <div class="skill-selector-parent skill-container oppia-skill-container protractor-test-skill-container">
+  <div class="skill-selector-parent skill-container oppia-skill-container e2e-test-skill-container">
     <div class="list-group oppia-list-group">
-      <mat-card class="list-view-item protractor-test-skill-select-header">
+      <mat-card class="list-view-item e2e-test-skill-select-header">
         Search By Skill
-        <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" [(ngModel)]="skillFilterText" autofocus>
+        <input type="text" class="form-control e2e-test-skill-name-input" placeholder="Enter a skill name" [(ngModel)]="skillFilterText" autofocus>
       </mat-card>
       <div class="skill-list-box">
         <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
@@ -16,7 +16,7 @@
                 <div *ngIf="!checkIfEmpty(subtopic.value)">
                   <mat-card class="list-view-item">
                     <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
-                    <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of searchInSubtopicSkills(subtopic.value, skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
+                    <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" *ngFor="let skill of searchInSubtopicSkills(subtopic.value, skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
                       {{ skill.description }}
                     </mat-radio-button>
                   </mat-card>
@@ -31,7 +31,7 @@
             <div *ngIf="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
               <mat-card class="list-view-item">
                 <label>
-                  <mat-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" *ngFor="let skill of searchInUntriagedSkillSummaries(skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
+                  <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" *ngFor="let skill of searchInUntriagedSkillSummaries(skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
                     {{ skill.description }}
                   </mat-radio-button>
                 </label>

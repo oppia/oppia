@@ -24,7 +24,7 @@
               <span class="improvements-tab-outer-dot">
                 <span class="improvements-tab-inner-dot">&nbsp;</span>
               </span>
-              <p class="improvements-tab-exploration-health protractor-test-improvements-tab-health"
+              <p class="improvements-tab-exploration-health e2e-test-improvements-tab-health"
                  ng-bind="$ctrl.getExplorationHealth()">
               </p>
             </div>
@@ -79,7 +79,7 @@
         card-level improvements
       </div>
       <hr>
-      <div class="improvements-tab-state-groups protractor-test-improvements-tab-state-group"
+      <div class="improvements-tab-state-groups e2e-test-improvements-tab-state-group"
            ng-repeat="stateTasks in $ctrl.allStateTasks track by stateTasks.stateName"
            ng-if="$ctrl.getNumCardLevelTasksForState(stateTasks.stateName) > 0">
         <div class="improvements-tab-state-header">

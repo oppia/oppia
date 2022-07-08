@@ -12,7 +12,7 @@
            {{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR' | translate }}
       </div>
       <div *ngIf="uploadedImage">
-        <div class="oppia-thumbnail-picture-crop-area protractor-test-photo-crop">
+        <div class="oppia-thumbnail-picture-crop-area e2e-test-photo-crop">
           <button class="btn btn-secondary oppia-thumbnail-picture-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
@@ -27,11 +27,11 @@
   </div>
 
   <div class="modal-footer" *ngIf="!windowIsNarrow || uploadedImage">
-    <button class="btn btn-secondary protractor-test-photo-upload-cancel"
+    <button class="btn btn-secondary e2e-test-photo-upload-cancel"
             (click)="cancel()">
             {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate }}
     </button>
-    <button class="btn btn-success protractor-test-photo-upload-submit"
+    <button class="btn btn-success e2e-test-photo-upload-submit"
             (click)="save()"
             [disabled]="!uploadedImage">
             {{ 'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate }}

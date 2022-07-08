@@ -25,16 +25,16 @@ var ExplorationEditorHistoryTab = function() {
   /*
    * Interactive elements
    */
-  var historyGraph = element(by.css('.protractor-test-history-graph'));
-  var stateNodes = historyGraph.all(by.css('.protractor-test-node'));
+  var historyGraph = element(by.css('.e2e-test-history-graph'));
+  var stateNodes = historyGraph.all(by.css('.e2e-test-node'));
   var codeMirrorElement = element.all(by.css('.CodeMirror-code'));
-  var nodeBackgroundLocator = by.css('.protractor-test-node-background');
-  var nodeLabelLocator = by.css('.protractor-test-node-label');
+  var nodeBackgroundLocator = by.css('.e2e-test-node-background');
+  var nodeLabelLocator = by.css('.e2e-test-node-label');
   var toastSuccessElement = element(by.css('.toast-success'));
   var firstVersionDropdown = element(
-    by.css('.protractor-test-history-version-dropdown-first'));
+    by.css('.e2e-test-history-version-dropdown-first'));
   var secondVersionDropdown = element(
-    by.css('.protractor-test-history-version-dropdown-second'));
+    by.css('.e2e-test-history-version-dropdown-second'));
   var stateNodeBackground = function(nodeElement) {
     return nodeElement.element(nodeBackgroundLocator);
   };
@@ -46,24 +46,24 @@ var ExplorationEditorHistoryTab = function() {
    * Buttons
    */
   var closeStateHistoryButton = element(
-    by.css('.protractor-test-close-history-state-modal'));
-  var revertVersionButton = element(by.css('.protractor-test-revert-version'));
-  var resetGraphButton = element(by.css('.protractor-test-reset-graph'));
+    by.css('.e2e-test-close-history-state-modal'));
+  var revertVersionButton = element(by.css('.e2e-test-revert-version'));
+  var resetGraphButton = element(by.css('.e2e-test-reset-graph'));
   var historyListOptions = element.all(
-    by.css('.protractor-test-history-list-options'));
+    by.css('.e2e-test-history-list-options'));
   var confirmRevertVersionButton = element(
-    by.css('.protractor-test-confirm-revert'));
+    by.css('.e2e-test-confirm-revert'));
 
   /*
    * Display
    */
   var datesCommitsWereSaved = element.all(
-    by.css('.protractor-test-history-tab-commit-date'));
+    by.css('.e2e-test-history-tab-commit-date'));
 
   /*
    * Links
    */
-  var historyGraphLink = historyGraph.all(by.css('.protractor-test-link'));
+  var historyGraphLink = historyGraph.all(by.css('.e2e-test-link'));
 
   /*
    * Workflows

@@ -27,127 +27,127 @@ var workflow = require('../protractor_utils/workflow.js');
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
   var createStoryButton = element(
-    by.css('.protractor-test-create-story-button'));
+    by.css('.e2e-test-create-story-button'));
   var newStoryTitleField = element(
-    by.css('.protractor-test-new-story-title-field'));
+    by.css('.e2e-test-new-story-title-field'));
   var newStoryUrlFragmentField = element(
-    by.css('.protractor-test-new-story-url-fragment-field'));
+    by.css('.e2e-test-new-story-url-fragment-field'));
   var confirmStoryCreationButton = element(
-    by.css('.protractor-test-confirm-story-creation-button'));
+    by.css('.e2e-test-confirm-story-creation-button'));
   var storyListItems = element.all(
-    by.css('.protractor-test-story-list-item'));
-  var storyListTable = element(by.css('.protractor-test-story-list-table'));
+    by.css('.e2e-test-story-list-item'));
+  var storyListTable = element(by.css('.e2e-test-story-list-table'));
 
   var topicNameField = element(
-    by.css('.protractor-test-topic-name-field'));
+    by.css('.e2e-test-topic-name-field'));
   var topicNameHeading = element(
-    by.css('.protractor-test-topic-name-heading'));
+    by.css('.e2e-test-topic-name-heading'));
   var topicDescriptionField = element(
-    by.css('.protractor-test-topic-description-field'));
+    by.css('.e2e-test-topic-description-field'));
   var topicDescriptionHeading = element(
-    by.css('.protractor-test-topic-description-heading'));
+    by.css('.e2e-test-topic-description-heading'));
   var saveTopicButton = element(
-    by.css('.protractor-test-save-topic-button'));
+    by.css('.e2e-test-save-topic-button'));
   var publishTopicButton = element(
-    by.css('.protractor-test-publish-topic-button'));
+    by.css('.e2e-test-publish-topic-button'));
   var commitMessageField = element(
-    by.css('.protractor-test-commit-message-input'));
+    by.css('.e2e-test-commit-message-input'));
   var closeSaveModalButton = element(
-    by.css('.protractor-test-close-save-modal-button'));
+    by.css('.e2e-test-close-save-modal-button'));
   var addSubtopicButton = element(
-    by.css('.protractor-test-add-subtopic-button'));
+    by.css('.e2e-test-add-subtopic-button'));
   var newSubtopicTitlefield = element(
-    by.css('.protractor-test-new-subtopic-title-field'));
+    by.css('.e2e-test-new-subtopic-title-field'));
   var newSubtopicUrlFragmentField = element(
-    by.css('.protractor-test-new-subtopic-url-fragment-field'));
+    by.css('.e2e-test-new-subtopic-url-fragment-field'));
   var confirmSubtopicCreationButton = element(by.css(
-    '.protractor-test-confirm-subtopic-creation-button'));
-  var subtopics = element.all(by.css('.protractor-test-subtopic'));
+    '.e2e-test-confirm-subtopic-creation-button'));
+  var subtopics = element.all(by.css('.e2e-test-subtopic'));
   var subtopicColumns = element.all(
-    by.css('.protractor-test-subtopic-column'));
+    by.css('.e2e-test-subtopic-column'));
   var subtopicEditOptions = element.all(by.css(
-    '.protractor-test-show-subtopic-options'));
+    '.e2e-test-show-subtopic-options'));
   var deleteSubtopicButton = element(
-    by.css('.protractor-test-delete-subtopic-button'));
+    by.css('.e2e-test-delete-subtopic-button'));
   var reassignSkillButton = element(
-    by.css('.protractor-test-reassign-skill-button'));
+    by.css('.e2e-test-reassign-skill-button'));
   var uncategorizedSkills = element.all(
-    by.css('.protractor-test-uncategorized-skill-card'));
+    by.css('.e2e-test-uncategorized-skill-card'));
   var uncategorizedSkillItems = element.all(
-    by.css('.protractor-test-skill-item'));
+    by.css('.e2e-test-skill-item'));
   var uncategorizedSkillsContainer = element(
-    by.css('.protractor-test-uncategorized-skills-container'));
+    by.css('.e2e-test-uncategorized-skills-container'));
   var subtopicTitleField = element(
-    by.css('.protractor-test-subtopic-title-field'));
+    by.css('.e2e-test-subtopic-title-field'));
   var questionsTabButton = element(
-    by.css('.protractor-test-questions-tab-button'));
+    by.css('.e2e-test-questions-tab-button'));
   var createQuestionButton = element(
-    by.css('.protractor-test-create-question-button'));
+    by.css('.e2e-test-create-question-button'));
   var saveQuestionButton = element(
-    by.css('.protractor-test-save-question-button'));
+    by.css('.e2e-test-save-question-button'));
   var questionItems = element.all(
-    by.css('.protractor-test-question-list-item'));
+    by.css('.e2e-test-question-list-item'));
   var selectSkillDropdown = element(
-    by.css('.protractor-test-select-skill-dropdown'));
+    by.css('.e2e-test-select-skill-dropdown'));
   var subtopicThumbnailImageElement = element(
     by.css(
-      '.protractor-test-subtopic-thumbnail .protractor-test-custom-photo'));
+      '.e2e-test-subtopic-thumbnail .e2e-test-custom-photo'));
   var subtopicThumbnailButton = element(
     by.css(
-      '.protractor-test-subtopic-thumbnail .protractor-test-photo-button'));
+      '.e2e-test-subtopic-thumbnail .e2e-test-photo-button'));
   var topicThumbnailImageElement = element(
-    by.css('.protractor-test-thumbnail-editor .protractor-test-custom-photo'));
+    by.css('.e2e-test-thumbnail-editor .e2e-test-custom-photo'));
   var topicThumbnailButton = element(
-    by.css('.protractor-test-thumbnail-editor .protractor-test-photo-button'));
+    by.css('.e2e-test-thumbnail-editor .e2e-test-photo-button'));
   var thumbnailContainer = element(
-    by.css('.protractor-test-thumbnail-container'));
+    by.css('.e2e-test-thumbnail-container'));
   var newStoryDescriptionField = element(
-    by.css('.protractor-test-new-story-description-field'));
+    by.css('.e2e-test-new-story-description-field'));
   var storyThumbnailButton = element(
-    by.css('.protractor-test-thumbnail-editor .protractor-test-photo-button'));
+    by.css('.e2e-test-thumbnail-editor .e2e-test-photo-button'));
   var topicMetaTagContentField = element(
-    by.css('.protractor-test-topic-meta-tag-content-field'));
+    by.css('.e2e-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
-    by.css('.protractor-test-topic-meta-tag-content-label'));
+    by.css('.e2e-test-topic-meta-tag-content-label'));
   var topicPageTitleFragmentField = element(
-    by.css('.protractor-test-topic-page-title-fragment-field'));
+    by.css('.e2e-test-topic-page-title-fragment-field'));
   var topicPageTitleFragmentLabel = element(
-    by.css('.protractor-test-topic-page-title-fragment-label'));
+    by.css('.e2e-test-topic-page-title-fragment-label'));
   var easyRubricDifficulty = element(
-    by.css('.protractor-test-skill-difficulty-easy'));
-  var storyTitleClassname = '.protractor-test-story-title';
+    by.css('.e2e-test-skill-difficulty-easy'));
+  var storyTitleClassname = '.e2e-test-story-title';
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
   var saveRearrangedSkillsButton = element(
-    by.css('.protractor-test-save-rearrange-skills'));
+    by.css('.e2e-test-save-rearrange-skills'));
   var practiceTabCheckbox = element(
-    by.css('.protractor-test-toggle-practice-tab'));
+    by.css('.e2e-test-toggle-practice-tab'));
   var subtopicContentText = element(
-    by.css('.protractor-test-subtopic-html-content'));
+    by.css('.e2e-test-subtopic-html-content'));
   var subtopicPageContentButton = element(
-    by.css('.protractor-test-edit-html-content'));
+    by.css('.e2e-test-edit-html-content'));
   var pageEditor = element(
-    by.css('.protractor-test-edit-subtopic-page-contents'));
-  var pageEditorInput = pageEditor.element(by.css('.protractor-test-rte'));
+    by.css('.e2e-test-edit-subtopic-page-contents'));
+  var pageEditorInput = pageEditor.element(by.css('.e2e-test-rte'));
   var saveSubtopicPageContentButton = element(
-    by.css('.protractor-test-save-subtopic-content-button'));
+    by.css('.e2e-test-save-subtopic-content-button'));
   var showSchemaEditorElement = element(
-    by.css('.protractor-test-show-schema-editor'));
+    by.css('.e2e-test-show-schema-editor'));
   var subtopicDescriptionEditor = element(
-    by.css('.protractor-test-subtopic-description-editor'));
+    by.css('.e2e-test-subtopic-description-editor'));
   var newSubtopicEditorElement = element(
-    by.css('.protractor-test-new-subtopic-editor'));
-  var cKEditorElement = element(by.css('.protractor-test-ck-editor'));
+    by.css('.e2e-test-new-subtopic-editor'));
+  var cKEditorElement = element(by.css('.e2e-test-ck-editor'));
   var closeRTEButton = element(
-    by.css('.protractor-test-close-rich-text-component-editor'));
+    by.css('.e2e-test-close-rich-text-component-editor'));
   var subtopicSkillDescriptionLocator = by.css(
-    '.protractor-test-subtopic-skill-description');
-  var topicEditorTab = element(by.css('.protractor-test-edit-topic-tab'));
-  var storyTitleLocator = by.css('.protractor-test-story-title');
+    '.e2e-test-subtopic-skill-description');
+  var topicEditorTab = element(by.css('.e2e-test-edit-topic-tab'));
+  var storyTitleLocator = by.css('.e2e-test-story-title');
   var storyPublicationStatusLocator = by.css(
-    '.protractor-test-story-publication-status');
+    '.e2e-test-story-publication-status');
 
   this.togglePracticeTab = async function() {
     await action.click('Practice tab checkbox', practiceTabCheckbox);
@@ -292,7 +292,7 @@ var TopicEditorPage = function() {
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = element(
       by.cssContainingText(
-        '.protractor-test-rte-skill-selector-item', skillName));
+        '.e2e-test-rte-skill-selector-item', skillName));
     await action.click('Skill for concept card', skillForConceptCard);
     await action.click('Close RTE button', closeRTEButton);
   };
@@ -505,7 +505,7 @@ var TopicEditorPage = function() {
     );
     let desc = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-topic-name-field')[0].value;
+        'e2e-test-topic-name-field')[0].value;
     });
     await expect(desc).toMatch(name);
   };
@@ -527,7 +527,7 @@ var TopicEditorPage = function() {
     );
     let desc = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-topic-description-field')[0].value;
+        'e2e-test-topic-description-field')[0].value;
     });
     await expect(desc).toMatch(description);
   };

@@ -2,7 +2,7 @@
      [ngClass]="checkTabletView() ? 'oppia-button-display' : 'float-right'">
   <!-- User must complete the registration process. -->
   <button type="button"
-          class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-activity protractor-test-create-new-exploration-button oppia-autofocus"
+          class="oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus"
           (click)="onRedirectToLogin('/creator-dashboard?mode=create')"
           *ngIf="userIsLoggedIn === false">
           <!-- "userIsLoggedIn === false" is needed because we want to show the button when we know that user is not logged in
@@ -10,7 +10,7 @@
           + {{'I18N_CREATE_EXPLORATION' | translate}}
   </button>
   <button type="button"
-          class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-activity protractor-test-create-new-exploration-button oppia-autofocus"
+          class="oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus"
           (click)="initCreationProcess()"
           *ngIf="userIsLoggedIn">
           + {{'I18N_CREATE_EXPLORATION' | translate}}

@@ -26,74 +26,74 @@ var general = require('../protractor_utils/general.js');
 
 var BlogDashboardPage = function() {
   var currUserProfilePhoto = element(
-    by.css('.protractor-test-profile-current-user-photo'));
+    by.css('.e2e-test-profile-current-user-photo'));
   var createBlogPostButton = element(
-    by.css('.protractor-test-create-blog-post-button'));
+    by.css('.e2e-test-create-blog-post-button'));
   var editBlogPostButton = element(
-    by.css('.protractor-test-edit-blog-post-button'));
+    by.css('.e2e-test-edit-blog-post-button'));
   var unpublishBlogPostButton = element(
-    by.css('.protractor-test-unpublish-blog-post-button'));
+    by.css('.e2e-test-unpublish-blog-post-button'));
   var deleteBlogPostButton = element(
-    by.css('.protractor-test-delete-blog-post-button'));
+    by.css('.e2e-test-delete-blog-post-button'));
   var matTabLabels = element.all(by.css('.mat-tab-label'));
   var blogPostEditOptions = by.css(
-    '.protractor-test-blog-post-edit-box');
+    '.e2e-test-blog-post-edit-box');
   var blogPostContentEditor = element(
-    by.css('.protractor-test-content-editor'));
+    by.css('.e2e-test-content-editor'));
   var blogPostTitleFieldElement = element(
-    by.css('.protractor-test-blog-post-title-field'));
+    by.css('.e2e-test-blog-post-title-field'));
   var listViewButton = element(
-    by.css('.protractor-test-list-view-button'));
+    by.css('.e2e-test-list-view-button'));
   var tilesViewButton = element(
-    by.css('.protractor-test-tiles-view-button'));
+    by.css('.e2e-test-tiles-view-button'));
   var draftBlogPostsTable = element(
-    by.css('.protractor-test-drafts-blog-post-table'));
+    by.css('.e2e-test-drafts-blog-post-table'));
   var publishedBlogPostsTable = element(
-    by.css('.protractor-test-published-blog-post-table'));
+    by.css('.e2e-test-published-blog-post-table'));
   var blogPostListItems = element.all(
-    by.css('.protractor-test-blog-post-list-item'));
+    by.css('.e2e-test-blog-post-list-item'));
   var draftBlogPostTiles = element.all(
-    by.css('.protractor-test-draft-blog-post-tile-item'));
+    by.css('.e2e-test-draft-blog-post-tile-item'));
   var publishedBlogPostTiles = element.all(
-    by.css('.protractor-test-published-blog-post-tile-item'));
+    by.css('.e2e-test-published-blog-post-tile-item'));
   var blogPostTags = element.all(
-    by.css('.protractor-test-blog-post-tags'));
+    by.css('.e2e-test-blog-post-tags'));
   var saveBlogPostAsDraftButton = element(
-    by.css('.protractor-test-save-as-draft-button'));
+    by.css('.e2e-test-save-as-draft-button'));
   var publishBlogPostButton = element(
-    by.css('.protractor-test-publish-blog-post-button'));
+    by.css('.e2e-test-publish-blog-post-button'));
   var thumbnailClickable = element(
-    by.css('.protractor-test-photo-clickable'));
+    by.css('.e2e-test-photo-clickable'));
   var customThumbnail = element(
-    by.css('.protractor-test-custom-photo'));
+    by.css('.e2e-test-custom-photo'));
   var thumbnailCropper = element(
-    by.css('.protractor-test-photo-crop .cropper-container'));
+    by.css('.e2e-test-photo-crop .cropper-container'));
   var thumbnailUploadError = element(
-    by.css('.protractor-test-upload-error'));
+    by.css('.e2e-test-upload-error'));
   var saveBlogPostContentButton = element(
-    by.css('.protractor-test-save-blog-post-content'));
+    by.css('.e2e-test-save-blog-post-content'));
   var blogPostContentDisplay = element(
-    by.css('.protractor-test-content-display'));
+    by.css('.e2e-test-content-display'));
   var confirmButton = element(
-    by.css('.protractor-test-confirm-button'));
+    by.css('.e2e-test-confirm-button'));
   var currUsername = element(
-    by.css('.protractor-test-username-visible'));
+    by.css('.e2e-test-username-visible'));
   var cancelThumbnailUploadButton = element(
-    by.css('.protractor-test-photo-upload-cancel'));
+    by.css('.e2e-test-photo-upload-cancel'));
   var blogDashboardIntroMessageContainer = element(
-    by.css('.protractor-test-intro-message-container'));
+    by.css('.e2e-test-intro-message-container'));
   var closeBlogCardPreviewButton = element(
-    by.css('.protractor-test-close-preview-button'));
+    by.css('.e2e-test-close-preview-button'));
   var blogCardPreviewButton = element(
-    by.css('.protractor-test-blog-card-preview-button'));
+    by.css('.e2e-test-blog-card-preview-button'));
   var blogDashboardLink = element(by.css(
-    '.protractor-test-blog-dashboard-link'));
+    '.e2e-test-blog-dashboard-link'));
   var blogPostTiles = element.all(by.css(
-    '.protractor-test-blog-dashboard-tile'));
+    '.e2e-test-blog-dashboard-tile'));
   var blogPostTileTitle = by.css(
-    '.protractor-test-blog-post-title');
+    '.e2e-test-blog-post-title');
   var navigateToBlogDashboardButton = element(
-    by.css('.protractor-test-back-button'));
+    by.css('.e2e-test-back-button'));
 
   this.get = async function() {
     await waitFor.pageToFullyLoad();

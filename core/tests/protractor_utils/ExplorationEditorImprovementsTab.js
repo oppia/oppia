@@ -22,10 +22,10 @@ var ExplorationEditorImprovementsTab = function() {
   /*
    * Interactive elements
    */
-  var explorationHealth = $('.protractor-test-improvements-tab-health');
+  var explorationHealth = $('.e2e-test-improvements-tab-health');
 
   this.expectToBeHidden = async function() {
-    expect(await $$('.protractor-test-improvements-tab').count()).toEqual(0);
+    expect(await $$('.e2e-test-improvements-tab').count()).toEqual(0);
   };
 
   this.expectHealthyExploration = async function() {

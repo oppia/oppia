@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Ratio Expression
- * Interaction.
+ * Interaction in protractor.
  */
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');

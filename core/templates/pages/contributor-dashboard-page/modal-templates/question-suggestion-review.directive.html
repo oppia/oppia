@@ -1,4 +1,4 @@
-<div class="modal-header protractor-test-question-suggestion-review-modal-header">
+<div class="modal-header e2e-test-question-suggestion-review-modal-header">
   <div>
     <h3><[questionHeader]></h3>
     <h4 class="author-header">Submitted by <[authorName]></h4>
@@ -36,7 +36,7 @@
   <section ng-show="reviewable" class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
       Review message (required if rejecting):
-      <textarea class="protractor-test-suggestion-review-message w-100" rows="3" ng-model="reviewMessage"></textarea>
+      <textarea class="e2e-test-suggestion-review-message w-100" rows="3" ng-model="reviewMessage"></textarea>
     </div>
   </section>
   <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
@@ -47,13 +47,13 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
   <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
-    <button class="btn btn-danger protractor-test-question-suggestion-review-reject-button" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
+    <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
   </span>
   <span tooltip-placement="bottom">
-    <button class="btn btn-secondary protractor-test-question-suggestion-review-edit-button" ng-if="reviewable" ng-click="edit()">Edit</button>
+    <button class="btn btn-secondary e2e-test-question-suggestion-review-edit-button" ng-if="reviewable" ng-click="edit()">Edit</button>
   </span>
   <span tooltip-placement="bottom">
-    <button class="btn btn-success protractor-test-question-suggestion-review-accept-button" ng-if="reviewable" ng-click="accept()">Accept</button>
+    <button class="btn btn-success e2e-test-question-suggestion-review-accept-button" ng-if="reviewable" ng-click="accept()">Accept</button>
   </span>
 </div>
 
