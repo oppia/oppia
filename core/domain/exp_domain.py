@@ -40,6 +40,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 
 from typing import Dict, List
+from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -658,6 +659,13 @@ class VersionedExplorationInteractionIdsMapping:
         """
         self.version = version
         self.state_interaction_ids_dict = state_interaction_ids_dict
+
+
+class VersionedExplorationStatesDict(TypedDict):
+    """Dictionary representing the versioned State objects for Exploration."""
+
+    states_schema_version: int
+    states: Dict[str, state_domain.StateDict]
 
 
 class Exploration(translation_domain.BaseTranslatableObject):

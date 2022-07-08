@@ -74,7 +74,7 @@ ruleTester.run('e2e-action', rule, {
     {
       code:
       `it('should test a feature', function() {
-        element(by.css('.protractor-test')).click();
+        element(by.css('.e2e-test')).click();
       });`,
       errors: [{
         message: (
@@ -86,7 +86,7 @@ ruleTester.run('e2e-action', rule, {
     {
       code:
       `it('should test a feature', function() {
-        element(by.css('.protractor-test')).sendKeys("keys");
+        element(by.css('.e2e-test')).sendKeys("keys");
       });`,
       errors: [{
         message: (
