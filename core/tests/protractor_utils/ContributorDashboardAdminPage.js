@@ -27,26 +27,26 @@ var ContributorDashboardAdminPage = function() {
   var CATEGORY_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
   var addContributionRightsForm = element(
-    by.css('.protractor-test-add-contribution-rights-form'));
+    by.css('.e2e-test-add-contribution-rights-form'));
   var viewContributionRightsForm = element(by.css(
-    '.protractor-test-view-contribution-rights-form'));
-  var languageSelectCss = by.css('.protractor-test-form-language-select');
+    '.e2e-test-view-contribution-rights-form'));
+  var languageSelectCss = by.css('.e2e-test-form-language-select');
   var contributorUsernameCss = by.css(
-    '.protractor-test-form-contributor-username');
+    '.e2e-test-form-contributor-username');
   var categorySelectCss = by.css(
-    '.protractor-test-form-contribution-rights-category-select');
+    '.e2e-test-form-contribution-rights-category-select');
   var contributionRightsFormSubmitButtonCss = by.css(
-    '.protractor-test-contribution-rights-form-submit-button');
+    '.e2e-test-contribution-rights-form-submit-button');
   var userTranslationReviewerLanguageCss = by.css(
-    '.protractor-test-translation-reviewer-language');
+    '.e2e-test-translation-reviewer-language');
   var userVoiceoverReviewerLanguageCss = by.css(
-    '.protractor-test-voiceover-reviewer-language');
-  var userQuestionReviewerCss = by.css('.protractor-test-question-reviewer');
+    '.e2e-test-voiceover-reviewer-language');
+  var userQuestionReviewerCss = by.css('.e2e-test-question-reviewer');
   var userQuestionContributorCss = by.css(
-    '.protractor-test-question-contributor');
+    '.e2e-test-question-contributor');
   var viewContributionRightsMethodInputCss = by.css(
-    '.protractor-test-view-contribution-rights-method');
-  var statusMessage = element(by.css('.protractor-test-status-message'));
+    '.e2e-test-view-contribution-rights-method');
+  var statusMessage = element(by.css('.e2e-test-status-message'));
 
   this.get = async function() {
     await browser.get('/contributor-dashboard-admin');
