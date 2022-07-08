@@ -15,9 +15,9 @@
 
         <strong>Hint #{{indexPlusOne}} is...</strong>
         <span>
-          <oppia-interaction-display classStr="oppia-rte-editor"
-                                     [htmlData]="hint.hintContent.html">
-          </oppia-interaction-display>
+          <oppia-rte-output-display class="oppia-rte-editor"
+                                    [rteString]="hint.hintContent.html">
+          </oppia-rte-output-display>
         </span>
       </div>
     </div>
