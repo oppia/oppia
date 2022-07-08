@@ -208,5 +208,5 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         sys.exit(task.returncode)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()
