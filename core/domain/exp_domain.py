@@ -2224,8 +2224,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 answer_group['outcome']['dest_if_really_stuck'] = None
 
             if state_dict['interaction']['default_outcome'] is not None:
-                state_dict[
-                    'interaction']['default_outcome']['dest_if_really_stuck'] = None
+                state_dict['interaction'][
+                    'default_outcome']['dest_if_really_stuck'] = None
 
         return states_dict
 

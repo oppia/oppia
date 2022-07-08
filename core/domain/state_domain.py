@@ -1483,48 +1483,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
     parameter changes.
     """
 
-    def to_dict(self):
-        """Returns a dict representing this Outcome domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of Outcome instance.
-        """
-        return {
-            'dest': self.dest,
-            'dest_if_really_stuck': self.dest_if_really_stuck,
-            'feedback': self.feedback.to_dict(),
-            'labelled_as_correct': self.labelled_as_correct,
-            'param_changes': [
-                param_change.to_dict() for param_change in self.param_changes],
-            'refresher_exploration_id': self.refresher_exploration_id,
-            'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id
-        }
-
-    @classmethod
-    def from_dict(cls, outcome_dict):
-        """Return a Outcome domain object from a dict.
-
-        Args:
-            outcome_dict: dict. The dict representation of Outcome object.
-
-        Returns:
-            Outcome. The corresponding Outcome domain object.
-        """
-        feedback = SubtitledHtml.from_dict(outcome_dict['feedback'])
-        feedback.validate()
-        return cls(
-            outcome_dict['dest'],
-            outcome_dict['dest_if_really_stuck'],
-            feedback,
-            outcome_dict['labelled_as_correct'],
-            [param_domain.ParamChange(
-                param_change['name'], param_change['generator_id'],
-                param_change['customization_args'])
-             for param_change in outcome_dict['param_changes']],
-            outcome_dict['refresher_exploration_id'],
-            outcome_dict['missing_prerequisite_skill_id']
-        )
-
     def __init__(
         self,
         dest: str,
