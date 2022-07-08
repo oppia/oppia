@@ -8,7 +8,7 @@
       {{ instructionMessage }}
     </h3>
   </div>
-  <div class="modal-body select-skill-modal protractor-test-skill-select-modal">
+  <div class="modal-body select-skill-modal e2e-test-skill-select-modal">
     <div *ngIf="skillSummaries.length === 0">
       You can only create questions for topics that have atleast one skill
       attached to it. Please link a skill to this topic before adding questions.
@@ -24,14 +24,14 @@
                autofocus>
       </div>
       <div class="skill-summary-container">
-        <a class="list-group-item protractor-test-skill-item"
+        <a class="list-group-item e2e-test-skill-item"
            *ngFor="let skillSummary of skillsToShow"
            (click)="selectOrDeselectSkill(skillSummary)"
            [ngClass]="{'list-group-item-success': isSkillSelected(skillSummary.id)}">
           <label class="list-group-item-heading">{{ skillSummary.description }}</label>
         </a>
         <hr *ngIf="skillSummariesInitial.length > 0">
-        <a class="list-group-item protractor-test-skill-item"
+        <a class="list-group-item e2e-test-skill-item"
            *ngFor="let skillSummary of skillsToShow"
            (click)="selectOrDeselectSkill(skillSummary)"
            [ngClass]="{'list-group-item-success': isSkillSelected(skillSummary.id)}">
@@ -43,7 +43,7 @@
   <div>
     <div *ngIf="skillSummaries.length > 0" class="modal-footer" >
       <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
-      <button class="btn btn-success protractor-test-confirm-skill-button"
+      <button class="btn btn-success e2e-test-confirm-skill-button"
               [disabled]="selectedSkillIds.length === 0"
               (click)="goToNextStep()"> Next
       </button>
@@ -79,7 +79,7 @@
   <div>
     <div *ngIf="linkedSkillsWithDifficulty.length > 0" class="modal-footer">
       <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
-      <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
+      <button class="btn btn-success e2e-test-confirm-skill-difficulty-button"
               [disabled]="linkedSkillsWithDifficulty.length === 0"
               (click)="startQuestionCreation()"> Continue
       </button>

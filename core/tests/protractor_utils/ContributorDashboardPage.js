@@ -23,36 +23,36 @@ var ContributorDashboardTranslateTextTab = require(
   '../protractor_utils/ContributorDashboardTranslateTextTab.js');
 var ContributorDashboardPage = function() {
   var navigateToTranslateTextTabButton = element(
-    by.css('.protractor-test-translateTextTab'));
+    by.css('.e2e-test-translateTextTab'));
   var submitQuestionTabButton = element(
-    by.css('.protractor-test-submitQuestionTab'));
+    by.css('.e2e-test-submitQuestionTab'));
   var opportunityLoadingPlaceholder = element(
-    by.css('.protractor-test-opportunity-loading-placeholder'));
+    by.css('.e2e-test-opportunity-loading-placeholder'));
   var opportunityListEmptyAvailabilityMessage = element(
-    by.css('.protractor-test-opportunity-list-empty-availability-message'));
+    by.css('.e2e-test-opportunity-list-empty-availability-message'));
   var opportunityListItems = element.all(
-    by.css('.protractor-test-opportunity-list-item'));
+    by.css('.e2e-test-opportunity-list-item'));
   var opportunityHeadingCss = by.css(
-    '.protractor-test-opportunity-list-item-heading');
+    '.e2e-test-opportunity-list-item-heading');
   var opportunitySubheadingCss = by.css(
-    '.protractor-test-opportunity-list-item-subheading');
+    '.e2e-test-opportunity-list-item-subheading');
   var opportunityActionButtonCss = by.css(
-    '.protractor-test-opportunity-list-item-button');
+    '.e2e-test-opportunity-list-item-button');
   var opportunityLabelCss = by.css(
-    '.protractor-test-opportunity-list-item-label');
+    '.e2e-test-opportunity-list-item-label');
   var opportunityProgressPercentageCss = by.css(
-    '.protractor-test-opportunity-list-item-progress-percentage');
+    '.e2e-test-opportunity-list-item-progress-percentage');
   var acceptQuestionSuggestionButton = element(
-    by.css('.protractor-test-question-suggestion-review-accept-button'));
+    by.css('.e2e-test-question-suggestion-review-accept-button'));
   var rejectQuestionSuggestionButton = element(
-    by.css('.protractor-test-question-suggestion-review-reject-button'));
+    by.css('.e2e-test-question-suggestion-review-reject-button'));
   var questionSuggestionReviewMessageInput = element(
-    by.css('.protractor-test-suggestion-review-message'));
+    by.css('.e2e-test-suggestion-review-message'));
   var questionReviewModalHeader = element(by.css(
-    '.protractor-test-question-suggestion-review-modal-header'));
-  var usernameContainer = element(by.css('.protractor-test-username'));
+    '.e2e-test-question-suggestion-review-modal-header'));
+  var usernameContainer = element(by.css('.e2e-test-username'));
 
-  var reviewRightsDiv = element(by.css('.protractor-test-review-rights'));
+  var reviewRightsDiv = element(by.css('.e2e-test-review-rights'));
 
   this.get = async function() {
     await browser.get('/contributor-dashboard');
@@ -82,7 +82,7 @@ var ContributorDashboardPage = function() {
       reviewRightsDiv, 'User does not have rights to review translation');
 
     var translationReviewRightsElement = element(by.css(
-      '.protractor-test-translation-' + (
+      '.e2e-test-translation-' + (
         _convertlanguageToKebabCase(language)) + '-reviewer'));
     await waitFor.visibilityOf(
       translationReviewRightsElement,
@@ -101,7 +101,7 @@ var ContributorDashboardPage = function() {
       reviewRightsDiv,
       'Review rights div is not visible, so user does not have rights to ' +
       'review ' + reviewCategory);
-    var reviewRightsElementClassName = ('.protractor-test-' + reviewCategory);
+    var reviewRightsElementClassName = ('.e2e-test-' + reviewCategory);
     if (langaugeDescription !== null) {
       let language = _convertlanguageToKebabCase(langaugeDescription);
       reviewRightsElementClassName += '-' + language;

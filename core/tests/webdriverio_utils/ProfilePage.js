@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,29 +14,27 @@
 
 /**
  * @fileoverview Page object for the profile page, for use in
- * Protractor tests.
+ * WebdriverIO tests.
  */
+
 var waitFor = require('./waitFor.js');
 
 var ProfilePage = function() {
-  var currUserProfilePhoto = element(
-    by.css('.protractor-test-profile-current-user-photo'));
-  var otherUserProfilePhoto = element(
-    by.css('.protractor-test-profile-other-user-photo'));
-  var bio = element(
-    by.css('.protractor-test-profile-bio'));
-  var interests = element.all(
-    by.css('.protractor-test-profile-interest'));
-  var interestPlaceholder = element(
-    by.css('.protractor-test-profile-no-interest'));
-  var allExplorationCardElements = element.all(
-    by.css('.protractor-test-exploration-dashboard-card'));
-  var createdExplorationStat = element.all(
-    by.css('.protractor-test-profile-created-stat'));
-  var cardTitleCss = by.css('.protractor-test-exp-summary-tile-title');
+  var allExplorationCardElement = $('.e2e-test-exploration-dashboard-card');
+  var allExplorationCardSelector = function() {
+    return $$('.e2e-test-exploration-dashboard-card');
+  };
+  var bio = $('.e2e-test-profile-bio');
+  var createdExplorationStat = $('.e2e-test-profile-created-stat');
+  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
+  var interestPlaceholder = $('.e2e-test-profile-no-interest');
+  var interestsSelector = function() {
+    return $$('.e2e-test-profile-interest');
+  };
+  var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
 
   this.get = async function(userName) {
-    await browser.get('/profile/' + userName);
+    await browser.url('/profile/' + userName);
     await waitFor.pageToFullyLoad();
   };
 
@@ -60,12 +58,14 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveNoInterests = async function() {
-    var numInterests = await interests.count();
+    var interests = await interestsSelector();
+    var numInterests = interests.length;
     expect(numInterests).toEqual(0);
   };
 
   this.expectUserToHaveInterests = async function(expectedInterests) {
-    var numInterests = await interests.count();
+    var interests = await interestsSelector();
+    var numInterests = interests.length;
     expect(numInterests).toEqual(expectedInterests.length);
 
     var interestTexts = await interests.map(async function(interestElem) {
@@ -76,7 +76,7 @@ var ProfilePage = function() {
     });
     for (var index = 0; index < interestTexts.length; index++) {
       var interestText = interestTexts[index];
-      expect(expectedInterests.includes(interestText)).toBe(true);
+      expect(expectedInterests.includes(await interestText)).toBe(true);
     }
   };
 
@@ -88,19 +88,20 @@ var ProfilePage = function() {
   };
 
   this.expectUserToNotHaveInterestPlaceholder = async function() {
-    expect(await interestPlaceholder.isPresent()).toBe(false);
+    expect(await interestPlaceholder.isExisting()).toBe(false);
   };
 
   this.expectToHaveExplorationCards = async function() {
     await waitFor.visibilityOf(
-      allExplorationCardElements.first(),
+      allExplorationCardElement,
       'Exploration cards is not present or taking time to display');
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
+    var allExplorationCardElements = allExplorationCardSelector();
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
-        var cardTitle = card.element(cardTitleCss);
+        var cardTitle = await card.$('.e2e-test-exp-summary-tile-title');
         await waitFor.visibilityOf(
           cardTitle,
           'CardTitle is not present or taking too long to display');
