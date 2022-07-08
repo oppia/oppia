@@ -51,7 +51,7 @@
           <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 80 && tile[0] <= 99">
           <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 60 && tile[0] <= 79">
           <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] > 0 && tile[0] <= 59">
-          <span class="skill-proficiency-topic-title protractor-test-skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
+          <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
           {{tile[1].name}}
           </span>
           <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
