@@ -513,6 +513,9 @@ URLS = [
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
+        '/checkpoints_feature_status_handler',
+        reader.CheckpointsFeatureStatusHandler),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(

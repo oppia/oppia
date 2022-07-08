@@ -28,7 +28,7 @@ var action = require('../protractor_utils/action.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
-var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
+var lostChangesModal = element(by.css('.e2e-test-lost-changes-modal'));
 
 describe('Full exploration editor', function() {
   var explorationEditorPage = null;
@@ -367,7 +367,7 @@ describe('Full exploration editor', function() {
       // After 50th change, modal should appear recommending user to save the
       // changes.
       await waitFor.visibilityOf(
-        element(by.css('.protractor-test-save-prompt-modal')),
+        element(by.css('.e2e-test-save-prompt-modal')),
         'Save Recommendation Prompt Modal taking too long to appear');
       await explorationEditorPage.acceptSaveRecommendationPrompt(
         'Changed Content so many times');

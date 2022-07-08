@@ -19,7 +19,7 @@
           <div class="oppia-add-hint-button-container">
             <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && editabilityService.isEditable()">
               <button type="button"
-                      class="btn btn-primary oppia-add-hint-button protractor-test-oppia-add-hint-button"
+                      class="btn btn-primary oppia-add-hint-button e2e-test-oppia-add-hint-button"
                       (click)="openAddHintModal()"
                       [disabled]="stateHintsService.displayed.length >= 5">
                 {{getHintButtonText()}}
@@ -48,7 +48,7 @@
                   </picture>
                 </span>
                 <a (click)="changeActiveHintIndex(index)"
-                   class="oppia-rule-tab protractor-test-hint-tab"
+                   class="oppia-rule-tab e2e-test-hint-tab"
                    ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
                   <oppia-response-header class="oppia-response-header-center"
                                          [defaultOutcome]="false"
@@ -61,7 +61,7 @@
                 </a>
 
                 <div *ngIf="stateHintsService.getActiveHintIndex() === index">
-                  <div class="oppia-editor-card-section protractor-test-hint-body-{{index}}">
+                  <div class="oppia-editor-card-section e2e-test-hint-body-{{index}}">
                     <oppia-hint-editor [hint]="hint"
                                        [indexPlusOne]="index + 1"
                                        (saveHint)="onSaveInlineHint()"

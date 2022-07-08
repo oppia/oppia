@@ -5,7 +5,7 @@
 <form>
   <div class="modal-body">
     <p [innerHTML]="'I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT' | translate"></p>
-    <input class="form-control protractor-test-confirm-username-field required"
+    <input class="form-control e2e-test-confirm-username-field required"
            [(ngModel)]="username"
            aria-label="Username"
            name="deleteAccountModel"
@@ -18,7 +18,7 @@
             (click)="cancel()">
     </button>
     <button [innerHTML]="'I18N_DELETE_ACCOUNT_PAGE_BUTTON' | translate"
-            class="btn btn-danger protractor-test-confirm-deletion-button"
+            class="btn btn-danger e2e-test-confirm-deletion-button"
             type="submit"
             [disabled]="!isValid()"
             (click)="confirm()">
