@@ -39,7 +39,7 @@ describe('CoordTwoDimEditorComponent', () => {
     component.value = [0, 0];
   });
 
-  it('should create', () => {
+  it('should initialize value [0, 0]', () => {
     expect(component).toBeDefined();
 
     component.value = undefined;

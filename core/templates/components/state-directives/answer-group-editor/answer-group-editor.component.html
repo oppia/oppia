@@ -5,8 +5,8 @@
       If the learner's answer...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-      <li *ngFor="let rule of rules;  let index = index;let last = last;" [ngClass]="{'active': activeRuleIndex === index, 'oppia-answer-rule-block': last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block">
-        <a (click)="openRuleEditor(index)" [hidden]="activeRuleIndex === index" class="oppia-rule-tab protractor-test-answer-tab" [ngClass]="{'oppia-rule-tab-disabled': !isEditable}">
+      <li *ngFor="let rule of rules;  let index = index;let last = last;" [ngClass]="{'active': activeRuleIndex === index, 'oppia-answer-rule-block': last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block e2e-test-rule-block">
+        <a (click)="openRuleEditor(index)" [hidden]="activeRuleIndex === index" class="oppia-rule-tab e2e-test-answer-tab" [ngClass]="{'oppia-rule-tab-disabled': !isEditable}">
           <div class="oppia-rule-header">
             <span *ngIf="index > 0">or</span>
             <span *ngIf="getCurrentInteractionId() !== 'MultipleChoiceInput' && index !== activeRuleIndex">
@@ -19,7 +19,7 @@
           </div>
         </a>
         <span *ngIf="isEditable && rules.length > 1"
-              class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer"
+              class="oppia-delete-rule-button oppia-transition-200 e2e-test-delete-answer"
               (click)="deleteRule(index)">
           <i class="material-icons md-18">&#xE5CD;</i>
         </span>
@@ -27,7 +27,7 @@
         <div *ngIf="activeRuleIndex === index">
           <div class="oppia-editor-card-section">
             <div class="oppia-rule-body-container">
-              <oppia-rule-editor [(rule)]="rule" [isEditable]="isEditable" [isEditingRuleInline]="true" (onCancelRuleEdit)="cancelActiveRuleEdit()" (onSaveRule)="saveRules()" class="protractor-test-answer-body">
+              <oppia-rule-editor [(rule)]="rule" [isEditable]="isEditable" [isEditingRuleInline]="true" (onCancelRuleEdit)="cancelActiveRuleEdit()" (onSaveRule)="saveRules()" class="e2e-test-answer-body">
               </oppia-rule-editor>
             </div>
           </div>
@@ -35,7 +35,7 @@
       </li>
     </ul>
 
-    <button type="button" *ngIf="isEditable" class="btn btn-secondary btn-lg oppia-add-rule-button protractor-test-add-answer" (click)="addNewRule()">
+    <button type="button" *ngIf="isEditable" class="btn btn-secondary btn-lg oppia-add-rule-button e2e-test-add-answer" (click)="addNewRule()">
       + Add Another Possible Answer
     </button>
 

@@ -22,7 +22,7 @@
 <div>
   <div *ngIf="linkedSkillsWithDifficulty.length > 0" class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
-    <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
+    <button class="btn btn-success e2e-test-confirm-skill-difficulty-button"
             [disabled]="linkedSkillsWithDifficulty.length === 0"
             (click)="startQuestionCreation()"> Continue
     </button>

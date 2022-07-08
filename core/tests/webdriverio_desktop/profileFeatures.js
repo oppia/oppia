@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,19 +19,19 @@
 var DEFAULT_BIO = 'This user has not supplied a bio yet.';
 var PLACEHOLDER_INTEREST_TEXT = 'none specified';
 
-var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
-var general = require('../protractor_utils/general.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var users = require('../webdriverio_utils/users.js');
+var general = require('../webdriverio_utils/general.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
+  require('../webdriverio_utils/CreatorDashboardPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
-var ProfilePage = require('../protractor_utils/ProfilePage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
+var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
+var ProfilePage = require('../webdriverio_utils/ProfilePage.js');
 
 describe('Un-customized profile page', function() {
   var TEST_USERNAME = 'defaultProfileFeatures';
@@ -185,9 +185,6 @@ describe('Playing the exploration', function() {
   var TEST_USERNAME = 'testUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
 
-  var backButton = element(by.css('.protractor-test-back-button'));
-  var nextButton = element(by.css('.protractor-test-next-button'));
-
   var explorationPlayerPage = null;
   var libraryPage = null;
 
@@ -233,6 +230,7 @@ describe('Playing the exploration', function() {
         await forms.toRichText('card 2'));
 
       // Test back button.
+      var backButton = $('.e2e-test-back-button');
       await waitFor.elementToBeClickable(
         backButton, 'Back button taking too long to be clickable');
       await backButton.click();
@@ -241,6 +239,7 @@ describe('Playing the exploration', function() {
         await forms.toRichText('card 1'));
 
       // Test next button.
+      var nextButton = $('.e2e-test-next-button');
       await waitFor.elementToBeClickable(
         nextButton, 'Next button taking too long to be clickable');
       await nextButton.click();

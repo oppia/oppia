@@ -1,10 +1,10 @@
 <div class="position-relative">
-  <form class="form-justify protractor-test-rule-details" role="form">
+  <form class="form-justify e2e-test-rule-details" role="form">
     <div *ngIf="rule.type != 'FuzzyMatches'" class="rule-parent">
-      <oppia-rule-type-selector class="protractor-test-answer-description" [(localValue)]="rule.type" (onSelectionChange)="onSelectNewRuleType($event)">
+      <oppia-rule-type-selector class="e2e-test-answer-description" [(localValue)]="rule.type" (onSelectionChange)="onSelectNewRuleType($event)">
       </oppia-rule-type-selector>
 
-      <span *ngFor="let item of ruleDescriptionFragments" class="form-group oppia-rule-editor-span protractor-test-answer-description-fragment">
+      <span *ngFor="let item of ruleDescriptionFragments" class="form-group oppia-rule-editor-span e2e-test-answer-description-fragment">
         <span *ngIf="item.type == 'select'" class="text-dark">
           <span *ngIf="ruleDescriptionChoices.length === 1">
             {{ ruleDescriptionChoices[0].val | convertToPlainText | truncate }}
@@ -73,8 +73,13 @@
 
   <div class="oppia-rule-save-cancel-buttons" *ngIf="isEditingRuleInline">
     <div class="float-right">
+<<<<<<< HEAD
       <button type="button" class="btn btn-default" (click)="cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-success protractor-test-save-answer" [disabled]="isInvalid" (click)="saveThisRule()">Save Answer</button>
+      <button type="button" class="btn btn-success e2e-test-save-answer" [disabled]="isInvalid" (click)="saveThisRule()">Save Answer</button>
+=======
+      <button type="button" class="btn btn-default" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
+      <button type="button" class="btn btn-success e2e-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid || $ctrl.isInvalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
+>>>>>>> upstream/develop
     </div>
 
     <div class="oppia-clear"></div>

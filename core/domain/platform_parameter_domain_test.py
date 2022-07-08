@@ -65,22 +65,24 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
         self
     ) -> None:
+        param_change_dict: Dict[str, Union[str, List[str]]] = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': [],
+            'invalid': 'invalid'
+        }
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid'):
-            parameter_domain.PlatformParameterChange({
-                'cmd': self.CMD_EDIT_RULES,
-                'new_rules': [],
-                'invalid': 'invalid'
-            })
+            parameter_domain.PlatformParameterChange(param_change_dict)
 
     def test_param_change_object_with_valid_data_success(self) -> None:
+        param_change_dict: Dict[str, Union[str, List[str]]] = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': []
+        }
         param_change_object = (
-            parameter_domain.PlatformParameterChange({
-                'cmd': self.CMD_EDIT_RULES,
-                'new_rules': []
-            }))
-
+            parameter_domain.PlatformParameterChange(param_change_dict)
+        )
         self.assertEqual(
             param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(

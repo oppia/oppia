@@ -33,6 +33,10 @@ interface DestinationChoice {
   text: string;
 }
 
+interface DestValidation {
+  isCreatingNewState: boolean;
+  value: string;
+}
 @Component({
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html'
@@ -41,7 +45,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   @Input() outcome: Outcome;
   @Input() outcomeHasFeedback: boolean;
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
-  @Output() getChanges: EventEmitter<void> = new EventEmitter();
+  @Output() getChanges: EventEmitter<DestValidation> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean;
   canEditRefresherExplorationId: boolean;
@@ -78,16 +82,25 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   updateChanges($event: string): void {
     if ($event !== '') {
       this.outcomeNewStateName = $event;
-      this.getChanges.emit();
     }
+
+    let validation = {
+      isCreatingNewState: this.isCreatingNewState(),
+      value: $event
+    };
+    this.getChanges.emit(validation);
   }
 
   onDestSelectorChange(): void {
     if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
       this.focusManagerService.setFocus('newStateNameInputField');
-    } else {
-      this.getChanges.emit();
     }
+
+    let validation = {
+      isCreatingNewState: this.isCreatingNewState(),
+      value: this.outcomeNewStateName
+    };
+    this.getChanges.emit(validation);
   }
 
   isCreatingNewState(): boolean {

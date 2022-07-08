@@ -1,9 +1,9 @@
 <mat-form-field class="oppia-html-select" appearance="fill">
   <mat-label>Parameter:</mat-label>
-  <mat-select class="protractor-test-main-html-select-selector"
+  <mat-select class="e2e-test-main-html-select-selector"
               [(value)]="selectionAsString"
               disableRipple>
-    <mat-option class="protractor-test-html-select-selector"
+    <mat-option class="e2e-test-html-select-selector"
                 *ngFor="let choice of options; index as index"
                 value="{{(choice.id)}}"
                 (click)="updatedSelection()">

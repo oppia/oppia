@@ -22,17 +22,17 @@ var waitFor = require('./waitFor.js');
 
 var ContributorDashboardTranslateTextTab = function() {
   var selectorContainer = element(
-    by.css('.protractor-test-language-selector'));
+    by.css('.e2e-test-language-selector'));
   var selectedLanguageElement = selectorContainer.element(
-    by.css('.protractor-test-language-selector-selected'));
+    by.css('.e2e-test-language-selector-selected'));
   var featuredLanguageContainer = selectorContainer.element(
-    by.css('.protractor-test-featured-language-container'));
+    by.css('.e2e-test-featured-language-container'));
   var featuredLanguageElements = selectorContainer.all(
-    by.css('.protractor-test-featured-language'));
+    by.css('.e2e-test-featured-language'));
   var featuredLanguageTooltipElements = selectorContainer.all(
-    by.css('.protractor-test-featured-language-tooltip'));
+    by.css('.e2e-test-featured-language-tooltip'));
   var featuredLanguageExplanation = selectorContainer.element(
-    by.css('.protractor-test-language-selector-featured-explanation'));
+    by.css('.e2e-test-language-selector-featured-explanation'));
 
   var _openLanguageSelector = async function() {
     await action.click('Test Language Selector Container', selectorContainer);
@@ -42,7 +42,7 @@ var ContributorDashboardTranslateTextTab = function() {
     await _openLanguageSelector();
     var selectorOption = selectorContainer.element(
       by.cssContainingText(
-        '.protractor-test-language-selector-option',
+        '.e2e-test-language-selector-option',
         language
       ));
     await action.click('Test Language Selector Option', selectorOption);
