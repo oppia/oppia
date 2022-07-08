@@ -114,6 +114,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         'param_changes': [],
                         'refresher_exploration_id': None,
                         'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
@@ -127,6 +128,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             'param_changes': [],
                             'refresher_exploration_id': None,
                             'dest': 'Introduction',
+                            'dest_if_really_stuck': None,
                             'missing_prerequisite_skill_id': None,
                             'feedback': {
                                 'content_id': 'feedback_2',
