@@ -2507,7 +2507,7 @@ def get_contributor_usernames(
         raise Exception('Invalid category: %s' % category)
 
     usernames = get_usernames(user_ids, strict=True)
-    # # Ruling out the possibility of Sequence for mypy type checking.
+    # Ruling out the possibility of Sequence for mypy type checking.
     assert isinstance(usernames, list)
     return usernames
 
