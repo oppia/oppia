@@ -33,7 +33,7 @@ describe('Navigation features on mobile', function() {
   it('should open the sidebar menu by clicking on the hamburger button',
     async function() {
       var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
+        by.css('.e2e-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
@@ -44,11 +44,11 @@ describe('Navigation features on mobile', function() {
   it('should navigate to About page using the sidebar menu',
     async function() {
       var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
+        by.css('.e2e-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
-      var aboutLink = element(by.css('.protractor-mobile-test-about-link'));
+      var aboutLink = element(by.css('.e2e-mobile-test-about-link'));
       await waitFor.elementToBeClickable(
         aboutLink, 'Could not click about link');
       await aboutLink.click();
@@ -60,12 +60,12 @@ describe('Navigation features on mobile', function() {
   it('should navigate to Donate page using the sidebar menu',
     async function() {
       var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
+        by.css('.e2e-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var donateLink = element(
-        by.css('.protractor-mobile-test-donate-link'));
+        by.css('.e2e-mobile-test-donate-link'));
       await waitFor.elementToBeClickable(
         donateLink, 'Could not click donate link');
       await donateLink.click();
@@ -77,16 +77,16 @@ describe('Navigation features on mobile', function() {
   it('should navigate to Library page using the sidebar menu',
     async function() {
       var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
+        by.css('.e2e-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var learnButton = element(
-        by.css('.protractor-mobile-test-learn'));
+        by.css('.e2e-mobile-test-learn'));
       await waitFor.elementToBeClickable(
         learnButton, 'Could not click learn button');
       await learnButton.click();
-      var libraryLink = element(by.css('.protractor-mobile-test-library-link'));
+      var libraryLink = element(by.css('.e2e-mobile-test-library-link'));
       await waitFor.elementToBeClickable(
         libraryLink, 'Could not click library link');
       await libraryLink.click();
@@ -98,17 +98,17 @@ describe('Navigation features on mobile', function() {
   it('should navigate to Classroom page using the sidebar menu',
     async function() {
       var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
+        by.css('.e2e-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var learnButton = element(
-        by.css('.protractor-mobile-test-learn'));
+        by.css('.e2e-mobile-test-learn'));
       await waitFor.elementToBeClickable(
         learnButton, 'Could not click learn button');
       await learnButton.click();
       var mathematicsLink = element(
-        by.css('.protractor-mobile-test-mathematics-link'));
+        by.css('.e2e-mobile-test-mathematics-link'));
       await waitFor.elementToBeClickable(
         mathematicsLink, 'Could not click mathematics link');
       await mathematicsLink.click();
@@ -118,7 +118,7 @@ describe('Navigation features on mobile', function() {
 
   it('should navigate to Home page by clicking on the Oppia logo',
     async function() {
-      var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+      var oppiaLogo = element(by.css('.e2e-test-oppia-main-logo'));
       await waitFor.elementToBeClickable(
         oppiaLogo, 'Could not click oppia logo');
       await oppiaLogo.click();
@@ -129,7 +129,7 @@ describe('Navigation features on mobile', function() {
   it('should navigate to the login page by clicking on the sign in button',
     async function() {
       var signInButton = element(
-        by.css('.protractor-mobile-test-login'));
+        by.css('.e2e-mobile-test-login'));
       await waitFor.elementToBeClickable(
         signInButton, 'Could not click sign in button');
       // For the rationale behind this statement, see
