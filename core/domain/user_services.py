@@ -813,19 +813,20 @@ def has_ever_registered(user_id: str) -> bool:
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
 
-def has_fully_registered_account(user_id: Optional[str]) -> bool:
+def has_fully_registered_account(user_id: str) -> bool:
     """Checks if a user has fully registered.
 
     Args:
-        user_id: str|None. The unique ID of the user.
+        user_id: str. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id has fully registered.
     """
-    if user_id is None:
+    user_settings = get_user_settings(user_id, strict=False)
+
+    if user_settings is None:
         return False
 
-    user_settings = get_user_settings(user_id, strict=True)
     return bool(
         user_settings.username and user_settings.last_agreed_to_terms and (
             user_settings.last_agreed_to_terms >=

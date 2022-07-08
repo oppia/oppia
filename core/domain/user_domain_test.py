@@ -401,7 +401,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_has_not_fully_registered_for_guest_user_is_false(
         self
     ) -> None:
-        self.assertFalse(user_services.has_fully_registered_account(None))
+        self.assertFalse(user_services.has_fully_registered_account(
+            'non_existing_user'
+        ))
 
     def test_create_new_user_with_existing_auth_id_raises_error(self) -> None:
         user_id = self.user_settings.user_id
