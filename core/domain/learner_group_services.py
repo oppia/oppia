@@ -181,13 +181,11 @@ def is_user_facilitator(user_id: str, group_id: str) -> bool:
     Returns:
         bool. Whether the user is a facilitator of the learner group.
     """
-    learner_group = learner_group_fetchers.get_learner_group_by_id(
-        group_id)
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert learner_group is not None
-
-    return user_id in learner_group.facilitator_user_ids
+    return user_id in learner_group_model.facilitator_user_ids
 
 
 def remove_learner_group(group_id: str) -> None:
