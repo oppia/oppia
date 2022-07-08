@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,25 @@
  * @fileoverview End-to-end tests for the learner flow.
  */
 
-var action = require('../protractor_utils/action.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
+  require('../webdriverio_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
+  require('../webdriverio_utils/CollectionEditorPage.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
-  require('../protractor_utils/LearnerDashboardPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  require('../webdriverio_utils/LearnerDashboardPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Learner dashboard functionality', function() {
   var adminPage = null;
@@ -46,9 +46,8 @@ describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
-  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
-  var continueButton = element(by.css('.protractor-test-continue-button'));
   var clickContinueButton = async function() {
+    var continueButton = $('.e2e-test-continue-button');
     await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
   };
@@ -65,14 +64,15 @@ describe('Learner dashboard functionality', function() {
     }
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
+      'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
+    true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination('Second', true, null);
     await explorationEditorMainTab.moveToState('Second');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'So what can I tell you?'));
+      'So what can I tell you?'), true);
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('How do your explorations work?'),
       await forms.toRichText('What can you tell me about this website?'),
@@ -87,7 +87,7 @@ describe('Learner dashboard functionality', function() {
     await responseEditor.setFeedback(await forms.toRichText('I do not know!'));
     await explorationEditorMainTab.moveToState('End Card');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Congratulations, you have finished!'));
+      await forms.toRichText('Congratulations, you have finished!'), true);
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Dummy Exploration');
@@ -222,6 +222,7 @@ describe('Learner dashboard functionality', function() {
     }
     // User clicks on Oppia logo to leave exploration, user should be
     // able to leave the page directly without getting any alert message.
+    var oppiaLogo = $('.e2e-test-oppia-main-logo');
     await action.click('Oppia logo', oppiaLogo);
 
     // Go to 'Test Exploration'.
@@ -343,9 +344,9 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? element.all(
-      by.css('.protractor-test-mobile-collection-exploration')).first() :
-      element.all(by.css('.protractor-test-collection-exploration')).first();
+    var firstExploration = browser.isMobile ? await $$(
+      '.e2e-test-mobile-collection-exploration')[0] :
+      await $$('.e2e-test-collection-exploration')[0];
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
@@ -353,8 +354,7 @@ describe('Learner dashboard functionality', function() {
     if (browser.isMobile) {
       // In mobile, 'Play Exploration' button also needs to be clicked
       // to begin an exploration which is a part of a collection.
-      var playExploration = element(
-        by.css('.protractor-test-play-exploration-button'));
+      var playExploration = $('.e2e-test-play-exploration-button');
       await action.click('Play exploration', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
@@ -364,6 +364,7 @@ describe('Learner dashboard functionality', function() {
     }
     // User clicks on Oppia logo to leave collection, user should be
     // able to leave the page directly without getting any alert message.
+    var oppiaLogo = $('.e2e-test-oppia-main-logo');
     await action.click('Oppia logo', oppiaLogo);
 
     // Learner Dashboard should display
@@ -378,15 +379,14 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? element.all(
-      by.css('.protractor-test-mobile-collection-exploration')).first() :
-      element.all(by.css('.protractor-test-collection-exploration')).first();
+    var firstExploration = browser.isMobile ? await $$(
+      '.e2e-test-mobile-collection-exploration')[0] :
+      await $$('.e2e-test-collection-exploration')[0];
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
     if (browser.isMobile) {
-      var playExploration = element(
-        by.css('.protractor-test-play-exploration-button'));
+      var playExploration = $('.e2e-test-play-exploration-button');
       await action.click('Play exploration', playExploration);
       await waitFor.pageToFullyLoad();
       await clickContinueButton();
@@ -428,7 +428,7 @@ describe('Learner dashboard functionality', function() {
       await creatorDashboardPage.get();
       await waitFor.pageToFullyLoad();
       // Click on 'Collections' tab.
-      var collectionsTab = element(by.css('.protractor-test-collections-tab'));
+      var collectionsTab = $('.e2e-test-collections-tab');
       await action.click('Collections tab', collectionsTab);
       await creatorDashboardPage.navigateToCollectionEditor();
       await collectionEditorPage.addExistingExploration(

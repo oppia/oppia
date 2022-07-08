@@ -2,12 +2,12 @@
 
 <div align="center"
      ng-if="$ctrl.statusMessage"
-     class="oppia-status-message-container protractor-test-status-message">
+     class="oppia-status-message-container e2e-test-status-message">
   <[ $ctrl.statusMessage ]>
 </div>
 <br>
 <div class="oppia-contributor-dashboard-admin-page-tabs-container">
-  <md-card class="oppia-page-card oppia-long-text protractor-test-view-contribution-rights-form">
+  <md-card class="oppia-page-card oppia-long-text e2e-test-view-contribution-rights-form">
     <form class="form-horizontal" ng-submit="$ctrl.submitViewContributorUsersForm($ctrl.formData.viewContributionReviewers)">
       <legend class="text-center">View Contributor Dashboard Users</legend>
       <div class="d-xl-inline-flex form-group">
@@ -17,7 +17,7 @@
         <div class="col-md-8 ml-auto">
           <select id="label-target-view-reviewer-method"
                   ng-model="$ctrl.formData.viewContributionReviewers.filterCriterion"
-                  class="form-control protractor-test-view-contribution-rights-method"
+                  class="form-control e2e-test-view-contribution-rights-method"
                   ng-change="$ctrl.clearResults()">
             <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
             <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
@@ -29,7 +29,7 @@
         <label for="label-target-form-review-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="label-target-form-review-category-select"
-                  class="form-control protractor-test-form-contribution-rights-category-select"
+                  class="form-control e2e-test-form-contribution-rights-category-select"
                   ng-options="roleString as roleName for (roleName, roleString) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
                   ng-model="$ctrl.formData.viewContributionReviewers.category"
                   ng-change="$ctrl.clearResults()">
@@ -42,7 +42,7 @@
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select ng-model="$ctrl.formData.viewContributionReviewers.languageCode"
-                  class="form-control protractor-test-form-language-select"
+                  class="form-control e2e-test-form-language-select"
                   ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
           </select>
         </div>
@@ -52,11 +52,11 @@
            ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_USERNAME">
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewContributionReviewers.username" class="form-control protractor-test-form-contributor-username">
+          <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewContributionReviewers.username" class="form-control e2e-test-form-contributor-username">
         </div>
       </div>
 
-      <button type="submit" class="btn btn-success protractor-test-contribution-rights-form-submit-button"
+      <button type="submit" class="btn btn-success e2e-test-contribution-rights-form-submit-button"
               ng-disabled="!$ctrl.formData.viewContributionReviewers.isValid()"
               value="view role">
         View Role
@@ -65,7 +65,7 @@
 
     <div ng-show="$ctrl.contributionReviewersDataFetched">
       <div ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_USERNAME">
-        <table class="table text-center view-results-table protractor-test-user-review-rights-table">
+        <table class="table text-center view-results-table e2e-test-user-review-rights-table">
           <thead>
             <tr>
               <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_TRANSLATION"><strong>Review Translations in languages</strong></td>
@@ -78,17 +78,17 @@
               <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_TRANSLATION">
                 <span ng-if="$ctrl.contributionReviewersResult.REVIEW_TRANSLATION.length === 0"><i>None</i></span>
                 <span ng-repeat="language in $ctrl.contributionReviewersResult.REVIEW_TRANSLATION"
-                      class="protractor-test-translation-reviewer-language">
+                      class="e2e-test-translation-reviewer-language">
                   <[language]><[$last ? '' : ', ']>
                 </span>
               </td>
               <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_QUESTION">
-                <span class="protractor-test-question-reviewer">
+                <span class="e2e-test-question-reviewer">
                   <[$ctrl.contributionReviewersResult.REVIEW_QUESTION ? 'Allowed' : 'Not-allowed']>
                 </span>
               </td>
               <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.SUBMIT_QUESTION">
-                <span class="protractor-test-question-contributor">
+                <span class="e2e-test-question-contributor">
                   <[$ctrl.contributionReviewersResult.SUBMIT_QUESTION ? 'Allowed' : 'Not-allowed']>
                 </span>
               </td>
@@ -96,19 +96,19 @@
           </tbody>
         </table>
       </div>
-      <div ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE" class="protractor-test-reviewer-roles-result">
+      <div ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE" class="e2e-test-reviewer-roles-result">
         <strong>Usernames:</strong> <[$ctrl.contributionReviewersResult.usernames]>
       </div>
     </div>
   </md-card>
 
-  <md-card class="oppia-page-card oppia-long-text protractor-test-add-contribution-rights-form">
+  <md-card class="oppia-page-card oppia-long-text e2e-test-add-contribution-rights-form">
     <form class="form-horizontal" ng-submit="$ctrl.submitAddContributionRightsForm($ctrl.formData.addContributionReviewer)">
       <legend class="text-center">Add Contribution Rights</legend>
       <div class="d-xl-inline-flex form-group">
         <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <input type="text" id="label-target-form-reviewer-username" placeholder="Enter username" ng-model="$ctrl.formData.addContributionReviewer.username" class="form-control protractor-test-form-contributor-username">
+          <input type="text" id="label-target-form-reviewer-username" placeholder="Enter username" ng-model="$ctrl.formData.addContributionReviewer.username" class="form-control e2e-test-form-contributor-username">
         </div>
       </div>
 
@@ -116,7 +116,7 @@
         <label for="label-target-form-review-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="label-target-form-review-category-select"
-                  class="form-control protractor-test-form-contribution-rights-category-select"
+                  class="form-control e2e-test-form-contribution-rights-category-select"
                   ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
                   ng-model="$ctrl.formData.addContributionReviewer.category">
           </select>
@@ -128,20 +128,20 @@
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select ng-model="$ctrl.formData.addContributionReviewer.languageCode"
-                  class="form-control protractor-test-form-language-select"
+                  class="form-control e2e-test-form-language-select"
                   ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
           </select>
         </div>
       </div>
       <button type="submit"
-              class="btn btn-success protractor-test-contribution-rights-form-submit-button"
+              class="btn btn-success e2e-test-contribution-rights-form-submit-button"
               ng-disabled="!$ctrl.formData.addContributionReviewer.isValid()"
               value="update role">Add Rights
       </button>
     </form>
   </md-card>
 
-  <md-card class="oppia-page-card oppia-long-text protractor-test-remove-reviewer-form">
+  <md-card class="oppia-page-card oppia-long-text e2e-test-remove-reviewer-form">
     <form class="form-horizontal" ng-submit="$ctrl.submitRemoveContributionRightsForm($ctrl.formData.removeContributionReviewer)">
       <legend class="text-center">Remove Contribution Rights</legend>
       <div class="d-xl-inline-flex form-group">
@@ -149,7 +149,7 @@
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <input type="text"
                  id="label-target-form-reviewer-username"
-                 class="form-control protractor-test-form-contributor-username"
+                 class="form-control e2e-test-form-contributor-username"
                  placeholder="Enter username"
                  ng-model="$ctrl.formData.removeContributionReviewer.username">
         </div>
@@ -168,13 +168,13 @@
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select ng-model="$ctrl.formData.removeContributionReviewer.languageCode"
-                  class="form-control protractor-test-form-language-select"
+                  class="form-control e2e-test-form-language-select"
                   ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
           </select>
         </div>
       </div>
       <button type="submit"
-              class="btn btn-success protractor-test-contribution-rights-form-submit-button"
+              class="btn btn-success e2e-test-contribution-rights-form-submit-button"
               ng-disabled="!$ctrl.formData.removeContributionReviewer.isValid()" value="update role">Remove Rights
       </button>
     </form>
@@ -189,14 +189,14 @@
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <input type="text"
                  id="label-target-form-translation-contributor-username"
-                 class="form-control protractor-test-username-value"
+                 class="form-control e2e-test-username-value"
                  placeholder="Enter username"
                  ng-model="$ctrl.formData.viewTranslationContributionStats.username">
         </div>
       </div>
 
       <button type="submit"
-              class="btn btn-success protractor-test-role-success"
+              class="btn btn-success e2e-test-role-success"
               [disabled]="!$ctrl.formData.viewTranslationContributionStats.isValid()"
               value="view stats">
         View Stats
@@ -219,7 +219,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="stats in $ctrl.translationContributionStatsResults">
-            <td class="protractor-test-roles-result-rows">{{ stats.contribution_months }}</td>
+            <td class="e2e-test-roles-result-rows">{{ stats.contribution_months }}</td>
             <td>{{ stats.language }}</td>
             <td>{{ stats.topic_name }}</td>
             <td>{{ stats.submitted_translations_count }}</td>

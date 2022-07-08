@@ -33,7 +33,6 @@ var suites = {
       'protractor_desktop/additionalEditorFeaturesModals.js'
     ],
 
-
     additionalPlayerFeatures: [
       'protractor_desktop/additionalPlayerFeatures.js'
     ],
@@ -52,10 +51,6 @@ var suites = {
 
     classroomPageFileUploadFeatures: [
       'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
-    collections: [
-      'protractor_desktop/collections.js'
     ],
 
     contributorDashboard: [
@@ -114,10 +109,6 @@ var suites = {
       'protractor_desktop/learnerDashboard.js'
     ],
 
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
-
     library: [
       'protractor/libraryFlow.js'
     ],
@@ -132,10 +123,6 @@ var suites = {
 
     preferences: [
       'protractor_desktop/preferences.js'
-    ],
-
-    profileFeatures: [
-      'protractor_desktop/profileFeatures.js'
     ],
 
     profileMenu: [
@@ -168,10 +155,6 @@ var suites = {
 
     topicAndStoryViewer: [
       'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
-    users: [
-      'protractor_desktop/userJourneys.js',
     ],
 
     wipeout: [

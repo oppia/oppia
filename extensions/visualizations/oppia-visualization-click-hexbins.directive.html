@@ -22,7 +22,7 @@
     </svg>
     <g clip-path="url(.click-hexbin-clip-path)">
       <path ng-repeat="hexbin in hexbins"
-            ng-class="['click-hexbin-hexagon', 'protractor-test-hexagon-' + $index]"
+            ng-class="['click-hexbin-hexagon', 'e2e-test-hexagon-' + $index]"
             ng-attr-fill="<[getFillColor(hexbin)]>"
             ng-attr-d="M<[hexbin.x]>,<[hexbin.y]><[hexagon]>"
             ng-mouseover="showTooltip(hexbin)"

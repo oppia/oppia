@@ -7,7 +7,7 @@
          tooltip-placement="top">warning
       </i>
     </button>
-    <div class="protractor-test-edit-translation"
+    <div class="e2e-test-edit-translation"
          ng-class="{'oppia-editable-section': isEditable()}"
          ng-click="openTranslationEditor()">
       <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon"
@@ -22,7 +22,7 @@
         <span ng-if="activeWrittenTranslation">
           <angular-html-bind ng-if="activeWrittenTranslation.isHtml()"
                              html-data="activeWrittenTranslation.getTranslation()"
-                             class="oppia-rte-editor protractor-test-translation-display">
+                             class="oppia-rte-editor e2e-test-translation-display">
           </angular-html-bind>
           <p ng-if="activeWrittenTranslation.isUnicode()">
             {{activeWrittenTranslation.getTranslation()}}
@@ -49,7 +49,7 @@
     </button>
   </div>
 
-  <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
+  <div ng-if="translationEditorIsOpen" class="e2e-test-state-translation-editor">
     <div ng-if="activeWrittenTranslation.isHtml()">
       <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
       <schema-based-editor [schema]="HTML_SCHEMA"
@@ -75,7 +75,7 @@
 
     <div class="oppia-save-item-button-container">
       <button type="button"
-              class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-translation"
+              class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-translation"
               ng-click="onSaveTranslationButtonClicked()">
         Save
       </button>
