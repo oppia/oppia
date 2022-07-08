@@ -134,7 +134,6 @@ import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-b
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
-import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service';
@@ -793,7 +792,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryEditorStateService', StoryEditorStateService],
   ['StoryObjectFactory', StoryObjectFactory],
   ['StoryUpdateService', StoryUpdateService],
-  ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
