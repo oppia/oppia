@@ -61,7 +61,7 @@ describe('ShortResponseCodeRepl', () => {
 
     component.ngOnInit();
 
-    expect(component.answer).toEqual({
+    expect(component.escapedAnswer).toEqual({
       code: "# Type your code here.\nprint('hello')",
       error: '',
       evaluation: '',
