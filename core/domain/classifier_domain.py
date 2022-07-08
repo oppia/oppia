@@ -471,21 +471,21 @@ class OppiaMLAuthInfo:
     of Oppia ML.
 
     Attributes:
-        message: str. The message being communicated.
+        message: bytes. The message being communicated.
         vm_id: str. The ID of the Oppia ML VM to be authenticated.
         signature: str. The authentication signature signed by Oppia ML.
     """
 
     def __init__(
         self,
-        message: str,
+        message: bytes,
         vm_id: str,
         signature: str
     ) -> None:
         """Creates new OppiaMLAuthInfo object.
 
         Args:
-            message: str. The message being communicated.
+            message: bytes. The message being communicated.
             vm_id: str. The ID of the Oppia ML VM to be authenticated.
             signature: str. The authentication signature signed by Oppia ML.
         """
@@ -494,7 +494,7 @@ class OppiaMLAuthInfo:
         self._signature = signature
 
     @property
-    def message(self) -> str:
+    def message(self) -> bytes:
         """Returns the message sent by OppiaML."""
         return self._message
 
