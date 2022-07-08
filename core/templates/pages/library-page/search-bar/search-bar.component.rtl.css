@@ -209,7 +209,7 @@
   .oppia-search-bar-input.btn:focus {
     color: #fff;
   }
-  .protractor-test-search-bar-dropdown-menu {
+  .e2e-test-search-bar-dropdown-menu {
     margin-top: -25px;
   }
   .oppia-same-row-container {
