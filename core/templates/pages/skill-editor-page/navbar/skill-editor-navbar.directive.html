@@ -2,7 +2,7 @@
     ng-if="!isLoadingSkill()">
   <li class="oppia-publish-button-container" ng-if="getActiveTabName() !== 'questions'">
     <div uib-dropdown>
-      <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
+      <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button e2e-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"
               ng-click="saveChanges()"
               ng-disabled="!isSkillSaveable()">
@@ -13,7 +13,7 @@
               &#xE161;
             </i>
             <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
-            <span class="d-none d-md-block float-left oppia-changes-count-text protractor-test-changes-count-text"
+            <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
                   ng-if="getChangeListCount() > 0">
               (<[getChangeListCount()]>)
             </span>
