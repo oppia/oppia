@@ -245,6 +245,7 @@ class ExplorationVersionHistoryDict(TypedDict):
     metadata_version_history: MetadataVersionHistoryDict
     committer_ids: List[str]
 
+
 class ExplorationChange(change_domain.BaseChange):
     """Domain object class for an exploration change.
 
@@ -3543,7 +3544,7 @@ class MetadataVersionHistory:
         self.last_edited_version_number = last_edited_version_number
         self.last_edited_committer_id = last_edited_committer_id
 
-    def to_dict(self)-> MetadataVersionHistoryDict:
+    def to_dict(self) -> MetadataVersionHistoryDict:
         """Returns a dict representation of the MetadataVersionHistory domain
         object.
 
