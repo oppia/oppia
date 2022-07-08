@@ -145,7 +145,7 @@ def get_user_settings_from_username(
     if user_model is None:
         return None
     else:
-        return get_user_settings(user_model.id, strict=False)
+        return get_user_settings(user_model.id)
 
 
 def get_user_settings_from_email(
@@ -164,7 +164,7 @@ def get_user_settings_from_email(
     if user_model is None:
         return None
     else:
-        return get_user_settings(user_model.id, strict=False)
+        return get_user_settings(user_model.id)
 
 
 @overload
