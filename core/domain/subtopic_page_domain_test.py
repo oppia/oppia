@@ -455,7 +455,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
 class SubtopicPageSummaryTests(test_utils.GenericTestBase):
 
-    SUBTOPIC_ID = 'subtopic_id'
+    SUBTOPIC_ID = 1
     SUBTOPIC_TITLE = 'subtopic_title'
     TOPIC_ID = 'topic_id'
     TOPIC_TITLE = 'topic_title'
