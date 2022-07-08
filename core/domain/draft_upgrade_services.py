@@ -211,8 +211,8 @@ class DraftUpgradeUtil:
     def _convert_states_v50_dict_to_v51_dict(cls, draft_change_list):
         """Converts from version 50 to 51. Version 51 adds a new
         dest_if_really_stuck field to Outcome class to redirect learners
-        to a state for strengthening concepts when they get really stuck.
-        As this is a new property and therefore doesn't affect any pre-existing
+        to a state for strengthening concepts when they get really stuck. As
+        this is a new property and therefore doesn't affect any pre-existing
         drafts, there should be no changes to drafts.
 
         Args:
