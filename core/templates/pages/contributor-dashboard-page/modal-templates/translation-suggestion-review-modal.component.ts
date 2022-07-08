@@ -291,8 +291,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     const response = await this.threadDataBackendApiService.fetchMessagesAsync(
       threadId);
     const threadMessageBackendDicts = response.messages;
-    this.reviewMessage = threadMessageBackendDicts.map(
-      m => ThreadMessage.createFromBackendDict(m))[1]?.text ?? '';
+    let threadMessages = threadMessageBackendDicts.map(
+      m => ThreadMessage.createFromBackendDict(m));
+    this.reviewMessage = '';
+    if (threadMessages[1]) {
+      this.reviewMessage = threadMessages[1].text;
+    }
   }
 
   gotoNextItem(): void {
@@ -336,10 +340,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.contextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id);
-    this.subheading = (
-      this.activeContributionDetails.topic_name + ' / ' +
-        this.activeContributionDetails.story_title +
-        ' / ' + this.activeContributionDetails.chapter_title);
+    this.subheading = `${this.activeContributionDetails.topic_name} / ` +
+      `${this.activeContributionDetails.story_title} / ` +
+      `${this.activeContributionDetails.chapter_title}`;
     this.init();
   }
 

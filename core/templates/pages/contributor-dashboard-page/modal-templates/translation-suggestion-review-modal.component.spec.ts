@@ -401,7 +401,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.startedEditing).toBe(false);
       });
 
-    it('should toggle the expansion state for the content area', ()=>{
+    it('should toggle the expansion state for the content area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       expect(component.isContentExpanded).toBeFalse();
       component.toggleExpansionState('content');
@@ -410,7 +410,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.isContentExpanded).toBeFalse();
     });
 
-    it('should toggle the expansion state for the translation area', ()=>{
+    it('should toggle the expansion state for the translation area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       expect(component.isTranslationExpanded).toBeFalse();
       component.toggleExpansionState('translation');
@@ -766,7 +766,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.reviewable = reviewable;
     });
 
-    it('should correctly set variables if there is only one item', ()=>{
+    it('should correctly set variables if there is only one item', () => {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContributionOne);
       component.ngOnInit();
@@ -777,7 +777,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.skippedContributionIds.length).toEqual(0);
     });
 
-    it('should correctly set variables if there are multiple items', ()=>{
+    it('should correctly set variables if there are multiple items', () => {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContribution);
       component.ngOnInit();
