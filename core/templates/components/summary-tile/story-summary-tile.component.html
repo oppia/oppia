@@ -1,4 +1,4 @@
-<div class="protractor-test-story-summary-title"
+<div class="e2e-test-story-summary-title"
   [ngClass]="checkTabletView() ? 'story-summary-tile-mobile': 'story-summary-tile-desktop'">
   <div class="story-progress-bar" *ngIf="!checkTabletView()">
     <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
@@ -43,7 +43,7 @@
     </span>
   </div>
   <div class="story-details">
-    <div class="story-thumbnail protractor-test-story-thumbnail"
+    <div class="story-thumbnail e2e-test-story-thumbnail"
          [ngStyle]="{background: thumbnailBgColor}">
       <a [href]="storyLink">
         <img *ngIf="thumbnailUrl !== null"

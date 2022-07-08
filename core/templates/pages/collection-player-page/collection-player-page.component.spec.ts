@@ -545,7 +545,7 @@ describe('Collection player page component', () => {
 
     // Opening the preview card.
     let icons = fixture.nativeElement.querySelectorAll(
-      '.protractor-mobile-test-collection-exploration');
+      '.e2e-mobile-test-collection-exploration');
     let icon = icons[0];
     icon.dispatchEvent(new Event('click'));
 

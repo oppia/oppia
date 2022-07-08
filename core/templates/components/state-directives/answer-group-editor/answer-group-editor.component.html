@@ -66,8 +66,8 @@
       If the learner's answer...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ng-model="$ctrl.rules">
-      <li ng-repeat="rule in $ctrl.rules" ng-class="{'active': $ctrl.activeRuleIndex === $index, 'oppia-answer-rule-block': $last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block">
-        <a ng-click="$ctrl.openRuleEditor($index)" ng-hide="$ctrl.activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !$ctrl.isEditable}">
+      <li ng-repeat="rule in $ctrl.rules" ng-class="{'active': $ctrl.activeRuleIndex === $index, 'oppia-answer-rule-block': $last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block e2e-test-rule-block">
+        <a ng-click="$ctrl.openRuleEditor($index)" ng-hide="$ctrl.activeRuleIndex === $index" class="oppia-rule-tab e2e-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !$ctrl.isEditable}">
           <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>
             <span ng-if="$ctrl.getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== $ctrl.activeRuleIndex">
@@ -80,7 +80,7 @@
           </div>
         </a>
         <span ng-if="$ctrl.isEditable && $ctrl.rules.length > 1"
-              class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer"
+              class="oppia-delete-rule-button oppia-transition-200 e2e-test-delete-answer"
               ng-click="$ctrl.deleteRule($index)">
           <i class="material-icons md-18">&#xE5CD;</i>
         </span>
@@ -88,7 +88,7 @@
         <div ng-if="$ctrl.activeRuleIndex === $index">
           <div class="oppia-editor-card-section">
             <div class="oppia-rule-body-container">
-              <rule-editor rule="rule" is-editable="$ctrl.isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="$ctrl.cancelActiveRuleEdit()" on-save-rule="$ctrl.saveRules()" class="protractor-test-answer-body">
+              <rule-editor rule="rule" is-editable="$ctrl.isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="$ctrl.cancelActiveRuleEdit()" on-save-rule="$ctrl.saveRules()" class="e2e-test-answer-body">
               </rule-editor>
             </div>
           </div>
@@ -96,7 +96,7 @@
       </li>
     </ul>
 
-    <button type="button" ng-if="$ctrl.isEditable" class="btn btn-secondary btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="$ctrl.addNewRule()">
+    <button type="button" ng-if="$ctrl.isEditable" class="btn btn-secondary btn-lg oppia-add-rule-button e2e-test-add-answer" ng-click="$ctrl.addNewRule()">
       + Add Another Possible Answer
     </button>
 
