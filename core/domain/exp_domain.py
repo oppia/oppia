@@ -2193,9 +2193,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_states_v50_dict_to_v51_dict(cls, states_dict):
-        """Converts from version 50 to 51. Version 51 adds
-        a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts.
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2211,7 +2211,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 answer_group['outcome']['dest_if_really_stuck'] = None
 
             if state_dict['interaction']['default_outcome'] is not None:
-                state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
+                state_dict[
+                    'interaction']['default_outcome']['dest_if_really_stuck'] = None
 
         return states_dict
 
@@ -2466,11 +2467,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v54.
+                with schema version v55.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v55.
+            following schema version v56.
         """
         exploration_dict['schema_version'] = 56
 

@@ -1238,7 +1238,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
-        """Converts from version 49 to 50. Version 50 adds
+        """Converts from version 50 to 51. Version 51 adds
         a new dest_if_really_stuck field to the Outcome class to redirect
         the learners to a state for strengthening concepts.
 
@@ -1256,7 +1256,8 @@ class Question(translation_domain.BaseTranslatableObject):
             answer_group['outcome']['dest_if_really_stuck'] = None
 
         if question_state_dict['interaction']['default_outcome'] is not None:
-            question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
+            question_state_dict[
+                'interaction']['default_outcome']['dest_if_really_stuck'] = None
 
         return question_state_dict
 
