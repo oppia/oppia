@@ -39,7 +39,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -228,6 +228,22 @@ def clean_math_expression(math_expression):
 
     return math_expression
 
+
+class MetadataVersionHistoryDict(TypedDict):
+    """Dictionary representing MetadataVersionHistory object."""
+
+    last_edited_version_number: Optional[int]
+    last_edited_committer_id: str
+
+
+class ExplorationVersionHistoryDict(TypedDict):
+    """Dictionary representing ExplorationVersionHistory object."""
+
+    exploration_id: str
+    exploration_version: int
+    state_version_history: Dict[str, state_domain.StateVersionHistoryDict]
+    metadata_version_history: MetadataVersionHistoryDict
+    committer_ids: List[str]
 
 class ExplorationChange(change_domain.BaseChange):
     """Domain object class for an exploration change.
@@ -3511,7 +3527,11 @@ class MetadataVersionHistory:
             the latest changes to the exploration metadata.
     """
 
-    def __init__(self, last_edited_version_number, last_edited_committer_id):
+    def __init__(
+        self,
+        last_edited_version_number: Optional[int],
+        last_edited_committer_id: str
+    ):
         """Initializes the MetadataVersionHistory domain object.
 
         Args:
@@ -3523,7 +3543,7 @@ class MetadataVersionHistory:
         self.last_edited_version_number = last_edited_version_number
         self.last_edited_committer_id = last_edited_committer_id
 
-    def to_dict(self):
+    def to_dict(self)-> MetadataVersionHistoryDict:
         """Returns a dict representation of the MetadataVersionHistory domain
         object.
 
@@ -3537,7 +3557,10 @@ class MetadataVersionHistory:
         }
 
     @classmethod
-    def from_dict(cls, metadata_version_history_dict):
+    def from_dict(
+        cls,
+        metadata_version_history_dict: MetadataVersionHistoryDict
+    ) -> MetadataVersionHistory:
         """Returns an MetadataVersionHistory domain object from a dict.
 
         Args:
@@ -3571,13 +3594,15 @@ class ExplorationVersionHistory:
 
     def __init__(
         self,
-        exploration_id,
-        exploration_version,
-        state_version_history_dict,
-        metadata_last_edited_version_number,
-        metadata_last_edited_committer_id,
-        committer_ids
-    ):
+        exploration_id: str,
+        exploration_version: int,
+        state_version_history_dict: Dict[
+            str, state_domain.StateVersionHistoryDict
+        ],
+        metadata_last_edited_version_number: Optional[int],
+        metadata_last_edited_committer_id: str,
+        committer_ids: List[str]
+    ) -> None:
         """Initializes the ExplorationVersionHistory domain object.
 
         Args:
@@ -3604,7 +3629,7 @@ class ExplorationVersionHistory:
         )
         self.committer_ids = committer_ids
 
-    def to_dict(self):
+    def to_dict(self) -> ExplorationVersionHistoryDict:
         """Returns a dict representation of the ExplorationVersionHistory
         domain object.
 

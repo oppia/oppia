@@ -328,14 +328,14 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         assert exp_user_data is not None
         self.assertEqual(expected_user_data_dict, exp_user_data.to_dict())
 
-    def test_get_exploration_version_history(self):
+    def test_get_exploration_version_history(self) -> None:
         version_history = exp_fetchers.get_exploration_version_history(
             self.EXP_1_ID, 2
         )
 
         self.assertIsNone(version_history)
 
-        exp_services.update_exploration(
+        exp_services.update_exploration( # type: ignore[no-untyped-call]
             self.owner_id, self.EXP_1_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -348,13 +348,14 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(version_history)
-        self.assertEqual(version_history.committer_ids, [self.owner_id])
-        self.assertEqual(
-            version_history.state_version_history['New state'].to_dict(),
-            state_domain.StateVersionHistory(
-                None, None, self.owner_id
-            ).to_dict()
-        )
+        if version_history is not None:
+            self.assertEqual(version_history.committer_ids, [self.owner_id])
+            self.assertEqual(
+                version_history.state_version_history['New state'].to_dict(),
+                state_domain.StateVersionHistory(
+                    None, None, self.owner_id
+                ).to_dict()
+            )
 
 
 class LoggedOutUserProgressTests(test_utils.GenericTestBase):
