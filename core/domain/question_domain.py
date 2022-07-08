@@ -1246,9 +1246,9 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
-        """Converts from version 50 to 51. Version 51 adds
-        a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts.
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
