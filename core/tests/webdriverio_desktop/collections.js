@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,15 @@
  * @fileoverview End-to-end tests for collections.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
+  require('../webdriverio_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
-
+  require('../webdriverio_utils/CollectionEditorPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Collections', function() {
   var creatorDashboardPage = null;
@@ -109,7 +108,7 @@ describe('Collections', function() {
     await workflow.createAndPublishExploration(
       'Test Exploration for CollectionSuiteTest',
       'Languages',
-      'discover the Protractor Testing',
+      'discover the WebdriverIO Testing',
       'English',
       false
     );
@@ -130,7 +129,7 @@ describe('Collections', function() {
       'This is the second test collection.');
     await collectionEditorPage.setCategory('Algebra');
     await collectionEditorPage.saveChanges();
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     var pathname = url.split('/');
     collectionId = pathname[5];
     await users.logout();
@@ -177,40 +176,40 @@ describe('Collections', function() {
     async function() {
     // Checking in a collection with one node.
       await users.login('player@collections.com');
-      await browser.get('/collection/' + collectionId);
+      await browser.url('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
       await general.checkForConsoleErrors([]);
 
       // Checking in a collection with two nodes.
-      await browser.get('/collection_editor/create/' + collectionId);
+      await browser.url('/collection_editor/create/' + collectionId);
       await waitFor.pageToFullyLoad();
       await collectionEditorPage.addExistingExploration(secondExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Exploration');
       await collectionEditorPage.closeSaveModal();
-      await browser.get('/collection/' + collectionId);
+      await browser.url('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
       await general.checkForConsoleErrors([]);
 
       // Checking in a collection with three nodes.
-      await browser.get('/collection_editor/create/' + collectionId);
+      await browser.url('/collection_editor/create/' + collectionId);
       await waitFor.pageToFullyLoad();
       await collectionEditorPage.addExistingExploration(thirdExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Exploration');
       await collectionEditorPage.closeSaveModal();
-      await browser.get('/collection/' + collectionId);
+      await browser.url('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
       await general.checkForConsoleErrors([]);
 
       // Checking in a collection with four nodes.
-      await browser.get('/collection_editor/create/' + collectionId);
+      await browser.url('/collection_editor/create/' + collectionId);
       await waitFor.pageToFullyLoad();
       await collectionEditorPage.addExistingExploration(fourthExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Exploration');
       await collectionEditorPage.closeSaveModal();
-      await browser.get('/collection/' + collectionId);
+      await browser.url('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
       await general.checkForConsoleErrors([]);
       await users.logout();

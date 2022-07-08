@@ -25,7 +25,7 @@ var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var pendingAccountDeletionHeading =
-  element(by.css('.protractor-test-pending-account-deletion'));
+  element(by.css('.e2e-test-pending-account-deletion'));
 
 describe('When account is deleted it', function() {
   var EXPLORATION_TITLE = 'Exploration';

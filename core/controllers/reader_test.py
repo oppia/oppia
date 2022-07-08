@@ -578,7 +578,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             if include_system_recommendations is not None else '')
         recommendations_url = (
             '/explorehandler/recommendations/%s?'
-            'stringified_author_recommended_ids=%s%s%s' % (
+            'author_recommended_ids=%s%s%s' % (
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
@@ -974,10 +974,10 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     def test_get_recommendation_ids_with_invalid_author_recommended_ids(self):
         self.get_json(
             '/explorehandler/recommendations/%s' % self.EXP_ID_1, params={
-                'collection_id': 'collection_id',
+                'collection_id': self.COL_ID,
                 'include_system_recommendations': True,
-                'stringified_author_recommended_ids': 'invalid_type'
-            }, expected_status_int=404
+                'author_recommended_ids': 'invalid_type'
+            }, expected_status_int=400
         )
 
 

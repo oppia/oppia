@@ -329,9 +329,9 @@ class OppiaMLAuthInfoDomainTests(unittest.TestCase):
         super(OppiaMLAuthInfoDomainTests, self).setUp()
 
         self.oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
-            'hello', 'world', '!')
+            'hello'.encode('utf-8'), 'world', '!')
 
     def test_attributes(self) -> None:
-        self.assertEqual('hello', self.oppia_ml_auth_info.message)
+        self.assertEqual(b'hello', self.oppia_ml_auth_info.message)
         self.assertEqual('world', self.oppia_ml_auth_info.vm_id)
         self.assertEqual('!', self.oppia_ml_auth_info.signature)
