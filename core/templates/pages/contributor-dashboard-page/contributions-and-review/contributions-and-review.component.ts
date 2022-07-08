@@ -198,61 +198,33 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var _showQuestionSuggestionModal = function(
-          suggestion, contributionDetails, reviewable,
-          misconceptionsBySkill, question, suggestionIdToContribution) {
+          suggestion, suggestionIdToContribution,
+          contributionDetails, reviewable,
+          misconceptionsBySkill, question) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'question-suggestion-review.directive.html');
         var targetId = suggestion.target_id;
         var suggestionId = suggestion.suggestion_id;
-        var authorName = suggestion.author_name;
-        var questionHeader = contributionDetails.skill_description;
         var question = question || QuestionObjectFactory.createFromBackendDict(
           suggestion.change.question_dict);
-        var contentHtml = question.getStateData().content.html;
-        var skillRubrics = contributionDetails.skill_rubrics;
-        var skillDifficulty = suggestion.change.skill_difficulty;
-        var suggestionIdToContribution = suggestionIdToContribution;
-
-        // console.log(suggestionIdToContribution);
 
         $uibModal.open({
           templateUrl: _templateUrl,
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            suggestion: function() {
-              return cloneDeep(suggestion);
-            },
-            authorName: function() {
-              return authorName;
-            },
-            contentHtml: function() {
-              return contentHtml;
-            },
             misconceptionsBySkill: function() {
               return misconceptionsBySkill;
-            },
-            question: function() {
-              return question;
-            },
-            suggestionIdToContribution: function() {
-              return cloneDeep(suggestionIdToContribution);
-            },
-            questionHeader: function() {
-              return questionHeader;
             },
             reviewable: function() {
               return reviewable;
             },
-            skillRubrics: function() {
-              return skillRubrics;
-            },
-            skillDifficulty: function() {
-              return skillDifficulty;
-            },
             suggestionId: function() {
               return suggestionId;
+            },
+            suggestionIdToContribution: function() {
+              return cloneDeep(suggestionIdToContribution);
             },
             editSuggestionCallback: () => openQuestionSuggestionModal
           },
@@ -319,18 +291,19 @@ angular.module('oppia').component('contributionsAndReview', {
         var skillId = suggestion.change.skill_id;
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
+        const suggestionIdToContribution = {};
+        for (let suggestionId in ctrl.contributions) {
+          var contribution = ctrl.contributions[suggestionId];
+          suggestionIdToContribution[suggestionId] = contribution;
+        }
         SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
           var misconceptionsBySkill = {};
           var skill = skillDict.skill;
           misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-          const suggestionIdToContribution = {};
-          for (let suggestionId in ctrl.contributions) {
-            var contribution = ctrl.contributions[suggestionId];
-            suggestionIdToContribution[suggestionId] = contribution;
-          }
           _showQuestionSuggestionModal(
-            suggestion, contributionDetails, reviewable,
-            misconceptionsBySkill, question, suggestionIdToContribution);
+            suggestion, suggestionIdToContribution,
+            contributionDetails, reviewable,
+            misconceptionsBySkill, question);
           $rootScope.$apply();
         });
       };
