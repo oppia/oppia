@@ -23,45 +23,45 @@ var action = require('./action.js');
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
   var homeSection =
-    element(by.css('.protractor-test-home-section'));
+    element(by.css('.e2e-test-home-section'));
   var goalsSection =
-    element(by.css('.protractor-test-goals-section'));
+    element(by.css('.e2e-test-goals-section'));
   var progressSection =
-    element(by.css('.protractor-test-progress-section'));
+    element(by.css('.e2e-test-progress-section'));
   var communityLessonsSection =
-    element(by.css('.protractor-test-community-lessons-section'));
+    element(by.css('.e2e-test-community-lessons-section'));
   var feedbackSection =
-    element(by.css('.protractor-test-feedback-section'));
+    element(by.css('.e2e-test-feedback-section'));
   var feedbackThread =
-    element(by.css('.protractor-test-feedback-thread'));
+    element(by.css('.e2e-test-feedback-thread'));
   var subscriptionName =
-    element.all(by.css('.protractor-test-subscription-name'));
+    element.all(by.css('.e2e-test-subscription-name'));
   var feedbackExplorationTitle =
-    element.all(by.css('.protractor-test-feedback-exploration'));
+    element.all(by.css('.e2e-test-feedback-exploration'));
   var feedbackMessage =
-    element.all(by.css('.protractor-test-feedback-message'));
+    element.all(by.css('.e2e-test-feedback-message'));
   var addToLearnerGoalsButton =
-    element(by.css('.protractor-test-add-topic-to-current-goals-button'));
+    element(by.css('.e2e-test-add-topic-to-current-goals-button'));
   var currentGoalsTopicName =
-    element(by.css('.protractor-test-topic-name-in-current-goals'));
+    element(by.css('.e2e-test-topic-name-in-current-goals'));
   var editGoalsTopicName =
-    element(by.css('.protractor-test-topic-name-in-edit-goals'));
+    element(by.css('.e2e-test-topic-name-in-edit-goals'));
   var skillProficiencyTopicTitle =
-    element(by.css('.protractor-test-skill-proficiency-topic-title'));
+    element(by.css('.e2e-test-skill-proficiency-topic-title'));
   var completedGoalsTopicName =
-    element(by.css('.protractor-test-completed-goals-topic-name'));
+    element(by.css('.e2e-test-completed-goals-topic-name'));
   var topicNamesInLearnerStorySummaryTiles =
     element.all(by.css(
-      '.protractor-test-topic-name-in-learner-story-summary-tile'));
+      '.e2e-test-topic-name-in-learner-story-summary-tile'));
   var storyNamesInLearnerStorySummaryTiles =
       element.all(by.css(
-        '.protractor-test-story-name-in-learner-story-summary-tile'));
+        '.e2e-test-story-name-in-learner-story-summary-tile'));
   var topicNamesInLearnerTopicSummaryTiles =
-      element.all(by.css('.protractor-test-learner-topic-summary-tile-title'));
+      element.all(by.css('.e2e-test-learner-topic-summary-tile-title'));
   var incompleteCommunityLessonsSection = element(by.css(
-    '.protractor-test-incomplete-community-lessons-section'));
+    '.e2e-test-incomplete-community-lessons-section'));
   var completeCommunityLessonsSection = element(by.css(
-    '.protractor-test-completed-community-lessons-section'));
+    '.e2e-test-completed-community-lessons-section'));
 
   this.get = async function() {
     await browser.get(LEARNER_DASHBOARD_URL);
@@ -94,7 +94,7 @@ var LearnerDashboardPage = function() {
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
     var collectionTitle = element(by.cssContainingText(
-      '.protractor-test-collection-summary-tile-title', title));
+      '.e2e-test-collection-summary-tile-title', title));
     await waitFor.visibilityOf(
       collectionTitle, 'Unable to find collection ' + title);
     expect(await collectionTitle.isDisplayed()).toBe(true);
@@ -102,7 +102,7 @@ var LearnerDashboardPage = function() {
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = async function(title) {
     var items = element.all(by.cssContainingText(
-      '.protractor-test-exp-summary-tile-title', title));
+      '.e2e-test-exp-summary-tile-title', title));
     expect(await items.count()).toBe(0);
   };
 
@@ -110,7 +110,7 @@ var LearnerDashboardPage = function() {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter.
     var explorationTitle = element(
-      by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
+      by.cssContainingText('.e2e-test-exp-summary-tile-title', title));
     expect(await action.getText(
       'Exploration title', explorationTitle)).toMatch(title);
   };
@@ -123,7 +123,7 @@ var LearnerDashboardPage = function() {
       editGoalsTopicName, name,
       `Text "${name}" taking too long to be present in editGoalsTopic`);
     var topicName = element(by.cssContainingText(
-      '.protractor-test-topic-name-in-edit-goals', name));
+      '.e2e-test-topic-name-in-edit-goals', name));
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -135,7 +135,7 @@ var LearnerDashboardPage = function() {
       currentGoalsTopicName, name,
       `Text "${name}" taking too long to be present in currentGoalsTopic`);
     var topicName = element(by.cssContainingText(
-      '.protractor-test-topic-name-in-current-goals', name));
+      '.e2e-test-topic-name-in-current-goals', name));
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -148,7 +148,7 @@ var LearnerDashboardPage = function() {
       skillProficiencyTopicTitle, name,
       `Text "${name}" taking too long to be present in skillProficiencyTopic`);
     var topicName = element(by.cssContainingText(
-      '.protractor-test-skill-proficiency-topic-title', name));
+      '.e2e-test-skill-proficiency-topic-title', name));
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -161,7 +161,7 @@ var LearnerDashboardPage = function() {
       completedGoalsTopicName, name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`);
     var topicName = element(by.cssContainingText(
-      '.protractor-test-completed-goals-topic-name', name));
+      '.e2e-test-completed-goals-topic-name', name));
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -228,7 +228,7 @@ var LearnerDashboardPage = function() {
       await this.navigateToCommunityLessonsSection();
       var explorationTitleInIncompleteSection = (
         incompleteCommunityLessonsSection.element(by.cssContainingText(
-          '.protractor-test-exp-summary-tile-title', explorationTitle)));
+          '.e2e-test-exp-summary-tile-title', explorationTitle)));
       expect(await action.getText(
         'Incomplete exploration title',
         explorationTitleInIncompleteSection)).toMatch(explorationTitle);
@@ -239,7 +239,7 @@ var LearnerDashboardPage = function() {
     await this.navigateToCommunityLessonsSection();
     var explorationTitleInCompleteSection = (
       completeCommunityLessonsSection.element(by.cssContainingText(
-        '.protractor-test-exp-summary-tile-title', explorationTitle)));
+        '.e2e-test-exp-summary-tile-title', explorationTitle)));
     expect(await action.getText(
       'Complete exploration title',
       explorationTitleInCompleteSection)).toMatch(explorationTitle);
@@ -250,7 +250,7 @@ var LearnerDashboardPage = function() {
     await this.navigateToCommunityLessonsSection();
     var collectionTitleInIncompleteSection = (
       incompleteCommunityLessonsSection.element(by.cssContainingText(
-        '.protractor-test-collection-summary-tile-title', collectionTitle)));
+        '.e2e-test-collection-summary-tile-title', collectionTitle)));
     expect(await action.getText(
       'Incomplete collection title',
       collectionTitleInIncompleteSection)).toMatch(collectionTitle);
@@ -261,7 +261,7 @@ var LearnerDashboardPage = function() {
     await this.navigateToCommunityLessonsSection();
     var collectionTitleInCompleteSection = (
       completeCommunityLessonsSection.element(by.cssContainingText(
-        '.protractor-test-collection-summary-tile-title', collectionTitle)));
+        '.e2e-test-collection-summary-tile-title', collectionTitle)));
     expect(await action.getText(
       'Complete collection title',
       collectionTitleInCompleteSection)).toMatch(collectionTitle);

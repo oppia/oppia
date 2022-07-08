@@ -37,7 +37,7 @@
                   ⚠
                 </div>
               </div>
-              <a (click)="changeActiveAnswerGroupIndex(index)" class="oppia-rule-tab protractor-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
+              <a (click)="changeActiveAnswerGroupIndex(index)" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
                 <oppia-response-header [index]="index"
                                        [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
                                        [shortSummary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
@@ -53,8 +53,8 @@
 
               <div *ngIf="activeAnswerGroupIndex === index">
                 <div class="oppia-editor-card-section">
-                  <div class="oppia-rule-body-container protractor-test-response-body-{{index}}">
-                    <oppia-answer-group-editor class="protractor-test-response-body"
+                  <div class="oppia-rule-body-container e2e-test-response-body-{{index}}">
+                    <oppia-answer-group-editor class="e2e-test-response-body"
                                                [rules]="answerGroup.rules"
                                                [outcome]="answerGroup.outcome"
                                                [taggedSkillMisconceptionId]="answerGroup.taggedSkillMisconceptionId"
@@ -89,7 +89,7 @@
                 </div>
               </div>
               <a (click)="changeActiveAnswerGroupIndex(answerGroups?.length)"
-                 class="oppia-sortable-rule-block oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab"
+                 class="oppia-sortable-rule-block oppia-rule-tab oppia-default-rule-tab e2e-test-default-response-tab"
                  [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups?.length}">
                 <oppia-response-header [index]="index"
                                        [isActive]="index === activeAnswerGroupIndex"
@@ -104,8 +104,8 @@
 
               <div *ngIf="activeAnswerGroupIndex === answerGroups?.length">
                 <div class="oppia-editor-card-section">
-                  <div class="oppia-rule-body-container protractor-test-response-body-default">
-                    <oppia-answer-group-editor class="protractor-test-response-body"
+                  <div class="oppia-rule-body-container e2e-test-response-body-default">
+                    <oppia-answer-group-editor class="e2e-test-response-body"
                                                [rules]="null"
                                                [outcome]="defaultOutcome"
                                                [taggedSkillMisconceptionId]="null"
@@ -127,14 +127,14 @@
         </div>
         <div class="oppia-add-response-button-container">
           <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear() && editabilityService.isEditable()">
-            <button type="button" class="btn btn-secondary oppia-add-response-button protractor-test-open-add-response-modal" (click)="openAddAnswerGroupModal()">
+            <button type="button" class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal" (click)="openAddAnswerGroupModal()">
               + ADD RESPONSE
             </button>
           </div>
         </div>
         <div *ngIf="!isInQuestionMode()" class="solicit-answer-checkbox">
           <span *ngIf="!isCurrentInteractionTrivial()" [hidden]="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
-            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="protractor-test-solicit-answer-details-checkbox" (change)="onChangeSolicitAnswerDetails()" [(ngModel)]="stateSolicitAnswerDetailsService.displayed" [disabled]="!editabilityService.isEditable()">
+            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="e2e-test-solicit-answer-details-checkbox" (change)="onChangeSolicitAnswerDetails()" [(ngModel)]="stateSolicitAnswerDetailsService.displayed" [disabled]="!editabilityService.isEditable()">
             <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
           </span>
         </div>

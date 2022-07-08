@@ -1,8 +1,8 @@
 <div class="list-group skill-selector-editor">
-  <mat-card layout="row" class="list-view-item protractor-test-skill-select-header">
+  <mat-card layout="row" class="list-view-item e2e-test-skill-select-header">
     Search By Skill
     <input type="text"
-           class="form-control protractor-test-skill-name-input"
+           class="form-control e2e-test-skill-name-input"
            placeholder="Enter a skill name"
            [(ngModel)]="skillFilterText"
            (ngModelChange)="filterSkills($event)"
@@ -13,7 +13,7 @@
     <loading-dots></loading-dots>
   </div>
   <div class="skill-selector-item-container">
-    <div class="oppia-list-group-item-text list-group-item protractor-test-rte-skill-selector-item"
+    <div class="oppia-list-group-item-text list-group-item e2e-test-rte-skill-selector-item"
          *ngFor="let skill of skillsToShow"
          (click)="selectSkill(skill.id, skill.description)"
          [ngClass]="{'list-group-item-success': (skill.id === value)}">

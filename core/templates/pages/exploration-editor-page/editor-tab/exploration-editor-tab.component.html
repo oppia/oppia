@@ -4,12 +4,12 @@
      on-finish="$ctrl.onFinishTutorial()"
      on-skip="$ctrl.onSkipTutorial()">
   <div class="exp-editor-main-editor">
-    <div class="oppia-editor-cards-container protractor-test-editor-cards-container">
+    <div class="oppia-editor-cards-container e2e-test-editor-cards-container">
       <div class="oppia-editor-header">
         <state-name-editor></state-name-editor>
       </div>
       <div>
-        <md-checkbox class="checkpoint-selection-checkbox protractor-test-checkpoint-selection-checkbox"
+        <md-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
                      ng-change="$ctrl.onChangeCardIsCheckpoint()"
                      ng-model="$ctrl.stateCardIsCheckpointService.displayed"
                      ng-disabled="!$ctrl.isEditable()">

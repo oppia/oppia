@@ -21,21 +21,21 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var TopicViewerPage = function() {
-  var topicDescription = element(by.css('.protractor-test-topic-description'));
+  var topicDescription = element(by.css('.e2e-test-topic-description'));
   var storySummaryTitleList =
-    element.all(by.css('.protractor-test-story-summary-title'));
+    element.all(by.css('.e2e-test-story-summary-title'));
   var startPracticeButton =
-    element(by.css('.protractor-test-practice-start-button'));
-  var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
-  var practiceTabLink = element(by.css('.protractor-test-practice-tab-link'));
+    element(by.css('.e2e-test-practice-start-button'));
+  var revisionTabLink = element(by.css('.e2e-test-revision-tab-link'));
+  var practiceTabLink = element(by.css('.e2e-test-practice-tab-link'));
   var messageOnCompletion = element(
-    by.css('.protractor-test-practice-complete-message'));
+    by.css('.e2e-test-practice-complete-message'));
 
   this.get = async function(classroomUrlFragment, topicName) {
     await browser.get(`/learn/${classroomUrlFragment}`);
     await waitFor.pageToFullyLoad();
     var topicLink = element(by.cssContainingText(
-      '.protractor-test-topic-link', topicName));
+      '.e2e-test-topic-link', topicName));
     await waitFor.presenceOf(
       topicLink, 'Topic ' +
       topicName + ' card is not present on /' + classroomUrlFragment);
@@ -71,7 +71,7 @@ var TopicViewerPage = function() {
 
   this.selectSkillForPractice = async function(subtopicTitle) {
     var skillCheckbox = element(by.cssContainingText(
-      '.protractor-test-skill-checkbox', subtopicTitle));
+      '.e2e-test-skill-checkbox', subtopicTitle));
     await action.click('Select skill to practice', skillCheckbox);
   };
 

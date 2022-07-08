@@ -707,6 +707,7 @@ describe('Exploration editor page component', function() {
       spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
+      spyOn(es, 'lockExploration').and.callThrough();
       mockInitExplorationPageEmitter.emit(successCallback);
 
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -719,7 +720,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       tick();
 
-      expect(successCallback).toHaveBeenCalled();
+      expect(es.lockExploration).toHaveBeenCalled();
 
       flush();
       discardPeriodicTasks();
