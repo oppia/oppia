@@ -495,7 +495,7 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
         })
 
 
-class TeacherDashboardPage(base.BaseHandler):
+class FacilitatorDashboardPage(base.BaseHandler):
     """Page showing the teacher dashboard."""
 
     URL_PATH_ARGS_SCHEMAS = {}

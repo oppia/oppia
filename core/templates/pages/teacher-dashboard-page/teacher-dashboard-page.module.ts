@@ -26,7 +26,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-import { TeacherDashboardPageComponent } from
+import { FacilitatorDashboardPageComponent } from
   './teacher-dashboard-page.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -45,10 +45,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    TeacherDashboardPageComponent
+    FacilitatorDashboardPageComponent
   ],
   entryComponents: [
-    TeacherDashboardPageComponent
+    FacilitatorDashboardPageComponent
   ],
   providers: [
     {
@@ -72,7 +72,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     }
   ]
 })
-class TeacherDashboardPageModule {
+class FacilitatorDashboardPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
@@ -87,7 +87,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(TeacherDashboardPageModule);
+  return platformRef.bootstrapModule(FacilitatorDashboardPageModule);
 };
 const downgradedModule = downgradeModule(bootstrapFnAsync);
 

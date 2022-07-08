@@ -38,7 +38,7 @@ import { PageTitleService } from 'services/page-title.service';
   templateUrl: './teacher-dashboard-page.component.html',
   styleUrls: []
 })
-export class TeacherDashboardPageComponent implements OnInit, OnDestroy {
+export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   constructor(
@@ -86,5 +86,5 @@ export class TeacherDashboardPageComponent implements OnInit, OnDestroy {
 }
 
 angular.module('oppia').directive(
-  'oppiaTeacherDashboardPage',
-  downgradeComponent({component: TeacherDashboardPageComponent}));
+  'oppiaFacilitatorDashboardPage',
+  downgradeComponent({component: FacilitatorDashboardPageComponent}));

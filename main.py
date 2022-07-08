@@ -952,8 +952,8 @@ URLS = [
         r'/learner_group_user_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupStudentProgressHandler),
     get_redirect_route(
-        r'%s' % feconf.TEACHER_DASHBOARD_PAGE_URL,
-        learner_group.TeacherDashboardPage),
+        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
+        learner_group.FacilitatorDashboardPage),
     get_redirect_route(
         r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
         learner_group.CreateLearnerGroupPage),

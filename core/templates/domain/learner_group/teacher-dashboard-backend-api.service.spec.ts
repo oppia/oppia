@@ -35,7 +35,7 @@ describe('Teacher Dashboard Backend API Service', () => {
     students_count: 5
   };
 
-  const TEACHER_DASHBOARD_URL = '/teacher_dashboard_handler';
+  const FACILITATOR_DASHBOARD_URL = '/facilitator_dashboard_handler';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -61,7 +61,7 @@ describe('Teacher Dashboard Backend API Service', () => {
         .fetchTeacherDashboardLearnerGroupsAsync()
         .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(TEACHER_DASHBOARD_URL);
+      var req = httpTestingController.expectOne(FACILITATOR_DASHBOARD_URL);
       expect(req.request.method).toEqual('GET');
       req.flush({
         learner_groups_list: [sampleShortLearnerGroupData]

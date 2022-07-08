@@ -39,7 +39,7 @@ export class TeacherDashboardBackendApiService {
   Promise<ShortLearnerGroupSummary[]> {
     return new Promise((resolve, reject) => {
       this.http.get<TeacherDashboardBackendResponse>(
-        '/teacher_dashboard_handler').toPromise().then(dashboardData => {
+        '/facilitator_dashboard_handler').toPromise().then(dashboardData => {
         resolve(
           dashboardData.learner_groups_list.map(
             shortLearnerGroupSummary => ShortLearnerGroupSummary
