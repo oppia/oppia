@@ -1,29 +1,4 @@
-<!-- Desktop -->
-<div *ngIf="!onMobile"
-     class="oppia-opportunities-list-item oppia-desktop-list-item protractor-test-opportunity-list-item">
-  <div class="oppia-opportunities-details">
-    <div class="oppia-opportunities-subheading oppia-animate-fadein">
-      <span title="{{ opportunity?.subheading }}"
-            class="protractor-test-opportunity-list-item-subheading oppia-subheading-large"
-            [hidden]="opportunityDataIsLoading">
-        {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
-      </span>
-      <span title="{{ opportunity?.subheading }}"
-            class="protractor-test-opportunity-list-item-subheading oppia-subheading-small"
-            [hidden]="opportunityDataIsLoading">
-        {{ opportunity?.subheading | wrapTextWithEllipsis : 20 }}
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-    <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span class="protractor-test-opportunity-list-item-heading"
-            title="{{ opportunity?.heading }}"
-            [hidden]="opportunityDataIsLoading">
-        {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-  </div>
+<ng-template #ProgressBar>
   <div class="oppia-opportunities-progress oppia-animate-fadein"
        *ngIf="progressBarRequired">
     <div class="oppia-opportunities-progress-bar">
@@ -80,91 +55,9 @@
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
-  <div class="oppia-opportunities-label-container oppia-animate-fadein"
-       *ngIf="labelRequired">
-    <div class="oppia-opportunities-label"
-         [ngStyle]="labelStyle">
-      <span class="protractor-test-opportunity-list-item-label"
-            [hidden]="opportunityDataIsLoading">
-          {{ labelText }}
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-  </div>
-  <div class="oppia-opportunities-button-container oppia-animate-fadein">
-    <div class="oppia-opportunities-button-wrapper"
-         [disableTooltip]="!opportunityButtonDisabled"
-         ngbTooltip="All available translations are currently in review."
-         placement="bottom">
-      <button class="protractor-test-opportunity-list-item-button"
-              [ngClass]="{'oppia-opportunities-button': !opportunityButtonDisabled, 'oppia-opportunities-disabled-button': opportunityButtonDisabled}"
-              [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
-              [disabled]="opportunityButtonDisabled"
-              (click)="clickActionButton.emit(opportunity.id)">
-        {{ opportunity?.actionButtonTitle }}
-      </button>
-    </div>
-  </div>
-</div>
+</ng-template>
 
-<!-- Mobile -->
-<div *ngIf="showOpportunityButton && onMobile"
-     class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
-  <div class="oppia-opportunities-progress oppia-animate-fadein"
-       *ngIf="progressBarRequired">
-    <div class="oppia-opportunities-progress-bar">
-      <div [hidden]="opportunityDataIsLoading"
-           *ngIf="!translationProgressBar"
-           class="progress">
-        <div class="progress-bar bg-success"
-             role="progressbar"
-             [ngStyle]="progressBarStyle">
-        </div>
-      </div>
-      <div [hidden]="opportunityDataIsLoading"
-           *ngIf="translationProgressBar"
-           class="progress">
-        <div class="progress-bar bg-success"
-             role="progressbar"
-             [ngStyle]="translatedProgressStyle"
-             ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted"
-             container="body"
-             placement="bottom">
-        </div>
-        <div class="progress-bar bg-light-green"
-             role="progressbar"
-             [ngStyle]="inReviewProgressStyle"
-             ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review"
-             container="body"
-             placement="bottom">
-        </div>
-        <div class="progress-bar bg-light"
-             role="progressbar"
-             [ngStyle]="untranslatedProgressStyle"
-             ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
-             container="body"
-             placement="bottom">
-        </div>
-      </div>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-    <div class="oppia-opportunities-progress-label">
-      <span class="protractor-test-opportunity-list-item-progress-percentage"
-            *ngIf="translationProgressBar"
-            [hidden]="opportunityDataIsLoading"
-            [disableTooltip]="!translationProgressBar"
-            ngbTooltip="Percentage of accepted translated cards"
-            placement="bottom"> ({{ progressPercentage }})
-      </span>
-      <span class="protractor-test-opportunity-list-item-progress-percentage"
-            *ngIf="!translationProgressBar"
-            [hidden]="opportunityDataIsLoading"
-            ngbTooltip="Percentage of accepted questions for skill out of target number of questions per skill ({{targetNumQuestionsPerSkill}})">
-        ({{ progressPercentage }})
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-  </div>
+<ng-template #OpportunitiesDetails>
   <div class="oppia-opportunities-details">
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
@@ -188,6 +81,9 @@
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
+</ng-template>
+
+<ng-template #OpportunitiesLabel>
   <div class="oppia-opportunities-label-container oppia-animate-fadein"
        *ngIf="labelRequired">
     <div class="oppia-opportunities-label"
@@ -199,6 +95,9 @@
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
+</ng-template>
+
+<ng-template #OpportunitiesButton>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <div class="oppia-opportunities-button-wrapper"
          [disableTooltip]="!opportunityButtonDisabled"
@@ -213,6 +112,24 @@
       </button>
     </div>
   </div>
+</ng-template>
+
+<!-- Desktop -->
+<div *ngIf="!onMobile"
+     class="oppia-opportunities-list-item oppia-desktop-list-item protractor-test-opportunity-list-item">
+  <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
+  <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
+  <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
+</div>
+
+<!-- Mobile -->
+<div *ngIf="showOpportunityButton && onMobile"
+     class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
+  <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
+  <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
+  <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
 <button *ngIf="!showOpportunityButton && onMobile"
@@ -220,96 +137,9 @@
         [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
         [disabled]="opportunityButtonDisabled"
         (click)="clickActionButton.emit(opportunity.id)">
-  <div class="oppia-opportunities-details">
-    <div class="oppia-opportunities-subheading oppia-animate-fadein">
-      <span title="{{ opportunity?.subheading }}"
-            class="protractor-test-opportunity-list-item-subheading oppia-subheading-large"
-            [hidden]="opportunityDataIsLoading">
-        {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
-      </span>
-      <span title="{{ opportunity?.subheading }}"
-            class="protractor-test-opportunity-list-item-subheading oppia-subheading-small"
-            [hidden]="opportunityDataIsLoading">
-        {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-    <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span class="protractor-test-opportunity-list-item-heading"
-            title="{{ opportunity?.heading }}"
-            [hidden]="opportunityDataIsLoading">
-        {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-  </div>
-  <div class="oppia-opportunities-progress oppia-animate-fadein"
-       *ngIf="progressBarRequired">
-    <div class="oppia-opportunities-progress-bar">
-      <div [hidden]="opportunityDataIsLoading"
-           *ngIf="!translationProgressBar"
-           class="progress">
-        <div class="progress-bar bg-success"
-             role="progressbar"
-             [ngStyle]="progressBarStyle">
-        </div>
-      </div>
-      <div [hidden]="opportunityDataIsLoading"
-           *ngIf="translationProgressBar"
-           class="progress">
-        <div class="progress-bar bg-success"
-             role="progressbar"
-             [ngStyle]="translatedProgressStyle"
-             ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted"
-             container="body"
-             placement="bottom">
-        </div>
-        <div class="progress-bar bg-light-green"
-             role="progressbar"
-             [ngStyle]="inReviewProgressStyle"
-             ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review"
-             container="body"
-             placement="bottom">
-        </div>
-        <div class="progress-bar bg-light"
-             role="progressbar"
-             [ngStyle]="untranslatedProgressStyle"
-             ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
-             container="body"
-             placement="bottom">
-        </div>
-      </div>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-    <div class="oppia-opportunities-progress-label">
-      <span class="protractor-test-opportunity-list-item-progress-percentage"
-            *ngIf="translationProgressBar"
-            [hidden]="opportunityDataIsLoading"
-            [disableTooltip]="!translationProgressBar"
-            ngbTooltip="Percentage of accepted translated cards"
-            placement="bottom">
-        ({{ progressPercentage }})
-      </span>
-      <span class="protractor-test-opportunity-list-item-progress-percentage"
-            *ngIf="!translationProgressBar"
-            [hidden]="opportunityDataIsLoading"
-            ngbTooltip="Percentage of accepted questions for skill out of target number of questions per skill ({{targetNumQuestionsPerSkill}})">
-        ({{ progressPercentage }})
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-  </div>
-  <div class="oppia-opportunities-label-container oppia-animate-fadein"
-       *ngIf="labelRequired">
-    <div class="oppia-opportunities-label"
-         [ngStyle]="labelStyle">
-      <span class="protractor-test-opportunity-list-item-label"
-            [hidden]="opportunityDataIsLoading">
-          {{ labelText }}
-      </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
-    </div>
-  </div>
+  <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
+  <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
+  <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
 </button>
 
 <style>
