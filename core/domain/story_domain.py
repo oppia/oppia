@@ -1892,3 +1892,15 @@ class StorySummary:
             'thumbnail_filename': self.thumbnail_filename,
             'url_fragment': self.url_fragment
         }
+
+
+class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
+    """Dictionary representation of a StorySummary object for learner
+    groups syllabus
+    """
+
+    story_is_published: bool
+    completed_node_titles: List[str]
+    all_node_dicts: List[StoryNodeDict]
+    topic_name: str
+    topic_url_fragment: str

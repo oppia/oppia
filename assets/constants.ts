@@ -6037,7 +6037,7 @@ export default {
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
 
-  // A regular expression for allowed learner group id's.
+  // A regular expression for allowed learner group IDs.
   "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
 
   // A regular expression for allowed characters in Title field for Blog Post.
@@ -6183,6 +6183,9 @@ export default {
 
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
+
+  // Maximum allowed length of unique progress url ID.
+  "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],

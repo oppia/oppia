@@ -37,7 +37,8 @@ third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/
 third_party/static/bower-angular-translate-loader-partial-2.18.1/
 third_party/static/bower-angular-translate-loader-static-files-2.18.1/
 third_party/static/bower-angular-translate-storage-cookie-2.18.1/
-third_party/static/bower-material-1.1.19/
+third_party/static/bower-material-1.1.19/layouts/
+third_party/static/bower-material-1.1.19/modules/
 third_party/python_libs/google/appengine/
 third_party/python_libs/google/net/
 third_party/python_libs/google/pyglib/

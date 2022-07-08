@@ -384,8 +384,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # Return None for usernames which don't exist.
         self.assertEqual(
-            user_services.get_multi_user_ids_from_usernames(['fakeUsername']),
-            []
+            user_services.get_multi_user_ids_from_usernames(
+                ['fakeUsername1', 'fakeUsername2', 'fakeUsername3',
+                'fakeUsername4', 'fakeUsername5', 'fakeUsername6',
+                'fakeUsername7', 'fakeUsername8', 'fakeUsername9']
+            ), [None, None, None, None, None, None, None, None, None]
+        )
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_usernames(
+                ['fakeUsername1', 'USERNAME1', 'fakeUsername3',
+                'fakeUsername4', 'fakeUsername5', 'fakeUsername6',
+                'fakeUsername7', username2, 'fakeUsername9']
+            ), [None, user_id1, None, None, None, None, None, user_id2, None]
+        )
+
+        # Return empty list if empty list is passed in as arguments.
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_usernames([]), []
         )
 
     def test_get_user_settings_from_username_returns_user_settings(self):
@@ -2300,10 +2315,10 @@ title: Title
 
         self.logout()
 
-    def test_sync_learner_checkpoint_progress_with_current_exp_version(self):
+    def test_sync_logged_in_learner_checkpoint_progress_with_current_exp_version(self): # pylint: disable=line-too-long
         self.login(self.VIEWER_EMAIL)
         exp_user_data = (
-            user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+            user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                 self.viewer_id, self.EXP_ID))
         self.assertIsNone(exp_user_data)
 
@@ -2345,7 +2360,7 @@ title: Title
         # furthest reached checkpoint is set to None. Similar workflow is
         # carried out for most recently reached checkpoint.
         exp_user_data = (
-            user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+            user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
                 self.viewer_id, self.EXP_ID))
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 2)

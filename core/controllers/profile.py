@@ -32,7 +32,6 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import takeout_service
-from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 
@@ -524,14 +523,24 @@ class UsernameCheckHandler(base.BaseHandler):
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
-        username = self.payload.get('username')
-        try:
-            user_domain.UserSettings.require_valid_username(username)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        username = self.normalized_payload.get('username')
 
         username_is_taken = user_services.is_username_taken(username)
         self.render_json({

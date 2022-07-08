@@ -36,7 +36,6 @@ from core.domain import user_domain
 from core.platform import models
 
 import requests
-from typing import List
 
 auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
@@ -111,16 +110,31 @@ def get_multi_user_ids_from_usernames(usernames):
         usernames: list(str). Identifiable usernames to display in the UI.
 
     Returns:
-        list(str). Return the list of user ids corresponding to given
+        list(str|None). Return the list of user ids corresponding to given
         usernames.
         """
-    user_ids: List[str] = []
-    for username in usernames:
-        user_id = get_user_id_from_username(username)
-        if user_id is not None:
-            user_ids.append(user_id)
+    if len(usernames) == 0:
+        return []
 
-    return user_ids
+    normalized_usernames = [
+        user_domain.UserSettings.normalize_username(username)
+        for username in usernames
+    ]
+
+    found_models = user_models.UserSettingsModel.query(
+        user_models.UserSettingsModel.normalized_username.IN(
+            normalized_usernames
+        )
+    ).fetch()
+
+    username_to_user_id_map = {
+        model.normalized_username: model.id for model in found_models
+    }
+
+    return [
+        username_to_user_id_map.get(username)
+        for username in normalized_usernames
+    ]
 
 
 def get_user_settings_from_username(username):
@@ -2332,7 +2346,7 @@ def get_dashboard_stats(user_id):
     }
 
 
-def _get_checkpoints_in_order(init_state_name, states):
+def get_checkpoints_in_order(init_state_name, states):
     """Returns the checkpoints of an exploration in sequential order by a
     BFS traversal.
 
@@ -2367,7 +2381,7 @@ def _get_checkpoints_in_order(init_state_name, states):
     return checkpoint_state_names
 
 
-def _get_most_distant_reached_checkpoint_in_current_exploration(
+def get_most_distant_reached_checkpoint_in_current_exploration(
     checkpoints_in_current_exploration,
     checkpoints_in_older_exploration,
     most_distant_reached_checkpoint_state_name_in_older_exploration
@@ -2440,15 +2454,15 @@ def update_learner_checkpoint_progress(
                 version=exp_user_model.furthest_reached_checkpoint_exp_version
             )
         )
-        checkpoints_in_current_exp = _get_checkpoints_in_order(
+        checkpoints_in_current_exp = get_checkpoints_in_order(
             current_exploration.init_state_name, current_exploration.states)
-        checkpoints_in_older_exp = _get_checkpoints_in_order(
+        checkpoints_in_older_exp = get_checkpoints_in_order(
             furthest_reached_checkpoint_exp.init_state_name,
             furthest_reached_checkpoint_exp.states)
 
         # Get the furthest reached checkpoint in current exploration.
         furthest_reached_checkpoint_in_current_exp = (
-            _get_most_distant_reached_checkpoint_in_current_exploration(
+            get_most_distant_reached_checkpoint_in_current_exploration(
                 checkpoints_in_current_exp,
                 checkpoints_in_older_exp,
                 exp_user_model.furthest_reached_checkpoint_state_name
@@ -2507,7 +2521,7 @@ def clear_learner_checkpoint_progress(user_id, exploration_id):
         exp_user_model.put()
 
 
-def sync_learner_checkpoint_progress_with_current_exp_version(
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     user_id,
     exploration_id
 ):
@@ -2543,11 +2557,11 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
         ))
 
     most_recently_reached_checkpoint_in_current_exploration = (
-        _get_most_distant_reached_checkpoint_in_current_exploration(
-            _get_checkpoints_in_order(
+        get_most_distant_reached_checkpoint_in_current_exploration(
+            get_checkpoints_in_order(
                 latest_exploration.init_state_name,
                 latest_exploration.states),
-            _get_checkpoints_in_order(
+            get_checkpoints_in_order(
                 most_recently_interacted_exploration.init_state_name,
                 most_recently_interacted_exploration.states),
             exp_user_model.most_recently_reached_checkpoint_state_name
@@ -2555,11 +2569,11 @@ def sync_learner_checkpoint_progress_with_current_exp_version(
     )
 
     furthest_reached_checkpoint_in_current_exploration = (
-        _get_most_distant_reached_checkpoint_in_current_exploration(
-            _get_checkpoints_in_order(
+        get_most_distant_reached_checkpoint_in_current_exploration(
+            get_checkpoints_in_order(
                 latest_exploration.init_state_name,
                 latest_exploration.states),
-            _get_checkpoints_in_order(
+            get_checkpoints_in_order(
                 furthest_reached_exploration.init_state_name,
                 furthest_reached_exploration.states),
             exp_user_model.furthest_reached_checkpoint_state_name

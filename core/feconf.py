@@ -570,7 +570,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.5'
+OPPIA_VERSION = '3.2.6'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1046,8 +1046,8 @@ USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
-TEACHER_DASHBOARD_HANDLER = '/teacher_dashboard_handler'
-TEACHER_DASHBOARD_PAGE_URL = '/teacher-dashboard'
+FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
+FACILITATOR_DASHBOARD_PAGE_URL = '/teacher-dashboard'
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 
 # Event types.

@@ -192,10 +192,10 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
+class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TeacherDashboardHandlerTests, self).setUp()
+        super(FacilitatorDashboardHandlerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
         self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -204,7 +204,7 @@ class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
         # There are no learner groups created by new user yet.
-        response = self.get_json('%s' % (feconf.TEACHER_DASHBOARD_HANDLER))
+        response = self.get_json('%s' % (feconf.FACILITATOR_DASHBOARD_HANDLER))
 
         self.assertEqual(response['learner_groups_list'], [])
 
@@ -217,7 +217,7 @@ class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
             learner_group_id, 'Learner Group Title', 'Description',
             [self.facilitator_id], [], ['subtopic_id_1'], ['story_id_1'])
 
-        response = self.get_json('%s' % (feconf.TEACHER_DASHBOARD_HANDLER))
+        response = self.get_json('%s' % (feconf.FACILITATOR_DASHBOARD_HANDLER))
 
         self.assertEqual(len(response['learner_groups_list']), 1)
         self.assertEqual(
@@ -226,7 +226,7 @@ class TeacherDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
+class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
 
     LEARNER_GROUP_ID = None
     STUDENT_ID = 'student_user_1'
@@ -236,7 +236,7 @@ class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     STORY_ID_1 = 'story_id_1'
 
     def setUp(self):
-        super(SearchLearnerGroupSyllabusHandlerTests, self).setUp()
+        super(LearnerGroupSearchSyllabusHandlerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -313,25 +313,25 @@ class SearchLearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/search_learner_group_syllabus_handler/%s' % (
+            '/learner_group_search_syllabus_handler/%s' % (
                 self.LEARNER_GROUP_ID),
             params=params
         )
 
         self.assertEqual(response['learner_group_id'], self.LEARNER_GROUP_ID)
-        story_summaries = response['story_summaries']
-        self.assertEqual(len(story_summaries), 1)
-        self.assertEqual(story_summaries[0]['id'], self.STORY_ID_0)
-        self.assertEqual(story_summaries[0]['title'], 'Story test 0')
-        self.assertEqual(story_summaries[0]['topic_name'], 'Place Values')
+        story_summary_dicts = response['story_summary_dicts']
+        self.assertEqual(len(story_summary_dicts), 1)
+        self.assertEqual(story_summary_dicts[0]['id'], self.STORY_ID_0)
+        self.assertEqual(story_summary_dicts[0]['title'], 'Story test 0')
+        self.assertEqual(story_summary_dicts[0]['topic_name'], 'Place Values')
 
-        subtopic_summaries = response['subtopic_summaries']
-        self.assertEqual(len(subtopic_summaries), 1)
-        self.assertEqual(subtopic_summaries[0]['subtopic_id'], 1)
+        subtopic_summary_dicts = response['subtopic_summary_dicts']
+        self.assertEqual(len(subtopic_summary_dicts), 1)
+        self.assertEqual(subtopic_summary_dicts[0]['subtopic_id'], 1)
         self.assertEqual(
-            subtopic_summaries[0]['subtopic_title'], 'Naming Numbers')
+            subtopic_summary_dicts[0]['subtopic_title'], 'Naming Numbers')
         self.assertEqual(
-            subtopic_summaries[0]['parent_topic_id'], self.TOPIC_ID_0)
+            subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID_0)
 
         self.logout()
 
@@ -529,15 +529,13 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
         self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'sub-one-frag')
         self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2')
+            2, 'Subtopic Title 2', 'sub-two-frag')
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
         self.subtopic_1.skill_ids = [self.SKILL_ID_1]
-        self.subtopic_1.url_fragment = 'sub-one-frag'
         self.subtopic_2.skill_ids = [self.SKILL_ID_2]
-        self.subtopic_2.url_fragment = 'sub-two-frag'
         self.save_new_topic(
             self.TOPIC_ID_1, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[story.id],

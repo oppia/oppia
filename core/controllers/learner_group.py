@@ -167,7 +167,7 @@ class LearnerGroupHandler(base.BaseHandler):
 
         # Check if user is the facilitator of the learner group, as only
         # facilitators have the right to update a learner group.
-        is_valid_request = learner_group_services.is_user_a_facilitator(
+        is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id
         )
 
@@ -205,7 +205,7 @@ class LearnerGroupHandler(base.BaseHandler):
     def delete(self, learner_group_id):
         """Deletes a learner group."""
 
-        is_valid_request = learner_group_services.is_user_a_facilitator(
+        is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id
         )
 
@@ -273,13 +273,16 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             learner_group_services.get_topic_ids_from_subtopic_page_ids(
                 subtopic_page_ids))
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
-        all_skill_ids = []
 
-        for topic in topics:
-            if topic:
-                all_skill_ids.extend(topic.get_all_skill_ids())
-
-        all_skill_ids = list(set(all_skill_ids))
+        all_skill_ids_lists = [
+            topic.get_all_skill_ids() for topic in topics if topic
+        ]
+        all_skill_ids = list(
+            {
+                skill_id for skill_list in all_skill_ids_lists
+                for skill_id in skill_list
+            }
+        )
 
         all_students_progress = []
 
@@ -304,7 +307,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             # Fetch the progress of the student in all the stories assigned
             # in the group syllabus.
             stories_progress = story_fetchers.get_progress_in_stories(
-                    user_id, story_ids)
+                user_id, story_ids)
             story_summaries = story_fetchers.get_story_summaries_by_ids(
                 story_ids)
 
@@ -335,7 +338,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         })
 
 
-class SearchLearnerGroupSyllabusHandler(base.BaseHandler):
+class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
     """Handles operations related to the learner group syllabus."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -401,13 +404,14 @@ class SearchLearnerGroupSyllabusHandler(base.BaseHandler):
 
         self.render_json({
             'learner_group_id': learner_group_id,
-            'story_summaries': matching_syllabus['story_summaries'],
-            'subtopic_summaries': matching_syllabus['subtopic_summaries']
+            'story_summary_dicts': matching_syllabus['story_summary_dicts'],
+            'subtopic_summary_dicts':
+                matching_syllabus['subtopic_summary_dicts']
         })
 
 
-class TeacherDashboardHandler(base.BaseHandler):
-    """Handles operations related to the teacher dashboard."""
+class FacilitatorDashboardHandler(base.BaseHandler):
+    """Handles operations related to the facilitator dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -418,7 +422,7 @@ class TeacherDashboardHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_groups
     def get(self):
-        """Handles GET requests for the teacher dashboard."""
+        """Handles GET requests for the facilitator dashboard."""
 
         learner_groups = (
             learner_group_fetchers.get_learner_groups_of_facilitator(
@@ -466,7 +470,7 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
     def get(self, learner_group_id):
         """Handles GET requests for facilitator's view of learner group."""
 
-        is_valid_request = learner_group_services.is_user_a_facilitator(
+        is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id)
 
         if not is_valid_request:
@@ -474,7 +478,7 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
                 'You are not a facilitator of this learner group.')
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-                learner_group_id)
+            learner_group_id)
 
         self.render_json({
             'id': learner_group.group_id,
