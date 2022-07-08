@@ -35,7 +35,6 @@ describe('Yaml service', () => {
         yetAnotherSubProperty: true
       }
     };
-    const yamlString = yamlService.stringify(objectToStringify);
     const expectedYamlString = (
       'someProperty: some property\n' +
       'someOtherProperty:\n' +
@@ -43,6 +42,8 @@ describe('Yaml service', () => {
       '  someOtherSubProperty: some other sub property\n' +
       '  yetAnotherSubProperty: true\n'
     );
+
+    const yamlString = yamlService.stringify(objectToStringify);
 
     expect(yamlString).toEqual(expectedYamlString);
   });
@@ -63,6 +64,7 @@ describe('Yaml service', () => {
         yetAnotherSubProperty: true
       }
     };
+
     const parsedObject = yamlService.parse(yamlString);
 
     expect(expectedObject).toEqual(parsedObject);
