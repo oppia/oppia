@@ -156,7 +156,7 @@ RERUN_POLICIES = {
 }
 
 MOBILE_SUITES = [
-    'contributordashboard'
+    'contributorDashboard'
 ]
 
 
@@ -317,7 +317,7 @@ def main(args=None):
     policy = RERUN_POLICIES[parsed_args.suite.lower()]
     suite = parsed_args.suite
 
-    if (parsed_args.mobile) and (suite.lower() not in MOBILE_SUITES):
+    if (parsed_args.mobile) and (suite not in MOBILE_SUITES):
         print(f'The {suite} suite should not be run in the mobile viewport')
         sys.exit(1)
 
