@@ -38,7 +38,7 @@
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-progress-label">
-      <span class="protractor-test-opportunity-list-item-progress-percentage"
+      <span class="e2e-test-opportunity-list-item-progress-percentage"
             *ngIf="translationProgressBar"
             [hidden]="opportunityDataIsLoading"
             [disableTooltip]="!translationProgressBar"
@@ -46,7 +46,7 @@
             placement="bottom">
         ({{ progressPercentage }})
       </span>
-      <span class="protractor-test-opportunity-list-item-progress-percentage"
+      <span class="e2e-test-opportunity-list-item-progress-percentage"
             *ngIf="!translationProgressBar"
             [hidden]="opportunityDataIsLoading"
             ngbTooltip="Percentage of accepted questions for skill out of target number of questions per skill ({{targetNumQuestionsPerSkill}})">
@@ -61,19 +61,19 @@
   <div class="oppia-opportunities-details">
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
       <span title="{{ opportunity?.subheading }}"
-            class="protractor-test-opportunity-list-item-subheading oppia-subheading-large"
+            class="e2e-test-opportunity-list-item-subheading oppia-subheading-large"
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
       </span>
       <span title="{{ opportunity?.subheading }}"
-            class="protractor-test-opportunity-list-item-subheading oppia-subheading-small"
+            class="e2e-test-opportunity-list-item-subheading oppia-subheading-small"
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
       </span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span class="protractor-test-opportunity-list-item-heading"
+      <span class="e2e-test-opportunity-list-item-heading"
             title="{{ opportunity?.heading }}"
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
@@ -88,7 +88,7 @@
        *ngIf="labelRequired">
     <div class="oppia-opportunities-label"
          [ngStyle]="labelStyle">
-      <span class="protractor-test-opportunity-list-item-label"
+      <span class="e2e-test-opportunity-list-item-label"
             [hidden]="opportunityDataIsLoading">
           {{ labelText }}
       </span>
@@ -103,7 +103,7 @@
          [disableTooltip]="!opportunityButtonDisabled"
          ngbTooltip="All available translations are currently in review."
          placement="bottom">
-      <button class="protractor-test-opportunity-list-item-button"
+      <button class="e2e-test-opportunity-list-item-button"
               [ngClass]="{'oppia-opportunities-button': !opportunityButtonDisabled, 'oppia-opportunities-disabled-button': opportunityButtonDisabled}"
               [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
               [disabled]="opportunityButtonDisabled"
@@ -116,7 +116,7 @@
 
 <!-- Desktop -->
 <div *ngIf="!onMobile"
-     class="oppia-opportunities-list-item oppia-desktop-list-item protractor-test-opportunity-list-item">
+     class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item">
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
@@ -125,7 +125,7 @@
 
 <!-- Mobile -->
 <div *ngIf="showOpportunityButton && onMobile"
-     class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
+     class="oppia-opportunities-list-item e2e-test-opportunity-list-item">
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
@@ -133,7 +133,7 @@
 </div>
 
 <button *ngIf="!showOpportunityButton && onMobile"
-        class="oppia-opportunities-list-item oppia-button-list-item protractor-test-opportunity-list-item"
+        class="oppia-opportunities-list-item oppia-button-list-item e2e-test-opportunity-list-item"
         [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
         [disabled]="opportunityButtonDisabled"
         (click)="clickActionButton.emit(opportunity.id)">
