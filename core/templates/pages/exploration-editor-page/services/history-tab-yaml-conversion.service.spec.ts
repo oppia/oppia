@@ -44,21 +44,27 @@ describe('History tab yaml conversion service', () => {
 
   it('should get the yaml representation of the given entity when it is truthy',
     fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       historyTabYamlConversionService
         .getYamlStringFromStateOrMetadata(testState)
-        .then((result) => {
-          expect(result).toEqual(testStateYamlString);
-        });
+        .then(successHandler, failHandler);
       tick(201);
+
+      expect(successHandler).toHaveBeenCalledWith(testStateYamlString);
+      expect(failHandler).not.toHaveBeenCalled();
     }));
 
   it('should return an empty string when the given entity is falsy',
     fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       historyTabYamlConversionService
         .getYamlStringFromStateOrMetadata(null)
-        .then((result) => {
-          expect(result).toEqual('');
-        });
+        .then(successHandler, failHandler);
       tick(201);
+
+      expect(successHandler).toHaveBeenCalledWith('');
+      expect(failHandler).not.toHaveBeenCalled();
     }));
 });
