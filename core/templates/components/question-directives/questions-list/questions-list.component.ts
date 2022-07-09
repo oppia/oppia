@@ -65,7 +65,6 @@ interface GroupedSkillSummaries {
 export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() skillDescriptionsAreShown: boolean;
   @Input() selectSkillModalIsShown: boolean;
-  @Input() skillIds: string[];
   @Input() allSkillSummaries: ShortSkillSummary[];
   @Input() canEditQuestion: boolean;
   @Input() skillIdToRubricsObject: object;
@@ -127,11 +126,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   createQuestion(): void {
     this.newQuestionSkillIds = [];
-    if (!this.selectSkillModalIsShown) {
-      this.newQuestionSkillIds = this.skillIds;
-    } else {
-      this.newQuestionSkillIds = [this.selectedSkillId];
-    }
+    this.newQuestionSkillIds = [this.selectedSkillId];
     this.linkedSkillsWithDifficulty = [];
     this.newQuestionSkillIds.forEach((skillId) => {
       this.linkedSkillsWithDifficulty.push(
@@ -231,11 +226,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       return;
     }
     this.newQuestionSkillIds = [];
-    if (!this.selectSkillModalIsShown) {
-      this.newQuestionSkillIds = this.skillIds;
-    } else {
-      this.newQuestionSkillIds = [this.selectedSkillId];
-    }
+    this.newQuestionSkillIds = [this.selectedSkillId];
     this.linkedSkillsWithDifficulty = [];
     this.newQuestionSkillIds.forEach((skillId) => {
       this.linkedSkillsWithDifficulty.push(
@@ -661,7 +652,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.showDifficultyChoices = false;
     this.difficultyCardIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
-    this.skillIds = [];
     this.associatedSkillSummaries = [];
     this.editorIsOpen = false;
     this.deletedQuestionIds = [];
