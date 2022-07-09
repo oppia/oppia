@@ -296,7 +296,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   gotoNextItem(): void {
     // If the current item is the last item, do not navigate.
-    if (this.isLastItem) {
+    if (this.remainingContributionIds.length === 0) {
       return;
     }
     // This prevents resolved contributions from getting added to the list.
@@ -334,7 +334,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   gotoPreviousItem(): void {
     // If the current item is the first item, do not navigate.
-    if (this.isFirstItem) {
+    if (this.skippedContributionIds.length === 0) {
       return;
     }
     // This prevents resolved contributions from getting added to the list.
