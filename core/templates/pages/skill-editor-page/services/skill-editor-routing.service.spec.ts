@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillEditorRoutingService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 
 describe('Skill Editor Routing Service', () => {
@@ -30,43 +30,54 @@ describe('Skill Editor Routing Service', () => {
     });
 
     sers = TestBed.inject(SkillEditorRoutingService);
-  });
-
-  it('should handler calls with unexpect paths', () => {
-    expect(sers.getActiveTabName()).toBe('main');
-    expect(sers.getTabStatuses()).toBe('main');
-
-    sers._changeTab('');
-
-    expect(sers.getActiveTabName()).toBe('main');
-    expect(sers.getTabStatuses()).toBe('main');
-
-    sers._changeTab('');
-
-    expect(sers.getActiveTabName()).toBe('main');
-    expect(sers.getTabStatuses()).toBe('main');
-  });
-
-  it('should toggle between main tab, questions and preview tab', () => {
-    sers.navigateToQuestionsTab();
-
-    expect(sers.getActiveTabName()).toBe('questions');
-    expect(sers.getTabStatuses()).toBe('questions');
-
-    sers.navigateToPreviewTab();
-    expect(sers.getActiveTabName()).toBe('preview');
-    expect(sers.getTabStatuses()).toBe('preview');
-
     sers.navigateToMainTab();
-    expect(sers.getActiveTabName()).toBe('main');
-    expect(sers.getTabStatuses()).toBe('main');
   });
 
-  it('should open the question-editor directly', () => {
+  it('should handler calls with unexpect paths', fakeAsync(() => {
+    expect(sers.getActiveTabName()).toBe('main');
+    expect(sers.getTabStatuses()).toBe('main');
+
+    sers._changeTab('');
+    tick();
+
+    expect(sers.getActiveTabName()).toBe('main');
+    expect(sers.getTabStatuses()).toBe('main');
+
+    sers._changeTab('');
+    tick();
+
+    expect(sers.getActiveTabName()).toBe('main');
+    expect(sers.getTabStatuses()).toBe('main');
+  }));
+
+  it('should toggle between main tab, questions and preview tab',
+    fakeAsync(() => {
+      sers.navigateToQuestionsTab();
+      tick();
+
+      expect(sers.getActiveTabName()).toBe('questions');
+      expect(sers.getTabStatuses()).toBe('questions');
+
+      sers.navigateToPreviewTab();
+      tick();
+
+      expect(sers.getActiveTabName()).toBe('preview');
+      expect(sers.getTabStatuses()).toBe('preview');
+
+      sers.navigateToMainTab();
+      tick();
+
+      expect(sers.getActiveTabName()).toBe('main');
+      expect(sers.getTabStatuses()).toBe('main');
+    }));
+
+  it('should open the question-editor directly', fakeAsync(() => {
     sers.creatingNewQuestion(true);
+    tick();
     expect(sers.navigateToQuestionEditor()).toBe(true);
 
     sers.creatingNewQuestion(false);
+    tick();
     expect(sers.navigateToQuestionEditor()).toBe(false);
-  });
+  }));
 });
