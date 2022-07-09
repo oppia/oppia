@@ -696,7 +696,9 @@ describe('Exploration editor page component', function() {
     });
 
     it('should react when refreshing graph', () => {
+      var successCallback = jasmine.createSpy('success');
       refreshGraphEmitter.emit();
+      mockInitExplorationPageEmitter.emit(successCallback);
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
