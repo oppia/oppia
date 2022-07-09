@@ -28,6 +28,11 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
+import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LocalStorageService } from 'services/local-storage.service';
 
 interface ResultActionButton {
   type: string;
@@ -35,7 +40,7 @@ interface ResultActionButton {
   url: string;
 }
 
-interface QuestionPlayerConfig {
+export interface QuestionPlayerConfig {
   resultActionButtons: ResultActionButton[];
   skillList: string[];
   skillDescriptions: string[];
@@ -55,12 +60,12 @@ export class RatingsAndRecommendationsComponent {
   @Input() userIsLoggedIn: boolean;
   @Input() explorationIsInPreviewMode: boolean;
   @Input() questionPlayerConfig: QuestionPlayerConfig;
-  @Input() inStoryMode: boolean;
-  @Input() storyViewerUrl!: string;
   @Input() collectionSummary: CollectionSummary;
   @Input() isRefresherExploration: boolean;
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
+  inStoryMode: boolean;
+  storyViewerUrl: string | undefined;
   collectionId: string;
   userRating: number;
   directiveSubscriptions = new Subscription();
@@ -71,10 +76,25 @@ export class RatingsAndRecommendationsComponent {
     private learnerViewRatingService: LearnerViewRatingService,
     private urlService: UrlService,
     private userService: UserService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private urlInterpolationService: UrlInterpolationService,
+    private platformFeatureService: PlatformFeatureService,
+    private localStorageService: LocalStorageService
   ) {}
 
   ngOnInit(): void {
+    this.inStoryMode = (
+      this.explorationPlayerStateService.isInStoryChapterMode());
+    if (this.inStoryMode) {
+      this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
+        TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
+          topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
+          classroom_url_fragment:
+            this.urlService.getUrlParams().classroom_url_fragment,
+          story_url_fragment: this.urlService.getUrlParams().story_url_fragment
+        });
+    }
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 
     this.directiveSubscriptions.add(
@@ -111,6 +131,20 @@ export class RatingsAndRecommendationsComponent {
         this.windowRef.nativeWindow.location.reload();
       }
     });
+  }
+
+  hideSignUpSection(): void {
+    this.localStorageService
+      .updateEndChapterSignUpSectionHiddenPreference('true');
+  }
+
+  isSignUpSectionHidden(): boolean {
+    return this.localStorageService
+      .getEndChapterSignUpSectionHiddenPreference() === 'true';
+  }
+
+  isEndChapterFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 }
 

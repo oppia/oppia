@@ -43,9 +43,12 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { QuestionPlayerConfig } from './ratings-and-recommendations.component';
 
 const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
 const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;
@@ -91,6 +94,13 @@ export class TutorCardComponent {
   @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
+  @Input() userIsLoggedIn: boolean;
+  @Input() explorationIsInPreviewMode: boolean;
+  @Input() questionPlayerConfig: QuestionPlayerConfig;
+  @Input() collectionSummary: CollectionSummary;
+  @Input() isRefresherExploration: boolean;
+  @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
+  @Input() parentExplorationIds: string[];
   @Input() inStoryMode: boolean;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
