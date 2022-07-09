@@ -63,6 +63,7 @@ TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
 TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
 TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB = 'page_title_fragment_for_web'
+TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST = 'diagnostic_test_skill_ids'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -127,7 +128,8 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_URL_FRAGMENT,
         TOPIC_PROPERTY_META_TAG_CONTENT,
         TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
-        TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB
+        TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
+        TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
     ]
 
     # The allowed list of subtopic properties which can be used in
@@ -583,6 +585,7 @@ class TopicDict(TypedDict, total=False):
     meta_tag_content: str
     practice_tab_is_displayed: bool
     page_title_fragment_for_web: str
+    skill_ids_for_diagnostic_test: List[str]
     created_on: str
     last_updated: str
 
@@ -626,6 +629,7 @@ class Topic:
         meta_tag_content: str,
         practice_tab_is_displayed: bool,
         page_title_fragment_for_web: str,
+        skill_ids_for_diagnostic_test: List[str],
         created_on: Optional[datetime.datetime] = None,
         last_updated: Optional[datetime.datetime] = None
     ) -> None:
@@ -665,6 +669,8 @@ class Topic:
             practice_tab_is_displayed: bool. Whether the practice tab is shown.
             page_title_fragment_for_web: str. The page title fragment in the
                 topic viewer page.
+            skill_ids_for_diagnostic_test: list(str). The list of skill_id that
+                will be used from a topic in the diagnostic test.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -693,6 +699,7 @@ class Topic:
         self.meta_tag_content = meta_tag_content
         self.practice_tab_is_displayed = practice_tab_is_displayed
         self.page_title_fragment_for_web = page_title_fragment_for_web
+        self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
     def to_dict(self) -> TopicDict:
         """Returns a dict representing this Topic domain object.
@@ -729,7 +736,8 @@ class Topic:
                 self.story_reference_schema_version),
             'meta_tag_content': self.meta_tag_content,
             'practice_tab_is_displayed': self.practice_tab_is_displayed,
-            'page_title_fragment_for_web': self.page_title_fragment_for_web
+            'page_title_fragment_for_web': self.page_title_fragment_for_web,
+            'skill_ids_for_diagnostic_test': self.skill_ids_for_diagnostic_test
         }
 
     def serialize(self) -> str:
@@ -809,6 +817,7 @@ class Topic:
             topic_dict['meta_tag_content'],
             topic_dict['practice_tab_is_displayed'],
             topic_dict['page_title_fragment_for_web'],
+            topic_dict['skill_ids_for_diagnostic_test'],
             topic_created_on,
             topic_last_updated)
 
@@ -1244,7 +1253,7 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
-            False, page_title_frag)
+            False, page_title_frag, [])
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
@@ -1478,6 +1487,18 @@ class Topic:
                 displayed property for the topic.
         """
         self.practice_tab_is_displayed = new_practice_tab_is_displayed
+
+    def update_skill_ids_for_diagnostic_test(
+        self, skill_ids_for_diagnostic_test: List[str]
+    ) -> None:
+        """Updates the skill_ids_for_diagnostic_test field for the topic
+        instance.
+
+        Args:
+            skill_ids_for_diagnostic_test: list(str). A list of skill_ids that
+                will be used to update skill_ids_for_diagnostic_test field.
+        """
+        self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
     def add_uncategorized_skill_id(
         self, new_uncategorized_skill_id: str

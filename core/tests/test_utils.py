@@ -3106,7 +3106,8 @@ title: Title
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
             practice_tab_is_displayed=False,
-            page_title_fragment_for_web='topic page title'):
+            page_title_fragment_for_web='topic page title',
+            skill_ids_for_diagnostic_test=[]):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -3137,6 +3138,8 @@ title: Title
                 displayed.
             page_title_fragment_for_web: str. The page title fragment for the
                 topic.
+            skill_ids_for_diagnostic_test: list(str). The list of skill_id that
+                will be used from a topic in the diagnostic test.
 
         Returns:
             Topic. A newly-created topic.
@@ -3159,7 +3162,7 @@ title: Title
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web)
+            page_title_fragment_for_web, skill_ids_for_diagnostic_test)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
