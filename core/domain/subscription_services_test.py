@@ -258,14 +258,14 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [])
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, EXP_ID, self.owner_2_id, rights_domain.ROLE_OWNER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [EXP_ID])
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [])
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, EXP_ID, self.editor_id, rights_domain.ROLE_EDITOR)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
@@ -278,7 +278,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, EXP_ID, self.viewer_id, rights_domain.ROLE_VIEWER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
@@ -339,7 +339,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_2_id), [])
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.owner_2_id,
             rights_domain.ROLE_OWNER)
         self.assertEqual(
@@ -348,7 +348,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.editor_id), [])
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
         self.assertEqual(
@@ -362,7 +362,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
         self.assertEqual(

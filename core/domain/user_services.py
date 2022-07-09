@@ -37,6 +37,8 @@ from core.platform import models
 
 import requests
 
+from typing import List
+
 auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
@@ -1336,7 +1338,9 @@ def save_deleted_username(normalized_username):
     deleted_user_model.put()
 
 
-def get_human_readable_user_ids(user_ids, strict=True):
+def get_human_readable_user_ids(
+    user_ids: List[str], strict: bool = True
+) -> List[str]:
     """Converts the given ids to usernames, or truncated email addresses.
     Requires all users to be known.
 

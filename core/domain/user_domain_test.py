@@ -416,7 +416,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             Exception, 'User not found.')
 
         with logging_swap, assert_raises_user_not_found:
-            user_services.get_human_readable_user_ids(['invalid_user_id'])  # type: ignore[no-untyped-call]
+            user_services.get_human_readable_user_ids(['invalid_user_id'])
 
         self.assertEqual(
             observed_log_messages,
@@ -433,7 +433,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             username=''
         ).put()
 
-        user_ids = user_services.get_human_readable_user_ids(  # type: ignore[no-untyped-call]
+        user_ids = user_services.get_human_readable_user_ids(
             [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
         expected_user_ids = [
             'owner', 'admin',
@@ -448,7 +448,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'auth_id', 'user@example.com').user_id
         user_services.set_username(user_id, 'username')  # type: ignore[no-untyped-call]
         user_services.mark_user_for_deletion(user_id)  # type: ignore[no-untyped-call]
-        human_readable_user_ids = user_services.get_human_readable_user_ids(  # type: ignore[no-untyped-call]
+        human_readable_user_ids = user_services.get_human_readable_user_ids(
             [user_id], strict=False)
 
         self.assertEqual(
