@@ -175,8 +175,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.suggestionIdToContribution);
     this.isLastItem = this.remainingContributionIds.length === 0
     this.allContributions = this.suggestionIdToContribution;
-    this.allContributions[this.activeSuggestionId] =
-      this.activeContribution;
+    this.allContributions[this.activeSuggestionId] = (
+      this.activeContribution);
 
     this.init();
     // The 'html' value is passed as an object as it is required for
