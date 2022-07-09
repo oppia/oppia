@@ -76,16 +76,16 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(learner_groups), 1)
         self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)
 
-    def test_get_progress_sharing_permission(self) -> None:
+    def test_can_share_progress(self) -> None:
         learner_group_services.add_student_to_learner_group(
             self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
 
         self.assertEqual(
-            learner_group_fetchers.get_progress_sharing_permission(
+            learner_group_fetchers.can_share_progress(
                 self.STUDENT_ID, self.LEARNER_GROUP_ID
             ), True)
 
         self.assertEqual(
-            learner_group_fetchers.get_progress_sharing_permission(
+            learner_group_fetchers.can_share_progress(
                 self.STUDENT_ID, 'fake_learner_group_id'
             ), False)

@@ -87,7 +87,7 @@ def get_learner_groups_of_facilitator(
     ]
 
 
-def get_progress_sharing_permission(user_id: str, group_id: str) -> bool:
+def can_share_progress(user_id: str, group_id: str) -> bool:
     """Returns the progress sharing permission of the given user in the given
     group.
 

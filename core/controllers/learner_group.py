@@ -291,7 +291,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
         for user_id in student_user_ids:
             progress_sharing_permission = (
-                learner_group_fetchers.get_progress_sharing_permission(
+                learner_group_fetchers.can_share_progress(
                     user_id, learner_group_id))
 
             student_progress = {

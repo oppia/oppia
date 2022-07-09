@@ -412,9 +412,12 @@ def get_matching_story_syllabus_item_dicts(
     matching_story_syllabus_item_dicts: List[
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
 
-    for ind, story in enumerate(matching_stories):
-        if keyword is None or keyword in story.title.lower():
-            summary_dict = story.to_dict()
+    for ind, story_summary in enumerate(matching_stories):
+        if keyword is None or keyword in story_summary.title.lower():
+            story = stories[ind]
+            # Ruling out the possibility of None for mypy type checking.
+            assert story is not None
+            summary_dict = story_summary.to_dict()
             syllabus_story_dict: story_domain.LearnerGroupSyllabusStorySummaryDict = { # pylint: disable=line-too-long
                 'id': summary_dict['id'],
                 'title': summary_dict['title'],
@@ -433,7 +436,7 @@ def get_matching_story_syllabus_item_dicts(
                 'completed_node_titles': [],
                 'all_node_dicts': [
                     node.to_dict() for node in
-                    stories[ind].story_contents.nodes # type: ignore[union-attr]
+                    story.story_contents.nodes
                 ],
                 'topic_name': topic.name,
                 'topic_url_fragment': topic.url_fragment
@@ -503,6 +506,8 @@ def invite_students_to_learner_group(
     learner_groups_user_models = (
         user_models.LearnerGroupsUserModel.get_multi(invited_student_ids))
 
+    models_to_put = []
+
     for index, student_id in enumerate(invited_student_ids):
         learner_groups_user_model = learner_groups_user_models[index]
         if learner_groups_user_model:
@@ -515,11 +520,10 @@ def invite_students_to_learner_group(
                 learner_groups_user_details=[]
             )
 
-        learner_groups_user_models[index] = learner_groups_user_model
+        models_to_put.append(learner_groups_user_model)
 
-    user_models.LearnerGroupsUserModel.update_timestamps_multi( # type: ignore[type-var]
-        learner_groups_user_models)
-    user_models.LearnerGroupsUserModel.put_multi(learner_groups_user_models) # type: ignore[type-var]
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
+    user_models.LearnerGroupsUserModel.put_multi(models_to_put)
 
 
 def remove_invited_students_from_learner_group(
@@ -535,14 +539,17 @@ def remove_invited_students_from_learner_group(
     found_models = (
         user_models.LearnerGroupsUserModel.get_multi(student_ids))
 
-    for index, model in enumerate(found_models):
+    models_to_put = []
+
+    for model in found_models:
         # Ruling out the possibility of None for mypy type checking.
         assert model is not None
         if group_id in model.invited_to_learner_groups_ids:
-            found_models[index].invited_to_learner_groups_ids.remove(group_id) # type: ignore[union-attr]
+            model.invited_to_learner_groups_ids.remove(group_id)
+            models_to_put.append(model)
 
-    user_models.LearnerGroupsUserModel.update_timestamps_multi(found_models) # type: ignore[type-var]
-    user_models.LearnerGroupsUserModel.put_multi(found_models) # type: ignore[type-var]
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
+    user_models.LearnerGroupsUserModel.put_multi(models_to_put)
 
 
 def get_subtopic_pages_progress(
