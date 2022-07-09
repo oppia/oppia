@@ -1604,6 +1604,12 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """
         self.feedback.validate()
 
+        if self.dest_if_really_stuck is not None:
+            if not isinstance(self.dest_if_really_stuck, str):
+                raise utils.ValidationError(
+                    'Expected outcome dest_if_really_stuck to be a '
+                    'string, received %s' % self.dest_if_really_stuck)
+
         if not isinstance(self.labelled_as_correct, bool):
             raise utils.ValidationError(
                 'The "labelled_as_correct" field should be a boolean, received '

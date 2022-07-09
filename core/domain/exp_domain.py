@@ -2476,7 +2476,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_v55_dict_to_v56_dict(cls, exploration_dict):
         """Converts a v55 exploration dict into a v56 exploration dict.
         Version 56 adds a new dest_if_really_stuck field to the Outcome class
-        to redirect the learners to a state for strengthening concepts.
+        to redirect the learners to a state for strengthening concepts when
+        they get really stuck.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
