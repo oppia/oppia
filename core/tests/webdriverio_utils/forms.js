@@ -119,7 +119,11 @@ var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = async function() {
     var items =
+<<<<<<< HEAD
       await elem.$$(
+=======
+      await $$(
+>>>>>>> c5c4515b361f0b21494ab4f7333ef9610665060c
         '#e2e-test-schema-based-list-editor-table-row');
     return items.length;
   };
@@ -133,7 +137,11 @@ var ListEditor = function(elem) {
     var addListEntryButton = elem.$(addListEntryLocator);
     await action.click('Add List Entry Button', addListEntryButton);
     if (objectType !== null) {
+<<<<<<< HEAD
       return await getEditor(objectType)(await elem.$$(
+=======
+      return await getEditor(objectType)(await $$(
+>>>>>>> c5c4515b361f0b21494ab4f7333ef9610665060c
         '.e2e-test-schema-based-list-editor-table-data')[listLength]);
     }
   };
@@ -148,7 +156,11 @@ var ListEditor = function(elem) {
 
   return {
     editItem: async function(index, objectType) {
+<<<<<<< HEAD
       var item = await elem.$$(
+=======
+      var item = await $$(
+>>>>>>> c5c4515b361f0b21494ab4f7333ef9610665060c
         '.e2e-test-schema-based-list-editor-table-data')[index];
 
       var editor = getEditor(objectType);
@@ -158,7 +170,11 @@ var ListEditor = function(elem) {
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary.
     setLength: async function(desiredLength) {
+<<<<<<< HEAD
       var startingLength = await elem.$$(
+=======
+      var startingLength = await $$(
+>>>>>>> c5c4515b361f0b21494ab4f7333ef9610665060c
         '#e2e-test-schema-based-list-editor-table-row').length;
       for (var i = startingLength; i < desiredLength; i++) {
         await addItem();
@@ -308,7 +324,11 @@ var UnicodeEditor = function(elem) {
       await action.clear('Input Field', await elem.$('<input>'));
       await action.setValue(
         'Input Field',
+<<<<<<< HEAD
         elem.$('<input>'), text);
+=======
+        await elem.$('<input>'), text);
+>>>>>>> c5c4515b361f0b21494ab4f7333ef9610665060c
     }
   };
 };
