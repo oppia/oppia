@@ -44,7 +44,6 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
                 $scope[key] = ctrl.parentScope[key];
               }
             }
-            console.error(ctrl.htmlData);
             $rootScope.$applyAsync();
           };
           // Manually implementing the OnChanges lifecycle hook to trigger the

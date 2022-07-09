@@ -99,8 +99,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     private stateSolutionService: StateSolutionService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-  ) {
-  }
+  ) { }
 
   sendRecomputeGraph(): void {
     this.recomputeGraph.emit();
