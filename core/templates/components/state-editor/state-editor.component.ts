@@ -220,8 +220,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
             this.stateName, stateData.interaction.customizationArgs);
           this.stateNextContentIdIndexService.init(
             this.stateName, stateData.nextContentIdIndex);
-          // Shivam PTAL.
-          // this.stateNameService.init(this.stateName, stateData.name);
           this.stateNameService.init();
           this.stateParamChangesService.init(
             this.stateName, stateData.paramChanges);

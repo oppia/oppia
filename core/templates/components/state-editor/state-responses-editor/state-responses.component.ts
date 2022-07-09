@@ -193,7 +193,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
           let rules = answerGroup.rules;
           rules.forEach((rule) => {
             let ruleInputs = rule.inputs.x;
-            // Shivam PTAL.
             Object.keys(ruleInputs).forEach((ruleInput) => {
               let choiceIndex = answerChoiceToIndex[ruleInput];
               if (rule.type === 'Equals' ||
