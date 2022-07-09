@@ -666,12 +666,6 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 'choices'
             )
         # Validates if all MC have feedbacks do not ask for def feedback.
-        print("**********************************************")
-        print(choices)
-        print("**********************************************")
-        print(rule_spec_list)
-        print("**********************************************")
-        print(set(rule_spec_list))
         if (
                 len(choices) == len(set(rule_spec_list))
                 and state.interaction.default_outcome is not None
