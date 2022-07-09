@@ -228,7 +228,7 @@ export class OutcomeEditorComponent implements OnInit {
   cancelThisIfStuckDestinationEdit(): void {
     this.outcome.destIfReallyStuck = (
       cloneDeep(this.savedOutcome.destIfReallyStuck));
-    this.destinationEditorIsOpen = false;
+    this.destinationIfStuckEditorIsOpen = false;
   }
 
   ngOnInit(): void {

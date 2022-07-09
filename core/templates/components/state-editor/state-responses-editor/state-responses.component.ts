@@ -428,6 +428,15 @@ angular.module('oppia').component('stateResponses', {
         });
       };
 
+      $scope.saveActiveAnswerGroupDestIfStuck = function(updatedOutcome) {
+        ResponsesService.updateActiveAnswerGroup({
+          destIfReallyStuck: updatedOutcome.destIfReallyStuck,
+        }, function(newAnswerGroups) {
+          ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
+          ctrl.refreshWarnings()();
+        });
+      };
+
       $scope.saveActiveAnswerGroupCorrectnessLabel = function(
           updatedOutcome) {
         ResponsesService.updateActiveAnswerGroup({
@@ -463,6 +472,17 @@ angular.module('oppia').component('stateResponses', {
           missingPrerequisiteSkillId:
             updatedOutcome.missingPrerequisiteSkillId
         }, function(newDefaultOutcome) {
+          ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+        });
+      };
+
+      $scope.saveDefaultOutcomeDestIfStuck = function(updatedOutcome) {
+        ResponsesService.updateDefaultOutcome({
+          destIfReallyStuck: updatedOutcome.destIfReallyStuck
+        }, function(newDefaultOutcome) {
+          console.log('\n\n\n\n\n');
+          console.log(newDefaultOutcome);
+          console.log('\n\n\n\n\n');
           ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
         });
       };

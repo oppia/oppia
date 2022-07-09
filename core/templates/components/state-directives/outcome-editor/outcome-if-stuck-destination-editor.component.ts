@@ -44,7 +44,7 @@
    @Output() getChanges: EventEmitter<void> = new EventEmitter();
    directiveSubscriptions: Subscription = new Subscription();
    newStateNamePattern: RegExp;
-   destinationChoices: DestinationChoice[];
+   destinationChoices: DestinationChoice[] = [];
    maxLen: number;
    outcomeNewStateName: string;
    currentStateName: string = null;
@@ -59,8 +59,7 @@
      private editorFirstTimeEventsService: EditorFirstTimeEventsService,
      private focusManagerService: FocusManagerService,
      private stateEditorService: StateEditorService,
-     private stateGraphLayoutService: StateGraphLayoutService,
-     private userService: UserService,
+     private stateGraphLayoutService: StateGraphLayoutService
    ) {}
  
    updateChanges($event: string): void {
@@ -92,10 +91,9 @@
        // represent all states, as well as an option to create a
        // new state.
 
-       //To be removed.
        this.destinationChoices = [{
-         id: (questionModeEnabled ? null : this.currentStateName),
-         text: '(try again)'
+         id: null,
+         text: 'None'
        }];
  
        // Arrange the remaining states based on their order in the state
