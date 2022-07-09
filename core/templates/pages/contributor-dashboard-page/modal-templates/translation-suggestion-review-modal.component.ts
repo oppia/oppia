@@ -173,7 +173,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     delete this.suggestionIdToContribution[this.initialSuggestionId];
     this.remainingContributionIds = Object.keys(
       this.suggestionIdToContribution);
-    this.isLastItem = this.remainingContributionIds.length === 0
+    this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;
     this.allContributions[this.activeSuggestionId] = (
       this.activeContribution);
@@ -309,10 +309,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.activeContribution = this.allContributions[
       lastContributionId];
 
-    if (this.remainingContributionIds.length === 0) {
-      this.isLastItem = true;
-    }
-
+    this.isLastItem = this.remainingContributionIds.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
 
     // Close modal instance if the suggestion's corresponding opportunity
@@ -328,8 +325,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id);
     this.subheading = (
-      `${this.activeContributionDetails.topic_name} / `
-      `${this.activeContributionDetails.story_title} / `
+      `${this.activeContributionDetails.topic_name} / ` +
+      `${this.activeContributionDetails.story_title} / ` +
       `${this.activeContributionDetails.chapter_title}`
     );
     this.init();
@@ -340,27 +337,18 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (this.isFirstItem) {
       return;
     }
-
     // This prevents resolved contributions from getting added to the list.
     if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
       this.remainingContributionIds.push(this.activeSuggestionId);
     }
 
-    let lastContributionId = (
-      this.skippedContributionIds[this.skippedContributionIds.length - 1]);
-
+    let lastContributionId = this.skippedContributionIds.pop();
     this.activeSuggestionId = lastContributionId;
     this.activeContribution = this.allContributions[
       lastContributionId];
 
-    this.skippedContributionIds.pop();
-
-    if (this.remainingContributionIds.length !== 0) {
-      this.isLastItem = false;
-    }
-    if (this.skippedContributionIds.length === 0) {
-      this.isFirstItem = true;
-    }
+    this.isLastItem = this.remainingContributionIds.length === 0;
+    this.isFirstItem = this.skippedContributionIds.length === 0;
 
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
@@ -375,19 +363,20 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id);
     this.subheading = (
-      this.activeContributionDetails.topic_name + ' / ' +
-      this.activeContributionDetails.story_title +
-      ' / ' + this.activeContributionDetails.chapter_title);
+      `${this.activeContributionDetails.topic_name} / ` +
+      `${this.activeContributionDetails.story_title} / ` +
+      `${this.activeContributionDetails.chapter_title}`
+    );
     this.init();
   }
 
-  showNextItemToReview(suggestionId: string): void {
+  processAndGotoNextItem(suggestionId: string): void {
     this.resolvedSuggestionIds.push(this.activeSuggestionId);
 
     // Remove resolved contributions from the record.
     delete this.allContributions[this.activeSuggestionId];
 
-    // If the reviewed item is the last item, close the modal.
+    // If the reviewed item was the last item, close the modal.
     if (this.lastSuggestionToReview || this.isLastItem) {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
@@ -410,7 +399,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       this.reviewMessage, this.finalCommitMessage,
-      this.showNextItemToReview.bind(this),
+      this.processAndGotoNextItem.bind(this),
       (error) => {
         this.rejectAndReviewNext('Invalid Suggestion');
         this.alertsService.clearWarnings();
@@ -432,7 +421,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        this.showNextItemToReview.bind(this),
+        this.processAndGotoNextItem.bind(this),
         (error) => {
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(
