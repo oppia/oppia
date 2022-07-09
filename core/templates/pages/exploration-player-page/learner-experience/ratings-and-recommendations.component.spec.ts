@@ -36,7 +36,6 @@ import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-b
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
-
 class MockPlatformFeatureService {
   get status(): object {
     return {
