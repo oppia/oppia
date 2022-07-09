@@ -27,6 +27,20 @@ import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
 import { MockLimitToPipe } from '../templates/information-card-modal.component.spec';
 import { RatingsAndRecommendationsComponent } from './ratings-and-recommendations.component';
+import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LocalStorageService } from 'services/local-storage.service';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EndChapterCelebration: {
+        isEnabled: true
+      }
+    };
+  }
+}
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -35,6 +49,10 @@ describe('Ratings and recommendations component', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
   let userService: UserService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let urlInterpolationService: UrlInterpolationService;
+  let platformFeatureService: PlatformFeatureService;
+  let localStorageService: LocalStorageService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -65,6 +83,13 @@ describe('Ratings and recommendations component', () => {
         LearnerViewRatingService,
         UrlService,
         UserService,
+        ExplorationPlayerStateService,
+        UrlInterpolationService,
+        LocalStorageService,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+        },
         {
           provide: WindowRef,
           useClass: MockWindowRef
@@ -81,13 +106,21 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    localStorageService = TestBed.inject(LocalStorageService);
   });
 
   it('should populate internal properties and subscribe to event' +
     ' listeners on initialize', fakeAsync(() => {
-    let collectionId = 'collection_id';
-    let userRating = 5;
-    let mockOnRatingUpdated = new EventEmitter<void>();
+    const collectionId = 'collection_id';
+    const userRating = 5;
+    const mockOnRatingUpdated = new EventEmitter<void>();
+
+    expect(componentInstance.inStoryMode).toBe(undefined);
+    expect(componentInstance.storyViewerUrl).toBe(undefined);
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       collectionId);
@@ -98,6 +131,10 @@ describe('Ratings and recommendations component', () => {
       (callb: (rating: number) => void) => {
         callb(userRating);
       });
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'dummy_story_viewer_page_url');
     spyOnProperty(learnerViewRatingService, 'onRatingUpdated').and.returnValue(
       mockOnRatingUpdated);
 
@@ -107,11 +144,37 @@ describe('Ratings and recommendations component', () => {
     mockOnRatingUpdated.emit();
     tick();
 
+    expect(explorationPlayerStateService.isInStoryChapterMode)
+      .toHaveBeenCalled();
+    expect(componentInstance.inStoryMode).toBe(true);
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
+    expect(componentInstance.storyViewerUrl).toBe(
+      'dummy_story_viewer_page_url');
     expect(componentInstance.userRating).toEqual(userRating);
     expect(alertsService.addSuccessMessage).toHaveBeenCalled();
     expect(learnerViewRatingService.getUserRating).toHaveBeenCalled();
     expect(componentInstance.collectionId).toEqual(collectionId);
   }));
+
+  it('should not generate story page url if not in story mode',
+    fakeAsync(() => {
+      expect(componentInstance.inStoryMode).toBe(undefined);
+      expect(componentInstance.storyViewerUrl).toBe(undefined);
+
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(false);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+        'dummy_story_viewer_page_url');
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(explorationPlayerStateService.isInStoryChapterMode)
+        .toHaveBeenCalled();
+      expect(componentInstance.inStoryMode).toBe(false);
+      expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
+      expect(componentInstance.storyViewerUrl).toBe(undefined);
+    }));
 
   it('should toggle popover when user clicks on rating stars', () => {
     componentInstance.feedbackPopOver = mockNgbPopover;
@@ -168,4 +231,44 @@ describe('Ratings and recommendations component', () => {
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
   }));
+
+  it('should save user\'s sign up section preference to localStorage', () => {
+    spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');
+
+    componentInstance.hideSignUpSection();
+
+    expect(localStorageService.updateEndChapterSignUpSectionHiddenPreference)
+      .toHaveBeenCalledWith('true');
+  });
+
+  it('should get user\'s sign up section preference from localStorage', () => {
+    const getPreferenceSpy = (
+      spyOn(localStorageService, 'getEndChapterSignUpSectionHiddenPreference')
+        .and.returnValue('true'));
+
+    expect(componentInstance.isSignUpSectionHidden()).toBe(true);
+    expect(localStorageService.getEndChapterSignUpSectionHiddenPreference)
+      .toHaveBeenCalled();
+
+    getPreferenceSpy.and.returnValue(null);
+
+    expect(componentInstance.isSignUpSectionHidden()).toBe(false);
+  });
+
+  it('should correctly determine if the feature is enabled or not', () => {
+    const featureSpy = (
+      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough());
+
+    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(true);
+
+    featureSpy.and.returnValue(
+      {
+        EndChapterCelebration: {
+          isEnabled: false
+        }
+      }
+    );
+
+    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(false);
+  });
 });
