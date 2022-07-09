@@ -26,15 +26,15 @@ var workflow = require('../protractor_utils/workflow.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 const { browser } = require('protractor');
 
-var backButton = element(by.css('.protractor-test-back-button'));
+var backButton = element(by.css('.e2e-test-back-button'));
 var categoryBar = element(by.css(
-  '.protractor-test-search-bar-dropdown-toggle'));
-var continueButton = element(by.css('.protractor-test-continue-button'));
-var mainContent = element(by.css('.protractor-test-main-content'));
-var nextButton = element(by.css('.protractor-test-next-button'));
-var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
-var searchBar = element(by.css('.protractor-test-search-input'));
-var skipLink = element(by.css('.protractor-test-skip-link'));
+  '.e2e-test-search-bar-dropdown-toggle'));
+var continueButton = element(by.css('.e2e-test-continue-button'));
+var mainContent = element(by.css('.e2e-test-main-content'));
+var nextButton = element(by.css('.e2e-test-next-button'));
+var oppiaLogo = element(by.css('.e2e-test-oppia-main-logo'));
+var searchBar = element(by.css('.e2e-test-search-input'));
+var skipLink = element(by.css('.e2e-test-skip-link'));
 
 var EXPLORATION = {
   title: 'A new exploration',
@@ -45,7 +45,7 @@ var EXPLORATION = {
 
 describe('screenreader and keyboard user accessibility features', function() {
   var oppiaContentContainer = element(
-    by.css('.protractor-test-content-container'));
+    by.css('.e2e-test-content-container'));
   var ERROR_MESSAGE = 'Content container taking too long to load';
   var libraryPage = null;
   var GET_STARTED_URL = 'http://localhost:9001/get-started';
