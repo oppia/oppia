@@ -65,7 +65,7 @@ class ValidateQuestionSnapshotMetadataModel(
 
 @validation_decorators.RelationshipsOf(question_models.QuestionSkillLinkModel)
 def question_skill_link_model_relationships(
-    model: question_models.QuestionSkillLinkModel
+    model: Type[question_models.QuestionSkillLinkModel]
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
@@ -83,7 +83,7 @@ def question_skill_link_model_relationships(
 @validation_decorators.RelationshipsOf(
     question_models.QuestionCommitLogEntryModel)
 def question_commit_log_entry_model_relationships(
-    model: question_models.QuestionCommitLogEntryModel
+    model: Type[question_models.QuestionCommitLogEntryModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -97,8 +97,13 @@ def question_commit_log_entry_model_relationships(
 
 @validation_decorators.RelationshipsOf(question_models.QuestionSummaryModel)
 def question_summary_model_relationships(
-    model: question_models.QuestionSummaryModel
-) -> Iterator[Tuple[str, List[Type[question_models.QuestionModel]]]]:
+    model: Type[question_models.QuestionSummaryModel]
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType,
+        List[Type[question_models.QuestionModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [question_models.QuestionModel]

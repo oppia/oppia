@@ -68,7 +68,7 @@ class ValidateExplorationSnapshotMetadataModel(
 
 @validation_decorators.RelationshipsOf(exp_models.ExplorationContextModel)
 def exploration_context_model_relationships(
-    model: exp_models.ExplorationContextModel
+    model: Type[exp_models.ExplorationContextModel]
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
@@ -83,10 +83,10 @@ def exploration_context_model_relationships(
 
 @validation_decorators.RelationshipsOf(exp_models.ExpSummaryModel)
 def exp_summary_model_relationships(
-    model: exp_models.ExpSummaryModel
+    model: Type[exp_models.ExpSummaryModel]
 ) -> Iterator[
     Tuple[
-        str,
+        model_property.PropertyType,
         List[Type[Union[
             exp_models.ExplorationModel, exp_models.ExplorationRightsModel
         ]]]

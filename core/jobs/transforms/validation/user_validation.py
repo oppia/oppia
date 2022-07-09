@@ -24,6 +24,7 @@ from core import feconf
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
+from core.jobs.types import model_property
 from core.jobs.types import user_validation_errors
 from core.platform import models
 
@@ -141,7 +142,7 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):  # type: ignore[misc]
 
 @validation_decorators.RelationshipsOf(user_models.CompletedActivitiesModel)
 def completed_activities_model_relationships(
-    model: user_models.CompletedActivitiesModel
+    model: Type[user_models.CompletedActivitiesModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -158,7 +159,7 @@ def completed_activities_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.IncompleteActivitiesModel)
 def incomplete_activities_model_relationships(
-    model: user_models.IncompleteActivitiesModel
+    model: Type[user_models.IncompleteActivitiesModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -175,7 +176,7 @@ def incomplete_activities_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.ExpUserLastPlaythroughModel)
 def exp_user_last_playthrough_model_relationships(
-    model: user_models.ExpUserLastPlaythroughModel
+    model: Type[user_models.ExpUserLastPlaythroughModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -188,7 +189,7 @@ def exp_user_last_playthrough_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.LearnerPlaylistModel)
 def learner_playlist_model_relationships(
-    model: user_models.LearnerPlaylistModel
+    model: Type[user_models.LearnerPlaylistModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -205,7 +206,7 @@ def learner_playlist_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserContributionsModel)
 def user_contributions_model_relationships(
-    model: user_models.UserContributionsModel
+    model: Type[user_models.UserContributionsModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -219,15 +220,20 @@ def user_contributions_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
 def user_email_preferences_model_relationships(
-    model: user_models.UserEmailPreferencesModel
-) -> Iterator[Tuple[str, List[Type[user_models.UserSettingsModel]]]]:
+    model: Type[user_models.UserEmailPreferencesModel]
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType,
+        List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [user_models.UserSettingsModel]
 
 
 @validation_decorators.RelationshipsOf(user_models.UserSubscriptionsModel)
 def user_subscriptions_model_relationships(
-    model: user_models.UserSubscriptionsModel
+    model: Type[user_models.UserSubscriptionsModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -251,7 +257,7 @@ def user_subscriptions_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserSubscribersModel)
 def user_subscribers_model_relationships(
-    model: user_models.UserSubscribersModel
+    model: Type[user_models.UserSubscribersModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -265,8 +271,13 @@ def user_subscribers_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserRecentChangesBatchModel)
 def user_recent_changes_batch_model_relationships(
-    model: user_models.UserRecentChangesBatchModel
-) -> Iterator[Tuple[str, List[Type[user_models.UserSettingsModel]]]]:
+    model: Type[user_models.UserRecentChangesBatchModel]
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType,
+        List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [user_models.UserSettingsModel]
@@ -274,8 +285,13 @@ def user_recent_changes_batch_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserStatsModel)
 def user_stats_model_relationships(
-    model: user_models.UserStatsModel
-) -> Iterator[Tuple[str, List[Type[user_models.UserSettingsModel]]]]:
+    model: Type[user_models.UserStatsModel]
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType,
+        List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [user_models.UserSettingsModel]
@@ -283,7 +299,7 @@ def user_stats_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.ExplorationUserDataModel)
 def exploration_user_data_model_relationships(
-    model: user_models.ExplorationUserDataModel
+    model: Type[user_models.ExplorationUserDataModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -297,7 +313,7 @@ def exploration_user_data_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.CollectionProgressModel)
 def collection_progress_model_relationships(
-    model: user_models.CollectionProgressModel
+    model: Type[user_models.CollectionProgressModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -317,7 +333,7 @@ def collection_progress_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.StoryProgressModel)
 def story_progress_model_relationships(
-    model: user_models.StoryProgressModel
+    model: Type[user_models.StoryProgressModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -331,7 +347,7 @@ def story_progress_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserQueryModel)
 def user_query_model_relationships(
-    model: user_models.UserQueryModel
+    model: Type[user_models.UserQueryModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -345,7 +361,7 @@ def user_query_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserBulkEmailsModel)
 def user_bulk_emails_model_relationships(
-    model: user_models.UserBulkEmailsModel
+    model: Type[user_models.UserBulkEmailsModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -359,7 +375,7 @@ def user_bulk_emails_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserSkillMasteryModel)
 def user_skill_mastery_model_relationships(
-    model: user_models.UserSkillMasteryModel
+    model: Type[user_models.UserSkillMasteryModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -374,7 +390,7 @@ def user_skill_mastery_model_relationships(
 @validation_decorators.RelationshipsOf(
     user_models.UserContributionProficiencyModel)
 def user_contribution_proficiency_model_relationships(
-    model: user_models.UserContributionProficiencyModel
+    model: Type[user_models.UserContributionProficiencyModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -388,10 +404,10 @@ def user_contribution_proficiency_model_relationships(
 
 @validation_decorators.RelationshipsOf(user_models.UserContributionRightsModel)
 def user_contribution_rights_model_relationships(
-    model: user_models.UserContributionRightsModel
+    model: Type[user_models.UserContributionRightsModel]
 ) -> Iterator[
     Tuple[
-        str,
+        model_property.PropertyType,
         List[Type[user_models.UserSettingsModel]]
     ]
 ]:

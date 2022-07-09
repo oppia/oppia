@@ -23,6 +23,7 @@ from core.domain import rights_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
+from core.jobs.types import model_property
 from core.platform import models
 
 from typing import Iterator, List, Optional, Tuple, Type, Union
@@ -61,10 +62,10 @@ class ValidateCollectionSnapshotMetadataModel(
 
 @validation_decorators.RelationshipsOf(collection_models.CollectionSummaryModel)
 def collection_summary_model_relationships(
-    model: collection_models.CollectionSummaryModel
+    model: Type[collection_models.CollectionSummaryModel]
 ) -> Iterator[
     Tuple[
-        str,
+        model_property.PropertyType,
         List[Type[Union[
             collection_models.CollectionModel,
             collection_models.CollectionRightsModel

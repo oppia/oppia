@@ -22,6 +22,7 @@ from core.domain import feedback_services
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import feedback_validation_errors
+from core.jobs.types import model_property
 from core.platform import models
 
 import apache_beam as beam
@@ -68,9 +69,12 @@ class ValidateEntityType(beam.DoFn):  # type: ignore[misc]
 
 @validation_decorators.RelationshipsOf(feedback_models.FeedbackAnalyticsModel)
 def feedback_analytics_model_relationships(
-    model: feedback_models.FeedbackAnalyticsModel
+    model: Type[feedback_models.FeedbackAnalyticsModel]
 ) -> Iterator[
-    Tuple[str, List[Type[exp_models.ExplorationModel]]]
+    Tuple[
+        model_property.PropertyType,
+        List[Type[exp_models.ExplorationModel]]
+    ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 

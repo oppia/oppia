@@ -37,7 +37,6 @@ datastore_services = models.Registry.import_datastore_services()
 # to generalize the type of properties that ModelProperty can accept,
 # we defined a type variable here.
 PropertyType = Union[
-    str,
     datastore_services.Property,
     Callable[[base_models.BaseModel], str]
 ]

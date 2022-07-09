@@ -196,7 +196,7 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
 @validation_decorators.RelationshipsOf(
     blog_models.BlogPostModel)
 def blog_post_model_relationships(
-    model: blog_models.BlogPostModel
+    model: Type[blog_models.BlogPostModel]
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
@@ -216,7 +216,7 @@ def blog_post_model_relationships(
 @validation_decorators.RelationshipsOf(
     blog_models.BlogPostSummaryModel)
 def blog_post_summary_model_relationships(
-    model: blog_models.BlogPostSummaryModel
+    model: Type[blog_models.BlogPostSummaryModel]
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
@@ -236,7 +236,7 @@ def blog_post_summary_model_relationships(
 @validation_decorators.RelationshipsOf(
     blog_models.BlogPostRightsModel)
 def blog_post_rights_model_relationships(
-    model: blog_models.BlogPostRightsModel
+    model: Type[blog_models.BlogPostRightsModel]
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,

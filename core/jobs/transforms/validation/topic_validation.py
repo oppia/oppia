@@ -22,6 +22,7 @@ from core.domain import topic_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
+from core.jobs.types import model_property
 from core.jobs.types import topic_validation_errors
 from core.platform import models
 
@@ -149,10 +150,10 @@ class ValidateTopicCommitLogEntryModel(
 
 @validation_decorators.RelationshipsOf(topic_models.TopicSummaryModel)
 def topic_summary_model_relationships(
-    model: topic_models.TopicSummaryModel
+    model: Type[topic_models.TopicSummaryModel]
 ) -> Iterator[
     Tuple[
-        str,
+        model_property.PropertyType,
         List[
             Type[Union[topic_models.TopicModel, topic_models.TopicRightsModel]]
         ]

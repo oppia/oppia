@@ -56,7 +56,7 @@ class ValidateUserIdByFirebaseAuthIdModelId(
 
 @validation_decorators.RelationshipsOf(auth_models.UserAuthDetailsModel)
 def user_auth_details_model_relationships(
-    model: auth_models.UserAuthDetailsModel
+    model: Type[auth_models.UserAuthDetailsModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -73,7 +73,7 @@ def user_auth_details_model_relationships(
 
 @validation_decorators.RelationshipsOf(auth_models.UserIdByFirebaseAuthIdModel)
 def user_id_by_firebase_auth_id_model_relationships(
-    model: auth_models.UserIdByFirebaseAuthIdModel
+    model: Type[auth_models.UserIdByFirebaseAuthIdModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
@@ -86,7 +86,7 @@ def user_id_by_firebase_auth_id_model_relationships(
 
 @validation_decorators.RelationshipsOf(auth_models.UserIdentifiersModel)
 def user_identifiers_model_relationships(
-    model: auth_models.UserIdentifiersModel
+    model: Type[auth_models.UserIdentifiersModel]
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
