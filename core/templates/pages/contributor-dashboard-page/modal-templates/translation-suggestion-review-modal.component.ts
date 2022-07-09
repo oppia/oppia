@@ -304,14 +304,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.skippedContributionIds.push(this.activeSuggestionId);
     }
 
-    let lastContributionId = (
-      this.remainingContributionIds[this.remainingContributionIds.length - 1]);
-
+    let lastContributionId = this.remainingContributionIds.pop();
     this.activeSuggestionId = lastContributionId;
     this.activeContribution = this.allContributions[
       lastContributionId];
-
-    this.remainingContributionIds.pop();
 
     if (this.remainingContributionIds.length === 0) {
       this.isLastItem = true;
