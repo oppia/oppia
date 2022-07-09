@@ -1337,12 +1337,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         raise utils.ValidationError(
                             'The destination for a stuck learner cannot be the '
                             'same state.')
-                    if (default_outcome.labelled_as_correct and
-                            default_outcome.dest_if_really_stuck is not None):
-                        raise utils.ValidationError(
-                            'The default outcome for the state is labelled '
-                            'correct but a destination for the stuck learner '
-                            'is specified.')
 
                 for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the

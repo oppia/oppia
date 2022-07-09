@@ -1237,6 +1237,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'The destination for a stuck learner '
             'cannot be the same state.')
 
+        # Testing the default outcome does not direct stuck learner
+        # back to the same state.
+        default_outcome.dest_if_really_stuck = exploration.init_state_name
+        self._assert_validation_error(
+            exploration, 'The destination for a stuck learner '
+            'cannot be the same state.')
+
+        default_outcome.dest_if_really_stuck = None
+
         # Restore a valid exploration.
         self.set_interaction_for_state(
             init_state, 'TextInput')
