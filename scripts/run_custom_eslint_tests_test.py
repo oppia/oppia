@@ -24,8 +24,8 @@ import sys
 from core.tests import test_utils
 from typing import Any
 
-from . import common
-from . import run_custom_eslint_tests
+from scripts import common
+from scripts import run_custom_eslint_tests
 
 
 class RunCustomEslintTestsTests(test_utils.GenericTestBase):

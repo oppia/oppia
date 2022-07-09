@@ -22,11 +22,11 @@ import subprocess
 from core.tests import test_utils
 from typing import Any
 
-from . import run_backend_tests
-from . import run_frontend_tests
-from . import run_tests
-from . import setup
-from . import setup_gae
+from scripts import run_backend_tests
+from scripts import run_frontend_tests
+from scripts import run_tests
+from scripts import setup
+from scripts import setup_gae
 
 
 class RunTestsTests(test_utils.GenericTestBase):
