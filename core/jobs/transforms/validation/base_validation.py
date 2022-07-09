@@ -400,8 +400,7 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
             'class. It should be implemented in the derived class.')
 
     def process(
-        self,
-        entity: ModelInstanceType
+        self, entity: ModelInstanceType
     ) -> Iterator[
         Union[
             base_validation_errors.CommitCmdsNoneError,
