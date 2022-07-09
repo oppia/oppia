@@ -317,11 +317,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.isLastItem = true;
     }
 
-    if (this.skippedContributionIds.length === 0) {
-      this.isFirstItem = true;
-    } else {
-      this.isFirstItem = false;
-    }
+    this.isFirstItem = this.skippedContributionIds.length === 0;
 
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
