@@ -218,7 +218,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_posting_to_feedback_thread_results_in_subscription(self) -> None:
         # The viewer posts a message to the thread.
         message_text = 'text'
-        feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
             self.viewer_id, 'subject', message_text)
 
@@ -228,12 +228,12 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         thread_id = thread_ids_subscribed_to[0]
 
         self.assertEqual(
-            feedback_services.get_messages(thread_id)[0].text,  # type: ignore[no-untyped-call]
+            feedback_services.get_messages(thread_id)[0].text,
             message_text)
 
         # The editor posts a follow-up message to the thread.
         new_message_text = 'new text'
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id, self.editor_id, '', '', new_message_text)
 
         # The viewer and editor are now both subscribed to the thread.

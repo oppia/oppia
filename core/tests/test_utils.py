@@ -1496,7 +1496,7 @@ class AppEngineTestBase(TestBase):
         with platform_taskqueue_services_swap:
             super(AppEngineTestBase, self).run(result=result)
 
-    def count_jobs_in_taskqueue(self, queue_name):
+    def count_jobs_in_taskqueue(self, queue_name: Optional[str]) -> int:
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 
@@ -1511,7 +1511,9 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
-    def process_and_flush_pending_tasks(self, queue_name=None):
+    def process_and_flush_pending_tasks(
+        self, queue_name: Optional[str] = None
+    ) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -3603,7 +3605,7 @@ class GenericEmailTestBase(GenericTestBase):
             self._send_email_to_recipients):
             super(EmailTestBase, self).run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(GenericEmailTestBase, self).setUp()
         self._wipe_emails_dict()
 

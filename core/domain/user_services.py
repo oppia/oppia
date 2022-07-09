@@ -1004,7 +1004,7 @@ def get_pseudonymous_username(pseudonymous_id):
         pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
 
 
-def get_username(user_id):
+def get_username(user_id: str) -> str:
     """Gets username corresponding to the given user_id.
 
     Args:
