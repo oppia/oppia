@@ -27,12 +27,15 @@ import shutil
 import subprocess
 import threading
 
-from core import utils
-from scripts import common
-from scripts import servers
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common # isort:skip pylint: disable=wrong-import-position
+from core import utils # isort:skip pylint: disable=wrong-import-position
+from scripts import servers # isort:skip pylint: disable=wrong-import-position
 
-from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple
-from typing_extensions import TypedDict
+from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple # isort:skip pylint: disable=wrong-import-position
+from typing_extensions import TypedDict # isort:skip pylint: disable=wrong-import-position
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
