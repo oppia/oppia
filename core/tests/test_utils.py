@@ -3553,7 +3553,7 @@ class EmailMessageMock:
         html_body: str,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
-        recipient_variables: Dict[str, Dict[str, str]] = None
+        recipient_variables: Optional[Dict[str, Dict[str, str]]] = None
     ) -> None:
         """Inits a mock email message with all the necessary data.
 
