@@ -1034,6 +1034,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % answer_group.outcome.dest)
+
+                outcome = answer_group.outcome
+                if outcome.dest_if_really_stuck is not None:
+                    if not isinstance(outcome.dest_if_really_stuck, str):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s' %
+                            outcome.dest_if_really_stuck)
+
             if state.interaction.default_outcome is not None:
                 if not state.interaction.default_outcome.dest:
                     raise utils.ValidationError(
@@ -1042,6 +1051,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
+
+                default_outcome = state.interaction.default_outcome
+                if default_outcome.dest_if_really_stuck is not None:
+                    if not isinstance(
+                        default_outcome.dest_if_really_stuck, str):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s'
+                            % default_outcome.dest_if_really_stuck)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -1138,6 +1156,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination %s is not a valid state.'
                         % default_outcome.dest)
 
+                # Check default if-stuck destinations.
+                if (default_outcome.dest_if_really_stuck is not None and
+                        default_outcome.dest_if_really_stuck not
+                            in all_state_names):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % default_outcome.dest_if_really_stuck)
+
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
                 if (default_outcome.refresher_exploration_id is not None and
@@ -1152,6 +1179,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'The destination %s is not a valid state.'
                         % group.outcome.dest)
+
+                # Check group if-stuck destinations.
+                if (group.outcome.dest_if_really_stuck is not None and
+                        group.outcome.dest_if_really_stuck not
+                            in all_state_names):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % group.outcome.dest_if_really_stuck)
+
+                if (group.outcome.dest_if_really_stuck is not None and
+                        group.outcome.dest_if_really_stuck == state_name):
+                    raise utils.ValidationError(
+                            'The destination for a stuck learner cannot be the '
+                            'same state.')
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
@@ -1291,6 +1333,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             'The default outcome for state %s is labelled '
                             'correct but is a self-loop.' % state_name)
 
+                    if default_outcome.dest_if_really_stuck == state_name:
+                        raise utils.ValidationError(
+                            'The destination for a stuck learner cannot be the '
+                            'same state.')
+                    if (default_outcome.labelled_as_correct and
+                            default_outcome.dest_if_really_stuck is not None):
+                        raise utils.ValidationError(
+                            'The default outcome for the state is labelled '
+                            'correct but a destination for the stuck learner '
+                            'is specified.')
+
                 for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
@@ -1299,6 +1352,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         raise utils.ValidationError(
                             'The outcome for an answer group in state %s is '
                             'labelled correct but is a self-loop.' % state_name)
+
+                    if (group.outcome.labelled_as_correct and
+                            group.outcome.dest_if_really_stuck is not None):
+                        raise utils.ValidationError(
+                            'The outcome for the state is labelled '
+                            'correct but a destination for the stuck learner '
+                            'is specified.')
 
             if len(warnings_list) > 0:
                 warning_str = ''

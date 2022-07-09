@@ -1123,7 +1123,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid character / in a state name')
 
         new_state = state_domain.State.create_default_state('ABC')
+        second_state = state_domain.State.create_default_state('BCD')
         self.set_interaction_for_state(new_state, 'TextInput')
+        self.set_interaction_for_state(second_state, 'TextInput')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -1136,7 +1138,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Invalid character _ in a state name')
 
-        exploration.states = {'ABC': new_state}
+        exploration.states = {
+            'ABC': new_state,
+            'BCD': second_state
+        }
 
         self._assert_validation_error(
             exploration, 'has no initial state name')
@@ -1145,11 +1150,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            r'There is no state in \[\'ABC\'\] corresponding to '
+            r'There is no state in \[\'ABC\'\, \'BCD\'\] corresponding to '
             'the exploration\'s initial state name initname.')
 
         # Test whether a default outcome to a non-existing state is invalid.
-        exploration.states = {exploration.init_state_name: new_state}
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'BCD': second_state
+        }
         self._assert_validation_error(
             exploration, 'destination ABC is not a valid')
 
@@ -1207,9 +1215,27 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction = init_state.interaction
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
+
+        default_outcome.dest_if_really_stuck = 'ABD'
+        self._assert_validation_error(
+            exploration, 'The destination for the stuck learner '
+            'ABD is not a valid state')
+
+        default_outcome.dest_if_really_stuck = None
+
         answer_group.outcome.dest = 'DEF'
         self._assert_validation_error(
             exploration, 'destination DEF is not a valid')
+        answer_group.outcome.dest = exploration.init_state_name
+
+        answer_group.outcome.dest_if_really_stuck = 'XYZ'
+        self._assert_validation_error(
+            exploration, 'The destination for the stuck learner '
+            'XYZ is not a valid state')
+        answer_group.outcome.dest_if_really_stuck = exploration.init_state_name
+        self._assert_validation_error(
+            exploration, 'The destination for a stuck learner '
+            'cannot be the same state.')
 
         # Restore a valid exploration.
         self.set_interaction_for_state(
@@ -1281,6 +1307,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Every outcome should have a destination.')
 
+        outcome.dest = destination
+
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest_if_really_stuck = 20
+
+        self._assert_validation_error(
+            exploration, 'Expected dest_if_really_stuck to be a string')
+
+        default_outcome.dest_if_really_stuck = None
+
         # Try setting the outcome destination to something other than a string.
         outcome.dest = 15
         self._assert_validation_error(
@@ -1308,6 +1344,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.labelled_as_correct = False
         exploration.validate()
 
+        # Try setting the outcome destination if stuck to something other
+        # than a string.
+        outcome.dest_if_really_stuck = 30
+        self._assert_validation_error(
+            exploration, 'Expected dest_if_really_stuck to be a string')
+
+        outcome.dest_if_really_stuck = 'BCD'
+        outcome.dest = 'BCD'
+
+        # Test that no destination for the stuck learner is specified when
+        # the outcome is labelled correct.
+        outcome.labelled_as_correct = True
+
+        with self.assertRaisesRegex(
+            Exception, 'The outcome for the state is labelled '
+            'correct but a destination for the stuck learner '
+            'is specified.'
+        ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+        outcome.labelled_as_correct = False
+        exploration.validate()
+
+        outcome.dest = destination
         outcome.param_changes = 'Changes'
         self._assert_validation_error(
             exploration, 'Expected outcome param_changes to be a list')
