@@ -63,7 +63,7 @@ TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
 TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
 TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB = 'page_title_fragment_for_web'
-TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST = 'diagnostic_test_skill_ids'
+TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST = 'skill_ids_for_diagnostic_test'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -1497,7 +1497,8 @@ class Topic:
 
         Args:
             skill_ids_for_diagnostic_test: list(str). A list of skill_ids that
-                will be used to update skill_ids_for_diagnostic_test field.
+                will be used to update skill_ids_for_diagnostic_test field for
+                a topic.
         """
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
