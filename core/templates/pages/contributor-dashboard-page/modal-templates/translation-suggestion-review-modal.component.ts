@@ -173,11 +173,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     delete this.suggestionIdToContribution[this.initialSuggestionId];
     this.remainingContributionIds = Object.keys(
       this.suggestionIdToContribution);
-    if (this.remainingContributionIds.length === 0) {
-      this.isLastItem = true;
-    } else {
-      this.isLastItem = false;
-    }
+    this.isLastItem = this.remainingContributionIds.length === 0
     this.allContributions = this.suggestionIdToContribution;
     this.allContributions[this.activeSuggestionId] =
       this.activeContribution;
