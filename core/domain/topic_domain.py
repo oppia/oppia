@@ -1253,7 +1253,8 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
-            False, page_title_frag, [])
+            False, page_title_frag,
+            constants.DEFAULT_SKILL_IDS_FOR_DIAGNOSTIC_TEST)
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(

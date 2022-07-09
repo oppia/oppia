@@ -694,6 +694,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB),
             'old_value': '',
             'new_value': 'topic page title'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+            'old_value': [],
+            'new_value': ['test_skill_id']
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -710,6 +716,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.practice_tab_is_displayed, True)
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
+        self.assertEqual(topic.skill_ids_for_diagnostic_test, ['test_skill_id'])
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')

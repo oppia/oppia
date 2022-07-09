@@ -51,6 +51,7 @@ export default {
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
+  "DEFAULT_SKILL_IDS_FOR_DIAGNOSTIC_TEST": [],
 
   "ACTION_ACCEPT_SUGGESTION": "accept",
   "ACTION_REJECT_SUGGESTION": "reject",

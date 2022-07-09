@@ -3107,7 +3107,8 @@ title: Title
             meta_tag_content='topic meta tag content',
             practice_tab_is_displayed=False,
             page_title_fragment_for_web='topic page title',
-            skill_ids_for_diagnostic_test=[]):
+            skill_ids_for_diagnostic_test=(
+                constants.DEFAULT_SKILL_IDS_FOR_DIAGNOSTIC_TEST)):
         """Creates an Oppia Topic and saves it.
 
         Args:

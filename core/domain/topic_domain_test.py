@@ -836,6 +836,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Topic.deserialize(
                 self.topic.serialize()).to_dict())
 
+    def test_skill_ids_for_diagnostic_test_update_in_the_topic(self):
+        """Checks the update method for the skill_ids_for_diagnostic_test field
+        is working correctly.
+        """
+        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
+        self.topic.update_skill_ids_for_diagnostic_test(['test_skill_id'])
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['test_skill_id'])
+
 
 class TopicChangeTests(test_utils.GenericTestBase):
 
