@@ -836,7 +836,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Topic.deserialize(
                 self.topic.serialize()).to_dict())
 
-    def test_skill_ids_for_diagnostic_test_update_in_the_topic(self):
+    def test_skill_ids_for_diagnostic_test_update_in_the_topic(self) -> None:
         """Checks the update method for the skill_ids_for_diagnostic_test field
         is working correctly.
         """
