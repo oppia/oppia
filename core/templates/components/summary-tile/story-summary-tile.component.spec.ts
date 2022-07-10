@@ -51,10 +51,6 @@ describe('StorySummaryTileComponent', () => {
       true);
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should set properties on initialization', () => {
     // Here, storySummary contains a StorySummary object, which defines the
     // properties of a story and its nodes.

@@ -29,6 +29,9 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { StoryNode } from 'domain/story/story-node.model';
 
+import './story-summary-tile.component.css';
+
+
 @Component({
   selector: 'oppia-story-summary-tile',
   templateUrl: 'story-summary-tile.component.html'
@@ -100,10 +103,6 @@ export class StorySummaryTileComponent implements OnInit {
 
   isChapterCompleted(title: string): boolean {
     return this.storySummary.isNodeCompleted(title);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isPreviousChapterCompleted(index: number): boolean {
