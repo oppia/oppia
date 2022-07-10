@@ -177,10 +177,6 @@ describe('InputResponsePairComponent', () => {
     expect(component.isVideoRteElementPresentInResponse()).toBeFalse();
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should get answer html for the displayed card', () => {
     spyOn(explorationHtmlFormatter, 'getAnswerHtml').and.returnValue(
       '<p> HTML Answer </p>'

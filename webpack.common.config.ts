@@ -18,6 +18,8 @@
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
@@ -485,6 +487,27 @@ module.exports = {
         },
       },
     }),
+    // Here we insert the CSS files depending on key-value stored on
+    // the local storage. This only works for dynamically inserted bundles.
+    // For statically inserted bundles we handle this logic in
+    // core/templates/pages/footer_js_libs.html.
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+      ignoreOrder: false,
+      insert: function(linkTag) {
+        if (localStorage.getItem('direction') === 'rtl') {
+          linkTag.href = linkTag.href.replace('.css', '.rtl.css');
+        }
+        document.head.appendChild(linkTag);
+      }
+    }),
+    // This generates the RTL version for all CSS bundles.
+    new WebpackRTLPlugin({
+      minify: {
+        zindex: false
+      }
+    })
   ],
   module: {
     rules: [{
@@ -532,17 +555,12 @@ module.exports = {
     {
       test: /\.css$/,
       include: [
+        path.resolve(__dirname, 'core/templates'),
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'node_modules'),
       ],
       use: [
-        'cache-loader',
-        {
-          loader: 'style-loader',
-          options: {
-            esModule: false
-          }
-        },
+        MiniCssExtractPlugin.loader,
         {
           loader: 'css-loader',
           options: {

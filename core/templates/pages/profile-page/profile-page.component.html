@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/profile-page/profile-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/profile-page/profile-page.component.rtl.css" as="style">
-
 <background-banner></background-banner>
 <div class="oppia-profile-container">
   <mat-card class="oppia-profile-user-card">
@@ -158,7 +155,3 @@
     </div>
   </mat-card>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/profile-page/profile-page.component.rtl.css">

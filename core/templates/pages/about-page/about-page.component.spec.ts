@@ -67,10 +67,6 @@ describe('About Page', () => {
   });
   beforeEach(angular.mock.module('oppia'));
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should successfully instantiate the component',
     () => {
       expect(component).toBeDefined();

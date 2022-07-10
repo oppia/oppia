@@ -6,6 +6,27 @@
   <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
 <% } %>
 
+<script>
+  // Here we look for statically inserted CSS bundles and transform them to RTL
+  // version depending on key-value stored on the local storage.
+  let linkHrefs = [
+    <% for (var chunk in htmlWebpackPlugin.files.css) { %>
+      "<%= htmlWebpackPlugin.files.css[chunk] %>",
+    <% } %>
+  ];
+  let rtl = localStorage.getItem('direction') === 'rtl';
+  for (let linkHref of linkHrefs) {
+    if (rtl) {
+      linkHref = linkHref.replace('.css', '.rtl.css');
+    }
+    let cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = linkHref;
+    document.head.appendChild(cssLink);
+  }
+</script>
+
+
 <% if (htmlWebpackPlugin.options.hybrid && webpackConfig.mode == 'production') { %>
   <script src="/third_party/generated/js/third_party.min.js"></script>
 <% } else if (htmlWebpackPlugin.options.hybrid) { %>

@@ -35,6 +35,9 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
 import { LoaderService } from 'services/loader.service';
 
+import './practice-tab.component.css';
+
+
 @Component({
   selector: 'practice-tab',
   templateUrl: './practice-tab.component.html',
@@ -137,10 +140,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
         this.topicNameTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isStartButtonDisabled(): boolean {

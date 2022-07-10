@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-footer/collection-footer.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-footer/collection-footer.component.rtl.css" as="style">
-
 <div class="footer navbar-fixed-bottom oppia-collection-footer">
   <div class="row">
     <div class="col-sm-5">
@@ -31,7 +28,3 @@
     </div>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-footer/collection-footer.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-footer/collection-footer.component.rtl.css">

@@ -33,6 +33,9 @@ import { ConstructTranslationIdsService } from 'services/construct-translation-i
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslateService } from '@ngx-translate/core';
 
+import './search-bar.component.css';
+
+
 interface SearchDropDownCategories {
   id: string;
   text: string;
@@ -133,10 +136,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       eventsTobeHandled: EventToCodes): void {
     this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   // Update the description, numSelections and summary fields of the

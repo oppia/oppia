@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/story-summary-tile.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/story-summary-tile.component.rtl.css" as="style">
-
 <div class="e2e-test-story-summary-title"
   [ngClass]="checkTabletView() ? 'story-summary-tile-mobile': 'story-summary-tile-desktop'">
   <div class="story-progress-bar" *ngIf="!checkTabletView()">
@@ -154,8 +151,4 @@
       </div>
     </div>
   </div>
-
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/story-summary-tile.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/story-summary-tile.component.rtl.css">

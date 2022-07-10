@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.rtl.css" as="style">
-
 <div class="subtopics-list">
   <div class="oppia-subtopics-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
@@ -35,6 +32,3 @@
     </mat-card>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.rtl.css">

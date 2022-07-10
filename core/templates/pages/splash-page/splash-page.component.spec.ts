@@ -107,10 +107,6 @@ describe('Splash Page', () => {
       '/assets/images/path/to/image');
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should record analytics when Browse Lessons is clicked', function() {
     spyOn(
       siteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')

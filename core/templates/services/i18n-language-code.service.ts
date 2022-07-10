@@ -28,6 +28,13 @@ export enum TranslationKeyType {
   DESCRIPTION = 'DESCRIPTION',
 }
 
+export interface LanguageInfo {
+  id: string;
+  text: string;
+  direction: string;
+  decimal_separator: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,8 +50,6 @@ export class I18nLanguageCodeService {
    */
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
-  static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
-
   // TODO(#9154): Remove this variable when translation service is extended.
   /**
    * It stores all classroom metadata translation keys, like topic/story
@@ -57,6 +62,15 @@ export class I18nLanguageCodeService {
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 
+  private supportedSiteLanguageCodes = Object.assign(
+    {},
+    ...AppConstants.SUPPORTED_SITE_LANGUAGES.map(
+      (languageInfo: LanguageInfo) => (
+        {[languageInfo.id]: languageInfo.direction}
+      )
+    )
+  );
+
   constructor() {}
 
   getCurrentI18nLanguageCode(): string {
@@ -64,10 +78,16 @@ export class I18nLanguageCodeService {
     return I18nLanguageCodeService.languageCode;
   }
 
+  isLanguageRTL(langCode: string): boolean {
+    return this.supportedSiteLanguageCodes[langCode] === 'rtl';
+  }
+
   isCurrentLanguageRTL(): boolean {
-    return (
-      I18nLanguageCodeService.rtlLanguageCodes.indexOf(
-        this.getCurrentI18nLanguageCode()) !== -1);
+    return this.isLanguageRTL(this.getCurrentI18nLanguageCode());
+  }
+
+  getCurrentLanguageDirection(): string {
+    return this.supportedSiteLanguageCodes[this.getCurrentI18nLanguageCode()];
   }
 
   // TODO(#14645): Remove this method when translation service is extended.
