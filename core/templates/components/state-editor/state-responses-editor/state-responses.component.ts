@@ -480,9 +480,6 @@ angular.module('oppia').component('stateResponses', {
         ResponsesService.updateDefaultOutcome({
           destIfReallyStuck: updatedOutcome.destIfReallyStuck
         }, function(newDefaultOutcome) {
-          console.log('\n\n\n\n\n');
-          console.log(newDefaultOutcome);
-          console.log('\n\n\n\n\n');
           ctrl.onSaveInteractionDefaultOutcome(newDefaultOutcome);
         });
       };

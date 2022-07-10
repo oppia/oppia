@@ -46,7 +46,7 @@ describe('Outcome Destination If Stuck Editor', () => {
         FormsModule
       ],
       declarations: [
-      OutcomeIfStuckDestinationEditorComponent
+        OutcomeIfStuckDestinationEditorComponent
       ],
       providers: [
         EditorFirstTimeEventsService,
@@ -286,5 +286,3 @@ describe('Outcome Destination If Stuck Editor', () => {
     expect(component.outcomeNewStateName).toBe('New State');
   });
 });
-
- 

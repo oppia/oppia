@@ -199,7 +199,8 @@ export class OutcomeEditorComponent implements OnInit {
   saveThisIfStuckDestination(): void {
     this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
     this.destinationIfStuckEditorIsOpen = false;
-    this.savedOutcome.destIfReallyStuck = cloneDeep(this.outcome.destIfReallyStuck);
+    this.savedOutcome.destIfReallyStuck = (
+      cloneDeep(this.outcome.destIfReallyStuck));
     this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
