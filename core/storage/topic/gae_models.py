@@ -166,11 +166,11 @@ class TopicModel(base_models.VersionedModel):
     # Multiply and Divide'.
     page_title_fragment_for_web = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The list of skill_id that will be used from a topic in the
+    # The list of skill_id that will be used from the topic in the
     # diagnostic test. In a diagnostic test, any learner can give a test and get
     # some set of topics as recommendations.
-    skill_ids_for_diagnostic_test = datastore_services.JsonProperty(
-        default=[], indexed=False)
+    skill_ids_for_diagnostic_test = datastore_services.StringProperty(
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

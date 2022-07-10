@@ -1180,6 +1180,7 @@ class Topic:
                     feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
                     self.subtopic_schema_version))
 
+        subtopic_skill_ids = []
         for subtopic in self.subtopics:
             subtopic.validate()
             if subtopic.id >= self.next_subtopic_id:
@@ -1192,6 +1193,16 @@ class Topic:
                     raise utils.ValidationError(
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
+            subtopic_skill_ids.extend(subtopic.skill_ids)
+
+        skill_ids_that_are_not_in_subtopics = (
+            set(self.skill_ids_for_diagnostic_test) -
+            set(subtopic_skill_ids))
+        if len(skill_ids_that_are_not_in_subtopics):
+            raise utils.ValidationError(
+                'The skill_ids %s are selected for the diagnostic test but they'
+                ' are not associated with any subtopic.' %
+                skill_ids_that_are_not_in_subtopics)
 
         if strict:
             if len(self.subtopics) == 0:
@@ -1253,8 +1264,7 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
-            False, page_title_frag,
-            constants.DEFAULT_SKILL_IDS_FOR_DIAGNOSTIC_TEST)
+            False, page_title_frag, [])
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(

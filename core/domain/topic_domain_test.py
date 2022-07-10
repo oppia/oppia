@@ -845,6 +845,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic.skill_ids_for_diagnostic_test, ['test_skill_id'])
 
+    def test_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Checks the validation of skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        self.topic.update_skill_ids_for_diagnostic_test(['test_skill_id'])
+        error_msg = (
+            'The skill_ids {\'test_skill_id\'} are selected for the '
+            'diagnostic test but they are not associated with any subtopic.')
+        self._assert_validation_error(error_msg)
+
 
 class TopicChangeTests(test_utils.GenericTestBase):
 

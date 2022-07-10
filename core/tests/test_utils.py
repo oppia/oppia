@@ -3106,9 +3106,7 @@ title: Title
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
             practice_tab_is_displayed=False,
-            page_title_fragment_for_web='topic page title',
-            skill_ids_for_diagnostic_test=(
-                constants.DEFAULT_SKILL_IDS_FOR_DIAGNOSTIC_TEST)):
+            page_title_fragment_for_web='topic page title'):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -3139,8 +3137,6 @@ title: Title
                 displayed.
             page_title_fragment_for_web: str. The page title fragment for the
                 topic.
-            skill_ids_for_diagnostic_test: list(str). The list of skill_id that
-                will be used from a topic in the diagnostic test.
 
         Returns:
             Topic. A newly-created topic.
@@ -3155,6 +3151,7 @@ title: Title
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
+        skill_ids_for_diagnostic_test = []
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
             thumbnail_bg_color, thumbnail_size_in_bytes, description,
