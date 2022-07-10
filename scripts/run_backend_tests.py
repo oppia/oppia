@@ -176,7 +176,7 @@ class TestingTaskSpec:
         if self.generate_coverage_report:
             exc_list = [
                 sys.executable, COVERAGE_MODULE_PATH, 'run',
-                TEST_RUNNER_PATH, test_target_flag
+                '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
             rand = random.Random(os.urandom(8)).randint(0, 999999)
             data_file = '.coverage.%s.%s.%06d' % (
@@ -592,7 +592,7 @@ def _check_coverage(
         )
     else:
         coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
             process.stdout)
         coverage = float(coverage_result.group('total'))
 
