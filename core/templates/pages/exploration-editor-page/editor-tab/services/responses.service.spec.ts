@@ -282,7 +282,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
-        destIfReallyStuck: null,
+        destIfReallyStuck: 'Stuck state',
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
@@ -308,6 +308,8 @@ describe('Responses Service', () => {
     expectedAnswerGroup[0].outcome.feedback =
       updatedAnswerGroup.outcome.feedback;
     expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
+    expectedAnswerGroup[0].outcome.destIfReallyStuck =
+      updatedAnswerGroup.outcome.destIfReallyStuck;
     expectedAnswerGroup[0].outcome.refresherExplorationId =
       updatedAnswerGroup.outcome.refresherExplorationId;
     expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
@@ -337,7 +339,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
-        destIfReallyStuck: null,
+        destIfReallyStuck: 'Stuck state',
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
@@ -375,6 +377,8 @@ describe('Responses Service', () => {
     expectedAnswerGroup[0].outcome.feedback =
       updatedAnswerGroup.outcome.feedback;
     expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
+    expectedAnswerGroup[0].outcome.destIfReallyStuck =
+      updatedAnswerGroup.outcome.destIfReallyStuck;
     expectedAnswerGroup[0].outcome.refresherExplorationId =
       updatedAnswerGroup.outcome.refresherExplorationId;
     expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
