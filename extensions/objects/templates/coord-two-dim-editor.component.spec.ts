@@ -1,4 +1,3 @@
-
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,8 +35,6 @@ describe('CoordTwoDimEditorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CoordTwoDimEditorComponent);
     component = fixture.componentInstance;
-
-    component.value = [0, 0];
   });
 
   it('should initialize value [0, 0]', () => {
@@ -108,6 +105,8 @@ describe('CoordTwoDimEditorComponent', () => {
   });
 
   it('should add location when user clicks', () => {
+    component.ngOnInit();
+
     spyOn(component.valueChanged, 'emit');
     let e = {
       latlng: {
