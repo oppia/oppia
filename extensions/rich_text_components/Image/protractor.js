@@ -137,16 +137,16 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
   if (selectedAction === 'create') {
     await action.click(
       'Create button',
-      modal.element(by.css('.protractor-test-create-image')));
+      modal.element(by.css('.e2e-test-create-image')));
     for (var i = 0; i < args.length; i++) {
-      var shapeClass = '.protractor-test-create-' + args[i];
+      var shapeClass = '.e2e-test-create-' + args[i];
       var shapeTool = modal.element(by.css(shapeClass));
       var customTools = ['bezier', 'piechart', 'svgupload'];
       if (customTools.includes(args[i])) {
         await action.click('Shape tool', shapeTool);
         if (args[i] === 'svgupload') {
           var imageUploadInput = element(
-            by.css('.protractor-test-photo-upload-input'));
+            by.css('.e2e-test-photo-upload-input'));
           absPath = path.resolve(__dirname, './circle.svg');
           await waitFor.presenceOf(
             imageUploadInput,
@@ -160,10 +160,10 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
       element(by.css(
         '[placeholder = "Description of Image (Example : George Handel, ' +
         '18th century baroque composer)"]')));
-    var saveDiagram = modal.element(by.css('.protractor-test-save-diagram'));
+    var saveDiagram = modal.element(by.css('.e2e-test-save-diagram'));
     await action.click('Save diagram button', saveDiagram);
     await waitFor.visibilityOf(
-      modal.element(by.css('.protractor-test-saved-diagram-container')),
+      modal.element(by.css('.e2e-test-saved-diagram-container')),
       'Diagram container not visible');
     await action.sendKeys('Alt text input', altTextInputElement, altText);
   }
@@ -174,7 +174,7 @@ var expectComponentDetailsToMatch = async function(
   if (selectedAction === 'create') {
     var svgName = args.join('_');
     var svgDiagramInputElement = elem.element(by.css(
-      '.protractor-test-image'));
+      '.e2e-test-image'));
     await waitFor.visibilityOf(
       svgDiagramInputElement,
       'SVG Diagram input element takes too long to load.');

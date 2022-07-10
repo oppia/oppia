@@ -29,8 +29,9 @@ import { StateInteractionIdService } from '../state-editor-properties-services/s
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { AlertsService } from 'services/alerts.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint, HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { CdkDragSortEvent } from '@angular/cdk/drag-drop';
 
 class MockStateHintsService {
   displayed = [
@@ -177,9 +178,7 @@ describe('StateHintsEditorComponent', () => {
     const event = {
       previousIndex: 1,
       currentIndex: 2,
-      container: undefined,
-      item: undefined,
-    };
+    } as CdkDragSortEvent<Hint[]>;
     component.drop(event);
 
     expect(stateHintsService.saveDisplayedValue).toHaveBeenCalled();
@@ -281,7 +280,7 @@ describe('StateHintsEditorComponent', () => {
     spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(0);
     stateHintsService.displayed = [
       {
-        hintContent: SubtitledHtml.createDefault(null, '1'),
+        hintContent: SubtitledHtml.createDefault('', '1'),
         toBackendDict(): HintBackendDict {
           return {
             hint_content: this.hintContent.toBackendDict()
@@ -303,7 +302,7 @@ describe('StateHintsEditorComponent', () => {
       spyOn(alertsService, 'addInfoMessage');
       stateHintsService.displayed = [
         {
-          hintContent: SubtitledHtml.createDefault(null, '1'),
+          hintContent: SubtitledHtml.createDefault('', '1'),
           toBackendDict(): HintBackendDict {
             return {
               hint_content: this.hintContent.toBackendDict()
@@ -311,7 +310,7 @@ describe('StateHintsEditorComponent', () => {
           }
         },
         {
-          hintContent: SubtitledHtml.createDefault(null, '1'),
+          hintContent: SubtitledHtml.createDefault('', '1'),
           toBackendDict(): HintBackendDict {
             return {
               hint_content: this.hintContent.toBackendDict()

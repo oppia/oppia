@@ -21,14 +21,14 @@ var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function() {
-  var chapterTitleList = element.all(by.css('.protractor-test-chapter-title'));
+  var chapterTitleList = element.all(by.css('.e2e-test-chapter-title'));
   var lessonCompletedIcons = element.all(
-    by.css('.protractor-test-lesson-icon-completed'));
+    by.css('.e2e-test-lesson-icon-completed'));
   var lessonUncompletedIcons = element.all(
-    by.css('.protractor-test-lesson-icon-uncompleted'));
-  var lessonTrack = element(by.css('.protractor-test-lesson-track'));
+    by.css('.e2e-test-lesson-icon-uncompleted'));
+  var lessonTrack = element(by.css('.e2e-test-lesson-track'));
   var practiceSessionContainer = element(
-    by.css('.protractor-test-practice-session-container'));
+    by.css('.e2e-test-practice-session-container'));
 
   this.get = async function(
       classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
