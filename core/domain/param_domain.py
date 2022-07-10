@@ -83,7 +83,7 @@ class ParamSpec:
                 (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
 
 
-class CustomizationArgsDict(TypedDict):
+class CustomizationArgsDict(TypedDict, total=False):
     """Dictionary representing the customization_args argument."""
 
     value: str

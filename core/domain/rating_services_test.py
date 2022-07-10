@@ -48,7 +48,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
             self.EXP_ID,
-            exp_domain.Exploration.create_default_exploration(self.EXP_ID))  # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
         self.assertEqual(
             rating_services.get_overall_ratings_for_exploration(self.EXP_ID),
@@ -97,7 +97,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
             self.EXP_ID,
-            exp_domain.Exploration.create_default_exploration(self.EXP_ID))  # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
         rating_services.assign_rating_to_exploration(
             self.USER_ID_1, self.EXP_ID, 1)
@@ -124,10 +124,10 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
             exp_id_a,
-            exp_domain.Exploration.create_default_exploration(exp_id_a))  # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(exp_id_a))
         exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
             exp_id_b,
-            exp_domain.Exploration.create_default_exploration(exp_id_b))  # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(exp_id_b))
 
         rating_services.assign_rating_to_exploration(
             self.USER_ID_1, exp_id_a, 1)
@@ -217,7 +217,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
             _mock_get_exploration_summary_by_id):
             exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
                 'exp_id_a',
-                exp_domain.Exploration.create_default_exploration('exp_id_a'))  # type: ignore[no-untyped-call]
+                exp_domain.Exploration.create_default_exploration('exp_id_a'))
 
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, 'exp_id_a', 1)

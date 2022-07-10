@@ -148,7 +148,7 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
 # is placed temporarily. Untill all classes are typed.
 SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_COLLECTION: lambda x: x.serialize(),
-    CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_EXPLORATION: lambda x: x.serialize(),
     CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),

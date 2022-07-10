@@ -34,7 +34,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from typing import Any, Dict, List, Mapping, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -593,7 +593,7 @@ class InteractionInstanceDict(TypedDict):
     default_outcome: OutcomeDict
     confirmed_unclassified_answers: List[str]
     hints: List[HintDict]
-    solution: SolutionDict
+    solution: Optional[SolutionDict]
 
 
 class InteractionInstance(translation_domain.BaseTranslatableObject):
@@ -614,7 +614,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         default_outcome: Outcome,
         confirmed_unclassified_answers: List[str],
         hints: List[Hint],
-        solution: Solution
+        solution: Optional[Solution]
     ) -> None:
         """Initializes a InteractionInstance domain object.
 
@@ -2358,7 +2358,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+    inputs: Dict[str, Any]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2367,7 +2367,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+        inputs: Dict[str, Any]
     ) -> None:
         """Initializes a RuleSpec domain object.
 
@@ -3034,7 +3034,7 @@ class State(translation_domain.BaseTranslatableObject):
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
 
-    def get_content_html(self, content_id):
+    def get_content_html(self, content_id: str) -> str:
         """Returns the content belongs to a given content id of the object.
 
         Args:

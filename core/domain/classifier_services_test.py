@@ -309,7 +309,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'old_state_name': 'Old home',
             'new_state_name': 'Home'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Test that Exception is raised if this method is called with version
         # number 1.

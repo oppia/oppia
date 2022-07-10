@@ -43,7 +43,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     # A dictionary representation of an exploration that contains unicode
     # characters.
-    exploration_dict_with_unicode_characters = {
+    exploration_dict_with_unicode_characters: exp_domain.ExplorationDict = {
         'tags': [],
         'title': '',
         'objective': '',
@@ -53,10 +53,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
-        'created_on': '08/17/2020, 17:30:48:283600',
         'category': '',
         'auto_tts_enabled': True,
-        'version': 3,
         'states': {
             'Introduction': {
                 'card_is_checkpoint': True,
@@ -150,7 +148,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         },
         'correctness_feedback_enabled': False,
         'edits_allowed': True,
-        'last_updated': '08/17/2020, 18:04:57:799687',
         'language_code': 'en',
         'blurb': ''
     }
@@ -206,7 +203,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -251,11 +248,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.SERIALIZATION_FUNCTIONS['exploration']
         )
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         self.assertEqual(
             default_exploration.to_dict(),
-            deserialize(serialize(default_exploration)).to_dict()) # type: ignore[no-untyped-call]
+            deserialize(serialize(default_exploration)).to_dict())
 
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
@@ -312,7 +309,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi( # type: ignore[call-overload]
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -337,7 +334,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '0', [exploration_id])
         self.assertEqual(
             default_exploration.to_dict(),
-            exp_ids_to_explorations[exploration_id].to_dict()) # type: ignore[no-untyped-call]
+            exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_partial_fetches_returns_correct_elements(self) -> None:
         """Testing that querying the cache returns reasonable output for
@@ -347,7 +344,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         exploration_id = 'id'
         nonexistent_exploration_id = 'id2'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
 
         self.assertEqual(
@@ -397,14 +394,14 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            result[exploration_id].to_dict()) # type: ignore[no-untyped-call]
+            result[exploration_id].to_dict())
 
         self.assertFalse(nonexistent_exploration_id in result)
 
     def test_queries_to_wrong_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
 
         caching_services.set_multi(
@@ -424,7 +421,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     def test_queries_to_wrong_sub_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
 
         self.assertEqual(
@@ -446,7 +443,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             [exploration_id])
 
         self.assertEqual(
-            existent_result[exploration_id].to_dict(), # type: ignore[no-untyped-call]
+            existent_result[exploration_id].to_dict(),
             default_exploration.to_dict())
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(
@@ -459,7 +456,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         cache_exploration_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -486,7 +483,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -663,7 +660,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        default_exploration = exp_domain.Exploration.from_dict( # type: ignore[no-untyped-call]
+        default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
         # id_value_mapping is a Dict whose values can be any of the type from
@@ -742,7 +739,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        default_exploration = exp_domain.Exploration.from_dict( # type: ignore[no-untyped-call]
+        default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
         caching_services.set_multi(
@@ -758,7 +755,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            exp_ids_to_explorations[exploration_id].to_dict()) # type: ignore[no-untyped-call]
+            exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_collections_with_unicode_characters_are_set_and_get_correctly(
         self

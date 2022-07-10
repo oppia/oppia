@@ -246,14 +246,14 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
         exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
-            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))  # type: ignore[no-untyped-call]
+            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
     def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(  # pylint: disable=line-too-long
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
@@ -273,7 +273,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
@@ -284,7 +284,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_exploration_does_not_delete_subscription(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
