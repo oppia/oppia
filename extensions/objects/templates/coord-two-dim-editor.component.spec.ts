@@ -1,3 +1,4 @@
+
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +43,6 @@ describe('CoordTwoDimEditorComponent', () => {
   it('should initialize value [0, 0]', () => {
     expect(component).toBeDefined();
 
-    component.value = undefined;
     component.ngOnInit();
 
     expect(component.value).toEqual([0, 0]);
