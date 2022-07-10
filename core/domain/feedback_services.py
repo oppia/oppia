@@ -630,7 +630,7 @@ def get_message(
 def get_next_page_of_all_feedback_messages(
     page_size: int = feconf.FEEDBACK_TAB_PAGE_SIZE,
     urlsafe_start_cursor: Optional[str] = None
-) -> Tuple[List[feedback_domain.FeedbackMessage], str, bool]:
+) -> Tuple[List[feedback_domain.FeedbackMessage], Optional[str], bool]:
     """Fetches a single page from the list of all feedback messages that have
     been posted to any exploration on the site.
 
@@ -646,7 +646,7 @@ def get_next_page_of_all_feedback_messages(
             messages_on_page: list(FeedbackMessage). Contains the slice of
                 messages that are part of the page pointed to by the given start
                 cursor.
-            next_urlsafe_start_cursor: str. The cursor to the next page.
+            next_urlsafe_start_cursor: str|None. The cursor to the next page.
             more: bool. Whether there are more messages available to fetch after
                 this batch.
     """
@@ -654,8 +654,6 @@ def get_next_page_of_all_feedback_messages(
         feedback_models.GeneralFeedbackMessageModel.get_all_messages(
             page_size, urlsafe_start_cursor))
     messages_on_page = [_get_message_from_model(m) for m in models_on_page]
-    # Ruling out the possibility of None for mypy type checking.
-    assert next_urlsafe_start_cursor is not None
     return (messages_on_page, next_urlsafe_start_cursor, more)
 
 
