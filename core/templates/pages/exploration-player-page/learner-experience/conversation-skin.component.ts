@@ -135,7 +135,6 @@ export class ConversationSkinComponent {
   isAnimatingToOneCard: boolean;
   isRefresherExploration: boolean;
   parentExplorationIds: string[];
-  storyViewerUrl: string;
   conceptCard: ConceptCard;
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
@@ -868,12 +867,6 @@ export class ConversationSkinComponent {
           this.urlService.getUrlParams().story_url_fragment);
         let nodeId = this.urlService.getUrlParams().node_id;
         this.inStoryMode = true;
-        this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
-          TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
-            topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: classroomUrlFragment,
-            story_url_fragment: storyUrlFragment
-          });
         this.storyViewerBackendApiService.fetchStoryDataAsync(
           topicUrlFragment, classroomUrlFragment,
           storyUrlFragment).then(
