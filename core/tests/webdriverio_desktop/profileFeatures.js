@@ -184,8 +184,6 @@ describe('Visiting user profile page', function() {
 describe('Playing the exploration', function() {
   var TEST_USERNAME = 'testUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
-  var backButton = $('.e2e-test-back-button');
-  var nextButton = $('.e2e-test-next-button');
 
   var explorationPlayerPage = null;
   var libraryPage = null;
@@ -195,6 +193,13 @@ describe('Playing the exploration', function() {
     category: 'Learning',
     objective: 'The goal is to check back and next buttons',
     language: 'English'
+  };
+
+  var backButtonSelector = function() {
+    return $('.e2e-test-back-button');
+  };
+  var nextButtonSelector = function() {
+    return $('.e2e-test-next-button');
   };
 
   beforeAll(async function() {
@@ -232,6 +237,7 @@ describe('Playing the exploration', function() {
         await forms.toRichText('card 2'));
 
       // Test back button.
+      var backButton = backButtonSelector();
       await waitFor.elementToBeClickable(
         backButton, 'Back button taking too long to be clickable');
       await backButton.click();
@@ -240,6 +246,7 @@ describe('Playing the exploration', function() {
         await forms.toRichText('card 1'));
 
       // Test next button.
+      var nextButton = nextButtonSelector();
       await waitFor.elementToBeClickable(
         nextButton, 'Next button taking too long to be clickable');
       await nextButton.click();
