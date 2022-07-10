@@ -18,6 +18,7 @@
 
 import { EventBusGroup } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { AppConstants } from 'app.constants';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -65,6 +66,8 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       });
     $scope.feedbackEditorIsOpen = false;
     $scope.addState = addState;
+    $scope.destIfStuckFeatEnabled = (
+      AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
     $scope.questionModeEnabled = (
       StateEditorService.isInQuestionMode());
     $scope.updateAnswerGroupFeedback = function(outcome) {
