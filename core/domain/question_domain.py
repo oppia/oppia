@@ -1399,7 +1399,7 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected all answer groups to have destination as None.'
             )
-        
+
         if dest_if_stuck_is_specified:
             raise utils.ValidationError(
                 'Expected all answer groups to have destination for the '
