@@ -87,27 +87,28 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
     $scope.reviewable = reviewable;
     $scope.misconceptionsBySkill = misconceptionsBySkill;
+    $scope.currentSuggestionId = suggestionId;
 
     let currentSuggestion = suggestionIdToContribution[suggestionId];
     delete suggestionIdToContribution[suggestionId];
-    let allContributions = suggestionIdToContribution;
-    allContributions[suggestionId] = currentSuggestion;
-
     let remainingContributionIds: string[] = Object.keys(
       suggestionIdToContribution
     );
     let skippedContributionIds: string[] = [];
+    let allContributions = suggestionIdToContribution;
+    allContributions[suggestionId] = currentSuggestion;
 
     $scope.init = function() {
-      $scope.suggestion = allContributions[suggestionId].suggestion;
+      $scope.suggestion = (
+        allContributions[$scope.currentSuggestionId].suggestion);
       $scope.question = QuestionObjectFactory.createFromBackendDict(
         $scope.suggestion.change.question_dict);
       $scope.authorName = $scope.suggestion.author_name;
       $scope.contentHtml = $scope.question.getStateData().content.html;
       $scope.questionHeader = (
-        allContributions[suggestionId].details.skill_description);
+        allContributions[$scope.currentSuggestionId].details.skill_description);
       $scope.skillRubrics = (
-        allContributions[suggestionId].details.skill_rubrics);
+        allContributions[$scope.currentSuggestionId].details.skill_rubrics);
       $scope.questionStateData = $scope.question.getStateData();
       $scope.questionId = $scope.question.getId();
       $scope.canEditQuestion = false;
@@ -124,8 +125,10 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         SiteAnalyticsService
           .registerContributorDashboardViewSuggestionForReview('Question');
       } else if ($scope.suggestionIsRejected) {
-        _getThreadMessagesAsync(suggestionId);
+        _getThreadMessagesAsync($scope.currentSuggestionId);
       }
+      $scope.showQuestion = true;
+      $rootScope.$applyAsync();
     };
 
     $scope.init();
@@ -134,18 +137,28 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       $scope.validationError = null;
     };
 
+    $scope.refreshModalData = function() {
+      SkillBackendApiService.fetchSkillAsync(
+        $scope.suggestion.change.skill_id).then((skillDict) => {
+        var misconceptionsBySkill = {};
+        var skill = skillDict.skill;
+        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+        $scope.misconceptionsBySkill = misconceptionsBySkill;
+        $scope.init();
+      });
+    };
+
     $scope.gotoNextItem = function() {
       if ($scope.isLastItem) {
         return;
       }
-      skippedContributionIds.push(suggestionId);
+      $scope.showQuestion = false;
+      skippedContributionIds.push($scope.currentSuggestionId);
 
       let lastContributionId = remainingContributionIds.pop();
-      suggestionId = lastContributionId;
+      $scope.currentSuggestionId = lastContributionId;
       let nextContribution = allContributions[lastContributionId];
       $scope.suggestion = allContributions[lastContributionId].suggestion;
-
-      console.log(nextContribution);
 
       $scope.isLastItem = remainingContributionIds.length === 0;
       $scope.isFirstItem = skippedContributionIds.length === 0;
@@ -155,28 +168,20 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         return;
       }
 
-      SkillBackendApiService.fetchSkillAsync(
-        $scope.suggestion.change.skill_id).then((skillDict) => {
-        var misconceptionsBySkill = {};
-        var skill = skillDict.skill;
-        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-        $scope.misconceptionsBySkill = misconceptionsBySkill;
-        $scope.init();
-      });
+      $scope.refreshModalData();
     };
 
     $scope.gotoPreviousItem = function() {
       if ($scope.isFirstItem) {
         return;
       }
-      remainingContributionIds.push(suggestionId);
+      $scope.showQuestion = false;
+      remainingContributionIds.push($scope.currentSuggestionId);
 
       let lastContributionId = skippedContributionIds.pop();
-      suggestionId = lastContributionId;
+      $scope.currentSuggestionId = lastContributionId;
       let nextContribution = allContributions[lastContributionId];
       $scope.suggestion = allContributions[lastContributionId].suggestion;
-
-      console.log(nextContribution);
 
       $scope.isLastItem = remainingContributionIds.length === 0;
       $scope.isFirstItem = skippedContributionIds.length === 0;
@@ -186,19 +191,12 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         return;
       }
 
-      SkillBackendApiService.fetchSkillAsync(
-        $scope.suggestion.change.skill_id).then((skillDict) => {
-        var misconceptionsBySkill = {};
-        var skill = skillDict.skill;
-        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-        $scope.misconceptionsBySkill = misconceptionsBySkill;
-        $scope.init();
-      });
+      $scope.refreshModalData();
     };
 
     $scope.accept = function() {
       ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-        [suggestionId]);
+        [$scope.currentSuggestionId]);
       SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
         'Question');
       SuggestionModalService.acceptSuggestion(
@@ -212,7 +210,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
     $scope.reject = function() {
       ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-        [suggestionId]);
+        [$scope.currentSuggestionId]);
       SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
         'Question');
       SuggestionModalService.rejectSuggestion(
@@ -235,7 +233,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
           backdrop: 'static',
           keyboard: false,
           resolve: {
-            suggestionId: () => suggestionId,
+            suggestionId: () => $scope.currentSuggestionId,
             question: () => $scope.question,
             questionId: () => '',
             questionStateData: () => $scope.question.getStateData(),
@@ -245,10 +243,13 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
           controller: 'QuestionSuggestionEditorModalController'
         }).result.then(function() {
           editSuggestionCallback(
-            suggestionId, $scope.suggestion, reviewable, $scope.question);
+            $scope.currentSuggestionId, $scope.suggestion, reviewable,
+            $scope.question);
         }, function() {
           ContextService.resetImageSaveDestination();
-          editSuggestionCallback(suggestionId, $scope.suggestion, reviewable);
+          editSuggestionCallback(
+            $scope.currentSuggestionId, $scope.suggestion,
+            reviewable);
         });
       });
     };

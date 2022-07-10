@@ -1,6 +1,6 @@
 <div class="modal-header protractor-test-question-suggestion-review-modal-header">
   <div>
-    <h3><[questionHeader]></h3>
+    <h3 class="oppia-question-header"><[questionHeader]></h3>
     <h4 class="author-header">Submitted by <[authorName]></h4>
     <div class="oppia-question-details">
       <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
@@ -16,14 +16,17 @@
       </div>
     </div>
   </div>  
-  <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
+  <button type="button"
+          class="close oppia-close-button-position"
+          ng-click="cancel()"
+          aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-suggestion">      
+    <div class="oppia-question-suggestion" ng-if="showQuestion">      
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"
                        question-state-data="questionStateData"
@@ -33,31 +36,105 @@
       </question-editor>
     </div>
   </section>
-  <section ng-show="reviewable" class="oppia-reviewer-actions">
+  <section ng-show="reviewable"
+           class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
       Review message (required if rejecting):
-      <textarea class="protractor-test-suggestion-review-message w-100" rows="3" ng-model="reviewMessage"></textarea>
+      <textarea class="protractor-test-suggestion-review-message w-100"
+                rows="3"
+                ng-model="reviewMessage">
+      </textarea>
     </div>
   </section>
-  <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
+  <div ng-show="!reviewable && suggestionIsRejected"
+       class="oppia-suggestion-review-message">
     <strong>Review message: </strong><[reviewMessage]>
   </div>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
-  <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
-    <button class="btn btn-danger protractor-test-question-suggestion-review-reject-button" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
-  </span>
-  <span tooltip-placement="bottom">
-    <button class="btn btn-secondary protractor-test-question-suggestion-review-edit-button" ng-if="reviewable" ng-click="edit()">Edit</button>
-  </span>
-  <span tooltip-placement="bottom">
-    <button class="btn btn-success protractor-test-question-suggestion-review-accept-button" ng-if="reviewable" ng-click="accept()">Accept</button>
-  </span>
+  <div class="oppia-review-buttons">
+    <span uib-tooltip="Enter review message before rejecting"
+          tooltip-placement="bottom"
+          tooltip-enable="reviewMessage.length == 0">
+      <button class="btn btn-danger oppia-review-button protractor-test-question-suggestion-review-reject-button"
+              ng-if="reviewable"
+              ng-disabled="reviewMessage.length == 0"
+              ng-click="reject()">
+        Reject
+      </button>
+    </span>
+    <span tooltip-placement="bottom">
+      <button class="btn btn-secondary oppia-review-button protractor-test-question-suggestion-review-edit-button"
+              ng-if="reviewable"
+              ng-click="edit()">
+        Edit
+      </button>
+    </span>
+    <span tooltip-placement="bottom">
+      <button class="btn btn-success oppia-review-button protractor-test-question-suggestion-review-accept-button"
+              ng-if="reviewable"
+              ng-click="accept()">
+        Accept
+      </button>
+    </span>
+  </div>
+  <div class="oppia-pagination-container">
+    <button type="button"
+            class="oppia-pagination-button"
+            ng-click="gotoPreviousItem()"
+            ng-disabled="isFirstItem">
+      <span class="material-icons">navigate_before</span>Previous
+    </button>
+    <button type="button"
+            class="oppia-pagination-button"
+            ng-click="gotoNextItem()"
+            ng-disabled="isLastItem">
+      Next<span class="material-icons">navigate_next</span>
+    </button>
+  </div>
 </div>
 
 <style>
+  .oppia-review-button {
+    margin: auto 5px;
+  }
+  .modal-footer {
+    display: flex;
+    flex-direction: column;
+  }
+  .oppia-review-buttons {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  .oppia-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    width: 100%;
+  }
+  .oppia-pagination-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #009688;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 40px;
+    min-width: 100px;
+    text-align: center;
+  }
+  .oppia-pagination-button:hover {
+    border: 2px solid #009688;
+    border-radius: 5px;
+  }
+  .oppia-pagination-button[disabled] {
+    color: #a9e5df;
+  }
+  .oppia-pagination-button[disabled]:hover {
+    border: none;
+  }
   .author-header {
     display: block;
     margin-top: -12px;

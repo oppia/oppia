@@ -199,8 +199,8 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var _showQuestionSuggestionModal = function(
           suggestion, suggestionIdToContribution,
-          contributionDetails, reviewable,
-          misconceptionsBySkill, question) {
+          reviewable,
+          misconceptionsBySkill) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'question-suggestion-review.directive.html');
@@ -286,8 +286,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       const openQuestionSuggestionModal = function(
-          suggestionId, suggestion, reviewable, question = undefined) {
-        var contributionDetails = ctrl.contributions[suggestionId].details;
+          suggestionId, suggestion, reviewable) {
         var skillId = suggestion.change.skill_id;
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
@@ -302,8 +301,8 @@ angular.module('oppia').component('contributionsAndReview', {
           misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
           _showQuestionSuggestionModal(
             suggestion, suggestionIdToContribution,
-            contributionDetails, reviewable,
-            misconceptionsBySkill, question);
+            reviewable,
+            misconceptionsBySkill);
           $rootScope.$apply();
         });
       };
