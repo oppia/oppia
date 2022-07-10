@@ -859,4 +859,3 @@ describe('Exploration editor page component', function() {
     });
   });
 });
-
