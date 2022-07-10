@@ -119,6 +119,16 @@
       </div>
     </div>
 
+    <oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                       [userIsLoggedIn]="userIsLoggedIn"
+                                       [explorationIsInPreviewMode]="explorationIsInPreviewMode"
+                                       [questionPlayerConfig]="questionPlayerConfig"
+                                       [collectionSummary]="collectionSummary"
+                                       [isRefresherExploration]="isRefresherExploration"
+                                       [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                                       [parentExplorationIds]="parentExplorationIds">
+    </oppia-ratings-and-recommendations>
+
     <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
       <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
         <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
