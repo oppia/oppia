@@ -34,7 +34,7 @@ var MathEditor = function(elem) {
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
       var mathInputElem = element.all(by.css(
-        '.protractor-test-guppy-div')).last();
+        '.e2e-test-guppy-div')).last();
       var present = await mathInputElem.isPresent();
       if (present) {
         await mathInputElem.sendKeys(text);
@@ -46,7 +46,7 @@ var MathEditor = function(elem) {
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
       var mathInputElem = element.all(by.css(
-        '.protractor-test-guppy-div')).last();
+        '.e2e-test-guppy-div')).last();
       var present = await mathInputElem.isPresent();
       if (present) {
         var contentElem = mathInputElem.element(by.tagName('annotation'));
@@ -88,12 +88,12 @@ var FilepathEditor = function(elem) {
     upload: async function(filepath) {
       // TODO(Jacob): Modify filepath relative to the directory from which the
       // protractor code is operating.
-      await elem.element(by.css('.protractor-test-file-upload'))
+      await elem.element(by.css('.e2e-test-file-upload'))
         .sendKeys(filepath);
     },
     setName: async function(name) {
-      await elem.element(by.css('.protractor-test-file-name')).clear();
-      await elem.element(by.css('.protractor-test-file-name')).sendKeys(name);
+      await elem.element(by.css('.e2e-test-file-name')).clear();
+      await elem.element(by.css('.e2e-test-file-name')).sendKeys(name);
     }
   };
 };
@@ -241,11 +241,11 @@ var SkillSelector = function(elem) {
   return {
     setValue: async function(skillDescription) {
       await elem.element(
-        by.css('.protractor-test-skill-name-input')).sendKeys(skillDescription);
+        by.css('.e2e-test-skill-name-input')).sendKeys(skillDescription);
       await waitFor.visibilityOf(elem.element(
-        by.css('.protractor-test-rte-skill-selector-item')));
+        by.css('.e2e-test-rte-skill-selector-item')));
       await elem.element(
-        by.css('.protractor-test-rte-skill-selector-item')).click();
+        by.css('.e2e-test-rte-skill-selector-item')).click();
     }
   };
 };
