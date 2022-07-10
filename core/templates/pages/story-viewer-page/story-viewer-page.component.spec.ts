@@ -217,10 +217,6 @@ describe('Story Viewer Page component', () => {
     httpTestingController.verify();
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should get complete exploration url when clicking on svg element',
     () => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(

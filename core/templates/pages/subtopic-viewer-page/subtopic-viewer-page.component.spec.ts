@@ -151,10 +151,6 @@ describe('Subtopic viewer page', function() {
       true);
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should succesfully get subtopic data and set context with next subtopic' +
   ' card', fakeAsync(() => {
     spyOn(component, 'subscribeToOnLangChange');

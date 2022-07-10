@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.rtl.css" as="style">
-
 <oppia-audio-bar *ngIf="showAudioBar()"></oppia-audio-bar>
 <div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard"
      [ngStyle]="{'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
@@ -127,7 +124,3 @@
     </div>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.rtl.css">

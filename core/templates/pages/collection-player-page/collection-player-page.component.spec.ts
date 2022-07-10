@@ -565,8 +565,4 @@ describe('Collection player page component', () => {
     expect(component.scrollToLocation).toHaveBeenCalled();
     expect(component.explorationCardIsShown).toBeFalse();
   }));
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
 });

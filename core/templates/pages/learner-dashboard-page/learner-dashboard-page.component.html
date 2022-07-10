@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/learner-dashboard-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/learner-dashboard-page.component.rtl.css" as="style">
-
 <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
 <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
      class="oppia-learner-dashboard-container position-relative">
@@ -359,6 +356,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/learner-dashboard-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/learner-dashboard-page.component.rtl.css">

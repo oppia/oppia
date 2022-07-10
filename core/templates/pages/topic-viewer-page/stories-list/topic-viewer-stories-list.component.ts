@@ -24,6 +24,9 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
+import './topic-viewer-stories-list.component.css';
+
+
 @Component({
   selector: 'stories-list',
   templateUrl: './topic-viewer-stories-list.component.html',
@@ -69,10 +72,6 @@ export class StoriesListComponent implements OnInit {
 
   checkTabletView(): boolean {
     return this.windowDimensionsService.getWidth() < 768;
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 angular.module('oppia').directive(
