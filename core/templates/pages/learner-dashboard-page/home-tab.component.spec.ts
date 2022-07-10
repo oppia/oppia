@@ -232,4 +232,13 @@ describe('Home tab Component', () => {
     component.goalTopicsLength = 0;
     expect(component.isGoalLimitReached()).toBeFalse();
   });
+
+  it('should not show empty learn something new tab' +
+    '\'when goal selection limit is reached and goal selection limit' +
+    ' is not reached\'', () => {
+    component.goalTopicsLength = 2;
+    component.currentGoalsLength = 0;
+    component.goalTopicsLength = 3;
+    expect(component.isGoalLimitReached()).toBeFalse();
+  });
 });

@@ -34,7 +34,10 @@ import { ContinueRulesService } from './continue-rules.service';
   styleUrls: []
 })
 export class OppiaInteractiveContinue implements OnInit {
-  @Input() buttonTextWithValue: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() buttonTextWithValue!: string;
   buttonText: string = '';
   isInEditorMode: boolean = false;
   readonly DEFAULT_BUTTON_TEXT: string = 'Continue';
