@@ -49,7 +49,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   destinationChoices: DestinationChoice[] = [];
   maxLen!: number;
   outcomeNewStateName!: string;
-  currentStateName: string | null;
+  currentStateName: string | null = null;
   directiveSubscriptions: Subscription = new Subscription();
 
   MAX_STATE_NAME_LENGTH: number = (
