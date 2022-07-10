@@ -157,6 +157,54 @@ describe('Outcome Editor Component', () => {
     expect(component.saveThisDestination).toHaveBeenCalled();
   });
 
+  it('should save destination for the stuck learner on interaction change' +
+    ' when state is not invalid after destination save', () => {
+    let onInteractionIdChangedEmitter = new EventEmitter();
+    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
+      .and.returnValue(onInteractionIdChangedEmitter);
+    spyOn(component, 'saveThisIfStuckDestination');
+
+    component.ngOnInit();
+
+    component.destinationIfStuckEditorIsOpen = true;
+
+    onInteractionIdChangedEmitter.emit();
+
+    expect(component.saveThisIfStuckDestination).toHaveBeenCalled();
+  });
+
+  it('should cancel destination if-stuck edit correctly', () => {
+    component.ngOnInit();
+
+    // Setup. No pre-check as we are setting up values below.
+    component.destinationIfStuckEditorIsOpen = true;
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      'Stuck state',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Saved Outcome',
+      'Changed state',
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
+
+    // Action.
+    component.cancelThisIfStuckDestinationEdit();
+
+    // Post-check.
+    expect(component.destinationIfStuckEditorIsOpen).toBeFalse();
+    expect(component.outcome.destIfReallyStuck).toBe('Stuck state');
+  });
+
   it('should cancel destination edit on interaction change when edit' +
     ' destination form is not valid or state is invalid after' +
     ' destination save', () => {
@@ -314,6 +362,15 @@ describe('Outcome Editor Component', () => {
     expect(component.destinationEditorIsOpen).toBeTrue();
   });
 
+  it('should open destination if-stuck editor if it is editable', () => {
+    component.destinationIfStuckEditorIsOpen = false;
+    component.isEditable = true;
+
+    component.openDestinationIfStuckEditor();
+
+    expect(component.destinationIfStuckEditorIsOpen).toBeTrue();
+  });
+
   it('should save correctness label when it is changed', () => {
     component.savedOutcome = new Outcome(
       'Introduction',
@@ -450,7 +507,7 @@ describe('Outcome Editor Component', () => {
   it('should set refresher exploration ID as null on saving destination' +
     ' when state is not in self loop', () => {
     component.savedOutcome = new Outcome(
-      'Saved Dest',
+      'Dest',
       null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
@@ -474,6 +531,32 @@ describe('Outcome Editor Component', () => {
     expect(component.outcome.refresherExplorationId).toBe(null);
     expect(component.savedOutcome.refresherExplorationId).toBe(null);
     expect(component.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
+  });
+
+  it('should set the dest_if_really_stuck property correctly' +
+    'when the destination for the stuck learner is saved.', () => {
+    component.savedOutcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      'Stuck state',
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
+
+    component.saveThisIfStuckDestination();
+
+    expect(component.savedOutcome.destIfReallyStuck).toBe('Stuck state');
   });
 
   it('should check if outcome feedback exceeds 10000 characters', () => {

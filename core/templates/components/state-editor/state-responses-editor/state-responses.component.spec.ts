@@ -886,6 +886,16 @@ describe('StateResponsesComponent', () => {
     expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
+  it('should update active answer group when destination is changed', () => {
+    spyOn(ResponsesService, 'updateActiveAnswerGroup')
+      .and.callFake(({destIfReallyStuck, expId, skillId}, callback) => {
+        callback();
+      });
+
+    $scope.saveActiveAnswerGroupDestIfStuck(defaultOutcome);
+
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
+  });
 
   it('should update active answer group when correctness' +
     ' label is changed', () => {
@@ -935,6 +945,18 @@ describe('StateResponsesComponent', () => {
       });
 
     $scope.saveDefaultOutcomeDest(defaultOutcome);
+
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
+  });
+
+  it('should update default outcome when default' +
+    ' outcome destination for stuck learner is changed', () => {
+    spyOn(ResponsesService, 'updateDefaultOutcome')
+      .and.callFake(({destIfReallyStuck, expId, skillId}, callback) => {
+        callback();
+      });
+
+    $scope.saveDefaultOutcomeDestIfStuck(defaultOutcome);
 
     expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
