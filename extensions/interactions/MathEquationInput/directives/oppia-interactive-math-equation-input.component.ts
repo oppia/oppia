@@ -38,12 +38,15 @@ import constants from 'assets/constants';
   templateUrl: './math-equation-input-interaction.component.html'
 })
 export class InteractiveMathEquationInput implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() savedSolution!: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue!: string;
+  @Input() allowedVariablesWithValue!: string;
   value: string = '';
   hasBeenTouched: boolean = false;
   warningText: string = '';
-  @Input() savedSolution: InteractionAnswer;
-  @Input() useFractionForDivisionWithValue;
-  @Input() allowedVariablesWithValue;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,

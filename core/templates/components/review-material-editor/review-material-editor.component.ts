@@ -35,14 +35,17 @@ interface BindableDict {
   templateUrl: './review-material-editor.component.html'
 })
 export class ReviewMaterialEditorComponent implements OnInit {
-  @Input() bindableDict: BindableDict;
   @Output() onSaveExplanation:
     EventEmitter<SubtitledHtml> = (new EventEmitter());
 
-  explanationMemento: string;
-  editableExplanation: string;
-  conceptCardExplanationEditorIsShown: boolean;
-  COMPONENT_NAME_EXPLANATION: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() bindableDict!: BindableDict;
+  explanationMemento!: string;
+  editableExplanation!: string;
+  COMPONENT_NAME_EXPLANATION!: string;
+  conceptCardExplanationEditorIsShown: boolean = false;
   HTML_SCHEMA: HtmlSchema = {
     type: 'html'
   };

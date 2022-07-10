@@ -115,7 +115,7 @@ describe('Blog Post Editor Component', () => {
             isWindowNarrow: () => true,
             getResizeEvent() {
               return {
-                subscribe: (callb) => {
+                subscribe: (callb: () => void) => {
                   callb();
                   return {
                     unsubscribe() {}

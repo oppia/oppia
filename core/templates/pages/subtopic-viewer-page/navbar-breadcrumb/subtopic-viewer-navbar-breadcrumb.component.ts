@@ -35,13 +35,16 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
   styleUrls: []
 })
 export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  subtopicTitle: string;
-  subtopicTitleTranslationKey: string;
-  topicName: string;
-  topicNameTranslationKey: string;
-  subtopicUrlFragment: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  subtopicTitle!: string;
+  subtopicTitleTranslationKey!: string;
+  topicName!: string;
+  topicNameTranslationKey!: string;
+  subtopicUrlFragment!: string;
   constructor(
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,

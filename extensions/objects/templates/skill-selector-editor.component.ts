@@ -30,8 +30,11 @@ import { ContextService } from 'services/context.service';
   templateUrl: './skill-selector-editor.component.html'
 })
 export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
-  @Input() modalId;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   skills: SkillBackendDict[] = [];
   showLoading = false;

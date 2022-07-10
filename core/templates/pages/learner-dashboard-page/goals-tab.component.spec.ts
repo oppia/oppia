@@ -33,11 +33,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 class MockRemoveActivityNgbModalRef {
-  componentInstance: {
-    sectionNameI18nId: null;
-    subsectionName: null;
-    activityId: null;
-    activityTitle: null;
+  componentInstance = {
+    sectionNameI18nId: null,
+    subsectionName: null,
+    activityId: null,
+    activityTitle: null,
   };
 }
 
@@ -289,7 +289,7 @@ describe('Goals tab Component', () => {
   it('should toggle story', () => {
     component.currentGoalsStoryIsShown = [true];
 
-    component.toggleStory('0');
+    component.toggleStory(0);
     fixture.detectChanges();
 
     expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
@@ -314,7 +314,6 @@ describe('Goals tab Component', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('success')
@@ -362,7 +361,7 @@ describe('Goals tab Component', () => {
     expect(component.showThreeDotsDropdown).toBe(false);
 
     // Three dots are not shown when no goals are present.
-    component.dropdownRef = null;
+    component.dropdownRef = undefined;
     component.onDocumentClick(fakeClickAwayEvent);
     fixture.detectChanges();
     expect(component.showThreeDotsDropdown).toBe(false);

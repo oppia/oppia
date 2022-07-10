@@ -115,7 +115,6 @@ describe('State Solution Editor Component', () => {
     component.ngOnInit();
 
     expect(component.solutionCardIsShown).toBeTrue();
-    expect(component.correctAnswer).toBe(null);
     expect(component.inlineSolutionEditorIsActive).toBeFalse();
     expect(component.SOLUTION_EDITOR_FOCUS_LABEL).toBe(
       'currentCorrectAnswerEditorHtmlForSolutionEditor');
@@ -260,6 +259,14 @@ describe('State Solution Editor Component', () => {
       ' This is the explanation to the answer.');
   });
 
+  it('should throw error if solution is not saved yet', () => {
+    stateSolutionService.savedMemento = null;
+
+    expect(() => {
+      component.getSolutionSummary();
+    }).toThrowError('Expected solution to be non-null.');
+  });
+
   it('should check if current interaction is linear or not', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
 
@@ -277,6 +284,7 @@ describe('State Solution Editor Component', () => {
     spyOn(solutionValidityService, 'updateValidity').and.stub();
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(true, false);
     spyOn(alertsService, 'addInfoMessage');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State 1');
 
     // In question mode.
     component.openAddOrUpdateSolutionModal();
@@ -293,6 +301,30 @@ describe('State Solution Editor Component', () => {
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'The current solution does not lead to another card.', 4000
     );
+  }));
+
+  it('should throw error if active state name is invalid', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: {
+        then: (successCallback: (
+          arg: {solution: Solution}
+        ) => void, errorCallback) => {
+          successCallback({
+            solution: solution
+          });
+        }
+      }
+    } as NgbModalRef);
+    spyOn(solutionVerificationService, 'verifySolution').and.returnValue(false);
+    spyOn(solutionValidityService, 'updateValidity').and.stub();
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(true, false);
+    spyOn(alertsService, 'addInfoMessage');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+
+    expect(function() {
+      component.openAddOrUpdateSolutionModal();
+      tick();
+    }).toThrowError('Expected active state name to be non-null.');
   }));
 
   it('should close add or update solution modal if user clicks cancel',

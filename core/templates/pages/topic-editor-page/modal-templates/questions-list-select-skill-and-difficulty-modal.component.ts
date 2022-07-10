@@ -37,19 +37,22 @@ interface Summary {
 })
 export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() currentMode: string;
-  @Input() countOfSkillsToPrioritize: number;
-  @Input() linkedSkillsWithDifficulty: SkillDifficulty[];
-  @Input() skillIdToRubricsObject: object;
-  @Input() allSkillSummaries: SkillSummaryBackendDict[];
-  instructionMessage: string;
-  skillSummaries: SkillSummaryBackendDict[];
-  skillSummariesInitial: SkillSummaryBackendDict[];
-  skillSummariesFinal: SkillSummaryBackendDict[];
-  selectedSkills: string[];
-  DEFAULT_SKILL_DIFFICULTY: number;
-  MODE_SELECT_DIFFICULTY: string;
-  MODE_SELECT_SKILL: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() currentMode!: string;
+  @Input() countOfSkillsToPrioritize!: number;
+  @Input() linkedSkillsWithDifficulty!: SkillDifficulty[];
+  @Input() skillIdToRubricsObject!: object;
+  @Input() allSkillSummaries!: SkillSummaryBackendDict[];
+  instructionMessage!: string;
+  skillSummaries!: SkillSummaryBackendDict[];
+  skillSummariesInitial!: SkillSummaryBackendDict[];
+  skillSummariesFinal!: SkillSummaryBackendDict[];
+  selectedSkills!: string[];
+  DEFAULT_SKILL_DIFFICULTY!: number;
+  MODE_SELECT_DIFFICULTY!: string;
+  MODE_SELECT_SKILL!: string;
   skillsToShow: SkillSummaryBackendDict[] = [];
 
   constructor(

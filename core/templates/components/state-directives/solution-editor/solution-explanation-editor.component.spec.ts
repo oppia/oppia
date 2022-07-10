@@ -23,6 +23,7 @@ import { ContextService } from 'services/context.service';
 import { SolutionExplanationEditor } from './solution-explanation-editor.component';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 
 class MockStateSolutionService {
   displayed = {
@@ -54,6 +55,7 @@ describe('Solution explanation editor', () => {
 
   let contextService: ContextService;
   let editabilityService: EditabilityService;
+  let solutionObjectFactory: SolutionObjectFactory;
   let stateSolutionService: StateSolutionService;
   let externalSaveService: ExternalSaveService;
   let externalSaveServiceEmitter = new EventEmitter<void>();
@@ -67,6 +69,7 @@ describe('Solution explanation editor', () => {
         ContextService,
         EditabilityService,
         ExternalSaveService,
+        SolutionObjectFactory,
         {
           provide: StateSolutionService,
           useClass: MockStateSolutionService
@@ -82,6 +85,7 @@ describe('Solution explanation editor', () => {
 
     contextService = TestBed.inject(ContextService);
     editabilityService = TestBed.inject(EditabilityService);
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateSolutionService = TestBed.inject(StateSolutionService);
     externalSaveService = TestBed.inject(ExternalSaveService);
 
@@ -136,7 +140,10 @@ describe('Solution explanation editor', () => {
     const updatedHtml = 'updateHtml';
 
     component.updateExplanationHtml(updatedHtml);
-    expect(stateSolutionService.displayed.explanation._html).toBe(updatedHtml);
+
+    let solutionDisplayed = stateSolutionService.displayed as Solution;
+
+    expect(solutionDisplayed.explanation._html).toBe(updatedHtml);
   });
 
   it('should save the explanation', fakeAsync(() => {
@@ -153,4 +160,35 @@ describe('Solution explanation editor', () => {
     expect(component.saveSolution.emit).toHaveBeenCalled();
     expect(component.explanationEditorIsOpen).toBe(false);
   }));
+
+  it('should throw error if solution is not saved yet', () => {
+    stateSolutionService.displayed = null;
+
+    expect(() => {
+      component.updateExplanationHtml('html');
+    }).toThrowError('Solution is undefined');
+    expect(() => {
+      component.isSolutionExplanationLengthExceeded();
+    }).toThrowError('Solution is undefined');
+    expect(() => {
+      component.saveThisExplanation();
+    }).toThrowError('Solution is undefined');
+  });
+
+  it('should throw error if solution content id is invalid', () => {
+    stateSolutionService.displayed = solutionObjectFactory.createNew(
+      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
+    );
+    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
+      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
+    );
+
+    stateSolutionService.displayed.explanation.html = '<p> Hint Index 0 </p>';
+    stateSolutionService.savedMemento.explanation.html = 'invalid_id';
+    stateSolutionService.displayed.explanation.contentId = null;
+
+    expect(() => {
+      component.saveThisExplanation();
+    }).toThrowError('Solution content id is undefined');
+  });
 });

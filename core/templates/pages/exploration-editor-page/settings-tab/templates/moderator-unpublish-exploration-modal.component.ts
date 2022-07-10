@@ -26,11 +26,13 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class ModeratorUnpublishExplorationModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() draftEmailBody: string;
-
-  EMAIL_BODY_SCHEMA: object;
-  willEmailBeSent: boolean;
-  emailBody: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() draftEmailBody!: string;
+  EMAIL_BODY_SCHEMA!: object;
+  emailBody!: string;
+  willEmailBeSent: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

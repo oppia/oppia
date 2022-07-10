@@ -30,6 +30,26 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PageTitleService } from 'services/page-title.service';
 
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val: string) => {}
+    },
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
   instant(key: string, interpolateParams?: Object): string {
@@ -42,8 +62,10 @@ describe('Donate page', () => {
     new WindowRef());
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
+  let windowRef: MockWindowRef;
 
   beforeEach(async() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [
         DonatePageComponent,
@@ -60,14 +82,7 @@ describe('Donate page', () => {
         },
         {
           provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              },
-              gtag: () => {}
-            }
-          }
+          useValue: windowRef
         },
         {
           provide: TranslateService,
@@ -78,7 +93,7 @@ describe('Donate page', () => {
     }).compileComponents();
   });
 
-  let component;
+  let component: DonatePageComponent;
 
   beforeEach(() => {
     const donatePageComponent = TestBed.createComponent(DonatePageComponent);
@@ -131,7 +146,7 @@ describe('Donate page', () => {
       .toHaveBeenCalledWith('Amazon');
 
     setTimeout(() => {
-      expect(component.windowRef.nativeWindow.location.href).toBe(
+      expect(windowRef.nativeWindow.location.href).toBe(
         'https://smile.amazon.com/ch/81-1740068');
 
       done();

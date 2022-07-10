@@ -70,8 +70,8 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     skill_model_last_updated: 2,
   }];
   let countOfSkillsToPrioritize = 2;
-  let currentMode = null;
-  let linkedSkillsWithDifficulty = [];
+  let currentMode: string;
+  let linkedSkillsWithDifficulty: SkillDifficulty[] = [];
   let skillIdToRubricsObject = {};
 
   beforeEach(waitForAsync(() => {

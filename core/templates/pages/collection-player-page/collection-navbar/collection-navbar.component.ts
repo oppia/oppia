@@ -43,9 +43,13 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
         () => {
-          this.collectionTitle = (
+          let title = (
             this.readOnlyCollectionBackendApiService.getCollectionDetails(
               this.urlService.getCollectionIdFromUrl()).title);
+          if (title === null) {
+            throw new Error('Collection title is null');
+          }
+          this.collectionTitle = title;
         }
       )
     );

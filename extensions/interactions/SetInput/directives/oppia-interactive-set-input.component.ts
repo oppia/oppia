@@ -35,11 +35,14 @@ import { SetInputAnswer } from 'interactions/answer-defs';
   templateUrl: './set-input-interaction.component.html'
 })
 export class InteractiveSetInputComponent implements OnInit {
-  @Input() buttonTextWithValue: string;
-  @Input() savedSolution;
-  errorMessage: string;
-  answer;
-  schema: {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() buttonTextWithValue!: string;
+  @Input() savedSolution!: SetInputAnswer;
+  errorMessage!: string;
+  answer!: SetInputAnswer;
+  schema!: {
     type: string;
     items: {
       type: string;
@@ -49,7 +52,7 @@ export class InteractiveSetInputComponent implements OnInit {
     };
   };
 
-  buttonText: string;
+  buttonText!: string;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -58,7 +61,7 @@ export class InteractiveSetInputComponent implements OnInit {
     private setInputRulesService: SetInputRulesService
   ) { }
 
-  private hasDuplicates(answer) {
+  private hasDuplicates(answer: SetInputAnswer): boolean {
     for (var i = 0; i < answer.length; i++) {
       for (var j = 0; j < i; j++) {
         if (eq(answer[i], answer[j])) {
@@ -69,16 +72,13 @@ export class InteractiveSetInputComponent implements OnInit {
     return false;
   }
 
-  private hasBlankOption(answer) {
+  private hasBlankOption(answer: SetInputAnswer): boolean {
     return answer.some((element) => {
       return (element === '');
     });
   }
 
-  updateAnswer(answer: number[]): void {
-    if (this.answer === answer) {
-      return;
-    }
+  updateAnswer(answer: SetInputAnswer): void {
     this.answer = answer;
   }
 

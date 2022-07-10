@@ -36,11 +36,14 @@ import { ServicesConstants } from 'services/services.constants';
   styleUrls: []
 })
 export class InteractiveEndExplorationComponent implements OnInit {
-  @Input() recommendedExplorationIdsWithValue: string;
-  errorMessage: string = '';
-  isInEditorPage: boolean;
-  isInEditorPreviewMode: boolean;
-  isInEditorMainTab: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() recommendedExplorationIdsWithValue!: string;
+  errorMessage!: string;
+  isInEditorPage: boolean = false;
+  isInEditorPreviewMode: boolean = false;
+  isInEditorMainTab: boolean = false;
 
   constructor(
     private contextService: ContextService,
@@ -81,12 +84,12 @@ export class InteractiveEndExplorationComponent implements OnInit {
       this.endExplorationBackendApiService.getRecommendExplorationsData(
         authorRecommendedExplorationIds
       ).then((response) => {
-        let foundExpIds = [];
+        let foundExpIds: string[] = [];
         response.summaries.map((expSummary) => {
           foundExpIds.push(expSummary.id);
         });
 
-        let missingExpIds = [];
+        let missingExpIds: string[] = [];
         authorRecommendedExplorationIds.forEach((expId) => {
           if (!foundExpIds.includes(expId)) {
             missingExpIds.push(expId);

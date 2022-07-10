@@ -31,10 +31,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class StoryViewerNavbarPreLogoActionComponent
 implements OnInit, OnDestroy {
-  topicName: string;
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  storyUrlFragment: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicName!: string;
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  storyUrlFragment!: string;
   constructor(
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -55,8 +58,12 @@ implements OnInit, OnDestroy {
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    this.storyUrlFragment =
-     this.urlService.getStoryUrlFragmentFromLearnerUrl();
+    let storyUrlFragment = (
+      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    if (storyUrlFragment === null) {
+      throw new Error('Story url fragment is null');
+    }
+    this.storyUrlFragment = storyUrlFragment;
     this.storyViewerBackendApiService.fetchStoryDataAsync(
       this.topicUrlFragment,
       this.classroomUrlFragment,

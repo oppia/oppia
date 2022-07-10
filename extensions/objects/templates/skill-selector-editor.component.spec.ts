@@ -33,7 +33,6 @@ describe('SkillSelectorEditorComponent', () => {
   let fetchAllSkillsEmitter = new EventEmitter();
 
   let skills = [{
-    misconceptions_schema_version: 3,
     next_misconception_id: 0,
     description: 'skill 2',
     rubrics: [
@@ -52,12 +51,10 @@ describe('SkillSelectorEditorComponent', () => {
         explanations: []
       }
     ],
-    superseding_skill_id: null,
+    superseding_skill_id: '0',
     language_code: 'en',
-    rubric_schema_version: 3,
     id: 'akS2GkSjaOVL',
     prerequisite_skill_ids: [],
-    skill_contents_schema_version: 2,
     all_questions_merged: false,
     version: 1,
     misconceptions: [],
@@ -67,11 +64,6 @@ describe('SkillSelectorEditorComponent', () => {
         content_id: 'explanation',
         html: '<p>Release Testing Dec 2020</p>'
       },
-      written_translations: {
-        translations_mapping: {
-          explanation: {}
-        }
-      },
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {}
@@ -79,7 +71,6 @@ describe('SkillSelectorEditorComponent', () => {
       }
     }
   }, {
-    misconceptions_schema_version: 3,
     next_misconception_id: 0,
     description: 'Derive a ratio from a description or a picture.',
     rubrics: [
@@ -102,12 +93,10 @@ describe('SkillSelectorEditorComponent', () => {
         ]
       }
     ],
-    superseding_skill_id: null,
+    superseding_skill_id: '1',
     language_code: 'en',
-    rubric_schema_version: 3,
     id: 'DABaIPpsHkTl',
     prerequisite_skill_ids: [],
-    skill_contents_schema_version: 2,
     all_questions_merged: false,
     version: 3,
     misconceptions: [],
@@ -116,11 +105,6 @@ describe('SkillSelectorEditorComponent', () => {
       explanation: {
         content_id: 'explanation',
         html: '<p>A ratio represents...</p>'
-      },
-      written_translations: {
-        translations_mapping: {
-          explanation: {}
-        }
       },
       recorded_voiceovers: {
         voiceovers_mapping: {

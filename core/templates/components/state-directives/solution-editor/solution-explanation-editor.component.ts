@@ -40,10 +40,13 @@ export class SolutionExplanationEditor
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
     EventEmitter<string[]> = new EventEmitter();
 
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  EXPLANATION_FORM_SCHEMA!: ExplanationFormSchema;
   directiveSubscriptions = new Subscription();
-  isEditable: boolean;
-  explanationEditorIsOpen: boolean;
-  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema;
+  isEditable: boolean = false;
+  explanationEditorIsOpen: boolean = false;
 
   constructor(
     private contextService: ContextService,
@@ -53,6 +56,9 @@ export class SolutionExplanationEditor
   ) {}
 
   updateExplanationHtml(newHtmlString: string): void {
+    if (this.stateSolutionService.displayed === null) {
+      throw new Error('Solution is undefined');
+    }
     this.stateSolutionService.displayed.explanation._html = newHtmlString;
   }
 
@@ -67,18 +73,30 @@ export class SolutionExplanationEditor
   }
 
   isSolutionExplanationLengthExceeded(): boolean {
+    if (this.stateSolutionService.displayed === null) {
+      throw new Error('Solution is undefined');
+    }
     // TODO(#13764): Edit this check after appropriate limits are found.
     return (
       this.stateSolutionService.displayed.explanation.html.length > 100000);
   }
 
   saveThisExplanation(): void {
+    if (
+      this.stateSolutionService.displayed === null ||
+      this.stateSolutionService.savedMemento === null
+    ) {
+      throw new Error('Solution is undefined');
+    }
     const contentHasChanged = (
       this.stateSolutionService.displayed.explanation.html !==
       this.stateSolutionService.savedMemento.explanation.html);
     if (contentHasChanged) {
       const solutionContentId = this.stateSolutionService.displayed.explanation
         .contentId;
+      if (solutionContentId === null) {
+        throw new Error('Solution content id is undefined');
+      }
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [solutionContentId]);
     }

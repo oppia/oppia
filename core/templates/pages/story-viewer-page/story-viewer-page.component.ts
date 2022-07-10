@@ -47,29 +47,32 @@ interface IconParametersArray {
   templateUrl: './story-viewer-page.component.html'
 })
 export class StoryViewerPageComponent implements OnInit, OnDestroy {
-  @ViewChild('overlay') overlay: ElementRef<HTMLDivElement>;
-  @ViewChild('skip') skipButton: ElementRef<HTMLButtonElement>;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @ViewChild('overlay') overlay!: ElementRef<HTMLDivElement>;
+  @ViewChild('skip') skipButton!: ElementRef<HTMLButtonElement>;
+  storyPlaythroughObject!: StoryPlaythrough;
+  storyId!: string;
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  storyUrlFragment!: string;
+  storyTitle!: string;
+  storyTitleTranslationKey!: string;
+  storyDescription!: string;
+  storyDescTranslationKey!: string;
+  pathIconParameters!: IconParametersArray[];
+  topicName!: string;
+  thumbnailFilename!: string;
+  thumbnailBgColor!: string;
+  storyNodes!: ReadOnlyStoryNode[];
+  iconUrl!: string;
   directiveSubscriptions = new Subscription();
   showLoginOverlay: boolean = true;
-  storyPlaythroughObject: StoryPlaythrough;
-  storyId: string;
-  storyIsLoaded: boolean;
-  isLoggedIn: boolean;
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  storyUrlFragment: string;
-  storyTitle: string;
-  storyTitleTranslationKey: string;
-  storyDescription: string;
-  storyDescTranslationKey: string;
-  pathIconParameters: IconParametersArray[];
-  topicName: string;
-  thumbnailFilename: string;
-  thumbnailBgColor: string;
-  storyNodes: ReadOnlyStoryNode[];
+  storyIsLoaded: boolean = false;
+  isLoggedIn: boolean = false;
   storyNodesTitleTranslationKeys: string[] = [];
   storyNodesDescTranslationKeys: string[] = [];
-  iconUrl: string;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -157,9 +160,13 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     result = this.urlService.addField(
       result, 'classroom_url_fragment',
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    result = this.urlService.addField(
-      result, 'story_url_fragment',
+    let storyUrlFragment = (
       this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    if (storyUrlFragment === null) {
+      throw new Error('Story url fragment is null');
+    }
+    result = this.urlService.addField(
+      result, 'story_url_fragment', storyUrlFragment);
     result = this.urlService.addField(
       result, 'node_id', node.getId());
     return result;
@@ -192,8 +199,12 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.classroomUrlFragment = (
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    this.storyUrlFragment = (
+    let storyUrlFragment = (
       this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    if (storyUrlFragment === null) {
+      throw new Error('Story url fragment is null');
+    }
+    this.storyUrlFragment = storyUrlFragment;
     this.loaderService.showLoadingScreen('Loading');
     this.storyViewerBackendApiService.fetchStoryDataAsync(
       this.topicUrlFragment,

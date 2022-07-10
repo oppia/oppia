@@ -24,6 +24,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveMathEquationInput } from './oppia-interactive-math-equation-input.component';
 import { TranslateService } from '@ngx-translate/core';
+import { MathEquationAnswer } from 'interactions/answer-defs';
 
 class MockTranslateService {
   instant(key: string): string {
@@ -37,7 +38,7 @@ describe('MathEquationInputInteractive', () => {
   let windowRef: WindowRef;
   let guppyInitializationService: GuppyInitializationService;
   let deviceInfoService: DeviceInfoService;
-  let mockCurrentInteractionService;
+  let mockCurrentInteractionService: CurrentInteractionService;
   let mockGuppyObject = {
     divId: '1',
     guppyInstance: {
@@ -64,8 +65,11 @@ describe('MathEquationInputInteractive', () => {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: MathEquationAnswer, rulesService: CurrentInteractionService) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
       validateExpressionFn();
     }

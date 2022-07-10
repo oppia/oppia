@@ -41,13 +41,16 @@ export interface Testimonial {
   styleUrls: []
 })
 export class SplashPageComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  classroomUrlFragment!: string;
+  classroomUrl!: string;
+  displayedTestimonialId!: number;
+  testimonialCount!: number;
   isWindowNarrow: boolean = false;
-  classroomUrlFragment: string;
-  classroomUrl: string;
-  displayedTestimonialId: number;
-  testimonialCount: number;
-  testimonials = [];
-  userIsLoggedIn: boolean = null;
+  testimonials: Testimonial[] = [];
+  userIsLoggedIn: boolean = false;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -140,7 +143,6 @@ export class SplashPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userIsLoggedIn = null;
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
     this.testimonials = this.getTestimonials();

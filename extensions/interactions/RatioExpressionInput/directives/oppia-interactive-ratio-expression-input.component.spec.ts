@@ -23,6 +23,8 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { RatioInputAnswer } from 'interactions/answer-defs';
 
 describe('InteractiveRatioExpressionInput', () => {
   let component: InteractiveRatioExpressionInputComponent;
@@ -30,7 +32,9 @@ describe('InteractiveRatioExpressionInput', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         numberOfTerms: {
           value: JSON.parse(attributes.numberOfTermsWithValue)
@@ -45,8 +49,11 @@ describe('InteractiveRatioExpressionInput', () => {
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: RatioInputAnswer, rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }

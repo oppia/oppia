@@ -22,6 +22,7 @@
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TextInputAnswer } from 'interactions/answer-defs';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
@@ -40,14 +41,17 @@ interface TextInputSchema {
   templateUrl: './text-input-interaction.component.html'
 })
 export class InteractiveTextInputComponent implements OnInit {
-  @Input() placeholderWithValue;
-  @Input() rowsWithValue;
-  @Input() savedSolution;
-  @Input() labelForFocusTarget: string;
-  answer: string;
-  placeholder: string;
-  schema: TextInputSchema;
-  rows: number;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() placeholderWithValue!: string;
+  @Input() rowsWithValue!: string;
+  @Input() savedSolution!: TextInputAnswer;
+  @Input() labelForFocusTarget!: string;
+  answer!: TextInputAnswer;
+  placeholder!: string;
+  schema!: TextInputSchema;
+  rows!: number;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -81,7 +85,6 @@ export class InteractiveTextInputComponent implements OnInit {
       this.savedSolution !== undefined ?
       this.savedSolution : ''
     );
-    this.labelForFocusTarget = this.labelForFocusTarget || null;
 
     this.schema = {
       type: 'unicode',
