@@ -53,11 +53,11 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             'run_backend_tests': False,
             'pre_commit_linter': False
         }
-        def mock_frontend_tests(args: list[str]):  # pylint: disable=unused-argument
+        def mock_frontend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
             self.scripts_called['run_frontend_tests'] = True
-        def mock_backend_tests(args: list[str]):  # pylint: disable=unused-argument
+        def mock_backend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
             self.scripts_called['run_backend_tests'] = True
-        def mock_pre_commit_linter(args: list[str]):  # pylint: disable=unused-argument
+        def mock_pre_commit_linter(args: list[str]) -> None:  # pylint: disable=unused-argument
             self.scripts_called['pre_commit_linter'] = True
 
         self.swap_frontend_tests = self.swap(

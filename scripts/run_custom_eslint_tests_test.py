@@ -47,7 +47,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         self.cmd_token_list: list[list[str]] = []
 
         self.sys_exit_code: int = 0
-        def mock_sys_exit(err_code: str) -> None:
+        def mock_sys_exit(err_code: int) -> None:
             self.sys_exit_code = err_code
         self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
 
@@ -110,7 +110,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         self.assertIn(self.proc_args, self.cmd_token_list)
         self.assertIn('All tests passed', self.print_arr)
 
-    def test_incomplete_eslint_coverage_raises_exception(self):
+    def test_incomplete_eslint_coverage_raises_exception(self) -> None:
         class MockTask:
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
                 return (
@@ -125,7 +125,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         error_msg = 'Eslint test coverage is not 100%'
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
-            with self.assertRaisesRegex(Exception, error_msg):
+            with self.assertRaisesRegex(Exception, error_msg): # type: ignore[no-untyped-call]
                 run_custom_eslint_tests.main()
 
         self.assertIn(self.proc_args, self.cmd_token_list)

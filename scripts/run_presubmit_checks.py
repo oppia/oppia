@@ -52,7 +52,7 @@ _PARSER.add_argument(
     help='optional; if specified, the origin branch to compare against.')
 
 
-def main(args=None):
+def main(args=None) -> None:
     """Run the presubmit checks."""
     parsed_args = _PARSER.parse_args(args=args)
 

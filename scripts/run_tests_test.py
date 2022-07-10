@@ -45,15 +45,15 @@ class RunTestsTests(test_utils.GenericTestBase):
             'run_e2e_tests': False
         }
 
-        def mock_setup(args: list[str]):  # pylint: disable=unused-argument
+        def mock_setup(args: list[str]) -> None:  # pylint: disable=unused-argument
             scripts_called['setup'] = True
-        def mock_setup_gae(args: list[str]):  # pylint: disable=unused-argument
+        def mock_setup_gae(args: list[str]) -> None:  # pylint: disable=unused-argument
             scripts_called['setup_gae'] = True
-        def mock_frontend_tests(args: list[str]):  # pylint: disable=unused-argument
+        def mock_frontend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
             scripts_called['run_frontend_tests'] = True
-        def mock_backend_tests(args: list[str]):  # pylint: disable=unused-argument
+        def mock_backend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
             scripts_called['run_backend_tests'] = True
-        def mock_popen(cmd: str, shell: bool):
+        def mock_popen(cmd: str, shell: bool) -> None:
             if cmd == 'bash scripts/run_e2e_tests.sh' and shell:
                 scripts_called['run_e2e_tests'] = True
 
