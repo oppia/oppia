@@ -2128,7 +2128,7 @@ title: Title
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
 
-    def set_moderators(self, moderator_usernames):
+    def set_moderators(self, moderator_usernames: List[str]) -> None:
         """Sets role of given users as MODERATOR.
 
         Args:
@@ -2137,7 +2137,7 @@ title: Title
         for name in moderator_usernames:
             self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-    def set_voiceover_admin(self, voiceover_admin_username):
+    def set_voiceover_admin(self, voiceover_admin_username: List[str]) -> None:
         """Sets role of given users as VOICEOVER ADMIN.
 
         Args:
@@ -2788,9 +2788,14 @@ title: Title
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
-            self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        self,
+        collection_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE
+    ) -> collection_domain.Collection:
         """Saves a new default collection written by owner_id.
 
         Args:

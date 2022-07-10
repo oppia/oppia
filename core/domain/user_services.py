@@ -574,7 +574,7 @@ def get_user_ids_by_role(role):
     return [user.id for user in user_settings]
 
 
-def get_user_actions_info(user_id):
+def get_user_actions_info(user_id: str) -> user_domain.UserActionsInfo:
     """Gets user actions info for a user.
 
     Args:

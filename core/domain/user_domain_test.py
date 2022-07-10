@@ -139,7 +139,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         super(UserSettingsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner = user_services.get_user_actions_info(self.owner_id)  # type: ignore[no-untyped-call]
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.user_settings = user_services.get_user_settings(self.owner_id)  # type: ignore[no-untyped-call]
         self.user_settings.validate()

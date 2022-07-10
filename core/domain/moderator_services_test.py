@@ -37,7 +37,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.set_moderators([self.MODERATOR_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_moderators([self.MODERATOR_USERNAME])
 
         self.no_user = None
 

@@ -264,7 +264,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         for exp_id, exp in self.EXP_DATA.items():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
-            owner = user_services.get_user_actions_info(exp['owner_id'])  # type: ignore[no-untyped-call]
+            owner = user_services.get_user_actions_info(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
     def test_recommendation_categories_and_matrix_headers_match(self) -> None:
