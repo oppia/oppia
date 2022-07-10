@@ -49,6 +49,23 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 import github # isort:skip  pylint: disable=wrong-import-position
 
 
+# The pool_size argument is required by Requester.__init__(), but it is
+# missing from the typing definition in Requester.pyi.  We therefore
+# disable type checking here.
+_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore
+    login_or_token=None,
+    password=None,
+    jwt=None,
+    base_url='https://github.com',
+    timeout=0,
+    user_agent='user',
+    per_page=0,
+    verify=False,
+    retry=None,
+    pool_size=None,
+)
+
+
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
 
@@ -611,34 +628,35 @@ class CommonTests(test_utils.GenericTestBase):
         self
     ) -> None:
         mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
+            requester=_MOCK_REQUESTER, headers={}, attributes={},
+            completed=True)
         label_for_released_prs = (
             constants.release_constants.LABEL_FOR_RELEASED_PRS)
         label_for_current_release_prs = (
             constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
         pull1 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
                     {'name': label_for_released_prs},
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         pull2 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
                     {'name': label_for_released_prs},
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         label = github.Label.Label(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'name': label_for_current_release_prs},
-            completed='')
+            completed=True)
 
         def mock_get_issues(
             unused_self: str, state: str, labels: List[github.Label.Label]  # pylint: disable=unused-argument
-        ) -> List[github.Label.Label]:
+        ) -> List[github.PullRequest.PullRequest]:
             return [pull1, pull2]
 
         def mock_get_label(
@@ -657,7 +675,8 @@ class CommonTests(test_utils.GenericTestBase):
         self
     ) -> None:
         mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
+            requester=_MOCK_REQUESTER, headers={}, attributes={},
+            completed=True)
 
         def mock_open_tab(unused_url: str) -> None:
             pass
@@ -666,23 +685,23 @@ class CommonTests(test_utils.GenericTestBase):
         label_for_current_release_prs = (
             constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
         pull1 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         pull2 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
                     {'name': label_for_released_prs},
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         label = github.Label.Label(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'name': label_for_current_release_prs},
-            completed='')
+            completed=True)
 
         def mock_get_issues(
             unused_self: str, state: str, labels: List[str]  # pylint: disable=unused-argument

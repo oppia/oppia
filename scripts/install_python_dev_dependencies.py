@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Install Python development dependencies."""
+
+from __future__ import annotations
+
 import os
 import subprocess
 import sys
@@ -29,11 +33,11 @@ COMPILED_REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.txt'
 
 
 def assert_in_venv() -> None:
-    '''Raise an error if we are not in a virtual environment.
+    """Raise an error if we are not in a virtual environment.
 
     No error is raised if we are running on GitHub Actions because a
     virtual environment is unnecessary there.
-    '''
+    """
     if 'GITHUB_ACTION' in os.environ:
         return
     if sys.prefix == sys.base_prefix:
@@ -42,6 +46,7 @@ def assert_in_venv() -> None:
 
 
 def install_installation_tools() -> None:
+    """Install the minimal tooling needed to install dependencies."""
     for package, version in INSTALLATION_TOOL_VERSIONS.items():
         # We run pip as a subprocess because importing from the pip
         # module is not supported:
@@ -57,6 +62,9 @@ def install_installation_tools() -> None:
 
 
 def install_dev_dependencies() -> None:
+    """Install dev dependencies from
+    COMPILED_REQUIREMENTS_DEV_FILE_PATH.
+    """
     subprocess.run(
         ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH],
         check=True,
@@ -65,6 +73,7 @@ def install_dev_dependencies() -> None:
 
 
 def compile_dev_dependencies() -> None:
+    """Generate COMPILED_REQUIREMENTS_DEV_FILE_PATH file."""
     subprocess.run(
         [
             'pip-compile', REQUIREMENTS_DEV_FILE_PATH, '--output-file',
@@ -75,7 +84,8 @@ def compile_dev_dependencies() -> None:
     )
 
 
-def main():
+def main() -> None:
+    """Install all dev dependencies."""
     assert_in_venv()
     install_installation_tools()
     compile_dev_dependencies()

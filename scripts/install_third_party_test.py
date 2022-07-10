@@ -368,7 +368,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 unused_tar_root_name, unused_target_root_name):
             check_function_calls['download_and_untar_files_is_called'] = True
         def mock_install_python_prod_dependencies():
-            check_function_calls['install_python_prod_dependencies_is_called'] = True
+            check_function_calls[
+                'install_python_prod_dependencies_is_called'] = True
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         validate_swap = self.swap(

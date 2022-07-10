@@ -21,8 +21,6 @@ import os
 import pathlib
 import shutil
 import subprocess
-import sys
-from typing import Tuple
 import urllib.request as urlrequest
 import zipfile
 

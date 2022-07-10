@@ -171,7 +171,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_python_prod_dependencies.verify_pip_is_installed()
 
         pip_string_with_version = (
-            'pip==%s' % install_python_prod_dependencies.OPPIA_REQUIRED_PIP_VERSION)
+            'pip==%s' %
+            install_python_prod_dependencies.OPPIA_REQUIRED_PIP_VERSION)
 
         self.assertEqual(self.cmd_token_list, [
             ['pip', 'install', pip_string_with_version],
@@ -223,19 +224,22 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)
         with swap_requirements, swap_find_distributions:
-            self.assertEqual(install_python_prod_dependencies.get_mismatches(), {
-                u'dependency1': (u'1.6.1', u'1.5.1'),
-                u'dependency2': (u'4.9.1', u'4.9.1.2'),
-                u'dependency3': (u'3.1.5', None),
-                u'dependency4': (u'0.3.0.1', None),
-                u'dependency5': (
-                    self.get_git_version_string('dependency5', 'a'),
-                    self.get_git_version_string('dependency5', 'b')),
-                u'dependency6': (
-                    None, self.get_git_version_string('dependency6', 'z')),
-                u'dependency7': (
-                    self.get_git_version_string('dependency7', 'b'), None),
-            })
+            self.assertEqual(
+                install_python_prod_dependencies.get_mismatches(),
+                {
+                    u'dependency1': (u'1.6.1', u'1.5.1'),
+                    u'dependency2': (u'4.9.1', u'4.9.1.2'),
+                    u'dependency3': (u'3.1.5', None),
+                    u'dependency4': (u'0.3.0.1', None),
+                    u'dependency5': (
+                        self.get_git_version_string('dependency5', 'a'),
+                        self.get_git_version_string('dependency5', 'b')),
+                    u'dependency6': (
+                        None, self.get_git_version_string('dependency6', 'z')),
+                    u'dependency7': (
+                        self.get_git_version_string('dependency7', 'b'), None),
+                }
+            )
 
     def test_library_removal_runs_correct_commands(self):
         """Library exists in the 'third_party/python_libs' directory but it is
@@ -258,7 +262,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
         swap_get_mismatches = self.swap(
-            install_python_prod_dependencies, 'get_mismatches', mock_get_mismatches)
+            install_python_prod_dependencies,
+            'get_mismatches',
+            mock_get_mismatches)
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
 
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
@@ -304,7 +310,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             mock_validate_metadata_directories)
 
         swap_get_mismatches = self.swap(
-            install_python_prod_dependencies, 'get_mismatches', mock_get_mismatches)
+            install_python_prod_dependencies,
+            'get_mismatches',
+            mock_get_mismatches)
 
         with self.swap_check_call, self.swap_Popen, self.open_file_swap:
             with swap_get_mismatches, swap_validate_metadata_directories:
@@ -362,7 +370,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
         swap_get_mismatches = self.swap(
-            install_python_prod_dependencies, 'get_mismatches', mock_get_mismatches)
+            install_python_prod_dependencies,
+            'get_mismatches',
+            mock_get_mismatches)
 
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
@@ -419,7 +429,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
         swap_get_mismatches = self.swap(
-            install_python_prod_dependencies, 'get_mismatches', mock_get_mismatches)
+            install_python_prod_dependencies,
+            'get_mismatches',
+            mock_get_mismatches)
         swap_call = self.swap(subprocess, 'check_call', mock_call)
 
         expected_lines = [
@@ -530,7 +542,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
         swap_get_mismatches = self.swap(
-            install_python_prod_dependencies, 'get_mismatches', mock_get_mismatches)
+            install_python_prod_dependencies,
+            'get_mismatches',
+            mock_get_mismatches)
         swap_rm_tree = self.swap(shutil, 'rmtree', mock_rm)
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
@@ -677,7 +691,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_pip_install_without_import_error(self):
         with self.swap_Popen:
-            install_python_prod_dependencies.pip_install('package==version', 'path')
+            install_python_prod_dependencies.pip_install(
+                'package==version', 'path')
 
     def test_pip_install_with_user_prefix_error(self):
         with self.swap_Popen_error, self.swap_check_call:
@@ -687,7 +702,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Error installing package'
         ):
-            install_python_prod_dependencies.pip_install('package==version', 'path')
+            install_python_prod_dependencies.pip_install(
+                'package==version', 'path')
 
     def test_pip_install_with_import_error_and_darwin_os(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
@@ -759,7 +775,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
                 normalized_library_name = (
-                    install_python_prod_dependencies.normalize_python_library_name(
+                    install_python_prod_dependencies
+                    .normalize_python_library_name(
                         library_name_and_version_string[0]))
                 self.assertNotIn(
                     normalized_library_name, normalized_library_names)
@@ -778,7 +795,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
                 normalized_library_name = (
-                    install_python_prod_dependencies.normalize_python_library_name(
+                    install_python_prod_dependencies
+                    .normalize_python_library_name(
                         library_name_and_version_string[0]))
                 self.assertNotIn(
                     normalized_library_name, normalized_library_names)

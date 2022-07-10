@@ -413,7 +413,9 @@ def verify_pip_is_installed():
     """
     print('Checking if pip is installed on the local machine')
     try:
-        import pip
+        # We are just checking that pip is available for import, so it's
+        # okay that we don't use it.
+        import pip  # pylint: disable=unused-import
     except ImportError as e:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
