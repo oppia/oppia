@@ -86,8 +86,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.reviewable = reviewable;
-    $scope.reviewMessage = '';
-    $scope.misconceptionsBySkill = misconceptionsBySkill; // Set this when navigating.
+    $scope.misconceptionsBySkill = misconceptionsBySkill;
 
     let currentSuggestion = suggestionIdToContribution[suggestionId];
     delete suggestionIdToContribution[suggestionId];
@@ -97,11 +96,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     let remainingContributionIds: string[] = Object.keys(
       suggestionIdToContribution
     );
-
-    let skippedSuggestionIds: string[] = [];
-
-    console.log(allContributions);
-    console.log(Object.keys(allContributions));
+    let skippedContributionIds: string[] = [];
 
     $scope.init = function() {
       $scope.suggestion = allContributions[suggestionId].suggestion;
@@ -122,6 +117,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         $scope.skillDifficultyLabel);
       $scope.reviewMessage = '';
       $scope.suggestionIsRejected = $scope.suggestion.status === 'rejected';
+      $scope.isLastItem = remainingContributionIds.length === 0;
+      $scope.isFirstItem = skippedContributionIds.length === 0;
 
       if (reviewable) {
         SiteAnalyticsService
@@ -135,6 +132,68 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
     $scope.questionChanged = function() {
       $scope.validationError = null;
+    };
+
+    $scope.gotoNextItem = function() {
+      if ($scope.isLastItem) {
+        return;
+      }
+      skippedContributionIds.push(suggestionId);
+
+      let lastContributionId = remainingContributionIds.pop();
+      suggestionId = lastContributionId;
+      let nextContribution = allContributions[lastContributionId];
+      $scope.suggestion = allContributions[lastContributionId].suggestion;
+
+      console.log(nextContribution);
+
+      $scope.isLastItem = remainingContributionIds.length === 0;
+      $scope.isFirstItem = skippedContributionIds.length === 0;
+
+      if (!nextContribution.details) {
+        SuggestionModalService.cancelSuggestion($uibModalInstance);
+        return;
+      }
+
+      SkillBackendApiService.fetchSkillAsync(
+        $scope.suggestion.change.skill_id).then((skillDict) => {
+        var misconceptionsBySkill = {};
+        var skill = skillDict.skill;
+        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+        $scope.misconceptionsBySkill = misconceptionsBySkill;
+        $scope.init();
+      });
+    };
+
+    $scope.gotoPreviousItem = function() {
+      if ($scope.isFirstItem) {
+        return;
+      }
+      remainingContributionIds.push(suggestionId);
+
+      let lastContributionId = skippedContributionIds.pop();
+      suggestionId = lastContributionId;
+      let nextContribution = allContributions[lastContributionId];
+      $scope.suggestion = allContributions[lastContributionId].suggestion;
+
+      console.log(nextContribution);
+
+      $scope.isLastItem = remainingContributionIds.length === 0;
+      $scope.isFirstItem = skippedContributionIds.length === 0;
+
+      if (!nextContribution.details) {
+        SuggestionModalService.cancelSuggestion($uibModalInstance);
+        return;
+      }
+
+      SkillBackendApiService.fetchSkillAsync(
+        $scope.suggestion.change.skill_id).then((skillDict) => {
+        var misconceptionsBySkill = {};
+        var skill = skillDict.skill;
+        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+        $scope.misconceptionsBySkill = misconceptionsBySkill;
+        $scope.init();
+      });
     };
 
     $scope.accept = function() {
