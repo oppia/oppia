@@ -35,7 +35,7 @@ export class ResponseItemSelectionInputComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   @Input() choices!: string;
-  responses: string[];
+  responses!: string[];
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
