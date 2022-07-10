@@ -66,7 +66,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             run_backend_tests, 'main', mock_backend_tests)
         self.swap_pre_commit_linter = self.swap(
             pre_commit_linter, 'main', mock_pre_commit_linter)
-    
+
     def test_run_presubmit_checks_when_branch_is_specified(self) -> None:
         specified_branch = 'develop'
         cmd_to_get_all_changed_file = [
@@ -81,17 +81,18 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
                 return self.changed_frontend_file
             else:
                 return ''
-        
+
         swap_check_output = self.swap(
             subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=['--b', specified_branch])
-        
+
         for script in self.scripts_called:
             self.assertTrue(script)
         self.assertIn('Linting passed.', self.print_arr)
-        self.assertIn('Comparing the current branch with %s' % specified_branch,
+        self.assertIn(
+            'Comparing the current branch with %s' % specified_branch,
             self.print_arr)
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
@@ -110,17 +111,18 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
                 return self.changed_frontend_file
             else:
                 return ''
-        
+
         swap_check_output = self.swap(
             subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=[])
-        
+
         for script in self.scripts_called:
             self.assertTrue(script)
         self.assertIn('Linting passed.', self.print_arr)
-        self.assertIn('Comparing the current branch with origin/%s' % self.current_branch,
+        self.assertIn(
+            'Comparing the current branch with origin/%s' % self.current_branch,
             self.print_arr)
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
@@ -134,17 +136,17 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
                 return '0'
             else:
                 return ''
-        
+
         swap_check_output = self.swap(
             subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=[])
-        
+
         self.assertFalse(self.scripts_called['run_frontend_tests'])
         self.assertTrue(self.scripts_called['pre_commit_linter'])
         self.assertTrue(self.scripts_called['run_backend_tests'])
         self.assertIn('Linting passed.', self.print_arr)
-        self.assertIn('Comparing the current branch with develop',
-            self.print_arr)
+        self.assertIn(
+            'Comparing the current branch with develop', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)

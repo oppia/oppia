@@ -20,7 +20,6 @@ import builtins
 import subprocess
 
 from core.tests import test_utils
-from typing import Any
 
 from scripts import run_backend_tests
 from scripts import run_frontend_tests
@@ -65,11 +64,11 @@ class RunTestsTests(test_utils.GenericTestBase):
         swap_backend_tests = self.swap(
             run_backend_tests, 'main', mock_backend_tests)
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
-        
+
         with print_swap, swap_setup, swap_setup_gae, swap_popen:
             with swap_frontend_tests, swap_backend_tests:
                 run_tests.main(args=[])
-        
+
         for script in scripts_called:
             self.assertTrue(script)
         self.assertIn(
