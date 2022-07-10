@@ -2,11 +2,11 @@
   <div class="oppia-rule-details-header">
     <strong *ngIf="outcomeHasFeedback">(Optional) Direct the stuck learner to...</strong>
     <strong *ngIf="!outcomeHasFeedback">(Optional) If really stuck, Oppia directs the learner to...</strong>
-  </div>
-  <div ngbTooltip="{{ 'I18N_DEST_IF_STUCK_INFO_TOOLTIP' }}"
-       placement="bottom"
-       class="float-right">
-    <strong class="clickable">&#x24D8;</strong>
+    <span uib-tooltip="Learners start at their last saved checkpoint when returning back from the lesson."
+            tooltip-placement="right-top"
+            class="clickable">
+        <strong>&#x24D8;</strong>
+    </span>
   </div>
   <div class="form-group oppia-form-group">
     <span>
@@ -44,6 +44,9 @@
   .nav .tooltip-inner {
     max-width: 220px;
     white-space: none;
+  }
+  .tltp {
+    max-width: 200px !important;  
   }
   .form-control.oppia-form-control {
     width: 200px;

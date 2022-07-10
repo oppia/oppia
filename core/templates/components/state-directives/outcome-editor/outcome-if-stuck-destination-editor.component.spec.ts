@@ -28,6 +28,7 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { OutcomeIfStuckDestinationEditorComponent } from './outcome-if-stuck-destination-editor.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Outcome Destination If Stuck Editor', () => {
   let component: OutcomeIfStuckDestinationEditorComponent;
@@ -46,7 +47,8 @@ describe('Outcome Destination If Stuck Editor', () => {
         FormsModule
       ],
       declarations: [
-        OutcomeIfStuckDestinationEditorComponent
+        OutcomeIfStuckDestinationEditorComponent,
+        MockTranslatePipe,
       ],
       providers: [
         EditorFirstTimeEventsService,
