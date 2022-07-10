@@ -335,7 +335,7 @@ def get_user_settings(
     Args:
         user_id: str. The unique ID of the user.
         strict: bool. Whether to fail noisily if no user with the given
-            id exists in the datastore. Defaults to False.
+            id exists in the datastore. Defaults to True.
 
     Returns:
         UserSettings or None. If the given user_id does not exist and strict
@@ -804,7 +804,7 @@ def has_ever_registered(user_id: str) -> bool:
     """Checks if a user has ever been registered with given user_id.
 
     Args:
-        user_id: str|None. The unique ID of the user.
+        user_id: str. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id has ever been registered.
