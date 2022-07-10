@@ -58,6 +58,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'parameterize-rule-description.filter.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
+    'responses.service.ts',
     'rule-type-selector.directive.ts',
     'select2-dropdown.directive.ts',
     'state-responses.component.ts',
