@@ -16,19 +16,26 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
+import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from './lesson-information-card-modal.component';
+import { LocalStorageService } from 'services/local-storage.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+
+
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -58,6 +65,11 @@ describe('Lesson Information card modal component', () => {
   let dateTimeFormatService: DateTimeFormatService;
   let ratingComputationService: RatingComputationService;
   let urlInterpolationService: UrlInterpolationService;
+  let urlService: UrlService;
+  let userService: UserService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let localStorageService: LocalStorageService;
+  let clipboard: Clipboard;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -122,6 +134,12 @@ describe('Lesson Information card modal component', () => {
     dateTimeFormatService = TestBed.inject(DateTimeFormatService);
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    urlService = TestBed.inject(UrlService);
+    userService = TestBed.inject(UserService);
+    localStorageService = TestBed.inject(LocalStorageService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
+    clipboard = TestBed.inject(Clipboard);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(true, false);
@@ -178,11 +196,25 @@ describe('Lesson Information card modal component', () => {
       expect(componentInstance.explorationIsPrivate).toBe(false);
     });
 
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toBeTrue();
-  });
+  it('should correctly set logged-out progress learner URL ' +
+    'when unique progress URL ID exists', fakeAsync (() => {
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('');
+    spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
+      .and.returnValue('abcdef');
 
-  it('should get get image url correctly', () => {
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
+      'https://oppia.org/progress/abcdef');
+  }));
+
+  it('should get image url correctly', () => {
     let imageUrl = 'image_url';
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('interpolated_url');
@@ -191,6 +223,18 @@ describe('Lesson Information card modal component', () => {
       .toEqual('interpolated_url');
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
       imageUrl);
+  });
+
+  it('should determine if current language is RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+
+    expect(componentInstance.isLanguageRTL()).toBe(true);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false);
+
+    expect(componentInstance.isLanguageRTL()).toBe(false);
   });
 
   it('should get exploration tags summary', () => {
@@ -230,5 +274,54 @@ describe('Lesson Information card modal component', () => {
       'word-wrap': 'break-word',
       width: titleHeight.toString()
     });
+  });
+
+  it('should save logged-out learner progress correctly', fakeAsync(() => {
+    spyOn(explorationPlayerStateService, 'setUniqueProgressUrlId')
+      .and.returnValue(Promise.resolve());
+    spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
+      .and.returnValue('abcdef');
+    spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
+
+    componentInstance.saveLoggedOutProgress();
+    tick(100);
+
+    expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
+      'https://oppia.org/progress/abcdef');
+    expect(componentInstance.loggedOutProgressUniqueUrlId).toEqual('abcdef');
+  }));
+
+  it('should correctly copy progress URL', () => {
+    spyOn(clipboard, 'copy');
+    let loggedOutProgressUrl = 'https://oppia.org/progress/abcdef';
+    componentInstance.loggedOutProgressUniqueUrl = loggedOutProgressUrl;
+
+    componentInstance.copyProgressUrl();
+
+    expect(clipboard.copy).toHaveBeenCalledWith(
+      loggedOutProgressUrl);
+  });
+
+  it('should store unique progress URL ID when login button is clicked',
+    fakeAsync(() => {
+      spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+        Promise.resolve('https://oppia.org/login'));
+      spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
+      componentInstance.loggedOutProgressUniqueUrlId = 'abcdef';
+
+      componentInstance.onLoginButtonClicked();
+      tick(100);
+
+      expect(localStorageService.updateUniqueProgressIdOfLoggedOutLearner)
+        .toHaveBeenCalledWith('abcdef');
+    })
+  );
+
+  it('should correctly close save progress menu', () => {
+    componentInstance.saveProgressMenuIsShown = true;
+
+    componentInstance.closeSaveProgressMenu();
+
+    expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
 });

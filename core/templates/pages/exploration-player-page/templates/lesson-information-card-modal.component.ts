@@ -16,22 +16,31 @@
  * @fileoverview Component for lesson information card modal.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
+import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
   tagsInTooltip: string[];
 }
+
+import './lesson-information-card-modal.component.css';
+
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
@@ -60,13 +69,23 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   lastUpdatedString: string;
   explorationIsPrivate!: boolean;
   explorationTags!: ExplorationTagSummary;
+  lessonAuthorsSubmenuIsShown: boolean = false;
+  loggedOutProgressUniqueUrlId: string;
+  loggedOutProgressUniqueUrl: string;
+  saveProgressMenuIsShown: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private ratingComputationService: RatingComputationService,
-    private dateTimeFormatService: DateTimeFormatService
+    private dateTimeFormatService: DateTimeFormatService,
+    private clipboard: Clipboard,
+    private urlService: UrlService,
+    private userService: UserService,
+    private windowRef: WindowRef,
+    private localStorageService: LocalStorageService,
+    private explorationPlayerStateService: ExplorationPlayerStateService
   ) {
     super(ngbActiveModal);
   }
@@ -117,6 +136,13 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       i < this.checkpointCount;
       i++) {
       this.checkpointStatusArray[i] = 'incomplete';
+    }
+    this.loggedOutProgressUniqueUrlId = (
+      this.explorationPlayerStateService.getUniqueProgressUrlId());
+    if (this.loggedOutProgressUniqueUrlId) {
+      this.loggedOutProgressUniqueUrl = (
+        this.urlService.getOrigin() +
+        '/progress/' + this.loggedOutProgressUniqueUrlId);
     }
   }
 
@@ -188,5 +214,37 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  async saveLoggedOutProgress(): Promise<void> {
+    if (!this.loggedOutProgressUniqueUrlId) {
+      this.explorationPlayerStateService
+        .setUniqueProgressUrlId()
+        .then(() => {
+          this.loggedOutProgressUniqueUrlId = (
+            this.explorationPlayerStateService.getUniqueProgressUrlId());
+          this.loggedOutProgressUniqueUrl = (
+            this.urlService.getOrigin() +
+            '/progress/' + this.loggedOutProgressUniqueUrlId);
+        });
+    }
+    this.saveProgressMenuIsShown = true;
+  }
+
+  copyProgressUrl(): void {
+    this.clipboard.copy(this.loggedOutProgressUniqueUrl);
+  }
+
+  onLoginButtonClicked(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) => {
+        this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+          this.loggedOutProgressUniqueUrlId);
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      });
+  }
+
+  closeSaveProgressMenu(): void {
+    this.saveProgressMenuIsShown = false;
   }
 }

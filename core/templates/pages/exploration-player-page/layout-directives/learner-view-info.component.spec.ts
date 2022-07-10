@@ -160,10 +160,6 @@ describe('Learner view info component', () => {
     expect(componentInstance.getTopicUrl()).toEqual(topicUrl);
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
-  });
-
   it('should set topic name and subtopic title translation key and ' +
   'check whether hacky translations are displayed or not correctly',
   waitForAsync(() => {

@@ -38,19 +38,20 @@ export class CkEditorCopyToolbarComponent {
 
   toggleToolActive(): void {
     this.ckEditorCopyContentService.toggleCopyMode();
+    let element = this.document.querySelectorAll(
+      '.oppia-rte-editor'
+    ) as NodeListOf<HTMLElement>;
 
     if (this.ckEditorCopyContentService.copyModeActive) {
       this.document.body.style.cursor = 'copy';
-      this.document.querySelectorAll('.oppia-rte-editor')
-        .forEach((editor: HTMLElement) => {
-          editor.focus();
-        });
+      element.forEach((editor) => {
+        editor.focus();
+      });
     } else {
       this.document.body.style.cursor = '';
-      this.document.querySelectorAll('.oppia-rte-editor')
-        .forEach((editor: HTMLElement) => {
-          editor.blur();
-        });
+      element.forEach((editor) => {
+        editor.blur();
+      });
     }
   }
 
