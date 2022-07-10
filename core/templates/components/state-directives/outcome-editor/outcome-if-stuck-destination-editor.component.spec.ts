@@ -99,7 +99,7 @@ describe('Outcome Destination If Stuck Editor', () => {
     expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
     expect(component.destinationChoices).toEqual([{
       id: null,
-      text: '(try again)'
+      text: 'None'
     }, {
       id: 'Introduction',
       text: 'Introduction'
@@ -121,7 +121,7 @@ describe('Outcome Destination If Stuck Editor', () => {
   it('should add new state if outcome destination if stuck is a placeholder' +
     ' when outcome destination if stuck details are saved', fakeAsync(() => {
     component.outcome = new Outcome(
-      null,
+      'Dest',
       PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
@@ -177,7 +177,7 @@ describe('Outcome Destination If Stuck Editor', () => {
 
     expect(component.destinationChoices).toEqual([{
       id: null,
-      text: '(try again)'
+      text: 'None'
     }, {
       id: 'Introduction',
       text: 'Introduction'
@@ -197,7 +197,7 @@ describe('Outcome Destination If Stuck Editor', () => {
 
     expect(component.destinationChoices).toEqual([{
       id: null,
-      text: '(try again)'
+      text: 'None'
     }, {
       id: 'Introduction',
       text: 'Introduction'

@@ -49,7 +49,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   destinationChoices: DestinationChoice[] = [];
   maxLen!: number;
   outcomeNewStateName!: string;
-  currentStateName!: string;
+  currentStateName: string | null;
   directiveSubscriptions: Subscription = new Subscription();
 
   MAX_STATE_NAME_LENGTH: number = (
@@ -179,8 +179,6 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
 
             let newStateName = this.outcomeNewStateName;
             this.outcome.destIfReallyStuck = newStateName;
-
-            delete this.outcomeNewStateName;
 
             this.addState.emit(newStateName);
           }
