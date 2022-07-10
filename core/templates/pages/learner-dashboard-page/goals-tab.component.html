@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/goals-tab.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/goals-tab.component.rtl.css" as="style">
-
 <div class="oppia-goals-box e2e-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
   <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
   </p>
@@ -91,7 +88,3 @@
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION' | translate"></p>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/goals-tab.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/goals-tab.component.rtl.css">

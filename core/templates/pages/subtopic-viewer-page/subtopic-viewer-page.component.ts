@@ -33,6 +33,9 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
+import './subtopic-viewer-page.component.css';
+
+
 @Component({
   selector: 'oppia-subtopic-viewer-page',
   templateUrl: './subtopic-viewer-page.component.html',
@@ -65,10 +68,6 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   checkMobileView(): boolean {
     return (this.windowDimensionsService.getWidth() < 500);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   subscribeToOnLangChange(): void {

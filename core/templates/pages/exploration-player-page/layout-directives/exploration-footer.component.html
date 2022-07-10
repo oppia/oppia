@@ -1,7 +1,3 @@
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css">
-
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
   <div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
     <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()"></div>
