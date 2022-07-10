@@ -13,9 +13,9 @@
   <br>
   <label> <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span> </label>
   <span>
-    <oppia-interaction-display classStr="oppia-learner-hint-and-solution-modal-body"
-                               [htmlData]="solutionExplanationHtml">
-    </oppia-interaction-display>
+    <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
+                              [rteString]="solutionExplanationHtml">
+    </oppia-rte-output-display>
   </span>
 </div>
 

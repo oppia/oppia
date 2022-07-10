@@ -29,7 +29,7 @@ const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
   container.innerHTML = (
     `<angular-html-bind>${html.trim()}</angular-html-bind>`);
-  // Return element inside <oppia-interaction-display />
+  // Return element inside <angular-html-bind />
   if (container.content.firstChild === null ||
     container.content.firstChild.firstChild === null) {
     throw new Error('First Child is null');

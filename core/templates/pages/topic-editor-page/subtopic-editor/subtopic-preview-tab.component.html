@@ -3,8 +3,8 @@
     <div class="content">
       <span class="content-title">{{ editableTitle }}</span>
       <div class="html-content">
-        <oppia-interaction-display [htmlData]="pageContents?.getHtml()">
-        </oppia-interaction-display>
+        <oppia-rte-output-display [rteString]="pageContents?.getHtml()">
+        </oppia-rte-output-display>
       </div>
     </div>
   </div>
