@@ -185,7 +185,7 @@ describe('Subtopic viewer page', function() {
       subtopicDataObject.getParentTopicId());
     expect(component.nextSubtopic).toEqual(
       subtopicDataObject.getNextSubtopic());
-    expect(component.prevSubtopic).toBeNull();
+    expect(component.prevSubtopic).toBeUndefined();
     expect(component.subtopicSummaryIsShown).toBeTrue();
 
     expect(component.subtopicTitleTranslationKey).toEqual(
@@ -256,7 +256,7 @@ describe('Subtopic viewer page', function() {
         subtopicDataObjectWithPrevSubtopic.getParentTopicId());
       expect(component.prevSubtopic).toEqual(
         subtopicDataObjectWithPrevSubtopic.getPrevSubtopic());
-      expect(component.nextSubtopic).toBeNull();
+      expect(component.nextSubtopic).toBeUndefined();
       expect(component.subtopicSummaryIsShown).toBeTrue();
 
       component.ngOnDestroy();

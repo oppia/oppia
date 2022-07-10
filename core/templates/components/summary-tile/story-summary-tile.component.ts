@@ -88,9 +88,6 @@ export class StorySummaryTileComponent implements OnInit {
         story_url_fragment: this.storySummary.getUrlFragment(),
         topic_url_fragment: this.topicUrlFragment
       });
-    if (storyLink === null) {
-      return '#';
-    }
     return storyLink;
   }
 

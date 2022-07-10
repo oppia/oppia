@@ -42,17 +42,20 @@ import './subtopic-viewer-page.component.css';
   styleUrls: []
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  subtopicUrlFragment!: string;
+  pageContents!: SubtopicPageContents;
+  subtopicTitle!: string;
+  subtopicTitleTranslationKey!: string;
+  parentTopicId!: string;
+  nextSubtopic!: Subtopic;
+  prevSubtopic!: Subtopic;
   directiveSubscriptions = new Subscription();
   subtopicSummaryIsShown: boolean = false;
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  subtopicUrlFragment: string;
-  pageContents: SubtopicPageContents;
-  subtopicTitle: string;
-  subtopicTitleTranslationKey: string;
-  parentTopicId: string;
-  nextSubtopic: Subtopic = null;
-  prevSubtopic: Subtopic = null;
 
   constructor(
     private alertsService: AlertsService,
