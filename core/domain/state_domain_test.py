@@ -4307,12 +4307,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False, [], None, None),
             [
                 state_domain.RuleSpec(
-                    'Contains', []
+                    'Contains', {}
                     )
             ],
             [],
             None
         )
+        state_answer_group.rule_specs[0].inputs = []
 
         with self.assertRaisesRegex(
             Exception,

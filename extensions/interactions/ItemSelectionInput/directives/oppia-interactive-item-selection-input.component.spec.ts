@@ -29,6 +29,9 @@ import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjec
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { ItemSelectionAnswer } from 'interactions/answer-defs';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('oppiaInteractiveItemSelectionInput', function() {
   let component: InteractiveItemSelectionInputComponent;
@@ -39,7 +42,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         choices: {
           value: JSON.parse(attributes.choicesWithValue)
@@ -55,8 +60,11 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: ItemSelectionAnswer, rulesService: CurrentInteractionService) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -139,6 +147,19 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       expect(component.notEnoughSelections).toBeTrue();
     });
 
+    it('should throw error if content id is null', () => {
+      component.choicesValue = [
+        {
+          html: 'choice 1',
+          _contentId: null
+        },
+      ] as SubtitledHtml[];
+
+      expect(() => {
+        component.getContentId();
+      }).toThrowError('Content id is null');
+    });
+
     it('should deselect previously selected option and select the option' +
     ' checked by the user', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
@@ -160,7 +181,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -174,7 +195,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -232,7 +253,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -303,7 +324,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         'choice 3': false
       };
       expect(component.selectionCount).toBeUndefined();
-      expect(component.newQuestion).toBeUndefined();
+      expect(component.newQuestion).toBeFalse();
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeTrue();
 

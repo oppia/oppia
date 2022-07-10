@@ -40,6 +40,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 
 from typing import Dict, List
+from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -441,26 +442,31 @@ class TransientCheckpointUrl:
 
         if not isinstance(self.furthest_reached_checkpoint_state_name, str):
             raise utils.ValidationError(
-            'Expected furthest_reached_checkpoint_state_name to be a str,' +
-            'received %s' % self.furthest_reached_checkpoint_state_name)
+                'Expected furthest_reached_checkpoint_state_name to be a str,'
+                'received %s' % self.furthest_reached_checkpoint_state_name
+            )
 
         if not isinstance(self.furthest_reached_checkpoint_exp_version, int):
             raise utils.ValidationError(
-            'Expected furthest_reached_checkpoint_exp_version to be an int')
+                'Expected furthest_reached_checkpoint_exp_version to be an int'
+            )
 
         if not isinstance(
             self.most_recently_reached_checkpoint_state_name, str
         ):
             raise utils.ValidationError(
-            'Expected most_recently_reached_checkpoint_state_name to be a' +
-            ' str, received %s'
-            % self.most_recently_reached_checkpoint_state_name)
+                'Expected most_recently_reached_checkpoint_state_name to be a'
+                ' str, received %s'
+                % self.most_recently_reached_checkpoint_state_name
+            )
 
         if not isinstance(
             self.most_recently_reached_checkpoint_exp_version, int
         ):
             raise utils.ValidationError(
-            'Expected most_recently_reached_checkpoint_exp_version to be an int') # pylint: disable=line-too-long
+                'Expected most_recently_reached_checkpoint_exp_version'
+                ' to be an int'
+            )
 
 
 class ExplorationCommitLogEntry:
@@ -653,6 +659,13 @@ class VersionedExplorationInteractionIdsMapping:
         """
         self.version = version
         self.state_interaction_ids_dict = state_interaction_ids_dict
+
+
+class VersionedExplorationStatesDict(TypedDict):
+    """Dictionary representing the versioned State objects for Exploration."""
+
+    states_schema_version: int
+    states: Dict[str, state_domain.StateDict]
 
 
 class Exploration(translation_domain.BaseTranslatableObject):
@@ -3536,3 +3549,57 @@ class ExplorationMetadata:
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'edits_allowed': self.edits_allowed
         }
+
+
+class MetadataVersionHistory:
+    """Class to represent an element of the version history list of the
+    exploration metadata.
+
+    Attributes:
+        last_edited_version_number: int. The version number of the
+            exploration in which the metadata was last edited.
+        last_edited_committer_id: str. The user id of the user who committed
+            the latest changes to the exploration metadata.
+    """
+
+    def __init__(self, last_edited_version_number, last_edited_committer_id):
+        """Initializes the MetadataVersionHistory domain object.
+
+        Args:
+            last_edited_version_number: int. The version number of the
+                exploration in which the metadata was last edited.
+            last_edited_committer_id: str. The user id of the user who
+                committed the latest changes to the exploration metadata.
+        """
+        self.last_edited_version_number = last_edited_version_number
+        self.last_edited_committer_id = last_edited_committer_id
+
+    def to_dict(self):
+        """Returns a dict representation of the MetadataVersionHistory domain
+        object.
+
+        Returns:
+            dict. The dict representation of the MetadataVersionHistory domain
+            object.
+        """
+        return {
+            'last_edited_version_number': self.last_edited_version_number,
+            'last_edited_committer_id': self.last_edited_committer_id
+        }
+
+    @classmethod
+    def from_dict(cls, metadata_version_history_dict):
+        """Returns an MetadataVersionHistory domain object from a dict.
+
+        Args:
+            metadata_version_history_dict: dict. The dict representation of
+                MetadataVersionHistory object.
+
+        Returns:
+            MetadataVersionHistory. The corresponding MetadataVersionHistory
+            domain object.
+        """
+        return cls(
+            metadata_version_history_dict['last_edited_version_number'],
+            metadata_version_history_dict['last_edited_committer_id']
+        )

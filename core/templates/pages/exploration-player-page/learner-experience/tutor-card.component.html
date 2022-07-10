@@ -28,7 +28,7 @@
            [oppiaFocusOn]="getContentFocusLabel($index)">
         <div tabindex="1">
           <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
-                                    class="protractor-test-conversation-content">
+                                    class="e2e-test-conversation-content">
           </oppia-rte-output-display>
         </div>
         <div *ngIf="isContentAudioTranslationAvailable()"
@@ -92,7 +92,7 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
+          <angular-html-bind-wrapper classStr="e2e-test-conversation-input"
                                      [htmlData]="displayedCard.getInteractionHtml()">
           </angular-html-bind-wrapper>
         </div>
@@ -118,6 +118,16 @@
         </div>
       </div>
     </div>
+
+    <oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                       [userIsLoggedIn]="userIsLoggedIn"
+                                       [explorationIsInPreviewMode]="explorationIsInPreviewMode"
+                                       [questionPlayerConfig]="questionPlayerConfig"
+                                       [collectionSummary]="collectionSummary"
+                                       [isRefresherExploration]="isRefresherExploration"
+                                       [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                                       [parentExplorationIds]="parentExplorationIds">
+    </oppia-ratings-and-recommendations>
 
     <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
       <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
