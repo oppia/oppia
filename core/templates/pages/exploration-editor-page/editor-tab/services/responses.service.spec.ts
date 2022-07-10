@@ -282,7 +282,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
-        destIfReallyStuck: 'Stuck state',
+        destIfReallyStuck: null,
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
@@ -339,7 +339,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
-        destIfReallyStuck: 'Stuck state',
+        destIfReallyStuck: null,
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
