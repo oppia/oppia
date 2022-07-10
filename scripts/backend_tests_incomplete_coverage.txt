@@ -50,6 +50,7 @@ core.domain.html_validation_service_test
 core.domain.image_validation_services_test
 core.domain.interaction_registry_test
 core.domain.learner_goals_services_test
+core.domain.learner_group_domain_test
 core.domain.learner_playlist_services_test
 core.domain.learner_progress_services_test
 core.domain.opportunity_services_test
@@ -107,6 +108,7 @@ core.storage.email.gae_models_test
 core.storage.exploration.gae_models_test
 core.storage.feedback.gae_models_test
 core.storage.job.gae_models_test
+core.storage.learner_group.gae_models_test
 core.storage.question.gae_models_test
 core.storage.skill.gae_models_test
 core.storage.statistics.gae_models_test
