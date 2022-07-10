@@ -326,6 +326,7 @@ describe('Outcome Destination Editor', () => {
     () => {
       component.outcome = new Outcome(
         'Introduction',
+        null,
         new SubtitledHtml('<p> HTML string </p>', 'Id'),
         false,
         [],
