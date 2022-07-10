@@ -142,6 +142,7 @@ import { QuestionEditorComponent } from './question-directives/question-editor/q
 import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
 import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
 import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
+import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -310,7 +311,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     QuestionEditorComponent,
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
-    QuestionsListComponent
+    QuestionsListComponent,
+    SkillMasteryModalComponent
   ],
 
   entryComponents: [
@@ -422,7 +424,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     QuestionEditorComponent,
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
-    QuestionsListComponent
+    QuestionsListComponent,
+    SkillMasteryModalComponent
   ],
 
   exports: [
@@ -543,7 +546,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     QuestionEditorComponent,
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
-    QuestionsListComponent
+    QuestionsListComponent,
+    SkillMasteryModalComponent
   ],
 })
 
