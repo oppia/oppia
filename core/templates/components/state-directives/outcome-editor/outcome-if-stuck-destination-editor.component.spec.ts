@@ -16,274 +16,275 @@
  * @fileoverview Unit tests for outcome if stuck destination editor component.
  */
 
- import { HttpClientTestingModule } from '@angular/common/http/testing';
- import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
- import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
- import { FormsModule } from '@angular/forms';
- import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
- import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
- import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
- import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
- import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
- import { FocusManagerService } from 'services/stateful/focus-manager.service';
- import { UserService } from 'services/user.service';
- import { OutcomeIfStuckDestinationEditorComponent } from './outcome-if-stuck-destination-editor.component';
- 
- fdescribe('Outcome Destination If Stuck Editor', () => {
-   let component: OutcomeIfStuckDestinationEditorComponent;
-   let fixture: ComponentFixture<OutcomeIfStuckDestinationEditorComponent>;
- 
-   let stateEditorService: StateEditorService;
-   let editorFirstTimeEventsService: EditorFirstTimeEventsService;
-   let stateGraphLayoutService: StateGraphLayoutService;
-   let focusManagerService: FocusManagerService;
-   let PLACEHOLDER_OUTCOME_DEST_IF_STUCK = '/';
- 
-   beforeEach(waitForAsync(() => {
-     TestBed.configureTestingModule({
-       imports: [
-         HttpClientTestingModule,
-         FormsModule
-       ],
-       declarations: [
-        OutcomeIfStuckDestinationEditorComponent
-       ],
-       providers: [
-         EditorFirstTimeEventsService,
-         FocusManagerService,
-         StateEditorService,
-         StateGraphLayoutService,
-         UserService
-       ],
-       schemas: [NO_ERRORS_SCHEMA]
-     }).compileComponents();
-   }));
- 
-   beforeEach(() => {
-     fixture = TestBed.createComponent(OutcomeIfStuckDestinationEditorComponent);
-     component = fixture.componentInstance;
-     editorFirstTimeEventsService = TestBed.inject(EditorFirstTimeEventsService);
-     focusManagerService = TestBed.inject(FocusManagerService);
-     stateEditorService = TestBed.inject(StateEditorService);
-     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
-   });
- 
-   afterEach(() => {
-     component.ngOnDestroy();
-   });
- 
-   it('should set component properties on initialization', fakeAsync(() => {
-     let computedLayout = stateGraphLayoutService.computeLayout(
-       {
-         Introduction: 'Introduction',
-         State1: 'State1',
-         End: 'End'
-       }, [
-         {
-           source: 'Introduction',
-           target: 'State1'
-         },
-         {
-           source: 'State1',
-           target: 'End'
-         }
-       ], 'Introduction', ['End']);
-     spyOn(stateEditorService, 'getStateNames')
-       .and.returnValue(['Introduction', 'State1', 'NewState', 'End']);
-     spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
-       .and.returnValue(computedLayout);
- 
-     component.ngOnInit();
-     tick(10);
- 
-     expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
-     expect(component.destinationChoices).toEqual([{
-       id: null,
-       text: '(try again)'
-     }, {
-       id: 'Introduction',
-       text: 'Introduction'
-     }, {
-       id: 'State1',
-       text: 'State1'
-     }, {
-       id: 'End',
-       text: 'End'
-     }, {
-       id: 'NewState',
-       text: 'NewState'
-     }, {
-       id: '/',
-       text: 'A New Card Called...'
-     }]);
-   }));
- 
-   it('should add new state if outcome destination if stuck is a placeholder' +
-     ' when outcome destination if stuck details are saved', fakeAsync(() => {
-     component.outcome = new Outcome(
-       null,
-       PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
-       new SubtitledHtml('<p> HTML string </p>', 'Id'),
-       false,
-       [],
-       null,
-       null,
-     );
-     component.outcomeNewStateName = 'End';
-     let onSaveOutcomeDestIfStuckDetailsEmitter = new EventEmitter();
-     spyOnProperty(stateEditorService, 'onSaveOutcomeDestIfStuckDetails')
-       .and.returnValue(onSaveOutcomeDestIfStuckDetailsEmitter);
-     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
-     spyOn(editorFirstTimeEventsService, 'registerFirstCreateSecondStateEvent');
- 
-     component.ngOnInit();
-     tick(10);
- 
-     onSaveOutcomeDestIfStuckDetailsEmitter.emit();
- 
-     expect(component.outcome.destIfReallyStuck).toBe('End');
-     expect(editorFirstTimeEventsService.registerFirstCreateSecondStateEvent)
-       .toHaveBeenCalled();
-   }));
- 
-   it('should update option names when state name is changed', fakeAsync(() => {
-     let onStateNamesChangedEmitter = new EventEmitter();
-     let computedLayout = stateGraphLayoutService.computeLayout(
-       {
-         Introduction: 'Introduction',
-         State1: 'State1',
-         End: 'End'
-       }, [
-         {
-           source: 'Introduction',
-           target: 'State1'
-         },
-         {
-           source: 'State1',
-           target: 'End'
-         }
-       ], 'Introduction', ['End']);
-     spyOnProperty(stateEditorService, 'onStateNamesChanged')
-       .and.returnValue(onStateNamesChangedEmitter);
-     spyOn(stateEditorService, 'getStateNames')
-       .and.returnValues(
-         ['Introduction', 'State1', 'End'],
-         ['Introduction', 'State2', 'End']);
-     spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
-       .and.returnValue(computedLayout);
- 
-     component.ngOnInit();
-     tick(10);
- 
-     expect(component.destinationChoices).toEqual([{
-       id: null,
-       text: '(try again)'
-     }, {
-       id: 'Introduction',
-       text: 'Introduction'
-     }, {
-       id: 'State1',
-       text: 'State1'
-     }, {
-       id: 'End',
-       text: 'End'
-     }, {
-       id: '/',
-       text: 'A New Card Called...'
-     }]);
- 
-     onStateNamesChangedEmitter.emit();
-     tick(10);
- 
-     expect(component.destinationChoices).toEqual([{
-       id: null,
-       text: '(try again)'
-     }, {
-       id: 'Introduction',
-       text: 'Introduction'
-     }, {
-       id: 'End',
-       text: 'End'
-     }, {
-       id: 'State2',
-       text: 'State2'
-     }, {
-       id: '/',
-       text: 'A New Card Called...'
-     }]);
-   }));
- 
-   it('should set focus to new state name input field on destination' +
-     ' selector change', () => {
-     component.outcome = new Outcome(
-       null,
-       PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
-       new SubtitledHtml('<p> HTML string </p>', 'Id'),
-       false,
-       [],
-       null,
-       null,
-     );
-     spyOn(focusManagerService, 'setFocus');
- 
-     component.onDestIfStuckSelectorChange();
- 
-     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-       'newStateNameInputField'
-     );
-   });
- 
-   it('should check if new state is being created', () => {
-     component.outcome = new Outcome(
-       null,
-       PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
-       new SubtitledHtml('<p> HTML string </p>', 'Id'),
-       false,
-       [],
-       null,
-       null,
-     );
- 
-     expect(component.isCreatingNewState()).toBeTrue();
- 
-     component.outcome = new Outcome(
-       null,
-       'Introduction',
-       new SubtitledHtml('<p> HTML string </p>', 'Id'),
-       false,
-       [],
-       null,
-       null,
-     );
- 
-     expect(component.isCreatingNewState()).toBeFalse();
-   });
- 
-   it('should emit changes on destination selector change', () => {
-     component.outcome = new Outcome(
-       'Introduction',
-       null,
-       new SubtitledHtml('<p> HTML string </p>', 'Id'),
-       false,
-       [],
-       null,
-       null,
-     );
-     spyOn(component.getChanges, 'emit');
- 
-     component.onDestIfStuckSelectorChange();
- 
-     expect(component.getChanges.emit).toHaveBeenCalled();
-   });
- 
-   it('should update outcomeNewStateName', () => {
-     component.outcomeNewStateName = 'Introduction';
- 
-     expect(component.outcomeNewStateName).toBe('Introduction');
- 
-     component.updateChanges('New State');
- 
-     expect(component.outcomeNewStateName).toBe('New State');
-   });
- });
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { UserService } from 'services/user.service';
+import { OutcomeIfStuckDestinationEditorComponent } from './outcome-if-stuck-destination-editor.component';
+
+describe('Outcome Destination If Stuck Editor', () => {
+  let component: OutcomeIfStuckDestinationEditorComponent;
+  let fixture: ComponentFixture<OutcomeIfStuckDestinationEditorComponent>;
+
+  let stateEditorService: StateEditorService;
+  let editorFirstTimeEventsService: EditorFirstTimeEventsService;
+  let stateGraphLayoutService: StateGraphLayoutService;
+  let focusManagerService: FocusManagerService;
+  let PLACEHOLDER_OUTCOME_DEST_IF_STUCK = '/';
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule
+      ],
+      declarations: [
+      OutcomeIfStuckDestinationEditorComponent
+      ],
+      providers: [
+        EditorFirstTimeEventsService,
+        FocusManagerService,
+        StateEditorService,
+        StateGraphLayoutService,
+        UserService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(OutcomeIfStuckDestinationEditorComponent);
+    component = fixture.componentInstance;
+    editorFirstTimeEventsService = TestBed.inject(EditorFirstTimeEventsService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should set component properties on initialization', fakeAsync(() => {
+    let computedLayout = stateGraphLayoutService.computeLayout(
+      {
+        Introduction: 'Introduction',
+        State1: 'State1',
+        End: 'End'
+      }, [
+        {
+          source: 'Introduction',
+          target: 'State1'
+        },
+        {
+          source: 'State1',
+          target: 'End'
+        }
+      ], 'Introduction', ['End']);
+    spyOn(stateEditorService, 'getStateNames')
+      .and.returnValue(['Introduction', 'State1', 'NewState', 'End']);
+    spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
+      .and.returnValue(computedLayout);
+
+    component.ngOnInit();
+    tick(10);
+
+    expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
+    expect(component.destinationChoices).toEqual([{
+      id: null,
+      text: '(try again)'
+    }, {
+      id: 'Introduction',
+      text: 'Introduction'
+    }, {
+      id: 'State1',
+      text: 'State1'
+    }, {
+      id: 'End',
+      text: 'End'
+    }, {
+      id: 'NewState',
+      text: 'NewState'
+    }, {
+      id: '/',
+      text: 'A New Card Called...'
+    }]);
+  }));
+
+  it('should add new state if outcome destination if stuck is a placeholder' +
+    ' when outcome destination if stuck details are saved', fakeAsync(() => {
+    component.outcome = new Outcome(
+      null,
+      PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
+    component.outcomeNewStateName = 'End';
+    let onSaveOutcomeDestIfStuckDetailsEmitter = new EventEmitter();
+    spyOnProperty(stateEditorService, 'onSaveOutcomeDestIfStuckDetails')
+      .and.returnValue(onSaveOutcomeDestIfStuckDetailsEmitter);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
+    spyOn(editorFirstTimeEventsService, 'registerFirstCreateSecondStateEvent');
+
+    component.ngOnInit();
+    tick(10);
+
+    onSaveOutcomeDestIfStuckDetailsEmitter.emit();
+
+    expect(component.outcome.destIfReallyStuck).toBe('End');
+    expect(editorFirstTimeEventsService.registerFirstCreateSecondStateEvent)
+      .toHaveBeenCalled();
+  }));
+
+  it('should update option names when state name is changed', fakeAsync(() => {
+    let onStateNamesChangedEmitter = new EventEmitter();
+    let computedLayout = stateGraphLayoutService.computeLayout(
+      {
+        Introduction: 'Introduction',
+        State1: 'State1',
+        End: 'End'
+      }, [
+        {
+          source: 'Introduction',
+          target: 'State1'
+        },
+        {
+          source: 'State1',
+          target: 'End'
+        }
+      ], 'Introduction', ['End']);
+    spyOnProperty(stateEditorService, 'onStateNamesChanged')
+      .and.returnValue(onStateNamesChangedEmitter);
+    spyOn(stateEditorService, 'getStateNames')
+      .and.returnValues(
+        ['Introduction', 'State1', 'End'],
+        ['Introduction', 'State2', 'End']);
+    spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
+      .and.returnValue(computedLayout);
+
+    component.ngOnInit();
+    tick(10);
+
+    expect(component.destinationChoices).toEqual([{
+      id: null,
+      text: '(try again)'
+    }, {
+      id: 'Introduction',
+      text: 'Introduction'
+    }, {
+      id: 'State1',
+      text: 'State1'
+    }, {
+      id: 'End',
+      text: 'End'
+    }, {
+      id: '/',
+      text: 'A New Card Called...'
+    }]);
+
+    onStateNamesChangedEmitter.emit();
+    tick(10);
+
+    expect(component.destinationChoices).toEqual([{
+      id: null,
+      text: '(try again)'
+    }, {
+      id: 'Introduction',
+      text: 'Introduction'
+    }, {
+      id: 'End',
+      text: 'End'
+    }, {
+      id: 'State2',
+      text: 'State2'
+    }, {
+      id: '/',
+      text: 'A New Card Called...'
+    }]);
+  }));
+
+  it('should set focus to new state name input field on destination' +
+    ' selector change', () => {
+    component.outcome = new Outcome(
+      null,
+      PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
+    spyOn(focusManagerService, 'setFocus');
+
+    component.onDestIfStuckSelectorChange();
+
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'newStateNameInputField'
+    );
+  });
+
+  it('should check if new state is being created', () => {
+    component.outcome = new Outcome(
+      null,
+      PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
+
+    expect(component.isCreatingNewState()).toBeTrue();
+
+    component.outcome = new Outcome(
+      null,
+      'Introduction',
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
+
+    expect(component.isCreatingNewState()).toBeFalse();
+  });
+
+  it('should emit changes on destination selector change', () => {
+    component.outcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
+    spyOn(component.getChanges, 'emit');
+
+    component.onDestIfStuckSelectorChange();
+
+    expect(component.getChanges.emit).toHaveBeenCalled();
+  });
+
+  it('should update outcomeNewStateName', () => {
+    component.outcomeNewStateName = 'Introduction';
+
+    expect(component.outcomeNewStateName).toBe('Introduction');
+
+    component.updateChanges('New State');
+
+    expect(component.outcomeNewStateName).toBe('New State');
+  });
+});
+
  
