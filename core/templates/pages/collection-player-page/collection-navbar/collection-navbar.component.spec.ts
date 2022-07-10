@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
 import { CollectionNavbarComponent } from './collection-navbar.component';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -54,7 +54,7 @@ describe('Collection navbar component', () => {
     rocbas = TestBed.inject(ReadOnlyCollectionBackendApiService);
   });
 
-  beforeEach(() => {
+  it('should load the component properly on playing a collection', () => {
     const expectedCollectionDetail = {
       canEdit: true,
       title: 'Test title'
@@ -62,9 +62,7 @@ describe('Collection navbar component', () => {
     spyOn(us, 'getCollectionIdFromUrl').and.returnValue('abcdef');
     spyOn(rocbas, 'getCollectionDetails').and.returnValue(
       expectedCollectionDetail);
-  });
 
-  it('should load the component properly on playing a collection', () => {
     component.ngOnInit();
     rocbas.onCollectionLoad.emit();
     expect(us.getCollectionIdFromUrl).toHaveBeenCalled();
@@ -72,4 +70,20 @@ describe('Collection navbar component', () => {
     expect(component.collectionTitle).toBe('Test title');
     component.ngOnDestroy();
   });
+
+  it('should throw error if collection title is null', fakeAsync(() => {
+    const expectedCollectionDetail = {
+      canEdit: true,
+      title: null
+    };
+    spyOn(us, 'getCollectionIdFromUrl').and.returnValue('abcdef');
+    spyOn(rocbas, 'getCollectionDetails').and.returnValue(
+      expectedCollectionDetail);
+
+    component.ngOnInit();
+    expect(() => {
+      rocbas.onCollectionLoad.emit();
+      tick();
+    }).toThrowError('Collection title is null');
+  }));
 });
