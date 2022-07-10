@@ -116,6 +116,9 @@ describe('Router Service', () => {
     });
 
     expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToPreviewTab();
+    tick(300);
+
     routerService.navigateToMainTab('first card');
 
     tick(300);

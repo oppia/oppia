@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { icon, LatLng, LeafletEvent, LeafletMouseEvent, tileLayer} from 'leaflet';
+import { icon, LatLng, LeafletMouseEvent, tileLayer} from 'leaflet';
 import { CoordTwoDimEditorComponent } from './coord-two-dim-editor.component';
 import * as alias from 'leaflet';
 
@@ -35,14 +35,11 @@ describe('CoordTwoDimEditorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CoordTwoDimEditorComponent);
     component = fixture.componentInstance;
-
-    component.value = [0, 0];
   });
 
   it('should initialize value [0, 0]', () => {
     expect(component).toBeDefined();
 
-    component.value = undefined;
     component.ngOnInit();
 
     expect(component.value).toEqual([0, 0]);
@@ -93,10 +90,10 @@ describe('CoordTwoDimEditorComponent', () => {
           lng: 50
         }
       }
-    } as unknown as LeafletEvent;
+    } as alias.DragEndEvent;
     spyOn(component, 'leafletMove').and.callThrough();
     spyOn(alias, 'marker').and.returnValue({
-      on: (txt, func) => {
+      on: (txt, func: alias.DragEndEventHandlerFn) => {
         func(e);
       }
     } as alias.Marker);
@@ -108,6 +105,8 @@ describe('CoordTwoDimEditorComponent', () => {
   });
 
   it('should add location when user clicks', () => {
+    component.ngOnInit();
+
     spyOn(component.valueChanged, 'emit');
     let e = {
       latlng: {

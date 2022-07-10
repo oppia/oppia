@@ -82,7 +82,9 @@ class MockWindowRef {
       pathname: '/path/name',
       reload: () => {}
     },
-    onresize: null,
+    onresize() {
+      return;
+    },
     addEventListener(event: string, callback) {
       callback({returnValue: null});
     },
@@ -1085,13 +1087,6 @@ describe('Conversation skin component', () => {
 
     expect(componentInstance.getContentFocusLabel(index)).toEqual(
       ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index);
-  });
-
-  it('should tell if language is RTL', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL')
-      .and.returnValue(true);
-
-    expect(componentInstance.isLanguageRTL()).toBeTrue();
   });
 
   it('should reload exploration', () => {
