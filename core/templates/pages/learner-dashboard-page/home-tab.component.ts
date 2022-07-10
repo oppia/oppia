@@ -25,24 +25,30 @@ import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './home-tab.component.css';
+
+
  @Component({
    selector: 'oppia-home-tab',
    templateUrl: './home-tab.component.html'
  })
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
-  @Input() currentGoals: LearnerTopicSummary[];
-  @Input() goalTopics: LearnerTopicSummary[];
-  @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
-  @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
-  @Input() username: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() currentGoals!: LearnerTopicSummary[];
+  @Input() goalTopics!: LearnerTopicSummary[];
+  @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
+  @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
+  @Input() username!: string;
   currentGoalsLength!: number;
-  CLASSROOM_LINK_URL_TEMPLATE = '/learn/<classroom_url_fragment>';
-  classroomUrlFragment: string;
+  classroomUrlFragment!: string;
   goalTopicsLength!: number;
+  width!: number;
+  CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
-  width: number;
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
@@ -74,10 +80,6 @@ export class HomeTabComponent {
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getTimeOfDay(): string {
@@ -112,6 +114,7 @@ export class HomeTabComponent {
     } else if (this.currentGoalsLength === constants.MAX_CURRENT_GOALS_COUNT) {
       return true;
     }
+    return false;
   }
 
   getWidth(length: number): number {
