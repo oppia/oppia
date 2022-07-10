@@ -285,6 +285,7 @@ describe('History tab component', function() {
         result: Promise.resolve()
       } as NgbModalRef;
     });
+
     ctrl.showExplorationMetadataDiffModal();
     $scope.$apply();
 

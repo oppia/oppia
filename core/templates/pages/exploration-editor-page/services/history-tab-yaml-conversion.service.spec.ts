@@ -46,6 +46,7 @@ describe('History tab yaml conversion service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
+
       historyTabYamlConversionService
         .getYamlStringFromStateOrMetadata(testState)
         .then(successHandler, failHandler);
@@ -59,6 +60,7 @@ describe('History tab yaml conversion service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
+
       historyTabYamlConversionService
         .getYamlStringFromStateOrMetadata(null)
         .then(successHandler, failHandler);

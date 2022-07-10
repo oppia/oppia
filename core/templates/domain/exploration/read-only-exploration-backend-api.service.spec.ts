@@ -160,10 +160,11 @@ describe('Read only exploration backend API service', () => {
     ).toHaveBeenCalledWith('0', 1, sampleDataResults);
   }));
 
-  it('should used cached exploration data with version if the data is ' +
+  it('should use cached exploration data with version if the data is ' +
   'already cached', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
+
     versionedExplorationCachingService.cacheVersionedExplorationData(
       '0', 1, sampleDataResults);
     roebas.fetchExplorationAsync('0', 1).then(successHandler, failHandler);
