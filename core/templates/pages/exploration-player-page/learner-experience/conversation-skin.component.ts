@@ -77,6 +77,9 @@ import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory'
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
+import './conversation-skin.component.css';
+
+
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
 const TIME_FADEOUT_MSEC = 100;
@@ -543,10 +546,6 @@ export class ConversationSkinComponent {
         callback();
       }
     }, 100);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getExplorationLink(): string {

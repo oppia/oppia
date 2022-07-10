@@ -27,6 +27,7 @@ import { ContextService } from 'services/context.service';
 import { EndExplorationBackendApiService } from './end-exploration-backend-api.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('Interactive ratio expression input', () => {
   let component: InteractiveEndExplorationComponent;
@@ -43,7 +44,9 @@ describe('Interactive ratio expression input', () => {
   const pageContextEditor = 'editor';
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         recommendedExplorationIds: {
           value: JSON.parse(attributes.recommendedExplorationIdsWithValue)
