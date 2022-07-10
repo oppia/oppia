@@ -62,7 +62,6 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         if os.path.exists(backend_test_file_path):
             os.remove(backend_test_file_path)
 
-
     def test_checks_fail_when_a_backend_file_lacks_associated_test_file(
         self) -> None:
         with self.print_swap, self.swap_logging, self.swap_exit:
