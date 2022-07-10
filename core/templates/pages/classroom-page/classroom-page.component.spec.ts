@@ -115,10 +115,6 @@ describe('Classroom Page Component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should provide static image url', () => {
     let imageUrl = 'image_url';
     spyOn(urlInterpolationService, 'getStaticImageUrl')

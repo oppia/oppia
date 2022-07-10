@@ -23,6 +23,10 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
+<<<<<<< HEAD
+<<<<<<<< HEAD:core/tests/webdriverio_utils/PreferencesPage.js
+=======
+>>>>>>> 6493f6b7c8ed159108af963874ac45381cdfdd82
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
   var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');
@@ -44,6 +48,43 @@ var PreferencesPage = function() {
   };
   var userBioElement = $('.e2e-test-user-bio');
   var userInterestsInput = $('.e2e-test-subject-interests-input');
+<<<<<<< HEAD
+========
+  var emailUpdatesCheckbox = element(
+    by.css('.e2e-test-email-updates-checkbox'));
+  var editorRoleEmailsCheckbox = element(
+    by.css('.e2e-test-editor-role-email-checkbox'));
+  var feedbackMessageEmailsCheckbox = element(
+    by.css('.e2e-test-feedback-message-email-checkbox'));
+  var navBar = element(by.css('.e2e-test-navbar-dropdown-toggle'));
+  var pageHeader = element(by.css('.e2e-test-preferences-title'));
+  var audioLanguageSelector = (
+    element(by.css('.e2e-test-audio-language-selector')));
+  var subscriptions = element.all(by.css('.e2e-test-subscription-name'));
+  var userBioElement = element(by.css('.e2e-test-user-bio'));
+  var userInterestsInput = element(
+    by.css('.e2e-test-subject-interests-input'));
+  var createrDashboardRadio = element(
+    by.css('.e2e-test-creator-dashboard-radio'));
+  var learnerDashboardRadio = element(
+    by.css('.e2e-test-learner-dashboard-radio'));
+  var profilePhotoClickable = element(
+    by.css('.e2e-test-photo-clickable'));
+  var customProfilePhoto = element(
+    by.css('.e2e-test-custom-photo'));
+  var profilePhotoCropper = element(
+    by.css('.e2e-test-photo-crop .cropper-container'));
+  var profilePhotoUploadError = element(
+    by.css('.e2e-test-upload-error'));
+  var deleteAccountButton = element(
+    by.css('.e2e-test-delete-account-button'));
+  var exportAccountButton = element(
+    by.css('.e2e-test-export-account-button'));
+  var languageSelector = element(
+    by.css('.e2e-test-site-language-selector'));
+>>>>>>>> 6493f6b7c8ed159108af963874ac45381cdfdd82:core/tests/protractor_utils/PreferencesPage.js
+=======
+>>>>>>> 6493f6b7c8ed159108af963874ac45381cdfdd82
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);
@@ -77,7 +118,11 @@ var PreferencesPage = function() {
   };
 
   this.editUserBio = async function(bio) {
+<<<<<<< HEAD
     await action.addValue('User bio field', userBioElement, bio);
+=======
+    await action.setValue('User bio field', userBioElement, bio);
+>>>>>>> 6493f6b7c8ed159108af963874ac45381cdfdd82
     await saveNewChanges('User Bio');
   };
 
