@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, tick, flush, discardPeriodicTasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, discardPeriodicTasks, tick, flush } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -62,20 +62,22 @@ import { HelpModalComponent } from './modal-templates/help-modal.component';
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
-  'state-tutorial-first-time.service.ts');
+   'state-tutorial-first-time.service.ts');
 
-class MockNgbModalRef {
-  componentInstance = {};
-}
+ class MockNgbModalRef {
+   componentInstance = {};
+ }
 
 describe('Exploration editor page component', function() {
   importAllAngularServices();
 
   var ctrl = null;
   let $location = null;
+
   var $q = null;
   var $rootScope = null;
   var $scope = null;
+  let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
   let as: AlertsService = null;
   var cs = null;
@@ -254,6 +256,7 @@ describe('Exploration editor page component', function() {
       }
     });
 
+    aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
@@ -344,7 +347,7 @@ describe('Exploration editor page component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should start editor tutorial when on main page', fakeAsync(() => {
+    it('should update view on location change', fakeAsync(() => {
       $location.path('');
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
@@ -360,6 +363,16 @@ describe('Exploration editor page component', function() {
       flush();
       discardPeriodicTasks();
     }));
+
+    it('should start editor tutorial when on main page', () => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
+      spyOn(sers.onRefreshStateEditor, 'emit');
+      rs.navigateToMainTab();
+      $scope.$apply();
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
+      expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
+    });
 
     it('should start editor tutorial when not on main page', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
@@ -430,7 +443,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should set active state name when active state name does not exist' +
-      ' on exploration', () => {
+       ' on exploration', () => {
       spyOn(ses, 'getActiveStateName').and.returnValue(
         'State2');
       spyOn(ses, 'setActiveStateName').and.callThrough();
@@ -438,6 +451,22 @@ describe('Exploration editor page component', function() {
 
       expect(ses.setActiveStateName).toHaveBeenCalledWith(
         'Introduction');
+    });
+
+    it('should load change list by draft changes successfully', () => {
+      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
+      $scope.$apply();
+
+      expect(loadSpy).toHaveBeenCalledWith(
+        explorationData.draft_changes);
+    });
+
+    it('should show mismatch version modal when draft change exists', () => {
+      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
+      $scope.$apply();
+
+      expect(aims.showVersionMismatchModal)
+        .toHaveBeenCalled();
     });
 
     it('should navigate to main tab', () => {
@@ -500,10 +529,10 @@ describe('Exploration editor page component', function() {
 
     it('should show the user help modal for editor tutorial', () => {
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve('editor')
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: $q.resolve('editor')
+         } as NgbModalRef
       );
 
       ctrl.showUserHelpModal();
@@ -514,24 +543,10 @@ describe('Exploration editor page component', function() {
 
     it('should show the user help modal for editor tutorial', () => {
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve('translation')
-        } as NgbModalRef
-      );
-
-      ctrl.showUserHelpModal();
-      $rootScope.$apply();
-
-      expect(ngbModal.open).toHaveBeenCalled();
-    });
-
-    it('should show the user help modal for editor tutorial', () => {
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.reject()
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: $q.resolve('translation')
+         } as NgbModalRef
       );
 
       ctrl.showUserHelpModal();
@@ -696,9 +711,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should react when refreshing graph', () => {
-      var successCallback = jasmine.createSpy('success');
       refreshGraphEmitter.emit();
-      mockInitExplorationPageEmitter.emit(successCallback);
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
@@ -709,33 +722,26 @@ describe('Exploration editor page component', function() {
       spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
-      spyOn(es, 'lockExploration').and.callThrough();
       mockInitExplorationPageEmitter.emit(successCallback);
-
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
       flushMicrotasks();
       $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
-      flushMicrotasks();
-      $scope.$apply();
-      tick();
 
-      expect(es.lockExploration).toHaveBeenCalled();
-
-      flush();
-      discardPeriodicTasks();
+      expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
+      expect(successCallback).toHaveBeenCalled();
     }));
 
     it('should start editor tutorial when closing welcome exploration' +
-      ' modal', () => {
+       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve(explorationId)
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: $q.resolve(explorationId)
+         } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
@@ -747,13 +753,13 @@ describe('Exploration editor page component', function() {
     });
 
     it('should dismiss tutorial when dismissing welcome exploration' +
-      ' modal', () => {
+       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.reject(explorationId)
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: $q.reject(explorationId)
+         } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
@@ -853,3 +859,4 @@ describe('Exploration editor page component', function() {
     });
   });
 });
+
