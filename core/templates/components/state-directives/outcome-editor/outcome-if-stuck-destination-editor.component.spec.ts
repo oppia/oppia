@@ -216,7 +216,7 @@ describe('Outcome Destination If Stuck Editor', () => {
   it('should set focus to new state name input field on destination' +
     ' selector change', () => {
     component.outcome = new Outcome(
-      null,
+      'Dest',
       PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
@@ -235,7 +235,7 @@ describe('Outcome Destination If Stuck Editor', () => {
 
   it('should check if new state is being created', () => {
     component.outcome = new Outcome(
-      null,
+      'Dest',
       PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
@@ -247,7 +247,7 @@ describe('Outcome Destination If Stuck Editor', () => {
     expect(component.isCreatingNewState()).toBeTrue();
 
     component.outcome = new Outcome(
-      null,
+      'Dest',
       'Introduction',
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,

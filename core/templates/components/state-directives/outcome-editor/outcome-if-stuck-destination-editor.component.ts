@@ -28,7 +28,7 @@ import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 interface DestinationChoice {
-  id: string;
+  id: string | null;
   text: string;
 }
 
@@ -37,16 +37,20 @@ interface DestinationChoice {
   templateUrl: './outcome-if-stuck-destination-editor.component.html'
 })
 export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
-  @Input() outcome: Outcome;
-  @Input() outcomeHasFeedback: boolean;
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
   @Output() getChanges: EventEmitter<void> = new EventEmitter();
-  directiveSubscriptions: Subscription = new Subscription();
-  newStateNamePattern: RegExp;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() outcome!: Outcome;
+  @Input() outcomeHasFeedback!: boolean;
+  explorationAndSkillIdPattern!: RegExp;
+  newStateNamePattern!: RegExp;
   destinationChoices: DestinationChoice[] = [];
-  maxLen: number;
-  outcomeNewStateName: string;
-  currentStateName: string = null;
+  maxLen!: number;
+  outcomeNewStateName!: string;
+  currentStateName!: string;
+  directiveSubscriptions: Subscription = new Subscription();
 
   MAX_STATE_NAME_LENGTH: number = (
     AppConstants.MAX_STATE_NAME_LENGTH);
@@ -120,7 +124,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
         }
 
         // Higher scores come later.
-        let allStateScores = {};
+        let allStateScores: {[stateName: string]: number} = {};
         let unarrangedStateCount = 0;
         for (let i = 0; i < allStateNames.length; i++) {
           stateName = allStateNames[i];
