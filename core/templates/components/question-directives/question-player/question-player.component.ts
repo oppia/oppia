@@ -457,7 +457,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   openConceptCardModal(skillIds: string[]): void {
     let skills = [];
-    skillIds.forEach(function(skillId) {
+    skillIds.forEach((skillId) => {
       skills.push(
         this.scorePerSkillMapping[skillId].description);
     });

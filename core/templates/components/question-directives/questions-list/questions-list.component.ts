@@ -46,12 +46,7 @@ import { State } from 'domain/state/StateObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { QuestionSummary } from 'domain/question/question-summary-object.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
-
-export interface SkillLinkageModificationsArray {
-  id: string;
-  task: string;
-  difficulty: number;
-}
+import { SkillLinkageModificationsArray } from 'domain/question/editable-question-backend-api.service';
 
 interface GroupedSkillSummaries {
   current: unknown[];
@@ -286,7 +281,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     // For the case when, it is in the skill editor.
     if (this.allSkillSummaries.length === 0) {
       this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-        questionId, [{id: this.selectedSkillId, task: 'remove'}]
+        questionId, [
+          {
+            id: this.selectedSkillId,
+            task: 'remove'
+          } as SkillLinkageModificationsArray
+        ]
       ).then(() => {
         this.questionsListService.resetPageNumber();
         this.questionsListService.getQuestionSummariesAsync(
@@ -298,7 +298,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       this.allSkillSummaries.forEach((summary) => {
         if (summary.getDescription() === skillDescription) {
           this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-            questionId, [{id: summary.getId(), task: 'remove'}]
+            questionId, [
+              {
+                id: summary.getId(),
+                task: 'remove'
+              } as SkillLinkageModificationsArray
+            ]
           ).then(() => {
             this.questionsListService.resetPageNumber();
             this.questionsListService.getQuestionSummariesAsync(
