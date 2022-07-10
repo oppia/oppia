@@ -306,7 +306,7 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -358,7 +358,7 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -412,7 +412,7 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -461,7 +461,7 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = False
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -512,7 +512,7 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]

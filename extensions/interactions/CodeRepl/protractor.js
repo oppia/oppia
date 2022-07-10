@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Pencil Code
- * Editor.
+ * Editor in protractor.
  */
 
 var waitFor = require(
@@ -34,7 +34,7 @@ var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
   // For testing purposes it is required that the order of
   // the quotes is single-quotes within double-quotes.
   var testValue = await browser.executeScript(
-    'var elem = $(\'.protractor-test-preview-tab .CodeMirror\')[0]' +
+    'var elem = $(\'.e2e-test-preview-tab .CodeMirror\')[0]' +
     '.CodeMirror;return elem.getValue()');
   expect(testValue).toEqual(placeHolderText + '\n');
 };
@@ -42,12 +42,12 @@ var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
 var submitAnswer = async function(conversationInput, answerCode) {
   if (answerCode) {
     await browser.executeScript(
-      "var elem = $('.protractor-test-preview-tab .CodeMirror')[0]" +
+      "var elem = $('.e2e-test-preview-tab .CodeMirror')[0]" +
       ".CodeMirror;elem.setValue('" + answerCode + "');");
   }
   await browser.executeScript('window.scrollTo(0,500);');
   var submitAnswerButton = element(by.css(
-    '.protractor-test-submit-answer-button'));
+    '.e2e-test-submit-answer-button'));
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');
   await submitAnswerButton.click();

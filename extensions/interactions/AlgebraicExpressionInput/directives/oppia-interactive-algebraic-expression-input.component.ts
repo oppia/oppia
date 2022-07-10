@@ -40,13 +40,16 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AlgebraicExpressionInputInteractionComponent
     implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() savedSolution!: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue!: string;
+  @Input() allowedVariablesWithValue: string = '';
   value: string = '';
   hasBeenTouched = false;
   viewIsDestroyed: boolean = false;
   warningText: string = '';
-  @Input() allowedVariablesWithValue: string = '';
-  @Input() savedSolution: InteractionAnswer;
-  @Input() useFractionForDivisionWithValue: string;
 
   constructor(
     private algebraicExpressionInputRulesService:

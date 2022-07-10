@@ -18,10 +18,18 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import feconf
 from core.domain import caching_services
 from core.domain import platform_parameter_domain
 from core.platform import models
+
+from typing import Dict, List, Optional, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import config_models
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
@@ -30,7 +38,10 @@ from core.platform import models
 class Registry:
     """Registry of all platform parameters."""
 
-    DEFAULT_VALUE_BY_TYPE_DICT = {
+    DEFAULT_VALUE_BY_TYPE_DICT: Dict[
+        platform_parameter_domain.DataTypes,
+        Union[bool, str, int]
+    ] = {
         platform_parameter_domain.DataTypes.BOOL: False,
         platform_parameter_domain.DataTypes.NUMBER: 0,
         platform_parameter_domain.DataTypes.STRING: '',
@@ -39,12 +50,19 @@ class Registry:
     # The keys of parameter_registry are the property names, and the values
     # are PlatformParameter instances with initial settings defined in this
     # file.
-    parameter_registry = {}
+    parameter_registry: Dict[
+        str, platform_parameter_domain.PlatformParameter
+    ] = {}
 
     @classmethod
     def create_platform_parameter(
-            cls, name, description, data_type, is_feature=False,
-            feature_stage=None):
+        cls,
+        name: enum.Enum,
+        description: str,
+        data_type: platform_parameter_domain.DataTypes,
+        is_feature: bool = False,
+        feature_stage: Optional[platform_parameter_domain.FeatureStages] = None
+    ) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter.
 
         Args:
@@ -73,8 +91,8 @@ class Registry:
                 'Unsupported data type \'%s\', must be one of'' %s.' % (
                     data_type.value, allowed_data_types))
 
-        param_dict = {
-            'name': name.value if name else None,
+        param_dict: platform_parameter_domain.PlatformParameterDict = {
+            'name': name.value,
             'description': description,
             'data_type': data_type.value,
             'rules': [],
@@ -88,7 +106,11 @@ class Registry:
 
     @classmethod
     def create_feature_flag(
-            cls, name, description, stage):
+        cls,
+        name: enum.Enum,
+        description: str,
+        stage: platform_parameter_domain.FeatureStages
+    ) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter that is also a
         feature flag.
 
@@ -105,7 +127,11 @@ class Registry:
             is_feature=True, feature_stage=stage)
 
     @classmethod
-    def init_platform_parameter(cls, name, instance):
+    def init_platform_parameter(
+        cls,
+        name: str,
+        instance: platform_parameter_domain.PlatformParameter
+    ) -> None:
         """Initializes parameter_registry with keys as the parameter names and
         values as instances of the specified parameter.
 
@@ -121,7 +147,9 @@ class Registry:
         cls.parameter_registry[name] = instance
 
     @classmethod
-    def get_platform_parameter(cls, name):
+    def get_platform_parameter(
+        cls, name: str
+    ) -> platform_parameter_domain.PlatformParameter:
         """Returns the instance of the specified name of the platform
         parameter.
 
@@ -157,8 +185,12 @@ class Registry:
 
     @classmethod
     def update_platform_parameter(
-        cls, name, committer_id, commit_message, new_rules
-    ):
+        cls,
+        name: str,
+        committer_id: str,
+        commit_message: str,
+        new_rules: List[platform_parameter_domain.PlatformParameterRule]
+    ) -> None:
         """Updates the platform parameter with new rules.
 
         Args:
@@ -198,7 +230,7 @@ class Registry:
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name])
 
     @classmethod
-    def get_all_platform_parameter_names(cls):
+    def get_all_platform_parameter_names(cls) -> List[str]:
         """Return a list of all the platform parameter names.
 
         Returns:
@@ -207,7 +239,10 @@ class Registry:
         return list(cls.parameter_registry.keys())
 
     @classmethod
-    def evaluate_all_platform_parameters(cls, context):
+    def evaluate_all_platform_parameters(
+        cls,
+        context: platform_parameter_domain.EvaluationContext
+    ) -> Dict[str, Union[str, bool, int]]:
         """Evaluate all platform parameters with the given context.
 
         Args:
@@ -224,7 +259,10 @@ class Registry:
         return result_dict
 
     @classmethod
-    def init_platform_parameter_from_dict(cls, parameter_dict):
+    def init_platform_parameter_from_dict(
+        cls,
+        parameter_dict: platform_parameter_domain.PlatformParameterDict
+    ) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter using the given
         dict representation of a platform parameter.
 
@@ -243,7 +281,9 @@ class Registry:
         return parameter
 
     @classmethod
-    def load_platform_parameter_from_storage(cls, name):
+    def load_platform_parameter_from_storage(
+        cls, name: str
+    ) -> Optional[platform_parameter_domain.PlatformParameter]:
         """Loads platform parameter from storage.
 
         Args:
@@ -257,7 +297,7 @@ class Registry:
             name, strict=False)
 
         if parameter_model:
-            param_with_init_settings = cls.parameter_registry.get(name)
+            param_with_init_settings = cls.parameter_registry[name]
             return platform_parameter_domain.PlatformParameter.from_dict({
                 'name': param_with_init_settings.name,
                 'description': param_with_init_settings.description,
@@ -272,7 +312,9 @@ class Registry:
             return None
 
     @classmethod
-    def load_platform_parameter_from_memcache(cls, name):
+    def load_platform_parameter_from_memcache(
+        cls, name: str
+    ) -> Optional[platform_parameter_domain.PlatformParameter]:
         """Loads cached platform parameter from memcache.
 
         Args:
@@ -288,7 +330,10 @@ class Registry:
         return cached_parameter
 
     @classmethod
-    def _to_platform_parameter_model(cls, param):
+    def _to_platform_parameter_model(
+        cls,
+        param: platform_parameter_domain.PlatformParameter
+    ) -> config_models.PlatformParameterModel:
         """Returns the platform parameter model corresponding to the given
         domain object.
 
