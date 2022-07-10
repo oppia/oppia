@@ -1370,18 +1370,24 @@ class Question(translation_domain.BaseTranslatableObject):
         interaction_specs = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
+        dest_if_stuck_is_specified = False
         interaction = self.question_state_data.interaction
         for answer_group in interaction.answer_groups:
             if answer_group.outcome.labelled_as_correct:
                 at_least_one_correct_answer = True
             if answer_group.outcome.dest is not None:
                 dest_is_specified = True
+            if answer_group.outcome.dest_if_really_stuck is not None:
+                dest_if_stuck_is_specified = True
 
         if interaction.default_outcome.labelled_as_correct:
             at_least_one_correct_answer = True
 
         if interaction.default_outcome.dest is not None:
             dest_is_specified = True
+
+        if interaction.default_outcome.dest_if_really_stuck is not None:
+            dest_if_stuck_is_specified = True
 
         if not at_least_one_correct_answer:
             raise utils.ValidationError(
@@ -1392,6 +1398,12 @@ class Question(translation_domain.BaseTranslatableObject):
         if dest_is_specified:
             raise utils.ValidationError(
                 'Expected all answer groups to have destination as None.'
+            )
+        
+        if dest_if_stuck_is_specified:
+            raise utils.ValidationError(
+                'Expected all answer groups to have destination for the '
+                'stuck learner as None.'
             )
 
         if not interaction.hints:

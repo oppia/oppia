@@ -1223,6 +1223,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome.dest_if_really_stuck = None
 
+        # Testing the default outcome does not direct stuck learner
+        # back to the same state.
+        default_outcome.dest_if_really_stuck = exploration.init_state_name
+        self._assert_validation_error(
+            exploration, 'The destination for a stuck learner '
+            'cannot be the same state.')
+
+        default_outcome.dest_if_really_stuck = None
+
         answer_group.outcome.dest = 'DEF'
         self._assert_validation_error(
             exploration, 'destination DEF is not a valid')
@@ -1238,15 +1247,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'The destination for a stuck learner '
             'cannot be the same state.')
         answer_group.outcome.dest_if_really_stuck = None
-
-        # Testing the default outcome does not direct stuck learner
-        # back to the same state.
-        default_outcome.dest_if_really_stuck = exploration.init_state_name
-        self._assert_validation_error(
-            exploration, 'The destination for a stuck learner '
-            'cannot be the same state.')
-
-        default_outcome.dest_if_really_stuck = None
 
         # Restore a valid exploration.
         self.set_interaction_for_state(

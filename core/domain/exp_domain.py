@@ -1164,6 +1164,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination for the stuck learner %s '
                         'is not a valid state.'
                         % default_outcome.dest_if_really_stuck)
+                
+                if default_outcome.dest_if_really_stuck == state_name:
+                    raise utils.ValidationError(
+                        'The destination for a stuck learner cannot be the '
+                        'same state.')
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
@@ -1332,11 +1337,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         raise utils.ValidationError(
                             'The default outcome for state %s is labelled '
                             'correct but is a self-loop.' % state_name)
-
-                    if default_outcome.dest_if_really_stuck == state_name:
-                        raise utils.ValidationError(
-                            'The destination for a stuck learner cannot be the '
-                            'same state.')
 
                 for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the
