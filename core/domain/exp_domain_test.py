@@ -1232,10 +1232,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'The destination for the stuck learner '
             'XYZ is not a valid state')
+
         answer_group.outcome.dest_if_really_stuck = exploration.init_state_name
         self._assert_validation_error(
             exploration, 'The destination for a stuck learner '
             'cannot be the same state.')
+        answer_group.outcome.dest_if_really_stuck = None
 
         # Testing the default outcome does not direct stuck learner
         # back to the same state.
