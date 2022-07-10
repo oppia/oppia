@@ -205,7 +205,11 @@
         "core.domain.app_feedback_report_constants_test",
         "scripts.linters.warranted_angular_security_bypasses_test",
         "scripts.create_expression_parser_test",
-        "scripts.run_frontend_tests_test"
+        "scripts.run_frontend_tests_test",
+        "scripts.check_backend_associated_test_file.py",
+        "scripts.run_custom_eslint_tests.py",
+        "scripts.run_presubmit_checks_test",
+        "scripts.run_tests"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
