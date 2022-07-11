@@ -229,6 +229,47 @@ describe('Lesson Information card modal component', () => {
       expect(componentInstance.explorationIsPrivate).toBe(false);
     });
 
+  it('should generate checkpoint status array upon initialization', () => {
+    componentInstance.checkpointCount = 3;
+    componentInstance.completedCheckpointsCount = 1;
+
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.checkpointStatusArray).toEqual(
+      ['completed', 'in-progress', 'incomplete']);
+
+    componentInstance.checkpointCount = 1;
+    componentInstance.completedCheckpointsCount = 0;
+
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.checkpointStatusArray).toEqual(
+      ['in-progress']);
+
+    componentInstance.checkpointCount = 3;
+    componentInstance.completedCheckpointsCount = 3;
+
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.checkpointStatusArray).toEqual(
+      ['completed', 'completed', 'completed']);
+  });
+
+  it('should get completed progress-bar width', () => {
+    componentInstance.checkpointCount = 3;
+    componentInstance.completedCheckpointsCount = 0;
+
+    expect(componentInstance.getCompletedProgressBarWidth()).toEqual(0);
+
+    componentInstance.completedCheckpointsCount = 1;
+
+    expect(componentInstance.getCompletedProgressBarWidth()).toEqual(25);
+
+    componentInstance.completedCheckpointsCount = 2;
+
+    expect(componentInstance.getCompletedProgressBarWidth()).toEqual(75);
+  });
+
   it('should correctly set logged-out progress learner URL ' +
     'when unique progress URL ID exists', fakeAsync (() => {
     spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
