@@ -31,9 +31,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
@@ -64,10 +61,10 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     RouterModule.forRoot([]),
     SharedComponentsModule,
     NgbPopoverModule,
+    ExplorationPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
@@ -78,7 +75,6 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
@@ -119,6 +115,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { ExplorationPlayerViewerCommonModule } from './exploration-player-viewer-common.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -48,7 +48,7 @@ export class SignupPageComponent {
   showEmailPreferencesForm: boolean;
   hasUsername: boolean;
   blurredAtLeastOnce = false;
-  canReceiveEmailUpdates: boolean;
+  canReceiveEmailUpdates: string;
   emailPreferencesWarningText: string;
 
   constructor(

@@ -38,8 +38,8 @@ export class GoalsTabComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private learnerDashboardActivityBackendApiService: (
-      LearnerDashboardActivityBackendApiService),
+    private learnerDashboardActivityBackendApiService:
+      LearnerDashboardActivityBackendApiService,
     private deviceInfoService: DeviceInfoService) {
   }
 

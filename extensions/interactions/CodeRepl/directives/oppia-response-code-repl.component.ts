@@ -24,8 +24,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-interface Answer {
+export interface Answer {
   error: string;
+  code: string;
+  output: string;
+  evaluation: string;
 }
 
 @Component({

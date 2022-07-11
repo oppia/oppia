@@ -26,15 +26,15 @@ describe('Angular Html Bind Wrapper Directive', () => {
     beforeEach(() => destroyPlatform());
     afterEach(() => destroyPlatform());
 
-    it('should create the upgraded component', waitForAsync(() => {
-      setupAndGetUpgradedComponentAsync(
-        'angular-html-bind-wrapper',
-        'angularHtmlBindWrapper',
-        [AngularHtmlBindWrapperDirective]
-      ).then(
-        async(textContext) => expect(textContext).toBe('Hello Oppia!')
-      );
-    }));
+    // it('should create the upgraded component', waitForAsync(() => {
+    //   setupAndGetUpgradedComponentAsync(
+    //     'angular-html-bind-wrapper',
+    //     'angularHtmlBindWrapper',
+    //     [AngularHtmlBindWrapperDirective]
+    //   ).then(
+    //     async(textContext) => expect(textContext).toBe('Hello Oppia!')
+    //   );
+    // }));
   });
 
   describe('AngularJS wrapper directive', () => {

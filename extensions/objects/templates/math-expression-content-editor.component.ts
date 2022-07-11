@@ -28,7 +28,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ExternalRteSaveService } from 'services/external-rte-save.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import 'mathjaxConfig.ts';
+import 'core/templates/mathjaxConfig.ts';
 
 interface MathExpression {
   'svg_filename': string;

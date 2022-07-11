@@ -29,13 +29,13 @@ import { APP_BASE_HREF } from '@angular/common';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
-import { RolesAndActionsVisualizerComponent } from 'pages/admin-page/roles-tab/roles-and-actions-visualizer.component';
 import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AdminBlogAdminCommonModule } from 'pages/admin-page/admin-blog-admin-common.module';
 
 declare var angular: ng.IAngularStatic;
 
@@ -51,17 +51,16 @@ declare var angular: ng.IAngularStatic;
     MatCardModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    AdminBlogAdminCommonModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     BlogAdminNavbarComponent,
-    BlogAdminPageComponent,
-    RolesAndActionsVisualizerComponent
+    BlogAdminPageComponent
   ],
   entryComponents: [
     BlogAdminNavbarComponent,
-    BlogAdminPageComponent,
-    RolesAndActionsVisualizerComponent
+    BlogAdminPageComponent
   ],
   providers: [
     {

@@ -30,10 +30,10 @@
       </picture>
 
       <div>
-        <h2 *ngIf="statusCode === 400" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_400' | translate"></h2>
-        <h2 *ngIf="statusCode === 401" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_401' | translate"></h2>
-        <h2 *ngIf="statusCode === 404" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_404' | translate"></h2>
-        <h2 *ngIf="statusCode === 500" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_500' | translate"></h2>
+        <h2 *ngIf="+statusCode === 400" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_400' | translate"></h2>
+        <h2 *ngIf="+statusCode === 401" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_401' | translate"></h2>
+        <h2 *ngIf="+statusCode === 404" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_404' | translate"></h2>
+        <h2 *ngIf="+statusCode === 500" class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_500' | translate"></h2>
       </div>
       <p><span [innerHTML]="'I18N_ERROR_NEXT_STEPS' | translate: {issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
     </div>

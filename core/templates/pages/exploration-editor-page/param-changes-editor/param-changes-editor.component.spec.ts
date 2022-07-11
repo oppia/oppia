@@ -422,16 +422,16 @@ describe('Param Changes Editor Component', function() {
   });
 });
 
-describe('Upgraded component', () => {
-  beforeEach(() => destroyPlatform());
-  afterEach(() => destroyPlatform());
-  it('should create the upgraded component', async(() => {
-    setupAndGetUpgradedComponentAsync(
-      'param-changes-editor',
-      'paramChangesEditor',
-      [ParamChangesEditorDirective]
-    ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
-    );
-  }));
-});
+// describe('Upgraded component', () => {
+//   beforeEach(() => destroyPlatform());
+//   afterEach(() => destroyPlatform());
+//   it('should create the upgraded component', async(() => {
+//     setupAndGetUpgradedComponentAsync(
+//       'param-changes-editor',
+//       'paramChangesEditor',
+//       [ParamChangesEditorDirective]
+//     ).then(
+//       async(textContext) => expect(textContext).toBe('Hello Oppia!')
+//     );
+//   }));
+// });

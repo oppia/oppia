@@ -55,7 +55,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import 'third-party-imports/gif-frames.import';
+import '../../../core/templates/third-party-imports/gif-frames.import';
 
 const gifshot = require('gifshot');
 

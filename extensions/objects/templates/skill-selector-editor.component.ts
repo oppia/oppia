@@ -37,6 +37,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
   eventBusGroup: EventBusGroup;
+  skillFilterText: string = '';
   constructor(
     private contextService: ContextService,
     private eventBusService: EventBusService,
@@ -45,7 +46,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  private filterSkills(skillSelector: string): void {
+  filterSkills(skillSelector: string): void {
     if (skillSelector === '') {
       this.skillsToShow = this.skills;
     }

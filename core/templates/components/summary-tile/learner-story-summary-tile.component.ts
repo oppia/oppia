@@ -45,6 +45,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   thumbnailBgColor: string;
   starImageUrl: string = '';
   cardIsHovered: boolean = false;
+  openInNewWindow = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

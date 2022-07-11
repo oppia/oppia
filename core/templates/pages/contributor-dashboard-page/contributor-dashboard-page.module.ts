@@ -28,7 +28,6 @@ import { OppiaAngularRootComponent } from
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
@@ -62,10 +61,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     SharedComponentsModule,
     NgbModalModule,
     SharedFormsModule,
+    OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
@@ -77,7 +76,6 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     TranslationModalComponent
   ],
   entryComponents: [
-    CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
@@ -119,6 +117,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
+import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

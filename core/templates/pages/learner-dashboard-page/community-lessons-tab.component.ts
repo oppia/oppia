@@ -34,8 +34,8 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
  })
 export class CommunityLessonsTabComponent {
   constructor(
-    private learnerDashboardActivityBackendApiService: (
-      LearnerDashboardActivityBackendApiService),
+    private learnerDashboardActivityBackendApiService:
+      LearnerDashboardActivityBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService) {
   }

@@ -63,7 +63,7 @@ export class AllowedVariablesEditorComponent implements OnInit {
 
   alwaysEditable = true;
   lettersAreLowercase = true;
-  currentTab = this.latinTab;
+  currentTab: typeof this.latinTab | typeof this.greekTab = this.latinTab;
 
   constructor(
     private guppyInitializationService: GuppyInitializationService,

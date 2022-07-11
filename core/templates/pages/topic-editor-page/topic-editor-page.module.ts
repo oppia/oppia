@@ -30,11 +30,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
-
-import { StoriesListComponent } from
-  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
-import { SubtopicsListComponent } from
-  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
 import { ChangeSubtopicAssignmentModalComponent } from './modal-templates/change-subtopic-assignment-modal.component';
 import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
@@ -58,12 +53,11 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     RouterModule.forRoot([]),
     InteractionExtensionsModule,
     SharedComponentsModule,
+    TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     ChangeSubtopicAssignmentModalComponent,
-    StoriesListComponent,
-    SubtopicsListComponent,
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
@@ -74,8 +68,6 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
   ],
   entryComponents: [
     ChangeSubtopicAssignmentModalComponent,
-    StoriesListComponent,
-    SubtopicsListComponent,
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
@@ -114,6 +106,7 @@ class TopicEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-viewer-player-common.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

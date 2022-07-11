@@ -20,13 +20,7 @@
         <strong>Content to translate:</strong>
       </div>
       <div class="oppia-suggestion-review-panel">
-        <ul *ngIf="isSetOfStringsContent">
-          <li *ngFor="let item of displayExplorationContent(); index as idx">
-            {{ item }}
-          </li>
-        </ul>
-        <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
-                                    [htmlData]="displayExplorationContent()">
+        <angular-html-bind-wrapper [htmlData]="displayExplorationContent()">
         </angular-html-bind-wrapper>
       </div>
     </div>
@@ -39,21 +33,16 @@
         <div>
           <angular-html-bind-wrapper [htmlData]="translationHtml" *ngIf="!startedEditing">
           </angular-html-bind-wrapper>
-          <ul *ngIf="isSetOfStringsContent">
-            <li *ngFor="let item of translationHtml; index as idx">
-              {{ item }}
-            </li>
-          </ul>
           <schema-based-editor [schema]="HTML_SCHEMA"
-                               *ngIf="startedEditing && isHtmlContent"
+                               *ngIf="startedEditing"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="UNICODE_SCHEMA"
-                               *ngIf="startedEditing && isUnicodeContent"
+                               *ngIf="startedEditing"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
-                               *ngIf="startedEditing && isSetOfStringsContent"
+                               *ngIf="startedEditing"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
         </div>
@@ -86,7 +75,7 @@
   </section>
   <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <textarea class="protractor-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage" [maxlength]="MAX_REVIEW_MESSAGE_LENGTH"></textarea>
+    <textarea class="protractor-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"></textarea>
     <div class="alert alert-danger" [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
       Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>

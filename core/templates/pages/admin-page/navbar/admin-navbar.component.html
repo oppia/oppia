@@ -178,31 +178,27 @@
                     (mouseenter)="activateProfileDropdown()"
                     (mouseleave)="deactivateProfileDropdown()">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="profileUrl"
+                    <a [href]="profileUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       <strong>{{ username }}</strong>
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/creator-dashboard"
+                    <a href="/creator-dashboard"
                        class="dropdown-item oppia-dropdown-item-text">
                       Creator Dashboard
                     </a>
                   </li>
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/preferences"
+                    <a href="/preferences"
                        [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
                   </li>
                   <li *ngIf="isModerator">
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/moderator"
+                    <a href="/moderator"
                        target="_blank"
                        rel="noopener"
                        class="dropdown-item oppia-dropdown-item-text">
@@ -210,8 +206,7 @@
                     </a>
                   </li>
                   <li *ngIf="isSuperAdmin">
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/admin"
+                    <a href="/admin"
                        target="_blank"
                        rel="noopener"
                        class="dropdown-item oppia-dropdown-item-text">
@@ -220,8 +215,7 @@
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="logoutUrl"
+                    <a [href]="logoutUrl"
                        [smartRouterLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout

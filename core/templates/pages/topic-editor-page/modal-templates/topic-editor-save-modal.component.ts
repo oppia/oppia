@@ -28,6 +28,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
   implements OnInit {
   @Input() topicIsPublished: boolean;
+  commitMessage: string = '';
 
   MAX_COMMIT_MESSAGE_LENGTH: number;
   isTopicPublished: boolean;

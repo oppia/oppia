@@ -25,7 +25,6 @@ import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
@@ -34,7 +33,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
 import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
@@ -74,14 +72,14 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
+    ExplorationPlayerViewerCommonModule,
+    OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
@@ -108,10 +106,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     TranslationTabBusyModalComponent,
   ],
   entryComponents: [
-    CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
@@ -168,6 +164,8 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
+import { ExplorationPlayerViewerCommonModule } from 'pages/exploration-player-page/exploration-player-viewer-common.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

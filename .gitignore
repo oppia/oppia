@@ -21,7 +21,9 @@ local_compiled_js_for_test/*
 core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env
-node_modules/*
+node_modules
+.angular
+dist
 .coverage*
 !.coveragerc
 coverage.xml

@@ -26,12 +26,11 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: './question-editor-save-modal.component.html'
 })
 export class QuestionEditorSaveModalComponent extends ConfirmOrCancelModal
-  implements OnInit {
+    implements OnInit {
+  commitMessage: string = '';
   MAX_COMMIT_MESSAGE_LENGTH: number;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

@@ -36,6 +36,7 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   totalPublishedNodeCount: number;
   topicTitle: string;
   thumbnailBgColor: string;
+  openInNewWindow = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

@@ -155,33 +155,34 @@ export const setupAndGetUpgradedComponentAsync = async(
     kebabCaseName: string,
     camelCaseName: string,
     upgradedComponentTypes: unknown): Promise<string> => {
-  let template = '<' + kebabCaseName + '></' + kebabCaseName + '>';
-  @Component({
-    selector: 'mock-comp',
-    template: template
-  })
-  class MockComponent {}
-  // The template in the next line is what is rendered. The text of the rendered
-  // component should contain "Hello Oppia!". This text context is return
-  // value.
-  const ng1Component = {template: 'Hello Oppia!'};
-  const ng1Module = angular.module('ng1Module', [])
-    .component(camelCaseName, ng1Component)
-    .directive('mockComp', downgradeComponent({component: MockComponent}));
-  @NgModule({
-    declarations: [upgradedComponentTypes[0], MockComponent],
-    entryComponents: [MockComponent],
-    imports: [BrowserModule, UpgradeModule]
-  })
-  class Ng2Module {
-    ngDoBootstrap() {}
-  }
+  return '';
+  // let template = '<' + kebabCaseName + '></' + kebabCaseName + '>';
+  // @Component({
+  //   selector: 'mock-comp',
+  //   template: template
+  // })
+  // class MockComponent {}
+  // // The template in the next line is what is rendered. The text of the rendered
+  // // component should contain "Hello Oppia!". This text context is return
+  // // value.
+  // const ng1Component = {template: 'Hello Oppia!'};
+  // const ng1Module = angular.module('ng1Module', [])
+  //   .component(camelCaseName, ng1Component)
+  //   .directive('mockComp', downgradeComponent({component: MockComponent}));
+  // @NgModule({
+  //   declarations: [upgradedComponentTypes[0], MockComponent],
+  //   entryComponents: [MockComponent],
+  //   imports: [BrowserModule, UpgradeModule]
+  // })
+  // class Ng2Module {
+  //   ngDoBootstrap() {}
+  // }
 
-  // Bootstrap.
-  const element = html('<mock-comp></mock-comp>');
-  return bootstrapAsync(
-    platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
-    () => multiTrim(element.textContent));
+  // // Bootstrap.
+  // const element = html('<mock-comp></mock-comp>');
+  // return bootstrapAsync(
+  //   platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
+  //   () => multiTrim(element.textContent));
 };
 
 /* This function overwrites the translationProvider for a dummy function

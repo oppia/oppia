@@ -31,16 +31,16 @@ export class MockNg2Component extends UpgradeComponent {
     super('mockNg2Component', elementRef, injector);
   }
 }
-describe('setupAndGetUpgradedComponent function', () => {
-  beforeEach(() => destroyPlatform());
-  afterEach(() => destroyPlatform());
-  it('should setup component and return the proper text context', async(() => {
-    setupAndGetUpgradedComponentAsync(
-      'mock-ng2-component',
-      'mockNg2Component',
-      [MockNg2Component]
-    ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
-    );
-  }));
-});
+// describe('setupAndGetUpgradedComponent function', () => {
+//   beforeEach(() => destroyPlatform());
+//   afterEach(() => destroyPlatform());
+//   it('should setup component and return the proper text context', async(() => {
+//     setupAndGetUpgradedComponentAsync(
+//       'mock-ng2-component',
+//       'mockNg2Component',
+//       [MockNg2Component]
+//     ).then(
+//       async(textContext) => expect(textContext).toBe('Hello Oppia!')
+//     );
+//   }));
+// });

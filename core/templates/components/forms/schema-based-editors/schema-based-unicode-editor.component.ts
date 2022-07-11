@@ -16,7 +16,7 @@
  * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
-require('third-party-imports/ui-codemirror.import.ts');
+import '../../../third-party-imports/ui-codemirror.import';
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
