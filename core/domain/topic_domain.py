@@ -1215,7 +1215,7 @@ class Topic:
         if len(self.skill_ids_for_diagnostic_test) > 3:
             raise utils.ValidationError(
                 'The skill_ids_for_diagnostic_test field should contain at '
-                'max 3 skill_ids.')
+                'most 3 skill_ids.')
 
         if strict:
             if len(self.subtopics) == 0:

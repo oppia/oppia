@@ -870,7 +870,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'The skill_ids_for_diagnostic_test field should not be empty.')
         self._assert_strict_validation_error(error_msg)
 
-    def test_most_skill_ids_for_diagnostic_test_validation(self) -> None:
+    def test_max_skill_ids_for_diagnostic_test_validation(self) -> None:
         """Validates maximum length for the skill_ids_for_diagnostic_test field
         for a topic.
         """
@@ -878,7 +878,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics[0].skill_ids = skill_ids
         self.topic.skill_ids_for_diagnostic_test = skill_ids
         error_msg = (
-            'The skill_ids_for_diagnostic_test field should contain at max 3 '
+            'The skill_ids_for_diagnostic_test field should contain at most 3 '
             'skill_ids.')
         self._assert_validation_error(error_msg)
 
