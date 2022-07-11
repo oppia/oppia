@@ -143,7 +143,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
     $scope.refreshModalData = function() {
       SkillBackendApiService.fetchSkillAsync(
-        $scope.suggestion.change.skill_id).then((skillDict) => {
+        $scope.suggestion.change.skill_id
+      ).then((skillDict) => {
         var misconceptionsBySkill = {};
         var skill = skillDict.skill;
         misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
