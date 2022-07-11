@@ -21,7 +21,7 @@ import subprocess
 
 from core.tests import test_utils
 
-from scripts import run_backend_tests
+from scripts import install_third_party_libs
 from scripts import run_frontend_tests
 from scripts import run_tests
 from scripts import setup
@@ -57,12 +57,18 @@ class RunTestsTests(test_utils.GenericTestBase):
             if cmd == 'bash scripts/run_e2e_tests.sh' and shell:
                 scripts_called['run_e2e_tests'] = True
 
+        swap_install_third_party_libs = self.swap(
+            install_third_party_libs, 'main', lambda: None)
+        # This is done because run_backend_tests scripts installs third party
+        # libs whenever it is imported.
+        with swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        swap_backend_tests = self.swap(
+            run_backend_tests, 'main', mock_backend_tests)
         swap_setup = self.swap(setup, 'main', mock_setup)
         swap_setup_gae = self.swap(setup_gae, 'main', mock_setup_gae)
         swap_frontend_tests = self.swap(
             run_frontend_tests, 'main', mock_frontend_tests)
-        swap_backend_tests = self.swap(
-            run_backend_tests, 'main', mock_backend_tests)
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with print_swap, swap_setup, swap_setup_gae, swap_popen:
