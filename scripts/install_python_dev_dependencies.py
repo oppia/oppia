@@ -18,9 +18,12 @@
 
 from __future__ import annotations
 
+import argparse
 import os
 import subprocess
 import sys
+
+from typing import List, Optional
 
 
 INSTALLATION_TOOL_VERSIONS = {
@@ -72,8 +75,16 @@ def install_dev_dependencies() -> None:
     )
 
 
-def compile_dev_dependencies() -> None:
-    """Generate COMPILED_REQUIREMENTS_DEV_FILE_PATH file."""
+def compile_dev_dependencies() -> bool:
+    """Generate COMPILED_REQUIREMENTS_DEV_FILE_PATH file.
+
+    Returns:
+        bool. Whether the compiled dev requirements file was changed.
+    """
+    with open(
+            COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r',
+            encoding='utf-8') as f:
+        old_compiled = f.read()
     subprocess.run(
         [
             'pip-compile', REQUIREMENTS_DEV_FILE_PATH, '--output-file',
@@ -82,11 +93,37 @@ def compile_dev_dependencies() -> None:
         check=True,
         encoding='utf-8',
     )
+    with open(
+            COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r',
+            encoding='utf-8') as f:
+        new_compiled = f.read()
+
+    return old_compiled != new_compiled
 
 
-def main() -> None:
+def main(cli_args: Optional[List[str]] = None) -> None:
     """Install all dev dependencies."""
+    parser = argparse.ArgumentParser(
+        'Install Python development dependencies')
+    parser.add_argument(
+        '--assert_compiled', action='store_true',
+        help='Assert that the dev requirements file is already compiled.')
+    args = parser.parse_args(cli_args)
+
     assert_in_venv()
     install_installation_tools()
-    compile_dev_dependencies()
+    not_compiled = compile_dev_dependencies()
     install_dev_dependencies()
+    if args.assert_compiled and not_compiled:
+        raise RuntimeError(
+            'The Python development requirements file '
+            f'{COMPILED_REQUIREMENTS_DEV_FILE_PATH} was changed by the '
+            'installation script. Please commit the changes. '
+            'You can get the changes again by running this command: '
+            'python -m scripts.install_python_dev_dependencies')
+
+
+# This code cannot be covered by tests since it only runs when this file
+# is executed as a script.
+if __name__ == '__main__':  # pragma: no cover
+    main()

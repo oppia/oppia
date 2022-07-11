@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import builtins
+import io
 import os
 import subprocess
 import sys
@@ -106,12 +108,17 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         with run_swap:
             install_python_dev_dependencies.install_dev_dependencies()
 
-    def test_compile_dev_dependencies(self) -> None:
+    def test_compile_dev_dependencies_no_change(self) -> None:
 
         def mock_run(
                 *_args: Tuple[Any],
                 **_kwargs: Dict[Any, Any]) -> None:  # pylint: disable=unused-argument
             pass
+
+        def mock_open(
+                *_args: Tuple[Any],
+                **_kwargs: Dict[Any, Any]) -> io.StringIO:
+            return io.StringIO('mock file contents')
 
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
@@ -124,13 +131,70 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 {'check': True, 'encoding': 'utf-8'},
             ]
         )
+        open_swap = self.swap_with_checks(
+            builtins, 'open', mock_open, expected_args=[
+                ('requirements_dev.txt', 'r'),
+                ('requirements_dev.txt', 'r'),
+            ],
+            expected_kwargs=[
+                {'encoding': 'utf-8'},
+                {'encoding': 'utf-8'},
+            ],
+        )
 
-        with run_swap:
-            install_python_dev_dependencies.compile_dev_dependencies()
+        with run_swap, open_swap:
+            change = (
+                install_python_dev_dependencies.compile_dev_dependencies())
+        self.assertFalse(change)
 
-    def test_main(self) -> None:
+    def test_compile_dev_dependencies_change(self) -> None:
+
+        def mock_run(
+                *_args: Tuple[Any],
+                **_kwargs: Dict[Any, Any]) -> None:  # pylint: disable=unused-argument
+            pass
+
+        counter = []
+
+        def mock_open(
+                *_args: Tuple[Any],
+                **_kwargs: Dict[Any, Any]) -> io.StringIO:
+            counter.append(1)
+            return io.StringIO(f'mock file contents {len(counter)}')
+
+        run_swap = self.swap_with_checks(
+            subprocess, 'run', mock_run, expected_args=[
+                ([
+                    'pip-compile', 'requirements_dev.in',
+                    '--output-file', 'requirements_dev.txt'
+                ],),
+            ],
+            expected_kwargs=[
+                {'check': True, 'encoding': 'utf-8'},
+            ]
+        )
+        open_swap = self.swap_with_checks(
+            builtins, 'open', mock_open, expected_args=[
+                ('requirements_dev.txt', 'r'),
+                ('requirements_dev.txt', 'r'),
+            ],
+            expected_kwargs=[
+                {'encoding': 'utf-8'},
+                {'encoding': 'utf-8'},
+            ],
+        )
+
+        with run_swap, open_swap:
+            change = (
+                install_python_dev_dependencies.compile_dev_dependencies())
+        self.assertTrue(change)
+
+    def test_main_passes_with_no_assert_and_no_change(self) -> None:
         def mock_func() -> None:
             pass
+
+        def mock_compile() -> bool:
+            return False
 
         assert_swap = self.swap_with_checks(
             install_python_dev_dependencies, 'assert_in_venv', mock_func)
@@ -139,11 +203,88 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_installation_tools', mock_func)
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_dev_dependencies', mock_func)
+            'compile_dev_dependencies', mock_compile)
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_dev_dependencies', mock_func)
 
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
-                install_python_dev_dependencies.main()
+                install_python_dev_dependencies.main([])
+
+    def test_main_passes_with_assert_and_no_change(self) -> None:
+        def mock_func() -> None:
+            pass
+
+        def mock_compile() -> bool:
+            return False
+
+        assert_swap = self.swap_with_checks(
+            install_python_dev_dependencies, 'assert_in_venv', mock_func)
+        install_tools_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'install_installation_tools', mock_func)
+        compile_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'compile_dev_dependencies', mock_compile)
+        install_dependencies_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'install_dev_dependencies', mock_func)
+
+        with assert_swap, install_tools_swap, compile_swap:
+            with install_dependencies_swap:
+                install_python_dev_dependencies.main(
+                    ['--assert_compiled'])
+
+    def test_main_passes_with_no_assert_and_change(self) -> None:
+        def mock_func() -> None:
+            pass
+
+        def mock_compile() -> bool:
+            return True
+
+        assert_swap = self.swap_with_checks(
+            install_python_dev_dependencies, 'assert_in_venv', mock_func)
+        install_tools_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'install_installation_tools', mock_func)
+        compile_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'compile_dev_dependencies', mock_compile)
+        install_dependencies_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'install_dev_dependencies', mock_func)
+
+        with assert_swap, install_tools_swap, compile_swap:
+            with install_dependencies_swap:
+                install_python_dev_dependencies.main([])
+
+    def test_main_fails_with_assert_and_change(self) -> None:
+        def mock_func() -> None:
+            pass
+
+        def mock_compile() -> bool:
+            return True
+
+        assert_swap = self.swap_with_checks(
+            install_python_dev_dependencies, 'assert_in_venv', mock_func)
+        install_tools_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'install_installation_tools', mock_func)
+        compile_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'compile_dev_dependencies', mock_compile)
+        install_dependencies_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'install_dev_dependencies', mock_func)
+
+        error_regex = (
+            'The Python development requirements file '
+            'requirements_dev.txt was changed')
+
+        with assert_swap, install_tools_swap, compile_swap:
+            with install_dependencies_swap:
+                with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                        RuntimeError, error_regex):
+                    install_python_dev_dependencies.main(
+                        ['--assert_compiled'])

@@ -26,7 +26,7 @@ import zipfile
 
 
 from scripts import install_python_dev_dependencies
-install_python_dev_dependencies.main()
+install_python_dev_dependencies.main(['--assert_compiled'])
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
