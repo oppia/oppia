@@ -92,7 +92,6 @@ def create_learner_group(
     learner_group_model.put()
 
     learner_group = get_learner_group_from_model(learner_group_model)
-
     learner_group.validate()
 
     if len(learner_group_model.invited_student_user_ids) > 0:
@@ -229,8 +228,6 @@ def get_matching_learner_group_syllabus_to_add(
     Returns:
         dict. The matching syllabus items to add to the learner group.
     """
-    keyword = keyword.lower()
-
     # Default case when syllabus is being added to a new group.
     group_subtopic_page_ids: List[str] = []
     group_story_ids: List[str] = []
@@ -244,7 +241,6 @@ def get_matching_learner_group_syllabus_to_add(
         group_story_ids = learner_group.story_ids
 
     matching_topics: List[topic_domain.Topic] = []
-
     matching_topic_ids: List[str] = []
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
@@ -261,6 +257,7 @@ def get_matching_learner_group_syllabus_to_add(
     else:
         matching_topics = topic_fetchers.get_all_topics() # type: ignore[no-untyped-call]
 
+    keyword = keyword.lower()
     for topic in matching_topics:
         if language_code and language_code != topic.language_code:
             continue
