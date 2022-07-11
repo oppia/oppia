@@ -1,4 +1,4 @@
-<div class="modal-header protractor-test-question-suggestion-review-modal-header">
+<div class="modal-header e2e-test-question-suggestion-review-modal-header">
   <div>
     <h3 class="oppia-question-header">
       <[questionHeader]>
@@ -48,7 +48,7 @@
            class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
       Review message (required if rejecting):
-      <textarea class="protractor-test-suggestion-review-message w-100"
+      <textarea class="e2e-test-suggestion-review-message w-100"
                 rows="3"
                 ng-model="reviewMessage">
       </textarea>
@@ -68,7 +68,7 @@
     <span uib-tooltip="Enter review message before rejecting"
           tooltip-placement="bottom"
           tooltip-enable="reviewMessage.length == 0">
-      <button class="btn btn-danger oppia-review-button protractor-test-question-suggestion-review-reject-button"
+      <button class="btn btn-danger oppia-review-button e2e-test-question-suggestion-review-reject-button"
               ng-if="reviewable"
               ng-disabled="reviewMessage.length == 0"
               ng-click="reject()">
@@ -76,14 +76,14 @@
       </button>
     </span>
     <span tooltip-placement="bottom">
-      <button class="btn btn-secondary oppia-review-button protractor-test-question-suggestion-review-edit-button"
+      <button class="btn btn-secondary oppia-review-button e2e-test-question-suggestion-review-edit-button"
               ng-if="reviewable"
               ng-click="edit()">
         Edit
       </button>
     </span>
     <span tooltip-placement="bottom">
-      <button class="btn btn-success oppia-review-button protractor-test-question-suggestion-review-accept-button"
+      <button class="btn btn-success oppia-review-button e2e-test-question-suggestion-review-accept-button"
               ng-if="reviewable"
               ng-click="accept()">
         Accept

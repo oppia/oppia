@@ -35,6 +35,9 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
+import './classroom-page.component.css';
+
+
 @Component({
   selector: 'oppia-classroom-page',
   templateUrl: './classroom-page.component.html'
@@ -120,10 +123,6 @@ export class ClassroomPageComponent implements OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   // This method is used to choose whether to display the classroom name or
