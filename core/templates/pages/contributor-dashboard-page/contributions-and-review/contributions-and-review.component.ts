@@ -294,8 +294,7 @@ angular.module('oppia').component('contributionsAndReview', {
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
         const suggestionIdToContribution = {};
-        for (let suggestionId in ctrl.contributions) {
-          var contribution = ctrl.contributions[suggestionId];
+        for (let contribution of ctrl.contributions) {
           suggestionIdToContribution[suggestionId] = contribution;
         }
         SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
