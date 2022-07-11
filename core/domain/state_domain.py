@@ -587,7 +587,7 @@ class Solution(translation_domain.BaseTranslatableObject):
 class InteractionInstanceDict(TypedDict):
     """Dictionary representing the InteractionInstance object."""
 
-    id: str
+    id: Optional[str]
     customization_args: Dict[str, Dict[str, Any]]
     answer_groups: List[AnswerGroupDict]
     default_outcome: OutcomeDict
@@ -608,7 +608,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     # of values, we used Any here.
     def __init__(
         self,
-        interaction_id: str,
+        interaction_id: Optional[str],
         customization_args: Dict[str, Dict[str, Any]],
         answer_groups: List[AnswerGroup],
         default_outcome: Outcome,

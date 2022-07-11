@@ -116,7 +116,9 @@ def handle_trainable_states(
     for state_name in state_names:
         state = exploration.states[state_name]
         training_data = state.get_training_data()  # type: ignore[no-untyped-call]
+        # Ruling out the possibility of None for mypy type checking.
         interaction_id = state.interaction.id
+        assert interaction_id is not None
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -576,6 +578,8 @@ def migrate_state_training_jobs(
         exp_id, version=exp_version)
     interaction_id = exploration.states[state_name].interaction.id
 
+    # Ruling out the possibility of None for mypy type checking.
+    assert interaction_id is not None
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
         interaction_id]['algorithm_id']
     algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[

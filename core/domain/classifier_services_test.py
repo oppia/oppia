@@ -809,6 +809,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         interaction_id = exploration.states[
             state_name].interaction.id
+        assert interaction_id is not None
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
 

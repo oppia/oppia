@@ -1018,7 +1018,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             solution = (
                 state_domain.Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] is not None else None)
+                if idict['solution'] is not None and idict['id'] is not None
+                else None)
 
             customization_args = (
                 state_domain.InteractionInstance.  # type: ignore[no-untyped-call]
@@ -1599,14 +1600,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_names = list(self.states.keys())
         return state_name in state_names
 
-    def get_interaction_id_by_state_name(self, state_name: str) -> str:
+    def get_interaction_id_by_state_name(
+        self, state_name: str
+    ) -> Optional[str]:
         """Returns the interaction id of the state.
 
         Args:
             state_name: str. The name of the state.
 
         Returns:
-            str. The ID of the interaction.
+            str|None. The ID of the interaction.
         """
         return self.states[state_name].interaction.id
 
