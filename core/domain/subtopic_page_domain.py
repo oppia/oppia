@@ -24,22 +24,24 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import List
-from typing_extensions import TypedDict
+from typing import Callable, List
+from typing_extensions import Final, TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html'
-SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO = 'page_contents_audio'
-SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS = 'page_written_translations'
+SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML: Final = 'page_contents_html'
+SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO: Final = 'page_contents_audio'
+SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS: Final = (
+    'page_written_translations'
+)
 
-CMD_CREATE_NEW = 'create_new'
+CMD_CREATE_NEW: Final = 'create_new'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
+CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: Final = 'update_subtopic_page_property'
 
 
 class SubtopicPageChange(change_domain.BaseChange):
@@ -56,20 +58,24 @@ class SubtopicPageChange(change_domain.BaseChange):
     SUBTOPIC_PAGE_PROPERTIES: List[str] = [
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
-        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS]
+        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS
+    ]
 
-    ALLOWED_COMMANDS = [{
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['topic_id', 'subtopic_id'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'new_value', 'old_value', 'subtopic_id'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES}
+        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
+        'deprecated_values': {}
     }]
 
 
@@ -117,12 +123,12 @@ class SubtopicPageContents:
         fields are of the correct type.
         """
         self.subtitled_html.validate()
-        content_ids = set([self.subtitled_html.content_id])
+        content_ids = [self.subtitled_html.content_id]
         self.recorded_voiceovers.validate(content_ids)
         self.written_translations.validate(content_ids)
 
     @classmethod
-    def create_default_subtopic_page_contents(cls):
+    def create_default_subtopic_page_contents(cls) -> SubtopicPageContents:
         """Creates a default subtopic page contents object.
 
         Returns:
@@ -130,7 +136,7 @@ class SubtopicPageContents:
         """
         content_id = feconf.DEFAULT_SUBTOPIC_PAGE_CONTENT_ID
         return cls(
-            state_domain.SubtitledHtml.create_default_subtitled_html(
+            state_domain.SubtitledHtml.create_default_subtitled_html(  # type: ignore[no-untyped-call]
                 content_id),
             state_domain.RecordedVoiceovers.from_dict(
                 {'voiceovers_mapping': {content_id: {}}}),
@@ -245,11 +251,13 @@ class SubtopicPage:
         return '%s-%s' % (topic_id, subtopic_id)
 
     @classmethod
-    def create_default_subtopic_page(cls, subtopic_id, topic_id):
+    def create_default_subtopic_page(
+        cls, subtopic_id: int, topic_id: str
+    ) -> SubtopicPage:
         """Creates a SubtopicPage object with default values.
 
         Args:
-            subtopic_id: str. ID of the subtopic.
+            subtopic_id: int. ID of the subtopic.
             topic_id: str. The Id of the topic to which this page is linked
                 with.
 
@@ -266,7 +274,10 @@ class SubtopicPage:
 
     @classmethod
     def convert_html_fields_in_subtopic_page_contents(
-            cls, subtopic_page_contents_dict, conversion_fn):
+        cls,
+        subtopic_page_contents_dict: SubtopicPageContentsDict,
+        conversion_fn: Callable[[str], str]
+    ) -> SubtopicPageContentsDict:
         """Applies a conversion function on all the html strings in subtopic
         page contents to migrate them to a desired state.
 
@@ -280,7 +291,7 @@ class SubtopicPage:
             dict. The converted subtopic_page_contents_dict.
         """
         subtopic_page_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
+            state_domain.WrittenTranslations.  # type: ignore[no-untyped-call]
             convert_html_in_written_translations(
                 subtopic_page_contents_dict['written_translations'],
                 conversion_fn))
@@ -290,7 +301,9 @@ class SubtopicPage:
         return subtopic_page_contents_dict
 
     @classmethod
-    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
+    def _convert_page_contents_v1_dict_to_v2_dict(
+        cls, page_contents_dict: SubtopicPageContentsDict
+    ) -> SubtopicPageContentsDict:
         """Converts v1 SubtopicPage Contents schema to the v2 schema.
         v2 schema introduces the new schema for Math components.
 
@@ -306,7 +319,9 @@ class SubtopicPage:
             html_validation_service.add_math_content_to_math_rte_components)
 
     @classmethod
-    def _convert_page_contents_v2_dict_to_v3_dict(cls, page_contents_dict):
+    def _convert_page_contents_v2_dict_to_v3_dict(
+        cls, page_contents_dict: SubtopicPageContentsDict
+    ) -> SubtopicPageContentsDict:
         """Converts v2 SubtopicPage Contents schema to the v3 schema.
         v3 schema deprecates oppia-noninteractive-svgdiagram tag and converts
         existing occurences of it to oppia-noninteractive-image tag.
@@ -323,7 +338,9 @@ class SubtopicPage:
             html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
-    def _convert_page_contents_v3_dict_to_v4_dict(cls, page_contents_dict):
+    def _convert_page_contents_v3_dict_to_v4_dict(
+        cls, page_contents_dict: SubtopicPageContentsDict
+    ) -> SubtopicPageContentsDict:
         """Converts v3 SubtopicPage Contents schema to the v4 schema.
         v4 schema fixes HTML encoding issues.
 
@@ -340,7 +357,10 @@ class SubtopicPage:
 
     @classmethod
     def update_page_contents_from_model(
-            cls, versioned_page_contents, current_version):
+        cls,
+        versioned_page_contents: VersionedSubtopicPageContentsDict,
+        current_version: int
+    ) -> None:
         """Converts the page_contents blob contained in the given
         versioned_page_contents dict from current_version to
         current_version + 1. Note that the versioned_page_contents being
@@ -362,7 +382,7 @@ class SubtopicPage:
         versioned_page_contents['page_contents'] = conversion_fn(
             versioned_page_contents['page_contents'])
 
-    def get_subtopic_id_from_subtopic_page_id(self):
+    def get_subtopic_id_from_subtopic_page_id(self) -> int:
         """Returns the id from the subtopic page id of the object.
 
         Returns:
@@ -370,7 +390,9 @@ class SubtopicPage:
         """
         return int(self.id[len(self.topic_id) + 1:])
 
-    def update_page_contents_html(self, new_page_contents_html):
+    def update_page_contents_html(
+        self, new_page_contents_html: state_domain.SubtitledHtml
+    ) -> None:
         """The new value for the html data field.
 
         Args:
@@ -379,7 +401,9 @@ class SubtopicPage:
         """
         self.page_contents.subtitled_html = new_page_contents_html
 
-    def update_page_contents_audio(self, new_page_contents_audio):
+    def update_page_contents_audio(
+        self, new_page_contents_audio: state_domain.RecordedVoiceovers
+    ) -> None:
         """The new value for the recorded_voiceovers data field.
 
         Args:
@@ -389,7 +413,9 @@ class SubtopicPage:
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 
     def update_page_contents_written_translations(
-            self, new_page_written_translations_dict):
+        self,
+        new_page_written_translations_dict: state_domain.WrittenTranslationsDict
+    ) -> None:
         """The new value for the written_translations data field.
 
         Args:
@@ -400,7 +426,7 @@ class SubtopicPage:
             state_domain.WrittenTranslations.from_dict(
                 new_page_written_translations_dict))
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the SubtopicPage object.
 
         Raises:

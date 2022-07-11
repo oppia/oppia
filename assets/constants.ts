@@ -77,8 +77,6 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
-  "RTL_LANGUAGE_CODES": ["ar"],
-
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
   // any new class, topic, skill, exploration or subtopic is added or a
@@ -5902,7 +5900,7 @@ export default {
   // The breakpoint for mobile view for contributor dashboard in px.
   // This value must be the same as the one specified in
   // opportunities-list-item.component.html.
-  "CONTRIBUTOR_DASHBOARD_MOBILE_BREAKPOINT": 700,
+  "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
 
   // Represents the string value indicating "All topics" in the Contributor
   // Dashboard topic selector.

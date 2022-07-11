@@ -32,7 +32,7 @@
                   ⚠
                 </div>
               </div>
-              <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
+              <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab e2e-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
                 <oppia-response-header [index]="$index"
                                        [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
                                        [short-summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
@@ -48,7 +48,7 @@
 
               <div ng-if="activeAnswerGroupIndex === $index">
                 <div class="oppia-editor-card-section">
-                  <div class="oppia-rule-body-container protractor-test-response-body-<[$index]>">
+                  <div class="oppia-rule-body-container e2e-test-response-body-<[$index]>">
                     <answer-group-editor rules="answerGroup.rules"
                                          outcome="answerGroup.outcome"
                                          tagged-skill-misconception-id="answerGroup.taggedSkillMisconceptionId"
@@ -60,7 +60,7 @@
                                          on-save-tagged-misconception="saveTaggedMisconception"
                                          is-editable="EditabilityService.isEditable()"
                                          display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                         class="protractor-test-response-body"
+                                         class="e2e-test-response-body"
                                          add-state="$ctrl.addState"
                                          show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
                     </answer-group-editor>
@@ -79,7 +79,7 @@
                   ⚠
                 </div>
               </div>
-              <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
+              <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab e2e-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
                 <oppia-response-header [index]="$index"
                                        [is-active]="$index === activeAnswerGroupIndex"
                                        [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
@@ -93,7 +93,7 @@
 
               <div ng-if="activeAnswerGroupIndex === answerGroups.length">
                 <div class="oppia-editor-card-section">
-                  <div class="oppia-rule-body-container protractor-test-response-body-default">
+                  <div class="oppia-rule-body-container e2e-test-response-body-default">
                     <answer-group-editor rules="null"
                                          outcome="defaultOutcome"
                                          tagged-skill-misconception-id="null"
@@ -104,7 +104,7 @@
                                          is-editable="EditabilityService.isEditable()"
                                          suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                          display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
-                                         class="protractor-test-response-body"
+                                         class="e2e-test-response-body"
                                          add-state="$ctrl.addState"
                                          show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
                     </answer-group-editor>
@@ -116,14 +116,14 @@
         </div>
         <div class="oppia-add-response-button-container">
           <div ng-if="EditabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear() && EditabilityService.isEditable()">
-            <button type="button" class="btn btn-secondary oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
+            <button type="button" class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
               + ADD RESPONSE
             </button>
           </div>
         </div>
         <div ng-if="!isInQuestionMode()" class="solicit-answer-checkbox">
           <span ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
-            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed" ng-disabled="!EditabilityService.isEditable()">
+            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="e2e-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed" ng-disabled="!EditabilityService.isEditable()">
             <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
           </span>
         </div>

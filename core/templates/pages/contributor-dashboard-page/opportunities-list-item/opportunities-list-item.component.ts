@@ -43,8 +43,7 @@ export interface ExplorationOpportunity {
 export class OpportunitiesListItemComponent {
   constructor(
     private windowDimensionsService: WindowDimensionsService
-  ) {
-  }
+  ) {}
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -64,10 +63,11 @@ export class OpportunitiesListItemComponent {
   inReviewProgressStyle!: { width: string };
   untranslatedProgressStyle!: { width: string };
   targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
-  mobileBreakpoint: number = constants.CONTRIBUTOR_DASHBOARD_MOBILE_BREAKPOINT;
   cardsAvailable: number = 0;
   onMobile!: boolean;
   resizeSubscription!: Subscription;
+  mobileBreakpoint: number = (
+    constants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT);
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
@@ -98,9 +98,8 @@ export class OpportunitiesListItemComponent {
     }
     if (this.opportunity) {
       if (this.opportunity.progressPercentage) {
-        this.progressPercentage = (
-          String((Math.floor(this.opportunity.progressPercentage))) + '%'
-        );
+        this.progressPercentage =
+          `${Math.floor(this.opportunity.progressPercentage)}%`;
         if (this.opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
           this.translationProgressBar = true;
           const translatedPercentage = (
