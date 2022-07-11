@@ -1198,11 +1198,23 @@ class Topic:
         skill_ids_that_are_not_in_subtopics = (
             set(self.skill_ids_for_diagnostic_test) -
             set(subtopic_skill_ids))
-        if len(skill_ids_that_are_not_in_subtopics):
+        if len(skill_ids_that_are_not_in_subtopics) > 0:
             raise utils.ValidationError(
                 'The skill_ids %s are selected for the diagnostic test but they'
                 ' are not associated with any subtopic.' %
                 skill_ids_that_are_not_in_subtopics)
+
+        if (
+            len(self.skill_ids_for_diagnostic_test) == 0 and
+            len(subtopic_skill_ids) > 0
+        ):
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should not be empty.')
+
+        if len(self.skill_ids_for_diagnostic_test) > 3:
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should contain at '
+                'max 3 skill_ids.')
 
         if strict:
             if len(self.subtopics) == 0:

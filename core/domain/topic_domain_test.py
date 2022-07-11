@@ -46,6 +46,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
@@ -479,6 +480,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.subtopics[0].skill_ids = []
+        self.topic.skill_ids_for_diagnostic_test = []
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
 
@@ -840,10 +842,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         """Checks the update method for the skill_ids_for_diagnostic_test field
         for a topic.
         """
-        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
-        self.topic.update_skill_ids_for_diagnostic_test(['test_skill_id'])
+        self.topic.subtopics[0].skill_ids = []
         self.assertEqual(
-            self.topic.skill_ids_for_diagnostic_test, ['test_skill_id'])
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+        self.topic.update_skill_ids_for_diagnostic_test([])
+        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
 
     def test_skill_ids_for_diagnostic_test_validation(self) -> None:
         """Checks the validation of skill_ids_for_diagnostic_test field
@@ -853,6 +856,27 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         error_msg = (
             'The skill_ids {\'test_skill_id\'} are selected for the '
             'diagnostic test but they are not associated with any subtopic.')
+        self._assert_validation_error(error_msg)
+
+    def test_min_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Validates empty skill_ids_for_diagnostic_test field must raise
+        exception.
+        """
+        self.topic.skill_ids_for_diagnostic_test = []
+        error_msg = (
+            'The skill_ids_for_diagnostic_test field should not be empty.')
+        self._assert_validation_error(error_msg)
+
+    def test_max_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Validates maximum length for the skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        skill_ids = ['skill_1', 'skill_2', 'skill_3', 'skill_4']
+        self.topic.subtopics[0].skill_ids = skill_ids
+        self.topic.skill_ids_for_diagnostic_test = skill_ids
+        error_msg = (
+            'The skill_ids_for_diagnostic_test field should contain at max 3 '
+            'skill_ids.')
         self._assert_validation_error(error_msg)
 
 
