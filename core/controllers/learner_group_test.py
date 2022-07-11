@@ -590,6 +590,8 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         expected_story_prog_summary['story_is_published'] = True
         expected_story_prog_summary['completed_node_titles'] = (
             ['Title 1', 'Title 2'])
+        expected_story_prog_summary['topic_name'] = 'Topic'
+        expected_story_prog_summary['topic_url_fragment'] = 'topic'
         expected_story_prog_summary['all_node_dicts'] = (
             [node.to_dict() for node in story.story_contents.nodes])
 

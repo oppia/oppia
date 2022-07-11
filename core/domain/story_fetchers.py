@@ -23,10 +23,12 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import copy
+import itertools
 
 from core import feconf
 from core.domain import caching_services
 from core.domain import story_domain
+from core.domain import topic_fetchers
 from core.platform import models
 
 from typing import Dict, List, Optional, overload
@@ -372,38 +374,101 @@ def get_completed_nodes_in_story(
     return completed_nodes
 
 
-def get_progress_in_stories(
-    user_id: str, story_ids: List[str]
-) -> List[story_domain.StoryProgress]:
-    """Returns the progress of the user in all given stories.
+def get_multi_users_progress_in_stories(
+    user_ids: List[str], story_ids: List[str]
+) -> Dict[str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]]:
+    """Returns the progress of given users in all given stories.
 
     Args:
-        user_id: str. The user id of the user.
+        user_ids: list(str). The user ids of the users.
         story_ids: list(str). The list of story ids.
 
     Returns:
-        list(StoryProgress). The list of story progress of the user.
+        Dict(str, list(StoryProgressDict)). Dictionary of user id and their
+        corresponding list of story progress dicts.
     """
-    all_stories_progress: List[story_domain.StoryProgress] = []
-    all_stories = get_stories_by_ids(story_ids)
+    all_users_stories_progress: Dict[
+        str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]
+    ] = {user_id: [] for user_id in user_ids}
 
-    for story in all_stories:
-        if story is None:
-            continue
-        completed_node_ids = get_completed_node_ids(user_id, story.id)
+    # Get all stories for valid story ids.
+    all_valid_stories = [
+        story for story in get_stories_by_ids(story_ids) if story
+    ]
+
+    # Filter valid story ids.
+    valid_story_ids = [story.id for story in all_valid_stories]
+
+    # Get summaries of all valid stories.
+    all_story_summaries = get_story_summaries_by_ids(valid_story_ids)
+
+    # Filter unique topic ids from all valid stories.
+    topic_ids = list(
+        {story.corresponding_topic_id for story in all_valid_stories}
+    )
+
+    # Get all topics for the filtered ids.
+    topics = topic_fetchers.get_topics_by_ids(topic_ids) # type: ignore[no-untyped-call]
+
+    # Generate topic id to topic mapping.
+    topic_id_to_topic_map = {topic.id: topic for topic in topics}
+
+    # Generate story id to story mapping.
+    story_id_to_story_map = {story.id: story for story in all_valid_stories}
+
+    # Generate story id to story summaries mapping.
+    story_id_to_summary_map = {
+        summary.id: summary for summary in all_story_summaries
+    }
+
+    # All poosible combinations of user_id and story_id for which progress
+    # models are returned.
+    all_posssible_combinations = list(
+        itertools.product(user_ids, valid_story_ids)
+    )
+
+    progress_models = user_models.StoryProgressModel.get_multi(
+        user_ids, valid_story_ids
+    )
+
+    for ind, (user_id, story_id) in enumerate(all_posssible_combinations):
+        progress_model = progress_models[ind]
+        completed_node_ids = []
+        if progress_model is not None:
+            completed_node_ids = progress_model.completed_node_ids
+        story = story_id_to_story_map[story_id]
         completed_node_titles = [
             node.title for node in story.story_contents.nodes
             if node.id in completed_node_ids
         ]
-        all_stories_progress.append(
-            story_domain.StoryProgress(
-                story.id,
-                completed_node_titles,
+        topic = topic_id_to_topic_map[story.corresponding_topic_id]
+        summary_dict = story_id_to_summary_map[story_id].to_dict()
+        story_progress: story_domain.LearnerGroupSyllabusStorySummaryDict = {
+            'id': summary_dict['id'],
+            'title': summary_dict['title'],
+            'description': summary_dict['description'],
+            'language_code': summary_dict['language_code'],
+            'version': summary_dict['version'],
+            'node_titles': summary_dict['node_titles'],
+            'thumbnail_filename': summary_dict['thumbnail_filename'],
+            'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
+            'url_fragment': summary_dict['url_fragment'],
+            'story_model_created_on':
+                summary_dict['story_model_created_on'],
+            'story_model_last_updated':
+                summary_dict['story_model_last_updated'],
+            'story_is_published': True,
+            'completed_node_titles': completed_node_titles,
+            'all_node_dicts': [
+                node.to_dict() for node in
                 story.story_contents.nodes
-            )
-        )
+            ],
+            'topic_name': topic.name,
+            'topic_url_fragment': topic.url_fragment
+        }
+        all_users_stories_progress[user_id].append(story_progress)
 
-    return all_stories_progress
+    return all_users_stories_progress
 
 
 def get_pending_and_all_nodes_in_story(

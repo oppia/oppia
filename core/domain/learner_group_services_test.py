@@ -346,30 +346,3 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_model_2.invited_to_learner_groups_ids,
             ['group_id_2'])
-
-    def test_get_subtopic_pages_progress(self) -> None:
-        degree_of_mastery = 0.5
-
-        # Add some subtopic progress for the student.
-        skill_ids = ['skill_id_1']
-        skill_services.create_user_skill_mastery( # type: ignore[no-untyped-call]
-            self.STUDENT_ID, 'skill_id_1', degree_of_mastery
-        )
-
-        topics = topic_fetchers.get_topics_by_ids( # type: ignore[no-untyped-call]
-            [self.TOPIC_ID_0, self.TOPIC_ID_1]
-        )
-
-        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
-
-        progress = learner_group_services.get_subtopic_pages_progress(
-            self.STUDENT_ID, [subtopic_page_id], topics, skill_ids
-        )
-
-        self.assertEqual(progress[0].subtopic_id, 1)
-        self.assertEqual(
-            progress[0].subtopic_title, 'Intro to negative numbers'
-        )
-        self.assertEqual(progress[0].parent_topic_id, self.TOPIC_ID_1)
-        self.assertEqual(progress[0].parent_topic_name, 'Negative Numbers')
-        self.assertEqual(progress[0].subtopic_mastery, degree_of_mastery)

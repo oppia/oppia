@@ -22,7 +22,6 @@ from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
 from core.domain import learner_group_fetchers
-from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -550,68 +549,6 @@ def remove_invited_students_from_learner_group(
 
     user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
     user_models.LearnerGroupsUserModel.put_multi(models_to_put)
-
-
-def get_subtopic_pages_progress(
-    user_id: str,
-    subtopic_page_ids: List[str],
-    topics: List[topic_domain.Topic],
-    all_skill_ids: List[str]
-) -> List[subtopic_page_domain.SubtopicPageSummary]:
-    """Returns the progress of the given user on the given subtopic pages.
-
-    Args:
-        user_id: str. The id of the user.
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
-        topics: list(Topic). The topics corresponding to the subtopic pages.
-        all_skill_ids: list(str). The ids of all the skills in the topics.
-
-    Returns:
-        list(SubtopicPageSummary). Subtopic Page Summary domain object
-        containing details of the subtopic page and users mastery in it.
-    """
-
-    # Fetch the progress of the student in all the subtopics assigned
-    # in the group syllabus.
-    skills_mastery_dict = skill_services.get_multi_user_skill_mastery( # type: ignore[no-untyped-call]
-        user_id, all_skill_ids
-    )
-
-    subtopic_prog_summaries: List[
-        subtopic_page_domain.SubtopicPageSummary] = []
-
-    for topic in topics:
-        for subtopic in topic.subtopics:
-            subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
-            if subtopic_page_id not in subtopic_page_ids:
-                continue
-            skill_mastery_dict = {
-                skill_id: mastery
-                for skill_id, mastery in skills_mastery_dict.items()
-                if mastery is not None and (
-                    skill_id in subtopic.skill_ids
-                )
-            }
-            subtopic_prog_summary = (
-                subtopic_page_domain.SubtopicPageSummary(
-                    subtopic_id=subtopic.id,
-                    subtopic_title=subtopic.title,
-                    parent_topic_id=topic.id,
-                    parent_topic_name=topic.name,
-                    thumbnail_filename=subtopic.thumbnail_filename,
-                    thumbnail_bg_color=subtopic.thumbnail_bg_color,
-                    subtopic_mastery=None
-                )
-            )
-            # Subtopic mastery is average of skill masteries.
-            if skill_mastery_dict:
-                subtopic_prog_summary.subtopic_mastery = (
-                    sum(skill_mastery_dict.values()) /
-                    len(skill_mastery_dict)
-                )
-            subtopic_prog_summaries.append(subtopic_prog_summary)
-
-    return subtopic_prog_summaries
 
 
 def get_learner_group_from_model(

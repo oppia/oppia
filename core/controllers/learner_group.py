@@ -270,69 +270,59 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
         subtopic_page_ids = learner_group.subtopic_page_ids
         story_ids = learner_group.story_ids
-        topic_ids = (
-            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
-                subtopic_page_ids
-            )
-        )
-        topics = topic_fetchers.get_topics_by_ids(topic_ids)
-
-        all_skill_ids_lists = [
-            topic.get_all_skill_ids() for topic in topics if topic
-        ]
-        all_skill_ids = list(
-            {
-                skill_id for skill_list in all_skill_ids_lists
-                for skill_id in skill_list
-            }
-        )
 
         all_students_progress = []
 
-        for user_id in student_user_ids:
-            progress_sharing_permission = (
-                learner_group_fetchers.can_share_progress(
-                    user_id, learner_group_id))
+        # Get progress sharing permissions for all students.
+        progress_sharing_permissions = (
+            learner_group_fetchers.can_multi_students_share_progress(
+                student_user_ids, learner_group_id
+            )
+        )
 
+        # This will store user ids of all students who have their progress
+        # sharing permissions enabled.
+        students_with_progress_sharing_on = []
+
+        for ind, user_id in enumerate(student_user_ids):
+            if progress_sharing_permissions[ind]:
+                students_with_progress_sharing_on.append(user_id)
+
+        # Fetch the progress of the students who have progress sharing turned
+        # on in all the stories assigned in the group syllabus.
+        stories_progresses = (
+            story_fetchers.get_multi_users_progress_in_stories(
+                students_with_progress_sharing_on, story_ids
+            )
+        )
+
+        # Fetch the progress of the students who have progress sharing turned
+        # on in all the subtopic pages assigned in the group syllabus.
+        subtopic_pages_progresses = (
+            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+                students_with_progress_sharing_on, subtopic_page_ids
+            )
+        )
+
+        for ind, user_id in enumerate(student_user_ids):
             student_progress = {
-                'username': user_services.get_username(user_id),
-                'progress_sharing_is_turned_on': progress_sharing_permission,
+                'username': student_usernames[ind],
+                'progress_sharing_is_turned_on':
+                    progress_sharing_permissions[ind],
                 'stories_progress': [],
                 'subtopic_pages_progress': []
             }
 
             # If progress sharing is turned off, then we don't need to
-            # fetch the progress of the student.
-            if not progress_sharing_permission:
+            # show the progress of the student.
+            if not progress_sharing_permissions[ind]:
                 all_students_progress.append(student_progress)
                 continue
 
-            # Fetch the progress of the student in all the stories assigned
-            # in the group syllabus.
-            stories_progress = story_fetchers.get_progress_in_stories(
-                user_id, story_ids)
-            story_summaries = story_fetchers.get_story_summaries_by_ids(
-                story_ids)
-
-            for index, summary in enumerate(story_summaries):
-                progress_dict = stories_progress[index].to_dict()
-                story_prog_dict = summary.to_dict()
-                story_prog_dict['story_is_published'] = True
-                story_prog_dict['completed_node_titles'] = (
-                    progress_dict['completed_node_titles'])
-                story_prog_dict['all_node_dicts'] = (
-                    progress_dict['all_node_dicts'])
-                student_progress['stories_progress'].append(story_prog_dict)
-
-            subtopic_pages_progress = (
-                learner_group_services.get_subtopic_pages_progress(
-                    user_id, subtopic_page_ids, topics, all_skill_ids
-                )
-            )
-
+            student_progress['stories_progress'] = stories_progresses[user_id]
             student_progress['subtopic_pages_progress'] = [
                 subtopic_page_progress.to_dict() for subtopic_page_progress in
-                subtopic_pages_progress
+                subtopic_pages_progresses[user_id]
             ]
 
             # Add current student's progress to all students progress.
