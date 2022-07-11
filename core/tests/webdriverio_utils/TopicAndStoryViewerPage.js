@@ -23,6 +23,15 @@ var waitFor = require('./waitFor.js');
 var TopicAndStoryViewerPage = function() {
   var lessonTrack = $('.e2e-test-lesson-track');
   var practiceSessionContainer = $('.e2e-test-practice-session-container');
+  var chapterTitleListSelector = function() {
+    return $$('.e2e-test-chapter-title');
+  };
+  var lessonCompletedIconsSelector = function() {
+    return $$('.e2e-test-lesson-icon-completed');
+  };
+  var lessonUncompletedIconsSelector = function() {
+    return $$('.e2e-test-lesson-icon-uncompleted');
+  };
 
   this.get = async function(
       classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
@@ -33,21 +42,21 @@ var TopicAndStoryViewerPage = function() {
   };
 
   this.goToChapterIndex = async function(index) {
-    var chapterTitleList = await $$('.e2e-test-chapter-title');
+    var chapterTitleList = await chapterTitleListSelector();
     var chapter = chapterTitleList[index];
     await action.click('Chapter title', chapter);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectCompletedLessonCountToBe = async function(count) {
-    var lessonCompletedIcons = await $$('.e2e-test-lesson-icon-completed');
+    var lessonCompletedIcons = await lessonCompletedIconsSelector();
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
     expect(lessonCompletedIcons.length).toEqual(count);
   };
 
   this.expectUncompletedLessonCountToBe = async function(count) {
-    var lessonUncompletedIcons = await $$('.e2e-test-lesson-icon-uncompleted');
+    var lessonUncompletedIcons = await lessonUncompletedIconsSelector();
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
     expect(lessonUncompletedIcons.length).toEqual(count);

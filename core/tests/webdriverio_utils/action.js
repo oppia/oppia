@@ -82,6 +82,8 @@ var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(`${optionToSelect} in ${selectorName}`, option);
 };
 
+// This method send a sequence of key strokes to an element after clearing
+// it's value.
 var setValue = async function(
     inputName, inputElement, keys, clickInputElement = true) {
   if (clickInputElement) {
@@ -90,6 +92,8 @@ var setValue = async function(
   await inputElement.setValue(keys);
 };
 
+// This method send a sequence of key strokes to an element without clearing
+// it's value before.
 var addValue = async function(
     inputName, inputElement, keys, clickInputElement = true) {
   if (clickInputElement) {
