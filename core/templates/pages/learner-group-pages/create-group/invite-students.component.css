@@ -8,10 +8,40 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-learner-group-details .oppia-long-text textarea {
-  resize: none;
+.oppia-learner-group-invite-students {
+  display: grid;
+  grid-gap: 20px;
 }
 
-.required-field {
-  color: #C55F45;
+.oppia-learner-group-invite-students .oppia-search-bar-input {
+  max-width: 560px;
+}
+
+.invited-students-inner-container {
+  background: rgba(39, 99, 92, 0.05);
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+}
+
+.invited-students-title {
+  color: #00645c;
+}
+
+.invited-student-card {
+  background: #fff;
+  border: 1px solid #27635c;
+  border-radius: 5px;
+  display: flex;
+  flex-basis: 17%;
+  gap: 15px;
+  padding: 10px;
+  width: max-content;
+}
+
+.invited-student-card .close-button {
+  align-items: center;
+  display: grid;
 }

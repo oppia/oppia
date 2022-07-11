@@ -17,7 +17,6 @@
 """Services for the learner groups."""
 
 from __future__ import annotations
-from ctypes import Union
 
 from core.constants import constants
 from core.domain import config_domain
@@ -30,7 +29,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -264,9 +263,8 @@ def get_matching_learner_group_syllabus_to_add(
         matching_topics = topic_fetchers.get_all_topics() # type: ignore[no-untyped-call]
 
     for topic in matching_topics:
-        if (
-            language_code != constants.DEFAULT_ADD_SYLLABUS_FILTER
-            and language_code != topic.language_code
+        if language_code not in (
+            constants.DEFAULT_ADD_SYLLABUS_FILTER, language_code
         ):
             continue
 

@@ -18,7 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { LearnerGroupPagesConstants } from "./learner-group-pages.constants";
+import { LearnerGroupPagesConstants } from './learner-group-pages.constants';
 
 angular.module('oppia').constant(
   'LEARNER_GROUP_CREATION_SECTION_I18N_IDS',

@@ -21,15 +21,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from
@@ -52,7 +46,6 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private pageTitleService: PageTitleService,
-    private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private facilitatorDashboardBackendApiService:
@@ -86,9 +79,10 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   learnerGroupPageUrl(learnerGroupId: string): string {
     return (
       this.urlInterpolationService.interpolateUrl(
-      '/create/learner-groups/<groupId>', {
-        groupId: learnerGroupId
-      })
+        '/create/learner-groups/<groupId>', {
+          groupId: learnerGroupId
+        }
+      )
     );
   }
 
@@ -98,13 +92,12 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
       LearnerGroupPagesConstants.CREATE_LEARNER_GROUP_PAGE_URL
     );
     this.facilitatorDashboardBackendApiService
-      .fetchTeacherDashboardLearnerGroupsAsync()
-        .then(shortGroupSummaries => {
+      .fetchTeacherDashboardLearnerGroupsAsync().then(
+        (shortGroupSummaries) => {
           this.shortLearnerGroupSummaries = shortGroupSummaries;
           this.loaderService.hideLoadingScreen();
-          console.log('shortGroupSummaries', shortGroupSummaries);
-        })
-
+        }
+      );
   }
 
   ngOnDestroy(): void {

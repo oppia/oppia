@@ -16,19 +16,16 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
- import { Component, EventEmitter, OnDestroy, OnInit, Output } from
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from
   '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { TranslateService } from '@ngx-translate/core';
- import { Subject, Subscription } from 'rxjs';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subject, Subscription } from 'rxjs';
 
- import { AlertsService } from 'services/alerts.service';
- import { ContextService } from 'services/context.service';
- import { UrlService } from 'services/contextual/url.service';
- import { WindowDimensionsService } from
+import { ContextService } from 'services/context.service';
+import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
- import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
- import { LoaderService } from 'services/loader.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LanguageIdAndText, LanguageUtilService } from
   'domain/utilities/language-util.service';
 import { NavigationService } from 'services/navigation.service';
@@ -36,10 +33,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
-import { LearnerGroupSyllabusFilter, LearnerGroupSyllabusBackendApiService } 
+import { LearnerGroupSyllabusFilter, LearnerGroupSyllabusBackendApiService }
   from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -49,7 +45,7 @@ interface SearchDropDownItems {
   id: string;
   text: string;
 }
- 
+
 @Component({
   selector: 'oppia-add-syllabus-items',
   templateUrl: './add-syllabus-items.component.html'
@@ -59,6 +55,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     EventEmitter<string[]> = new EventEmitter();
   @Output() updateLearnerGroupSubtopics:
     EventEmitter<string[]> = new EventEmitter();
+
   syllabusStoryIds: string[] = [];
   syllabusSubtopicPageIds: string[] = [];
   syllabusStorySummaries: StorySummary[] = [];
@@ -89,8 +86,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   constructor(
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private loaderService: LoaderService,
-    private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private navigationService: NavigationService,
@@ -98,7 +93,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     private constructTranslationIdsService: ConstructTranslationIdsService,
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService,
-    private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
@@ -115,7 +109,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('testing')
     this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
     this.KEYBOARD_EVENT_TO_KEY_CODES = (
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES);
@@ -132,14 +125,14 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         id: 'Story',
         text: 'Story'
       }
-    ]
+    ];
     this.selectionDetails = {
       types: {
         description: '',
         itemsName: 'types',
         masterList: this.SEARCH_DROPDOWN_TYPES,
         selection: '',
-        default: 'All',
+        defaultValue: 'All',
         summary: 'Type'
       },
       categories: {
@@ -147,7 +140,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         itemsName: 'categories',
         masterList: this.SEARCH_DROPDOWN_CATEGORIES,
         selection: '',
-        default: 'All',
+        defaultValue: 'All',
         summary: 'Category'
       },
       languageCodes: {
@@ -155,11 +148,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         itemsName: 'languages',
         masterList: this.SUPPORTED_CONTENT_LANGUAGES,
         selection: '',
-        default: 'All',
+        defaultValue: 'All',
         summary: 'Language'
       }
     };
-    // this.loaderService.showLoadingScreen('Loading');
     // Initialize the selection descriptions and summaries.
     for (let itemsType in this.selectionDetails) {
       this.updateSelectionDetails(itemsType);
@@ -173,8 +165,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         this.searchQuery = model;
         this.onSearchQueryChangeExec();
       });
-
-    console.log(this.selectionDetails, "selection details");
   }
 
   // Update the description field of the relevant entry of selectionDetails.
@@ -251,7 +241,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-   openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu(evt: KeyboardEvent, menuName: string): void {
     this.navigationService.openSubmenu(evt, menuName);
   }
 
@@ -261,24 +251,22 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
       keyword: this.searchQuery,
       type: (
         this.selectionDetails.types.selection ||
-        this.selectionDetails.types.default
+        this.selectionDetails.types.defaultValue
       ),
       category: (
         this.selectionDetails.categories.selection ||
-        this.selectionDetails.categories.default
+        this.selectionDetails.categories.defaultValue
       ),
       languageCode: (
         this.selectionDetails.languageCodes.selection ||
-        this.selectionDetails.languageCodes.default
+        this.selectionDetails.languageCodes.defaultValue
       )
     };
-    console.log(this.syllabusFilter, "syllabus filter");
     if (this.isValidSearch()) {
       this.learnerGroupSyllabusBackendApiService.searchNewSyllabusItemsAsync(
         'newId', this.syllabusFilter
       ).then((syllabusItems) => {
         this.searchIsInProgress = false;
-        console.log(syllabusItems, "syllabus items");
         this.storySummaries = syllabusItems.storySummaries;
         this.subtopicSummaries = syllabusItems.subtopicPageSummaries;
       });
@@ -309,7 +297,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   }
 
   getSubtopicThumbnailUrl(
-    subtopicSummary: LearnerGroupSubtopicSummary
+      subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
     let thumbnailUrl = '';
     if (subtopicSummary.thumbnailFilename) {
@@ -325,11 +313,11 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
   getStoryThumbnailUrl(storySummary: StorySummary): string {
     let thumbnailUrl = '';
-    if (storySummary.getThumbnailFilename()){
+    if (storySummary.getThumbnailFilename()) {
       thumbnailUrl = (
         this.assetsBackendApiService.getThumbnailUrlForPreview(
-            AppConstants.ENTITY_TYPE.STORY, storySummary.getId(),
-            storySummary.getThumbnailFilename()
+          AppConstants.ENTITY_TYPE.STORY, storySummary.getId(),
+          storySummary.getThumbnailFilename()
         )
       );
     }
@@ -361,7 +349,9 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.updateLearnerGroupSyllabus();
   }
 
-  removeSubtopicFromSyllabus(subtopicSummary: LearnerGroupSubtopicSummary): void {
+  removeSubtopicFromSyllabus(
+      subtopicSummary: LearnerGroupSubtopicSummary
+  ): void {
     this.syllabusSubtopicSummaries = this.syllabusSubtopicSummaries.filter(
       (s) => s.subtopicPageId !== subtopicSummary.subtopicPageId);
     this.syllabusSubtopicPageIds = this.syllabusSubtopicPageIds.filter(
@@ -373,7 +363,9 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     return this.syllabusStoryIds.indexOf(storySummary.getId()) !== -1;
   }
 
-  isSubtopicPartOfSyllabus(subtopicSummary: LearnerGroupSubtopicSummary): boolean {
+  isSubtopicPartOfSyllabus(
+      subtopicSummary: LearnerGroupSubtopicSummary
+  ): boolean {
     return this.syllabusSubtopicPageIds.indexOf(
       subtopicSummary.subtopicPageId) !== -1;
   }

@@ -16,15 +16,17 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { LearnerGroupInvitedUserInfo } from 'domain/learner_group/learner-group-user-progress.model';
- 
+import { LearnerGroupBackendApiService } from
+  'domain/learner_group/learner-group-backend-api.service';
+import { LearnerGroupInvitedUserInfo } from
+  'domain/learner_group/learner-group-user-progress.model';
+
 @Component({
   selector: 'oppia-invite-students',
   templateUrl: './invite-students.component.html'
@@ -33,6 +35,7 @@ export class InviteStudentsComponent implements OnInit {
   @Input() learnerGroupID: string;
   @Output() updateLearnerGroupInvitedStudents:
     EventEmitter<string[]> = new EventEmitter();
+
   learnerGroupTitle: string;
   learnerGroupDescription: string;
   searchedUsername: string;
@@ -43,7 +46,6 @@ export class InviteStudentsComponent implements OnInit {
   constructor(
     private alertsService: AlertsService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
@@ -57,7 +59,9 @@ export class InviteStudentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.placeholderMessage = 'Add username of the student to invite and press enter';
+    this.placeholderMessage = (
+      'Add username of the student to invite and press enter'
+    );
   }
 
   updateInvitedStudents(): void {
@@ -71,7 +75,7 @@ export class InviteStudentsComponent implements OnInit {
         this.alertsService.addWarning(
           'User with username ' + username + ' has been already invited.'
         );
-        return
+        return;
       }
       this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
         this.learnerGroupID, username
@@ -86,7 +90,6 @@ export class InviteStudentsComponent implements OnInit {
         }
       });
     }
-    
   }
 
   removeInvitedStudent(username: string): void {

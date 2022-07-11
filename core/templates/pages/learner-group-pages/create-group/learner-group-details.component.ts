@@ -20,7 +20,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
- 
+
 @Component({
   selector: 'oppia-learner-group-details',
   templateUrl: './learner-group-details.component.html'

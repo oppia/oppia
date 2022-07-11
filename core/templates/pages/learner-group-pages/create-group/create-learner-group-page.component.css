@@ -17,7 +17,7 @@
 }
 
 .oppia-create-learner-group-title {
-  color: #00609C;;
+  color: #00609c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 26px;
   padding-top: 60px;
@@ -33,8 +33,7 @@
 }
 
 .oppia-learner-groups-section-title {
-  color: #00609C;
-  font-family: 'Roboto';
+  color: #00609c;
   font-size: 24px;
   font-style: normal;
   font-weight: 400;
@@ -43,8 +42,8 @@
 
 .oppia-create-learner-group-progress {
   margin: auto;
+  margin-left: 40px;
   margin-top: 40px;
-  margin-left: -40px;
   max-width: 1120px;
 }
 
@@ -56,28 +55,24 @@
   position: relative;
 }
 
+.cdt-step-progressbar li {
+  border-left: 2px solid #9e9e9e;
+  color: #9e9e9e;
+  padding: 7px 0 40px 40px;
+  position: relative;
+}
+
 .cdt-step-progressbar.horizontal li {
-  color: #9E9E9E;
   border-left: none;
+  color: #9e9e9e;
   padding-left: 0;
   padding-top: 20px;
   text-align: center;
   width: 33%;
 }
 
-.cdt-step-progressbar li {
-  border-left: 2px solid #9E9E9E;
-  color: #9E9E9E;
-  padding: 7px 0 40px 40px;
-  position: relative;
-}
-
-.cdt-step-progressbar.horizontal li:first-child:before {
-  content: none;
-}
-
 .cdt-step-progressbar.horizontal li:before {
-  background-color: #9E9E9E;
+  background-color: #9e9e9e;
   content: "";
   height: 1px;
   left: -40%;
@@ -87,19 +82,16 @@
   z-index: 1;
 }
 
-.cdt-step-progressbar.horizontal li .indicator {
-  left: 50%;
-  position: absolute;
-  top: 0;
-  transform: translate(-50%,-50%);
+.cdt-step-progressbar.horizontal li:first-child:before {
+  content: none;
 }
 
 .cdt-step-progressbar li .indicator {
   align-items: center;
   background: #fff;
-  border: 2px solid #9E9E9E;
+  border: 2px solid #9e9e9e;
   border-radius: 50%;
-  color: #9E9E9E;
+  color: #9e9e9e;
   display: flex;
   height: 30px;
   justify-content: center;
@@ -110,48 +102,37 @@
   width: 30px;
 }
 
+.cdt-step-progressbar.horizontal li .indicator {
+  left: 50%;
+  position: absolute;
+  top: 0;
+  transform: translate(-50%,-50%);
+}
+
 .cdt-step-progressbar li.active .indicator {
-  border-color: #27635C;
-  color: #27635C;
+  border-color: #27635c;
+  color: #27635c;
 }
 
 .cdt-step-progressbar li.completed .indicator {
-  background-color: #27635C;
-  border-color: #27635C;
+  background-color: #27635c;
+  border-color: #27635c;
   color: #fff;
 }
 
 .cdt-step-progressbar li.active .title,
 .cdt-step-progressbar li.completed .title {
-  color: #27635C;
+  color: #27635c;
 }
 
 .oppia-create-learner-group-tab-container {
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
-  min-height: 440px;
   margin-top: -30px;
+  min-height: 440px;
   padding: 32px 30px 30px 40px;
   position: relative;
-}
-
-.oppia-create-learner-group-tab-container .required-field {
-  color: #C55F45;
-}
-
-.oppia-create-learner-group-tab-container .form-group {
-  display: grid;
-  grid-gap: 10px;
-}
-
-.oppia-learner-group-details {
-  display: grid;
-  grid-gap: 40px;
-}
-
-.oppia-learner-group-details .oppia-long-text textarea {
-  resize: none;
 }
 
 .oppia-next-section-container {
@@ -161,7 +142,7 @@
 }
 
 .oppia-next-section-button {
-  background: #D9D9D9;
+  background: #d9d9d9;
   border-radius: 4px;
   cursor: pointer;
   margin-left: auto;
@@ -171,7 +152,7 @@
 }
 
 .oppia-next-section-button.active {
-  background: #00645C;
+  background: #00645c;
   color: #fff;
   pointer-events: auto;
 }
@@ -179,46 +160,6 @@
 .add-syllabus-items-message {
   color: #757575;
   font-size: 14px;
-}
-
-/** Invite Students **/
-
-.oppia-learner-group-invite-students  {
-  display: grid;
-  grid-gap: 20px;
-}
-
-.oppia-learner-group-invite-students .oppia-search-bar-input {
-  max-width: 560px;
-}
-
-.invited-students-inner-container {
-  background: rgba(39, 99, 92, 0.05);
-  border-radius: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 20px;
-}
-
-.invited-students-title {
-  color: #00645C;
-}
-
-.invited-student-card {
-  background: #FFFFFF;
-  border: 1px solid #27635C;
-  border-radius: 5px;
-  display: flex;
-  flex-basis: 17%;
-  gap: 15px;
-  padding: 10px;
-  width: max-content;
-}
-
-.invited-student-card .close-button {
-  align-items: center;
-  display: grid;
 }
 
 .oppia-learner-group-created-container {
@@ -236,7 +177,7 @@
 }
 
 .oppia-learner-group-created-title {
-  color: #00645C;
+  color: #00645c;
 }
 
 .oppia-learner-group-created-container .group-link {

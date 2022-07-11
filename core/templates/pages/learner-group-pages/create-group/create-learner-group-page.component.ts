@@ -21,13 +21,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
@@ -135,14 +131,13 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('testing')
     this.activeSection = (
       this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS
     );
-    // this.loaderService.showLoadingScreen('Loading');
   }
 
   createLearnerGroup(): void {
+    this.loaderService.showLoadingScreen('Creating learner group');
     this.learnerGroupBackendApiService.createNewLearnerGroupAsync(
       this.learnerGroupTitle,
       this.learnerGroupDescription,
@@ -151,10 +146,9 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
       this.learnerGroupStoryIds
     ).then((responseLearnerGroup: LearnerGroupData) => {
       this.learnerGroup = responseLearnerGroup;
-      console.log(this.learnerGroup, "learnerGroupCreated");
+      this.loaderService.hideLoadingScreen();
     });
   }
-
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
