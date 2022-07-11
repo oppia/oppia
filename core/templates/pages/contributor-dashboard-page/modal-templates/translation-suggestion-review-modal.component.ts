@@ -301,6 +301,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   refreshModalData(): void {
     this.activeSuggestion = this.activeContribution.suggestion;
+    if (this.activeContribution.details === null) {
+      return;
+    }
     this.activeContributionDetails = this.activeContribution.details;
     this.contextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,

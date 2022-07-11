@@ -555,45 +555,45 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should initialize $scope properties after controller is initialized',
       fakeAsync(function() {
-          const messages = [{
-            author_username: '',
-            created_on_msecs: 0,
-            entity_type: '',
-            entity_id: '',
-            message_id: 0,
-            text: '',
-            updated_status: '',
-            updated_subject: '',
-          },
-          {
-            author_username: '',
-            created_on_msecs: 0,
-            entity_type: '',
-            entity_id: '',
-            message_id: 0,
-            text: 'Review Message',
-            updated_status: 'fixed',
-            updated_subject: null,
-          }];
+        const messages = [{
+          author_username: '',
+          created_on_msecs: 0,
+          entity_type: '',
+          entity_id: '',
+          message_id: 0,
+          text: '',
+          updated_status: '',
+          updated_subject: '',
+        },
+        {
+          author_username: '',
+          created_on_msecs: 0,
+          entity_type: '',
+          entity_id: '',
+          message_id: 0,
+          text: 'Review Message',
+          updated_status: 'fixed',
+          updated_subject: null,
+        }];
 
-          const fetchMessagesAsyncSpy = spyOn(
-            threadDataBackendApiService, 'fetchMessagesAsync')
-            .and.returnValue(Promise.resolve({messages: messages}));
+        const fetchMessagesAsyncSpy = spyOn(
+          threadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue(Promise.resolve({messages: messages}));
 
-          component.ngOnInit();
-          component.init();
-          tick();
+        component.ngOnInit();
+        component.init();
+        tick();
 
-          expect(component.activeSuggestionId).toBe('suggestion_1');
-          expect(component.activeSuggestion).toEqual(suggestion1);
-          expect(component.reviewable).toBe(reviewable);
-          expect(component.subheading).toBe('subheading_title');
-          // Suggestion 1's exploration_content_html does not match its
-          // content_html.
-          expect(component.hasExplorationContentChanged()).toBe(true);
-          expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
-          expect(component.reviewMessage).toBe('Review Message');
-        }));
+        expect(component.activeSuggestionId).toBe('suggestion_1');
+        expect(component.activeSuggestion).toEqual(suggestion1);
+        expect(component.reviewable).toBe(reviewable);
+        expect(component.subheading).toBe('subheading_title');
+        // Suggestion 1's exploration_content_html does not match its
+        // content_html.
+        expect(component.hasExplorationContentChanged()).toBe(true);
+        expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
+        expect(component.reviewMessage).toBe('Review Message');
+      }));
   });
 
   describe('when reviewing suggestions' +
