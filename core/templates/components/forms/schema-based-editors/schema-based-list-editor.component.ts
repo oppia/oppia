@@ -16,7 +16,7 @@
  * @fileoverview Component for a schema-based editor for lists.
  */
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
@@ -43,8 +43,19 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   ]
 })
 export class SchemaBasedListEditorComponent
-implements OnInit, ControlValueAccessor, Validator {
-  localValue: SchemaDefaultValue[] = [];
+implements AfterViewInit, ControlValueAccessor, Validator {
+  _localValue: SchemaDefaultValue[] = [];
+  @Input() set localValue(val: SchemaDefaultValue[]) {
+    if (this._localValue === val) {
+      return;
+    }
+    this._localValue = val;
+  }
+
+  get localValue(): SchemaDefaultValue[] {
+    return this._localValue;
+  }
+
   directiveSubscriptions = new Subscription();
   @Input() disabled: boolean;
   // Read-only property. The schema definition for each item in the list.
@@ -201,7 +212,7 @@ implements OnInit, ControlValueAccessor, Validator {
     this.onChange(this.localValue);
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     this.baseFocusLabel = (
       this.labelForFocusTarget ||
       this.idGenerationService.generateNewId() + '-');
