@@ -222,10 +222,6 @@ angular.module('oppia').component('explorationEditorPage', {
         }
       });
 
-      RouterService.refreshTranslationTabEventEmitter.subscribe(() => {
-        $scope.$applyAsync();
-      });
-
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
           PageTitleService.setDocumentTitle(
@@ -577,6 +573,11 @@ angular.module('oppia').component('explorationEditorPage', {
             () => {
               ctrl.startEditorTutorial();
             })
+        );
+        ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshTranslationTab.subscribe(() => {
+            $scope.$applyAsync();
+          })
         );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
