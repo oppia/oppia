@@ -2461,7 +2461,7 @@ def remove_contribution_reviewer(user_id: str) -> None:
 
 def get_contributor_usernames(
     category: str, language_code: Optional[str] = None
-) -> List[str]:
+) -> Sequence[str]:
     """Returns a list of usernames of users who has contribution rights of given
     category.
 
@@ -2472,7 +2472,7 @@ def get_contributor_usernames(
             review category.
 
     Returns:
-        list(str). A list of usernames.
+        Sequence(str). A list of usernames.
 
     Raises:
         Exception. The language code is not of None for question review
@@ -2507,8 +2507,6 @@ def get_contributor_usernames(
         raise Exception('Invalid category: %s' % category)
 
     usernames = get_usernames(user_ids, strict=True)
-    # Ruling out the possibility of Sequence for mypy type checking.
-    assert isinstance(usernames, list)
     return usernames
 
 

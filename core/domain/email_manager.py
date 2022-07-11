@@ -493,7 +493,11 @@ def _send_email(
     require_sender_id_is_valid(intent, sender_id)
 
     if recipient_email is None:
-        recipient_email = user_services.get_email_from_user_id(recipient_id)
+        recipient_email_address = user_services.get_email_from_user_id(
+            recipient_id
+        )
+    else:
+        recipient_email_address = recipient_email
 
     cleaned_html_body = html_cleaner.clean(email_html_body)
     if cleaned_html_body != email_html_body:
@@ -520,14 +524,13 @@ def _send_email(
         """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert recipient_email is not None
         email_services.send_mail(
-            sender_name_email, recipient_email, email_subject,
+            sender_name_email, recipient_email_address, email_subject,
             cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin)
         email_models.SentEmailModel.create(
-            recipient_id, recipient_email, sender_id, sender_name_email, intent,
-            email_subject, cleaned_html_body, datetime.datetime.utcnow())
+            recipient_id, recipient_email_address, sender_id, sender_name_email,
+            intent, email_subject, cleaned_html_body, datetime.datetime.utcnow()
+        )
 
     _send_email_transactional()
 
