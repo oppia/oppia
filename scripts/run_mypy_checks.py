@@ -63,8 +63,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/question_domain_test.py',
     'core/domain/question_services.py',
     'core/domain/question_services_test.py',
-    'core/domain/skill_domain.py',
-    'core/domain/skill_domain_test.py',
     'core/domain/skill_services.py',
     'core/domain/skill_services_test.py',
     'core/domain/state_domain.py',
