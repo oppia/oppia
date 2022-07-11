@@ -1103,18 +1103,15 @@ def get_multi_users_skills_mastery(
         as the corresponding mastery degree of the user or None if
         UserSkillMasteryModel does not exist for the skill.
     """
-    degrees_of_masteries = {user_id: {} for user_id in user_ids}
-    model_ids = []
-
     all_combinations = list(itertools.product(user_ids, skill_ids))
-
+    model_ids = []
     for (user_id, skill_id) in all_combinations:
         model_ids.append(user_models.UserSkillMasteryModel.construct_model_id(
             user_id, skill_id))
 
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
-
+    degrees_of_masteries = {user_id: {} for user_id in user_ids}
     for ind, (user_id, skill_id) in enumerate(all_combinations):
         skill_mastery_model = skill_mastery_models[ind]
         if skill_mastery_model is None:

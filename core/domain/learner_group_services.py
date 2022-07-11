@@ -257,7 +257,6 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-
         matching_topics = topic_fetchers.get_topics_by_ids(matching_topic_ids) # type: ignore[no-untyped-call]
     else:
         matching_topics = topic_fetchers.get_all_topics() # type: ignore[no-untyped-call]
@@ -358,12 +357,11 @@ def get_matching_subtopic_syllabus_item_dicts(
     """
     matching_subtopic_syllabus_item_dicts: List[
         subtopic_page_domain.SubtopicPageSummaryDict] = []
-
     for subtopic in topic.subtopics:
         subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
         if subtopic_page_id not in group_subtopic_page_ids:
             if keyword is None or keyword in subtopic.title.lower():
-                syllabus_subtopic_dict: subtopic_page_domain.SubtopicPageSummaryDict = { # pylint: disable=line-too-long
+                matching_subtopic_syllabus_item_dicts.append({
                     'subtopic_id': subtopic.id,
                     'subtopic_title': subtopic.title,
                     'parent_topic_id': topic.id,
@@ -371,10 +369,7 @@ def get_matching_subtopic_syllabus_item_dicts(
                     'thumbnail_filename': subtopic.thumbnail_filename,
                     'thumbnail_bg_color': subtopic.thumbnail_bg_color,
                     'subtopic_mastery': None
-                }
-                matching_subtopic_syllabus_item_dicts.append(
-                    syllabus_subtopic_dict
-                )
+                })
 
     return matching_subtopic_syllabus_item_dicts
 
@@ -404,7 +399,6 @@ def get_matching_story_syllabus_item_dicts(
             story.story_is_published is True
         )
     ]
-
     matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
     stories = story_fetchers.get_stories_by_ids(story_ids)
 
@@ -417,7 +411,7 @@ def get_matching_story_syllabus_item_dicts(
             # Ruling out the possibility of None for mypy type checking.
             assert story is not None
             summary_dict = story_summary.to_dict()
-            syllabus_story_dict: story_domain.LearnerGroupSyllabusStorySummaryDict = { # pylint: disable=line-too-long
+            matching_story_syllabus_item_dicts.append({
                 'id': summary_dict['id'],
                 'title': summary_dict['title'],
                 'description': summary_dict['description'],
@@ -439,8 +433,7 @@ def get_matching_story_syllabus_item_dicts(
                 ],
                 'topic_name': topic.name,
                 'topic_url_fragment': topic.url_fragment
-            }
-            matching_story_syllabus_item_dicts.append(syllabus_story_dict)
+            })
 
     return matching_story_syllabus_item_dicts
 
@@ -506,7 +499,6 @@ def invite_students_to_learner_group(
         user_models.LearnerGroupsUserModel.get_multi(invited_student_ids))
 
     models_to_put = []
-
     for index, student_id in enumerate(invited_student_ids):
         learner_groups_user_model = learner_groups_user_models[index]
         if learner_groups_user_model:
@@ -539,7 +531,6 @@ def remove_invited_students_from_learner_group(
         user_models.LearnerGroupsUserModel.get_multi(student_ids))
 
     models_to_put = []
-
     for model in found_models:
         # Ruling out the possibility of None for mypy type checking.
         assert model is not None

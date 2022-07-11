@@ -350,7 +350,7 @@ def get_topic_ids_from_subtopic_page_ids(
 def get_multi_users_subtopic_pages_progress(
     user_ids: List[str],
     subtopic_page_ids: List[str]
-) -> Dict[str, List[subtopic_page_domain.SubtopicPageSummary]]:
+) -> Dict[str, List[subtopic_page_domain.SubtopicPageSummaryDict]]:
     """Returns the progress of the given user on the given subtopic pages.
 
     Args:
@@ -358,15 +358,12 @@ def get_multi_users_subtopic_pages_progress(
         subtopic_page_ids: list(str). The ids of the subtopic pages.
 
     Returns:
-        dict(str, list(SubtopicPageSummary)). User IDs as keys and Subtopic
-        Page Summary domain object containing details of the subtopic page
-        and users mastery in it as values.
+        dict(str, list(SubtopicPageSummaryDict)). User IDs as keys and Subtopic
+        Page Summary domain object dictionaries containing details of the
+        subtopic page and users mastery in it as values.
     """
 
-    topic_ids = get_topic_ids_from_subtopic_page_ids(
-        subtopic_page_ids
-    )
-
+    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
     topics = topic_fetchers.get_topics_by_ids(topic_ids) # type: ignore[no-untyped-call]
 
     all_skill_ids_lists = [
@@ -388,7 +385,7 @@ def get_multi_users_subtopic_pages_progress(
     )
 
     all_users_subtopic_prog_summaries: Dict[
-        str, List[subtopic_page_domain.SubtopicPageSummary]
+        str, List[subtopic_page_domain.SubtopicPageSummaryDict]
     ] = {user_id: [] for user_id in user_ids}
 
     for topic in topics:
@@ -404,25 +401,23 @@ def get_multi_users_subtopic_pages_progress(
                         skill_id in subtopic.skill_ids
                     )
                 }
-                subtopic_prog_summary = (
-                    subtopic_page_domain.SubtopicPageSummary(
-                        subtopic_id=subtopic.id,
-                        subtopic_title=subtopic.title,
-                        parent_topic_id=topic.id,
-                        parent_topic_name=topic.name,
-                        thumbnail_filename=subtopic.thumbnail_filename,
-                        thumbnail_bg_color=subtopic.thumbnail_bg_color,
-                        subtopic_mastery=None
-                    )
-                )
+                subtopic_mastery: Optional[float] = None
+
                 # Subtopic mastery is average of skill masteries.
                 if skill_mastery_dict:
-                    subtopic_prog_summary.subtopic_mastery = (
+                    subtopic_mastery = (
                         sum(skill_mastery_dict.values()) /
                         len(skill_mastery_dict)
                     )
-                all_users_subtopic_prog_summaries[user_id].append(
-                    subtopic_prog_summary
-                )
+
+                all_users_subtopic_prog_summaries[user_id].append({
+                    'subtopic_id': subtopic.id,
+                    'subtopic_title': subtopic.title,
+                    'parent_topic_id': topic.id,
+                    'parent_topic_name': topic.name,
+                    'thumbnail_filename': subtopic.thumbnail_filename,
+                    'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                    'subtopic_mastery': subtopic_mastery
+                })
 
     return all_users_subtopic_prog_summaries

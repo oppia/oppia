@@ -257,74 +257,57 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         """
 
         student_usernames = self.normalized_request.get('student_usernames')
-
         student_user_ids = user_services.get_multi_user_ids_from_usernames(
             student_usernames)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             learner_group_id)
-
         if learner_group is None:
             raise self.InvalidInputException('No such learner group exists.')
 
-        subtopic_page_ids = learner_group.subtopic_page_ids
-        story_ids = learner_group.story_ids
-
-        all_students_progress = []
-
-        # Get progress sharing permissions for all students.
         progress_sharing_permissions = (
             learner_group_fetchers.can_multi_students_share_progress(
                 student_user_ids, learner_group_id
             )
         )
-
-        # This will store user ids of all students who have their progress
-        # sharing permissions enabled.
         students_with_progress_sharing_on = []
-
-        for ind, user_id in enumerate(student_user_ids):
-            if progress_sharing_permissions[ind]:
+        for i, user_id in enumerate(student_user_ids):
+            if progress_sharing_permissions[i]:
                 students_with_progress_sharing_on.append(user_id)
 
-        # Fetch the progress of the students who have progress sharing turned
-        # on in all the stories assigned in the group syllabus.
+        story_ids = learner_group.story_ids
         stories_progresses = (
             story_fetchers.get_multi_users_progress_in_stories(
                 students_with_progress_sharing_on, story_ids
             )
         )
-
-        # Fetch the progress of the students who have progress sharing turned
-        # on in all the subtopic pages assigned in the group syllabus.
+        subtopic_page_ids = learner_group.subtopic_page_ids
         subtopic_pages_progresses = (
             subtopic_page_services.get_multi_users_subtopic_pages_progress(
                 students_with_progress_sharing_on, subtopic_page_ids
             )
         )
 
-        for ind, user_id in enumerate(student_user_ids):
+        all_students_progress = []
+        for i, user_id in enumerate(student_user_ids):
             student_progress = {
-                'username': student_usernames[ind],
+                'username': student_usernames[i],
                 'progress_sharing_is_turned_on':
-                    progress_sharing_permissions[ind],
+                    progress_sharing_permissions[i],
                 'stories_progress': [],
                 'subtopic_pages_progress': []
             }
 
             # If progress sharing is turned off, then we don't need to
             # show the progress of the student.
-            if not progress_sharing_permissions[ind]:
+            if not progress_sharing_permissions[i]:
                 all_students_progress.append(student_progress)
                 continue
 
             student_progress['stories_progress'] = stories_progresses[user_id]
-            student_progress['subtopic_pages_progress'] = [
-                subtopic_page_progress.to_dict() for subtopic_page_progress in
+            student_progress['subtopic_pages_progress'] = (
                 subtopic_pages_progresses[user_id]
-            ]
-
-            # Add current student's progress to all students progress.
+            )
             all_students_progress.append(student_progress)
 
         self.render_json({
@@ -466,7 +449,6 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
 
         is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id)
-
         if not is_valid_request:
             raise self.UnauthorizedUserException(
                 'You are not a facilitator of this learner group.')
