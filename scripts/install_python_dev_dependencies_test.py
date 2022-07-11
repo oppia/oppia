@@ -25,7 +25,7 @@ import sys
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
-from typing import List
+from typing import Any, Dict, List, Tuple
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
@@ -47,7 +47,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         environ_swap = self.swap(os, 'environ', {})
         expected_error = (
             'Oppia must be developed within a virtual environment.')
-        with self.assertRaisesRegex(AssertionError, expected_error):
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                AssertionError, expected_error):
             with prefix_swap, base_prefix_swap, environ_swap:
                 install_python_dev_dependencies.assert_in_venv()
 
@@ -88,7 +89,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_install_dev_dependencies(self) -> None:
 
-        def mock_run(*args, **kwargs) -> None:  # pylint: disable=unused-argument
+        def mock_run(
+                *_args: Tuple[Any],
+                **_kwargs: Dict[Any, Any]) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
@@ -105,7 +108,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_compile_dev_dependencies(self) -> None:
 
-        def mock_run(*args, **kwargs) -> None:  # pylint: disable=unused-argument
+        def mock_run(
+                *_args: Tuple[Any],
+                **_kwargs: Dict[Any, Any]) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
@@ -124,7 +129,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             install_python_dev_dependencies.compile_dev_dependencies()
 
     def test_main(self) -> None:
-        def mock_func():
+        def mock_func() -> None:
             pass
 
         assert_swap = self.swap_with_checks(
