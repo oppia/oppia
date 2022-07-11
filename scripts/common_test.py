@@ -32,6 +32,8 @@ import sys
 import tempfile
 import time
 
+import github
+
 from core import constants
 from core import utils
 from core.tests import test_utils
@@ -40,13 +42,6 @@ from typing import Generator, List, NoReturn
 from typing_extensions import Literal
 
 from . import common
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
-
-import github # isort:skip  pylint: disable=wrong-import-position
 
 
 # The pool_size argument is required by Requester.__init__(), but it is

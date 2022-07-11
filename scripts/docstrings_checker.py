@@ -22,16 +22,11 @@ import os
 import re
 import sys
 
+import astroid
+from pylint.checkers import utils
+from pylint.extensions import _check_docs_utils
+
 from scripts import common
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'pylint-%s' % common.PYLINT_VERSION)
-sys.path.insert(0, _PYLINT_PATH)
-
-import astroid # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.checkers import utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def space_indentation(s):
