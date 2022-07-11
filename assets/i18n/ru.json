@@ -265,6 +265,7 @@
 	"I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "Выберите предпочитаемые языки...",
 	"I18N_PREFERENCES_USERNAME": "Имя участника",
 	"I18N_PREFERENCES_USERNAME_NOT_SELECTED": "Пока не выбрано",
+	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Уже есть учётная запись?",
 	"I18N_SHOW_LESS": "Показать меньше",
 	"I18N_SIDEBAR_ABOUT_LINK": "О нас",
 	"I18N_SIDEBAR_ABOUT_OPPIA_FOUNDATION": "О фонде «Oppia»",
