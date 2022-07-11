@@ -126,7 +126,6 @@
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
         "scripts.linters.css_linter_test",
         "scripts.rtl_css_test",
-        "core.jobs.batch_jobs.exp_version_history_computation_job_test",
         "extensions.actions.ExplorationStart.ExplorationStart_test",
         "extensions.actions.AnswerSubmit.AnswerSubmit_test",
         "extensions.actions.ExplorationQuit.ExplorationQuit_test",
@@ -206,7 +205,8 @@
         "core.domain.app_feedback_report_constants_test",
         "scripts.linters.warranted_angular_security_bypasses_test",
         "scripts.create_expression_parser_test",
-        "scripts.run_frontend_tests_test"
+        "scripts.run_frontend_tests_test",
+        "core.jobs.batch_jobs.exp_version_history_computation_job_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
