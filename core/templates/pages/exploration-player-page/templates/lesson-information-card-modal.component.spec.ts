@@ -24,6 +24,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
@@ -58,9 +59,38 @@ export class MockLimitToPipe implements PipeTransform {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/learn/math',
+      href: '',
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
+    },
+    localStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
+    },
+    gtag: () => {},
+    history: {
+      pushState(data: object, title: string, url?: string | null) {}
+    },
+    document: {
+      body: {
+        style: {
+          overflowY: 'auto',
+        }
+      }
+    }
+  };
+}
+
 describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
+  let mockWindowRef: MockWindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let dateTimeFormatService: DateTimeFormatService;
   let ratingComputationService: RatingComputationService;
@@ -77,6 +107,7 @@ describe('Lesson Information card modal component', () => {
   let rating: ExplorationRatings;
 
   beforeEach(waitForAsync(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -95,6 +126,10 @@ describe('Lesson Information card modal component', () => {
         DateTimeFormatService,
         RatingComputationService,
         UrlInterpolationService,
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -145,8 +180,6 @@ describe('Lesson Information card modal component', () => {
       .and.returnValues(true, false);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValues(false, true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
   });
 
   it('should initialize the component', () => {
@@ -226,13 +259,12 @@ describe('Lesson Information card modal component', () => {
   });
 
   it('should determine if current language is RTL', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+    const isLanguageRTLSpy = spyOn(
+      i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(true);
 
     expect(componentInstance.isLanguageRTL()).toBe(true);
 
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      false);
+    isLanguageRTLSpy.and.returnValue(false);
 
     expect(componentInstance.isLanguageRTL()).toBe(false);
   });
@@ -309,11 +341,15 @@ describe('Lesson Information card modal component', () => {
       spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
       componentInstance.loggedOutProgressUniqueUrlId = 'abcdef';
 
+      expect(mockWindowRef.nativeWindow.location.href).toEqual('');
+
       componentInstance.onLoginButtonClicked();
       tick(100);
 
       expect(localStorageService.updateUniqueProgressIdOfLoggedOutLearner)
         .toHaveBeenCalledWith('abcdef');
+      expect(mockWindowRef.nativeWindow.location.href).toEqual(
+        'https://oppia.org/login');
     })
   );
 
