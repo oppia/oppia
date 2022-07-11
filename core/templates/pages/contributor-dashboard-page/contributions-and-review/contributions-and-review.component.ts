@@ -302,9 +302,11 @@ angular.module('oppia').component('contributionsAndReview', {
           var skill = skillDict.skill;
           misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
           _showQuestionSuggestionModal(
-            suggestion, suggestionIdToContribution,
+            suggestion, 
+            suggestionIdToContribution,
             reviewable,
-            misconceptionsBySkill);
+            misconceptionsBySkill
+          );
           $rootScope.$apply();
         });
       };
