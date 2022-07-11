@@ -1,8 +1,8 @@
 <div>
-  <span class="protractor-test-state-name-container">
+  <span class="e2e-test-state-name-container">
     <span ng-if="$ctrl.EditabilityService.isEditable()">
       <span ng-if="!$ctrl.StateNameService.isStateNameEditorShown()" ng-click="$ctrl.openStateNameEditor()" class="oppia-editable-section">
-        <strong class="oppia-state-name-text protractor-test-state-name-text"><[$ctrl.StateEditorService.getActiveStateName()]></strong>
+        <strong class="oppia-state-name-text e2e-test-state-name-text"><[$ctrl.StateEditorService.getActiveStateName()]></strong>
         <button ng-if="$ctrl.EditabilityService.isEditable()" class="material-icons oppia-editor-edit-icon oppia-autofocus"
                 title="Edit State Name">&#xE254;
         </button>
@@ -10,8 +10,8 @@
 
       <span ng-if="$ctrl.StateNameService.isStateNameEditorShown()">
         <form class="form-horizontal" role="form" ng-submit="$ctrl.saveStateNameAndRefresh($ctrl.tmpStateName)">
-          <input type="text" ng-model="$ctrl.tmpStateName" maxlength="{{$ctrl.maxLen}}" focus-on="stateNameEditorOpened" class="protractor-test-state-name-input">
-          <button type="submit" class="btn btn-success btn-sm protractor-test-state-name-submit">Save</button>
+          <input type="text" ng-model="$ctrl.tmpStateName" maxlength="{{$ctrl.maxLen}}" focus-on="stateNameEditorOpened" class="e2e-test-state-name-input">
+          <button type="submit" class="btn btn-success btn-sm e2e-test-state-name-submit">Save</button>
         </form>
       </span>
     </span>

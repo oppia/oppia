@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.rtl.css" as="style">
-
 <ng-template #popContent>
   <div class="oppia-answer-popup-container">
     <div class="oppia-answer-popup">
@@ -43,7 +40,7 @@
          [src]="oppiaAvatarImageUrl" alt="">
   </a>
   <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
-       class="protractor-test-input-response-loading-dots">
+       class="e2e-test-input-response-loading-dots">
     <div class="conversation-skin-feedback-dot-one"></div>
     <div class="conversation-skin-feedback-dot-two"></div>
     <div class="conversation-skin-feedback-dot-three"></div>
@@ -52,13 +49,9 @@
   <div dir="auto">
     <angular-html-bind-wrapper *ngIf="data.oppiaResponse !== null"
                                [htmlData]="data.oppiaResponse"
-                               [classStr]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'protractor-test-conversation-feedback-latest' : '')"
+                               [classStr]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
                                [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
                                [ngClass]="getFeedbackAudioHighlightClass()">
     </angular-html-bind-wrapper>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.rtl.css">

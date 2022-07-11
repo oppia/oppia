@@ -21,7 +21,7 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { Subtopic } from './subtopic.model';
 
 describe('Learner Topic summary model', () => {
-  let _sampleLearnerTopicSummary: LearnerTopicSummary = null;
+  let _sampleLearnerTopicSummary: LearnerTopicSummary;
 
   beforeEach(() => {
     let subtopic = {

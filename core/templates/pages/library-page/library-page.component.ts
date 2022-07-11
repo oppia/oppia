@@ -37,6 +37,9 @@ import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
+import './library-page.component.css';
+
+
 interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
   buttonText: string;
@@ -255,10 +258,6 @@ export class LibraryPageComponent {
     this.mobileLibraryGroupsProperties[idx].inCollapsedState =
       !this.mobileLibraryGroupsProperties[idx].inCollapsedState;
     this.toggleButtonText(idx);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   setPageTitle(): void {
