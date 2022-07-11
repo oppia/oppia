@@ -20,7 +20,7 @@ import { ReplaceInputsWithEllipsesPipe } from
   'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 
 describe('Testing filters', function() {
-  let pipe: ReplaceInputsWithEllipsesPipe = null;
+  let pipe: ReplaceInputsWithEllipsesPipe;
   beforeEach(() => {
     pipe = new ReplaceInputsWithEllipsesPipe();
   });
@@ -31,8 +31,10 @@ describe('Testing filters', function() {
 
   it('should convert {{...}} tags to ...', () => {
     expect(pipe.transform('')).toEqual('');
-    expect(pipe.transform(null)).toEqual('');
-    expect(pipe.transform(undefined)).toEqual('');
+    // Use unknown type conversion to check input invalidity.
+    expect(pipe.transform(null as unknown as string)).toEqual('');
+    // Use unknown type conversion to check input invalidity.
+    expect(pipe.transform(undefined as unknown as string)).toEqual('');
     expect(pipe.transform('hello')).toEqual('hello');
     expect(pipe.transform('{{hello}}')).toEqual('...');
     expect(pipe.transform('{{hello}} and {{goodbye}}')).toEqual('... and ...');
