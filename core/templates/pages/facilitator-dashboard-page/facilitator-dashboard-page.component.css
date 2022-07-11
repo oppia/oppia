@@ -12,13 +12,14 @@
   margin: 0 auto 0 auto;
   max-width: 1160px;
   text-align: left;
+  width: 90%;
 }
 
 .oppia-facilitator-dashboard-title {
-  padding-top: 80px;
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 36px;
+  padding-top: 80px;
 }
 
 .oppia-learner-groups-section {
@@ -28,6 +29,13 @@
   margin-top: 100px;
   min-height: 460px;
   padding: 32px 30px 30px 40px;
+}
+
+.oppia-learner-groups-section-title-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 .oppia-learner-groups-section-title {
@@ -41,8 +49,47 @@
 
 .oppia-create-new-learner-group-button {
   background: #00645C;
+  border: solid 1px #00645C;
   border-radius: 4px;
   color: #fff;
+  font-weight: 700;
   padding: 8px 24px;
   text-align: center;
+}
+
+.oppia-create-new-learner-group-button:hover {
+  background: #fff;
+  border-radius: 4px;
+  color: #00645C;
+}
+
+.oppia-learner-group-summary-cards-container {
+  display: grid;
+  grid-gap: 20px;
+  margin-top: 40px;
+}
+
+.oppia-learner-group-summary-card {
+  background: #fff;
+  border: 1px solid #E6E6E6;
+  border-radius: 4px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.oppia-learner-group-summary-card .oppia-learner-group-summary-card-info {
+  color: #000;
+}
+
+.oppia-learner-group-summary-card .oppia-learner-group-summary-card-info:hover {
+  text-decoration: none;
+}
+
+.oppia-learner-group-summary-card-title {
+  font-size: 20px;
+}
+
+.oppia-learner-group-summary-card-students {
+  color: #555555;
+  font-size: 14px;
 }

@@ -23,8 +23,6 @@ import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
-import { Subtopic } from 'domain/topic/subtopic.model';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -55,13 +53,10 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   learnerGroup!: LearnerGroupData;
 
   constructor(
-    private alertsService: AlertsService,
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
-    private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
-    private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
@@ -85,7 +80,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_TOPNAV_TEACHER_DASHBOARD');
+      'I18N_TOPNAV_FACILITATOR_DASHBOARD');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 

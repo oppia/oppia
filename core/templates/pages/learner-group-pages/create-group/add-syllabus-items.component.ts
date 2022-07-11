@@ -42,6 +42,8 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { AppConstants } from 'app.constants';
 
 interface SearchDropDownItems {
   id: string;
@@ -82,6 +84,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   searchIsInProgress = false;
   storySummaries: StorySummary[];
   subtopicSummaries: LearnerGroupSubtopicSummary[] = [];
+  syllabusFilter: LearnerGroupSyllabusFilter;
 
   constructor(
     private contextService: ContextService,
@@ -95,7 +98,8 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     private constructTranslationIdsService: ConstructTranslationIdsService,
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
   checkMobileView(): boolean {
@@ -253,7 +257,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
   onSearchQueryChangeExec(): void {
     this.searchIsInProgress = true;
-    let syllabusFilter: LearnerGroupSyllabusFilter = {
+    this.syllabusFilter = {
       keyword: this.searchQuery,
       type: (
         this.selectionDetails.types.selection ||
@@ -268,14 +272,21 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         this.selectionDetails.languageCodes.default
       )
     };
-    this.learnerGroupSyllabusBackendApiService.searchNewSyllabusItemsAsync(
-      'newId', syllabusFilter
-    ).then((syllabusItems) => {
-      this.searchIsInProgress = false;
+    console.log(this.syllabusFilter, "syllabus filter");
+    if (this.isValidSearch()) {
+      this.learnerGroupSyllabusBackendApiService.searchNewSyllabusItemsAsync(
+        'newId', this.syllabusFilter
+      ).then((syllabusItems) => {
+        this.searchIsInProgress = false;
         console.log(syllabusItems, "syllabus items");
         this.storySummaries = syllabusItems.storySummaries;
         this.subtopicSummaries = syllabusItems.subtopicPageSummaries;
-    });
+      });
+    } else {
+      this.searchIsInProgress = false;
+      this.storySummaries = [];
+      this.subtopicSummaries = [];
+    }
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
@@ -284,9 +295,45 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     }
   }
 
-  getCompleteThumbnailIconUrl(thumbnailFilename: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(
-      '/' + thumbnailFilename);
+  isValidSearch(): boolean {
+    return (
+      this.searchQuery.length > 0 ||
+      this.selectionDetails.types.selection.length > 0 ||
+      this.selectionDetails.categories.selection.length > 0 ||
+      this.selectionDetails.languageCodes.selection.length > 0
+    );
+  }
+
+  isSearchInProgress(): boolean {
+    return this.searchIsInProgress;
+  }
+
+  getSubtopicThumbnailUrl(
+    subtopicSummary: LearnerGroupSubtopicSummary
+  ): string {
+    let thumbnailUrl = '';
+    if (subtopicSummary.thumbnailFilename) {
+      thumbnailUrl = (
+        this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.TOPIC, subtopicSummary.parentTopicId,
+          subtopicSummary.thumbnailFilename
+        )
+      );
+    }
+    return thumbnailUrl;
+  }
+
+  getStoryThumbnailUrl(storySummary: StorySummary): string {
+    let thumbnailUrl = '';
+    if (storySummary.getThumbnailFilename()){
+      thumbnailUrl = (
+        this.assetsBackendApiService.getThumbnailUrlForPreview(
+            AppConstants.ENTITY_TYPE.STORY, storySummary.getId(),
+            storySummary.getThumbnailFilename()
+        )
+      );
+    }
+    return thumbnailUrl;
   }
 
   updateLearnerGroupSyllabus(): void {

@@ -16,24 +16,12 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
- import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { TranslateService } from '@ngx-translate/core';
- import { Subscription } from 'rxjs';
- 
- import { AppConstants } from 'app.constants';
- import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
- import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
- import { Subtopic } from 'domain/topic/subtopic.model';
- import { AlertsService } from 'services/alerts.service';
- import { ContextService } from 'services/context.service';
- import { UrlService } from 'services/contextual/url.service';
- import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
- import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
- import { LoaderService } from 'services/loader.service';
- import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupPagesConstants } from './learner-group-pages.constants';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupInvitedUserInfo } from 'domain/learner_group/learner-group-user-progress.model';
  
@@ -41,13 +29,12 @@ import { LearnerGroupInvitedUserInfo } from 'domain/learner_group/learner-group-
   selector: 'oppia-invite-students',
   templateUrl: './invite-students.component.html'
 })
-export class InviteStudentsComponent implements OnInit, OnDestroy {
+export class InviteStudentsComponent implements OnInit {
+  @Input() learnerGroupID: string;
   @Output() updateLearnerGroupInvitedStudents:
     EventEmitter<string[]> = new EventEmitter();
   learnerGroupTitle: string;
   learnerGroupDescription: string;
-  directiveSubscriptions = new Subscription();
-
   searchedUsername: string;
   placeholderMessage: string;
   invitedUsersInfo: LearnerGroupInvitedUserInfo[] = [];
@@ -55,14 +42,9 @@ export class InviteStudentsComponent implements OnInit, OnDestroy {
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private loaderService: LoaderService,
-    private pageTitleService: PageTitleService,
-    private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
 
@@ -76,11 +58,6 @@ export class InviteStudentsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.placeholderMessage = 'Add username of the student to invite and press enter';
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
-    this.contextService.removeCustomEntityContext();
   }
 
   updateInvitedStudents(): void {
@@ -97,7 +74,7 @@ export class InviteStudentsComponent implements OnInit, OnDestroy {
         return
       }
       this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
-        'newId', username
+        this.learnerGroupID, username
       ).then((userInfo) => {
         if (!userInfo.error) {
           this.invitedUsersInfo.push(userInfo);

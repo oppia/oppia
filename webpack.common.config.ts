@@ -96,7 +96,7 @@ module.exports = {
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
-    teacher_dashboard:
+    facilitator_dashboard:
       commonPrefix + '/pages/facilitator-dashboard-page/' +
       'facilitator-dashboard-page.import.ts',
     learner_group_creator:
@@ -481,7 +481,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['teacher_dashboard'],
+      chunks: ['facilitator_dashboard'],
       filename: 'facilitator-dashboard-page.mainpage.html',
       hybrid: true,
       meta: defaultMeta,

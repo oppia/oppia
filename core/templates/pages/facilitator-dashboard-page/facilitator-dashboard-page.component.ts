@@ -32,6 +32,11 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupPagesConstants } from
+  'pages/learner-group-pages/learner-group-pages.constants';
+import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
+import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'oppia-facilitator-dashboard-page',
@@ -40,17 +45,20 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  createLearnerGroupPageUrl: string;
+  shortLearnerGroupSummaries: ShortLearnerGroupSummary[];
 
   constructor(
-    private alertsService: AlertsService,
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
-    private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private facilitatorDashboardBackendApiService:
+      FacilitatorDashboardBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private loaderService: LoaderService
   ) {}
 
   checkMobileView(): boolean {
@@ -71,12 +79,32 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_TOPNAV_TEACHER_DASHBOARD');
+      'I18N_TOPNAV_FACILITATOR_DASHBOARD');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
+  learnerGroupPageUrl(learnerGroupId: string): string {
+    return (
+      this.urlInterpolationService.interpolateUrl(
+      '/create/learner-groups/<groupId>', {
+        groupId: learnerGroupId
+      })
+    );
+  }
+
   ngOnInit(): void {
-    // this.loaderService.showLoadingScreen('Loading');
+    this.loaderService.showLoadingScreen('Loading your learner groups');
+    this.createLearnerGroupPageUrl = (
+      LearnerGroupPagesConstants.CREATE_LEARNER_GROUP_PAGE_URL
+    );
+    this.facilitatorDashboardBackendApiService
+      .fetchTeacherDashboardLearnerGroupsAsync()
+        .then(shortGroupSummaries => {
+          this.shortLearnerGroupSummaries = shortGroupSummaries;
+          this.loaderService.hideLoadingScreen();
+          console.log('shortGroupSummaries', shortGroupSummaries);
+        })
+
   }
 
   ngOnDestroy(): void {

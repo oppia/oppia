@@ -8,10 +8,145 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-learner-group-details .oppia-long-text textarea {
-  resize: none;
+.learner-group-syllabus-filters-title {
+  font-size: 18px;
+  margin-bottom: 5px;
+  margin-top: 30px;
 }
 
-.required-field {
-  color: #C55F45;
+.add-learner-group-syllabus-desc-text {
+  color: #00645C;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.9;
+}
+
+.learner-group-syllabus-filters-container {
+  display: flex;
+}
+
+.search-bar-float-left {
+  border: 0.5px solid #bdbdbc;
+  margin-top: 10px;
+}
+
+.oppia-add-learner-group-syllabus {
+  padding-bottom: 70px;
+}
+
+.oppia-add-learner-group-syllabus .form-group {
+  margin-bottom: 0;
+}
+
+.oppia-search-bar-icon {
+  padding: 5px;
+}
+
+.oppia-same-row-container.oppia-search-box-container {
+  width: 49%;
+}
+
+.oppia-same-row-container {
+  width: 17%;
+}
+
+.oppia-search-bar-dropdown-toggle {
+  width: 100%;
+}
+
+.filtered-syllabus-items-container {
+  display: grid;
+  grid-gap: 12px;
+  max-height: 300px;
+  overflow: auto;
+  padding: 20px;
+}
+
+.syllabus-item-card {
+  background: #fff;
+  border: 1px solid #E6E6E6;
+  border-radius: 4px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  padding: 10px;
+}
+
+.syllabus-item-image-title-container {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 70%;
+}
+
+.syllabus-item-title-container {
+  align-items: center;
+  justify-content: right;
+}
+
+.syllabus-item-title-info {
+  color: #999999;
+  font-size: 14px;
+}
+
+.syllabus-item-cta-buttons-container {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: right;
+  padding: 6px;
+  width: 30%;
+}
+
+.syllabus-item-cta-buttons-container .syllabus-item-details-cta-button {
+  background: #fff;
+  border: 1px solid #00609C;
+  color: #00609C;
+  font-weight: 700;
+  min-width: 130px;
+}
+
+.syllabus-item-cta-buttons-container .syllabus-item-details-cta-button:hover {
+  background: #00609C;
+  color: #fff;
+}
+
+.syllabus-item-cta-buttons-container .syllabus-item-add-cta-button {
+  background: #fff;
+  border: 1px solid #27635C;
+  color: #27635C;
+  font-weight: 700;
+  min-width: 130px;
+}
+
+.syllabus-item-cta-buttons-container .syllabus-item-add-cta-button:hover {
+  background: #27635C;
+  color: #fff;
+}
+
+.syllabus-item-cta-buttons-container .syllabus-item-add-cta-button.disabled {
+  background: #fff;
+  border: 1px solid #9E9E9E;
+  color: #9E9E9E;
+  font-weight: 700;
+  min-width: 130px;
+  pointer-events: none;
+}
+
+.syllabus-item-cta-buttons-container .syllabus-item-remove-cta-button {
+  background: #C30000;
+  border: 1px solid #C30000;
+  color: #fff;
+  font-weight: 700;
+  min-width: 130px;
+}
+
+.added-syllabus-container .filtered-syllabus-items-container {
+  background: rgba(39, 99, 92, 0.05);
+  max-height: 200px;
+}
+
+.syllabus-item-image {
+  height: 75px;
+  object-fit: fill;
+  width: 100px
 }

@@ -75,7 +75,7 @@ export default {
     "Reading", "Statistics"],
 
   // These classrooms are shown in the add learner group syllabus filters.
-  "SEARCH_DROPDOWN_CLASSROOMS": ["Maths"],
+  "SEARCH_DROPDOWN_CLASSROOMS": ["math"],
 
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",

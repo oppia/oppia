@@ -1,5 +1,5 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css" as="style">
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/add-syllabus-items.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/add-syllabus-items.component.rtl.css" as="style">
 
 <div class="oppia-add-learner-group-syllabus">
   <div class="add-learner-group-syllabus-desc-text">
@@ -9,9 +9,12 @@
     <div>Added lessons</div>
     <div class="filtered-syllabus-items-container">
       <div class="syllabus-item-card" *ngFor="let storySummary of syllabusStorySummaries; trackBy: index">
-        <div class="syllabus-item-image-desc-container">
-          <img class="thumbnail-image syllabus-item-image" [src]="storySummary.getThumbnailFilename() && getCompleteThumbnailIconUrl(storySummary.getThumbnailFilename())">
-          <div class="syllabus-item-des">{{ storySummary.getTitle() }}</div>
+        <div class="syllabus-item-image-title-container">
+          <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
+          <div class="syllabus-item-title-container">
+            <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
+            <div class="syllabus-item-title-info">Story | {{ storySummary.getTopicName() }}</div>
+          </div>
         </div>
         <div class="syllabus-item-cta-buttons-container">
           <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
@@ -24,9 +27,12 @@
         </div>
       </div>
       <div class="syllabus-item-card" *ngFor="let subtopicSummary of syllabusSubtopicSummaries; trackBy: index">
-        <div class="syllabus-item-image-desc-container">
-          <img class="thumbnail-image syllabus-item-image" [src]="getCompleteThumbnailIconUrl(subtopicSummary.thumbnailFilename)">
-          <div class="syllabus-item-des">{{ subtopicSummary.subtopicTitle }}</div>
+        <div class="syllabus-item-image-title-container">
+          <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
+          <div class="syllabus-item-title-container">
+            <div class="syllabus-item-title">{{ subtopicSummary.subtopicTitle }}</div>
+            <div class="syllabus-item-title-info">Skill | {{ subtopicSummary.parentTopicName }}</div>
+          </div>
         </div>
         <div class="syllabus-item-cta-buttons-container">
           <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
@@ -174,9 +180,12 @@
   </div>
   <div class="filtered-syllabus-items-container">
     <div class="syllabus-item-card" *ngFor="let storySummary of storySummaries; trackBy: index">
-      <div class="syllabus-item-image-desc-container">
-        <img class="thumbnail-image syllabus-item-image" [src]="storySummary.getThumbnailFilename() && getCompleteThumbnailIconUrl(storySummary.getThumbnailFilename())">
-        <div class="syllabus-item-des">{{ storySummary.getTitle() }}</div>
+      <div class="syllabus-item-image-title-container">
+        <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
+        <div class="syllabus-item-title-container">
+          <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
+          <div class="syllabus-item-title-info">Story | {{ storySummary.getTopicName() }}</div>
+        </div>
       </div>
       <div class="syllabus-item-cta-buttons-container">
         <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
@@ -193,9 +202,12 @@
       </div>
     </div>
     <div class="syllabus-item-card" *ngFor="let subtopicSummary of subtopicSummaries; trackBy: index">
-      <div class="syllabus-item-image-desc-container">
-        <img class="thumbnail-image syllabus-item-image" [src]="getCompleteThumbnailIconUrl(subtopicSummary.thumbnailFilename)">
-        <div class="syllabus-item-des">{{ subtopicSummary.subtopicTitle }}</div>
+      <div class="syllabus-item-image-title-container">
+        <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
+        <div class="syllabus-item-title-container">
+          <div class="syllabus-item-title">{{ subtopicSummary.subtopicTitle }}</div>
+          <div class="syllabus-item-title-info">Skill | {{ subtopicSummary.parentTopicName }}</div>
+        </div>
       </div>
       <div class="syllabus-item-cta-buttons-container">
         <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
@@ -214,5 +226,5 @@
   </div>
 </div>
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/learner-group-details.component.rtl.css">
+<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/add-syllabus-items.component.css">
+<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/add-syllabus-items.component.rtl.css">

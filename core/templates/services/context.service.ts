@@ -135,8 +135,8 @@ export class ContextService {
           return ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD;
         } else if (pathnameArray[i] === 'facilitator-dashboard') {
           this.pageContext = (
-            ServicesConstants.PAGE_CONTEXT.TEACHER_DASHBOARD);
-          return ServicesConstants.PAGE_CONTEXT.TEACHER_DASHBOARD;
+            ServicesConstants.PAGE_CONTEXT.FACILITATOR_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.FACILITATOR_DASHBOARD;
         }
       }
 

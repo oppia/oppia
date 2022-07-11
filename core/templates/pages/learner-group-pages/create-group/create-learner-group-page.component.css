@@ -11,14 +11,16 @@
 .oppia-create-learner-group-container {
   margin: 0 auto 0 auto;
   max-width: 1080px;
+  padding-bottom: 40px;
   text-align: left;
+  width: 90%;
 }
 
 .oppia-create-learner-group-title {
-  padding-top: 60px;
   color: #00609C;;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 26px;
+  padding-top: 60px;
 }
 
 .oppia-learner-groups-section {
@@ -42,32 +44,32 @@
 .oppia-create-learner-group-progress {
   margin: auto;
   margin-top: 40px;
-  max-width: 1120px;
   margin-left: -40px;
+  max-width: 1120px;
 }
 
 .cdt-step-progressbar {
-  list-style: none;
-  position: relative;
   counter-reset: step;
   display: flex;
   flex-direction: row;
+  list-style: none;
+  position: relative;
 }
 
 .cdt-step-progressbar.horizontal li {
   color: #9E9E9E;
+  border-left: none;
   padding-left: 0;
   padding-top: 20px;
-  border-left: none;
   text-align: center;
   width: 33%;
 }
 
 .cdt-step-progressbar li {
-  padding: 7px 0 40px 40px;
   border-left: 2px solid #9E9E9E;
-  position: relative;
   color: #9E9E9E;
+  padding: 7px 0 40px 40px;
+  position: relative;
 }
 
 .cdt-step-progressbar.horizontal li:first-child:before {
@@ -75,36 +77,37 @@
 }
 
 .cdt-step-progressbar.horizontal li:before {
-  content: "";
-  position: absolute;
-  width: 80%;
-  height: 1px;
   background-color: #9E9E9E;
-  top: 0;
+  content: "";
+  height: 1px;
   left: -40%;
+  position: absolute;
+  top: 0;
+  width: 80%;
   z-index: 1;
 }
 
 .cdt-step-progressbar.horizontal li .indicator {
-  position: absolute;
   left: 50%;
+  position: absolute;
   top: 0;
   transform: translate(-50%,-50%);
 }
+
 .cdt-step-progressbar li .indicator {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #fff;
-  position: absolute;
-  left: 0;
-  top: 0;
-  border: 2px solid #9E9E9E;
-  color: #9E9E9E;
-  transform: translate(-50%);
-  display: flex;
   align-items: center;
+  background: #fff;
+  border: 2px solid #9E9E9E;
+  border-radius: 50%;
+  color: #9E9E9E;
+  display: flex;
+  height: 30px;
   justify-content: center;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform: translate(-50%);
+  width: 30px;
 }
 
 .cdt-step-progressbar li.active .indicator {
@@ -151,15 +154,20 @@
   resize: none;
 }
 
-.oppia-next-section-button {
+.oppia-next-section-container {
+  bottom: 30px;
   position: absolute;
   right: 30px;
-  bottom: 30px;
-  cursor: pointer;
-  padding: 6px 28px;
+}
+
+.oppia-next-section-button {
   background: #D9D9D9;
   border-radius: 4px;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 6px 28px;
   pointer-events: none;
+  width: max-content;
 }
 
 .oppia-next-section-button.active {
@@ -168,135 +176,9 @@
   pointer-events: auto;
 }
 
-.oppia-learner-group-created-container {
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 0 4px #0000001a;
-  margin-top: 200px;
-  min-height: 260px;
-  padding: 32px 30px 30px 40px;
-}
-
-/**
- * The following style rules are for the learner group add syllabus section.
- */
-.learner-group-syllabus-filters-title {
-  font-size: 18px;
-  margin-top: 30px;
-  margin-bottom: 5px;
-}
-
-.add-learner-group-syllabus-desc-text {
+.add-syllabus-items-message {
+  color: #757575;
   font-size: 14px;
-  font-weight: 400;
-  line-height: 1.9;
-  color: #00645C;
-}
-
-.learner-group-syllabus-filters-container {
-  display: flex;
-}
-
-.search-bar-float-left {
-  margin-top: 10px;
-  border: 0.5px solid #bdbdbc
-}
-
-.oppia-add-learner-group-syllabus .form-group {
-  margin-bottom: 0;
-}
-
-.oppia-search-bar-icon {
-  padding: 5px;
-}
-
-.oppia-same-row-container.oppia-search-box-container {
-  width: 49%;
-}
-
-.oppia-same-row-container {
-  width: 17%;
-}
-
-.oppia-search-bar-dropdown-toggle {
-  width: 100%;
-}
-
-.filtered-syllabus-items-container {
-  display: grid;
-  grid-gap: 12px;
-  max-height: 200px;
-  padding: 20px;
-}
-
-.syllabus-item-card {
-  background: #fff;
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  display: flex;
-}
-
-.syllabus-item-image-desc-container {
-  width: 70%;
-  align-items: center;
-}
-
-.syllabus-item-des {
-  align-items: center;
-  justify-content: right;
-}
-
-.syllabus-item-cta-buttons-container {
-  justify-content: right;
-  width: 30%;
-  display: flex;
-  gap: 10px;
-  padding: 6px;
-}
-
-.syllabus-item-cta-buttons-container .syllabus-item-details-cta-button {
-  background: #fff;
-  border: 1px solid #00609C;
-  color: #00609C;
-  font-weight: 700;
-  min-width: 130px;
-}
-
-.syllabus-item-cta-buttons-container .syllabus-item-add-cta-button {
-  background: #fff;
-  border: 1px solid #27635C;
-  color: #27635C;
-  font-weight: 700;
-  min-width: 130px;
-}
-
-.syllabus-item-cta-buttons-container .syllabus-item-add-cta-button {
-  background: #fff;
-  border: 1px solid #27635C;
-  color: #27635C;
-  font-weight: 700;
-  min-width: 130px;
-}
-
-.syllabus-item-cta-buttons-container .syllabus-item-add-cta-button.disabled {
-  background: #fff;
-  border: 1px solid #9E9E9E;
-  color: #9E9E9E;
-  font-weight: 700;
-  min-width: 130px;
-  pointer-events: none;
-}
-
-.syllabus-item-cta-buttons-container .syllabus-item-remove-cta-button {
-  background: #C30000;
-  border: 1px solid #C30000;
-  color: #fff;
-  font-weight: 700;
-  min-width: 130px;
-}
-
-.added-syllabus-container .filtered-syllabus-items-container {
-  background: rgba(39, 99, 92, 0.05);
 }
 
 /** Invite Students **/
@@ -337,4 +219,26 @@
 .invited-student-card .close-button {
   align-items: center;
   display: grid;
+}
+
+.oppia-learner-group-created-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 200px;
+  max-width: 560px;
+  min-height: 200px;
+  min-width: 320px;
+  padding: 60px;
+  width: 90%;
+}
+
+.oppia-learner-group-created-title {
+  color: #00645C;
+}
+
+.oppia-learner-group-created-container .group-link {
+  text-align: center;
 }

@@ -16,78 +16,27 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
- import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { TranslateService } from '@ngx-translate/core';
- import { Subscription } from 'rxjs';
- 
- import { AppConstants } from 'app.constants';
- import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
- import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
- import { Subtopic } from 'domain/topic/subtopic.model';
- import { AlertsService } from 'services/alerts.service';
- import { ContextService } from 'services/context.service';
- import { UrlService } from 'services/contextual/url.service';
- import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
- import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
- import { LoaderService } from 'services/loader.service';
- import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
  
 @Component({
   selector: 'oppia-learner-group-details',
   templateUrl: './learner-group-details.component.html'
 })
-export class LearnerGroupDetailsComponent implements OnInit, OnDestroy {
+export class LearnerGroupDetailsComponent {
   @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
   @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
   learnerGroupTitle: string;
   learnerGroupDescription: string;
-  directiveSubscriptions = new Subscription();
 
   constructor(
-    private alertsService: AlertsService,
-    private contextService: ContextService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private loaderService: LoaderService,
-    private pageTitleService: PageTitleService,
-    private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
-    private urlService: UrlService,
-    private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
-
-  checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 500);
-  }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
-  subscribeToOnLangChange(): void {
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
-  }
-
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_TOPNAV_TEACHER_DASHBOARD');
-    this.pageTitleService.setDocumentTitle(translatedTitle);
-  }
-
-  ngOnInit(): void {
-    console.log('testing')
-    // this.loaderService.showLoadingScreen('Loading');
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
-    this.contextService.removeCustomEntityContext();
   }
 
   updateLearnerGroupDetails(): void {
