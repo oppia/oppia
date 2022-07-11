@@ -870,7 +870,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         # Here we are defining a VersionedRubricDict and in VersionedRubricDict
         # there is no key exists with the name `explanation`, but here for
         # testing purposes we are defining `explanation` key which causes MyPy
-        # to throw error. Thus to avoid the error, we used ignore here. 
+        # to throw error. Thus to avoid the error, we used ignore here.
         versioned_rubrics: skill_domain.VersionedRubricDict = {
             'schema_version': 1,
             'rubrics': [

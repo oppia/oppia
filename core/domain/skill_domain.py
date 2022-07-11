@@ -2206,6 +2206,7 @@ class CategorizedSkills:
                 ]
         return result_categorized_skills_dict
 
+
 class ShortSkillSummaryDict(TypedDict):
     """Dictionary representing the ShortSkillSummary object."""
 
