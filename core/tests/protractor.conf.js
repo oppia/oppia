@@ -116,6 +116,10 @@ var suites = {
       'protractor_desktop/publicationAndLibrary.js'
     ],
 
+    topicAndStoryEditor: [
+      'protractor_desktop/topicAndStoryEditor.js'
+    ],
+
     topicAndStoryEditorFileUploadFeatures: [
       'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
     ],
@@ -126,6 +130,10 @@ var suites = {
 
     skillEditor: [
       'protractor_desktop/skillEditor.js'
+    ],
+
+    topicAndStoryViewer: [
+      'protractor_desktop/topicAndStoryViewer.js'
     ],
 
     wipeout: [
