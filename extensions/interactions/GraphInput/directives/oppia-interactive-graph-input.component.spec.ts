@@ -24,6 +24,8 @@ import { InteractiveGraphInput } from './oppia-interactive-graph-input.component
 import { TranslateModule } from '@ngx-translate/core';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { GraphAnswer } from 'interactions/answer-defs';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('InteractiveGraphInput', () => {
   let component: InteractiveGraphInput;
@@ -34,7 +36,9 @@ describe('InteractiveGraphInput', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         graph: {
           value: JSON.parse(attributes.graphWithValue)
@@ -66,8 +70,10 @@ describe('InteractiveGraphInput', () => {
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: GraphAnswer, rulesService: CurrentInteractionService) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -389,7 +395,8 @@ describe('InteractiveGraphInput', () => {
   });
 
   it('should return false when a invalid graph is passed', () => {
-    component.graph = null;
+    // Using unknown type conversion to check for an invalid graph.
+    component.graph = null as unknown as GraphAnswer;
 
     expect(component.validityCheckFn()).toBe(false);
   });

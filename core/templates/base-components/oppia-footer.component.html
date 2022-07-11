@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/base-components/oppia-footer.component.rtl.css" as="style">
-
 <footer class="oppia-footer" role="contentinfo">
   <div class="oppia-footer-container">
     <div class="row row-cols-2">
@@ -112,7 +109,3 @@
     </div>
   </div>
 </footer>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/oppia-footer.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/oppia-footer.component.rtl.css">

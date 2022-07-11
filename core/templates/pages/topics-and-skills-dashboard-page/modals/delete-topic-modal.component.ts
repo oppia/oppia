@@ -25,7 +25,10 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: './delete-topic-modal.component.html'
 })
 export class DeleteTopicModalComponent extends ConfirmOrCancelModal {
-  topicName: string;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicName!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal
