@@ -289,9 +289,27 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     const threadMessageBackendDicts = response.messages;
     let threadMessages = threadMessageBackendDicts.map(
       m => ThreadMessage.createFromBackendDict(m));
+    // This is to prevent a console error when a contribution
+    // doesn't have a review message. When a contribution has
+    // a review message the second element of the threadMessages
+    // array contains the actual review message.
     if (threadMessages[1] !== undefined) {
       this.reviewMessage = threadMessages[1].text;
     }
+  }
+
+  refreshModalData(): void {
+    this.activeSuggestion = this.activeContribution.suggestion;
+    this.activeContributionDetails = this.activeContribution.details;
+    this.contextService.setCustomEntityContext(
+      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      this.activeSuggestion.target_id);
+    this.subheading = (
+      `${this.activeContributionDetails.topic_name} / ` +
+      `${this.activeContributionDetails.story_title} / ` +
+      `${this.activeContributionDetails.chapter_title}`
+    );
+    this.init();
   }
 
   gotoNextItem(): void {
@@ -319,17 +337,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
-    this.activeSuggestion = this.activeContribution.suggestion;
-    this.activeContributionDetails = this.activeContribution.details;
-    this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
-      this.activeSuggestion.target_id);
-    this.subheading = (
-      `${this.activeContributionDetails.topic_name} / ` +
-      `${this.activeContributionDetails.story_title} / ` +
-      `${this.activeContributionDetails.chapter_title}`
-    );
-    this.init();
+    this.refreshModalData();
   }
 
   gotoPreviousItem(): void {
@@ -357,17 +365,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
-    this.activeSuggestion = this.activeContribution.suggestion;
-    this.activeContributionDetails = this.activeContribution.details;
-    this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
-      this.activeSuggestion.target_id);
-    this.subheading = (
-      `${this.activeContributionDetails.topic_name} / ` +
-      `${this.activeContributionDetails.story_title} / ` +
-      `${this.activeContributionDetails.chapter_title}`
-    );
-    this.init();
+    this.refreshModalData();
   }
 
   processAndGotoNextItem(suggestionId: string): void {

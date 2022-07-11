@@ -804,6 +804,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContribution);
       component.ngOnInit();
+      spyOn(component, 'refreshModalData').and.callThrough();
 
       expect(component.isFirstItem).toBeTrue();
       expect(component.isLastItem).toBeFalse();
@@ -826,6 +827,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.remainingContributionIds.length).toEqual(0);
       expect(component.skippedContributionIds).toEqual(['suggestion_1']);
       expect(component.activeSuggestionId).toEqual('suggestion_2');
+      expect(component.refreshModalData).toHaveBeenCalled();
 
       component.gotoNextItem();
       // As we are on the last item, gotoNextItem shoudn't navigate.
@@ -842,6 +844,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.remainingContributionIds).toEqual(['suggestion_2']);
       expect(component.skippedContributionIds.length).toEqual(0);
       expect(component.activeSuggestionId).toEqual('suggestion_1');
+      expect(component.refreshModalData).toHaveBeenCalled();
     });
 
     it('should close the modal if the opportunity is' +
