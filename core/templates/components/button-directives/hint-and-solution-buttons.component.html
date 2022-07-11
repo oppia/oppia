@@ -5,13 +5,13 @@
   <ul [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}" class="list-inline">
     <span class="float-left footer-hints-label" translate="I18N_PLAYER_HINTS"></span>
     <li *ngFor="let hintIndex of hintIndexes; index as idx">
-      <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
+      <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
               *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)"
               [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
               (click)="displayHintModal(hintIndex)">
         <i class="material-icons">&#xE90F;</i>
       </button>
-      <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
+      <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
               *ngIf="hintIndex && isHintButtonVisible(hintIndex)"
               [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
               (click)="displayHintModal(hintIndex)">
@@ -19,7 +19,7 @@
       </button>
     </li>
     <li *ngIf="isSolutionButtonVisible()">
-      <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-solution"
+      <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-solution"
               [ngClass]="{'viewed': isSolutionConsumed()}"
               (click)="onClickSolutionButton()">
         <i class="material-icons oppia-lightbulb-yellow">&#xE90F;</i>

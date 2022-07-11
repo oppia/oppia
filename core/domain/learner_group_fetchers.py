@@ -87,27 +87,33 @@ def get_learner_groups_of_facilitator(
     ]
 
 
-def get_progress_sharing_permission(user_id: str, group_id: str) -> bool:
-    """Returns the progress sharing permission of the given user in the given
+def can_multi_students_share_progress(
+    user_ids: List[str], group_id: str
+) -> List[bool]:
+    """Returns the progress sharing permissions of the given users in the given
     group.
 
     Args:
-        user_id: str. The id of the user.
+        user_ids: list(str). The user ids of the students of the group.
         group_id: str. The id of the learner group.
 
     Returns:
-        bool. True if the user has progress sharing permission of the given
-        group as True, False otherwise.
+        list(bool). True if a user has progress sharing permission of the
+        given group as True, False otherwise.
     """
-    learner_group_user_model = user_models.LearnerGroupsUserModel.get(
-        user_id, strict=False
+    learner_group_user_models = user_models.LearnerGroupsUserModel.get_multi(
+        user_ids
     )
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert learner_group_user_model is not None
+    progress_sharing_permissions: List[bool] = []
 
-    for group_details in learner_group_user_model.learner_groups_user_details:
-        if group_details['group_id'] == group_id:
-            return bool(group_details['progress_sharing_is_turned_on'])
+    for model in learner_group_user_models:
+        assert model is not None
+        for group_details in model.learner_groups_user_details:
+            if group_details['group_id'] == group_id:
+                progress_sharing_permissions.append(
+                    bool(group_details['progress_sharing_is_turned_on'])
+                )
+                break
 
-    return False
+    return progress_sharing_permissions

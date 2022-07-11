@@ -581,8 +581,8 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         students_prog = response['students_progress']
         student1_stories_prog = students_prog[0]['stories_progress']
         student2_stories_prog = students_prog[1]['stories_progress']
-        student1_subtopics_prog = students_prog[0]['subtopic_page_progress']
-        student2_subtopics_prog = students_prog[1]['subtopic_page_progress']
+        student1_subtopics_prog = students_prog[0]['subtopic_pages_progress']
+        student2_subtopics_prog = students_prog[1]['subtopic_pages_progress']
         story_summary = story_fetchers.get_story_summaries_by_ids(
             [self.STORY_ID_1])[0]
         story = story_fetchers.get_story_by_id(self.STORY_ID_1)
@@ -590,6 +590,8 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         expected_story_prog_summary['story_is_published'] = True
         expected_story_prog_summary['completed_node_titles'] = (
             ['Title 1', 'Title 2'])
+        expected_story_prog_summary['topic_name'] = 'Topic'
+        expected_story_prog_summary['topic_url_fragment'] = 'topic'
         expected_story_prog_summary['all_node_dicts'] = (
             [node.to_dict() for node in story.story_contents.nodes])
 

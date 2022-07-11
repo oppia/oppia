@@ -23,7 +23,6 @@ from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
 from core.domain import learner_group_fetchers
-from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -135,17 +134,11 @@ def update_learner_group(
     Returns:
         learner_group: learner_group_domain.LearnerGroup. The domain object
         of the updated learner group.
-
-    Raises:
-        Exception. The learner group with the given id does not exist.
     """
 
     learner_group_model = learner_group_models.LearnerGroupModel.get(
-        group_id, strict=False)
-
-    if not learner_group_model:
-        raise Exception(
-            'The learner group with the given group id does not exist.')
+        group_id, strict=True
+    )
 
     old_invited_student_ids = set(learner_group_model.invited_student_user_ids)
     new_invited_student_ids = set(invited_student_ids)
@@ -188,13 +181,11 @@ def is_user_facilitator(user_id: str, group_id: str) -> bool:
     Returns:
         bool. Whether the user is a facilitator of the learner group.
     """
-    learner_group = learner_group_fetchers.get_learner_group_by_id(
-        group_id)
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert learner_group is not None
-
-    return user_id in learner_group.facilitator_user_ids
+    return user_id in learner_group_model.facilitator_user_ids
 
 
 def remove_learner_group(group_id: str) -> None:
@@ -204,10 +195,8 @@ def remove_learner_group(group_id: str) -> None:
         group_id: str. The id of the learner group to be removed.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
-        group_id, strict=False)
-
-    # Ruling out the possibility of None for mypy type checking.
-    assert learner_group_model is not None
+        group_id, strict=True
+    )
 
     # Note: We are not deleting the references of the learner group from the
     # related learner group user models. These references are deleted when the
@@ -215,27 +204,6 @@ def remove_learner_group(group_id: str) -> None:
     # notification saying the group was deleted instead of the group just being
     # silently removed.
     learner_group_model.delete()
-
-
-def get_topic_ids_from_subtopic_page_ids(
-    subtopic_page_ids: List[str]
-) -> List[str]:
-    """Returns the topic ids corresponding to the given subtopic page ids.
-
-    Args:
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
-
-    Returns:
-        list(str). The topic ids corresponding to the given subtopic page ids.
-    """
-    topic_ids: List[str] = []
-
-    for subtopic_page_id in subtopic_page_ids:
-        topic_id = subtopic_page_id.split(':')[0]
-        if topic_id not in topic_ids:
-            topic_ids.append(topic_id)
-
-    return topic_ids
 
 
 def get_matching_learner_group_syllabus_to_add(
@@ -303,28 +271,36 @@ def get_matching_learner_group_syllabus_to_add(
             continue
 
         # If the keyword matches a topic name.
-        if topic.canonical_name.find(keyword) != -1:
+        if keyword in topic.canonical_name:
             # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the filtered
             # story ids.
             if (
-                search_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
             ):
                 matching_story_syllabus_item_dicts.extend(
                     get_matching_story_syllabus_item_dicts(
-                        topic, group_story_ids))
+                        topic, group_story_ids
+                    )
+                )
 
             # If search type is set to default or search type is set to
             # 'Skill', add all subtopics of this topic to the filtered
             # subtopics.
             if (
-                search_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
             ):
                 matching_subtopics_dicts.extend(
                     get_matching_subtopic_syllabus_item_dicts(
-                        topic, group_subtopic_page_ids))
+                        topic, group_subtopic_page_ids
+                    )
+                )
 
         # If the keyword does not matches a topic name.
         else:
@@ -332,23 +308,31 @@ def get_matching_learner_group_syllabus_to_add(
             # 'Skill', add the subtopics which have the keyword in their
             # title to the filtered subtopics.
             if (
-                search_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
             ):
                 matching_subtopics_dicts.extend(
                     get_matching_subtopic_syllabus_item_dicts(
-                        topic, group_subtopic_page_ids, keyword))
+                        topic, group_subtopic_page_ids, keyword
+                    )
+                )
 
             # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the possible
             # story ids.
             if (
-                search_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER)
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
             ):
                 matching_story_syllabus_item_dicts.extend(
                     get_matching_story_syllabus_item_dicts(
-                        topic, group_story_ids, keyword))
+                        topic, group_story_ids, keyword
+                    )
+                )
 
     return {
         'story_summary_dicts': matching_story_syllabus_item_dicts,
@@ -380,9 +364,9 @@ def get_matching_subtopic_syllabus_item_dicts(
         subtopic_page_domain.SubtopicPageSummaryDict] = []
 
     for subtopic in topic.subtopics:
-        subtopic_page_id = topic.id + ':' + str(subtopic.id)
+        subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
         if subtopic_page_id not in group_subtopic_page_ids:
-            if keyword is None or subtopic.title.lower().find(keyword) != -1:
+            if keyword is None or keyword in subtopic.title.lower():
                 syllabus_subtopic_dict: subtopic_page_domain.SubtopicPageSummaryDict = { # pylint: disable=line-too-long
                     'subtopic_id': subtopic.id,
                     'subtopic_title': subtopic.title,
@@ -393,7 +377,8 @@ def get_matching_subtopic_syllabus_item_dicts(
                     'subtopic_mastery': None
                 }
                 matching_subtopic_syllabus_item_dicts.append(
-                    syllabus_subtopic_dict)
+                    syllabus_subtopic_dict
+                )
 
     return matching_subtopic_syllabus_item_dicts
 
@@ -418,8 +403,10 @@ def get_matching_story_syllabus_item_dicts(
     story_ids = [
         story.story_id for story in
         topic.canonical_story_references
-        if (story.story_id not in group_story_ids
-            and story.story_is_published is True)
+        if (
+            story.story_id not in group_story_ids and
+            story.story_is_published is True
+        )
     ]
 
     matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
@@ -428,9 +415,12 @@ def get_matching_story_syllabus_item_dicts(
     matching_story_syllabus_item_dicts: List[
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
 
-    for ind, story in enumerate(matching_stories):
-        if keyword is None or story.title.lower().find(keyword) != -1:
-            summary_dict = story.to_dict()
+    for ind, story_summary in enumerate(matching_stories):
+        if keyword is None or keyword in story_summary.title.lower():
+            story = stories[ind]
+            # Ruling out the possibility of None for mypy type checking.
+            assert story is not None
+            summary_dict = story_summary.to_dict()
             syllabus_story_dict: story_domain.LearnerGroupSyllabusStorySummaryDict = { # pylint: disable=line-too-long
                 'id': summary_dict['id'],
                 'title': summary_dict['title'],
@@ -449,7 +439,7 @@ def get_matching_story_syllabus_item_dicts(
                 'completed_node_titles': [],
                 'all_node_dicts': [
                     node.to_dict() for node in
-                    stories[ind].story_contents.nodes # type: ignore[union-attr]
+                    story.story_contents.nodes
                 ],
                 'topic_name': topic.name,
                 'topic_url_fragment': topic.url_fragment
@@ -477,10 +467,8 @@ def add_student_to_learner_group(
         Exception. Student was not invited to join the learner group.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
-        group_id, strict=False)
-
-    # Ruling out the possibility of None for mypy type checking.
-    assert learner_group_model is not None
+        group_id, strict=True
+    )
 
     if user_id not in learner_group_model.invited_student_user_ids:
         raise Exception('Student was not invited to join the learner group.')
@@ -494,10 +482,8 @@ def add_student_to_learner_group(
     }
 
     learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
-        user_id, strict=False)
-
-    # Ruling out the possibility of None for mypy type checking.
-    assert learner_grps_user_model is not None
+        user_id, strict=True
+    )
 
     learner_grps_user_model.invited_to_learner_groups_ids.remove(group_id)
     learner_grps_user_model.learner_groups_user_details.append(
@@ -523,6 +509,8 @@ def invite_students_to_learner_group(
     learner_groups_user_models = (
         user_models.LearnerGroupsUserModel.get_multi(invited_student_ids))
 
+    models_to_put = []
+
     for index, student_id in enumerate(invited_student_ids):
         learner_groups_user_model = learner_groups_user_models[index]
         if learner_groups_user_model:
@@ -535,11 +523,10 @@ def invite_students_to_learner_group(
                 learner_groups_user_details=[]
             )
 
-        learner_groups_user_models[index] = learner_groups_user_model
+        models_to_put.append(learner_groups_user_model)
 
-    user_models.LearnerGroupsUserModel.update_timestamps_multi( # type: ignore[type-var]
-        learner_groups_user_models)
-    user_models.LearnerGroupsUserModel.put_multi(learner_groups_user_models) # type: ignore[type-var]
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
+    user_models.LearnerGroupsUserModel.put_multi(models_to_put)
 
 
 def remove_invited_students_from_learner_group(
@@ -555,74 +542,17 @@ def remove_invited_students_from_learner_group(
     found_models = (
         user_models.LearnerGroupsUserModel.get_multi(student_ids))
 
-    for index, model in enumerate(found_models):
+    models_to_put = []
+
+    for model in found_models:
         # Ruling out the possibility of None for mypy type checking.
         assert model is not None
         if group_id in model.invited_to_learner_groups_ids:
-            found_models[index].invited_to_learner_groups_ids.remove(group_id) # type: ignore[union-attr]
+            model.invited_to_learner_groups_ids.remove(group_id)
+            models_to_put.append(model)
 
-    user_models.LearnerGroupsUserModel.update_timestamps_multi(found_models) # type: ignore[type-var]
-    user_models.LearnerGroupsUserModel.put_multi(found_models) # type: ignore[type-var]
-
-
-def get_subtopic_page_progress(
-    user_id: str,
-    subtopic_page_ids: List[str],
-    topics: List[topic_domain.Topic],
-    all_skill_ids: List[str]
-) -> subtopic_page_domain.SubtopicPageSummary:
-    """Returns the progress of the given user on the given subtopic pages.
-
-    Args:
-        user_id: str. The id of the user.
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
-        topics: list(Topic). The topics corresponding to the subtopic pages.
-        all_skill_ids: list(str). The ids of all the skills in the topics.
-
-    Returns:
-        SubtopicPageSummary. Subtopic Page Summary domain object containing
-        details of the subtopic page and users mastery in it.
-    """
-
-    # Fetch the progress of the student in all the subtopics assigned
-    # in the group syllabus.
-    skills_mastery_dict = skill_services.get_multi_user_skill_mastery( # type: ignore[no-untyped-call]
-        user_id, all_skill_ids
-    )
-
-    subtopic_prog_summary: subtopic_page_domain.SubtopicPageSummary
-
-    for topic in topics:
-        assert topic is not None
-        for subtopic in topic.subtopics:
-            subtopic_page_id = topic.id + ':' + str(subtopic.id)
-            if not subtopic_page_id in subtopic_page_ids:
-                continue
-            skill_mastery_dict = {
-                skill_id: mastery
-                for skill_id, mastery in skills_mastery_dict.items()
-                if mastery is not None and (
-                    skill_id in subtopic.skill_ids
-                )
-            }
-            if skill_mastery_dict:
-                # Subtopic mastery is average of skill masteries.
-                subtopic_prog_summary = (
-                    subtopic_page_domain.SubtopicPageSummary(
-                        subtopic_id=subtopic.id,
-                        subtopic_title=subtopic.title,
-                        parent_topic_id=topic.id,
-                        parent_topic_name=topic.name,
-                        thumbnail_filename=subtopic.thumbnail_filename,
-                        thumbnail_bg_color=subtopic.thumbnail_bg_color,
-                        subtopic_mastery=(
-                            sum(skill_mastery_dict.values()) /
-                            len(skill_mastery_dict)
-                        )
-                    )
-                )
-
-    return subtopic_prog_summary
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
+    user_models.LearnerGroupsUserModel.put_multi(models_to_put)
 
 
 def get_learner_group_from_model(
