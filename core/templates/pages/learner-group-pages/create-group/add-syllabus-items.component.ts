@@ -16,7 +16,7 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from
   '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
@@ -51,8 +51,10 @@ interface SearchDropDownItems {
   templateUrl: './add-syllabus-items.component.html'
 })
 export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
+  @Input() learnerGroupId: string = '';
   @Output() updateLearnerGroupStories:
     EventEmitter<string[]> = new EventEmitter();
+
   @Output() updateLearnerGroupSubtopics:
     EventEmitter<string[]> = new EventEmitter();
 
@@ -79,7 +81,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
   searchIsInProgress = false;
-  storySummaries: StorySummary[];
+  storySummaries: StorySummary[] = [];
   subtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   syllabusFilter: LearnerGroupSyllabusFilter;
 
@@ -248,6 +250,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   onSearchQueryChangeExec(): void {
     this.searchIsInProgress = true;
     this.syllabusFilter = {
+      learnerGroupId: this.learnerGroupId,
       keyword: this.searchQuery,
       type: (
         this.selectionDetails.types.selection ||
@@ -264,7 +267,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     };
     if (this.isValidSearch()) {
       this.learnerGroupSyllabusBackendApiService.searchNewSyllabusItemsAsync(
-        'newId', this.syllabusFilter
+        this.syllabusFilter
       ).then((syllabusItems) => {
         this.searchIsInProgress = false;
         this.storySummaries = syllabusItems.storySummaries;

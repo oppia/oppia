@@ -20,7 +20,7 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import learner_group_fetchers
+from core.domain import config_domain, learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -307,14 +307,14 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
         params = {
+            'learner_group_id': self.LEARNER_GROUP_ID,
             'search_keyword': 'Place',
             'search_category': 'All',
             'search_language_code': constants.DEFAULT_LANGUAGE_CODE,
         }
 
         response = self.get_json(
-            '/learner_group_search_syllabus_handler/%s' % (
-                self.LEARNER_GROUP_ID),
+            '/learner_group_search_syllabus_handler',
             params=params
         )
 
@@ -632,4 +632,60 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
             '/learner_group_user_progress_handler/%s' % (
                 'invalidId'), params=params, expected_status_int=400)
 
+        self.logout()
+
+
+class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
+    """Checks the access and rendering of the create learner group page."""
+
+    def test_create_learner_page_access_without_logging_in(self):
+        """Tests access to the Create Learner Group page."""
+        self.get_html_response(
+            '/create-learner-group', expected_status_int=302
+        )
+
+    def test_create_learner_page_access_with_feature_flag_off(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.set_config_property(
+            config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
+        self.get_html_response(
+            '/create-learner-group', expected_status_int=404
+        )
+        self.logout()
+
+    def test_create_learner_page_access_with_feature_flag_on(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.set_config_property(
+            config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
+        self.get_html_response('/create-learner-group')
+        self.logout()
+
+
+class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
+    """Checks the access and rendering of the facilitator dashboard page."""
+
+    def test_facilitator_dashboard_page_access_without_logging_in(self):
+        """Tests access to the facilitator dashboard page."""
+        self.get_html_response(
+            '/facilitator-dashboard', expected_status_int=302
+        )
+
+    def test_facilitator_dashboard_page_access_with_feature_flag_off(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.set_config_property(
+            config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
+        self.get_html_response(
+            '/facilitator-dashboard', expected_status_int=404
+        )
+        self.logout()
+
+    def test_facilitator_dashboard_page_access_with_feature_flag_on(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.set_config_property(
+            config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
+        self.get_html_response('/facilitator-dashboard')
         self.logout()

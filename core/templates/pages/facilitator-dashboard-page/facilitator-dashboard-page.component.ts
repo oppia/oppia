@@ -40,7 +40,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   createLearnerGroupPageUrl: string;
-  shortLearnerGroupSummaries: ShortLearnerGroupSummary[];
+  shortLearnerGroupSummaries: ShortLearnerGroupSummary[] = [];
 
   constructor(
     private contextService: ContextService,

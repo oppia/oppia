@@ -20,6 +20,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import story_fetchers
@@ -337,21 +338,16 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'learner_group_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
-                }]
-            },
-            'default_value': None
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {}
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
+            'learner_group_id': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': ''
+            },
             'search_keyword': {
                 'schema': {
                     'type': 'basestring',
@@ -380,7 +376,7 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self):
         """Handles GET requests for learner group syllabus views."""
 
         search_keyword = self.normalized_request.get('search_keyword')
@@ -388,6 +384,7 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
         search_category = self.normalized_request.get('search_category')
         search_language_code = self.normalized_request.get(
             'search_language_code')
+        learner_group_id = self.normalized_request.get('learner_group_id')
 
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
@@ -500,6 +497,13 @@ class FacilitatorDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests."""
+        learner_groups_are_enabled = (
+            config_domain.LEARNER_GROUPS_ARE_ENABLED.value
+        )
+
+        if not learner_groups_are_enabled:
+            raise self.PageNotFoundException
+
         self.render_template('facilitator-dashboard-page.mainpage.html')
 
 
@@ -514,6 +518,13 @@ class CreateLearnerGroupPage(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests."""
+        learner_groups_are_enabled = (
+            config_domain.LEARNER_GROUPS_ARE_ENABLED.value
+        )
+
+        if not learner_groups_are_enabled:
+            raise self.PageNotFoundException
+
         self.render_template('create-learner-group-page.mainpage.html')
 
 
@@ -522,21 +533,16 @@ class LearnerGroupSearchStudentHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'learner_group_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
-                }]
-            },
-            'default_value': None
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {}
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
+            'learner_group_id': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': ''
+            },
             'username': {
                 'schema': {
                     'type': 'basestring',
@@ -547,10 +553,11 @@ class LearnerGroupSearchStudentHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self):
         """Handles GET requests for learner group syllabus views."""
 
         username: str = self.normalized_request.get('username')
+        learner_group_id: str = self.normalized_request.get('learner_group_id')
 
         user_settings = user_services.get_user_settings_from_username(username)
 

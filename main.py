@@ -946,7 +946,7 @@ URLS = [
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
         learner_group.FacilitatorLearnerGroupViewHandler),
     get_redirect_route(
-        r'/learner_group_search_syllabus_handler/<learner_group_id>',
+        r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
@@ -958,7 +958,7 @@ URLS = [
         r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
         learner_group.CreateLearnerGroupPage),
     get_redirect_route(
-        r'/learner_group_search_student_handler/<learner_group_id>',
+        r'/learner_group_search_student_handler',
         learner_group.LearnerGroupSearchStudentHandler)
 ]
 

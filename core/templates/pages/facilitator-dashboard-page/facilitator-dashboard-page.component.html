@@ -12,14 +12,22 @@
         <div class="oppia-learner-groups-section-title">
           <span translate="I18N_LEARNER_GROUPS_SECTION_TITLE"></span>
         </div>
-        <div>
+        <div *ngIf="shortLearnerGroupSummaries.length > 0">
           <a [href]="createLearnerGroupPageUrl" class="btn oppia-create-new-learner-group-button oppia-autofocus">
             <span translate="I18N_CREATE_LEARNER_GROUP"></span>
           </a>
         </div>
       </div>
+      <div class="oppia-empty-learner-groups-container">
+        <div class="oppia-empty-learner-groups-message" *ngIf="shortLearnerGroupSummaries.length == 0">
+          <span translate="I18N_EMPTY_LEARNER_GROUPS_MESSAGE"></span>
+        </div>
+        <a [href]="createLearnerGroupPageUrl" class="btn oppia-create-new-learner-group-button oppia-autofocus">
+          <span translate="I18N_CREATE_LEARNER_GROUP"></span>
+        </a>
+      </div>
       <div class="oppia-learner-group-summary-cards-container"
-           *ngIf="shortLearnerGroupSummaries && shortLearnerGroupSummaries.length > 0">
+           *ngIf="shortLearnerGroupSummaries.length > 0">
         <div class="oppia-learner-group-summary-card"
              *ngFor="let learnerGroupSummary of shortLearnerGroupSummaries">
           <a [href]="learnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">

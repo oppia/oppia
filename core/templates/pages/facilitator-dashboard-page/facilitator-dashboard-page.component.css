@@ -11,8 +11,21 @@
 .oppia-facilitator-dashboard-container {
   margin: 0 auto 0 auto;
   max-width: 1160px;
+  padding-bottom: 60px;
   text-align: left;
   width: 90%;
+}
+
+.oppia-empty-learner-groups-container {
+  margin-top: 14%;
+  text-align: center;
+}
+
+.oppia-empty-learner-groups-message {
+  color: #707070;
+  font-size: 16px;
+  line-height: 19px;
+  padding-bottom: 5px;
 }
 
 .oppia-facilitator-dashboard-title {

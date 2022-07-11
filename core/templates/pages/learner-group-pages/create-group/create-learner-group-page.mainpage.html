@@ -16,10 +16,12 @@
       <div ng-controller="Base" dir="<[direction]>">
         <oppia-base-content>
           <navbar-breadcrumb>
-            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb oppia-learner-group-pages-breadcrumb">
               <li>
                 <span class="oppia-navbar-breadcrumb-separator"></span>
-                <span translate="I18N_TOPNAV_FACILITATOR_DASHBOARD"></span>
+                <a href="/facilitator-dashboard">
+                  <span translate="I18N_TOPNAV_FACILITATOR_DASHBOARD"></span>
+                </a>
               </li>
             </ul>
           </navbar-breadcrumb>

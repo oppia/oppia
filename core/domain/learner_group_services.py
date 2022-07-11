@@ -235,13 +235,13 @@ def get_matching_learner_group_syllabus_to_add(
     group_subtopic_page_ids: List[str] = []
     group_story_ids: List[str] = []
 
-    learner_group = learner_group_fetchers.get_learner_group_by_id(
-        learner_group_id)
-
     # Case when syllabus is being added to an existing group.
-    if learner_group is not None:
-        group_subtopic_page_ids = learner_group.subtopic_page_ids
-        group_story_ids = learner_group.story_ids
+    if learner_group_id:
+        learner_group_model = learner_group_models.LearnerGroupModel.get(
+            learner_group_id, strict=True
+        )
+        group_subtopic_page_ids = learner_group_model.subtopic_page_ids
+        group_story_ids = learner_group_model.story_ids
 
     matching_topics: List[topic_domain.Topic] = []
 

@@ -155,7 +155,7 @@
           <i *ngIf="isMobileViewActive()" class="material-icons md-18 language-selector-icon">&#xe8e2;</i>
           {{ languageButtonText | truncate:14 }}
         </button>
-        <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+        <ul ngbDropdownMenu class="oppia-search-bar-dropdown-menu-section dropdown-menu"
             role="menu">
           <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList trackBy: index">
             <li ngbDropdownItem>
@@ -221,6 +221,11 @@
         <button *ngIf="isSubtopicPartOfSyllabus(subtopicSummary)" class="btn btn-secondary syllabus-item-add-cta-button disabled">
           Added
         </button>
+      </div>
+    </div>
+    <div *ngIf="isValidSearch() && storySummaries.length == 0 && subtopicSummaries.length == 0">
+      <div class="no-results-container">
+        <div class="no-results-message">No results found.</div>
       </div>
     </div>
   </div>
