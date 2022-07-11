@@ -198,9 +198,11 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var _showQuestionSuggestionModal = function(
-          suggestion, suggestionIdToContribution,
+          suggestion, 
+          suggestionIdToContribution,
           reviewable,
-          misconceptionsBySkill) {
+          misconceptionsBySkill
+      ) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'question-suggestion-review.directive.html');
