@@ -251,8 +251,8 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    var conceptCardButton = await cKEditorElement.$(
-      '.cke_button=Insert Concept Card Link');
+    var conceptCardButton = cKEditorElement.$(
+      '.cke_button_label=Insert Concept Card Link');
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = $(
       '.e2e-test-rte-skill-selector-item=', skillName);

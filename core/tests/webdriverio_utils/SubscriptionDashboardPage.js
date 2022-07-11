@@ -55,7 +55,7 @@ var SubscriptionDashboardPage = function() {
     await waitFor.visibilityOf(
       subscriptionName[0],
       'Subscriber Name Card takes too long to appear');
-    expect(await subscriptionName.length).toEqual(value);
+    expect(subscriptionName.length).toEqual(value);
   };
 
   this.navigateToSubscriptionButton = async function() {
