@@ -37,6 +37,14 @@ var AdminPage = function() {
   var usernameInputFieldForRolesEditing = $(
     '.e2e-test-username-for-role-editor');
 
+  var _switchToRolesTab = async function() {
+    await action.click('Admin roles tab button', adminRolesTab);
+
+    await expect(await adminRolesTab.getAttribute('class')).toMatch('active');
+    await waitFor.visibilityOf(
+      adminRolesTabContainer, 'Roles tab page is not visible.');
+  };
+
   var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
     await waitFor.visibilityOf(
@@ -54,19 +62,6 @@ var AdminPage = function() {
         'New config could not be saved');
       return true;
     }
-  };
-
-  this.get = async function() {
-    await browser.url(ADMIN_URL_SUFFIX);
-    await waitFor.pageToFullyLoad();
-  };
-
-  var _switchToRolesTab = async function() {
-    await action.click('Admin roles tab button', adminRolesTab);
-
-    await expect(await adminRolesTab.getAttribute('class')).toMatch('active');
-    await waitFor.visibilityOf(
-      adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
   this.get = async function() {

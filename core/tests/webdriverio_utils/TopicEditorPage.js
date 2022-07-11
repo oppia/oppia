@@ -88,6 +88,9 @@ var TopicEditorPage = function() {
   var storyListTable = $('.e2e-test-story-list-table');
   var storyThumbnailButton = $(
     '.e2e-test-thumbnail-editor .e2e-test-photo-button');
+  var subtopicColumnsSelector = function() {
+    return $$('.e2e-test-subtopic-column');
+  };
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
   var subtopicsSelector = function() {
     return $$('.e2e-test-subtopic');

@@ -23,6 +23,9 @@ var workflow = require('./workflow.js');
 var general = require('../webdriverio_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
+  var assignSkillToTopicButtonsSelector = function() {
+    return $$('.e2e-test-assign-skill-to-topic-button');
+  };
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
   var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
@@ -40,9 +43,15 @@ var TopicsAndSkillsDashboardPage = function() {
   var mergeSkillsButton = $('.e2e-test-merge-skills-button');
   var noSkillsPresentMessage = $('.e2e-test-no-skills-present-message');
   var openConceptCardExplanationButton = $('.e2e-test-open-concept-card');
+  var openSkillEditorButtonsSelector = function() {
+    return $$('.e2e-test-open-skill-editor');
+  };
   var skillDescriptionField = $('.e2e-test-skill-description-field');
   var skillEditOptionsSelector = function() {
     return $$('.e2e-test-skill-edit-box');
+  };
+  var skillsListItemsSelector = function() {
+    return $$('.e2e-test-skills-list-item');
   };
   var skillNameField = $('.e2e-test-new-skill-description-field');
   var skillStatusFilterDropdown = $('.e2e-test-select-skill-status-dropdown');
@@ -69,7 +78,6 @@ var TopicsAndSkillsDashboardPage = function() {
   var topicUrlFragmentField = $('.e2e-test-new-topic-url-fragment-field');
   var topicsTable = $('.e2e-test-topics-table');
   var unassignSkillButton = $('.e2e-test-unassign-skill-button');
-
 
   this.get = async function() {
     await waitFor.clientSideRedirection(async() => {
@@ -139,7 +147,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.navigateToSkillWithDescription = async function(description) {
     await this.navigateToSkillsTab();
     await this.waitForSkillsToLoad();
-    var openSkillEditorButtons = await $$('.e2e-test-open-skill-editor');
+    var openSkillEditorButtons = await openSkillEditorButtonsSelector();
     for (var i = 0; i < openSkillEditorButtons.length; i++) {
       var button = openSkillEditorButtons[i];
       var buttonText = await action.getText('Skill editor button', button);
@@ -154,8 +162,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
-    var assignSkillToTopicButtons = await $$(
-      '.e2e-test-assign-skill-to-topic-button');
+    var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
     await waitFor.visibilityOf(
       assignSkillToTopicButtons[0],
       'Assign skill to topic buttons taking too long to appear');
@@ -406,7 +413,7 @@ var TopicsAndSkillsDashboardPage = function() {
       expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
       return;
     }
-    var skillsListItems = await $$('.e2e-test-skills-list-item');
+    var skillsListItems = await skillsListItemsSelector();
     expect(skillsListItems.length).toEqual(number);
   };
 

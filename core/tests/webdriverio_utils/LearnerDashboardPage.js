@@ -30,6 +30,7 @@ var LearnerDashboardPage = function() {
   var completedGoalsTopicName = $('.e2e-test-completed-goals-topic-name');
   var currentGoalsTopicName = $('.e2e-test-topic-name-in-current-goals');
   var editGoalsTopicName = $('.e2e-test-topic-name-in-edit-goals');
+  var feedbackMessage = $('.e2e-test-feedback-message');
   var feedbackSection = $('.e2e-test-feedback-section');
   var feedbackThread = $('.e2e-test-feedback-thread');
   var goalsSection = $('.e2e-test-goals-section');
@@ -39,6 +40,18 @@ var LearnerDashboardPage = function() {
   var progressSection = $('.e2e-test-progress-section');
   var subscriptionSection = $('.e2e-test-subscriptions-section');
   var skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
+  var stopicNamesInLearnerTopicSummaryTilesSelector = function() {
+    return $$('.e2e-test-learner-topic-summary-tile-title');
+  };
+  var storyNamesInLearnerStorySummaryTilesSelector = function() {
+    return $$('.e2e-test-story-name-in-learner-story-summary-tile');
+  };
+  var topicNamesInLearnerStorySummaryTilesSelector = function() {
+    return $$('.e2e-test-topic-name-in-learner-story-summary-tile');
+  };
+  var feedbackExplorationTitleSelector = function() {
+    return $$('.e2e-test-feedback-exploration');
+  };
   var subscriptionNameSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
@@ -147,8 +160,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectNumberOfTopicsInSuggestedForYou = async function(value) {
-    var topicNamesInLearnerTopicSummaryTiles = await $$(
-      '.e2e-test-learner-topic-summary-tile-title');
+    var topicNamesInLearnerTopicSummaryTiles = (
+      await stopicNamesInLearnerTopicSummaryTilesSelector());
     if (value > 0) {
       await waitFor.visibilityOf(
         topicNamesInLearnerTopicSummaryTiles[0],
@@ -158,8 +171,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectNumberOfStoriesInCompletedStory = async function(value) {
-    var storyNamesInLearnerStorySummaryTiles = await $$(
-      '.e2e-test-story-name-in-learner-story-summary-tile');
+    var storyNamesInLearnerStorySummaryTiles = (
+      await storyNamesInLearnerStorySummaryTilesSelector());
     if (value > 0) {
       await waitFor.visibilityOf(
         storyNamesInLearnerStorySummaryTiles[0],
@@ -169,8 +182,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
-    var topicNamesInLearnerStorySummaryTiles = await $$(
-      '.e2e-test-topic-name-in-learner-story-summary-tile');
+    var topicNamesInLearnerStorySummaryTiles = (
+      await topicNamesInLearnerStorySummaryTilesSelector());
     if (value > 0) {
       await waitFor.visibilityOf(
         topicNamesInLearnerStorySummaryTiles[0],
@@ -202,8 +215,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectFeedbackExplorationTitleToMatch = async function(title) {
-    var feedbackExplorationTitle = await $$(
-      '.e2e-test-feedback-exploration');
+    var feedbackExplorationTitle = await feedbackExplorationTitleSelector();
     await waitFor.visibilityOf(
       feedbackExplorationTitle[0],
       'Feedback Exploration Title takes too long to appear');
@@ -211,7 +223,6 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectFeedbackMessageToMatch = async function(message) {
-    var feedbackMessage = await $('.e2e-test-feedback-message');
     await waitFor.visibilityOf(
       feedbackMessage, 'Feedback Message takes too long to appear');
     expect(await feedbackMessage.getText()).toMatch(message);
