@@ -189,6 +189,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   init(): void {
+    this.refreshModalData();
     this.userCanReviewTranslationSuggestionsInLanguages = [];
     this.languageCode = this.activeSuggestion.change.
       language_code;
@@ -309,12 +310,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       `${this.activeContributionDetails.story_title} / ` +
       `${this.activeContributionDetails.chapter_title}`
     );
-    this.init();
   }
 
   gotoNextItem(): void {
+    let lastContributionId = this.remainingContributionIds.pop();
     // If the current item is the last item, do not navigate.
-    if (this.remainingContributionIds.length === 0) {
+    if (lastContributionId === undefined) {
       return;
     }
     // This prevents resolved contributions from getting added to the list.
@@ -322,7 +323,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.skippedContributionIds.push(this.activeSuggestionId);
     }
 
-    let lastContributionId = this.remainingContributionIds.pop();
     this.activeSuggestionId = lastContributionId;
     this.activeContribution = this.allContributions[
       lastContributionId];
@@ -337,12 +337,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
-    this.refreshModalData();
+    this.init();
   }
 
   gotoPreviousItem(): void {
+    let lastContributionId = this.skippedContributionIds.pop();
     // If the current item is the first item, do not navigate.
-    if (this.skippedContributionIds.length === 0) {
+    if (lastContributionId === undefined) {
       return;
     }
     // This prevents resolved contributions from getting added to the list.
@@ -350,7 +351,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.remainingContributionIds.push(this.activeSuggestionId);
     }
 
-    let lastContributionId = this.skippedContributionIds.pop();
     this.activeSuggestionId = lastContributionId;
     this.activeContribution = this.allContributions[
       lastContributionId];
@@ -365,7 +365,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
-    this.refreshModalData();
+    this.init();
   }
 
   processAndGotoNextItem(suggestionId: string): void {
