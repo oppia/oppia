@@ -554,8 +554,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     });
 
     it('should initialize $scope properties after controller is initialized',
-      fakeAsync(
-        function() {
+      fakeAsync(function() {
           const messages = [{
             author_username: '',
             created_on_msecs: 0,
