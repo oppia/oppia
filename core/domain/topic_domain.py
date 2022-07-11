@@ -1195,16 +1195,17 @@ class Topic:
                         'linked.' % subtopic.title)
             subtopic_skill_ids.extend(subtopic.skill_ids)
 
-        skill_ids_that_are_not_in_subtopics = (
+        skill_ids_for_diagnostic_that_are_not_in_subtopics = (
             set(self.skill_ids_for_diagnostic_test) -
             set(subtopic_skill_ids))
-        if len(skill_ids_that_are_not_in_subtopics) > 0:
+        if len(skill_ids_for_diagnostic_that_are_not_in_subtopics) > 0:
             raise utils.ValidationError(
                 'The skill_ids %s are selected for the diagnostic test but they'
                 ' are not associated with any subtopic.' %
-                skill_ids_that_are_not_in_subtopics)
+                skill_ids_for_diagnostic_that_are_not_in_subtopics)
 
         if (
+            strict and
             len(self.skill_ids_for_diagnostic_test) == 0 and
             len(subtopic_skill_ids) > 0
         ):
@@ -1842,6 +1843,8 @@ class Topic:
                 % skill_id)
 
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
+        if skill_id in self.skill_ids_for_diagnostic_test:
+            self.skill_ids_for_diagnostic_test.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
 
     def are_subtopic_url_fragments_unique(self) -> bool:

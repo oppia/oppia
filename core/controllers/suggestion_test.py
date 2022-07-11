@@ -2109,6 +2109,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_333']
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
@@ -2424,6 +2425,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_333']
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 

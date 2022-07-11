@@ -313,13 +313,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'old_subtopic_id': None,
             'new_subtopic_id': 1,
             'skill_id': self.skill_id_3
-        }), topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                'property_name': (
-                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
-                'old_value': [],
-                'new_value': [self.skill_id_3]
-            })]
+        })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Added skills to the subtopic.')
@@ -877,13 +871,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_subtopic_id': None,
                 'new_subtopic_id': 2,
                 'skill_id': self.skill_id_1
-            }),
-            topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                'property_name': (
-                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
-                'old_value': [],
-                'new_value': [self.skill_id_1]
             })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -1188,15 +1175,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'new-subtopic',
                 'old_value': '',
                 'subtopic_id': 2
-            }),
-            topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                'property_name': (
-                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
-                'old_value': [],
-                'new_value': [self.skill_id_2]
-            })
-        ]
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
@@ -1268,15 +1247,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
                 'subtopic_id': self.subtopic_id,
                 'skill_id': self.skill_id_1
-            }),
-            topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                'property_name': (
-                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
-                'old_value': [self.skill_id_2],
-                'new_value': []
-            })
-        ]
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
