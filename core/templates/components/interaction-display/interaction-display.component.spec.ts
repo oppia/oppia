@@ -127,7 +127,7 @@ describe('Interaction display', () => {
   it('should rebuild interaction if htmlData is updated', () => {
     componentInstance.viewContainerRef = {
       clear: () => {}
-    };
+    } as ViewContainerRef;
     spyOn(componentInstance, 'buildInteraction');
 
     componentInstance.ngOnChanges({

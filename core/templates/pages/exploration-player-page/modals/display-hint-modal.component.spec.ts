@@ -30,10 +30,10 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplayHintModalComponent } from './display-hint-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { InteractionDisplayComponent } from 'components/interaction-display/interaction-display.component';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Display hint modal', () => {
   let fixture: ComponentFixture<DisplayHintModalComponent>;
@@ -51,7 +51,6 @@ describe('Display hint modal', () => {
       declarations: [
         DisplayHintModalComponent,
         MockTranslatePipe,
-        InteractionDisplayComponent
       ],
       providers: [
         NgbActiveModal,
@@ -61,7 +60,8 @@ describe('Display hint modal', () => {
         HintsAndSolutionManagerService,
         PlayerPositionService,
         PlayerTranscriptService
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 

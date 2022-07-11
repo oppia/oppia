@@ -17,9 +17,9 @@
  * @fileoverview Unit tests for LearnerDashboardSuggestionModalComponent.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { InteractionDisplayComponent } from 'components/interaction-display/interaction-display.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
@@ -49,13 +49,13 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
       declarations: [
         LearnerDashboardSuggestionModalComponent,
         MockTranslatePipe,
-        InteractionDisplayComponent
       ],
       providers: [
         {
           provide: NgbActiveModal, useClass: MockActiveModal
         },
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 

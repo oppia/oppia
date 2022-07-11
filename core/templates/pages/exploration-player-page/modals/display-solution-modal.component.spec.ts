@@ -33,6 +33,7 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { InteractionDisplayComponent } from 'components/interaction-display/interaction-display.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Display Solution Modal', () => {
   let fixture: ComponentFixture<DisplaySolutionModalComponent>;
@@ -82,7 +83,8 @@ describe('Display Solution Modal', () => {
         },
         PlayerPositionService,
         PlayerTranscriptService
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
