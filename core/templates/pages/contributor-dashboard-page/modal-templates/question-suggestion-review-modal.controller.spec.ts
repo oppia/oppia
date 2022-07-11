@@ -471,6 +471,7 @@ describe('Question Suggestion Review Modal Controller', function() {
         editSuggestionCallback: () => {}
       });
     }));
+    
     it('should allow users to navigate between suggestions', function() {
       spyOn($scope, 'refreshModalData').and.callThrough();
 
