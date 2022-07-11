@@ -40,14 +40,192 @@ describe('Question Suggestion Review Modal Controller', function() {
   let skillObjectFactory = null;
 
   const authorName = 'Username 1';
-  const contentHtml = 'Content html';
+  const contentHtml = 'Question 1';
   const misconceptionsBySkill = [];
-  let question = null;
-  const questionHeader = 'Question header';
+  const questionHeader = 'Skill 1';
   const reviewable = true;
   const skillDifficulty = 0.3;
-  const suggestionId = '123';
-  let suggestion = null;
+  const suggestionId = '1';
+  const suggestionIdNoSkillRubrics = '2';
+  let suggestionIdToContribution = {
+    1: {
+      details: {
+        id: '1',
+        question_count: 1,
+        skill_description: questionHeader,
+        skill_rubrics: [{
+          explanations: ['explanation'],
+          difficulty: 'Easy'
+        }]
+      },
+      suggestion: {
+        status: '',
+        author_name: authorName,
+        change: {
+          cmd: 'create_new_fully_specified_question',
+          question_dict: {
+            id: '1',
+            inapplicable_skill_misconception_ids: [],
+            language_code: 'en',
+            linked_skill_ids: ['skill1'],
+            question_state_data_schema_version: 50,
+            version: 1,
+            question_state_data: {
+              content: {
+                html: contentHtml,
+                content_id: 'content_1'
+              },
+              interaction: {
+                answer_groups: [{
+                  outcome: {
+                    dest: 'outcome 1',
+                    feedback: {
+                      content_id: 'content_5',
+                      html: ''
+                    },
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null
+                  },
+                  rule_specs: [],
+                }],
+                confirmed_unclassified_answers: [],
+                customization_args: {
+                  placeholder: {
+                    value: {
+                      content_id: 'ca_placeholder_0',
+                      unicode_str: ''
+                    }
+                  },
+                  rows: { value: 1 }
+                },
+                default_outcome: {
+                  dest: null,
+                  feedback: {
+                    html: 'Correct Answer',
+                    content_id: 'content_2'
+                  },
+                  param_changes: [],
+                  labelled_as_correct: true
+                },
+                hints: [{
+                  hint_content: {
+                    html: 'Hint 1',
+                    content_id: 'content_3'
+                  }
+                }],
+                solution: {
+                  correct_answer: 'This is the correct answer',
+                  answer_is_exclusive: false,
+                  explanation: {
+                    html: 'Solution explanation',
+                    content_id: 'content_4'
+                  }
+                },
+                id: 'TextInput'
+              },
+              param_changes: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              },
+              written_translations: {
+                translations_mapping: {}
+              },
+            }
+          },
+          skill_difficulty: skillDifficulty,
+          skill_id: 'skill_1'
+        }
+      }
+    },
+    2: {
+      details: {
+        id: '2',
+        question_count: 1,
+        skill_description: questionHeader,
+        skill_rubrics: []
+      },
+      suggestion: {
+        status: '',
+        author_name: authorName,
+        change: {
+          cmd: 'create_new_fully_specified_question',
+          question_dict: {
+            id: '2',
+            inapplicable_skill_misconception_ids: [],
+            language_code: 'en',
+            linked_skill_ids: ['skill2'],
+            question_state_data_schema_version: 50,
+            version: 1,
+            question_state_data: {
+              content: {
+                html: contentHtml,
+                content_id: 'content_1'
+              },
+              interaction: {
+                answer_groups: [{
+                  outcome: {
+                    dest: 'outcome 1',
+                    feedback: {
+                      content_id: 'content_5',
+                      html: ''
+                    },
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null
+                  },
+                  rule_specs: [],
+                }],
+                confirmed_unclassified_answers: [],
+                customization_args: {
+                  placeholder: {
+                    value: {
+                      content_id: 'ca_placeholder_0',
+                      unicode_str: ''
+                    }
+                  },
+                  rows: { value: 1 }
+                },
+                default_outcome: {
+                  dest: null,
+                  feedback: {
+                    html: 'Correct Answer',
+                    content_id: 'content_2'
+                  },
+                  param_changes: [],
+                  labelled_as_correct: true
+                },
+                hints: [{
+                  hint_content: {
+                    html: 'Hint 1',
+                    content_id: 'content_3'
+                  }
+                }],
+                solution: {
+                  correct_answer: 'This is the correct answer',
+                  answer_is_exclusive: false,
+                  explanation: {
+                    html: 'Solution explanation',
+                    content_id: 'content_4'
+                  }
+                },
+                id: 'TextInput'
+              },
+              param_changes: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              },
+              written_translations: {
+                translations_mapping: {}
+              },
+            }
+          },
+          skill_difficulty: skillDifficulty,
+          skill_id: 'skill_1'
+        }
+      }
+    },
+  };
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -65,11 +243,6 @@ describe('Question Suggestion Review Modal Controller', function() {
   }));
 
   describe('when skill rubrics is specified', function() {
-    const skillRubrics = [{
-      explanations: ['explanation'],
-      difficulty: 'Easy'
-    }];
-
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       const $http = $injector.get('$http');
@@ -87,71 +260,6 @@ describe('Question Suggestion Review Modal Controller', function() {
         SiteAnalyticsService,
         'registerContributorDashboardViewSuggestionForReview');
 
-      question = QuestionObjectFactory.createFromBackendDict({
-        id: '1',
-        question_state_data: {
-          content: {
-            html: 'Question 1',
-            content_id: 'content_1'
-          },
-          interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                feedback: {
-                  content_id: 'content_5',
-                  html: ''
-                },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [],
-            }],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: null,
-              feedback: {
-                html: 'Correct Answer',
-                content_id: 'content_2'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation',
-                content_id: 'content_4'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {}
-          },
-        },
-      });
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
         $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
@@ -184,28 +292,15 @@ describe('Question Suggestion Review Modal Controller', function() {
           })
         }));
 
-      suggestion = {
-        status: 'accepted',
-        change: {
-          skill_id: 'skill_1'
-        }
-      };
-
       $scope = $rootScope.$new();
       $controller('QuestionSuggestionReviewModalController', {
         $http: $http,
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
-        authorName: authorName,
-        contentHtml: contentHtml,
         misconceptionsBySkill: misconceptionsBySkill,
-        question: question,
-        questionHeader: questionHeader,
         reviewable: reviewable,
-        skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics,
-        suggestion: suggestion,
         suggestionId: suggestionId,
+        suggestionIdToContribution: suggestionIdToContribution,
         editSuggestionCallback: () => {}
       });
     }));
@@ -238,10 +333,13 @@ describe('Question Suggestion Review Modal Controller', function() {
         expect($scope.contentHtml).toBe(contentHtml);
         expect($scope.reviewable).toBe(reviewable);
         expect($scope.reviewMessage).toBe('');
-        expect($scope.question).toEqual(question);
+        expect($scope.question).toEqual(
+          QuestionObjectFactory
+            .createFromBackendDict($scope.suggestion.change.question_dict));
         expect($scope.questionHeader).toBe(questionHeader);
-        expect($scope.questionStateData).toEqual(question.getStateData());
-        expect($scope.questionId).toEqual(question.getId());
+        expect($scope.questionStateData).toEqual(
+          $scope.question.getStateData());
+        expect($scope.questionId).toEqual($scope.question.getId());
         expect($scope.canEditQuestion).toBe(false);
         expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
         expect($scope.skillDifficultyLabel).toBe('Easy');
@@ -311,9 +409,142 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
   });
 
-  describe('when skill rubrics is not specified', function() {
-    const skillRubrics = [];
+  describe('when the user is navigating', function() {
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      const $rootScope = $injector.get('$rootScope');
+      const $http = $injector.get('$http');
+      $q = $injector.get('$q');
+      $uibModal = $injector.get('$uibModal');
+      skillBackendApiService = $injector.get('SkillBackendApiService');
+      skillObjectFactory = $injector.get('SkillObjectFactory');
+      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+      SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardViewSuggestionForReview');
+
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+        $q.resolve({
+          skill: skillObjectFactory.createFromBackendDict({
+            id: 'skill1',
+            description: 'test description 1',
+            misconceptions: [{
+              id: '2',
+              name: 'test name',
+              notes: 'test notes',
+              feedback: 'test feedback',
+              must_be_addressed: true
+            }],
+            rubrics: [{
+              difficulty: 'Easy',
+              explanations: ['explanation']
+            }],
+            skill_contents: {
+              explanation: {
+                html: 'test explanation',
+                content_id: 'explanation',
+              },
+              worked_examples: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              }
+            },
+            language_code: 'en',
+            version: 3,
+            prerequisite_skill_ids: ['skill_1']
+          })
+        }));
+
+      $scope = $rootScope.$new();
+      $controller('QuestionSuggestionReviewModalController', {
+        $http: $http,
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        misconceptionsBySkill: misconceptionsBySkill,
+        reviewable: reviewable,
+        suggestionId: suggestionId,
+        suggestionIdToContribution: suggestionIdToContribution,
+        editSuggestionCallback: () => {}
+      });
+    }));
+    it('should allow users to navigate between suggestions', function() {
+      spyOn($scope, 'refreshModalData').and.callThrough();
+
+      expect($scope.currentSuggestionId).toEqual('1');
+      expect($scope.skippedContributionIds.length).toEqual(0);
+      expect($scope.remainingContributionIds.length).toEqual(1);
+      expect($scope.isLastItem).toBeFalse();
+      expect($scope.isFirstItem).toBeTrue();
+
+      $scope.gotoNextItem();
+      $scope.$apply();
+
+      expect($scope.refreshModalData).toHaveBeenCalled();
+      expect($scope.currentSuggestionId).toEqual('2');
+      expect($scope.skippedContributionIds.length).toEqual(1);
+      expect($scope.remainingContributionIds.length).toEqual(0);
+      expect($scope.isLastItem).toBeTrue();
+      expect($scope.isFirstItem).toBeFalse();
+
+      $scope.gotoNextItem();
+      $scope.$apply();
+
+      expect($scope.currentSuggestionId).toEqual('2');
+      expect($scope.skippedContributionIds.length).toEqual(1);
+      expect($scope.remainingContributionIds.length).toEqual(0);
+      expect($scope.isLastItem).toBeTrue();
+      expect($scope.isFirstItem).toBeFalse();
+
+      $scope.gotoPreviousItem();
+      $scope.$apply();
+
+      expect($scope.refreshModalData).toHaveBeenCalled();
+      expect($scope.currentSuggestionId).toEqual('1');
+      expect($scope.skippedContributionIds.length).toEqual(0);
+      expect($scope.remainingContributionIds.length).toEqual(1);
+      expect($scope.isLastItem).toBeFalse();
+      expect($scope.isFirstItem).toBeTrue();
+
+      $scope.gotoPreviousItem();
+      $scope.$apply();
+
+      expect($scope.currentSuggestionId).toEqual('1');
+      expect($scope.skippedContributionIds.length).toEqual(0);
+      expect($scope.remainingContributionIds.length).toEqual(1);
+      expect($scope.isLastItem).toBeFalse();
+      expect($scope.isFirstItem).toBeTrue();
+    });
+
+    it('should not navigate if the corresponding opportunity is deleted',
+      function() {
+        let details1 = $scope.allContributions['1'].details;
+        let details2 = $scope.allContributions['2'].details;
+        $scope.allContributions['2'].details = null;
+
+        $scope.gotoNextItem();
+        expect(cancelSuggestionSpy).toHaveBeenCalledWith(
+          $uibModalInstance
+        );
+
+        $scope.allContributions['2'].details = details2;
+        $scope.gotoNextItem();
+        $scope.allContributions['1'].details = null;
+
+        $scope.gotoPreviousItem();
+        expect(cancelSuggestionSpy).toHaveBeenCalledWith(
+          $uibModalInstance
+        );
+
+        $scope.allContributions['1'].details = details1;
+        $scope.allContributions['2'].details = details2;
+      });
+  });
+
+  describe('when skill rubrics is not specified', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
@@ -321,88 +552,15 @@ describe('Question Suggestion Review Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      question = QuestionObjectFactory.createFromBackendDict({
-        id: '1',
-        question_state_data: {
-          content: {
-            html: 'Question 1',
-            content_id: 'content_1'
-          },
-          interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                feedback: {
-                  content_id: 'content_5',
-                  html: ''
-                },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [],
-            }],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: null,
-              feedback: {
-                html: 'Correct Answer',
-                content_id: 'content_2'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation',
-                content_id: 'content_4'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {}
-          },
-        },
-      });
-
       $scope = $rootScope.$new();
-      suggestion = { status: 'accepted' };
       $controller('QuestionSuggestionReviewModalController', {
         $http: $http,
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
-        authorName: authorName,
-        contentHtml: contentHtml,
         misconceptionsBySkill: misconceptionsBySkill,
-        question: question,
-        questionHeader: questionHeader,
         reviewable: reviewable,
-        skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics,
-        suggestion: suggestion,
-        suggestionId: suggestionId,
+        suggestionId: suggestionIdNoSkillRubrics,
+        suggestionIdToContribution: suggestionIdToContribution,
         editSuggestionCallback: () => {}
       });
     }));
@@ -425,97 +583,18 @@ describe('Question Suggestion Review Modal Controller', function() {
       ThreadDataBackendApiService = $injector.get(
         'ThreadDataBackendApiService');
 
-      const skillRubrics = [{
-        explanations: ['explanation'],
-        difficulty: 'Easy'
-      }];
-
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      question = QuestionObjectFactory.createFromBackendDict({
-        id: '1',
-        question_state_data: {
-          content: {
-            html: 'Question 1',
-            content_id: 'content_1'
-          },
-          interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                feedback: {
-                  content_id: 'content_5',
-                  html: ''
-                },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [],
-            }],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: null,
-              feedback: {
-                html: 'Correct Answer',
-                content_id: 'content_2'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation',
-                content_id: 'content_4'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {}
-          },
-        },
-      });
-
       $scope = $rootScope.$new();
-      suggestion = { status: 'rejected' };
+      suggestionIdToContribution['1'].suggestion.status = 'rejected';
       $controller('QuestionSuggestionReviewModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
-        authorName: authorName,
-        contentHtml: contentHtml,
         misconceptionsBySkill: misconceptionsBySkill,
-        question: question,
-        questionHeader: questionHeader,
         reviewable: false,
-        skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics,
-        suggestion: suggestion,
         suggestionId: suggestionId,
+        suggestionIdToContribution: suggestionIdToContribution,
         editSuggestionCallback: () => {}
       });
     }));
@@ -535,7 +614,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       $scope.init();
       $rootScope.$apply();
 
-      expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('123');
+      expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('1');
       expect($scope.reviewMessage).toBe('This is a rejection.');
     });
   });

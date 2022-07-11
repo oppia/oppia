@@ -1,21 +1,16 @@
 <div class="modal-header protractor-test-question-suggestion-review-modal-header">
   <div>
-    <h3 class="oppia-question-header"><[questionHeader]></h3>
-    <h4 class="author-header">Submitted by <[authorName]></h4>
-    <div class="oppia-question-details">
-      <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
-      <div ng-if="skillRubricExplanations.length > 0">
-        <strong title="Use these notes to make sure your question is at the right difficulty.">
-          Notes from Skill Rubric
-        </strong>
-        <ul>
-          <li ng-repeat="explanation in skillRubricExplanations">
-            <span ng-bind-html="explanation"></span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>  
+    <h3 class="oppia-question-header">
+      <[questionHeader]>
+    </h3>
+    <h3 class="oppia-mobile-question-header" title="<[questionHeader]>">
+      <[questionHeader | wrapTextWithEllipsis: 20]>
+    </h3>
+    <h4 class="author-header"
+        ng-if="reviewable">
+      Submitted by <[authorName]>
+    </h4>
+  </div>
   <button type="button"
           class="close oppia-close-button-position"
           ng-click="cancel()"
@@ -25,8 +20,21 @@
 </div>
 
 <div class="modal-body">
+  <div class="oppia-question-details">
+    <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
+    <div ng-if="skillRubricExplanations.length > 0">
+      <strong title="Use these notes to make sure your question is at the right difficulty.">
+        Notes from Skill Rubric
+      </strong>
+      <ul>
+        <li ng-repeat="explanation in skillRubricExplanations">
+          <span ng-bind-html="explanation"></span>
+        </li>
+      </ul>
+    </div>
+  </div>
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-suggestion" ng-if="showQuestion">      
+    <div class="oppia-question-suggestion" ng-if="showQuestion">
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"
                        question-state-data="questionStateData"
@@ -48,7 +56,10 @@
   </section>
   <div ng-show="!reviewable && suggestionIsRejected"
        class="oppia-suggestion-review-message">
-    <strong>Review message: </strong><[reviewMessage]>
+    <strong>Review message: </strong>
+    <div class="oppia-review-message">
+      <[reviewMessage]>
+    </div>
   </div>
 </div>
 
@@ -96,6 +107,18 @@
 </div>
 
 <style>
+  .oppia-review-message {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    min-height: 100px;
+    padding: 10px;
+  }
+  .oppia-mobile-question-header {
+    display: none;
+  }
+  .oppia-question-header {
+    display: block;
+  }
   .oppia-review-button {
     margin: auto 5px;
   }
@@ -162,11 +185,20 @@
   }
 
   @media only screen and (max-width: 700px) {
-    .oppia-question-details {
-      margin-top: -12px;
+    .oppia-suggestion-review-container {
+      padding: 10px 0;
     }
-    .author-header {
+  }
+
+  @media only screen and (max-width: 535px) {
+    .oppia-mobile-question-header {
+      display: block;
+    }
+    .oppia-question-header {
       display: none;
+    }
+    .oppia-suggestion-review-message {
+      font-size: 16px;
     }
   }
 </style>

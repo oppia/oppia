@@ -31,6 +31,7 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-data-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
@@ -89,26 +90,31 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.misconceptionsBySkill = misconceptionsBySkill;
     $scope.currentSuggestionId = suggestionId;
 
-    let currentSuggestion = suggestionIdToContribution[suggestionId];
+    $scope.currentSuggestion = suggestionIdToContribution[suggestionId];
     delete suggestionIdToContribution[suggestionId];
-    let remainingContributionIds: string[] = Object.keys(
+    $scope.remainingContributionIds = Object.keys(
       suggestionIdToContribution
     );
-    let skippedContributionIds: string[] = [];
-    let allContributions = suggestionIdToContribution;
-    allContributions[suggestionId] = currentSuggestion;
+    $scope.skippedContributionIds = [];
+    $scope.allContributions = suggestionIdToContribution;
+    $scope.allContributions[suggestionId] = $scope.currentSuggestion;
+
+    $scope.isLastItem = $scope.remainingContributionIds.length === 0;
+    $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
 
     $scope.init = function() {
       $scope.suggestion = (
-        allContributions[$scope.currentSuggestionId].suggestion);
+        $scope.allContributions[$scope.currentSuggestionId].suggestion);
       $scope.question = QuestionObjectFactory.createFromBackendDict(
         $scope.suggestion.change.question_dict);
       $scope.authorName = $scope.suggestion.author_name;
       $scope.contentHtml = $scope.question.getStateData().content.html;
       $scope.questionHeader = (
-        allContributions[$scope.currentSuggestionId].details.skill_description);
+        $scope.allContributions[
+          $scope.currentSuggestionId].details.skill_description);
       $scope.skillRubrics = (
-        allContributions[$scope.currentSuggestionId].details.skill_rubrics);
+        $scope.allContributions[
+          $scope.currentSuggestionId].details.skill_rubrics);
       $scope.questionStateData = $scope.question.getStateData();
       $scope.questionId = $scope.question.getId();
       $scope.canEditQuestion = false;
@@ -118,8 +124,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         $scope.skillDifficultyLabel);
       $scope.reviewMessage = '';
       $scope.suggestionIsRejected = $scope.suggestion.status === 'rejected';
-      $scope.isLastItem = remainingContributionIds.length === 0;
-      $scope.isFirstItem = skippedContributionIds.length === 0;
 
       if (reviewable) {
         SiteAnalyticsService
@@ -153,15 +157,16 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         return;
       }
       $scope.showQuestion = false;
-      skippedContributionIds.push($scope.currentSuggestionId);
+      $scope.skippedContributionIds.push($scope.currentSuggestionId);
 
-      let lastContributionId = remainingContributionIds.pop();
+      let lastContributionId = $scope.remainingContributionIds.pop();
       $scope.currentSuggestionId = lastContributionId;
-      let nextContribution = allContributions[lastContributionId];
-      $scope.suggestion = allContributions[lastContributionId].suggestion;
+      let nextContribution = $scope.allContributions[lastContributionId];
+      $scope.suggestion = $scope.allContributions[
+        lastContributionId].suggestion;
 
-      $scope.isLastItem = remainingContributionIds.length === 0;
-      $scope.isFirstItem = skippedContributionIds.length === 0;
+      $scope.isLastItem = $scope.remainingContributionIds.length === 0;
+      $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
 
       if (!nextContribution.details) {
         SuggestionModalService.cancelSuggestion($uibModalInstance);
@@ -176,15 +181,16 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         return;
       }
       $scope.showQuestion = false;
-      remainingContributionIds.push($scope.currentSuggestionId);
+      $scope.remainingContributionIds.push($scope.currentSuggestionId);
 
-      let lastContributionId = skippedContributionIds.pop();
+      let lastContributionId = $scope.skippedContributionIds.pop();
       $scope.currentSuggestionId = lastContributionId;
-      let nextContribution = allContributions[lastContributionId];
-      $scope.suggestion = allContributions[lastContributionId].suggestion;
+      let nextContribution = $scope.allContributions[lastContributionId];
+      $scope.suggestion = $scope.allContributions[
+        lastContributionId].suggestion;
 
-      $scope.isLastItem = remainingContributionIds.length === 0;
-      $scope.isFirstItem = skippedContributionIds.length === 0;
+      $scope.isLastItem = $scope.remainingContributionIds.length === 0;
+      $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
 
       if (!nextContribution.details) {
         SuggestionModalService.cancelSuggestion($uibModalInstance);
