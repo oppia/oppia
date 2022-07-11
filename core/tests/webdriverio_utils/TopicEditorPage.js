@@ -52,6 +52,9 @@ var TopicEditorPage = function() {
   var storyListTable = $('.e2e-test-story-list-table');
   var storyThumbnailButton = $(
     '.e2e-test-thumbnail-editor .e2e-test-photo-button');
+  var subtopicColumnsSelector = function() {
+    return $$('.e2e-test-subtopic-column');
+  };
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
   var subtopicSkillDescriptionLocator = '.e2e-test-subtopic-skill-description';
   var subtopicThumbnailButton = $(
@@ -183,7 +186,7 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       uncategorizedSkills[0],
       'Uncategorized skills taking too long to appear.');
-    var subtopicColumns = await $$('.e2e-test-subtopic-column');
+    var subtopicColumns = await subtopicColumnsSelector();
     var target = subtopicColumns[subtopicIndex];
     var uncategorizedSkillIndex = -1;
     for (var i = 0; i < uncategorizedSkills.length; i++) {
@@ -225,7 +228,7 @@ var TopicEditorPage = function() {
 
   this.expectSubtopicWithIndexToHaveSkills = async function(
       subtopicIndex, skillNames) {
-    var subtopicColumns = await $$('.e2e-test-subtopic-column');
+    var subtopicColumns = await subtopicColumnsSelector();
     var assignedSkillDescriptions = await (
       subtopicColumns[subtopicIndex].$$(
         subtopicSkillDescriptionLocator));

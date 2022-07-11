@@ -60,9 +60,15 @@ var SkillEditorPage = function() {
   var misconceptionFeedbackField = $(
     '.e2e-test-feedback-textarea .e2e-test-rte');
   var misconceptionListContainer = $('.e2e-test-misconception-list-container');
+  var misconceptionListItemsSelector = function() {
+    return $$('.e2e-test-misconception-list-item');
+  };
   var misconceptionNameField = $('.e2e-test-misconception-name-field');
   var misconceptionNotesField = $('.e2e-test-notes-textarea .e2e-test-rte');
   var questionItem = $('.e2e-test-question-list-item');
+  var questionItemsSelector = function() {
+    return $$('.e2e-test-question-list-item');
+  };
   var questionsTab = $('.e2e-test-questions-tab');
   var rubricExplanationEditorElement = $('.e2e-test-rubric-explanation-text');
   var rubricExplanationEditorInput = $(
@@ -195,7 +201,7 @@ var SkillEditorPage = function() {
   this.expectNumberOfQuestionsToBe = async function(count) {
     await waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
-    var questionItems = await $$('.e2e-test-question-list-item');
+    var questionItems = await questionItemsSelector();
     expect(questionItems.length).toEqual(count);
   };
 
@@ -365,7 +371,7 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       misconceptionListContainer,
       'Misconception list container takes too long to appear.');
-    var misconceptionListItems = await $$('.e2e-test-misconception-list-item');
+    var misconceptionListItems = await misconceptionListItemsSelector();
     expect(misconceptionListItems.length).toBe(number);
   };
 
