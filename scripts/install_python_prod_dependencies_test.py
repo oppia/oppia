@@ -164,30 +164,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
 
-    def test_wrong_pip_version_raises_import_error(self):
-        import pip
-
-        with self.swap_Popen, self.swap(pip, '__version__', '21.1.0'):
-            install_python_prod_dependencies.verify_pip_is_installed()
-
-        pip_string_with_version = (
-            'pip==%s' %
-            install_python_prod_dependencies.OPPIA_REQUIRED_PIP_VERSION)
-
-        self.assertEqual(self.cmd_token_list, [
-            ['pip', 'install', pip_string_with_version],
-        ])
-
-    def test_correct_pip_version_does_nothing(self):
-        import pip
-
-        with self.swap_check_call, self.swap(
-                pip, '__version__',
-                install_python_prod_dependencies.OPPIA_REQUIRED_PIP_VERSION):
-            install_python_prod_dependencies.verify_pip_is_installed()
-
-        self.assertEqual(self.cmd_token_list, [])
-
     def test_invalid_git_dependency_raises_an_exception(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
