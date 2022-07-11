@@ -24,9 +24,9 @@ import re
 import shutil
 import subprocess
 
-import esprima
-
 from core.tests import test_utils
+
+import esprima
 
 from . import js_ts_linter
 from . import pre_commit_linter

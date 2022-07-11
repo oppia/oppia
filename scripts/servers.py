@@ -23,14 +23,13 @@ import re
 import shutil
 import signal
 import subprocess
-import sys
 import threading
-
-import psutil
 
 from core import feconf
 from core import utils
 from scripts import common
+
+import psutil
 
 
 @contextlib.contextmanager

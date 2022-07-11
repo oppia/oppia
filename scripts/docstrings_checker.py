@@ -18,15 +18,11 @@
 
 from __future__ import annotations
 
-import os
 import re
-import sys
 
 import astroid
 from pylint.checkers import utils
 from pylint.extensions import _check_docs_utils
-
-from scripts import common
 
 
 def space_indentation(s):

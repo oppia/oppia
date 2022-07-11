@@ -24,12 +24,7 @@ file is generated, we must call the CLI in a separate process.
 
 from __future__ import annotations
 
-import os
-import sys
-
-from piptools.scripts import compile
-
-from scripts import common
+from piptools.scripts import compile  # pylint: disable=redefined-builtin
 
 
 def main() -> None:

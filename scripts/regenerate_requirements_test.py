@@ -18,14 +18,12 @@
 
 from __future__ import annotations
 
-import os
 import sys
 
-from piptools.scripts import compile
-
 from core.tests import test_utils
-from scripts import common
 from scripts import regenerate_requirements
+
+from piptools.scripts import compile  # pylint: disable=redefined-builtin
 
 
 class RegenerateRequirementsTests(test_utils.GenericTestBase):

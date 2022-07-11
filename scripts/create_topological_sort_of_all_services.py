@@ -23,10 +23,10 @@ from __future__ import annotations
 import collections
 import os
 
+from core import utils
+
 import esprima
 from typing import Dict, List, Set, Tuple
-
-from core import utils
 
 
 DIRECTORY_NAMES = ['core/templates', 'extensions']

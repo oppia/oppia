@@ -27,6 +27,7 @@ import json
 import os
 import random
 import re
+import ssl
 import string
 import time
 import unicodedata
@@ -34,12 +35,12 @@ import urllib.parse
 import urllib.request
 import zlib
 
-import certifi
-import ssl
-import yaml
 
 from core import feconf
 from core.constants import constants
+
+import certifi
+import yaml
 
 from typing import ( # isort:skip
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,

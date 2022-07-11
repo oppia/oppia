@@ -22,10 +22,10 @@ import io
 import os
 import re
 
-from pylint import lint
-from pylint.reporters import text
 import isort.api
 import pycodestyle
+from pylint import lint
+from pylint.reporters import text
 
 from . import linter_utils
 from .. import concurrent_task_utils

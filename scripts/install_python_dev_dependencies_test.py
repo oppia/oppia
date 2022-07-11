@@ -21,10 +21,11 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
-from typing import List
 
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
+
+from typing import List
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
@@ -76,7 +77,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 sys.executable, '-m', 'pip', 'install',
                 f'{package}=={version}']
             assert check
-            assert encoding=='utf-8'
+            assert encoding == 'utf-8'
 
         run_swap = self.swap(subprocess, 'run', mock_run)
 

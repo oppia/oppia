@@ -32,12 +32,11 @@ import sys
 import tempfile
 import time
 
-import github
-
 from core import constants
 from core import utils
 from core.tests import test_utils
 
+import github
 from typing import Generator, List, NoReturn
 from typing_extensions import Literal
 
