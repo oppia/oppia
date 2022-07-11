@@ -288,7 +288,8 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       const openQuestionSuggestionModal = function(
-          suggestionId, suggestion, reviewable) {
+          suggestionId, suggestion, reviewable
+      ) {
         var skillId = suggestion.change.skill_id;
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
