@@ -397,7 +397,7 @@ def get_multi_users_subtopic_pages_progress(
             if subtopic_page_id not in subtopic_page_ids:
                 continue
             for user_id, skills_mastery_dict in all_users_skill_mastery_dicts.items(): # pylint: disable=line-too-long
-                skill_mastery_dict =  {
+                skill_mastery_dict = {
                     skill_id: mastery
                     for skill_id, mastery in skills_mastery_dict.items()
                     if mastery is not None and (

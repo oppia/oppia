@@ -22,9 +22,7 @@ from core.constants import constants
 from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
-from core.domain import skill_services
 from core.domain import topic_domain
-from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
