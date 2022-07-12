@@ -1566,6 +1566,9 @@ class Topic:
             raise Exception(
                 'The skill id %s is not present in the topic.'
                 % uncategorized_skill_id)
+
+        if uncategorized_skill_id in self.skill_ids_for_diagnostic_test:
+            self.skill_ids_for_diagnostic_test.remove(uncategorized_skill_id)
         self.uncategorized_skill_ids.remove(uncategorized_skill_id)
 
     def get_all_subtopics(self) -> List[SubtopicDict]:
