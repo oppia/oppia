@@ -2810,12 +2810,12 @@ class TranslatableItem:
         }
 
     def is_set_data_format(self):
-        """Check whether the data format of the translatable content is set of 
+        """Check whether the data format of the translatable content is set of
         strings.
 
         Returns:
             bool. Whether the data format of the translatable content is set of
-                strings.
+            strings.
         """
         return self.data_format in [
             TranslatableItem.DATA_FORMAT_SET_OF_NORMALIZED_STRING,

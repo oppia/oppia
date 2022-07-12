@@ -405,6 +405,7 @@ class TranslatableTextHandler(base.BaseHandler):
                 dict(str, dict(str, TranslatableItem)). A dict whose keys are
                 state names, and whose corresponding values are each dicts
                 mapping content IDs to the corresponding translatable items.
+
         Returns:
             dict(str, dict(str, TranslatableItem)). A dict where state_name
             is the key and a dict with content_id as the key and
