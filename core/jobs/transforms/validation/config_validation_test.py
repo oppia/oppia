@@ -26,6 +26,14 @@ from core.platform import models
 
 import apache_beam as beam
 
+from typing import Dict, List, Union
+from typing_extensions import Final
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import config_models
+
 (base_models, config_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.config])
 
@@ -33,7 +41,7 @@ import apache_beam as beam
 class ValidateConfigPropertySnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_validate_change_domain_implemented(self):
+    def test_validate_change_domain_implemented(self) -> None:
         invalid_commit_cmd_model = (
             config_models.ConfigPropertySnapshotMetadataModel(
                 id='model_id-1',
@@ -54,7 +62,7 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_config_property_change_object_with_missing_cmd(self):
+    def test_config_property_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = (
             config_models.ConfigPropertySnapshotMetadataModel(
                 id='model_id-1',
@@ -79,7 +87,7 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 'Missing cmd key in change dict')
         ])
 
-    def test_config_property_change_object_with_invalid_cmd(self):
+    def test_config_property_change_object_with_invalid_cmd(self) -> None:
         invalid_commit_cmd_model = (
             config_models.ConfigPropertySnapshotMetadataModel(
                 id='model_id-1',
@@ -104,7 +112,9 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 'Command invalid is not allowed')
         ])
 
-    def test_config_property_change_object_with_missing_attribute_in_cmd(self):
+    def test_config_property_change_object_with_missing_attribute_in_cmd(
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             config_models.ConfigPropertySnapshotMetadataModel(
                 id='model_id-1',
@@ -130,7 +140,9 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 'new_value')
         ])
 
-    def test_config_property_change_object_with_extra_attribute_in_cmd(self):
+    def test_config_property_change_object_with_extra_attribute_in_cmd(
+        self
+    ) -> None:
         commit_dict = {
             'cmd': 'change_property_value',
             'new_value': 'new_value',
@@ -164,9 +176,11 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
 class ValidatePlatformParameterSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
-    CMD_EDIT_RULES = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+    CMD_EDIT_RULES: Final = (
+        parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+    )
 
-    def test_validate_change_domain_implemented(self):
+    def test_validate_change_domain_implemented(self) -> None:
         invalid_commit_cmd_model = (
             config_models.PlatformParameterSnapshotMetadataModel(
                 id='model_id-1',
@@ -188,7 +202,9 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_param_change_object_with_missing_cmd_raises_exception(self):
+    def test_param_change_object_with_missing_cmd_raises_exception(
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             config_models.PlatformParameterSnapshotMetadataModel(
                 id='model_id-1',
@@ -214,7 +230,9 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
                 'Missing cmd key in change dict')
         ])
 
-    def test_param_change_object_with_invalid_cmd_raises_exception(self):
+    def test_param_change_object_with_invalid_cmd_raises_exception(
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             config_models.PlatformParameterSnapshotMetadataModel(
                 id='model_id-1',
@@ -241,7 +259,8 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
         ])
 
     def test_param_change_object_missing_attribute_in_cmd_raises_exception(
-            self):
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             config_models.PlatformParameterSnapshotMetadataModel(
                 id='model_id-1',
@@ -268,8 +287,9 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
         ])
 
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
-            self):
-        commit_dict = {
+        self
+    ) -> None:
+        commit_dict: Dict[str, Union[str, List[str]]] = {
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': [],
             'invalid': 'invalid'

@@ -27,12 +27,16 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import feedback_models
+
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
 class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
 
-    def test_model_with_invalid_entity_type_raises_error(self):
+    def test_model_with_invalid_entity_type_raises_error(self) -> None:
         model = feedback_models.GeneralFeedbackThreadModel(
             id='123',
             entity_id='123',
@@ -51,7 +55,7 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
             feedback_validation_errors.InvalidEntityTypeError(model)
         ])
 
-    def test_model_with_valid_entity_type_raises_no_error(self):
+    def test_model_with_valid_entity_type_raises_no_error(self) -> None:
         model = feedback_models.GeneralFeedbackThreadModel(
             id='123',
             entity_id='123',
@@ -71,7 +75,7 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
 
 class RelationshipsOfTests(test_utils.TestBase):
 
-    def test_feedback_analytics_model_relationships(self):
-        self.assertItemsEqual(
+    def test_feedback_analytics_model_relationships(self) -> None:
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'FeedbackAnalyticsModel', 'id'), ['ExplorationModel'])

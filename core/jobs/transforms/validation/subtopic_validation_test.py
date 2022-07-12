@@ -110,7 +110,7 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             ])
 
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(
-            self
+        self
     ) -> None:
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
@@ -147,7 +147,7 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             ])
 
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(
-            self
+        self
     ) -> None:
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
@@ -185,7 +185,7 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             ])
 
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
-            self
+        self
     ) -> None:
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(

@@ -20,12 +20,13 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.domain import change_domain
 from core.jobs import job_utils
 from core.jobs.types import job_run_result
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Dict, Optional, Union
+from typing import Mapping, Optional, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -169,7 +170,13 @@ class ModelExpiredError(BaseAuditError):
 class InvalidCommitTypeError(BaseAuditError):
     """Error class for commit_type validation errors."""
 
-    def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
+    def __init__(
+        self,
+        model: Union[
+            base_models.BaseCommitLogEntryModel,
+            base_models.BaseSnapshotMetadataModel
+        ]
+    ) -> None:
         message = 'Commit type %s is not allowed' % model.commit_type
         super(InvalidCommitTypeError, self).__init__(message, model)
 
@@ -208,7 +215,11 @@ class CommitCmdsNoneError(BaseAuditError):
     """Error class for None Commit Cmds."""
 
     def __init__(
-        self, model: base_models.BaseCommitLogEntryModel
+        self,
+        model: Union[
+            base_models.BaseCommitLogEntryModel,
+            base_models.BaseSnapshotMetadataModel
+        ]
     ) -> None:
         message = (
             'No commit command domain object defined for entity with commands: '
@@ -221,8 +232,11 @@ class CommitCmdsValidateError(BaseAuditError):
 
     def __init__(
         self,
-        model: base_models.BaseCommitLogEntryModel,
-        commit_cmd_dict: Dict[str, str],
+        model: Union[
+            base_models.BaseCommitLogEntryModel,
+            base_models.BaseSnapshotMetadataModel
+        ],
+        commit_cmd_dict: Mapping[str, change_domain.AcceptableChangeDictTypes],
         e: str
     ) -> None:
         message = (

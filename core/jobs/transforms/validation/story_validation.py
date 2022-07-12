@@ -24,6 +24,8 @@ from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
 
+from typing import Optional, Type
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import story_models
@@ -33,10 +35,15 @@ if MYPY: # pragma: no cover
 
 @validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel)
 class ValidateStorySnapshotMetadataModel(
-        base_validation.BaseValidateCommitCmdsSchema):
+    base_validation.BaseValidateCommitCmdsSchema[
+        story_models.StorySnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
 
-    def _get_change_domain_class(self, unused_input_model): # pylint: disable=unused-argument
+    def _get_change_domain_class(
+        self, unused_input_model: story_models.StorySnapshotMetadataModel  # pylint: disable=unused-argument
+    ) -> Type[story_domain.StoryChange]:
         """Returns a change domain class.
 
         Args:
@@ -51,10 +58,17 @@ class ValidateStorySnapshotMetadataModel(
 
 @validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel)
 class ValidateStoryCommitLogEntryModel(
-        base_validation.BaseValidateCommitCmdsSchema):
+    base_validation.BaseValidateCommitCmdsSchema[
+        story_models.StoryCommitLogEntryModel
+    ]
+):
     """Overrides _get_change_domain_class for StoryCommitLogEntryModel."""
 
-    def _get_change_domain_class(self, input_model):
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with super class's _get_change_domain_class() method.
+    def _get_change_domain_class(  # type: ignore[override]
+        self, input_model: story_models.StoryCommitLogEntryModel
+    ) -> Optional[Type[story_domain.StoryChange]]:
         """Returns a change domain class.
 
         Args:

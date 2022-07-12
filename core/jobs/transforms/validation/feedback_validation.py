@@ -22,20 +22,36 @@ from core.domain import feedback_services
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import feedback_validation_errors
+from core.jobs.types import model_property
 from core.platform import models
 
 import apache_beam as beam
 
-(exp_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.feedback])
+from typing import Iterator, List, Tuple, Type
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import feedback_models
+
+(exp_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.exploration,
+    models.NAMES.feedback
+])
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 @validation_decorators.AuditsExisting(
     feedback_models.GeneralFeedbackThreadModel)
-class ValidateEntityType(beam.DoFn):
+class ValidateEntityType(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the entity type."""
 
-    def process(self, input_model):
+    def process(
+        self, input_model: feedback_models.GeneralFeedbackThreadModel
+    ) -> Iterator[feedback_validation_errors.InvalidEntityTypeError]:
         """Function that checks if the entity type is valid
 
         Args:
@@ -52,7 +68,14 @@ class ValidateEntityType(beam.DoFn):
 
 
 @validation_decorators.RelationshipsOf(feedback_models.FeedbackAnalyticsModel)
-def feedback_analytics_model_relationships(model):
+def feedback_analytics_model_relationships(
+    model: Type[feedback_models.FeedbackAnalyticsModel]
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType,
+        List[Type[exp_models.ExplorationModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [exp_models.ExplorationModel]
