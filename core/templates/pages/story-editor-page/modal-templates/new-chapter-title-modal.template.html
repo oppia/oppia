@@ -34,9 +34,9 @@
       </div>
       <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control e2e-test-chapter-exploration-input">
       <div ng-if="invalidExpId || explorationId && !validateExplorationId()">
-          <div ng-repeat="invalidExpErrorString in invalidExpErrorStrings" class="new-chapter-error-msg e2e-test-invalid-exp-id">
-            <span><[invalidExpErrorString]></span>
-          </div>
+        <div ng-repeat="invalidExpErrorString in invalidExpErrorStrings" class="new-chapter-error-msg e2e-test-invalid-exp-id">
+          <span><[invalidExpErrorString]></span>
+        </div>
       </div>
       <span class="new-chapter-error-msg" ng-if="correctnessFeedbackDisabled">
         <span><[correctnessFeedbackDisabledString]></span>
