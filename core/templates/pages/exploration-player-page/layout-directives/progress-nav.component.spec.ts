@@ -33,6 +33,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { ProgressNavComponent } from './progress-nav.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -47,6 +48,7 @@ describe('Progress nav component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
+  let contentTranslationManagerService: ContentTranslationManagerService;
   let mockDisplayedCard = new StateCard(
     '', '', '', null, [], null, null, '', null);
 
@@ -87,6 +89,8 @@ describe('Progress nav component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
+    contentTranslationManagerService = TestBed.inject(
+      ContentTranslationManagerService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -151,6 +155,22 @@ describe('Progress nav component', () => {
       mockDisplayedCard.getInteractionCustomizationArgs());
   }));
 
+  it('should respond to state card content updates', fakeAsync(() => {
+    let mockOnStateCardContentUpdate = new EventEmitter<void>();
+    spyOn(componentInstance, 'updateDisplayedCardInfo');
+    spyOnProperty(contentTranslationManagerService, 'onStateCardContentUpdate')
+      .and.returnValue(mockOnStateCardContentUpdate);
+
+    componentInstance.ngOnInit();
+    tick();
+    expect(componentInstance.updateDisplayedCardInfo).not.toHaveBeenCalled();
+
+    mockOnStateCardContentUpdate.emit();
+    tick();
+
+    expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
+  }));
+
   it('should return true if interaction has special case for mobile', () => {
     spyOn(browserCheckerService, 'isMobileDevice')
       .and.returnValue(true);
@@ -169,10 +189,6 @@ describe('Progress nav component', () => {
         .toBeFalse();
       expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
     });
-
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
-  });
 
   it('should not resolve special case for interaction if in desktop mode',
     () => {

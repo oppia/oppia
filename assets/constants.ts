@@ -77,8 +77,6 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
-  "RTL_LANGUAGE_CODES": ["ar"],
-
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
   // any new class, topic, skill, exploration or subtopic is added or a
@@ -6172,6 +6170,9 @@ export default {
 
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
+
+  // Maximum allowed length of unique progress url ID.
+  "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
