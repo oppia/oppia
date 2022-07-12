@@ -1,7 +1,4 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.rtl.css" as="style">
-
-<div class="progress-nav-bar row space-between center" [@fadeInOut]="this.displayedCard">
+<div class="progress-nav-bar row space-between center">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
@@ -50,7 +47,3 @@
     </oppia-continue-button>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.rtl.css">

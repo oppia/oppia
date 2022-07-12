@@ -62,8 +62,7 @@ References:
 #### Proof of changes in Arabic language
 
 <!--
-If the PR changes the UI in any of the files listed in rtl_css.py (i.e, those that have
-a separate .rtl.css file for styling), make sure to add screenshots with the site
+If the PR changes the UI, make sure to add screenshots with the site
 language set to Arabic as well (we use Arabic as it is a language written from right to left).
 -->
 
