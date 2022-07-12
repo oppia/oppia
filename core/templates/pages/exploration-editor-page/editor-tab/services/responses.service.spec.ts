@@ -37,7 +37,7 @@ import {
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
 
-describe('Responses Service', () => {
+fdescribe('Responses Service', () => {
   let alertsService: AlertsService = null;
   let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService = null;
@@ -293,6 +293,7 @@ describe('Responses Service', () => {
         hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
         isConfusing: jasmine.createSpy('isConfusing'),
       },
+      destIfReallyStuck: null,
       trainingData: ['This is training data text'],
       taggedSkillMisconceptionId: '',
       toBackendDict: jasmine.createSpy('toBackendDict'),
