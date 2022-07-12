@@ -70,8 +70,6 @@ var ExplorationEditorPage = function() {
     by.css('.e2e-test-save-prompt-modal'));
   var explorationSaveModalElement = element(
     by.css('.e2e-test-exploration-save-modal'));
-  var explorationTitleInput = element(
-    by.css('.e2e-test-exploration-title-input'));
   var toastMessage = element(by.css('.e2e-test-toast-message'));
 
   /*
@@ -380,8 +378,6 @@ var ExplorationEditorPage = function() {
   this.navigateToSettingsTab = async function() {
     await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      explorationTitleInput, 'Settings tab is not visible');
   };
 
   this.navigateToStatsTab = async function() {
