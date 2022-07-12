@@ -26,6 +26,8 @@ import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFact
 import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
+import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 import { UrlService } from 'services/contextual/url.service';
 
 export interface ReadOnlyExplorationBackendDict {
@@ -42,6 +44,7 @@ export interface ReadOnlyExplorationBackendDict {
 export interface FetchExplorationBackendResponse {
   'can_edit': boolean;
   'exploration': ReadOnlyExplorationBackendDict;
+  'exploration_metadata': ExplorationMetadataBackendDict;
   'exploration_id': string;
   'is_logged_in': boolean;
   'session_id': string;
@@ -73,7 +76,10 @@ export class ReadOnlyExplorationBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService) {}
+    private versionedExplorationCachingService:
+      VersionedExplorationCachingService,
+    private urlService: UrlService
+  ) {}
 
   _fetchCheckpointsFeatureIsEnabledStatus(
       successCallback: (value: boolean) => void,
@@ -102,12 +108,30 @@ export class ReadOnlyExplorationBackendApiService {
       const explorationDataUrl = this._getExplorationUrl(
         explorationId, version, uniqueProgressUrlId);
 
-      this.http.get<FetchExplorationBackendResponse>(
-        explorationDataUrl).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      // If version is not null, then check whether the exploration data for
+      // the given version is already cached. If so, then resolve the Promise
+      // with the cached exploration data.
+      if (
+        version && this.versionedExplorationCachingService.isCached(
+          explorationId, version
+        )) {
+        resolve(
+          this.versionedExplorationCachingService
+            .retrieveCachedVersionedExplorationData(explorationId, version));
+      } else {
+        this.http.get<FetchExplorationBackendResponse>(
+          explorationDataUrl).toPromise().then(response => {
+          // If version is not null, then cache the fetched
+          // exploration data (response) for the given version.
+          if (version) {
+            this.versionedExplorationCachingService
+              .cacheVersionedExplorationData(explorationId, version, response);
+          }
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+      }
     });
   }
 

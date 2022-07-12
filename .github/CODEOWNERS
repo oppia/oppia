@@ -242,6 +242,7 @@
 /core/templates/services/image-upload-helper.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/yaml.service*.ts @oppia/lace-frontend-reviewers
 
 
 # Forms pages.

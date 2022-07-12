@@ -61,6 +61,22 @@ describe('Learner Local Nav Component ', () => {
       objective: '',
       correctness_feedback_enabled: false
     },
+    exploration_metadata: {
+      title: '',
+      category: '',
+      objective: '',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: '',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      edits_allowed: true
+    },
     exploration_id: 'test_id',
     is_logged_in: true,
     session_id: 'test_session',

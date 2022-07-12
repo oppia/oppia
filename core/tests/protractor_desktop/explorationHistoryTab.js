@@ -33,6 +33,7 @@ describe('Exploration history', function() {
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
   var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
 
   // Constants for colors of nodes in history graph.
   var COLOR_ADDED = 'rgb(78, 162, 78)';
@@ -45,6 +46,7 @@ describe('Exploration history', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -64,7 +66,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should display the history', async function() {
+  it('should display the history of the states', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration(true);
@@ -92,24 +94,24 @@ describe('Exploration history', function() {
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
-        text: 'card_is_checkpoint: true',
-        highlighted: false
-      },
-      2: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      3: {
         text: 'content:',
         highlighted: false
       },
-      4: {
+      2: {
+        text: '  html: \'\'',
+        highlighted: true
+      },
+      3: {
         text: '  content_id: content',
         highlighted: false
       },
+      4: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
       5: {
-        text: '  html: \'\'',
-        highlighted: true
+        text: 'linked_skill_id: null',
+        highlighted: false
       },
       6: {
         text: 'interaction:',
@@ -121,7 +123,7 @@ describe('Exploration history', function() {
       },
       8: {
         text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        highlighted: true
       },
       9: {
         text: '  customization_args: {}',
@@ -142,11 +144,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       13: {
-        text: '      content_id: default_outcome',
+        text: '      html: \'\'',
         highlighted: false
       },
       14: {
-        text: '      html: \'\'',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       15: {
@@ -154,15 +156,15 @@ describe('Exploration history', function() {
         highlighted: false
       },
       16: {
-        text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
-      },
-      17: {
         text: '    param_changes: []',
         highlighted: false
       },
-      18: {
+      17: {
         text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      18: {
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       19: {
@@ -178,51 +180,51 @@ describe('Exploration history', function() {
         highlighted: false
       },
       22: {
-        text: 'linked_skill_id: null',
-        highlighted: false
-      },
-      23: {
-        text: 'next_content_id_index: 0',
-        highlighted: true
-      },
-      24: {
         text: 'param_changes: []',
         highlighted: false
       },
-      25: {
+      23: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      26: {
+      24: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      27: {
+      25: {
         text: '    content: {}',
         highlighted: false
       },
-      28: {
+      26: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      29: {
+      27: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      30: {
+      28: {
+        text: 'card_is_checkpoint: true',
+        highlighted: false
+      },
+      29: {
         text: 'written_translations:',
         highlighted: false
       },
-      31: {
+      30: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      32: {
+      31: {
         text: '    content: {}',
         highlighted: false
       },
-      33: {
+      32: {
         text: '    default_outcome: {}',
+        highlighted: false
+      },
+      33: {
+        text: 'next_content_id_index: 0',
         highlighted: true
       },
       34: {
@@ -233,24 +235,24 @@ describe('Exploration history', function() {
 
     var VERSION_2_STATE_1_CONTENTS = {
       1: {
-        text: 'card_is_checkpoint: true',
-        highlighted: false
-      },
-      2: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      3: {
         text: 'content:',
         highlighted: false
       },
-      4: {
+      2: {
+        text: '  html: <p>enter 6 to continue</p>',
+        highlighted: true
+      },
+      3: {
         text: '  content_id: content',
         highlighted: false
       },
+      4: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
       5: {
-        text: '  html: <p>enter 6 to continue</p>',
-        highlighted: true
+        text: 'linked_skill_id: null',
+        highlighted: false
       },
       6: {
         text: 'interaction:',
@@ -261,68 +263,68 @@ describe('Exploration history', function() {
         highlighted: true
       },
       8: {
-        text: '  - outcome:',
+        text: '    - rule_specs:',
         highlighted: true
       },
       9: {
-        text: '      dest: second',
+        text: '        - rule_type: Equals',
         highlighted: true
       },
       10: {
-        text: '      feedback:',
+        text: '          inputs:',
         highlighted: true
       },
       11: {
-        text: '        content_id: feedback_1',
+        text: '            x: 6',
         highlighted: true
       },
       12: {
-        text: '        html: \'\'',
+        text: '      outcome:',
         highlighted: true
       },
       13: {
-        text: '      labelled_as_correct: false',
+        text: '        dest: second',
         highlighted: true
       },
       14: {
-        text: '      missing_prerequisite_skill_id: null',
+        text: '        feedback:',
         highlighted: true
       },
       15: {
-        text: '      param_changes: []',
+        text: '          html: \'\'',
         highlighted: true
       },
       16: {
-        text: '      refresher_exploration_id: null',
+        text: '          content_id: feedback_1',
         highlighted: true
       },
       17: {
-        text: '    rule_specs:',
+        text: '        labelled_as_correct: false',
         highlighted: true
       },
       18: {
-        text: '    - inputs:',
+        text: '        param_changes: []',
         highlighted: true
       },
       19: {
-        text: '        x: 6',
+        text: '        refresher_exploration_id: null',
         highlighted: true
       },
       20: {
-        text: '      rule_type: Equals',
+        text: '        missing_prerequisite_skill_id: null',
         highlighted: true
       },
       21: {
-        text: '    tagged_skill_misconception_id: null',
+        text: '      training_data: []',
         highlighted: true
       },
       22: {
-        text: '    training_data: []',
+        text: '      tagged_skill_misconception_id: null',
         highlighted: true
       },
       23: {
         text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        highlighted: true
       },
       24: {
         text: '  customization_args:',
@@ -349,11 +351,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       30: {
-        text: '      content_id: default_outcome',
+        text: '      html: \'\'',
         highlighted: false
       },
       31: {
-        text: '      html: \'\'',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       32: {
@@ -361,15 +363,15 @@ describe('Exploration history', function() {
         highlighted: false
       },
       33: {
-        text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
-      },
-      34: {
         text: '    param_changes: []',
         highlighted: false
       },
-      35: {
+      34: {
         text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      35: {
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       36: {
@@ -385,59 +387,59 @@ describe('Exploration history', function() {
         highlighted: false
       },
       39: {
-        text: 'linked_skill_id: null',
-        highlighted: false
-      },
-      40: {
-        text: 'next_content_id_index: 2',
-        highlighted: true
-      },
-      41: {
         text: 'param_changes: []',
         highlighted: false
       },
-      42: {
+      40: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      43: {
+      41: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      44: {
+      42: {
         text: '    content: {}',
         highlighted: false
       },
-      45: {
+      43: {
         text: '    default_outcome: {}',
         highlighted: false
       },
-      46: {
+      44: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      47: {
+      45: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      48: {
+      46: {
+        text: 'card_is_checkpoint: true',
+        highlighted: false
+      },
+      47: {
         text: 'written_translations:',
         highlighted: false
       },
-      49: {
+      48: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      50: {
+      49: {
         text: '    content: {}',
         highlighted: false
       },
-      51: {
+      50: {
         text: '    default_outcome: {}',
+        highlighted: false
+      },
+      51: {
+        text: '    feedback_1: {}',
         highlighted: true
       },
       52: {
-        text: '    feedback_1: {}',
+        text: 'next_content_id_index: 2',
         highlighted: true
       },
       53: {
@@ -447,45 +449,45 @@ describe('Exploration history', function() {
     };
 
     var STATE_2_STRING =
-      'card_is_checkpoint: false\n' +
-      'classifier_model_id: null\n' +
       'content:\n' +
-      '  content_id: content\n' +
       '  html: <p>this is card 2</p>\n' +
+      '  content_id: content\n' +
+      'classifier_model_id: null\n' +
+      'linked_skill_id: null\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value:\n' +
-      '        content_id: ca_buttonText_0\n' +
       '        unicode_str: Continue\n' +
+      '        content_id: ca_buttonText_0\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    feedback:\n' +
-      '      content_id: default_outcome\n' +
       '      html: \'\'\n' +
+      '      content_id: default_outcome\n' +
       '    labelled_as_correct: false\n' +
-      '    missing_prerequisite_skill_id: null\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
+      '    missing_prerequisite_skill_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
-      'linked_skill_id: null\n' +
-      'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
       '  voiceovers_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      '    ca_buttonText_0: {}\n' +
       'solicit_answer_details: false\n' +
+      'card_is_checkpoint: false\n' +
       'written_translations:\n' +
       '  translations_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      '    ca_buttonText_0: {}\n' +
+      'next_content_id_index: 1\n' +
       '';
 
     var expectedHistoryStates = [{
@@ -598,6 +600,62 @@ describe('Exploration history', function() {
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
+    await users.logout();
+  });
+
+  it('should show the history of exploration metadata', async function() {
+    await users.createUser('user3@historyTab.com', 'user3HistoryTab');
+    await users.login('user3@historyTab.com');
+    await workflow.createExploration(true);
+
+    var METADATA_1_STRING = (
+      'title: \'\'\n' +
+      'category: \'\'\n' +
+      'objective: \'\'\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 50\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    var METADATA_2_STRING = (
+      'title: Dummy Exploration\n' +
+      'category: Algorithms\n' +
+      'objective: Learn more about Oppia\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 50\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Dummy Exploration');
+    await explorationEditorSettingsTab.setCategory('Algorithms');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToHistoryTab();
+    var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions('1', '2');
+    await historyGraph.openExplorationMetadataHistory();
+    await historyGraph.expectTextToMatch(METADATA_1_STRING, METADATA_2_STRING);
+    await historyGraph.closeExplorationMetadataHistory();
     await users.logout();
   });
 

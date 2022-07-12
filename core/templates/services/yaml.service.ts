@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,36 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Backend API for StateDiffModal.
+ * @fileoverview Service for using the js-yaml library for yaml
+ * conversions.
  */
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { StateBackendDict } from 'domain/state/StateObjectFactory';
-
-interface resInterface {
-  yaml: string;
-}
+import yaml from 'js-yaml';
 
 @Injectable({
   providedIn: 'root'
 })
-export class StateDiffModalBackendApiService {
-  constructor(
-    private http: HttpClient,
-  ) {}
+export class YamlService {
+  constructor() {}
 
-  async fetchYaml(
-      stateDict: StateBackendDict, width: number, url: string
-  ): Promise<resInterface> {
-    return this.http.post<resInterface>(url, {
-      state_dict: stateDict,
-      width: width
-    }).toPromise();
+  stringify(objectToBeStringified: Object): string {
+    return yaml.dump(objectToBeStringified);
+  }
+
+  parse(yamlStringToBeParsed: string): unknown {
+    return yaml.load(yamlStringToBeParsed);
   }
 }
 
 angular.module('oppia').factory(
-  'StateDiffModalBackendApiService',
-  downgradeInjectable(StateDiffModalBackendApiService));
+  'YamlService', downgradeInjectable(YamlService));
