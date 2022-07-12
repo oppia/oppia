@@ -55,13 +55,13 @@
       <div class="list-header">
         <h3>Question List</h3>
       </div>
-      <div *ngIf="getQuestionSummariesForOneSkill().length === 0">
+      <div *ngIf="questionSummariesForOneSkill.length === 0">
         <span>
           There are no questions in this skill.
         </span>
       </div>
-      <div *ngFor="let questionSummaryForOneSkill of getQuestionSummariesForOneSkill(); let index = index" class="question-list-item e2e-test-question-list-item">
-        <div *ngIf="getQuestionSummariesForOneSkill().length > 0">
+      <div *ngIf="questionSummariesForOneSkill.length > 0">
+        <div *ngFor="let questionSummaryForOneSkill of questionSummariesForOneSkill; let index = index" class="question-list-item e2e-test-question-list-item">
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
                (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
             <div class="question-data">
@@ -78,7 +78,7 @@
           </div>
         </div>
       </div>
-      <div class="page-navigation-arrows" *ngIf="getQuestionSummariesForOneSkill().length > 0">
+      <div class="page-navigation-arrows" *ngIf="questionSummariesForOneSkill.length > 0">
         <i class="material-icons md-18"
            *ngIf="getCurrentPageNumber() !== 0"
            (click)="goToPreviousPage()">&#xE5C4;

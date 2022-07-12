@@ -16,7 +16,7 @@
  * @fileoverview Component for the questions list.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ContextService } from 'services/context.service';
@@ -57,7 +57,7 @@ interface GroupedSkillSummaries {
   selector: 'oppia-questions-list',
   templateUrl: './questions-list.component.html'
 })
-export class QuestionsListComponent implements OnInit, OnDestroy {
+export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() skillDescriptionsAreShown: boolean;
   @Input() selectSkillModalIsShown: boolean;
   @Input() allSkillSummaries: ShortSkillSummary[];
@@ -89,6 +89,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   difficulty: number;
   misconceptionIdsForSelectedSkill: unknown[];
   questionEditorIsShown: boolean;
+  questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
 
   constructor(
     private questionsListService: QuestionsListService,
@@ -108,7 +109,19 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private questionObjectFactory: QuestionObjectFactory,
     private questionValidationService: QuestionValidationService,
+    private changeDetectorRef: ChangeDetectorRef,
   ) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // QuestionsListService takes time to
+    // update QuestionSummariesForOneSkill when new
+    // skill is selected from dropdown
+    // in topic quesiton tab component.
+    setTimeout(() => {
+      this.getQuestionSummariesForOneSkill();
+      this.changeDetectorRef.detectChanges();
+    }, 300);
+  }
 
   initializeNewQuestionCreation(skillIds: string[]): void {
     this.question =
@@ -604,8 +617,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
   }
 
-  getQuestionSummariesForOneSkill(): QuestionSummaryForOneSkill[] {
-    return this.questionsListService.getCachedQuestionSummaries();
+  getQuestionSummariesForOneSkill(): void {
+    this.questionSummariesForOneSkill = (
+      this.questionsListService.getCachedQuestionSummaries());
   }
 
   getCurrentPageNumber(): number {
@@ -644,6 +658,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         resetHistoryAndFetch
       );
     }
+
+    this.getQuestionSummariesForOneSkill();
   }
 
   ngOnInit(): void {
