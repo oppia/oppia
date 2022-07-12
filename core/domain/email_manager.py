@@ -52,13 +52,6 @@ app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-def log_new_error(*args: str) -> None:
-    """Logs an error message (This is a stub for logging.error(), so that the
-    latter can be swapped out in tests).
-    """
-    logging.error(*args)
-
-
 NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'review_category': 'translations',
@@ -501,7 +494,7 @@ def _send_email(
 
     cleaned_html_body = html_cleaner.clean(email_html_body)
     if cleaned_html_body != email_html_body:
-        log_new_error(
+        logging.error(
             'Original email HTML body does not match cleaned HTML body:\n'
             'Original:\n%s\n\nCleaned:\n%s\n' %
             (email_html_body, cleaned_html_body))
@@ -513,7 +506,7 @@ def _send_email(
 
     if email_models.SentEmailModel.check_duplicate_message(
             recipient_id, email_subject, cleaned_plaintext_body):
-        log_new_error(
+        logging.error(
             'Duplicate email:\n'
             'Details:\n%s %s\n%s\n\n' %
             (recipient_id, email_subject, cleaned_plaintext_body))
@@ -567,7 +560,7 @@ def _send_bulk_mail(
 
     cleaned_html_body = html_cleaner.clean(email_html_body)
     if cleaned_html_body != email_html_body:
-        log_new_error(
+        logging.error(
             'Original email HTML body does not match cleaned HTML body:\n'
             'Original:\n%s\n\nCleaned:\n%s\n' %
             (email_html_body, cleaned_html_body))
@@ -675,7 +668,7 @@ def send_post_signup_email(
     if not test_for_duplicate_email:
         for key, content in SIGNUP_EMAIL_CONTENT.value.items():
             if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
-                log_new_error(
+                logging.error(
                     'Please ensure that the value for the admin config '
                     'property SIGNUP_EMAIL_CONTENT is set, before allowing '
                     'post-signup emails to be sent.')
@@ -842,12 +835,12 @@ def send_role_notification_email(
 
     # Return from here if sending email is turned off.
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     # Return from here is sending editor role email is disabled.
     if not feconf.CAN_SEND_EDITOR_ROLE_EMAILS:
-        log_new_error('This app cannot send editor role emails to users.')
+        logging.error('This app cannot send editor role emails to users.')
         return
 
     recipient_username = user_services.get_username(recipient_id)
@@ -908,11 +901,11 @@ def send_emails_to_subscribers(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     if not feconf.CAN_SEND_SUBSCRIPTION_EMAILS:
-        log_new_error('This app cannot send subscription emails to users.')
+        logging.error('This app cannot send subscription emails to users.')
         return
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(
@@ -968,11 +961,11 @@ def send_feedback_message_email(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
-        log_new_error('This app cannot send feedback message emails to users.')
+        logging.error('This app cannot send feedback message emails to users.')
         return
 
     if not feedback_messages:
@@ -1077,11 +1070,11 @@ def send_suggestion_email(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
-        log_new_error('This app cannot send feedback message emails to users.')
+        logging.error('This app cannot send feedback message emails to users.')
         return
 
     author_username = user_services.get_username(author_id)
@@ -1134,11 +1127,11 @@ def send_instant_feedback_message_email(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
-        log_new_error('This app cannot send feedback message emails to users.')
+        logging.error('This app cannot send feedback message emails to users.')
         return
 
     sender_username = user_services.get_username(sender_id)
@@ -1184,7 +1177,7 @@ def send_flag_exploration_email(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     reporter_username = user_services.get_username(reporter_id)
@@ -1358,7 +1351,7 @@ def send_mail_to_onboard_new_reviewers(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     recipient_username = user_services.get_username(recipient_id)
@@ -1402,7 +1395,7 @@ def send_mail_to_notify_users_to_review(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     recipient_username = user_services.get_username(recipient_id)
@@ -1508,13 +1501,13 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             descending order based on review wait time.
     """
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     if not (
             config_domain
             .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value):
-        log_new_error(
+        logging.error(
             'The "notify_admins_suggestions_waiting_too_long" property '
             'must be enabled on the admin config page in order to send '
             'admins the emails.'
@@ -1528,7 +1521,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         return
 
     if not admin_ids:
-        log_new_error('There were no admins to notify.')
+        logging.error('There were no admins to notify.')
         return
 
     translation_suggestion_descriptions = []
@@ -1599,7 +1592,7 @@ def _send_suggestions_waiting_too_long_email(
 
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
-            log_new_error(
+            logging.error(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
@@ -1644,13 +1637,13 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             that need more reviewers.
     """
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     if not (
             config_domain
             .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
-        log_new_error(
+        logging.error(
             'The "enable_admin_notifications_for_reviewer_shortage" '
             'property must be enabled on the admin config page in order to '
             'send admins the emails.'
@@ -1664,7 +1657,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         return
 
     if not admin_ids:
-        log_new_error('There were no admins to notify.')
+        logging.error('There were no admins to notify.')
         return
 
     if feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
@@ -1750,7 +1743,7 @@ def _send_reviews_needed_email_to_admins(
 
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
-            log_new_error(
+            logging.error(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
@@ -1791,13 +1784,13 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             'email_body_template'])
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     if not (
             config_domain
             .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
-        log_new_error(
+        logging.error(
             'The "contributor_dashboard_reviewer_emails_is_enabled" property '
             'must be enabled on the admin config page in order to send '
             'reviewers the emails.'
@@ -1805,7 +1798,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         return
 
     if not reviewer_ids:
-        log_new_error('No Contributor Dashboard reviewers to notify.')
+        logging.error('No Contributor Dashboard reviewers to notify.')
         return
 
     reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
@@ -1823,7 +1816,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             continue
 
         if not reviewer_emails[index]:
-            log_new_error(
+            logging.error(
                 'There was no email for the given reviewer id: %s.' % (
                     reviewer_id))
             continue
@@ -1882,7 +1875,7 @@ def send_accepted_voiceover_application_email(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     recipient_username = user_services.get_username(recipient_id)
@@ -1933,7 +1926,7 @@ def send_rejected_voiceover_application_email(
         '<br>%s')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     recipient_username = user_services.get_username(recipient_id)
@@ -1967,7 +1960,7 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
         '- The Oppia Team')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     email_body = email_body_template % user_email
@@ -2048,7 +2041,7 @@ def send_email_to_new_contribution_reviewer(
         'The Oppia Community')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     recipient_username = user_services.get_username(recipient_id)
@@ -2118,7 +2111,7 @@ def send_email_to_removed_contribution_reviewer(
         'The Oppia Community')
 
     if not feconf.CAN_SEND_EMAILS:
-        log_new_error('This app cannot send emails to users.')
+        logging.error('This app cannot send emails to users.')
         return
 
     recipient_username = user_services.get_username(user_id)

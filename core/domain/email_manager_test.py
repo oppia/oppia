@@ -636,42 +636,37 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_content_config_is_not_modified(self) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        logged_errors = []
-
-        def _log_error_for_tests(error_message: str) -> None:
-            """Appends the error message to the logged errors list."""
-            logged_errors.append(error_message)
-
-        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
         log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', log_new_error_counter)
+            logging, 'error', log_new_error_counter)
 
-        with can_send_emails_ctx, log_new_error_ctx:
-            self.assertEqual(log_new_error_counter.times_called, 0)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with can_send_emails_ctx, log_new_error_ctx:
+                self.assertEqual(log_new_error_counter.times_called, 0)
 
-            self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+                self.login(self.EDITOR_EMAIL)
+                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
+                csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
 
-            # No user-facing error should surface.
-            self.post_json(  # type: ignore[no-untyped-call]
-                feconf.SIGNUP_DATA_URL, {
-                    'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                # No user-facing error should surface.
+                self.post_json(  # type: ignore[no-untyped-call]
+                    feconf.SIGNUP_DATA_URL, {
+                        'agreed_to_terms': True,
+                        'username': self.EDITOR_USERNAME,
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                    }, csrf_token=csrf_token)
 
-            # However, an error should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertEqual(
-                logged_errors[0],
-                'Please ensure that the value for the admin config property '
-                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
-                'emails to be sent.')
+                # However, an error should be recorded in the logs.
+                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertEqual(
+                    logs[0],
+                    'Please ensure that the value for the admin config '
+                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
+                    'post-signup emails to be sent.')
 
-            # Check that no email was sent.
-            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-            self.assertEqual(0, len(messages))
+                # Check that no email was sent.
+                messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+                self.assertEqual(0, len(messages))
 
     def test_email_not_sent_if_content_config_is_partially_modified(
         self
@@ -686,42 +681,37 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'html_body': 'New HTML body.',
             })
 
-        logged_errors = []
-
-        def _log_error_for_tests(error_message: str) -> None:
-            """Appends the error message to the logged errors list."""
-            logged_errors.append(error_message)
-
-        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
         log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', log_new_error_counter)
+            logging, 'error', log_new_error_counter)
 
-        with can_send_emails_ctx, log_new_error_ctx:
-            self.assertEqual(log_new_error_counter.times_called, 0)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with can_send_emails_ctx, log_new_error_ctx:
+                self.assertEqual(log_new_error_counter.times_called, 0)
 
-            self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+                self.login(self.EDITOR_EMAIL)
+                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
+                csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
 
-            # No user-facing error should surface.
-            self.post_json(  # type: ignore[no-untyped-call]
-                feconf.SIGNUP_DATA_URL, {
-                    'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                # No user-facing error should surface.
+                self.post_json(  # type: ignore[no-untyped-call]
+                    feconf.SIGNUP_DATA_URL, {
+                        'agreed_to_terms': True,
+                        'username': self.EDITOR_USERNAME,
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                    }, csrf_token=csrf_token)
 
-            # However, an error should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertEqual(
-                logged_errors[0],
-                'Please ensure that the value for the admin config property '
-                'SIGNUP_EMAIL_CONTENT is set, before allowing post-signup '
-                'emails to be sent.')
+                # However, an error should be recorded in the logs.
+                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertEqual(
+                    logs[0],
+                    'Please ensure that the value for the admin config '
+                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
+                    'post-signup emails to be sent.')
 
-            # Check that no email was sent.
-            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-            self.assertEqual(0, len(messages))
+                # Check that no email was sent.
+                messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+                self.assertEqual(0, len(messages))
 
     def test_email_with_bad_content_is_not_sent(self) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -732,39 +722,35 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'html_body': 'New HTML body.<script>alert(3);</script>',
             })
 
-        logged_errors = []
-
-        def _log_error_for_tests(error_message: str) -> None:
-            """Appends the error message to the logged errors list."""
-            logged_errors.append(error_message)
-
-        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
         log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', log_new_error_counter)
+            logging, 'error', log_new_error_counter)
 
-        with can_send_emails_ctx, log_new_error_ctx:
-            self.assertEqual(log_new_error_counter.times_called, 0)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with can_send_emails_ctx, log_new_error_ctx:
+                self.assertEqual(log_new_error_counter.times_called, 0)
 
-            self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+                self.login(self.EDITOR_EMAIL)
+                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
+                csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
 
-            # No user-facing error should surface.
-            self.post_json(  # type: ignore[no-untyped-call]
-                feconf.SIGNUP_DATA_URL, {
-                    'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                # No user-facing error should surface.
+                self.post_json(  # type: ignore[no-untyped-call]
+                    feconf.SIGNUP_DATA_URL, {
+                        'agreed_to_terms': True,
+                        'username': self.EDITOR_USERNAME,
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                    }, csrf_token=csrf_token)
 
-            # However, an error should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertTrue(logged_errors[0].startswith(
-                'Original email HTML body does not match cleaned HTML body'))
+                # However, an error should be recorded in the logs.
+                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertTrue(logs[0].startswith(
+                    'Original email HTML body does not match cleaned HTML body')
+                )
 
-            # Check that no email was sent.
-            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
-            self.assertEqual(0, len(messages))
+                # Check that no email was sent.
+                messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+                self.assertEqual(0, len(messages))
 
     def test_contents_of_signup_email_are_correct(self) -> None:
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -977,54 +963,49 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000)
 
-        logged_errors = []
-
-        def _log_error_for_tests(error_message: str) -> None:
-            """Appends the error message to the logged errors list."""
-            logged_errors.append(error_message)
-
-        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
         log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', log_new_error_counter)
+            logging, 'error', log_new_error_counter)
 
-        with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 0)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
+                all_models: Sequence[
+                    email_models.SentEmailModel
+                ] = email_models.SentEmailModel.get_all().fetch()
+                self.assertEqual(len(all_models), 0)
 
-            cleaned_html_body = html_cleaner.clean(self.new_email_html_body)
-            raw_plaintext_body = cleaned_html_body.replace(
-                '<br/>', '\n').replace('<br>', '\n').replace(
-                    '<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
-            cleaned_plaintext_body = html_cleaner.strip_html_tags(
-                raw_plaintext_body)
-            email_models.SentEmailModel.create(
-                self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
-                feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
-                cleaned_plaintext_body, datetime.datetime.utcnow())
+                cleaned_html_body = html_cleaner.clean(self.new_email_html_body)
+                raw_plaintext_body = cleaned_html_body.replace(
+                    '<br/>', '\n').replace('<br>', '\n').replace(
+                        '<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
+                cleaned_plaintext_body = html_cleaner.strip_html_tags(
+                    raw_plaintext_body)
+                email_models.SentEmailModel.create(
+                    self.new_user_id, self.NEW_USER_EMAIL,
+                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                    feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
+                    cleaned_plaintext_body, datetime.datetime.utcnow())
 
-            # Check that the content of this email was recorded in
-            # SentEmailModel.
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 1)
+                # Check that the content of this email was recorded in
+                # SentEmailModel.
+                all_models = email_models.SentEmailModel.get_all().fetch()
+                self.assertEqual(len(all_models), 1)
 
-            email_manager.send_post_signup_email(
-                self.new_user_id, test_for_duplicate_email=True)
+                email_manager.send_post_signup_email(
+                    self.new_user_id, test_for_duplicate_email=True)
 
-            # An error should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertRegex(logged_errors[0], 'Duplicate email')
+                # An error should be recorded in the logs.
+                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertRegex(logs[0], 'Duplicate email')
 
-            # Check that a new email was not sent.
-            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-            self.assertEqual(0, len(messages))
+                # Check that a new email was not sent.
+                messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
+                self.assertEqual(0, len(messages))
 
-            # Check that the content of this email was not recorded in
-            # SentEmailModel.
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 1)
+                # Check that the content of this email was not recorded in
+                # SentEmailModel.
+                all_models = email_models.SentEmailModel.get_all().fetch()
+                self.assertEqual(len(all_models), 1)
 
     def test_send_email_does_not_resend_within_duplicate_interval(self) -> None:
         can_send_emails_ctx = self.swap(
@@ -1033,60 +1014,55 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        logged_errors = []
-
-        def _log_error_for_tests(error_message: str) -> None:
-            """Appends the error message to the logged errors list."""
-            logged_errors.append(error_message)
-
-        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
         log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', log_new_error_counter)
+            logging, 'error', log_new_error_counter)
 
-        with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
-            config_services.set_property(
-                self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
-                'Email Sender')
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
+                config_services.set_property(
+                    self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
+                    'Email Sender')
 
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 0)
+                all_models: Sequence[
+                    email_models.SentEmailModel
+                ] = email_models.SentEmailModel.get_all().fetch()
+                self.assertEqual(len(all_models), 0)
 
-            email_manager._send_email(  # pylint: disable=protected-access
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                feconf.SYSTEM_EMAIL_ADDRESS)
+                email_manager._send_email(  # pylint: disable=protected-access
+                    self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                    feconf.SYSTEM_EMAIL_ADDRESS)
 
-            # Check that a new email was sent.
-            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-            self.assertEqual(1, len(messages))
+                # Check that a new email was sent.
+                messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
+                self.assertEqual(1, len(messages))
 
-            # Check that the content of this email was recorded in
-            # SentEmailModel.
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 1)
+                # Check that the content of this email was recorded in
+                # SentEmailModel.
+                all_models = email_models.SentEmailModel.get_all().fetch()
+                self.assertEqual(len(all_models), 1)
 
-            # No error should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 0)
+                # No error should be recorded in the logs.
+                self.assertEqual(log_new_error_counter.times_called, 0)
 
-            email_manager._send_email(  # pylint: disable=protected-access
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                feconf.SYSTEM_EMAIL_ADDRESS)
+                email_manager._send_email(  # pylint: disable=protected-access
+                    self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                    feconf.SYSTEM_EMAIL_ADDRESS)
 
-            # An error should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertRegex(logged_errors[0], 'Duplicate email')
+                # An error should be recorded in the logs.
+                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertRegex(logs[0], 'Duplicate email')
 
-            # Check that a new email was not sent.
-            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-            self.assertEqual(1, len(messages))
+                # Check that a new email was not sent.
+                messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
+                self.assertEqual(1, len(messages))
 
-            # Check that the content of this email was not recorded in
-            # SentEmailModel.
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 1)
+                # Check that the content of this email was not recorded in
+                # SentEmailModel.
+                all_models = email_models.SentEmailModel.get_all().fetch()
+                self.assertEqual(len(all_models), 1)
 
     def test_sending_email_with_different_recipient_but_same_hash(self) -> None:
         """Hash for both messages is same but recipients are different."""
@@ -2172,10 +2148,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             sent_email_model.intent,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
-    def _log_error_for_tests(self, error_message: str) -> None:
-        """Appends the error message to the logged errors list."""
-        self.logged_errors.append(error_message)
-
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
         list.
@@ -2198,11 +2170,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.logged_errors: List[str] = []
         self.log_new_error_counter = test_utils.CallCounter(  # type: ignore[no-untyped-call]
-            self._log_error_for_tests)
+            logging.error)
         self.log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', self.log_new_error_counter)
+            logging, 'error', self.log_new_error_counter)
         self.logged_info: List[str] = []
         self.log_new_info_ctx = self.swap(
             logging, 'info', self._mock_logging_info)
@@ -2223,71 +2194,77 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
-        with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
-            )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.cannot_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
+                    [self.reviewer_1_id],
+                    [[self.reviewable_suggestion_email_info]]
+                )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0], 'This app cannot send emails to users.')
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0], 'This app cannot send emails to users.')
 
     def test_email_not_sent_if_reviewer_notifications_is_disabled(self) -> None:
         config_services.set_property(
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', False)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
-            )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
+                    [self.reviewer_1_id],
+                    [[self.reviewable_suggestion_email_info]]
+                )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'The "contributor_dashboard_reviewer_emails_is_enabled" property '
-            'must be enabled on the admin config page in order to send '
-            'reviewers the emails.')
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'The "contributor_dashboard_reviewer_emails_is_enabled" '
+                'property must be enabled on the admin config page in order '
+                'to send reviewers the emails.')
 
     def test_email_not_sent_if_reviewer_email_does_not_exist(self) -> None:
         config_services.set_property(
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                ['reviewer_id_with_no_email'],
-                [[self.reviewable_suggestion_email_info]]
-            )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
+                    ['reviewer_id_with_no_email'],
+                    [[self.reviewable_suggestion_email_info]]
+                )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'There was no email for the given reviewer id: '
-            'reviewer_id_with_no_email.')
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'There was no email for the given reviewer id: '
+                'reviewer_id_with_no_email.')
 
     def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:
         config_services.set_property(
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                [], [[self.reviewable_suggestion_email_info]]
-            )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
+                    [], [[self.reviewable_suggestion_email_info]]
+                )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'No Contributor Dashboard reviewers to notify.')
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'No Contributor Dashboard reviewers to notify.')
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
         self
@@ -3783,10 +3760,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
-    def _log_error_for_tests(self, error_message: str) -> None:
-        """Appends the error message to the logged errors list."""
-        self.logged_errors.append(error_message)
-
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
         list.
@@ -3811,11 +3784,10 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.logged_errors: List[str] = []
         self.log_new_error_counter = test_utils.CallCounter(  # type: ignore[no-untyped-call]
-            self._log_error_for_tests)
+            logging.error)
         self.log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', self.log_new_error_counter)
+            logging, 'error', self.log_new_error_counter)
         self.logged_info: List[str] = []
         self.log_new_info_ctx = self.swap(
             logging, 'info', self._mock_logging_info)
@@ -3836,24 +3808,25 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
 
-        with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                (
-                    email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [self.admin_1_id],
-                        [],
-                        [],
-                        [self.reviewable_suggestion_email_info])
-                )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.cannot_send_emails_ctx, self.log_new_error_ctx:
+                with self.swap(
+                    suggestion_models,
+                    'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                    (
+                        email_manager
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
+                            [self.admin_1_id],
+                            [],
+                            [],
+                            [self.reviewable_suggestion_email_info])
+                    )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0], 'This app cannot send emails to users.')
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0], 'This app cannot send emails to users.')
 
     def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
         self
@@ -3862,70 +3835,74 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', False)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                (
-                    email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [self.admin_1_id], [], [],
-                        [self.reviewable_suggestion_email_info])
-                )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                with self.swap(
+                    suggestion_models,
+                    'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                    (
+                        email_manager
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
+                            [self.admin_1_id], [], [],
+                            [self.reviewable_suggestion_email_info])
+                    )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'The "notify_admins_suggestions_waiting_too_long" property '
-            'must be enabled on the admin config page in order to send '
-            'admins the emails.')
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'The "notify_admins_suggestions_waiting_too_long" property '
+                'must be enabled on the admin config page in order to send '
+                'admins the emails.')
 
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                (
-                    email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_long(
-                        ['admin_id_without_email'], [], [],
-                        [self.reviewable_suggestion_email_info])
-                )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                with self.swap(
+                    suggestion_models,
+                    'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                    (
+                        email_manager
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
+                            ['admin_id_without_email'], [], [],
+                            [self.reviewable_suggestion_email_info])
+                    )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'There was no email for the given admin id: admin_id_without_email.'
-        )
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'There was no email for the given admin id: '
+                'admin_id_without_email.'
+            )
 
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                (
-                    email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [], [], [], [self.reviewable_suggestion_email_info])
-                )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                with self.swap(
+                    suggestion_models,
+                    'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                    (
+                        email_manager
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
+                            [], [], [], [self.reviewable_suggestion_email_info])
+                    )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0], 'There were no admins to notify.')
+            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0], 'There were no admins to notify.')
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_admin_about(
         self
@@ -4570,10 +4547,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
 
-    def _log_error_for_tests(self, error_message: str) -> None:
-        """Appends the error message to the logged errors list."""
-        self.logged_errors.append(error_message)
-
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
         list.
@@ -4601,11 +4574,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.logged_errors: List[str] = []
         self.log_new_error_counter = test_utils.CallCounter(   # type: ignore[no-untyped-call]
-            self._log_error_for_tests)
+            logging.error)
         self.log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', self.log_new_error_counter)
+            logging, 'error', self.log_new_error_counter)
         self.logged_info: List[str] = []
         self.log_new_info_ctx = self.swap(
             logging, 'info', self._mock_logging_info)
@@ -4619,16 +4591,17 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', True)
 
-        with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], [], [],
-                self.suggestion_types_needing_reviewers)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.cannot_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
+                    [self.admin_1_id], [], [],
+                    self.suggestion_types_needing_reviewers)
 
-        messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0], 'This app cannot send emails to users.')
+            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0], 'This app cannot send emails to users.')
 
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
         self
@@ -4637,35 +4610,37 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', False)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], [], [],
-                self.suggestion_types_needing_reviewers)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
+                    [self.admin_1_id], [], [],
+                    self.suggestion_types_needing_reviewers)
 
-        messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'The "enable_admin_notifications_for_reviewer_shortage" '
-            'property must be enabled on the admin config page in order to '
-            'send admins the emails.')
+            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'The "enable_admin_notifications_for_reviewer_shortage" '
+                'property must be enabled on the admin config page in order to '
+                'send admins the emails.')
 
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         config_services.set_property(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [], [], [],
-                self.suggestion_types_needing_reviewers)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
+                    [], [], [],
+                    self.suggestion_types_needing_reviewers)
 
-        messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0], 'There were no admins to notify.')
+            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0], 'There were no admins to notify.')
 
     def test_email_not_sent_if_no_suggestion_types_that_need_reviewers(
         self
@@ -4690,18 +4665,20 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                ['admin_id_without_email'], [], [],
-                self.suggestion_types_needing_reviewers)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
+                    ['admin_id_without_email'], [], [],
+                    self.suggestion_types_needing_reviewers)
 
-        messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'There was no email for the given admin id: admin_id_without_email.'
-        )
+            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'There was no email for the given admin id: '
+                'admin_id_without_email.'
+            )
 
     def test_email_sent_to_admin_if_question_suggestions_need_reviewers(
         self
