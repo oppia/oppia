@@ -384,7 +384,6 @@ def apply_change_list_to_exploration(
     # The below exception is added so that this method cannot be used
     # incorrectly. Otherwise it might create a fork in the versioning
     # hierarchy if incorrectly used.
-    raise Exception('some')
     if current_version != old_exploration.version:
         raise Exception(
             'Trying to get the new version of the exploration from version '
