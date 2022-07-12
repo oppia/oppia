@@ -118,11 +118,8 @@
     <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage()">
       <div class="conversation-skin-milestone-message">
         <div class="milestone-message-star-container">
-          <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48" class="star-icon">
-            <title>Milestone message star icon</title>
-            <path fill="#f8bf74" d="m11.65 44 4.65-15.2L4 20h15.2L24 4l4.8 16H44l-12.3 8.8L36.35 44 24 34.6Z"/>
-          </svg>
-          <p class="completed-chapter-count">5</p>
+          <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
+          <p class="completed-chapter-count">{{ completedChaptersCount }}</p>
         </div>
         <span class="milestone-message-text">{{ generateMilestoneMessage() }}</span>
       </div>

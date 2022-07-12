@@ -150,6 +150,8 @@ export class ConversationSkinComponent {
   mostRecentlyReachedCheckpoint: string;
   showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
+  // 'completedChaptersCount' is fetched via a HTTP request.
+  // Until the response is received, it remains undefined.
   completedChaptersCount: number | undefined;
   chapterIsCompletedForTheFirstTime: boolean = false;
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;

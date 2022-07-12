@@ -71,7 +71,7 @@ export class RatingsAndRecommendationsComponent {
   @Input() nextLessonLink: string | undefined;
   inStoryMode: boolean;
   storyViewerUrl: string | undefined;
-  nextStoryNode: ReadOnlyStoryNode = null;
+  nextStoryNode: ReadOnlyStoryNode | null = null;
   nextStoryNodeIconUrl: string | undefined;
   storyId: string | undefined;
   collectionId: string;
@@ -104,12 +104,14 @@ export class RatingsAndRecommendationsComponent {
       let nodeId = this.urlService.getUrlParams().node_id;
       this.storyViewerBackendApiService.fetchStoryDataAsync(
         topicUrlFragment, classroomUrlFragment,
-        storyUrlFragment).then(
+        storyUrlFragment
+      ).then(
         (res) => {
           this.storyId = res.id;
           for (let i = 0; i < res.nodes.length; i++) {
-            if (res.nodes[i].id === nodeId &&
-                (i + 1) < res.nodes.length) {
+            if (
+              res.nodes[i].id === nodeId && (i + 1) < res.nodes.length
+            ) {
               this.nextStoryNode = res.nodes[i + 1];
               this.nextStoryNodeIconUrl = this.getIconUrl(
                 this.storyId, this.nextStoryNode.thumbnailFilename);

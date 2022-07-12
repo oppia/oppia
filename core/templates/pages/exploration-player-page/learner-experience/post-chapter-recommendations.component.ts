@@ -25,7 +25,10 @@ import { PracticeSessionPageConstants } from 'pages/practice-session-page/practi
   template: require('./post-chapter-recommendations.component.html'),
 })
 export class PostChapterRecommendationsComponent {
+  // The below property will be undefined when the current chapter
+  // is the last chapter of a story.
   @Input() nextStoryNodeLink: string | undefined;
+
   // The properties below will not be null because when being passed down as
   // input from the parent component, a null/undefined check is performed and
   // if the check fails, an empty string is passed down instead.

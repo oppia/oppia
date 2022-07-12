@@ -1,5 +1,7 @@
 <div class="post-chapter-recommendations-container">
-  <p class="post-chapter-recommendation-text">{{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}</p>
+  <p class="post-chapter-recommendation-text">
+    {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
+  </p>
   <div class="post-chapter-recommendation-cards-container">
     <div *ngIf="nextStoryNodeTitle" class="recommendation-card-wrapper">
       <div class="recommendation-card">
@@ -20,8 +22,12 @@
           </a>
         </svg>
       </div>
-      <p class="to-the-next-lesson-text">{{ 'I18N_END_CHAPTER_NEXT_CHAPTER_TEXT' | translate }}</p>
-      <p [ngStyle]="{'font-style': 'italic'}">{{ nextStoryNodeTitle }}</p>
+      <p class="to-the-next-lesson-text">
+        {{ 'I18N_END_CHAPTER_NEXT_CHAPTER_TEXT' | translate }}
+      </p>
+      <p [ngStyle]="{'font-style': 'italic'}">
+        {{ nextStoryNodeTitle }}
+      </p>
     </div>
     <p *ngIf="nextStoryNodeTitle" class="or-text">Or</p>
     <div class="recommendation-card-wrapper">
@@ -43,7 +49,9 @@
           </a>
         </svg>
       </div>
-      <p [ngStyle]="{'font-style': 'italic'}">{{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}</p>
+      <p [ngStyle]="{'font-style': 'italic'}">
+        {{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}
+      </p>
     </div>
   </div>
 </div>

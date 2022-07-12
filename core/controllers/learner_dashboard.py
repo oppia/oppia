@@ -140,8 +140,8 @@ class LearnerCompletedChaptersCountHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         learner_progress_in_topics_and_stories = (
-                learner_progress_services.get_topics_and_stories_progress(
-                    self.user_id)[0])
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id)[0])
 
         all_topic_summary_dicts = (
             learner_progress_services.get_displayable_topic_summary_dicts(
@@ -152,7 +152,7 @@ class LearnerCompletedChaptersCountHandler(base.BaseHandler):
         for topic in all_topic_summary_dicts:
             for story in topic['canonical_story_summary_dict']:
                 completed_chapters_count += (
-                len(story_fetchers.get_completed_nodes_in_story(
+                    len(story_fetchers.get_completed_nodes_in_story(
                         self.user_id, story['id'])))
 
         self.render_json({

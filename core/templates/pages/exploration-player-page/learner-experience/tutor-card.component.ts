@@ -107,7 +107,11 @@ export class TutorCardComponent {
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
   @Input() inStoryMode: boolean;
+  // The below property will be undefined when the current chapter
+  // is the last chapter of a story.
   @Input() nextLessonLink: string | undefined;
+  // 'completedChaptersCount' is fetched via a HTTP request.
+  // Until the response is received, it remains undefined.
   @Input() completedChaptersCount: number | undefined;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
   directiveSubscriptions = new Subscription();
@@ -265,6 +269,10 @@ export class TutorCardComponent {
     let milestoneMessageTranslationKey = (
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex);
     return this.translateService.instant(milestoneMessageTranslationKey);
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   isAudioBarExpandedOnMobileDevice(): boolean {
