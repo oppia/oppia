@@ -52,16 +52,24 @@ interface SearchDropDownItems {
 })
 export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   @Input() learnerGroupId: string = '';
-  @Output() updateLearnerGroupStories:
+  @Input() syllabusStorySummaries: StorySummary[] = [];
+  @Input() syllabusSubtopicSummaries: LearnerGroupSubtopicSummary[] = [];
+  @Input() syllabusStoryIds: string[] = [];
+  @Input() syllabusSubtopicPageIds: string[] = [];
+  @Output() updateLearnerGroupStoryIds:
     EventEmitter<string[]> = new EventEmitter();
+
+  @Output() updateLearnerGroupSubtopicIds:
+    EventEmitter<string[]> = new EventEmitter();
+
+  @Output() updateLearnerGroupStories:
+    EventEmitter<StorySummary[]> = new EventEmitter();
 
   @Output() updateLearnerGroupSubtopics:
-    EventEmitter<string[]> = new EventEmitter();
+    EventEmitter<LearnerGroupSubtopicSummary[]> = new EventEmitter();
 
-  syllabusStoryIds: string[] = [];
-  syllabusSubtopicPageIds: string[] = [];
-  syllabusStorySummaries: StorySummary[] = [];
-  syllabusSubtopicSummaries: LearnerGroupSubtopicSummary[] = [];
+  storySummaries: StorySummary[] = [];
+  subtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   searchBarPlaceholder!: string;
   categoryButtonText!: string;
   languageButtonText!: string;
@@ -81,8 +89,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
   searchIsInProgress = false;
-  storySummaries: StorySummary[] = [];
-  subtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   syllabusFilter: LearnerGroupSyllabusFilter;
 
   constructor(
@@ -328,8 +334,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   }
 
   updateLearnerGroupSyllabus(): void {
-    this.updateLearnerGroupStories.emit(this.syllabusStoryIds);
-    this.updateLearnerGroupSubtopics.emit(this.syllabusSubtopicPageIds);
+    this.updateLearnerGroupStories.emit(this.syllabusStorySummaries);
+    this.updateLearnerGroupSubtopics.emit(this.syllabusSubtopicSummaries);
+    this.updateLearnerGroupStoryIds.emit(this.syllabusStoryIds);
+    this.updateLearnerGroupSubtopicIds.emit(this.syllabusSubtopicPageIds);
   }
 
   addStoryToSyllabus(storySummary: StorySummary): void {

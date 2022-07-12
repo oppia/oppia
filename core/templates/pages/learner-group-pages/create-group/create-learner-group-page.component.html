@@ -6,41 +6,58 @@
     <span translate="I18N_CREATE_LEARNER_GROUP"></span>
   </div>
   <div class="oppia-create-learner-group-progress">
-    <ul class="cdt-step-progressbar horizontal">
+    <ul class="oppia-learner-group-progressbar horizontal">
       <li [ngClass]="getProgressTabStatusClass(1)">
-        <span class="indicator">1</span>
-        <span class="title">Add Group Details</span>
+        <span *ngIf="getProgressTabStatusClass(1) != 'completed'" class="indicator">1</span>
+        <span *ngIf="getProgressTabStatusClass(1) == 'completed'" class="indicator checkmark"></span>
+        <span translate="I18N_LEARNER_GROUP_ADD_GROUP_DETAILS" class="title"></span>
       </li>
       <li [ngClass]="getProgressTabStatusClass(2)">
-        <span class="indicator">2</span>
-        <span class="title">Add Syllabus Items</span>
+        <span *ngIf="getProgressTabStatusClass(2) != 'completed'" class="indicator">2</span>
+        <span *ngIf="getProgressTabStatusClass(2) == 'completed'" class="indicator checkmark"></span>
+
+        <span translate="I18N_LEARNER_GROUP_ADD_SYLLABUS_ITEMS" class="title"></span>
       </li>
       <li [ngClass]="getProgressTabStatusClass(3)">
-        <span class="indicator">3</span>
-        <span class="title">Add Members</span>
+        <span *ngIf="getProgressTabStatusClass(3) != 'completed'" class="indicator">3</span>
+        <span *ngIf="getProgressTabStatusClass(3) == 'completed'" class="indicator checkmark"></span>
+        <span translate="I18N_LEARNER_GROUP_INVITE_STUDENTS" class="title"></span>
       </li>
     </ul>
   </div>
   <div class="oppia-create-learner-group-tab-container">
     <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS">
-      <oppia-learner-group-details (updateLearnerGroupTitle)="updateLearnerGroupTitle($event)"
+      <oppia-learner-group-details [learnerGroupTitle]="learnerGroupTitle"
+                                   [learnerGroupDescription]="learnerGroupDescription"
+                                   (updateLearnerGroupTitle)="updateLearnerGroupTitle($event)"
                                    (updateLearnerGroupDesc)="updateLearnerGroupDesc($event)">
       </oppia-learner-group-details>
       <div class="oppia-next-section-container oppia-next-section-button"
            [ngClass]="{'active': !isGroupDetailsNextButtonDisabled()}"
            (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS, 2)">
-        Next
+        <span translate="I18N_LEARNER_GROUP_CREATION_NEXT_BUTTON_TEXT"></span>
       </div>
     </div>
     <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS">
-      <oppia-add-syllabus-items (updateLearnerGroupStories)="updateLearnerGroupStories($event)"
+      <oppia-add-syllabus-items [syllabusStorySummaries]="syllabusStorySummaries"
+                                [syllabusSubtopicSummaries]="syllabusSubtopicSummaries"
+                                [syllabusStoryIds]="learnerGroupStoryIds"
+                                [syllabusSubtopicPageIds]="learnerGroupSubtopicPageIds"
+                                (updateLearnerGroupStoryIds)="updateLearnerGroupStoryIds($event)"
+                                (updateLearnerGroupSubtopicIds)="updateLearnerGroupSubtopicIds($event)"
+                                (updateLearnerGroupStories)="updateLearnerGroupStories($event)"
                                 (updateLearnerGroupSubtopics)="updateLearnerGroupSubtopics($event)">
       </oppia-add-syllabus-items>
+      <div class="oppia-prev-section-container oppia-prev-section-button"
+           [ngClass]="{'no-syllabus-items': isAddSyllabusNextButtonDisabled()}"
+           (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS, 1)">
+        <span translate="I18N_LEARNER_GROUP_CREATION_PREV_BUTTON_TEXT"></span>
+      </div>
       <div class="oppia-next-section-container">
         <div class="oppia-next-section-button"
              [ngClass]="{'active': !isAddSyllabusNextButtonDisabled()}"
              (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.INVITE_STUDENTS, 3)">
-          Next
+          <span translate="I18N_LEARNER_GROUP_CREATION_NEXT_BUTTON_TEXT"></span>
         </div>
         <span *ngIf="isAddSyllabusNextButtonDisabled()" class="add-syllabus-items-message">
           You need to add at least one syllabus item(Skill/Story) in order to make a group.
@@ -48,21 +65,31 @@
       </div>
     </div>
     <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.INVITE_STUDENTS">
-      <oppia-invite-students (updateLearnerGroupInvitedStudents)="updateLearnerGroupInvitedStudents($event)">
+      <oppia-invite-students [invitedUsersInfo]=""
+                             [invitedUsernames]=""
+                             (updateLearnerGroupInvitedStudentsInfo)="updateLearnerGroupInvitedStudentsInfo($event)"
+                             (updateLearnerGroupInvitedStudents)="updateLearnerGroupInvitedStudents($event)">
       </oppia-invite-students>
+      <div class="oppia-prev-section-container oppia-prev-section-button"
+           (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS, 1)">
+        <span translate="I18N_LEARNER_GROUP_CREATION_PREV_BUTTON_TEXT"></span>
+      </div>
       <div class="oppia-next-section-container oppia-next-section-button active"
            (click)="createLearnerGroup()">
-        Create Group
+        <span translate="I18N_CREATE_LEARNER_GROUP"></span>
       </div>
     </div>
   </div>
 </div>
 
 <div *ngIf="learnerGroup" class="oppia-learner-group-created-container">
+  <img [src]="getOppiaLargeAvatarUrl()" class="oppia-large-avatar">
   <div class="oppia-learner-group-created-title">
     <span [innerHTML]="'I18N_LEARNER_GROUP_CREATED_TITLE' | translate: { groupName: learnerGroup.title }"></span>
   </div>
-  <div class="group-link">Your group link: <a href="/">link</a>&nbsp;&nbsp;<i class="far fa-copy"></i></div>
+  <div class="oppia-group-link">Your group link: <a [href]="learnerGroupUrl">{{ learnerGroupUrl }}</a>
+    &nbsp;&nbsp;<i class="far fa-copy" (click)="copyCreatedGroupUrl()"></i>
+  </div>
 </div>
 <!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.css">

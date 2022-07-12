@@ -5,61 +5,32 @@
   <div class="add-learner-group-syllabus-desc-text">
     Add skills or stories to your syllabus to automatically send them to your students.
   </div>
-  <div class="added-syllabus-container" *ngIf="syllabusStorySummaries.length > 0 || syllabusSubtopicSummaries.length > 0">
-    <div>Added lessons</div>
-    <div class="filtered-syllabus-items-container">
-      <div class="syllabus-item-card" *ngFor="let storySummary of syllabusStorySummaries; trackBy: index">
-        <div class="syllabus-item-image-title-container">
-          <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
-          <div class="syllabus-item-title-container">
-            <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
-            <div class="syllabus-item-title-info">Story | {{ storySummary.getTopicName() }}</div>
-          </div>
-        </div>
-        <div class="syllabus-item-cta-buttons-container">
-          <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
-            View Details
-          </button>
-          <button class="btn btn-primary syllabus-item-remove-cta-button"
-                  (click)="removeStoryFromSyllabus(storySummary)">
-            Remove
-          </button>
-        </div>
+  <div class="added-syllabus-container">
+    <div class="added-syllabus-item-card" *ngFor="let storySummary of syllabusStorySummaries; trackBy: index">
+      <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
+      <div class="syllabus-item-title-container">
+        <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
       </div>
-      <div class="syllabus-item-card" *ngFor="let subtopicSummary of syllabusSubtopicSummaries; trackBy: index">
-        <div class="syllabus-item-image-title-container">
-          <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
-          <div class="syllabus-item-title-container">
-            <div class="syllabus-item-title">{{ subtopicSummary.subtopicTitle }}</div>
-            <div class="syllabus-item-title-info">Skill | {{ subtopicSummary.parentTopicName }}</div>
-          </div>
-        </div>
-        <div class="syllabus-item-cta-buttons-container">
-          <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
-            View Details
-          </button>
-          <button class="btn btn-primary syllabus-item-remove-cta-button"
-                  (click)="removeSubtopicFromSyllabus(subtopicSummary)">
-            Remove
-          </button>
-        </div>
+      <span class="remove-syllabus" (click)="removeStoryFromSyllabus(storySummary)"></span>
+    </div>
+    <div class="added-syllabus-item-card" *ngFor="let subtopicSummary of syllabusSubtopicSummaries; trackBy: index">
+      <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
+      <div class="syllabus-item-title-container">
+        <div class="syllabus-item-title">{{ subtopicSummary.subtopicTitle }}</div>
+      </div>
+      <span class="remove-syllabus" (click)="removeSubtopicFromSyllabus(subtopicSummary)"></span>
+    </div>
+    <div *ngIf="syllabusStorySummaries.length == 0 && syllabusSubtopicSummaries.length == 0">
+      <div class="no-syllabus-items-text">
+        <span translate="I18N_LEARNER_GROUP_NO_ITEMS_ADDED"></span>
       </div>
     </div>
-  </div>
-  <div class="learner-group-syllabus-filters-title">
-    Search by keyword, topic, language, or skill name
   </div>
   <div class="learner-group-syllabus-filters-container">
     <div class="oppia-same-row-container oppia-search-box-container">
       <form class="search-bar-float-left oppia-search-bar-form" role="search">
         <div class="form-group">
           <div class="input-group oppia-input-group">
-            <div class="input-group-addon oppia-search-bar-icon">
-              <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
-              <span *ngIf="isSearchInProgress()">
-                <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
-              </span>
-            </div>
             <input type="text"
                    class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
                    [placeholder]="searchBarPlaceholder"
@@ -183,8 +154,10 @@
       <div class="syllabus-item-image-title-container">
         <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
         <div class="syllabus-item-title-container">
+          <div class="syllabus-item-title-info">{{ storySummary.getTopicName() }}
+            <span class="syllabus-item-type-pill">{{ storySummary.getNodeTitles().length }} Lessons</span>
+          </div>
           <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
-          <div class="syllabus-item-title-info">Story | {{ storySummary.getTopicName() }}</div>
         </div>
       </div>
       <div class="syllabus-item-cta-buttons-container">
@@ -205,8 +178,8 @@
       <div class="syllabus-item-image-title-container">
         <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
         <div class="syllabus-item-title-container">
+          <div class="syllabus-item-title-info">{{ subtopicSummary.parentTopicName }} <span class="syllabus-item-type-pill">Skill</span> </div>
           <div class="syllabus-item-title">{{ subtopicSummary.subtopicTitle }}</div>
-          <div class="syllabus-item-title-info">Skill | {{ subtopicSummary.parentTopicName }}</div>
         </div>
       </div>
       <div class="syllabus-item-cta-buttons-container">
@@ -223,9 +196,12 @@
         </button>
       </div>
     </div>
-    <div *ngIf="isValidSearch() && storySummaries.length == 0 && subtopicSummaries.length == 0">
+    <div *ngIf="isSearchInProgress()" class="oppia-search-spinner">
+      <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+    </div>
+    <div *ngIf="isValidSearch() && !searchIsInProgress && storySummaries.length == 0 && subtopicSummaries.length == 0">
       <div class="no-results-container">
-        <div class="no-results-message">No results found.</div>
+        <div class="no-results-message"><span translate="I18N_LEARNER_GROUP_NO_RESULTS_FOUND"></span></div>
       </div>
     </div>
   </div>

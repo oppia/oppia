@@ -47,7 +47,7 @@
   max-width: 1120px;
 }
 
-.cdt-step-progressbar {
+.oppia-learner-group-progressbar {
   counter-reset: step;
   display: flex;
   flex-direction: row;
@@ -55,14 +55,14 @@
   position: relative;
 }
 
-.cdt-step-progressbar li {
+.oppia-learner-group-progressbar li {
   border-left: 2px solid #9e9e9e;
   color: #9e9e9e;
   padding: 7px 0 40px 40px;
   position: relative;
 }
 
-.cdt-step-progressbar.horizontal li {
+.oppia-learner-group-progressbar.horizontal li {
   border-left: none;
   color: #9e9e9e;
   padding-left: 0;
@@ -71,7 +71,7 @@
   width: 33%;
 }
 
-.cdt-step-progressbar.horizontal li:before {
+.oppia-learner-group-progressbar.horizontal li:before {
   background-color: #9e9e9e;
   content: "";
   height: 1px;
@@ -82,11 +82,24 @@
   z-index: 1;
 }
 
-.cdt-step-progressbar.horizontal li:first-child:before {
+.oppia-learner-group-progressbar.horizontal li:first-child:before {
   content: none;
 }
 
-.cdt-step-progressbar li .indicator {
+.checkmark:after {
+  border-bottom: 3px solid #fff;
+  border-right: 3px solid #fff;
+  content: "";
+  height: 16px;
+  margin-top: -2px;
+  transform: rotate(45deg);
+  width: 8px;
+  -o-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+.oppia-learner-group-progressbar li .indicator {
   align-items: center;
   background: #fff;
   border: 2px solid #9e9e9e;
@@ -102,26 +115,26 @@
   width: 30px;
 }
 
-.cdt-step-progressbar.horizontal li .indicator {
+.oppia-learner-group-progressbar.horizontal li .indicator {
   left: 50%;
   position: absolute;
   top: 0;
   transform: translate(-50%,-50%);
 }
 
-.cdt-step-progressbar li.active .indicator {
+.oppia-learner-group-progressbar li.active .indicator {
   border-color: #27635c;
   color: #27635c;
 }
 
-.cdt-step-progressbar li.completed .indicator {
+.oppia-learner-group-progressbar li.completed .indicator {
   background-color: #27635c;
   border-color: #27635c;
   color: #fff;
 }
 
-.cdt-step-progressbar li.active .title,
-.cdt-step-progressbar li.completed .title {
+.oppia-learner-group-progressbar li.active .title,
+.oppia-learner-group-progressbar li.completed .title {
   color: #27635c;
 }
 
@@ -135,6 +148,27 @@
   position: relative;
 }
 
+.oppia-prev-section-container {
+  bottom: 30px;
+  left: 30px;
+  position: absolute;
+}
+
+.oppia-prev-section-button {
+  background: #fff;
+  border: solid 1px #27635C;
+  border-radius: 4px;
+  color: #27635C;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 6px 24px;
+  width: max-content;
+}
+
+.oppia-prev-section-container.no-syllabus-items {
+  bottom: 55px;
+}
+
 .oppia-next-section-container {
   bottom: 30px;
   position: absolute;
@@ -143,6 +177,7 @@
 
 .oppia-next-section-button {
   background: #d9d9d9;
+  border: solid 1px #d9d9d9;
   border-radius: 4px;
   cursor: pointer;
   margin-left: auto;
@@ -153,6 +188,7 @@
 
 .oppia-next-section-button.active {
   background: #00645c;
+  border: solid 1px #00645c;
   color: #fff;
   pointer-events: auto;
 }
@@ -166,13 +202,14 @@
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
+  height: 200px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 200px;
+  margin-top: 220px;
   max-width: 560px;
-  min-height: 200px;
   min-width: 320px;
   padding: 60px;
+  position: relative;
   width: 90%;
 }
 
@@ -181,5 +218,16 @@
 }
 
 .oppia-learner-group-created-container .group-link {
+  padding-top: 40px;
   text-align: center;
+}
+
+.oppia-large-avatar {
+  left: 35%;
+  position: absolute;
+  top: -140px;
+}
+
+.oppia-group-link .fa-copy{
+  cursor: pointer;
 }

@@ -32,16 +32,20 @@ import { LearnerGroupInvitedUserInfo } from
   templateUrl: './invite-students.component.html'
 })
 export class InviteStudentsComponent implements OnInit {
-  @Input() learnerGroupID: string;
+  @Input() learnerGroupID: string = '';
+  @Input() invitedUsersInfo: LearnerGroupInvitedUserInfo[] = [];
+  @Input() invitedUsernames: string[] = [];
   @Output() updateLearnerGroupInvitedStudents:
     EventEmitter<string[]> = new EventEmitter();
+
+  @Output() updateLearnerGroupInvitedStudentsInfo:
+    EventEmitter<LearnerGroupInvitedUserInfo[]> = new EventEmitter();
 
   learnerGroupTitle: string;
   learnerGroupDescription: string;
   searchedUsername: string;
   placeholderMessage: string;
-  invitedUsersInfo: LearnerGroupInvitedUserInfo[] = [];
-  invitedUsernames: string[] = [];
+  alertTimeout = 6000;
 
   constructor(
     private alertsService: AlertsService,
@@ -67,6 +71,8 @@ export class InviteStudentsComponent implements OnInit {
   updateInvitedStudents(): void {
     this.updateLearnerGroupInvitedStudents.emit(
       this.invitedUsernames);
+    this.updateLearnerGroupInvitedStudentsInfo.emit(
+      this.invitedUsersInfo);
   }
 
   onSearchQueryChangeExec(username: string): void {
@@ -83,10 +89,9 @@ export class InviteStudentsComponent implements OnInit {
         if (!userInfo.error) {
           this.invitedUsersInfo.push(userInfo);
           this.invitedUsernames.push(userInfo.username);
-          this.alertsService.clearWarnings();
           this.updateInvitedStudents();
         } else {
-          this.alertsService.addWarning(userInfo.error);
+          this.alertsService.addInfoMessage(userInfo.error, this.alertTimeout);
         }
       });
     }

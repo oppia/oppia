@@ -16,7 +16,7 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -26,10 +26,10 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
   templateUrl: './learner-group-details.component.html'
 })
 export class LearnerGroupDetailsComponent {
+  @Input() learnerGroupTitle: string;
+  @Input() learnerGroupDescription: string;
   @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
   @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
-  learnerGroupTitle: string;
-  learnerGroupDescription: string;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService

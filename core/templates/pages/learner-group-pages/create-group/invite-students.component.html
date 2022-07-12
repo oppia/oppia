@@ -3,7 +3,7 @@
 
 <div class="oppia-learner-group-invite-students">
   <div class="form-group">
-    <b>Invite students through Username</b>
+    <b><span translate="I18N_LEARNER_GROUP_INVITE_STUDENTS_BY_USERNAME"></span></b>
     <input type="text"
            class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
            [placeholder]="placeholderMessage"
@@ -12,15 +12,18 @@
            aria-label="Search bar"
            (keydown.enter)="onSearchQueryChangeExec($event.target.value)">
   </div>
-  <div class="invited-students-container" *ngIf="invitedUsersInfo.length">
+  <div class="invited-students-container">
     <div class="invited-students-title">
-      Users who will receive your invitation after creating the group
+      <span translate="I18N_LEARNER_GROUP_INVITE_LIST_TEXT"></span>
     </div>
     <div class="invited-students-inner-container">
       <div class="invited-student-card" *ngFor="let userInfo of invitedUsersInfo; trackBy: index">
         <img [src]="userInfo.profile_picture_data_url">
         <div>{{userInfo.username}}</div>
         <i class="fa fa-times close-button" (click)="removeInvitedStudent(userInfo.username)"></i>
+      </div>
+      <div *ngIf="!invitedUsersInfo.length" class="oppia-no-students-invited">
+        <span translate="I18N_LEARNER_GROUP_NO_STUDENTS_INVITED"></span>
       </div>
     </div>
   </div>

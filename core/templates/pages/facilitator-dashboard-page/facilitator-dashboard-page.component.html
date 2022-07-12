@@ -18,8 +18,8 @@
           </a>
         </div>
       </div>
-      <div class="oppia-empty-learner-groups-container">
-        <div class="oppia-empty-learner-groups-message" *ngIf="shortLearnerGroupSummaries.length == 0">
+      <div class="oppia-empty-learner-groups-container" *ngIf="shortLearnerGroupSummaries.length == 0">
+        <div class="oppia-empty-learner-groups-message">
           <span translate="I18N_EMPTY_LEARNER_GROUPS_MESSAGE"></span>
         </div>
         <a [href]="createLearnerGroupPageUrl" class="btn oppia-create-new-learner-group-button oppia-autofocus">

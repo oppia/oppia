@@ -16,6 +16,7 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
@@ -29,6 +30,11 @@ import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerGroupInvitedUserInfo } from 'domain/learner_group/learner-group-user-progress.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-create-learner-group-page',
@@ -44,9 +50,13 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   learnerGroupTitle: string = '';
   learnerGroupDescription: string = '';
   learnerGroupSubtopicPageIds: string[] = [];
+  syllabusSubtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   learnerGroupStoryIds: string[] = [];
+  syllabusStorySummaries: StorySummary[] = [];
   learnerGroupInvitedStudents: string[] = [];
+  learnerGroupInvitedStudentsInfo: LearnerGroupInvitedUserInfo[] = [];
   learnerGroup!: LearnerGroupData;
+  learnerGroupUrl: string = '';
 
   constructor(
     private contextService: ContextService,
@@ -55,8 +65,17 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef,
+    private clipboard: Clipboard
   ) {}
+
+  ngOnInit(): void {
+    this.activeSection = (
+      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS
+    );
+  }
 
   checkMobileView(): boolean {
     return (this.windowDimensionsService.getWidth() < 500);
@@ -102,16 +121,32 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.learnerGroupDescription = description;
   }
 
-  updateLearnerGroupSubtopics(subtopicPageIds: string[]): void {
+  updateLearnerGroupSubtopics(
+      subtopicSummaries: LearnerGroupSubtopicSummary[]
+  ): void {
+    this.syllabusSubtopicSummaries = subtopicSummaries;
+  }
+
+  updateLearnerGroupSubtopicIds(subtopicPageIds: string[]): void {
     this.learnerGroupSubtopicPageIds = subtopicPageIds;
   }
 
-  updateLearnerGroupStories(storyIds: string[]): void {
+  updateLearnerGroupStories(storySummaries: StorySummary[]): void {
+    this.syllabusStorySummaries = storySummaries;
+  }
+
+  updateLearnerGroupStoryIds(storyIds: string[]): void {
     this.learnerGroupStoryIds = storyIds;
   }
 
   updateLearnerGroupInvitedStudents(invitedUsernames: string[]): void {
     this.learnerGroupInvitedStudents = invitedUsernames;
+  }
+
+  updateLearnerGroupInvitedStudentsInfo(
+      invitedUsersInfo: LearnerGroupInvitedUserInfo[]
+  ): void {
+    this.learnerGroupInvitedStudentsInfo = invitedUsersInfo;
   }
 
   isAddSyllabusNextButtonDisabled(): boolean {
@@ -130,9 +165,9 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit(): void {
-    this.activeSection = (
-      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS
+  getOppiaLargeAvatarUrl(): string {
+    return this.urlInterpolationService.getStaticImageUrl(
+      '/avatar/oppia_avatar_large_100px.svg'
     );
   }
 
@@ -146,8 +181,18 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
       this.learnerGroupStoryIds
     ).then((responseLearnerGroup: LearnerGroupData) => {
       this.learnerGroup = responseLearnerGroup;
+      this.learnerGroupUrl = (
+        this.windowRef.nativeWindow.location.protocol + '//' +
+         this.windowRef.nativeWindow.location.host +
+          '/learner-group/' + this.learnerGroup.id
+      );
+      console.log('Learner group created: ', this.learnerGroup);
       this.loaderService.hideLoadingScreen();
     });
+  }
+
+  copyCreatedGroupUrl(): void {
+    this.clipboard.copy(this.learnerGroupUrl);
   }
 
   ngOnDestroy(): void {

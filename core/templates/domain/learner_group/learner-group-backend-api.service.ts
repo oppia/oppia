@@ -147,15 +147,10 @@ export class LearnerGroupBackendApiService {
       username: string
   ): Promise<LearnerGroupInvitedUserInfo> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          '/learner_group_search_student_handler/<learner_group_id>', {
-            learner_group_id: learnerGroupId
-          }
-        )
-      );
+      const learnerGroupUrl = '/learner_group_search_student_handler'
       const filterData = {
-        username: username
+        username: username,
+        learner_group_id: learnerGroupId
       };
       this.http.get<LearnerGroupInvitedUserInfo>(
         learnerGroupUrl, {

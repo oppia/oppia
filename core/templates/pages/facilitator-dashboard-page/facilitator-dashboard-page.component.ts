@@ -35,7 +35,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 @Component({
   selector: 'oppia-facilitator-dashboard-page',
   templateUrl: './facilitator-dashboard-page.component.html',
-  styleUrls: []
 })
 export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
