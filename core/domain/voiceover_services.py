@@ -297,30 +297,3 @@ def create_new_voiceover_application(
 
     _save_voiceover_applications([voiceover_application])
 
-
-def get_text_to_create_voiceover_application(
-        target_type, target_id, language_code):
-    """Returns a text to voiceover for a voiceover application.
-
-    Args:
-        target_type: str. The string representing the type of the target entity.
-        target_id: str. The ID of the target entity.
-        language_code: str. The language code for the content.
-
-    Returns:
-        str. The text which can be voiceover for a voiceover application.
-
-    Raises:
-        Exception. Invalid target type.
-    """
-    if target_type == feconf.ENTITY_TYPE_EXPLORATION:
-        exploration = exp_fetchers.get_exploration_by_id(target_id)
-        init_state_name = exploration.init_state_name
-        state = exploration.states[init_state_name]
-        if exploration.language_code == language_code:
-            return state.content.html
-        else:
-            return state.written_translations.get_translated_content(
-                state.content.content_id, language_code)
-    else:
-        raise Exception('Invalid target type: %s' % target_type)

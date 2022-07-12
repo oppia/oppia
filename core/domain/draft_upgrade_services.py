@@ -139,8 +139,7 @@ class DraftUpgradeUtil:
                         elif isinstance(value, str):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
-            elif (change.property_name ==
-                  exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+            elif (change.property_name == 'written_translations'):
                 for content_id, language_code_to_written_translation in (
                         new_value['translations_mapping'].items()):
                     for language_code in (

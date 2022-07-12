@@ -1015,7 +1015,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         state_with_training_data = exploration.states['Home']
         self.assertIsNotNone(
             state_with_training_data)
-        self.assertEqual(len(state_with_training_data.to_dict()), 10)
+        self.assertEqual(len(state_with_training_data.to_dict()), 8)
 
     def test_save_and_retrieve_exploration(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -1734,12 +1734,14 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+        ca_placeholder_2: {}
     solicit_answer_details: false
     card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
+        ca_placeholder_2: {}
 states_schema_version: 42
 tags: []
 title: Title
@@ -4570,18 +4572,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         composite_change_list_dict_expected = [{
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
-            'content_id_for_state_content': (
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT)
-            ),
-            'content_id_for_default_outcome': (
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME)
-            )
+            'content_id_for_state_content': 'content_3',
+            'content_id_for_default_outcome': 'default_outcome_4'
         }, {
             'cmd': 'edit_exploration_property',
             'property_name': 'next_content_id_index',
-            'new_value': content_id_generator.next_content_id_index
+            'new_value': 5,
+            'old_value': None
         }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'old_value': None,
@@ -6007,22 +6004,6 @@ title: Old Title
                     'new_value': 'new title'
                 })], 'changed title')
 
-    def test_update_exploration_with_invalid_commit_message(self):
-        self.save_new_valid_exploration('exp_id', 'user_id')
-
-        exploration_model = exp_models.ExplorationModel.get('exp_id')
-        exploration_model.version = 0
-
-        with self.assertRaisesRegex(
-            Exception,
-            'Commit messages for non-suggestions may not start with'):
-            exp_services.update_exploration(
-                'user_id', 'exp_id', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'new title'
-                })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
-
     def test_update_title(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'en')
@@ -7185,17 +7166,12 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.EXP_ID1,
             migration_change_list, 'Migrate state schema.')
 
-        self.init_state_name = exploration.init_state_name
-        self.param_changes = [{
-            'customization_args': {
-                'list_of_values': ['1', '2'], 'parse_with_jinja': False
-            },
-            'name': 'myParam',
-            'generator_id': 'RandomSelector'
-        }]
-
+        state = exploration.states[exploration.init_state_name]
         self.draft_change_list = _get_change_list(
-            self.init_state_name, 'param_changes', self.param_changes)
+            exploration.init_state_name, 'content', {
+                'content_id': state.content.content_id,
+                'html': '<p>New html value</p>'
+            })
         self.draft_change_list_dict = [
             change.to_dict() for change in self.draft_change_list]
         # Explorations with draft set.
@@ -7214,12 +7190,8 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
-        param_changes = updated_exp.init_state.param_changes[0].to_dict()
-        self.assertEqual(param_changes['name'], 'myParam')
-        self.assertEqual(param_changes['generator_id'], 'RandomSelector')
-        self.assertEqual(
-            param_changes['customization_args'],
-            {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
+        new_content_html = updated_exp.init_state.content.html
+        self.assertEqual(new_content_html, '<p>New html value</p>')
 
 
 class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
@@ -7299,11 +7271,20 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         self.assertEqual(
             old_model.state_version_history.get('New state'), None)
-
+        content_id_generator = translation_domain.ContentIdGenerator(
+            self.exploration.next_content_id_index)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'New state'
+                'state_name': 'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
             })], 'Added state')
 
         new_model = self.version_history_model_class.get(
@@ -7315,10 +7296,20 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                 None, None, self.owner_id).to_dict())
 
     def test_version_history_on_delete_state(self):
+        content_id_generator = translation_domain.ContentIdGenerator(
+            self.exploration.next_content_id_index)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'New state'
+                'state_name': 'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
             })], 'Added state')
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
@@ -7607,10 +7598,20 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         # recorded because it was added and deleted in the same commit.
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        content_id_generator = translation_domain.ContentIdGenerator(
+            self.exploration.next_content_id_index)
         change_list = [
           exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'New state'
+                'state_name': 'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
           }), exp_domain.ExplorationChange({
               'cmd': exp_domain.CMD_DELETE_STATE,
               'state_name': 'New state'
@@ -7626,13 +7627,31 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         self.assertIsNone(new_model.state_version_history.get('New state'))
 
     def test_version_history_on_state_name_interchange(self):
+        content_id_generator = translation_domain.ContentIdGenerator(
+            self.exploration.next_content_id_index)
         change_list_from_v1_to_v2 = [
           exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'first'
+                'state_name': 'first',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
           }), exp_domain.ExplorationChange({
               'cmd': exp_domain.CMD_ADD_STATE,
-              'state_name': 'second'
+              'state_name': 'second',
+              'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
           })
         ]
         exp_services.update_exploration(
@@ -7687,15 +7706,33 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         self.assertNotIn(self.editor_id, old_model.committer_ids)
 
+        content_id_generator = translation_domain.ContentIdGenerator(
+            self.exploration.next_content_id_index)
         exp_services.update_exploration(
             self.editor_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'New state'
+                'state_name': 'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
             })], 'Added a state')
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'Another state'
+                'state_name': 'Another state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
             })], 'Added a state')
         new_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))

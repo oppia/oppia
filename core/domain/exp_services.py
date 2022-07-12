@@ -497,33 +497,6 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-            elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
-                # DEPRECATED: This command is deprecated. Please do not use.
-                # The command remains here to support old suggestions.
-                exploration.states[change.state_name].add_translation(
-                    change.content_id, change.language_code,
-                    change.translation_html)
-            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                exploration.states[change.state_name].add_written_translation(
-                    change.content_id, change.language_code,
-                    change.translation_html, change.data_format)
-            elif (change.cmd ==
-                  exp_domain
-                  .DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE
-            ):
-                exploration.states[
-                    change.state_name
-                ].mark_written_translation_as_needing_update(
-                    change.content_id,
-                    change.language_code
-                )
-            elif (change.cmd ==
-                  exp_domain
-                  .DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
-            ):
-                exploration.states[
-                    change.state_name
-                ].mark_written_translations_as_needing_update(change.content_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -680,8 +653,7 @@ def update_states_version_history(
     # related to translations. Hence, they are ignored in order to avoid
     # updating the version history in case of translation-only commits.
     state_property_ignore_list = [
-        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS,
-        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
     ]
     for change in change_list:
         if (

@@ -1048,34 +1048,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
-                'property_name': 'written_translations',
-                'new_value': {
-                    'translations_mapping': {
-                        'content1': {
-                            'en': {
-                                'html': html_content,
-                                'needs_update': True
-                            },
-                            'hi': {
-                                'html': 'Hey!',
-                                'needs_update': False
-                            }
-                        },
-                        'feedback_1': {
-                            'hi': {
-                                'html': html_content,
-                                'needs_update': False
-                            },
-                            'en': {
-                                'html': 'hello!',
-                                'needs_update': False
-                            }
-                        }
-                    }
-                }
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
                 'property_name': 'solution',
                 'new_value': {
                     'answer_is_exclusive': False,
@@ -1249,37 +1221,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
-                'property_name': 'written_translations',
-                'new_value': {
-                    'translations_mapping': {
-                        'content1': {
-                            'en': {
-                                'html': expected_html_content,
-                                'needs_update': True
-                            },
-                            'hi': {
-                                'html': 'Hey!',
-                                'needs_update': False
-                            }
-                        },
-                        'feedback_1': {
-                            'hi': {
-                                'html': expected_html_content,
-                                'needs_update': False
-                            },
-                            'en': {
-                                'html': 'hello!',
-                                'needs_update': False
-                            }
-                        }
-                    }
-                }
-            }).to_dict())
-        self.assertEqual(
-            migrated_draft_change_list[4].to_dict(),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
                 'property_name': 'solution',
                 'new_value': {
                     'answer_is_exclusive': False,
@@ -1291,7 +1232,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             }).to_dict())
         self.assertEqual(
-            migrated_draft_change_list[5].to_dict(),
+            migrated_draft_change_list[4].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -1312,7 +1253,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            migrated_draft_change_list[6].to_dict(),
+            migrated_draft_change_list[5].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -1331,7 +1272,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            migrated_draft_change_list[7].to_dict(),
+            migrated_draft_change_list[6].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',

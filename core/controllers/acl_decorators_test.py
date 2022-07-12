@@ -5272,7 +5272,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.admin_id,
             self._create_valid_question_data('ABC', content_id_generator),
-            self.skill_id],
+            [self.skill_id],
             content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.admin_id, self.question_id, self.skill_id, 0.5)

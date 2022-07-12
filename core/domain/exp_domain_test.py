@@ -1647,7 +1647,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     content_id_generator.generate(
                         translation_domain.ContentType.CONTENT),
                     content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                        translation_domain.ContentType.DEFAULT_OUTCOME),
                     is_initial_state=True))
         }
         self.set_interaction_for_state(

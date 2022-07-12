@@ -3408,30 +3408,6 @@ class ExplorationChangeMergeVerifier:
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
-            elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
-                state_name = state_names_of_renamed_states.get(
-                    change.state_name) or change.state_name
-                if state_name in old_to_new_state_names:
-                    # Here we will send the changelist, frontend_version,
-                    # backend_version and exploration to the admin, so
-                    # that the changes related to state renames can be
-                    # reviewed and the proper conditions can be written
-                    # to handle those cases.
-                    return False, True
-                changed_property = self._get_property_name_from_content_id(
-                    change.content_id)
-                if (changed_property not in
-                        (self.changed_properties[state_name] |
-                         self.changed_translations[state_name])):
-                    change_is_mergeable = True
-                if not self.changed_properties[state_name]:
-                    change_is_mergeable = True
-            elif change.cmd == (
-                DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
-                change_is_mergeable = True
-            elif change.cmd == (
-                DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
-                change_is_mergeable = True
             elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
                 change_is_mergeable = (
                     exp_at_change_list_version.__getattribute__(

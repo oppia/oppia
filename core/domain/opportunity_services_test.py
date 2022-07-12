@@ -56,7 +56,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     suggestion_target_version_at_submission = 1
     suggestion_change = {
         'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-        'state_name': 'End State',
+        'state_name': 'Introduction',
         'content_id': 'content_0',
         'language_code': 'hi',
         'content_html': '',
@@ -1015,22 +1015,3 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
             ))
         self.opportunity_model.put()
 
-    def test_update_opportunity_with_accepted_suggestion(self):
-        self.assertEqual(
-            self.opportunity_model.translation_counts, {})
-        self.assertItemsEqual(
-            self.opportunity_model.incomplete_translation_language_codes,
-            self.new_incomplete_translation_language_codes
-        )
-
-        opportunity_services.update_opportunity_with_accepted_suggestion(
-            'exp_1', 'hi')
-
-        self.assertEqual(
-            self.opportunity_model.translation_counts,
-            {'hi': 1}
-        )
-        self.assertItemsEqual(
-            self.opportunity_model.incomplete_translation_language_codes,
-            self.new_incomplete_translation_language_codes
-        )

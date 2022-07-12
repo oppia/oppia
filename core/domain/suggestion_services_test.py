@@ -32,8 +32,11 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_services
+from core.domain import subtopic_page_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import translation_domain
 from core.domain import user_services
@@ -45,6 +48,78 @@ from core.tests import test_utils
         [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user]
     )
 )
+
+
+class BaseSuggestionServicesTest(test_utils.GenericTestBase):
+
+    def _publish_valid_topic(self, topic, uncategorized_skill_ids):
+        """Saves and publishes a valid topic with linked skills and subtopic.
+
+        Args:
+            topic: Topic. The topic to be saved and published.
+            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
+                to add to the supplied topic.
+        """
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        subtopic_id = 1
+        subtopic_skill_id = 'subtopic_skill_id' + topic.id
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                subtopic_id, 'Title', [subtopic_skill_id], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic.id))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
+
+        for skill_id in uncategorized_skill_ids:
+            self.save_new_skill(
+                skill_id, self.admin_id, description='skill_description')
+            topic_services.add_uncategorized_skill(
+                self.admin_id, topic.id, skill_id)
+
+    def setUp(self):
+        super(BaseSuggestionServicesTest, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        explorations = [self.save_new_valid_exploration(
+            '%s' % i,
+            self.owner_id,
+            title='title %d' % i,
+            category=constants.ALL_CATEGORIES[i],
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in range(2)]
+
+        for exp in explorations:
+            self.publish_exploration(self.owner_id, exp.id)
+
+        self.topic_id = '0'
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'topic', 'abbrev', 'description', 'fragm')
+        self.skill_id_0 = 'skill_id_0'
+        self.skill_id_1 = 'skill_id_1'
+        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
+
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_0', self.topic_id, '0')
 
 
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
@@ -105,19 +180,21 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         accept_suggestion.
         """
         with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
+            exp_services, 'update_exploration', self.mock_update_exploration):
             with self.swap(
-                suggestion_registry.SuggestionEditStateContent,
-                'pre_accept_validate',
-                self.mock_pre_accept_validate_does_nothing):
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
                 with self.swap(
                     suggestion_registry.SuggestionEditStateContent,
-                    'get_change_list_for_accepting_suggestion',
-                    self.mock_get_change_list_does_nothing):
-                    suggestion_services.accept_suggestion(
-                        suggestion_id, reviewer_id,
-                        commit_message, review_message)
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        suggestion_services.accept_suggestion(
+                            suggestion_id, reviewer_id,
+                            commit_message, review_message)
 
     def mock_create_suggestion(self, target_id):
         """Sets up the appropriate mocks to successfully call
@@ -274,6 +351,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             7 * 24 * 60 * 60 * 1000):
             self.assertEqual(
                 len(suggestion_services.get_all_stale_suggestion_ids()), 0)
+
+    def mock_update_exploration(
+        self, unused_user_id, unused_exploration_id, unused_change_list,
+        commit_message):
+        self.assertEqual(
+            commit_message, 'Accepted suggestion by %s: %s' % (
+                'author', self.COMMIT_MESSAGE))
 
     def test_cannot_reject_suggestion_with_empty_review_message(self):
         suggestion_services.create_suggestion(
@@ -864,7 +948,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.update_question_suggestion(
             suggestion.suggestion_id,
             suggestion.change.skill_difficulty,
-            question_state_data)
+            question_state_data,
+            content_id_generator.next_content_id_index)
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
         new_question_state_data = updated_suggestion.change.question_dict[
@@ -913,7 +998,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.update_question_suggestion(
             suggestion.suggestion_id,
             0.6,
-            question_state_data)
+            question_state_data,
+            content_id_generator.next_content_id_index)
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
 
@@ -998,7 +1084,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'state_name': 'state_1',
         'content_id': 'content_0',
         'language_code': 'hi',
-        'content_html': '<p>State name: state_1, Content id: content</p>',
+        'content_html': '<p>State name: state_1, Content id: content_0</p>',
         'translation_html': '<p>This is translated html.</p>',
         'data_format': 'html'
     }
@@ -1076,7 +1162,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'content_id': 'content_0',
             'language_code': language_code,
             'content_html': (
-                '<p>State name: state_1, Content id: content</p>'),
+                '<p>State name: state_1, Content id: content_0</p>'),
             'translation_html': '<p>This is translated html.</p>',
             'data_format': 'html'
         }
@@ -1857,11 +1943,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Gets the html content in the exploration to be translated.
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         content_html = exploration.states['State 1'].content.html
+        content_id = exploration.states['State 1'].content.content_id
 
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'State 1',
-            'content_id': 'content_0',
+            'content_id': content_id,
             'language_code': 'hi',
             'content_html': content_html,
             'translation_html': '<p>This is translated html.</p>',
@@ -2086,7 +2173,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': state_name,
-            'content_id': 'content_0',
+            'content_id': exploration.states[state_name].content.content_id,
             'language_code': 'hi',
             'content_html': exploration.states[state_name].content.html,
             'translation_html': '<p>This is translated html.</p>',
@@ -2882,14 +2969,14 @@ class ReviewableSuggestionEmailInfoUnitTests(
 
 
 class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
-        test_utils.GenericTestBase):
+        BaseSuggestionServicesTest):
     """Test the ability of the
     get_suggestions_waitng_for_review_info_to_notify_reviewers method
     in suggestion services, which is used to retrieve the information required
     to notify reviewers that there are suggestions that need review.
     """
 
-    target_id = 'exp1'
+    target_id = '0'
     language_code = 'en'
     AUTHOR_EMAIL = 'author1@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
@@ -3011,7 +3098,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
         self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
-        self.save_new_valid_exploration(self.target_id, self.author_id)
 
     def test_get_returns_empty_for_reviewers_who_authored_the_suggestions(self):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
@@ -3485,7 +3571,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             expected_reviewable_suggestion_email_infos)
 
 
-class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
+class CommunityContributionStatsUnitTests(BaseSuggestionServicesTest):
     """Test the functionality related to updating the community contribution
     stats.
 
@@ -3496,7 +3582,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     to be added then this can be removed. See issue #10957 for more context.
     """
 
-    target_id = 'exp1'
+    target_id = '0'
     skill_id = 'skill_123456'
     language_code = 'en'
     AUTHOR_EMAIL = 'author@example.com'
@@ -3853,7 +3939,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         suggestion_services.accept_suggestion(
             translation_suggestion.suggestion_id, self.reviewer_id,
-            self.COMMIT_MESSAGE, 'review message')
+                self.COMMIT_MESSAGE, 'review message')
 
         self._assert_community_contribution_stats_is_in_default_state()
 

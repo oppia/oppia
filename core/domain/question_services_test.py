@@ -803,8 +803,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'inputs': {
                         'x': {
                             'contentId': rule_content_ids[0],
-                                extra_prefix='input'
-                            ),
                             'normalizedStrSet': ['Test']
                         }
                     },

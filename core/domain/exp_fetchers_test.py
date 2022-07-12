@@ -23,7 +23,7 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import user_services
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -168,8 +168,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 ),
                 'content_id_for_default_outcome': (
                     self.content_id_generator_1.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-    ,
+                        translation_domain.ContentType.DEFAULT_OUTCOME))
             }),
             exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -189,8 +188,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 ),
                 'content_id_for_default_outcome': (
                     self.content_id_generator_1.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-    ,
+                        translation_domain.ContentType.DEFAULT_OUTCOME))
             }),
             exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -225,8 +223,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 ),
                 'content_id_for_default_outcome': (
                     self.content_id_generator_1.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-    ,
+                        translation_domain.ContentType.DEFAULT_OUTCOME))
             }),
             exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -246,7 +243,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 ),
                 'content_id_for_default_outcome': (
                     self.content_id_generator_1.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                        translation_domain.ContentType.DEFAULT_OUTCOME))
             }),
             exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',

@@ -156,7 +156,8 @@ class QuestionModel(base_models.VersionedModel):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'inapplicable_skill_misconception_ids':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
