@@ -554,12 +554,18 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         exps_having_invalid_change_list = (
             version_history_models
-            | 'Filter exps having invalid change list' >> beam.Filter(
-                lambda models: len(models[1]) == 0
-            )
-            | 'Extract the exp ids having invalid change list' >> beam.Map(
-                lambda models: models[0]
-            )
+            | 'Filter exps having invalid change list' >>
+                beam.Filter(lambda models: len(models[1]) == 0)
+            | 'Extract the exp ids having invalid change list' >>
+                beam.Map(lambda models: models[0])
+        )
+
+        exps_for_which_version_history_was_computed = (
+            version_history_models
+            | 'Filter exps for which version history was computed' >>
+                beam.Filter(lambda models: len(models[1]) > 0)
+            | 'Extract the exp ids for which version history was computed' >>
+                beam.Map(lambda models: models[0])
         )
 
         flattened_vh_models = (
@@ -580,14 +586,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 job_result_transforms.CountObjectsToJobRunResult('ALL EXPS')
         )
 
-        report_number_of_valid_exps_queried = (
-            valid_explorations_v1
-            | 'Count valid queried explorations' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'VALID EXPS'
-                )
-        )
-
         # The following are explorations which have outdated state schema
         # version and cannot be converted from older schema versions to the
         # latest one which is required while calculating version histories.
@@ -596,7 +594,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             invalid_explorations_v1
             | 'Count invalid queried explorations' >>
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'INVALID EXPS'
+                    'EXPS HAVING OUTDATED STATES SCHEMA'
                 )
         )
 
@@ -607,6 +605,18 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     'Version history cannot be calculated for %s' % (model.id)
                 )
             )
+        )
+
+        # The below count gives the number of explorations which have complete
+        # commit logs of all versions and have supported states schema version.
+        # However, it also includes the explorations having invalid change
+        # list.
+        report_exps_count_for_which_version_history_can_be_computed = (
+            model_groups
+            | 'Count exps for which version history can be computed' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED'
+                )
         )
 
         # The following are explorations which have complete commit logs for
@@ -621,6 +631,18 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 )
         )
 
+        # The below count is the number of explorations for which version
+        # history was computed. It is clear that this count will be equal to
+        # (exps_count_for_which_version_history_can_be_computed) -
+        # (number_of_exps_with_invalid_change_list).
+        report_number_of_exps_for_which_version_history_was_computed = (
+            exps_for_which_version_history_was_computed
+            | 'Count explorations for which version history was computed' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED'
+                )
+        )
+
         report_details_of_exps_having_invalid_change_list = (
             exps_having_invalid_change_list
             | 'Save info on explorations having invalid change list' >>
@@ -629,23 +651,24 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 ))
         )
 
-        report_number_of_models_created = (
+        report_number_of_models_modified = (
             flattened_vh_models
             | 'Count number of models created' >>
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'CREATED VERSION HISTORY MODELS'
+                    'CREATED OR MODIFIED VERSION HISTORY MODELS'
                 )
         )
 
         return (
             (
                 report_number_of_exps_queried,
-                report_number_of_valid_exps_queried,
                 report_number_of_invalid_exps,
                 report_details_of_invalid_exps,
+                report_exps_count_for_which_version_history_can_be_computed,
                 report_number_of_exps_with_invalid_change_list,
                 report_details_of_exps_having_invalid_change_list,
-                report_number_of_models_created
+                report_number_of_exps_for_which_version_history_was_computed,
+                report_number_of_models_modified
             )
             | 'Flatten' >> beam.Flatten()
         )
