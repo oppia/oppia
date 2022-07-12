@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, tick, flush, discardPeriodicTasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, discardPeriodicTasks, tick, flush } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -62,17 +62,18 @@ import { HelpModalComponent } from './modal-templates/help-modal.component';
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
-  'state-tutorial-first-time.service.ts');
+   'state-tutorial-first-time.service.ts');
 
-class MockNgbModalRef {
-  componentInstance = {};
-}
+ class MockNgbModalRef {
+   componentInstance = {};
+ }
 
 describe('Exploration editor page component', function() {
   importAllAngularServices();
 
   var ctrl = null;
   let $location = null;
+
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -109,6 +110,7 @@ describe('Exploration editor page component', function() {
 
   var refreshGraphEmitter = new EventEmitter();
 
+  let mockRefreshTranslationTabEventEmitter = new EventEmitter();
   var autosaveIsInProgress = new EventEmitter();
   var mockConnectionServiceEmitter = new EventEmitter<boolean>();
   var mockOpenEditorTutorialEmitter = new EventEmitter();
@@ -234,11 +236,11 @@ describe('Exploration editor page component', function() {
         {
           provide: ExplorationDataService,
           useValue: {
-            getDataAsync: function(callback) {
+            getDataAsync: (callback) => {
               callback();
               return $q.resolve(explorationData);
             },
-            autosaveChangeListAsync: function() {
+            autosaveChangeListAsync: () => {
               return;
             }
           }
@@ -326,6 +328,8 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue($q.resolve([]));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(rs, 'onRefreshTranslationTab')
+        .and.returnValue(mockRefreshTranslationTabEventEmitter);
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue($q.resolve(new UserInfo(
           ['USER_ROLE'], true, true, false, false, false, null, null, null,
@@ -344,7 +348,7 @@ describe('Exploration editor page component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should start editor tutorial when on main page', fakeAsync(() => {
+    it('should update view on location change', fakeAsync(() => {
       $location.path('');
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
@@ -352,6 +356,7 @@ describe('Exploration editor page component', function() {
       rs.navigateToMainTab();
       $scope.$apply();
       mockOpenEditorTutorialEmitter.emit();
+      mockRefreshTranslationTabEventEmitter.emit();
       tick();
 
       expect(ctrl.startEditorTutorial).toHaveBeenCalled();
@@ -361,45 +366,72 @@ describe('Exploration editor page component', function() {
       discardPeriodicTasks();
     }));
 
-    it('should start editor tutorial when not on main page', () => {
+    it('should start editor tutorial when on main page', fakeAsync(() => {
+      spyOn(ctrl, 'startEditorTutorial').and.callThrough();
+      spyOn(sers.onRefreshStateEditor, 'emit');
+      rs.navigateToMainTab();
+      $scope.$apply();
+      tick();
+
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startEditorTutorial).toHaveBeenCalled();
+      expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
+
+      flush();
+      discardPeriodicTasks();
+    }));
+
+    it('should start editor tutorial when not on main page', fakeAsync(() => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(rs, 'navigateToMainTab');
       rs.navigateToSettingsTab();
       $scope.$apply();
+      tick();
+
       expect(rs.getActiveTabName()).toBe('settings');
       mockOpenEditorTutorialEmitter.emit();
       expect(ctrl.startEditorTutorial).toHaveBeenCalled();
       expect(rs.navigateToMainTab).toHaveBeenCalled();
-    });
+    }));
 
-    it('should start translation tutorial when on translation page', () => {
-      spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
-      spyOn(rs.onRefreshTranslationTab, 'emit');
-      rs.navigateToTranslationTab();
-      $scope.$apply();
-      mockOpenTranslationTutorialEmitter.emit();
-      expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
-      expect(rs.onRefreshTranslationTab.emit).toHaveBeenCalled();
-    });
+    it('should start translation tutorial when on translation page',
+      fakeAsync(() => {
+        spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
+        rs.navigateToTranslationTab();
+        mockRefreshTranslationTabEventEmitter.emit();
+        $scope.$apply();
+        tick();
 
-    it('should start translation tutorial when not on translation page', () => {
-      spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
-      spyOn(rs, 'navigateToTranslationTab');
-      rs.navigateToSettingsTab();
-      $scope.$apply();
-      mockOpenTranslationTutorialEmitter.emit();
-      expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
-      expect(rs.navigateToTranslationTab).toHaveBeenCalled();
-    });
+        mockOpenTranslationTutorialEmitter.emit();
+        expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
 
-    it('should mark exploration as editable and translatable', () => {
-      spyOn(es, 'markEditable').and.callThrough();
-      spyOn(es, 'markTranslatable').and.callThrough();
-      $scope.$apply();
+        flush();
+        discardPeriodicTasks();
+      }));
 
-      expect(es.markEditable).toHaveBeenCalled();
-      expect(es.markTranslatable).toHaveBeenCalled();
-    });
+    it('should start translation tutorial when not on translation page',
+      fakeAsync(() => {
+        spyOn(ctrl, 'startTranslationTutorial').and.callThrough();
+        spyOn(rs, 'navigateToTranslationTab');
+        rs.navigateToSettingsTab();
+        $scope.$apply();
+        tick();
+
+        mockOpenTranslationTutorialEmitter.emit();
+        expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
+        expect(rs.navigateToTranslationTab).toHaveBeenCalled();
+      }));
+
+    it('should mark exploration as editable and translatable',
+      fakeAsync(() => {
+        spyOn(es, 'markEditable').and.callThrough();
+        spyOn(es, 'markTranslatable').and.callThrough();
+        $scope.$apply();
+        tick();
+
+        expect(es.markEditable).toHaveBeenCalled();
+        expect(es.markTranslatable).toHaveBeenCalled();
+      }));
 
     it('should return navbar text', () => {
       expect(ctrl.getNavbarText()).toEqual('Exploration Editor');
@@ -430,7 +462,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should set active state name when active state name does not exist' +
-      ' on exploration', () => {
+       ' on exploration', () => {
       spyOn(ses, 'getActiveStateName').and.returnValue(
         'State2');
       spyOn(ses, 'setActiveStateName').and.callThrough();
@@ -440,14 +472,27 @@ describe('Exploration editor page component', function() {
         'Introduction');
     });
 
-    it('should navigate to main tab', () => {
+    it('should load change list by draft changes successfully',
+      () => {
+        const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
+
+        $scope.$apply();
+
+        expect(loadSpy).toHaveBeenCalledWith(
+          explorationData.draft_changes);
+      });
+
+    it('should navigate to main tab', fakeAsync(() => {
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToMainTab').and.callThrough();
       $scope.$apply();
+      tick();
 
       expect(rs.navigateToMainTab).toHaveBeenCalled();
-    });
+      flush();
+      discardPeriodicTasks();
+    }));
 
     it('should navigate between tabs', () => {
       var focusSpy = spyOn(ctrl, 'setFocusOnActiveTab');
@@ -500,10 +545,10 @@ describe('Exploration editor page component', function() {
 
     it('should show the user help modal for editor tutorial', () => {
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve('editor')
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: Promise.resolve('editor')
+         } as NgbModalRef
       );
 
       ctrl.showUserHelpModal();
@@ -514,24 +559,10 @@ describe('Exploration editor page component', function() {
 
     it('should show the user help modal for editor tutorial', () => {
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve('translation')
-        } as NgbModalRef
-      );
-
-      ctrl.showUserHelpModal();
-      $rootScope.$apply();
-
-      expect(ngbModal.open).toHaveBeenCalled();
-    });
-
-    it('should show the user help modal for editor tutorial', () => {
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.reject()
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: Promise.resolve('translation')
+         } as NgbModalRef
       );
 
       ctrl.showUserHelpModal();
@@ -707,8 +738,8 @@ describe('Exploration editor page component', function() {
       spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
-      spyOn(es, 'lockExploration').and.callThrough();
       mockInitExplorationPageEmitter.emit(successCallback);
+      tick();
 
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
@@ -720,20 +751,18 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       tick();
 
-      expect(es.lockExploration).toHaveBeenCalled();
-
-      flush();
-      discardPeriodicTasks();
+      expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
+      expect(successCallback).toHaveBeenCalled();
     }));
 
     it('should start editor tutorial when closing welcome exploration' +
-      ' modal', () => {
+       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.resolve(explorationId)
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: $q.resolve(explorationId)
+         } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
@@ -745,13 +774,13 @@ describe('Exploration editor page component', function() {
     });
 
     it('should dismiss tutorial when dismissing welcome exploration' +
-      ' modal', () => {
+       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
       spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: $q.reject(explorationId)
-        } as NgbModalRef
+         {
+           componentInstance: new MockNgbModalRef(),
+           result: $q.reject(explorationId)
+         } as NgbModalRef
       );
 
       ctrl.showWelcomeExplorationModal();
