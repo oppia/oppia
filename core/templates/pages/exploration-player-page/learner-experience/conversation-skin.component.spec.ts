@@ -603,6 +603,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+    window.dispatchEvent(new Event('resize'));
 
     mockOnHintConsumed.emit();
     mockOnSolutionViewedEventEmitter.emit();
