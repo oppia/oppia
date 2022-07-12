@@ -46,9 +46,6 @@ export class SchemaBasedListEditorComponent
 implements ControlValueAccessor, Validator {
   _localValue: SchemaDefaultValue[] = [];
   @Input() set localValue(val: SchemaDefaultValue[]) {
-    if (this._localValue === val) {
-      return;
-    }
     this._localValue = val;
   }
 
@@ -255,13 +252,13 @@ implements ControlValueAccessor, Validator {
       }
     }
 
-    while (this.localValue.length < this.minListLength) {
+    while (this.localValue && this.localValue.length < this.minListLength) {
       this.localValue.push(
         this.schemaDefaultValueService.getDefaultValue(this.itemSchema));
     }
 
     if (this.len === undefined) {
-      if (this.localValue.length === 1) {
+      if (this.localValue && this.localValue.length === 1) {
         if ((this.localValue[0] as SchemaDefaultValue[]).length === 0) {
           this.isAddItemButtonPresent = false;
         }
