@@ -29,24 +29,27 @@
         <strong>Content to translate:</strong>
       </div>
       <div class="oppia-suggestion-review-panel"
-           [ngClass]="isContentExpanded ? 'oppia-expanded' : 'oppia-contracted'">
+           [ngClass]="isContentExpanded ? 'oppia-expanded' : 'oppia-contracted'"
+           #contentContainer>
         <ul *ngIf="contentTypeIsSetOfStrings">
           <li *ngFor="let item of displayExplorationContent(); index as idx">
             {{ item }}
           </li>
         </ul>
         <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
-                                    [htmlData]="displayExplorationContent()">
+                                    [htmlData]="displayExplorationContent()"
+                                    #contentPanel>
         </angular-html-bind-wrapper>
       </div>
       <div class="oppia-collapse-content"
+           *ngIf="isContentOverflowing"
            (click)="toggleExpansionState('content')">
         {{ isContentExpanded ? "View Less" : "View More" }}
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
       <div dir="auto"
-           class="oppia-suggestion-review-panel-header-container">
+           class="oppia-suggestion-review-panel-header-container mt-3">
         <strong> Translation:</strong>
         <button class="btn btn-sm btn-secondary float-right"
                 *ngIf="!startedEditing && status === 'review' && canEditTranslation"
@@ -54,11 +57,13 @@
           Edit
         </button>
       </div>
-      <div class="oppia-suggestion-review-panel"
-           [ngClass]="isTranslationExpanded ? 'oppia-expanded' : 'oppia-contracted'">
+      <div class="oppia-suggestion-review-panel oppia-content"
+           [ngClass]="isTranslationExpanded ? 'oppia-expanded' : 'oppia-contracted'"
+           #translationContainer>
         <div>
           <angular-html-bind-wrapper [htmlData]="translationHtml"
-                                     *ngIf="!startedEditing">
+                                     *ngIf="!startedEditing"
+                                     #translationPanel>
           </angular-html-bind-wrapper>
           <ul *ngIf="contentTypeIsSetOfStrings">
             <li *ngFor="let item of translationHtml; index as idx">
@@ -79,12 +84,12 @@
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">
-          <button class="btn btn-secondary"
+          <button class="btn btn-secondary mr-2"
                   *ngIf="startedEditing"
                   (click)="cancelEdit()">
             Cancel
           </button>
-          <button class="btn btn-success"
+          <button class="btn btn-success ml-2"
                   *ngIf="startedEditing"
                   (click)="updateSuggestion()">
             Update
@@ -98,6 +103,7 @@
         </div>
       </div>
       <div class="oppia-collapse-content"
+           *ngIf="isTranslationOverflowing"
            (click)="toggleExpansionState('translation')">
         {{ isTranslationExpanded ? "View Less" : "View More" }}
       </div>
@@ -281,7 +287,7 @@
     margin-top: 18px;
   }
   .oppia-translation-review-edit-buttons {
-    margin-left: 10px;
+    margin-bottom: 10px;
     margin-top: 10px;
   }
   .oppia-translation-error-section {
@@ -382,6 +388,9 @@
       font-size: 24px;
       font-weight: bold;
     }
+    .oppia-content {
+      padding-bottom: 6px;
+    }
   }
   @media only screen and (max-width: 450px) {
     .oppia-suggestion-resolve-button {
@@ -393,7 +402,7 @@
       justify-content: center;
     }
     .oppia-suggestion-review-message {
-      font-size: 12px;
+      font-size: 16px;
     }
   }
 </style>

@@ -17,7 +17,7 @@
  * @fileoverview Component for translation suggestion review modal.
  */
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -126,7 +126,21 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   canEditTranslation: boolean = false;
   userIsCurriculumAdmin: boolean = false;
   isContentExpanded: boolean = false;
+  isContentOverflowing: boolean = false;
   isTranslationExpanded: boolean = false;
+  isTranslationOverflowing: boolean = false;
+  @ViewChild('contentPanel')
+    contentPanel!: ElementRef;
+
+  @ViewChild('translationPanel')
+    translationPanel!: ElementRef;
+
+  @ViewChild('contentContainer')
+    contentContainer!: ElementRef;
+
+  @ViewChild('translationContainer')
+    translationContainer!: ElementRef;
+
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
   MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
@@ -248,6 +262,21 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
+  calculatePanelHeight(): void {
+    setTimeout(()=>{
+      this.isContentOverflowing = (
+        this.contentPanel.nativeElement.offsetHeight >
+        this.contentContainer.nativeElement.offsetHeight);
+      this.isTranslationOverflowing = (
+        this.translationPanel.nativeElement.offsetHeight >
+        this.translationContainer.nativeElement.offsetHeight);
+    }, 0);
+  }
+
+  ngAfterViewInit(): void {
+    this.calculatePanelHeight();
+  }
+
   toggleExpansionState(tab: string): void {
     if (tab === 'content') {
       this.isContentExpanded = !this.isContentExpanded;
@@ -313,6 +342,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       `${this.activeContributionDetails.story_title} / ` +
       `${this.activeContributionDetails.chapter_title}`
     );
+    // This is needed to re-calculate height of the panels.
+    this.calculatePanelHeight();
   }
 
   gotoNextItem(): void {

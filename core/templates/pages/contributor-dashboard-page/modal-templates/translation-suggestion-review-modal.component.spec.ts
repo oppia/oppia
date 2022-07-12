@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { TranslationSuggestionReviewModalComponent } from './translation-suggestion-review-modal.component';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
@@ -86,6 +86,11 @@ describe('Translation Suggestion Review Modal Component', function() {
     spyOn(
       languageUtilService, 'getAudioLanguageDescription')
       .and.returnValue('audio_language_description');
+
+    component.contentContainer = new ElementRef({offsetHeight: 150});
+    component.translationContainer = new ElementRef({offsetHeight: 150});
+    component.contentPanel = new ElementRef({offsetHeight: 100});
+    component.translationPanel = new ElementRef({offsetHeight: 200});
   });
 
   describe('when reviewing suggestion', function() {
@@ -593,6 +598,31 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.hasExplorationContentChanged()).toBe(true);
         expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect(component.reviewMessage).toBe('Review Message');
+      }));
+
+    it('should correctly determine whether the panel data is overflowing',
+      fakeAsync(() => {
+        expect(component.isContentOverflowing).toBeFalse();
+        expect(component.isTranslationOverflowing).toBeFalse();
+
+        component.contentPanel.nativeElement.offsetHeight = 100;
+        component.translationPanel.nativeElement.offsetHeight = 200;
+        component.contentContainer.nativeElement.offsetHeight = 150;
+        component.translationContainer.nativeElement.offsetHeight = 150;
+
+        component.calculatePanelHeight();
+        tick(0);
+
+        expect(component.isContentOverflowing).toBeFalse();
+        expect(component.isTranslationOverflowing).toBeTrue();
+
+        component.contentPanel.nativeElement.offsetHeight = 300;
+
+        component.calculatePanelHeight();
+        tick(0);
+
+        expect(component.isContentOverflowing).toBeTrue();
+        expect(component.isTranslationOverflowing).toBeTrue();
       }));
   });
 
