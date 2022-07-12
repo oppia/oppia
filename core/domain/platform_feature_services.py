@@ -220,7 +220,10 @@ def _evaluate_feature_flag_values_for_context(
     for feature_name in feature_names_set:
         param = registry.Registry.get_platform_parameter(
             feature_name)
-        result_dict[feature_name] = bool(param.evaluate(context))
+        feature_name_value = param.evaluate(context)
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(feature_name_value, bool)
+        result_dict[feature_name] = feature_name_value
     return result_dict
 
 
