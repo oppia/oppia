@@ -43,6 +43,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
         .RegenerateContentIdForTranslationSuggestionsInReviewJob
     )
     TARGET_ID = 'exp1'
+    OLD_SCHEMA_VERSION = 50
 
     def setUp(self):
         super().setUp()
@@ -60,7 +61,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
             tags=['Topic'],
             blurb='blurb',
             author_notes='author notes',
-            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            states_schema_version=self.OLD_SCHEMA_VERSION,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
