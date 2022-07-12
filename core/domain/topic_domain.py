@@ -1520,7 +1520,7 @@ class Topic:
         Args:
             skill_ids_for_diagnostic_test: list(str). A list of skill_ids that
                 will be used to update skill_ids_for_diagnostic_test field for
-                a topic.
+                the topic.
         """
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
