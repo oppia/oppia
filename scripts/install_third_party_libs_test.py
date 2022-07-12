@@ -30,7 +30,6 @@ from core import utils
 from core.tests import test_utils
 
 from . import common
-from . import install_python_prod_dependencies
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
