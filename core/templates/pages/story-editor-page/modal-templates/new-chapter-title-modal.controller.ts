@@ -23,16 +23,19 @@ require(
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 
 import newChapterConstants from 'assets/constants';
 
 angular.module('oppia').controller('CreateNewChapterModalController', [
   '$controller', '$scope', '$uibModalInstance',
+  'EditableStoryBackendApiService',
   'ExplorationIdValidationService', 'StoryEditorStateService',
   'StoryUpdateService', 'ValidatorsService', 'nodeTitles',
   'MAX_CHARS_IN_EXPLORATION_TITLE',
   function(
       $controller, $scope, $uibModalInstance,
+      EditableStoryBackendApiService,
       ExplorationIdValidationService, StoryEditorStateService,
       StoryUpdateService, ValidatorsService, nodeTitles,
       MAX_CHARS_IN_EXPLORATION_TITLE) {
@@ -47,7 +50,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.invalidExpId = '';
       $scope.nodeTitles = nodeTitles;
       $scope.errorMsg = null;
-      $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
+      $scope.invalidExpErrorStrings = ['Please enter a valid exploration id.'];
       $scope.correctnessFeedbackDisabledString = 'The correctness feedback ' +
         'of this exploration is disabled. Explorations need to have their ' +
         'correctness feedback enabled before they can be added to a story.';
@@ -93,8 +96,8 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       var nodes = $scope.story.getStoryContents().getNodes();
       for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].getExplorationId() === $scope.explorationId) {
-          $scope.invalidExpErrorString = (
-            'The given exploration already exists in the story.');
+          $scope.invalidExpErrorStrings = [
+            'The given exploration already exists in the story.'];
           $scope.invalidExpId = true;
           $scope.$applyAsync();
           return;
@@ -110,7 +113,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.invalidExpId = false;
       $scope.correctnessFeedbackDisabled = false;
       $scope.categoryIsDefault = true;
-      $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
+      $scope.invalidExpErrorStrings = ['Please enter a valid exploration id.'];
     };
 
     $scope.validateExplorationId = function() {
@@ -135,10 +138,9 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         await ExplorationIdValidationService.isExpPublishedAsync(
           $scope.explorationId));
       if (!expIsPublished) {
-        $scope.invalidExpErrorString = (
-          'This exploration does not exist ' +
-          'or is not published yet.'
-        );
+        $scope.invalidExpErrorStrings = [
+          'This exploration does not exist or is not published yet.'
+        ];
         $scope.invalidExpId = true;
         $scope.$applyAsync();
         return;
@@ -163,8 +165,20 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         $scope.$applyAsync();
         return;
       }
-
       $scope.categoryIsDefault = true;
+
+      const validationErrorMessages = (
+        await EditableStoryBackendApiService.validateExplorationsAsync(
+          $scope.story.getId(), [$scope.explorationId]
+        ));
+      if (validationErrorMessages.length > 0) {
+        $scope.invalidExpId = true;
+        $scope.invalidExpErrorStrings = validationErrorMessages;
+        $scope.$applyAsync();
+        return;
+      }
+      $scope.invalidExpId = false;
+
       $scope.updateTitle();
       $scope.updateExplorationId();
       $scope.$applyAsync();

@@ -41,7 +41,7 @@ VALID_INTERACTION_IDS = [
 SUPPORTED_LANGUAGES = ['en']
 
 # This is linked to VALID_RTE_COMPONENTS_FOR_ANDROID in constants.ts.
-VALID_RTE_COMPONENTS = ['image', 'link', 'math', 'skillreview']
+VALID_RTE_COMPONENTS = ['image', 'math', 'skillreview']
 
 # If any of the following values are changed, edit the corresponding value in
 # app.constants.ts as well.
