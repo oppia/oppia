@@ -16,7 +16,7 @@
  * @fileoverview Utility service for saving data locally on the client machine.
  */
 
-// Service for saving exploration draft changes to local storage.
+// Includes methods for saving exploration draft changes to local storage.
 //
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
@@ -56,6 +56,8 @@ export class LocalStorageService {
   LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = ('last_selected_translation_lang');
 
   LAST_SELECTED_TRANSLATION_TOPIC_NAME = ('last_selected_translation_topic');
+
+  HIDE_SIGN_UP_SECTION_PREFERENCE = ('hide_sign_up_section');
 
   /**
    * Create the key to access the changeList in localStorage
@@ -218,6 +220,37 @@ export class LocalStorageService {
     if (this.isStorageAvailable()) {
       (this.storage as Storage).removeItem('unique_progress_id');
     }
+  }
+
+  /**
+   * Save the given sign up section hidden preference to localStorage.
+   * @param isSectionHidden
+   */
+  updateEndChapterSignUpSectionHiddenPreference(isSectionHidden: string): void {
+    if (this.isStorageAvailable()) {
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).setItem(
+        this.HIDE_SIGN_UP_SECTION_PREFERENCE, isSectionHidden);
+    }
+  }
+
+  /**
+   * Retrieve the local save of the sign up section preference.
+   * @returns {String} The local save of the preference for
+   *   hiding the end chapter sign up section.
+   */
+  getEndChapterSignUpSectionHiddenPreference(): string | null {
+    if (this.isStorageAvailable()) {
+      return (
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (this.storage as Storage).getItem(
+          this.HIDE_SIGN_UP_SECTION_PREFERENCE));
+    }
+    return null;
   }
 
   /**

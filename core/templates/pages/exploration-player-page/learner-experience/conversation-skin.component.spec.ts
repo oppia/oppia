@@ -1087,13 +1087,6 @@ describe('Conversation skin component', () => {
       ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index);
   });
 
-  it('should tell if language is RTL', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL')
-      .and.returnValue(true);
-
-    expect(componentInstance.isLanguageRTL()).toBeTrue();
-  });
-
   it('should reload exploration', () => {
     spyOn(windowRef.nativeWindow.location, 'reload');
 
