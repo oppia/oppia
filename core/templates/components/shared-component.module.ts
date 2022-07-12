@@ -156,11 +156,6 @@ import { AuthService } from 'services/auth.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
-import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
-import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 @NgModule({
   imports: [
@@ -191,11 +186,6 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 
   providers: [
     AngularFireAuth,
-    ReplaceInputsWithEllipsesPipe,
-    ParameterizeRuleDescriptionPipe,
-    ConvertToPlainTextPipe,
-    TruncatePipe,
-    WrapTextWithEllipsisPipe,
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig

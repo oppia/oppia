@@ -17,6 +17,7 @@
  */
 
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/exploration/ExplorationMetadataObjectFactory.ts');
 require('domain/state/StateObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -26,10 +27,12 @@ require(
 
 angular.module('oppia').factory('CompareVersionsService', [
   '$q', 'ExplorationDataService', 'ExplorationDiffService',
+  'ExplorationMetadataObjectFactory',
   'ReadOnlyExplorationBackendApiService',
   'StatesObjectFactory', 'VersionTreeService',
   function(
       $q, ExplorationDataService, ExplorationDiffService,
+      ExplorationMetadataObjectFactory,
       ReadOnlyExplorationBackendApiService,
       StatesObjectFactory, VersionTreeService) {
     /**
@@ -101,6 +104,8 @@ angular.module('oppia').factory('CompareVersionsService', [
         }).then(function(response) {
           var v1StatesDict = response.v1Data.exploration.states;
           var v2StatesDict = response.v2Data.exploration.states;
+          var v1MetadataDict = response.v1Data.exploration_metadata;
+          var v2MetadataDict = response.v2Data.exploration_metadata;
 
           // Track changes from v1 to LCA, and then from LCA to v2.
           var lca = VersionTreeService.findLCA(v1, v2);
@@ -120,6 +125,17 @@ angular.module('oppia').factory('CompareVersionsService', [
             }]
           );
 
+          var v1Metadata = (
+            ExplorationMetadataObjectFactory.createFromBackendDict(
+              v1MetadataDict
+            )
+          );
+          var v2Metadata = (
+            ExplorationMetadataObjectFactory.createFromBackendDict(
+              v2MetadataDict
+            )
+          );
+
           return {
             nodes: diffGraphData.nodes,
             links: diffGraphData.links,
@@ -129,7 +145,9 @@ angular.module('oppia').factory('CompareVersionsService', [
             v2InitStateId: diffGraphData.stateIds[
               response.v2Data.exploration.init_state_name],
             v1States: v1States,
-            v2States: v2States
+            v2States: v2States,
+            v1Metadata: v1Metadata,
+            v2Metadata: v2Metadata
           };
         });
       }
