@@ -77,6 +77,18 @@ def create_learner_group(
     Returns:
         LearnerGroup. The domain object of the newly created learner group.
     """
+    learner_group = learner_group_domain.LearnerGroup(
+        group_id,
+        title,
+        description,
+        facilitator_user_ids,
+        [],
+        invited_student_ids,
+        subtopic_page_ids,
+        story_ids
+    )
+    learner_group.validate()
+
     learner_group_model = learner_group_models.LearnerGroupModel(
         id=group_id,
         title=title,
@@ -90,9 +102,6 @@ def create_learner_group(
 
     learner_group_model.update_timestamps()
     learner_group_model.put()
-
-    learner_group = get_learner_group_from_model(learner_group_model)
-    learner_group.validate()
 
     if len(learner_group_model.invited_student_user_ids) > 0:
         invite_students_to_learner_group(
@@ -160,13 +169,13 @@ def update_learner_group(
     learner_group_model.subtopic_page_ids = subtopic_page_ids
     learner_group_model.story_ids = story_ids
 
-    learner_group_model.update_timestamps()
-    learner_group_model.put()
-
     learner_group = get_learner_group_from_model(learner_group_model)
     learner_group.validate()
 
-    return learner_group
+    learner_group_model.update_timestamps()
+    learner_group_model.put()
+
+    return get_learner_group_from_model(learner_group_model)
 
 
 def is_user_facilitator(user_id: str, group_id: str) -> bool:
