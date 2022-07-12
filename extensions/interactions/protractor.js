@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Clearing-house for protractor test utilities for interactions.
+ * @fileoverview Clearing-house for protractor test utilities for interactions
+ * in protractor.
  */
 
 /* Each interaction's protractor file must implement the following:

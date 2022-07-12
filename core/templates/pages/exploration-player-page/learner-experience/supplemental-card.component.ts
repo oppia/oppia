@@ -31,6 +31,9 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './supplemental-card.component.css';
+
+
 @Component({
   selector: 'oppia-supplemental-card',
   templateUrl: './supplemental-card.component.html'
@@ -118,10 +121,6 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
     if (this.displayedCard.isCompleted()) {
       this.lastAnswer = this.currentDisplayedCard.getLastAnswer();
     }
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   // We use the max because the height property of the help card is

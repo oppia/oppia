@@ -37,6 +37,9 @@ import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { InformationCardModalComponent } from '../templates/information-card-modal.component';
 
+import './learner-view-info.component.css';
+
+
 @Component({
   selector: 'oppia-learner-view-info',
   templateUrl: './learner-view-info.component.html'
@@ -86,7 +89,9 @@ export class LearnerViewInfoComponent {
 
     this.explorationTitle = 'Loading...';
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
-      this.explorationId, this.urlService.getExplorationVersionFromUrl())
+      this.explorationId,
+      this.urlService.getExplorationVersionFromUrl(),
+      this.urlService.getPidFromUrl())
       .then((response) => {
         this.explorationTitle = response.exploration.title;
       });
@@ -174,10 +179,6 @@ export class LearnerViewInfoComponent {
           this.explorationId);
       });
     }
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
