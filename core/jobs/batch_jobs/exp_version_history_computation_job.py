@@ -32,7 +32,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from typing_extensions import TypedDict
 
 MYPY = False
@@ -277,15 +277,15 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
     def _create_version_history_models(
         self, model_group: FormattedModelGroupDict
-    ) -> List[exp_models.ExplorationVersionHistoryModel]:
+    ) -> Tuple[str, List[exp_models.ExplorationVersionHistoryModel]]:
         """Creates the version history models for a particular exploration.
 
         Args:
             model_group: FormattedModelGroupDict. The formatted model group.
 
         Returns:
-            list[ExplorationVersionHistoryModel]. The created version history
-            models.
+            Tuple[str, List[exp_models.ExplorationVersionHistoryModel]].
+            The exploration id along with the created version history models.
         """
         with datastore_services.get_ndb_context():
             exp_v1 = model_group['exp_v1']
@@ -346,7 +346,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             revert_to_version <= 0 or
                             revert_to_version >= version
                         ):
-                            return []
+                            return (exp_id, [])
                         new_exploration = copy.deepcopy(
                             versioned_explorations[revert_to_version - 1]
                         )
@@ -381,7 +381,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             # If any error is thrown while applying the change
                             # list, we just return an empty array indicating
                             # that no models were created for this exploration.
-                            return []
+                            return (exp_id, [])
 
                         old_states = old_exploration.states
                         new_states = new_exploration.states
@@ -431,7 +431,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         version_history_models[version - 1] = new_vh_model
                         versioned_explorations[version - 1] = new_exploration
 
-            return version_history_models
+            return (exp_id, version_history_models)
 
     def _get_exploration_model_at_v1(
         self, exp_id: str
@@ -550,11 +550,27 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             model_groups
             | 'Create the version history models for each valid exploration' >>
                 beam.Map(self._create_version_history_models)
+        )
+
+        exps_having_invalid_change_list = (
+            version_history_models
+            | 'Filter exps having invalid change list' >> beam.Filter(
+                lambda models: len(models[1]) == 0
+            )
+            | 'Extract the exp ids having invalid change list' >> beam.Map(
+                lambda models: models[0]
+            )
+        )
+
+        flattened_vh_models = (
+            version_history_models
+            | 'Drop the exploration ids' >>
+                beam.Map(lambda models: models[1])
             | 'Flatten the models' >> beam.FlatMap(lambda x: x)
         )
 
         unused_put_result = (
-            version_history_models
+            flattened_vh_models
             | 'Save the models to the datastore' >> ndb_io.PutModels()
         )
 
@@ -572,6 +588,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 )
         )
 
+        # The following are explorations which have outdated state schema
+        # version and cannot be converted from older schema versions to the
+        # latest one which is required while calculating version histories.
+        # Due to this, their version histories cannot be calculated.
         report_number_of_invalid_exps = (
             invalid_explorations_v1
             | 'Count invalid queried explorations' >>
@@ -589,8 +609,28 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             )
         )
 
+        # The following are explorations which have complete commit logs for
+        # all versions but the change list in one or multiple versions are
+        # invalid. We cannot calculate version histories of these explorations
+        # either.
+        report_number_of_exps_with_invalid_change_list = (
+            exps_having_invalid_change_list
+            | 'Count explorations having invalid change list' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXPS HAVING INVALID CHANGE LIST'
+                )
+        )
+
+        report_details_of_exps_having_invalid_change_list = (
+            exps_having_invalid_change_list
+            | 'Save info on explorations having invalid change list' >>
+                beam.Map(lambda exp_id: job_run_result.JobRunResult.as_stderr(
+                    'Exploration %s has invalid change list' % (exp_id)
+                ))
+        )
+
         report_number_of_models_created = (
-            version_history_models
+            flattened_vh_models
             | 'Count number of models created' >>
                 job_result_transforms.CountObjectsToJobRunResult(
                     'CREATED VERSION HISTORY MODELS'
@@ -603,6 +643,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 report_number_of_valid_exps_queried,
                 report_number_of_invalid_exps,
                 report_details_of_invalid_exps,
+                report_number_of_exps_with_invalid_change_list,
+                report_details_of_exps_having_invalid_change_list,
                 report_number_of_models_created
             )
             | 'Flatten' >> beam.Flatten()
