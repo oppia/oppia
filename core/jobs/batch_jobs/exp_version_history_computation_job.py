@@ -463,12 +463,11 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             bool. Whether the exploration model at v1 can be used for
             calculation of version history.
         """
-        # try:
-        #     exp_fetchers.get_exploration_from_model(exp_model)
-        #     return True
-        # except Exception:
-        #     return False
-        return False
+        try:
+            exp_fetchers.get_exploration_from_model(exp_model)
+            return True
+        except Exception:
+            return False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations_vlatest = (
