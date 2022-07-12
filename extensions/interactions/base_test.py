@@ -390,6 +390,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # The interaction directory should contain the following files:
             #  Required:
             #    * A python file called {InteractionName}.py.
+            #    * A python test file called {InteractionName}_test.py.
             #    * An __init__.py file used to import the Python file.
             #    * A TypeScript file called {InteractionName}.ts.
             #    * If migrated to Angular2+, a module.ts file called
@@ -407,6 +408,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir, 'protractor.js')))
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir, 'webdriverio.js')))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -436,7 +444,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                interaction_dir_optional_dirs_and_files_count + 5,
+                interaction_dir_optional_dirs_and_files_count + 6,
                 len(interaction_dir_contents)
             )
 

@@ -5766,7 +5766,8 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
         exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            'invalid_exploration_id')
+            'invalid_exploration_id', strict=False
+        )
 
         self.assertIsNone(exploration_summary)
 
@@ -8729,6 +8730,15 @@ title: Title
             self.UNIQUE_PROGRESS_URL_ID
         )
         self.assertIsNone(logged_out_user_data)
+
+        # No sync occurs if there is no logged-out user data or if the data
+        # has been cleared by the cron job.
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNone(exp_user_data)
 
         # First checkpoint reached as logged out user.
         exp_services.update_logged_out_user_progress(

@@ -22,7 +22,6 @@ import { StoryViewerPageRootComponent } from './story-viewer-page-root.component
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Story Viewer Page Root component', () => {
-  let component: StoryViewerPageRootComponent;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
@@ -34,15 +33,7 @@ describe('Story Viewer Page Root component', () => {
 
   beforeEach(() => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-
-    let fixture = TestBed.createComponent(StoryViewerPageRootComponent);
-    component = fixture.componentInstance;
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
-  });
-
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 });

@@ -1,10 +1,6 @@
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.rtl.css">
-
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
-  <div *ngIf="!footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
-    <div class="close-tooltip protractor-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()"></div>
+  <div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
+    <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()"></div>
     <div class="lesson-info-tooltip lesson-info-tooltip-add-ons"
          [innerHTML]="'I18N_LESSON_INFO_TOOLTIP_MESSAGE' | translate">
     </div>
@@ -13,10 +9,10 @@
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
       <ul class="oppia-lesson-info"
           (click)="showInformationCard()"
-          *ngIf="!footerIsInQuestionPlayerMode">
+          *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
         <li
             [ngbTooltip]="'I18N_PLAYER_INFO_TOOLTIP' | translate"
-            class="oppia-exploration-info-icon protractor-test-exploration-info-icon">
+            class="oppia-exploration-info-icon e2e-test-exploration-info-icon">
           <i class="material-icons oppia-navbar-breadcrumb-icon oppia-footer-info-icon">&#xE88E;</i>
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
         </li>
