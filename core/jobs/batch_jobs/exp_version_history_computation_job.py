@@ -457,7 +457,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         of version history.
 
         Args:
-            exp_model: The exploration model at version 1.
+            exp_model: exp_models.ExplorationModel. The exploration model at
+                version 1.
 
         Returns:
             bool. Whether the exploration model at v1 can be used for
@@ -631,6 +632,14 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 )
         )
 
+        report_details_of_exps_having_invalid_change_list = (
+            exps_having_invalid_change_list
+            | 'Save info on explorations having invalid change list' >>
+                beam.Map(lambda exp_id: job_run_result.JobRunResult.as_stderr(
+                    'Exploration %s has invalid change list' % (exp_id)
+                ))
+        )
+
         # The below count is the number of explorations for which version
         # history was computed. It is clear that this count will be equal to
         # (exps_count_for_which_version_history_can_be_computed) -
@@ -641,14 +650,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 job_result_transforms.CountObjectsToJobRunResult(
                     'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED'
                 )
-        )
-
-        report_details_of_exps_having_invalid_change_list = (
-            exps_having_invalid_change_list
-            | 'Save info on explorations having invalid change list' >>
-                beam.Map(lambda exp_id: job_run_result.JobRunResult.as_stderr(
-                    'Exploration %s has invalid change list' % (exp_id)
-                ))
         )
 
         report_number_of_models_modified = (

@@ -104,9 +104,14 @@ class ComputeExplorationVersionHistoryJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout(
-                'CREATED VERSION HISTORY MODELS SUCCESS: 2'
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 2'
             )
         ])
 
@@ -115,6 +120,83 @@ class ComputeExplorationVersionHistoryJobTests(
         )
         for model in version_history_models:
             assert model is not None
+
+    def test_no_model_is_created_for_exp_with_invalid_changes(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        self.save_new_default_exploration(self.EXP_ID_2, self.user_1_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit message.')
+        version_history_keys = [
+            datastore_services.Key(
+                exp_models.ExplorationVersionHistoryModel,
+                exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    self.EXP_ID_1, 1
+                )
+            ),
+            datastore_services.Key(
+                exp_models.ExplorationVersionHistoryModel,
+                exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    self.EXP_ID_1, 2
+                )
+            ),
+            datastore_services.Key(
+                exp_models.ExplorationVersionHistoryModel,
+                exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                    self.EXP_ID_2, 1
+                )
+            )
+        ]
+        # Deleting the version history models as they were created by
+        # exp_services while creating and updating the explorations. We want
+        # to test that the beam job can create the models from scratch.
+        datastore_services.delete_multi(version_history_keys)
+
+        # Having invalid change list is not possible if the exploration is
+        # updated using exp_services. Hence, we have to simulate the scenario
+        # manually by changing the commit logs.
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
+            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+                self.EXP_ID_1, 2
+            )
+        )
+        commit_log_model.commit_cmds = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': feconf.DEFAULT_INIT_STATE_NAME
+            }).to_dict()
+        ]
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 2'),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS HAVING INVALID CHANGE LIST SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Exploration %s has invalid change list' % (self.EXP_ID_1)
+            )
+        ])
+
+        version_history_models = datastore_services.get_multi(
+            version_history_keys
+        )
+        for model in version_history_models:
+            if model is not None:
+                self.assertEqual(model.exploration_id, self.EXP_ID_2)
 
     def test_create_version_history_for_exp_with_revert_commit(
         self
@@ -172,9 +254,14 @@ class ComputeExplorationVersionHistoryJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 1'),
             job_run_result.JobRunResult.as_stdout(
-                'CREATED VERSION HISTORY MODELS SUCCESS: 4'
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 4'
             )
         ])
 
@@ -239,62 +326,15 @@ class ComputeExplorationVersionHistoryJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 1')
-        ])
-
-        version_history_models = datastore_services.get_multi(
-            version_history_keys
-        )
-        for model in version_history_models:
-            assert model is None
-
-    def test_no_model_is_created_for_exp_with_invalid_changes(self) -> None:
-        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit message.')
-        version_history_keys = [
-            datastore_services.Key(
-                exp_models.ExplorationVersionHistoryModel,
-                exp_models.ExplorationVersionHistoryModel.get_instance_id(
-                    self.EXP_ID_1, 1
-                )
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 1'
             ),
-            datastore_services.Key(
-                exp_models.ExplorationVersionHistoryModel,
-                exp_models.ExplorationVersionHistoryModel.get_instance_id(
-                    self.EXP_ID_1, 2
-                )
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS HAVING INVALID CHANGE LIST SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Exploration %s has invalid change list' % (self.EXP_ID_1)
             )
-        ]
-        # Deleting the version history models as they were created by
-        # exp_services while creating and updating the explorations. We want
-        # to test that the beam job can create the models from scratch.
-        datastore_services.delete_multi(version_history_keys)
-
-        # Having invalid change list is not possible if the exploration is
-        # updated using exp_services. Hence, we have to simulate the scenario
-        # manually by changing the commit logs.
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
-            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
-                self.EXP_ID_1, 2
-            )
-        )
-        commit_log_model.commit_cmds = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': feconf.DEFAULT_INIT_STATE_NAME
-            }).to_dict()
-        ]
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 1')
         ])
 
         version_history_models = datastore_services.get_multi(
@@ -347,9 +387,14 @@ class ComputeExplorationVersionHistoryJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 2'),
-            job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 2'),
             job_run_result.JobRunResult.as_stdout(
-                'CREATED VERSION HISTORY MODELS SUCCESS: 3'
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 3'
             )
         ])
 
@@ -406,9 +451,14 @@ class ComputeExplorationVersionHistoryJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 2'),
-            job_run_result.JobRunResult.as_stdout('ALL VALID EXPS SUCCESS: 2'),
             job_run_result.JobRunResult.as_stdout(
-                'CREATED VERSION HISTORY MODELS SUCCESS: 4'
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 4'
             )
         ])
 
