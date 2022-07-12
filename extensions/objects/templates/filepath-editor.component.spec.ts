@@ -129,6 +129,7 @@ describe('File path editor', () => {
         isFirstChange: () => false
       }
     };
+
     component.ngOnChanges(changes);
 
     expect(component.value).toEqual('/path/to/svg-image.svg');
