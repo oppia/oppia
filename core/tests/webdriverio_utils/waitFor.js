@@ -36,6 +36,7 @@ var alertToBePresent = async() => {
     });
 };
 
+// Wait for current url to change to a specific url.
 var urlToBe = async function(url) {
   await browser.waitUntil(async function() {
     return await browser.getUrl() === url;

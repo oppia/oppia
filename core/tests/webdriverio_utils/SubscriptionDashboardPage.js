@@ -16,7 +16,6 @@
  * @fileoverview Page object for the subscription dashboard,
  * for use in WebdriverIO tests.
  */
-
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 

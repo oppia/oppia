@@ -32,7 +32,6 @@ var ExplorationPlayerPage = function() {
   var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
   var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
   var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
-  var lessonCompleteMessage = $('.e2e-test-exploration-checkpoints-message');
   var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
 
   // This verifies the question just asked, including formatting and
@@ -96,11 +95,6 @@ var ExplorationPlayerPage = function() {
     expect(
       await conversationContent[lastElement].getText()
     ).not.toEqual('Congratulations, you have finished!');
-  };
-
-  this.expectLessonCompleteMessage = async function() {
-    await waitFor.visibilityOf(
-      lessonCompleteMessage, 'Checkpoint message take too long to appear');
   };
 
   this.submitFeedback = async function(feedback) {

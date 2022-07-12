@@ -431,21 +431,18 @@ describe('Learner dashboard functionality', function() {
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await explorationPlayerPage.expectLessonCompleteMessage();
     await topicAndStoryViewerPage.get(
       'math', TOPIC_URL_FRAGMENT_NAME, 'storytwo');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.goToChapterIndex(1);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await explorationPlayerPage.expectLessonCompleteMessage();
     await topicAndStoryViewerPage.get(
       'math', TOPIC_URL_FRAGMENT_NAME, 'storytwo');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.goToChapterIndex(2);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await explorationPlayerPage.expectLessonCompleteMessage();
     /**  There are two topics on the server named Learner Dashboard Topic 1
      * which is linked to a subtopic named Learner Dashboard Subtopic 1 and
      * a story called Story Title and Learner Dashboard Topic 2 which is linked

@@ -126,25 +126,6 @@ var SkillEditorPage = function() {
       'Save Rubric Explanation editor takes too long to close.');
   };
 
-  this.addRubricExplanationForDifficulty = async function(
-      difficulty, explanation) {
-    await this.selectDifficultyForRubric(difficulty);
-    var addRubricExplanationButton = $(
-      `.e2e-test-add-explanation-button-${difficulty}`);
-    await action.click(
-      'Add rubric explanation button',
-      addRubricExplanationButton);
-    await action.setValue(
-      'Rubric explanation editor input',
-      rubricExplanationEditorInput, explanation, true);
-    await action.click(
-      'Save rubric explanation button',
-      saveRubricExplanationButton);
-    await waitFor.invisibilityOf(
-      saveRubricExplanationButton,
-      'Save Rubric Explanation editor takes too long to close.');
-  };
-
   this.deleteRubricExplanationWithIndex = async function(
       difficulty, explIndex) {
     // The edit explanation buttons for all explanations of a difficulty have

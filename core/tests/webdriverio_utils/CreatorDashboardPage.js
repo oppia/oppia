@@ -23,6 +23,9 @@ var action = require('./action.js');
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
+  var allExplorationCardsSelector = function() {
+    return $$('.e2e-test-exploration-dashboard-card');
+  };
   var activityCreationModal = $('.e2e-test-creation-modal');
   var averageRating = $('.e2e-test-oppia-average-rating');
   var collectionCard = $('.e2e-test-collection-card');
@@ -68,7 +71,7 @@ var CreatorDashboardPage = function() {
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    var allExplorationCards = $$('.e2e-test-exploration-dashboard-card');
+    var allExplorationCards = allExplorationCardsSelector();
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
       // Tile text contains title, possibly followed by newline and text.
