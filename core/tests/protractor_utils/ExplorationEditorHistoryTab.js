@@ -53,6 +53,10 @@ var ExplorationEditorHistoryTab = function() {
     by.css('.e2e-test-history-list-options'));
   var confirmRevertVersionButton = element(
     by.css('.e2e-test-confirm-revert'));
+  var viewMetadataHistoryButton = element(
+    by.css('.e2e-test-view-metadata-history'));
+  var closeMetadataHistoryButton = element(
+    by.css('.e2e-test-close-history-metadata-modal'));
 
   /*
    * Display
@@ -119,6 +123,21 @@ var ExplorationEditorHistoryTab = function() {
         await waitFor.invisibilityOf(
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
+      },
+      openExplorationMetadataHistory: async function() {
+        await action.click(
+          'View metadata changes button', viewMetadataHistoryButton);
+      },
+      closeExplorationMetadataHistory: async function() {
+        await waitFor.elementToBeClickable(
+          closeMetadataHistoryButton,
+          'Close metadata history button is not clickable');
+        expect(await closeMetadataHistoryButton.isDisplayed()).toBe(true);
+        await action.click(
+          'Close metadata history button', closeMetadataHistoryButton);
+        await waitFor.invisibilityOf(
+          closeMetadataHistoryButton,
+          'Close metadata history button takes too long to disappear.');
       },
       deselectVersion: async function() {
         await waitFor.invisibilityOf(

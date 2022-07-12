@@ -33,6 +33,7 @@ describe('Exploration history', function() {
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
   var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
 
   // Constants for colors of nodes in history graph.
   var COLOR_ADDED = 'rgb(78, 162, 78)';
@@ -45,6 +46,7 @@ describe('Exploration history', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -64,7 +66,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should display the history', async function() {
+  it('should display the history of the states', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration(true);
@@ -92,24 +94,24 @@ describe('Exploration history', function() {
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
-        text: 'card_is_checkpoint: true',
-        highlighted: false
-      },
-      2: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      3: {
         text: 'content:',
         highlighted: false
       },
-      4: {
+      2: {
+        text: '  html: \'\'',
+        highlighted: true
+      },
+      3: {
         text: '  content_id: content',
         highlighted: false
       },
+      4: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
       5: {
-        text: '  html: \'\'',
-        highlighted: true
+        text: 'linked_skill_id: null',
+        highlighted: false
       },
       6: {
         text: 'interaction:',
@@ -121,7 +123,7 @@ describe('Exploration history', function() {
       },
       8: {
         text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        highlighted: true
       },
       9: {
         text: '  customization_args: {}',
@@ -237,24 +239,24 @@ describe('Exploration history', function() {
 
     var VERSION_2_STATE_1_CONTENTS = {
       1: {
-        text: 'card_is_checkpoint: true',
-        highlighted: false
-      },
-      2: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      3: {
         text: 'content:',
         highlighted: false
       },
-      4: {
+      2: {
+        text: '  html: <p>enter 6 to continue</p>',
+        highlighted: true
+      },
+      3: {
         text: '  content_id: content',
         highlighted: false
       },
+      4: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
       5: {
-        text: '  html: <p>enter 6 to continue</p>',
-        highlighted: true
+        text: 'linked_skill_id: null',
+        highlighted: false
       },
       6: {
         text: 'interaction:',
@@ -265,11 +267,11 @@ describe('Exploration history', function() {
         highlighted: true
       },
       8: {
-        text: '  - outcome:',
+        text: '    - rule_specs:',
         highlighted: true
       },
       9: {
-        text: '      dest: second',
+        text: '        - rule_type: Equals',
         highlighted: true
       },
       10: {
@@ -330,7 +332,7 @@ describe('Exploration history', function() {
       },
       24: {
         text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        highlighted: true
       },
       25: {
         text: '  customization_args:',
@@ -459,46 +461,46 @@ describe('Exploration history', function() {
     };
 
     var STATE_2_STRING =
-      'card_is_checkpoint: false\n' +
-      'classifier_model_id: null\n' +
       'content:\n' +
-      '  content_id: content\n' +
       '  html: <p>this is card 2</p>\n' +
+      '  content_id: content\n' +
+      'classifier_model_id: null\n' +
+      'linked_skill_id: null\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value:\n' +
-      '        content_id: ca_buttonText_0\n' +
       '        unicode_str: Continue\n' +
+      '        content_id: ca_buttonText_0\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    dest_if_really_stuck: null\n' +
       '    feedback:\n' +
-      '      content_id: default_outcome\n' +
       '      html: \'\'\n' +
+      '      content_id: default_outcome\n' +
       '    labelled_as_correct: false\n' +
-      '    missing_prerequisite_skill_id: null\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
+      '    missing_prerequisite_skill_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
-      'linked_skill_id: null\n' +
-      'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
       '  voiceovers_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      '    ca_buttonText_0: {}\n' +
       'solicit_answer_details: false\n' +
+      'card_is_checkpoint: false\n' +
       'written_translations:\n' +
       '  translations_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      '    ca_buttonText_0: {}\n' +
+      'next_content_id_index: 1\n' +
       '';
 
     var expectedHistoryStates = [{
@@ -611,6 +613,62 @@ describe('Exploration history', function() {
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
+    await users.logout();
+  });
+
+  it('should show the history of exploration metadata', async function() {
+    await users.createUser('user3@historyTab.com', 'user3HistoryTab');
+    await users.login('user3@historyTab.com');
+    await workflow.createExploration(true);
+
+    var METADATA_1_STRING = (
+      'title: \'\'\n' +
+      'category: \'\'\n' +
+      'objective: \'\'\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 50\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    var METADATA_2_STRING = (
+      'title: Dummy Exploration\n' +
+      'category: Algorithms\n' +
+      'objective: Learn more about Oppia\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 50\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Dummy Exploration');
+    await explorationEditorSettingsTab.setCategory('Algorithms');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToHistoryTab();
+    var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions('1', '2');
+    await historyGraph.openExplorationMetadataHistory();
+    await historyGraph.expectTextToMatch(METADATA_1_STRING, METADATA_2_STRING);
+    await historyGraph.closeExplorationMetadataHistory();
     await users.logout();
   });
 

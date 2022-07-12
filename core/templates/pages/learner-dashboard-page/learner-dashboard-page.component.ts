@@ -47,6 +47,9 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 
+import './learner-dashboard-page.component.css';
+
+
 @Component({
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
@@ -302,10 +305,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   setActiveSection(newActiveSectionName: string): void {
