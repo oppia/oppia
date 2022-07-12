@@ -37,7 +37,7 @@ import {
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
 
-fdescribe('Responses Service', () => {
+describe('Responses Service', () => {
   let alertsService: AlertsService = null;
   let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService = null;
