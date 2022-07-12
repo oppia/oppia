@@ -359,7 +359,9 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
     return exploration_dict
 
 
-def apply_change_list_to_exploration(old_exploration, change_list):
+def apply_change_list_to_exploration(
+    old_exploration, current_version, change_list
+):
     """Applies a changelist to a pristine exploration and returns the result.
 
     Each entry in change_list is a dict that represents an ExplorationChange
@@ -368,6 +370,7 @@ def apply_change_list_to_exploration(old_exploration, change_list):
     Args:
         old_exploration: Exploration. The exploration object on which we
             need to apply the change list.
+        current_version: int. The current version number of the exploration.
         change_list: list(ExplorationChange). The list of changes to apply.
 
     Returns:
@@ -378,6 +381,16 @@ def apply_change_list_to_exploration(old_exploration, change_list):
     Raises:
         Exception. Any entries in the changelist are invalid.
     """
+    # The below exception is added so that this method cannot be used
+    # incorrectly. Otherwise it might create a fork in the versioning
+    # hierarchy if incorrectly used.
+    if current_version != old_exploration.version:
+        raise Exception(
+            'Trying to get the new version of the exploration from version '
+            '%d which is not equal to the current version of the exploration '
+            'i.e. %d.' % (old_exploration.version, current_version)
+        )
+
     exploration = copy.deepcopy(old_exploration)
     to_param_domain = param_domain.ParamChange.from_dict
     for change in change_list:
@@ -602,7 +615,7 @@ def apply_change_list(exploration_id, change_list):
     old_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
         exploration = apply_change_list_to_exploration(
-            old_exploration, change_list
+            old_exploration, old_exploration.version, change_list
         )
         return exploration
     except Exception as e:

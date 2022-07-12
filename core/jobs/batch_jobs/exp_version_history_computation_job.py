@@ -373,7 +373,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         try:
                             new_exploration = (
                                 exp_services.apply_change_list_to_exploration(
-                                    old_exploration, change_list
+                                    old_exploration, version - 1, change_list
                                 )
                             )
                             new_exploration.version = version
@@ -450,6 +450,26 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             )
             return exp_model_at_v1
 
+    def filter_valid_exploration_models_at_v1(
+        self, exp_model: exp_models.ExplorationModel
+    ) -> bool:
+        """Returns true if the exploration model at v1 is valid for calculation
+        of version history.
+
+        Args:
+            exp_model: The exploration model at version 1.
+
+        Returns:
+            bool. Whether the exploration model at v1 can be used for
+            calculation of version history.
+        """
+        # try:
+        #     exp_fetchers.get_exploration_from_model(exp_model)
+        #     return True
+        # except Exception:
+        #     return False
+        return False
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations_vlatest = (
             self.pipeline
@@ -460,21 +480,30 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 beam.Map(lambda model: (model.id, model))
         )
 
-        all_explorations_v1 = (
+        explorations_at_v1 = (
             all_explorations_vlatest
             | 'Get the exploration ids' >>
                 beam.Map(lambda model: model[0])
             | 'Get the ExplorationModels at v1' >>
                 beam.Map(self._get_exploration_model_at_v1)
-            | 'Filter the exploration models at v1' >> beam.Filter(
-                lambda model: (
-                    feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION
-                    <= model.states_schema_version
-                    <= feconf.CURRENT_STATE_SCHEMA_VERSION
-                )
+        )
+
+        valid_explorations_v1 = (
+            explorations_at_v1
+            | 'Filter the valid exploration models at v1' >> beam.Filter(
+                self.filter_valid_exploration_models_at_v1
             )
             | 'Create key-value pairs with id and exp models at v1' >>
                 beam.Map(lambda model: (model.id, model))
+        )
+
+        invalid_explorations_v1 = (
+            explorations_at_v1
+            | 'Filter the invalid exploration models at v1' >> beam.Filter(
+                lambda model: (
+                    not self.filter_valid_exploration_models_at_v1(model)
+                )
+            )
         )
 
         all_commit_logs = (
@@ -502,7 +531,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         model_groups = (
             ({
-                'exp_models_v1': all_explorations_v1,
+                'exp_models_v1': valid_explorations_v1,
                 'exp_models_vlatest': all_explorations_vlatest,
                 'commit_log_models': all_commit_logs,
                 'version_history_models': all_version_history_models
@@ -537,11 +566,28 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
 
         report_number_of_valid_exps_queried = (
-            all_explorations_v1
+            valid_explorations_v1
             | 'Count valid queried explorations' >>
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'ALL VALID EXPS'
+                    'VALID EXPS'
                 )
+        )
+
+        report_number_of_invalid_exps = (
+            invalid_explorations_v1
+            | 'Count invalid queried explorations' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'INVALID EXPS'
+                )
+        )
+
+        report_details_of_invalid_exps = (
+            invalid_explorations_v1
+            | 'Save info on invalid explorations' >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stderr(
+                    'Version history cannot be calculated for %s' % (model.id)
+                )
+            )
         )
 
         report_number_of_models_created = (
@@ -556,6 +602,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_number_of_valid_exps_queried,
+                report_number_of_invalid_exps,
+                report_details_of_invalid_exps,
                 report_number_of_models_created
             )
             | 'Flatten' >> beam.Flatten()
