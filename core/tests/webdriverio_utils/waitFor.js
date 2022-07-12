@@ -36,9 +36,7 @@ var alertToBePresent = async() => {
     });
 };
 
-// In some cases we explicitly needs to wait for url to change
-// as test takes some time to change the url and webdriverio
-// doesn't wait that much.
+// Wait for current url to change to a specific url.
 var urlToBe = async function(url) {
   await browser.waitUntil(async function() {
     return await browser.getUrl() === url;
