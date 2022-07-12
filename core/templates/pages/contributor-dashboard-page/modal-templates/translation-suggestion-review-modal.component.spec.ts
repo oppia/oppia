@@ -624,6 +624,14 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.isContentOverflowing).toBeTrue();
         expect(component.isTranslationOverflowing).toBeTrue();
       }));
+
+    it('should determine panle height after view initialization', () => {
+      spyOn(component, 'calculatePanelHeight').and.callFake(() => {});
+
+      component.ngAfterViewInit();
+
+      expect(component.calculatePanelHeight).toHaveBeenCalled();
+    });
   });
 
   describe('when reviewing suggestions' +
