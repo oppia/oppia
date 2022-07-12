@@ -117,8 +117,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/tests/test_utils_test.py',
     'core/jobs/batch_jobs/blog_validation_jobs.py',
     'core/jobs/batch_jobs/blog_validation_jobs_test.py',
-    'core/jobs/batch_jobs/collection_info_jobs.py',
-    'core/jobs/batch_jobs/collection_info_jobs_test.py',
     'core/jobs/batch_jobs/email_deletion_jobs.py',
     'core/jobs/batch_jobs/email_deletion_jobs_test.py',
     'core/jobs/batch_jobs/exp_recommendation_computation_jobs.py',

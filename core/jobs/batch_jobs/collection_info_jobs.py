@@ -35,11 +35,14 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (
-    collection_models, feedback_models, user_models
+    collection_models,
+    feedback_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.feedback, models.NAMES.user])
-
-datastore_services = models.Registry.import_datastore_services()
+    models.NAMES.collection,
+    models.NAMES.feedback,
+    models.NAMES.user
+])
 
 
 class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
@@ -47,7 +50,7 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
 
     @staticmethod
     def _extract_user_and_collection_ids(
-        collection_rights_model: datastore_services.Model
+        collection_rights_model: collection_models.CollectionRightsModel
     ) -> Iterable[Tuple[str, str]]:
         """Extracts user id and collection id.
 
