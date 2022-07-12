@@ -462,27 +462,25 @@ describe('Exploration editor page component', function() {
     });
 
     it('should set active state name when active state name does not exist' +
-       ' on exploration', fakeAsync(() => {
+       ' on exploration', () => {
       spyOn(ses, 'getActiveStateName').and.returnValue(
         'State2');
       spyOn(ses, 'setActiveStateName').and.callThrough();
       $scope.$apply();
-      tick();
 
       expect(ses.setActiveStateName).toHaveBeenCalledWith(
         'Introduction');
-    }));
+    });
 
     it('should load change list by draft changes successfully',
-      fakeAsync(() => {
+      () => {
         const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
 
         $scope.$apply();
-        tick();
 
         expect(loadSpy).toHaveBeenCalledWith(
           explorationData.draft_changes);
-      }));
+      });
 
     it('should navigate to main tab', fakeAsync(() => {
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
