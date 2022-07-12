@@ -16,7 +16,7 @@
  * @fileoverview Component for a schema-based editor for lists.
  */
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
@@ -43,8 +43,16 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   ]
 })
 export class SchemaBasedListEditorComponent
-implements OnInit, ControlValueAccessor, Validator {
-  localValue: SchemaDefaultValue[] = [];
+implements ControlValueAccessor, Validator {
+  _localValue: SchemaDefaultValue[] = [];
+  @Input() set localValue(val: SchemaDefaultValue[]) {
+    this._localValue = val;
+  }
+
+  get localValue(): SchemaDefaultValue[] {
+    return this._localValue;
+  }
+
   directiveSubscriptions = new Subscription();
   @Input() disabled: boolean;
   // Read-only property. The schema definition for each item in the list.
@@ -244,13 +252,13 @@ implements OnInit, ControlValueAccessor, Validator {
       }
     }
 
-    while (this.localValue.length < this.minListLength) {
+    while (this.localValue && this.localValue.length < this.minListLength) {
       this.localValue.push(
         this.schemaDefaultValueService.getDefaultValue(this.itemSchema));
     }
 
     if (this.len === undefined) {
-      if (this.localValue.length === 1) {
+      if (this.localValue && this.localValue.length === 1) {
         if ((this.localValue[0] as SchemaDefaultValue[]).length === 0) {
           this.isAddItemButtonPresent = false;
         }
