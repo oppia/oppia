@@ -225,7 +225,7 @@ describe('Exploration history', function() {
       },
       33: {
         text: '    default_outcome: {}',
-        highlighted: true
+        highlighted: false
       },
       34: {
         text: 'next_content_id_index: 0',
@@ -359,98 +359,102 @@ describe('Exploration history', function() {
         highlighted: false
       },
       31: {
-        text: '      html: \'\'',
+        text: '    feedback:',
         highlighted: false
       },
       32: {
-        text: '      content_id: default_outcome',
+        text: '      html: \'\'',
         highlighted: false
       },
       33: {
-        text: '    labelled_as_correct: false',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       34: {
-        text: '    param_changes: []',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       35: {
-        text: '    refresher_exploration_id: null',
+        text: '    param_changes: []',
         highlighted: false
       },
       36: {
-        text: '    missing_prerequisite_skill_id: null',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       37: {
-        text: '  hints: []',
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       38: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      39: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      39: {
+      40: {
         text: '  solution: null',
         highlighted: false
       },
-      40: {
+      41: {
         text: 'param_changes: []',
         highlighted: false
       },
-      41: {
+      42: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      42: {
+      43: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      43: {
-        text: '    content: {}',
-        highlighted: false
-      },
       44: {
-        text: '    default_outcome: {}',
+        text: '    content: {}',
         highlighted: false
       },
       45: {
-        text: '    feedback_1: {}',
-        highlighted: true
-      },
-      46: {
-        text: 'solicit_answer_details: false',
-        highlighted: false
-      },
-      47: {
-        text: 'card_is_checkpoint: true',
-        highlighted: false
-      },
-      48: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      49: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      50: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      51: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      52: {
+      46: {
         text: '    feedback_1: {}',
         highlighted: true
       },
+      47: {
+        text: 'solicit_answer_details: false',
+        highlighted: false
+      },
+      48: {
+        text: 'card_is_checkpoint: true',
+        highlighted: false
+      },
+      49: {
+        text: 'written_translations:',
+        highlighted: false
+      },
+      50: {
+        text: '  translations_mapping:',
+        highlighted: false
+      },
+      51: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      52: {
+        text: '    default_outcome: {}',
+        highlighted: false
+      },
       53: {
-        text: 'next_content_id_index: 2',
+        text: '    feedback_1: {}',
         highlighted: true
       },
       54: {
+        text: 'next_content_id_index: 2',
+        highlighted: true
+      },
+      55: {
         text: '',
         highlighted: false
       }
@@ -625,7 +629,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 50\n' +
+      'states_schema_version: 51\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -643,7 +647,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 50\n' +
+      'states_schema_version: 51\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
