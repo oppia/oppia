@@ -500,7 +500,7 @@ describe('Tutor card component', () => {
 
   it('should get the static image url from the image path', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      'assets/images/general/milestone-message-star-icon.svg');
+      '/assets/images/general/milestone-message-star-icon.svg');
 
     expect(componentInstance.getStaticImageUrl(
       '/general/milestone-message-star-icon.svg')).toBe(
