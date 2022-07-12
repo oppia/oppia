@@ -90,7 +90,7 @@
 }
 
 @media(max-width:1052px) {
-  .hide-nav-heading {
+  .oppia-hide-nav-heading {
     display: none ;
   }
 }
