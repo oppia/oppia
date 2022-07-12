@@ -22,7 +22,7 @@
   width: 100px;
 }
 
-.oppia-popover {
+oppia-input-response-pair .oppia-popover {
   cursor: pointer;
 }
 .oppia-answer-popup-container .oppia-answer-popup {

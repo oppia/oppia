@@ -17,7 +17,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
   z-index: 16;
 }
 
-.supplemental-card-parent-container {
+oppia-conversation-skin .supplemental-card-parent-container {
   min-width: 50%;
 }
 
@@ -114,11 +114,11 @@ otherwise they will interfere with the iframed conversation skin directive. */
   cursor: default;
 }
 
-.oppia-button-raised.md-raised {
+oppia-conversation-skin .oppia-button-raised.md-raised {
   background-color: #0d48a1
 }
 
-.oppia-button-icon {
+oppia-conversation-skin .oppia-button-icon {
   color: #fff;
 }
 
