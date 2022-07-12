@@ -1,10 +1,26 @@
-from typing import Any, Dict, Optional
+from .mailchimpclient import MailChimpClient as MailChimpClient
 
-class MailChimp(object):
+from typing import Any, Dict, List, Optional
+from typing_extensions import TypedDict
+
+
+class ListsDataDict(TypedDict):
+    members: List[Dict[str, str]]
+    update_existing: bool
+
+
+class MailChimp(MailChimpClient):
     lists: Lists = ...
+
 
 class Lists:
     members: ListMembers = ...
+    def update_members(
+        self,
+        list_id: Optional[str],
+        data: ListsDataDict
+    ) -> Dict[str, Any]: ...
+
 
 class ListMembers:
     def create(
