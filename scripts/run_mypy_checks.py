@@ -117,8 +117,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/tests/test_utils_test.py',
     'core/jobs/batch_jobs/blog_validation_jobs.py',
     'core/jobs/batch_jobs/blog_validation_jobs_test.py',
-    'core/jobs/batch_jobs/exp_recommendation_computation_jobs.py',
-    'core/jobs/batch_jobs/exp_recommendation_computation_jobs_test.py',
     'core/jobs/batch_jobs/exp_search_indexing_jobs.py',
     'core/jobs/batch_jobs/exp_search_indexing_jobs_test.py',
     'core/jobs/batch_jobs/mailchimp_population_jobs.py',
