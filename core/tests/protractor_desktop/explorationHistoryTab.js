@@ -148,11 +148,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       14: {
-        text: '      content_id: default_outcome',
+        text: '      html: \'\'',
         highlighted: false
       },
       15: {
-        text: '      html: \'\'',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       16: {
@@ -160,15 +160,15 @@ describe('Exploration history', function() {
         highlighted: false
       },
       17: {
-        text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
-      },
-      18: {
         text: '    param_changes: []',
         highlighted: false
       },
-      19: {
+      18: {
         text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      19: {
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       20: {
@@ -184,51 +184,51 @@ describe('Exploration history', function() {
         highlighted: false
       },
       23: {
-        text: 'linked_skill_id: null',
-        highlighted: false
-      },
-      24: {
-        text: 'next_content_id_index: 0',
-        highlighted: true
-      },
-      25: {
         text: 'param_changes: []',
         highlighted: false
       },
-      26: {
+      24: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      27: {
+      25: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      28: {
+      26: {
         text: '    content: {}',
         highlighted: false
       },
-      29: {
+      27: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      30: {
+      28: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      31: {
+      29: {
+        text: 'card_is_checkpoint: true',
+        highlighted: false
+      },
+      30: {
         text: 'written_translations:',
         highlighted: false
       },
-      32: {
+      31: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      33: {
+      32: {
         text: '    content: {}',
         highlighted: false
       },
-      34: {
+      33: {
         text: '    default_outcome: {}',
+        highlighted: true
+      },
+      34: {
+        text: 'next_content_id_index: 0',
         highlighted: true
       },
       35: {
@@ -275,59 +275,59 @@ describe('Exploration history', function() {
         highlighted: true
       },
       10: {
-        text: '      dest_if_really_stuck: null',
+        text: '          inputs:',
         highlighted: true
       },
       11: {
-        text: '      feedback:',
+        text: '            x: 6',
         highlighted: true
       },
       12: {
-        text: '        content_id: feedback_1',
+        text: '      outcome:',
         highlighted: true
       },
       13: {
-        text: '        html: \'\'',
+        text: '        dest: second',
         highlighted: true
       },
       14: {
-        text: '      labelled_as_correct: false',
+        text: '    dest_if_really_stuck: null',
         highlighted: true
       },
       15: {
-        text: '      missing_prerequisite_skill_id: null',
+        text: '        feedback:',
         highlighted: true
       },
       16: {
-        text: '      param_changes: []',
+        text: '          html: \'\'',
         highlighted: true
       },
       17: {
-        text: '      refresher_exploration_id: null',
+        text: '          content_id: feedback_1',
         highlighted: true
       },
       18: {
-        text: '    rule_specs:',
+        text: '        labelled_as_correct: false',
         highlighted: true
       },
       19: {
-        text: '    - inputs:',
+        text: '        param_changes: []',
         highlighted: true
       },
       20: {
-        text: '        x: 6',
+        text: '        refresher_exploration_id: null',
         highlighted: true
       },
       21: {
-        text: '      rule_type: Equals',
+        text: '        missing_prerequisite_skill_id: null',
         highlighted: true
       },
       22: {
-        text: '    tagged_skill_misconception_id: null',
+        text: '      training_data: []',
         highlighted: true
       },
       23: {
-        text: '    training_data: []',
+        text: '      tagged_skill_misconception_id: null',
         highlighted: true
       },
       24: {
@@ -359,7 +359,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       31: {
-        text: '    feedback:',
+        text: '      html: \'\'',
         highlighted: false
       },
       32: {
@@ -367,94 +367,90 @@ describe('Exploration history', function() {
         highlighted: false
       },
       33: {
-        text: '      html: \'\'',
-        highlighted: false
-      },
-      34: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      35: {
-        text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
-      },
-      36: {
+      34: {
         text: '    param_changes: []',
         highlighted: false
       },
-      37: {
+      35: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      38: {
+      36: {
+        text: '    missing_prerequisite_skill_id: null',
+        highlighted: false
+      },
+      37: {
         text: '  hints: []',
         highlighted: false
       },
-      39: {
+      38: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      40: {
+      39: {
         text: '  solution: null',
         highlighted: false
       },
-      41: {
-        text: 'linked_skill_id: null',
-        highlighted: false
-      },
-      42: {
-        text: 'next_content_id_index: 2',
-        highlighted: true
-      },
-      43: {
+      40: {
         text: 'param_changes: []',
         highlighted: false
       },
-      44: {
+      41: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      45: {
+      42: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      46: {
+      43: {
         text: '    content: {}',
         highlighted: false
       },
-      47: {
+      44: {
         text: '    default_outcome: {}',
         highlighted: false
       },
-      48: {
+      45: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      49: {
+      46: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      50: {
+      47: {
+        text: 'card_is_checkpoint: true',
+        highlighted: false
+      },
+      48: {
         text: 'written_translations:',
         highlighted: false
       },
-      51: {
+      49: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      52: {
+      50: {
         text: '    content: {}',
         highlighted: false
       },
-      53: {
+      51: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      54: {
+      52: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      55: {
+      53: {
+        text: 'next_content_id_index: 2',
+        highlighted: true
+      },
+      54: {
         text: '',
         highlighted: false
       }
