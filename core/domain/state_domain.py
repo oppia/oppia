@@ -34,7 +34,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Mapping, Optional, Union
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -46,6 +46,15 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # with 'invalid-import-from'.
 
 
+class AnswerGroupDict(TypedDict):
+    """Dictionary representing the AnswerGroup object."""
+
+    outcome: OutcomeDict
+    rule_specs: List[RuleSpecDict]
+    training_data: List[str]
+    tagged_skill_misconception_id: Optional[str]
+
+
 class AnswerGroup(translation_domain.BaseTranslatableObject):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
@@ -55,8 +64,12 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
     """
 
     def __init__(
-            self, outcome, rule_specs, training_data,
-            tagged_skill_misconception_id):
+        self,
+        outcome: Outcome,
+        rule_specs: List[RuleSpec],
+        training_data: List[str],
+        tagged_skill_misconception_id: Optional[str]
+    ) -> None:
         """Initializes a AnswerGroup domain object.
 
         Args:
@@ -106,7 +119,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             )
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> AnswerGroupDict:
         """Returns a dict representing this AnswerGroup domain object.
 
         Returns:
@@ -121,7 +134,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, answer_group_dict):
+    def from_dict(cls, answer_group_dict: AnswerGroupDict) -> AnswerGroup:
         """Return a AnswerGroup domain object from a dict.
 
         Args:
@@ -298,10 +311,19 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         return answer_group_dict
 
 
+class HintDict(TypedDict):
+    """Dictionary representing the Hint object."""
+
+    hint_content: SubtitledHtmlDict
+
+
 class Hint(translation_domain.BaseTranslatableObject):
     """Value object representing a hint."""
 
-    def __init__(self, hint_content):
+    def __init__(
+        self,
+        hint_content: SubtitledHtml
+    ) -> None:
         """Constructs a Hint domain object.
 
         Args:
@@ -329,7 +351,7 @@ class Hint(translation_domain.BaseTranslatableObject):
             self.hint_content.html)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> HintDict:
         """Returns a dict representing this Hint domain object.
 
         Returns:
@@ -340,7 +362,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, hint_dict):
+    def from_dict(cls, hint_dict: HintDict) -> Hint:
         """Return a Hint domain object from a dict.
 
         Args:
@@ -375,6 +397,18 @@ class Hint(translation_domain.BaseTranslatableObject):
         return hint_dict
 
 
+# Here, correct_answer is annotated with Any type. Because correct_answer
+# can accept values of type List[Set[str]], List[str], str, int, Dict and
+# other types too. So, to make it generalized for every types of values.
+# We used Any type here.
+class SolutionDict(TypedDict):
+    """Dictionary representing the Solution object."""
+
+    answer_is_exclusive: bool
+    correct_answer: Any
+    explanation: SubtitledHtmlDict
+
+
 class Solution(translation_domain.BaseTranslatableObject):
     """Value object representing a solution.
 
@@ -386,9 +420,17 @@ class Solution(translation_domain.BaseTranslatableObject):
     an explanation for the solution.
     """
 
+    # Here, argument `correct_answer` is annotated with Any type. Because
+    # correct_answer can accept values of type List[Set[str]], List[str], str,
+    # int, Dict and other types too. So, to make it generalized for every types
+    # of values. We used Any type here.
     def __init__(
-            self, interaction_id, answer_is_exclusive,
-            correct_answer, explanation):
+        self,
+        interaction_id: str,
+        answer_is_exclusive: bool,
+        correct_answer: Any,
+        explanation: SubtitledHtml
+    ) -> None:
         """Constructs a Solution domain object.
 
         Args:
@@ -428,7 +470,7 @@ class Solution(translation_domain.BaseTranslatableObject):
             self.explanation.html)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> SolutionDict:
         """Returns a dict representing this Solution domain object.
 
         Returns:
@@ -441,7 +483,11 @@ class Solution(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, interaction_id, solution_dict):
+    def from_dict(
+        cls,
+        interaction_id: str,
+        solution_dict: SolutionDict
+    ) -> Solution:
         """Return a Solution domain object from a dict.
 
         Args:
@@ -540,15 +586,42 @@ class Solution(translation_domain.BaseTranslatableObject):
         return solution_dict
 
 
+# Here, in 'customization_args', we used Any type because it accepts
+# the values of customization args and that values can be of type str, int,
+# bool, List and other types too. So to make it generalize for every type
+# of values, we used Any here.
+class InteractionInstanceDict(TypedDict):
+    """Dictionary representing the InteractionInstance object."""
+
+    id: str
+    customization_args: Dict[str, Dict[str, Any]]
+    answer_groups: List[AnswerGroupDict]
+    default_outcome: OutcomeDict
+    confirmed_unclassified_answers: List[str]
+    hints: List[HintDict]
+    solution: SolutionDict
+
+
 class InteractionInstance(translation_domain.BaseTranslatableObject):
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
     _DEFAULT_INTERACTION_ID = None
 
+    # In argument 'customization_args', we used Any type because it accepts
+    # the values of customization args and that values can be of type str, int,
+    # bool, List and other types too. So to make it generalize for every type
+    # of values, we used Any here.
     def __init__(
-            self, interaction_id, customization_args, answer_groups,
-            default_outcome, confirmed_unclassified_answers, hints, solution):
+        self,
+        interaction_id: str,
+        customization_args: Dict[str, Dict[str, Any]],
+        answer_groups: List[AnswerGroup],
+        default_outcome: Outcome,
+        confirmed_unclassified_answers: List[str],
+        hints: List[Hint],
+        solution: Solution
+    ) -> None:
         """Initializes a InteractionInstance domain object.
 
         Args:
@@ -1406,6 +1479,17 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         }
 
 
+class OutcomeDict(TypedDict):
+    """Dictionary representing the Outcome object."""
+
+    dest: str
+    feedback: SubtitledHtmlDict
+    labelled_as_correct: bool
+    param_changes: List[param_domain.ParamChangeDict]
+    refresher_exploration_id: Optional[str]
+    missing_prerequisite_skill_id: Optional[str]
+
+
 class Outcome(translation_domain.BaseTranslatableObject):
     """Value object representing an outcome of an interaction. An outcome
     consists of a destination state, feedback to show the user, and any
@@ -1413,8 +1497,14 @@ class Outcome(translation_domain.BaseTranslatableObject):
     """
 
     def __init__(
-            self, dest, feedback, labelled_as_correct, param_changes,
-            refresher_exploration_id, missing_prerequisite_skill_id):
+        self,
+        dest: str,
+        feedback: SubtitledHtml,
+        labelled_as_correct: bool,
+        param_changes: List[param_domain.ParamChange],
+        refresher_exploration_id: Optional[str],
+        missing_prerequisite_skill_id: Optional[str]
+    ) -> None:
         """Initializes a Outcome domain object.
 
         Args:
@@ -1472,7 +1562,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
             self.feedback.html)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> OutcomeDict:
         """Returns a dict representing this Outcome domain object.
 
         Returns:
@@ -1489,7 +1579,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, outcome_dict):
+    def from_dict(cls, outcome_dict: OutcomeDict) -> Outcome:
         """Return a Outcome domain object from a dict.
 
         Args:
@@ -1679,6 +1769,12 @@ class Voiceover:
                 self.duration_secs)
 
 
+class RecordedVoiceoversDict(TypedDict):
+    """Dictionary representing the RecordedVoiceovers object."""
+
+    voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]]
+
+
 class RecordedVoiceovers:
     """Value object representing a recorded voiceovers which stores voiceover of
     all state contents (like hints, feedback etc.) in different languages linked
@@ -1742,7 +1838,7 @@ class RecordedVoiceovers:
 
         return cls(voiceovers_mapping)
 
-    def validate(self, expected_content_id_list):
+    def validate(self, expected_content_id_list: List[str]) -> None:
         """Validates properties of the RecordedVoiceovers.
 
         Args:
@@ -1842,10 +1938,21 @@ class RecordedVoiceovers:
         self.voiceovers_mapping.pop(content_id, None)
 
 
+class RuleSpecDict(TypedDict):
+    """Dictionary representing the RuleSpec object."""
+
+    rule_type: str
+    inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+
+
 class RuleSpec(translation_domain.BaseTranslatableObject):
     """Value object representing a rule specification."""
 
-    def __init__(self, rule_type, inputs):
+    def __init__(
+        self,
+        rule_type: str,
+        inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+    ) -> None:
         """Initializes a RuleSpec domain object.
 
         Args:
@@ -1859,6 +1966,9 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                 enclosed in {{...}} braces.
         """
         self.rule_type = rule_type
+        # Here, we are narrowing down the type from Mapping to Dict. Because
+        # Mapping is used just to accept the different types of allowed Dicts.
+        assert isinstance(inputs, dict)
         self.inputs = inputs
 
     def get_translatable_contents_collection(
@@ -1894,7 +2004,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                     self.rule_type)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> RuleSpecDict:
         """Returns a dict representing this RuleSpec domain object.
 
         Returns:
@@ -1906,7 +2016,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, rulespec_dict):
+    def from_dict(cls, rulespec_dict: RuleSpecDict) -> RuleSpec:
         """Return a RuleSpec domain object from a dict.
 
         Args:
@@ -2137,7 +2247,7 @@ class SubtitledHtml:
         return cls(
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates properties of the SubtitledHtml, and cleans the html.
 
         Raises:
@@ -2240,13 +2350,33 @@ class SubtitledUnicode:
         return cls(content_id, '')
 
 
+class StateDict(TypedDict):
+    """Dictionary representing the State object."""
+
+    content: SubtitledHtmlDict
+    param_changes: List[param_domain.ParamChangeDict]
+    interaction: InteractionInstanceDict
+    recorded_voiceovers: RecordedVoiceoversDict
+    solicit_answer_details: bool
+    card_is_checkpoint: bool
+    linked_skill_id: Optional[str]
+    classifier_model_id: Optional[str]
+
+
 class State(translation_domain.BaseTranslatableObject):
     """Domain object for a state."""
 
     def __init__(
-            self, content, param_changes, interaction, recorded_voiceovers,
-            solicit_answer_details, card_is_checkpoint,
-            linked_skill_id=None, classifier_model_id=None):
+        self,
+        content: SubtitledHtml,
+        param_changes: List[param_domain.ParamChange],
+        interaction: InteractionInstance,
+        recorded_voiceovers: RecordedVoiceovers,
+        solicit_answer_details: bool,
+        card_is_checkpoint: bool,
+        linked_skill_id: Optional[str] = None,
+        classifier_model_id: Optional[str] = None
+    ) -> None:
         """Initializes a State domain object.
 
         Args:
@@ -2883,7 +3013,7 @@ class State(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, state_dict):
+    def from_dict(cls, state_dict: StateDict) -> State:
         """Return a State domain object from a dict.
 
         Args:

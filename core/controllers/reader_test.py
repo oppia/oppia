@@ -22,6 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -595,7 +596,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             if include_system_recommendations is not None else '')
         recommendations_url = (
             '/explorehandler/recommendations/%s?'
-            'stringified_author_recommended_ids=%s%s%s' % (
+            'author_recommended_ids=%s%s%s' % (
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
@@ -991,10 +992,10 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     def test_get_recommendation_ids_with_invalid_author_recommended_ids(self):
         self.get_json(
             '/explorehandler/recommendations/%s' % self.EXP_ID_1, params={
-                'collection_id': 'collection_id',
+                'collection_id': self.COL_ID,
                 'include_system_recommendations': True,
-                'stringified_author_recommended_ids': 'invalid_type'
-            }, expected_status_int=404
+                'author_recommended_ids': 'invalid_type'
+            }, expected_status_int=400
         )
 
 
@@ -3276,3 +3277,25 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'Welcome!')
 
         self.logout()
+
+
+class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
+    """Unit test for CheckpointsFeatureStatusHandler."""
+
+    def test_get_request_returns_correct_status(self):
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, False)
+
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': False
+            })
+
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, True)
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': True,
+            })

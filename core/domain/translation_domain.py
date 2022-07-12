@@ -585,6 +585,14 @@ class MachineTranslation:
 # will also support translation feature.
 
 
+class WrittenTranslationDict(TypedDict):
+    """Dictionary representing the WrittenTranslation object."""
+
+    data_format: str
+    translation: Union[str, List[str]]
+    needs_update: bool
+
+
 class WrittenTranslation:
     """Value object representing a written translation for a content.
 
@@ -624,7 +632,12 @@ class WrittenTranslation:
             cls.DATA_FORMAT_SET_OF_UNICODE_STRING
         )
 
-    def __init__(self, data_format, translation, needs_update):
+    def __init__(
+        self,
+        data_format: str,
+        translation: Union[str, List[str]],
+        needs_update: bool
+    ) -> None:
         """Initializes a WrittenTranslation domain object.
 
         Args:
@@ -640,7 +653,7 @@ class WrittenTranslation:
         self.translation = translation
         self.needs_update = needs_update
 
-    def to_dict(self):
+    def to_dict(self) -> WrittenTranslationDict:
         """Returns a dict representing this WrittenTranslation domain object.
 
         Returns:
@@ -653,7 +666,9 @@ class WrittenTranslation:
         }
 
     @classmethod
-    def from_dict(cls, written_translation_dict):
+    def from_dict(
+        cls, written_translation_dict: WrittenTranslationDict
+    ) -> WrittenTranslation:
         """Return a WrittenTranslation domain object from a dict.
 
         Args:
@@ -696,13 +711,22 @@ class WrittenTranslation:
                 self.needs_update)
 
 
+class WrittenTranslationsDict(TypedDict):
+    """Dictionary representing the WrittenTranslations object."""
+
+    translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]]
+
+
 class WrittenTranslations:
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
     different languages linked through their content_id.
     """
 
-    def __init__(self, translations_mapping):
+    def __init__(
+        self,
+        translations_mapping: Dict[str, Dict[str, WrittenTranslation]]
+    ) -> None:
         """Initializes a WrittenTranslations domain object.
 
         Args:
@@ -712,7 +736,7 @@ class WrittenTranslations:
         """
         self.translations_mapping = translations_mapping
 
-    def to_dict(self):
+    def to_dict(self) -> WrittenTranslationsDict:
         """Returns a dict representing this WrittenTranslations domain object.
 
         Returns:
@@ -733,7 +757,9 @@ class WrittenTranslations:
         return written_translations_dict
 
     @classmethod
-    def from_dict(cls, written_translations_dict):
+    def from_dict(
+        cls, written_translations_dict: WrittenTranslationsDict
+    ) -> WrittenTranslations:
         """Return a WrittenTranslations domain object from a dict.
 
         Args:
@@ -815,7 +841,7 @@ class WrittenTranslations:
             self.translations_mapping[content_id][language_code] = (
                 written_translation)
 
-    def validate(self, expected_content_id_list):
+    def validate(self, expected_content_id_list: List[str]) -> None:
         """Validates properties of the WrittenTranslations.
 
         Args:

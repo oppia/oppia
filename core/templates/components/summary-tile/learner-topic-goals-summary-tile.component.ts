@@ -32,22 +32,26 @@ import { StorySummary } from 'domain/story/story-summary.model';
   templateUrl: 'learner-topic-goals-summary-tile.component.html'
 })
 export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicSummary!: LearnerTopicSummary;
   @Input() displayArea!: string;
   @Input() topicName!: string;
-  incompleteStoryNodes: StoryNode[];
-  storySummaryToDisplay: StorySummary;
-  storyName: string;
-  storyProgress: number;
-  isStoryChapterDisplayed = false;
-  storyNodeToDisplay: StoryNode;
-  thumbnailUrl: string;
-  thumbnailBgColor: string;
-  storyNodeLink: string;
-  storyNodeTitle: string;
-  starImageUrl: string;
-  cardIsHovered = false;
-  openInNewWindow = false;
+  incompleteStoryNodes!: StoryNode[];
+  storySummaryToDisplay!: StorySummary;
+  storyName!: string;
+  storyProgress!: number;
+  storyNodeToDisplay!: StoryNode;
+  thumbnailBgColor!: string;
+  storyNodeLink!: string;
+  storyNodeTitle!: string;
+  starImageUrl!: string;
+  // Set thumbnail url to null if the thumbnail file is not available.
+  thumbnailUrl: string | null = null;
+  isStoryChapterDisplayed: boolean = false;
+  cardIsHovered: boolean = false;
+  openInNewWindow: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -76,21 +80,20 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   }
 
   getStoryNodeLink(): string {
-    if (!this.storySummaryToDisplay.getClassroomUrlFragment() ||
-      !this.storySummaryToDisplay.getTopicUrlFragment() ||
-      !this.storyNodeToDisplay) {
+    const classroomUrlFragment = (
+      this.storySummaryToDisplay.getClassroomUrlFragment());
+    const topicUrlFragment = this.storySummaryToDisplay.getTopicUrlFragment();
+    const explorationId = this.storyNodeToDisplay.getExplorationId();
+    if (classroomUrlFragment === undefined || topicUrlFragment === undefined ||
+      explorationId === null) {
       return '#';
     }
     let result = this.urlInterpolationService.interpolateUrl(
-      '/explore/<exp_id>', {
-        exp_id: this.storyNodeToDisplay.getExplorationId()
-      });
+      '/explore/<exp_id>', { exp_id: explorationId });
     result = this.urlService.addField(
-      result, 'topic_url_fragment',
-      this.storySummaryToDisplay.getTopicUrlFragment());
+      result, 'topic_url_fragment', topicUrlFragment);
     result = this.urlService.addField(
-      result, 'classroom_url_fragment',
-      this.storySummaryToDisplay.getClassroomUrlFragment());
+      result, 'classroom_url_fragment', classroomUrlFragment);
     result = this.urlService.addField(
       result, 'story_url_fragment',
       this.storySummaryToDisplay.getUrlFragment());
@@ -104,17 +107,19 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     if (this.incompleteStoryNodes.length > 0) {
       this.storyNodeToDisplay = this.incompleteStoryNodes[0];
 
-      if (this.storyNodeToDisplay.getThumbnailFilename()) {
+      let thumbnailFilename = this.storyNodeToDisplay.getThumbnailFilename();
+      if (thumbnailFilename) {
         this.thumbnailUrl = (
           this.assetsBackendApiService.getThumbnailUrlForPreview(
             AppConstants.ENTITY_TYPE.STORY, this.storySummaryToDisplay.getId(),
-            this.storyNodeToDisplay.getThumbnailFilename()
-          )
-        );
+            thumbnailFilename));
       }
 
       this.storyNodeTitle = this.storyNodeToDisplay.getTitle();
-      this.thumbnailBgColor = this.storyNodeToDisplay.getThumbnailBgColor();
+      let thumbnailBgColor = this.storyNodeToDisplay.getThumbnailBgColor();
+      if (thumbnailBgColor) {
+        this.thumbnailBgColor = thumbnailBgColor;
+      }
       this.storyName = this.storySummaryToDisplay.getTitle();
 
       this.storyNodeLink = this.getStoryNodeLink();
@@ -133,6 +138,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     if (this.cardIsHovered) {
       return '-webkit-filter: blur(2px); filter: blur(2px);';
     }
+    return 'height: 144px; width: 192px;';
   }
 }
 

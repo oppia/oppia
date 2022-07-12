@@ -24,7 +24,9 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './information-card-modal.component.css';
+
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -64,8 +66,7 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
     private ngbActiveModal: NgbActiveModal,
     private dateTimeFormatService: DateTimeFormatService,
     private ratingComputationService: RatingComputationService,
-    private urlInterpolationService: UrlInterpolationService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private urlInterpolationService: UrlInterpolationService
   ) {
     super(ngbActiveModal);
   }
@@ -138,9 +139,5 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }

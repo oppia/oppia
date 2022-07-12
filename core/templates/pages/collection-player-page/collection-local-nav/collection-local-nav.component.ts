@@ -31,7 +31,7 @@ import { UrlService } from 'services/contextual/url.service';
   styleUrls: []
 })
 export class CollectionLocalNavComponent implements OnInit, OnDestroy {
-  canEdit: boolean;
+  canEdit: boolean = false;
   collectionId: string = '';
   directiveSubscriptions = new Subscription();
 

@@ -37,6 +37,7 @@ import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/
 import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface DeleteValueResponse {
   index: number;
@@ -53,14 +54,14 @@ interface AddHintModalResponse {
 })
 export class StateHintsEditorComponent implements OnInit {
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
-  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() onSaveSolution = new EventEmitter<Solution | null>();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
 
   @Output() onSaveHints = new EventEmitter<Hint[]>();
 
-  hintCardIsShown: boolean;
-  canEdit: boolean;
+  hintCardIsShown: boolean = false;
+  canEdit: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -125,7 +126,10 @@ export class StateHintsEditorComponent implements OnInit {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     const interactionId = this.stateInteractionIdService.savedMemento;
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    if (interactionId) {
+      return INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear;
+    }
+    return false;
   }
 
   openAddHintModal(): void {
