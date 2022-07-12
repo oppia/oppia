@@ -92,9 +92,9 @@
     margin: 0 auto;
   }
 }
-/* Fix #15530: Text in navbar overflows in smaller screen size; added media query to hide text in smaller screen size*/
-@media(min-width:1052px) {
-  .hide {
-    display: flex !important;
+
+@media(max-width:1052px) {
+  .hide-nav-heading {
+    display: none ;
   }
 }
