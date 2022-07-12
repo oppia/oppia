@@ -44,7 +44,7 @@
       </tr>
     </table>
 
-    <div *ngIf="showDuplicatesWarning && hasDuplicates()" class="oppia-form-error" aria-live="assertive">
+    <div *ngIf="localValue && showDuplicatesWarning && hasDuplicates()" class="oppia-form-error" aria-live="assertive">
       Please ensure that the list has no duplicates.
     </div>
 
