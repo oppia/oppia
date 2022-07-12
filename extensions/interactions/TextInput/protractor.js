@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for the Text interaction.
+ * @fileoverview End-to-end testing utilities for the Text interaction
+ * in protractor.
  */
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
@@ -62,7 +63,7 @@ var submitAnswer = async function(elem, answer) {
   var inputElem = textInputElem.element(by.tagName('input'));
   if (await textAreaElem.isPresent()) {
     await textAreaElem.sendKeys(answer);
-    await element(by.css('.protractor-test-submit-answer-button')).click();
+    await element(by.css('.e2e-test-submit-answer-button')).click();
   } else {
     // This must be chained in here due to the textInputElem possibly being
     // invisible after the longer text area submits, causing the instantiation
@@ -71,7 +72,7 @@ var submitAnswer = async function(elem, answer) {
     if (await inputElem.isPresent()) {
       await inputElem.clear();
       await inputElem.sendKeys(answer);
-      await element(by.css('.protractor-test-submit-answer-button')).click();
+      await element(by.css('.e2e-test-submit-answer-button')).click();
     }
   }
 };
