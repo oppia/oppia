@@ -3152,6 +3152,9 @@ title: Title
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
         skill_ids_for_diagnostic_test = []
+        for subtopic in subtopics:
+            skill_ids_for_diagnostic_test.extend(subtopic.skill_ids)
+
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
             thumbnail_bg_color, thumbnail_size_in_bytes, description,
