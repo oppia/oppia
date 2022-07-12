@@ -116,14 +116,10 @@ describe('File path editor', () => {
   });
 
   it('should reinitialise when the value changes', () => {
-    expect(component.value).toBe(undefined);
-    expect(component.imageEditorIsShown).toBeFalse();
-    expect(component.svgEditorIsShown).toBeFalse();
-
-    component.value = '/path/to/svg-image.svg';
+    spyOn(component, 'ngOnInit');
     const changes: SimpleChanges = {
       value: {
-        currentValue: component.value,
+        currentValue: '/path/to/svg-image.svg',
         previousValue: undefined,
         firstChange: false,
         isFirstChange: () => false
@@ -132,8 +128,6 @@ describe('File path editor', () => {
 
     component.ngOnChanges(changes);
 
-    expect(component.value).toEqual('/path/to/svg-image.svg');
-    expect(component.imageEditorIsShown).toBeFalse();
-    expect(component.svgEditorIsShown).toBeTrue();
+    expect(component.ngOnInit).toHaveBeenCalled();
   });
 });

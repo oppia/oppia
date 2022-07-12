@@ -16,7 +16,7 @@
  * @fileoverview Component for a schema-based editor for lists.
  */
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
