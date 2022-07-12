@@ -1401,6 +1401,114 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 
+    def test_validation_fail_for_state_classifier_model(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].classifier_model_id = '2'
+        error_string = (
+            'Explorations in a story are not expected to contain '
+            'classifier models. State %s of exploration with ID %s '
+            'contains classifier models.' % (
+                feconf.DEFAULT_INIT_STATE_NAME, exploration.id
+            ))
+        errors = exp_services.validate_exploration_for_story(
+            exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                exploration, True)
+
+    def test_validation_fail_for_answer_groups(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.answer_groups = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state 1', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    }
+                )
+            ],
+            [{
+                'answer_group_index': 1,
+                'answers': [
+                    'cheerful',
+                    'merry',
+                    'ecstatic',
+                    'glad',
+                    'overjoyed',
+                    'pleased',
+                    'thrilled',
+                    'smile'
+                ]
+            }],
+            None
+        )]
+        error_string = (
+            'Explorations in a story are not expected to contain '
+            'training data for any answer group. State %s of '
+            'exploration with ID %s contains training data in one of '
+            'its answer groups.' % (
+                feconf.DEFAULT_INIT_STATE_NAME, exploration.id
+            )
+        )
+        errors = exp_services.validate_exploration_for_story(
+            exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                exploration, True)
+
+    def test_validation_fail_for_default_outcome(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.default_outcome = (
+            state_domain.Outcome(
+                'state 1', state_domain.SubtitledHtml(
+                    'default_outcome', '<p>Default outcome for state 4</p>'
+                ), False, [param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['3', '4'],
+                        'parse_with_jinja': True
+                    }
+                )], None, None
+            )
+        )
+        error_string = (
+            'Explorations in a story are not expected to contain '
+            'parameter values. State %s of exploration with ID %s '
+            'contains parameter values in its default outcome.' % (
+                feconf.DEFAULT_INIT_STATE_NAME, exploration.id
+            )
+        )
+        errors = exp_services.validate_exploration_for_story(
+            exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                exploration, True)
+
     def test_update_exploration_by_migration_bot(self):
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
@@ -7533,169 +7641,6 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_changes['customization_args'],
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
-
-
-class CuratedExplorationValidationUnitTests(test_utils.GenericTestBase):
-    """Test curated exploration validation functions in exp_services."""
-
-    def test_cannot_be_curated_if_classifier_model_id_is_not_none(self):
-        """Tests that the exploration with defined classifier model id in any
-        of its states cannot be curated.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration('1')
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME
-        ].classifier_model_id = '2'
-
-        error_message = (
-            exp_services.can_exploration_be_curated(exploration))
-
-        self.assertEqual(
-            error_message,
-            'The exploration should not have classifier model for any state.'
-        )
-
-    def test_cannot_be_curated_if_non_empty_param_changes(self):
-        """Tests that the exploration with non-empty param changes cannot
-        be curated.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration('1')
-        exploration.param_changes = [
-            param_domain.ParamChange(
-                'ParamChange', 'RandomSelector', {
-                    'list_of_values': ['1', '2'],
-                    'parse_with_jinja': False
-                }
-            ).to_dict()
-        ]
-
-        error_message = (
-            exp_services.can_exploration_be_curated(exploration))
-
-        self.assertEqual(
-            error_message,
-            'The exploration should not have any parameter changes.'
-        )
-
-    def test_cannot_be_curated_if_non_empty_param_specs(self):
-        """Tets that the exploration with non-empty param specs cannot be
-        curated.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration('1')
-        exploration.param_specs = {
-            'ExampleParamOne': param_domain.ParamSpec('UnicodeString')
-        }
-
-        error_message = (
-            exp_services.can_exploration_be_curated(exploration))
-
-        self.assertEqual(
-            error_message,
-            'The exploration should not have any parameter specs.'
-        )
-
-    def test_cannot_be_curated_if_non_empty_training_data(self):
-        """Tests that the exploration with non-empty training data in any
-        of its states cannot be curated.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration('1')
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME
-        ].interaction.answer_groups = [state_domain.AnswerGroup(
-            state_domain.Outcome(
-                'state 1', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>state outcome html</p>'),
-                False, [], None, None),
-            [
-                state_domain.RuleSpec(
-                    'Equals', {
-                        'x': {
-                            'contentId': 'rule_input_Equals',
-                            'normalizedStrSet': ['Test']
-                        }
-                    }
-                )
-            ],
-            [{
-                'answer_group_index': 1,
-                'answers': [
-                    u'cheerful',
-                    u'merry',
-                    u'ecstatic',
-                    u'glad',
-                    u'overjoyed',
-                    u'pleased',
-                    u'thrilled',
-                    u'smile'
-                ]
-            }],
-            None
-        )]
-
-        error_message = (
-            exp_services.can_exploration_be_curated(exploration))
-
-        self.assertEqual(
-            error_message,
-            'The exploration should not have training data ' +
-            'for any answer group in any state.'
-        )
-
-    def test_cannot_be_curated_if_non_empty_param_changes_in_default_outcome(
-        self
-    ):
-        """Tests that the exploration with non-empty param changes in the
-        default outcome of any state interaction cannot be curated.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration('1')
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME
-        ].interaction.default_outcome = (
-            state_domain.Outcome(
-                'state 1', state_domain.SubtitledHtml(
-                    'default_outcome', '<p>Default outcome for state 4</p>'
-                ), False, [param_domain.ParamChange(
-                    'ParamChange', 'RandomSelector', {
-                        'list_of_values': ['3', '4'],
-                        'parse_with_jinja': True
-                    }
-                )], None, None
-            )
-        )
-
-        error_message = (
-            exp_services.can_exploration_be_curated(exploration))
-
-        self.assertEqual(
-            error_message,
-            'The exploration should not have any parameter changes ' +
-            'in the default outcome of any state interaction.'
-        )
-
-    def tests_cannot_be_curated_if_videos_or_links_are_present(self):
-        """Tests that the exploration with any videos or links cannot be
-        curated.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration('1')
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME
-        ].update_content(
-            state_domain.SubtitledHtml(
-                '1',
-                '<p><oppia-noninteractive-video autoplay-with-value="false" '
-                'end-with-value="0" start-with-value="0">'
-                '</oppia-noninteractive-video></p>'
-            )
-        )
-
-        error_message = (
-            exp_services.can_exploration_be_curated(exploration))
-
-        self.assertEqual(
-            error_message,
-            'The exploration should not have any video or link ' +
-            'in any of its states.'
-        )
 
 
 class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):

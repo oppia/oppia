@@ -927,11 +927,7 @@ URLS = [
     get_redirect_route(
         r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
         topics_and_skills_dashboard
-            .CategorizedAndUntriagedSkillsDataHandler),
-
-    get_redirect_route(
-        r'/explorehandler/curated_exploration_validation/<exploration_id>',
-        reader.CuratedExplorationValidationHandler)
+            .CategorizedAndUntriagedSkillsDataHandler)
 ]
 
 # Adding redirects for topic landing pages.

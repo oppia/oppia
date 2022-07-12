@@ -1810,39 +1810,6 @@ class ExplorationRestartEventHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class CuratedExplorationValidationHandler(base.BaseHandler):
-    """Handler for validating that an exploration can be used as a chapter
-    of a story.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, strict=False)
-
-        if exploration is None:
-            raise self.PageNotFoundException
-
-        error_message = (
-            exp_services.can_exploration_be_curated(exploration))
-
-        self.render_json({
-            'can_be_curated': len(error_message) == 0,
-            'error_message': error_message
-        })
-
-
 class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
     """Syncs logged out progress of a learner with the logged in progress."""
 

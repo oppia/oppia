@@ -1343,6 +1343,13 @@ def validate_exploration_for_story(exp, strict):
         ValidationError. Invalid interaction in exploration.
         ValidationError. RTE content in state of exploration with ID is not
             supported on mobile.
+        ValidationError. Expected no exploration to have classifier models.
+        ValidationError. Expected no exploration to contain training data in
+            any answer group.
+        ValidationError. Expected no exploration to have parameter values in
+            the default outcome of any state interaction.
+        ValidationError. Expected no exploration to have video tags.
+        ValidationError. Expected no exploration to have link tags.
     """
     validation_error_messages = []
     if (
@@ -1416,6 +1423,44 @@ def validate_exploration_for_story(exp, strict):
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
+
+        if state.classifier_model_id is not None:
+            error_string = (
+                'Explorations in a story are not expected to contain '
+                'classifier models. State %s of exploration with ID %s '
+                'contains classifier models.' % (state_name, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        for answer_group in state.interaction.answer_groups:
+            if len(answer_group.training_data) > 0:
+                error_string = (
+                    'Explorations in a story are not expected to contain '
+                    'training data for any answer group. State %s of '
+                    'exploration with ID %s contains training data in one of '
+                    'its answer groups.' % (state_name, exp.id)
+                )
+                if strict:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+                break
+
+        if (
+            state.interaction.default_outcome is not None and
+            len(state.interaction.default_outcome.param_changes) > 0
+        ):
+            error_string = (
+                'Explorations in a story are not expected to contain '
+                'parameter values. State %s of exploration with ID %s '
+                'contains parameter values in its default outcome.' % (
+                    state_name, exp.id
+                )
+            )
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
     return validation_error_messages
 
 
@@ -2838,69 +2883,3 @@ def rollback_exploration_to_safe_state(exp_id):
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
     return last_known_safe_version
-
-
-def can_exploration_be_curated(exploration):
-    """Checks if the exploration be used as the chapter of a story.
-
-    Args:
-        exploration: Exploration. The exploration domain object.
-
-    Returns:
-        tuple[bool, str]. A tuple consisting of whether the exploration can be
-        curated along with the error message.
-    """
-    error_message = ''
-
-    if any(
-        state.classifier_model_id is not None
-        for state in exploration.states.values()
-    ):
-        error_message += (
-            'The exploration should not have classifier model for any state.')
-
-    if not bool(error_message) and len(exploration.param_changes) > 0:
-        error_message += (
-            'The exploration should not have any parameter changes.')
-
-    if not bool(error_message) and len(exploration.param_specs) > 0:
-        error_message += 'The exploration should not have any parameter specs.'
-
-    if not bool(error_message):
-        for state in exploration.states.values():
-            for answer_group in state.interaction.answer_groups:
-                if len(answer_group.training_data) > 0:
-                    error_message += (
-                        'The exploration should not have training data ' +
-                        'for any answer group in any state.'
-                    )
-                    break
-            if not bool(error_message):
-                break
-
-    if not bool(error_message):
-        for state in exploration.states.values():
-            default_outcome = state.interaction.default_outcome
-            if (
-                default_outcome is not None and
-                len(default_outcome.param_changes) > 0
-            ):
-                error_message += (
-                    'The exploration should not have any parameter changes ' +
-                    'in the default outcome of any state interaction.'
-                )
-                break
-
-    if not bool(error_message):
-        html_list = exploration.get_all_html_content_strings()
-        video_tag = 'oppia-noninteractive-video'
-        link_tag = 'oppia-noninteractive-link'
-        for html_string in html_list:
-            if video_tag in html_string or link_tag in html_string:
-                error_message += (
-                    'The exploration should not have any video or link ' +
-                    'in any of its states.'
-                )
-                break
-
-    return error_message
