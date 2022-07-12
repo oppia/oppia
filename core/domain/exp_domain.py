@@ -1204,8 +1204,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     group.outcome.dest_if_really_stuck == state_name
                 ):
                     raise utils.ValidationError(
-                            'The destination for a stuck learner cannot be the '
-                            'same state.')
+                        'The destination for a stuck learner cannot be the '
+                        'same state.')
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
