@@ -333,7 +333,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.assertEqual({
             'subtitled_html': {
                 'html': '',
-                'content_id': 'content_0'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -357,7 +357,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.assertEqual({
             'subtitled_html': {
                 'html': '',
-                'content_id': 'content_0'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -381,7 +381,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.assertEqual({
             'subtitled_html': {
                 'html': '',
-                'content_id': 'content_0'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -560,12 +560,12 @@ class TopicEditorTests(
                 'property_name': 'page_contents_html',
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 },
                 'subtopic_id': 1,
                 'new_value': {
                     'html': '<p>New Data</p>',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 }
             }, {
                 'cmd': 'update_subtopic_property',
@@ -589,11 +589,11 @@ class TopicEditorTests(
                 'property_name': 'page_contents_html',
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 },
                 'new_value': {
                     'html': '<p>New Value</p>',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 },
                 'subtopic_id': 2
             }, {
@@ -655,7 +655,7 @@ class TopicEditorTests(
         self.assertEqual({
             'subtitled_html': {
                 'html': '<p>New Data</p>',
-                'content_id': 'content_0'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -675,7 +675,7 @@ class TopicEditorTests(
         self.assertEqual({
             'subtitled_html': {
                 'html': '<p>New Value</p>',
-                'content_id': 'content_0'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -784,12 +784,12 @@ class TopicEditorTests(
                 'property_name': 'page_contents_html',
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 },
                 'subtopic_id': 1,
                 'new_value': {
                     'html': '<p>New Data</p>',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 }
             }, {
                 'cmd': 'update_subtopic_property',
@@ -813,11 +813,11 @@ class TopicEditorTests(
                 'property_name': 'page_contents_html',
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 },
                 'new_value': {
                     'html': '<p>New Value</p>',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 },
                 'subtopic_id': 2
             }, {

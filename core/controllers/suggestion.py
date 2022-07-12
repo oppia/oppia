@@ -183,7 +183,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                 suggestion_id, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
         elif action == constants.ACTION_REJECT_SUGGESTION:
-            raise Exception("noooo")
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
         else:

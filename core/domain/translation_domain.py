@@ -23,7 +23,7 @@ import enum
 from core import feconf
 from core import utils
 
-from typing import Dict, List
+from typing import Dict, List, Union
 from typing_extensions import TypedDict
 
 
@@ -856,7 +856,7 @@ class WrittenTranslations:
             if not set(self.translations_mapping.keys()) == (
                     set(expected_content_id_list)):
                 raise utils.ValidationError(
-                    'Expected state written_translations to match the listed '
+                    'Expected written_translations to match the listed '
                     'content ids %s, found %s' % (
                         expected_content_id_list,
                         list(self.translations_mapping.keys()))

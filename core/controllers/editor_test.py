@@ -169,7 +169,7 @@ class EditorTests(BaseEditorControllerTests):
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id('0')
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
@@ -362,7 +362,7 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
             """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_3
   html: ''
 interaction:
   answer_groups: []
@@ -377,7 +377,7 @@ interaction:
   default_outcome:
     dest: State A
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_4
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -387,25 +387,19 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    content_3: {}
+    default_outcome_4: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """),
         'State B': (
             """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_5
   html: ''
 interaction:
   answer_groups: []
@@ -420,7 +414,7 @@ interaction:
   default_outcome:
     dest: State B
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_6
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -430,25 +424,19 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    content_5: {}
+    default_outcome_6: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
             """card_is_checkpoint: true
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_0
   html: ''
 interaction:
   answer_groups: []
@@ -456,14 +444,14 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_2
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: %s
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_1
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -473,19 +461,13 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_2: {}
+    content_0: {}
+    default_outcome_1: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
@@ -493,7 +475,7 @@ written_translations:
         """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_3
   html: ''
 interaction:
   answer_groups: []
@@ -501,14 +483,14 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_9
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: State A
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_4
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -518,19 +500,13 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_9: {}
+    content_3: {}
+    default_outcome_4: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """)
 
     def test_can_not_download_exploration_with_disabled_exp_id(self):
@@ -627,13 +603,6 @@ written_translations:
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State A',
-                    'new_value': 1
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 2',
                     'new_value': 'TextInput'
@@ -655,13 +624,6 @@ written_translations:
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State 2',
-                    'new_value': 1
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 3',
                     'new_value': 'TextInput'
@@ -680,13 +642,6 @@ written_translations:
                         },
                         'rows': {'value': 1}
                     }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State 3',
-                    'new_value': 1
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
@@ -824,10 +779,10 @@ written_translations:
             category='This is just a test category')
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        exploration.add_states(['State A', 'State 2', 'State 3'])
         self.set_interaction_for_state(
             exploration.states['State A'], 'TextInput', content_id_generator)
 
@@ -1482,12 +1437,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
         self.logout()
 
         self.login(self.COLLABORATOR_EMAIL)
@@ -1534,12 +1491,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
         response = self.delete_json(
@@ -1581,12 +1540,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
@@ -2256,12 +2217,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
 
         csrf_token = self.get_new_csrf_token()
 

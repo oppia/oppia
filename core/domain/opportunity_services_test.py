@@ -437,13 +437,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
-                    'new_value': 4
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS),
                     'state_name': 'Introduction',

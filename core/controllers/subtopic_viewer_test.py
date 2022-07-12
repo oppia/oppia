@@ -116,7 +116,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.subtopic_page_1.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
-                'content_id': 'content_0'
+                'content_id': 'content'
             }))
         self.subtopic_page_1.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
@@ -134,7 +134,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.subtopic_page_2.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world 2</p>',
-                'content_id': 'content_0'
+                'content_id': 'content'
             }))
         self.subtopic_page_2.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
@@ -178,7 +178,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         expected_page_contents_dict = {
             'recorded_voiceovers': self.recorded_voiceovers_dict,
             'subtitled_html': {
-                'content_id': 'content_0',
+                'content_id': 'content',
                 'html': '<p>hello world</p>'
             },
             'written_translations': self.written_translations_dict
@@ -209,7 +209,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         expected_page_contents_dict = {
             'recorded_voiceovers': self.recorded_voiceovers_dict,
             'subtitled_html': {
-                'content_id': 'content_0',
+                'content_id': 'content',
                 'html': '<p>hello world 2</p>'
             },
             'written_translations': self.written_translations_dict

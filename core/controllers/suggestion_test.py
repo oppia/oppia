@@ -94,27 +94,17 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
-
-        self.old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content html</p>').to_dict()
-        self.exploration.states['State 1'].update_content(
-            state_domain.SubtitledHtml.from_dict(self.old_content))
-        self.exploration.states['State 2'].update_content(
-            state_domain.SubtitledHtml.from_dict(self.old_content))
-        self.exploration.states['State 3'].update_content(
-            state_domain.SubtitledHtml.from_dict(self.old_content))
+        self.old_content_html = '<p>old content html</p>'
+        self.exploration.states['State 1'].content.html = self.old_content_html
+        self.exploration.states['State 2'].content.html = self.old_content_html
+        self.exploration.states['State 3'].content.html = self.old_content_html
         exp_services._save_exploration(self.editor_id, self.exploration, '', [])  # pylint: disable=protected-access
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.editor, self.EXP_ID, self.owner_id, rights_domain.ROLE_EDITOR)
 
-        self.new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>').to_dict()
-        self.resubmit_change_content = state_domain.SubtitledHtml(
-            'content', '<p>resubmit change content html</p>').to_dict()
-        self.update_change_content = state_domain.SubtitledHtml(
-            'content', '<p>update change content html</p>').to_dict()
+        self.new_content_html = '<p>new content html</p>'
 
         self.logout()
 
@@ -127,8 +117,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'State 1',
-                'old_value': self.old_content,
-                'new_value': self.new_content
+                'old_value': {
+                    'content_id': (
+                        self.exploration.states['State 1'].content.content_id),
+                    'html': self.old_content_html
+                },
+                'new_value': {
+                    'content_id': (
+                        self.exploration.states['State 1'].content.content_id),
+                    'html': self.new_content_html
+                }
             },
             'change to state 1')
         suggestion_services.create_suggestion(
@@ -139,8 +137,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'State 2',
-                'old_value': self.old_content,
-                'new_value': self.new_content
+                'old_value': {
+                    'content_id': (
+                        self.exploration.states['State 2'].content.content_id),
+                    'html': self.old_content_html
+                },
+                'new_value': {
+                    'content_id': (
+                        self.exploration.states['State 2'].content.content_id),
+                    'html': self.new_content_html
+                }
             },
             'change to state 2')
         suggestion_services.create_suggestion(
@@ -151,8 +157,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'State 3',
-                'old_value': self.old_content,
-                'new_value': self.new_content
+                'old_value': {
+                    'content_id': (
+                        self.exploration.states['State 3'].content.content_id),
+                    'html': self.old_content_html
+                },
+                'new_value': {
+                    'content_id': (
+                        self.exploration.states['State 3'].content.content_id),
+                    'html': self.new_content_html
+                }
             },
             'change to state 3')
 
@@ -168,7 +182,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 3',
-                    'content_id': 'content_0',
+                    'content_id': (
+                        self.exploration.states['State 3'].content.content_id),
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
                     'translation_html': '<p>In हिन्दी (Hindi)</p>',
@@ -192,8 +207,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'State 1',
-                    'old_value': self.old_content,
-                    'new_value': self.new_content
+                    'old_value': {
+                        'content_id': (
+                            self.exploration.states['State 3']
+                            .content.content_id),
+                        'html': self.old_content_html
+                    },
+                    'new_value': {
+                        'content_id': (
+                            self.exploration.states['State 3']
+                            .content.content_id),
+                        'html': self.new_content_html
+                    }
                 },
                 'description': 'change to state 1',
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -615,7 +640,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
+        self.resubmit_change_content_html = (
+            '<p>resubmit change content html</p>')
         self.put_json('%s/resubmit/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id), {
                 'summary_message': 'summary message',
@@ -624,8 +650,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'State 1',
-                    'new_value': self.resubmit_change_content,
-                    'old_value': self.old_content
+                    'old_value': {
+                        'content_id': (
+                            self.exploration.states['State 1']
+                            .content.content_id),
+                        'html': self.old_content_html
+                    },
+                    'new_value': {
+                        'content_id': (
+                            self.exploration.states['State 1']
+                            .content.content_id),
+                        'html': self.resubmit_change_content_html
+                    }
                 }
             }, csrf_token=csrf_token)
 
@@ -635,7 +671,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(
             suggestion.change.new_value['html'],
-            self.resubmit_change_content['html'])
+            self.resubmit_change_content_html)
         self.assertEqual(
             suggestion.change.cmd, exp_domain.CMD_EDIT_STATE_PROPERTY)
         self.assertEqual(
@@ -655,14 +691,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.translator_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
+        with self.swap(
+                opportunity_services,
+                'update_translation_opportunity_with_accepted_suggestion',
+                lambda x, _: x):
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -768,14 +808,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'Translated content of State 1',
-                'review_message': u'This looks good!',
-            }, csrf_token=csrf_token)
+        with self.swap(
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda x, _: x):
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'Translated content of State 1',
+                    'review_message': u'This looks good!',
+                }, csrf_token=csrf_token)
 
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         self.assertTrue(fs.isfile('image/img.png'))
@@ -800,7 +844,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'content_html': '<p>old content html</p>',
                     'translation_html': ['test1', 'test2'],
                     'data_format': (
-                        state_domain.WrittenTranslation
+                        translation_domain.WrittenTranslation
                         .DATA_FORMAT_SET_OF_NORMALIZED_STRING
                     ),
                 },
@@ -841,21 +885,26 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_already_handled_translation(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'state_name': 'State 1',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
 
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, self.translator_id, change_dict, 'description')
-        suggestion_services.accept_suggestion(
-            suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
-        )
+        with self.swap(
+                opportunity_services,
+                'update_translation_opportunity_with_accepted_suggestion',
+                lambda x, _: x):
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
+            )
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json('%s/%s' % (
@@ -872,12 +921,13 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_translations_without_translation_html(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'state_name': 'State 1',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
 
         suggestion = suggestion_services.create_suggestion(
@@ -900,12 +950,13 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_translation_with_invalid_translation_html(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'state_name': 'State 1',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
 
         suggestion = suggestion_services.create_suggestion(
@@ -985,7 +1036,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id
             ), {
                 'question_state_data': question_state_data,
-                'skill_difficulty': 0.6
+                'skill_difficulty': 0.6,
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             csrf_token=csrf_token,
             upload_files=(('img.png', 'img.png', raw_image),)
@@ -1608,7 +1661,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                             'dest': None,
                             'feedback': {
                                 'html': '<p>assas</p>',
-                                'content_id': 'feedback_0'
+                                'content_id': 'feedback_2'
                             },
                             'labelled_as_correct': True,
                             'param_changes': [],
@@ -1652,7 +1705,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'dest': None,
                     'feedback': {
                         'html': '<p>wer</p>',
-                        'content_id': 'default_outcome'
+                        'content_id': 'default_outcome_1'
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
@@ -1663,7 +1716,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     {
                         'hint_content': {
                             'html': '<p>assaas</p>',
-                            'content_id': 'hint_1'
+                            'content_id': 'hint_3'
                         }
                     }
                 ],
@@ -1672,23 +1725,14 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_0': {},
-                    'hint_1': {}
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'feedback_2': {},
+                    'hint_3': {}
                 }
             },
             'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_0': {},
-                    'hint_1': {}
-                }
-            },
-            'next_content_id_index': 2
+            'card_is_checkpoint': False
         }
         question_dict = {
             'question_state_data': question_state_dict,
@@ -1696,7 +1740,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [skill_id],
-            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': 4
         }
         suggestion_change = {
             'cmd': (

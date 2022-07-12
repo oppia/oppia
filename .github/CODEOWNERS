@@ -102,6 +102,8 @@
 /core/templates/services/generate-content-id.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/speech-synthesis-chunker.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/assets-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
+/core/templates/domain/translation/EntityTranslationObjectFactory.ts @oppia/lace-frontend-reviewers
 
 
 # Blog project

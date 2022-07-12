@@ -522,13 +522,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                         },
                         'showChoicesInShuffledOrder': {'value': False}
                     }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': 1
                 })], 'Add state name')
 
         # Create a translation suggestion for the first multiple choice text
@@ -632,13 +625,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                         },
                         'showChoicesInShuffledOrder': {'value': False}
                     }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': 1
                 })], 'Add state name')
 
         # Create a translation suggestion for the second multiple choice
