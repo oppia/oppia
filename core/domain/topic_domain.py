@@ -1180,7 +1180,6 @@ class Topic:
                     feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
                     self.subtopic_schema_version))
 
-        subtopic_skill_ids = []
         for subtopic in self.subtopics:
             subtopic.validate()
             if subtopic.id >= self.next_subtopic_id:
@@ -1193,21 +1192,21 @@ class Topic:
                     raise utils.ValidationError(
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
-            subtopic_skill_ids.extend(subtopic.skill_ids)
 
-        skill_ids_for_diagnostic_that_are_not_in_subtopics = (
+        all_skill_ids = self.get_all_skill_ids()
+        skill_ids_for_diagnostic_that_are_not_in_topic = (
             set(self.skill_ids_for_diagnostic_test) -
-            set(subtopic_skill_ids))
-        if len(skill_ids_for_diagnostic_that_are_not_in_subtopics) > 0:
+            set(all_skill_ids))
+        if len(skill_ids_for_diagnostic_that_are_not_in_topic) > 0:
             raise utils.ValidationError(
                 'The skill_ids %s are selected for the diagnostic test but they'
                 ' are not associated with any subtopic.' %
-                skill_ids_for_diagnostic_that_are_not_in_subtopics)
+                skill_ids_for_diagnostic_that_are_not_in_topic)
 
         if (
             strict and
             len(self.skill_ids_for_diagnostic_test) == 0 and
-            len(subtopic_skill_ids) > 0
+            len(all_skill_ids) > 0
         ):
             raise utils.ValidationError(
                 'The skill_ids_for_diagnostic_test field should not be empty.')
