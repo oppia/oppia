@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
 import { waitForAsync, TestBed } from '@angular/core/testing';
 import { FilepathEditorComponent } from './filepath-editor.component';
 
@@ -111,6 +111,27 @@ describe('File path editor', () => {
 
     component.onClickCreateImage();
 
+    expect(component.imageEditorIsShown).toBeFalse();
+    expect(component.svgEditorIsShown).toBeTrue();
+  });
+
+  it('should reinitialise when the value changes', () => {
+    expect(component.value).toBe(undefined);
+    expect(component.imageEditorIsShown).toBeFalse();
+    expect(component.svgEditorIsShown).toBeFalse();
+
+    component.value = '/path/to/svg-image.svg';
+    const changes: SimpleChanges = {
+      value: {
+        currentValue: component.value,
+        previousValue: undefined,
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    };
+    component.ngOnChanges(changes);
+
+    expect(component.value).toEqual('/path/to/svg-image.svg');
     expect(component.imageEditorIsShown).toBeFalse();
     expect(component.svgEditorIsShown).toBeTrue();
   });
