@@ -45,6 +45,12 @@ if MYPY: # pragma: no cover
     [models.NAMES.exploration, models.NAMES.opportunity])
 
 
+# Exploration migration backend tests with BEAM jobs involves creating and
+# publishing the exploration. This requires a ElasticSearch stub for running
+# while the backend tests run. JobTestBase does not initialize a
+# ElasticSearch stub, so MigrateExplorationJobTests also inherits from
+# GenericTestBase to successfully emulate the exploration publishing and
+# verify the migration.
 class MigrateExplorationJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase):
 
