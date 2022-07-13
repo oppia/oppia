@@ -5,24 +5,25 @@
 
 <div class="version-diff-container">
   <div>
-    <div state-graph-visualization class="e2e-test-history-graph diff-graph"
-         graph-data="$ctrl.diffGraphData" node-colors="$ctrl.diffGraphNodeColors"
-         node-secondary-labels="$ctrl.diffGraphSecondaryLabels"
-         init-state-id2="$ctrl.v1InitStateId"
-         link-property-mapping="$ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING"
-         on-click-function="$ctrl.onClickStateInDiffGraph">
-    </div>
+    <state-graph-visualization class="e2e-test-history-graph diff-graph"
+                               [graph-data]="$ctrl.diffGraphData"
+                               [node-colors]="$ctrl.diffGraphNodeColors"
+                               [node-secondary-labels]="$ctrl.diffGraphSecondaryLabels"
+                               [init-state-id2]="$ctrl.v1InitStateId"
+                               [link-property-mapping]="$ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING"
+                               (on-click-function)="$ctrl.onClickStateInDiffGraph($event)">
+    </state-graph-visualization>
   </div>
 
   <div>
     <div class="legend-graph" ng-show="$ctrl.diffGraphData">
       <h4 class="exploration-graph-legend-heading">Exploration Graph Legend</h4>
-      <div state-graph-visualization graph-data="$ctrl.legendGraph"
-           node-colors="$ctrl.LEGEND_GRAPH_COLORS"
-           node-secondary-labels="$ctrl.LEGEND_GRAPH_SECONDARY_LABELS"
-           link-property-mapping="$ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
-           id="legend-graph">
-      </div>
+      <state-graph-visualization [graph-data]="$ctrl.legendGraph"
+                                 [node-colors]="$ctrl.LEGEND_GRAPH_COLORS"
+                                 [node-secondary-labels]="$ctrl.LEGEND_GRAPH_SECONDARY_LABELS"
+                                 [link-property-mapping]="$ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
+                                 id="legend-graph">
+      </state-graph-visualization>
     </div>
   </div>
 </div>

@@ -58,9 +58,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 
-require(
-  'pages/exploration-editor-page/editor-tab/graph-directives/' +
-  'state-graph-visualization.directive.ts');
+
 require('pages/exploration-editor-page/services/router.service.ts');
 
 describe('State Graph Visualization directive', function() {
@@ -219,7 +217,8 @@ describe('State Graph Visualization directive', function() {
     $scope.showTranslationWarnings = true;
 
     $element = angular.element(
-      '<div state-graph-visualization allowPanning="true"></div>');
+      '<state-graph-visualization' +
+      ' [allow-panning]="true"></state-graph-visualization>');
     var directive = $injector.get('stateGraphVisualizationDirective')[0];
 
     ctrl = $injector.instantiate(directive.controller, {

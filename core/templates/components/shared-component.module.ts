@@ -143,6 +143,8 @@ import { QuestionPlayerConceptCardModalComponent } from './question-directives/q
 import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
 import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
 import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
+import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
+
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -302,7 +304,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
-    SkillMasteryModalComponent
+    SkillMasteryModalComponent,
+    StateGraphVisualization
   ],
 
   entryComponents: [
@@ -390,9 +393,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
-    AddHintModalComponent,
-    ReviewMaterialEditorComponent,
-    TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
@@ -415,7 +415,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
-    SkillMasteryModalComponent
+    SkillMasteryModalComponent,
+    StateGraphVisualization
   ],
 
   exports: [
@@ -537,7 +538,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
-    SkillMasteryModalComponent
+    SkillMasteryModalComponent,
+    StateGraphVisualization
   ],
 })
 
