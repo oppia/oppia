@@ -49,7 +49,7 @@
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
       <div dir="auto"
-           class="oppia-suggestion-review-panel-header-container mt-3">
+           class="oppia-suggestion-review-panel-header-container oppia-translation-panel">
         <strong> Translation:</strong>
         <button class="btn btn-sm btn-secondary float-right"
                 *ngIf="!startedEditing && status === 'review' && canEditTranslation"
@@ -323,6 +323,9 @@
   }
 
   @media only screen and (max-width: 700px) {
+    .oppia-translation-panel {
+      margin-top: 12px;
+    }
     .oppia-expanded {
       height: fit-content;
       max-height: none;
