@@ -245,7 +245,13 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
-        return exp_fetchers.get_exploration_from_model(model_pair[0])
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(
+                model_pair[0]
+            )
+            return exploration
+        except:
+            return None
 
     def convert_into_model_pair(
       self, models_list_pair: Tuple[
@@ -309,6 +315,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 self.filter_curated_explorations)
             | 'Get exploration from model' >> beam.Map(
                 self.get_exploration_from_models)
+            | 'Filter explorations without None' >>
+                beam.Filter(lambda exploration: exploration is not None)
         )
 
         report_number_of_exps_queried = (
