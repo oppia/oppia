@@ -374,6 +374,7 @@ class ExplorationHandler(base.BaseHandler):
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
+            'exploration_metadata': exploration.get_metadata().to_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
