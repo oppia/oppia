@@ -122,7 +122,7 @@ var TopicEditorPage = function() {
   };
 
   this.get = async function(topicId) {
-    await browser.url(EDITOR_URL_PREFIX + topicId);
+    await browser.url(EDITOR_URL_PREFIX + topicId + '/');
     await waitFor.pageToFullyLoad();
   };
 
