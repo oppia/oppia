@@ -1103,7 +1103,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     def test_that_emails_are_not_sent_for_anonymous_user(self) -> None:
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
-                'exploration', self.exploration.id, 'anonymous_user',
+                'exploration', self.exploration.id, 'test_id',
                 'a subject', 'some text')
 
             messages = self._get_sent_email_messages(
@@ -1597,7 +1597,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             # Create thread as anonoymous user.
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
-                'anonymous_user', 'a subject', 'some text')
+                'test_id', 'a subject', 'some text')
             self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(

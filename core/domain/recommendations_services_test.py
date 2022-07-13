@@ -290,7 +290,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             9.0
         )
 
-        system_user = user_services.get_system_user()  # type: ignore[no-untyped-call]
+        system_user = user_services.get_system_user()
         rights_manager.unpublish_exploration(system_user, 'exp_id_2')
         exp_summaries = exp_services.get_all_exploration_summaries()  # type: ignore[no-untyped-call]
         self.assertEqual(

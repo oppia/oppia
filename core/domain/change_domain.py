@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Mapping, Union, cast
 # Union type defined from allowed types that a Dict can contain for its values.
 AcceptableChangeDictTypes = Union[
     str,
+    bool,
     int,
     None,
     List[str],
@@ -36,7 +37,7 @@ AcceptableChangeDictTypes = Union[
     Dict[str, Any],
     state_domain.SubtitledHtmlDict,
     List[state_domain.AnswerGroupDict],
-    state_domain.RecordedVoiceoversDict
+    state_domain.RecordedVoiceoversDict,
 ]
 
 
