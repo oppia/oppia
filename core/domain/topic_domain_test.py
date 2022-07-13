@@ -882,6 +882,25 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'skill_ids.')
         self._assert_validation_error(error_msg)
 
+    def test_removing_uncatgorized_skill_removes_diagnostic_test_skill_if_any(
+        self
+    ) -> None:
+        """Validates the skill id removal from uncategorized skills must also
+        remove from the diagnostic tests if any.
+        """
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+
+        self.topic.remove_skill_id_from_subtopic(1, 'skill_id_1')
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+        self.assertEqual(self.topic.uncategorized_skill_ids, ['skill_id_1'])
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+
+        self.topic.remove_uncategorized_skill_id('skill_id_1')
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
+
 
 class TopicChangeTests(test_utils.GenericTestBase):
 

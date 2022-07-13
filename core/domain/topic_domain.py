@@ -1845,8 +1845,6 @@ class Topic:
                 % skill_id)
 
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
-        if skill_id in self.skill_ids_for_diagnostic_test:
-            self.skill_ids_for_diagnostic_test.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
 
     def are_subtopic_url_fragments_unique(self) -> bool:
