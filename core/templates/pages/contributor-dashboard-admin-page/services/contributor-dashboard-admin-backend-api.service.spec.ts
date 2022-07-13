@@ -26,9 +26,9 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 describe('Contributor dashboard admin backend api service', () => {
   let cdabas: ContributorDashboardAdminBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let csrfService: CsrfTokenService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -126,10 +126,9 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     category = 'question';
-    languageCode = null;
 
     cdabas.viewContributionReviewersAsync(
-      category, languageCode
+      category, null
     ).then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(

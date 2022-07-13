@@ -98,6 +98,9 @@ import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboa
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { TeacherDashboardBackendApiService } from 'domain/learner_group/teacher-dashboard-backend-api.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -134,7 +137,6 @@ import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-b
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
-import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service';
@@ -383,7 +385,6 @@ import { PageHeadService } from './page-head.service';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
 import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
-import { StateDiffModalBackendApiService } from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';
 import { I18nService } from 'i18n/i18n.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { SettingTabBackendApiService } from 'pages/exploration-editor-page/services/setting-tab-backend-api.service';
@@ -415,6 +416,9 @@ import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/ed
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { YamlService } from './yaml.service';
+import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
+import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -595,6 +599,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['HintsAndSolutionManagerService', HintsAndSolutionManagerService],
   ['HintObjectFactory', HintObjectFactory],
   ['HistoryTabBackendApiService', HistoryTabBackendApiService],
+  ['HistoryTabYamlConversionService', HistoryTabYamlConversionService],
   ['HtmlEscaperService', HtmlEscaperService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],
   ['I18nService', I18nService],
@@ -627,6 +632,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerParamsService', LearnerParamsService],
   ['LearnerDashboardActivityBackendApiService',
     LearnerDashboardActivityBackendApiService],
+  ['LearnerGroupBackendApiService', LearnerGroupBackendApiService],
+  ['LearnerGroupSyllabusBackendApiService',
+    LearnerGroupSyllabusBackendApiService],
   ['SuggestionModalForLearnerDashboardService',
     SuggestionModalForLearnerDashboardService],
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
@@ -759,7 +767,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateContentService', StateContentService],
   ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
-  ['StateDiffModalBackendApiService', StateDiffModalBackendApiService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],
   ['StateGraphLayoutService', StateGraphLayoutService],
@@ -793,7 +800,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryEditorStateService', StoryEditorStateService],
   ['StoryObjectFactory', StoryObjectFactory],
   ['StoryUpdateService', StoryUpdateService],
-  ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
@@ -804,6 +810,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionsService', SuggestionsService],
   ['SvgFileFetcherBackendApiService', SvgFileFetcherBackendApiService],
   ['SvgSanitizerService', SvgSanitizerService],
+  ['TeacherDashboardBackendApiService', TeacherDashboardBackendApiService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
   ['TextInputTokenizer', TextInputTokenizer],
@@ -846,6 +853,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
+  ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
@@ -853,6 +861,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['WorkedExampleObjectFactory', WorkedExampleObjectFactory],
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
+  ['YamlService', YamlService],
   ['baseInteractionValidationService', baseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
