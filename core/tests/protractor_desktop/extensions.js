@@ -133,7 +133,7 @@ describe('Interactions', function() {
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('some content'));
+      await forms.toRichText('some content'), true);
     await explorationEditorPage.saveChanges();
 
     var defaultOutcomeSet = false;
