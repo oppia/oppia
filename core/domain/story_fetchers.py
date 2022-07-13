@@ -387,52 +387,35 @@ def get_multi_users_progress_in_stories(
         Dict(str, list(StoryProgressDict)). Dictionary of user id and their
         corresponding list of story progress dicts.
     """
-    all_users_stories_progress: Dict[
-        str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]
-    ] = {user_id: [] for user_id in user_ids}
-
-    # Get all stories for valid story ids.
     all_valid_stories = [
         story for story in get_stories_by_ids(story_ids) if story
     ]
-
-    # Filter valid story ids.
-    valid_story_ids = [story.id for story in all_valid_stories]
-
-    # Get summaries of all valid stories.
-    all_story_summaries = get_story_summaries_by_ids(valid_story_ids)
 
     # Filter unique topic ids from all valid stories.
     topic_ids = list(
         {story.corresponding_topic_id for story in all_valid_stories}
     )
-
-    # Get all topics for the filtered ids.
     topics = topic_fetchers.get_topics_by_ids(topic_ids) # type: ignore[no-untyped-call]
-
-    # Generate topic id to topic mapping.
     topic_id_to_topic_map = {topic.id: topic for topic in topics}
 
-    # Generate story id to story mapping.
     story_id_to_story_map = {story.id: story for story in all_valid_stories}
-
-    # Generate story id to story summaries mapping.
+    valid_story_ids = [story.id for story in all_valid_stories]
+    all_story_summaries = get_story_summaries_by_ids(valid_story_ids)
     story_id_to_summary_map = {
         summary.id: summary for summary in all_story_summaries
     }
 
     # All poosible combinations of user_id and story_id for which progress
     # models are returned.
-    all_posssible_combinations = list(
-        itertools.product(user_ids, valid_story_ids)
-    )
-
+    all_posssible_combinations = itertools.product(user_ids, valid_story_ids)
     progress_models = user_models.StoryProgressModel.get_multi(
         user_ids, valid_story_ids
     )
-
-    for ind, (user_id, story_id) in enumerate(all_posssible_combinations):
-        progress_model = progress_models[ind]
+    all_users_stories_progress: Dict[
+        str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]
+    ] = {user_id: [] for user_id in user_ids}
+    for i, (user_id, story_id) in enumerate(all_posssible_combinations):
+        progress_model = progress_models[i]
         completed_node_ids = []
         if progress_model is not None:
             completed_node_ids = progress_model.completed_node_ids
@@ -443,7 +426,7 @@ def get_multi_users_progress_in_stories(
         ]
         topic = topic_id_to_topic_map[story.corresponding_topic_id]
         summary_dict = story_id_to_summary_map[story_id].to_dict()
-        story_progress: story_domain.LearnerGroupSyllabusStorySummaryDict = {
+        all_users_stories_progress[user_id].append({
             'id': summary_dict['id'],
             'title': summary_dict['title'],
             'description': summary_dict['description'],
@@ -465,8 +448,7 @@ def get_multi_users_progress_in_stories(
             ],
             'topic_name': topic.name,
             'topic_url_fragment': topic.url_fragment
-        }
-        all_users_stories_progress[user_id].append(story_progress)
+        })
 
     return all_users_stories_progress
 

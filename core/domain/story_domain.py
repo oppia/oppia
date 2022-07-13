@@ -1865,7 +1865,7 @@ class StorySummary:
 
 class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
     """Dictionary representation of a StorySummary object for learner
-    groups syllabus
+    groups syllabus.
     """
 
     story_is_published: bool

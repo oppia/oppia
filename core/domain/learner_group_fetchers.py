@@ -106,8 +106,8 @@ def can_multi_students_share_progress(
     )
 
     progress_sharing_permissions: List[bool] = []
-
     for model in learner_group_user_models:
+        # Ruling out the possibility of None for mypy type checking.
         assert model is not None
         for group_details in model.learner_groups_user_details:
             if group_details['group_id'] == group_id:

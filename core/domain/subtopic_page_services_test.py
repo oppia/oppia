@@ -653,7 +653,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
 
         subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
-
         progress = (
             subtopic_page_services.get_multi_users_subtopic_pages_progress(
                 [student_id_1, student_id_2], [subtopic_page_id]
@@ -665,17 +664,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(student_1_progress), 1)
         self.assertEqual(len(student_2_progress), 1)
-        self.assertEqual(student_1_progress[0].subtopic_id, 1)
+        self.assertEqual(student_1_progress[0]['subtopic_id'], 1)
         self.assertEqual(
-            student_1_progress[0].subtopic_title, 'Naming Numbers'
+            student_1_progress[0]['subtopic_title'], 'Naming Numbers'
         )
         self.assertEqual(
-            student_1_progress[0].parent_topic_id, self.TOPIC_ID_1
+            student_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
         )
         self.assertEqual(
-            student_1_progress[0].parent_topic_name, 'Place Values'
+            student_1_progress[0]['parent_topic_name'], 'Place Values'
         )
         self.assertEqual(
-            student_1_progress[0].subtopic_mastery, degree_of_mastery
+            student_1_progress[0]['subtopic_mastery'], degree_of_mastery
         )
-        self.assertIsNone(student_2_progress[0].subtopic_mastery)
+        self.assertIsNone(student_2_progress[0]['subtopic_mastery'])
