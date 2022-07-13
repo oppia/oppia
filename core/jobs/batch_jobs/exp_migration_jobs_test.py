@@ -95,8 +95,7 @@ class MigrateExplorationJobTests(
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
-            self.assertEqual(
-                exploration.states_schema_version, 48)
+            self.assertEqual(exploration.states_schema_version, 48)
 
         with cache_swap:
             self.assert_job_output_is([
