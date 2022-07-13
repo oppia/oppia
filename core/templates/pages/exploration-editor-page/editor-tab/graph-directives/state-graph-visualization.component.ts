@@ -32,16 +32,10 @@ import { AppConstants } from 'app.constants';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 
 interface ElementDimensions {
-  h: any;
-  w: any;
+  h: number;
+  w: number;
 }
 
-interface GraphData {
-  nodes: any;
-  links: any;
-  initStateId: any;
-  finalStateIds: any;
-}
 
 @Component({
   selector: 'state-graph-visualization',
@@ -55,20 +49,6 @@ export class StateGraphVisualization
   @Input() allowPanning;
   @Input() centerAtCurrentState;
   @Input() currentStateId;
-  // A function returning an object with these keys:
-  //  - 'nodes': An object whose keys are node ids and whose values are
-  //             node labels
-  //  - 'links': A list of objects with keys:
-  //            'source': id of source node
-  //            'target': id of target node
-  //            'linkProperty': property of link which determines how
-  //              it is styled (styles in linkPropertyMapping). If
-  //              linkProperty or corresponding linkPropertyMatching
-  //              is undefined, link style defaults to the gray arrow.
-  //  - 'initStateId': The initial state id
-  //  - 'finalStateIds': The list of ids corresponding to terminal states
-  //             (i.e., those whose interactions are terminal).
-  graphData: any;
   // Id of a second initial state, which will be styled as an initial
   // state.
   @Input() initStateId2: unknown;
@@ -79,6 +59,7 @@ export class StateGraphVisualization
     deleted: string;
   };
 
+  @Input() maximize: boolean = false;
   // Object whose keys are node ids and whose values are node colors.
   @Input() nodeColors: object;
   // A value which is the color of all nodes.
@@ -106,23 +87,25 @@ export class StateGraphVisualization
     right: 0
   };
 
-  initStateId: any;
-  finalStateIds: any;
-  nodeData = {};
+  initStateId: string;
+  finalStateIds: string;
+  nodeData: NodeDataDict;
   // The translation applied when the graph is first loaded.
   origTranslations = [0, 0];
   graphLoaded: boolean;
-  GRAPH_HEIGHT: any;
-  GRAPH_WIDTH: any;
-  VIEWPORT_WIDTH: any;
-  VIEWPORT_HEIGHT: any;
-  VIEWPORT_X: any;
-  VIEWPORT_Y: any;
-  augmentedLinks: any;
+  GRAPH_HEIGHT: number;
+  GRAPH_WIDTH: number;
+  VIEWPORT_WIDTH: string;
+  VIEWPORT_HEIGHT: string;
+  VIEWPORT_X: string;
+  VIEWPORT_Y: string;
+  augmentedLinks: AugmentedLink[];
   nodeList: any;
-  overallTransformStr: any;
-  innerTransformStr: any;
+  graphData: any
+  overallTransformStr: string;
+  innerTransformStr: string;
   switch: boolean = false;
+  check: boolean = false;
 
   constructor(
     private explorationStatesService: ExplorationStatesService,
@@ -161,55 +144,52 @@ export class StateGraphVisualization
   }
 
   makeGraphPannable(): void {
-    // Without the timeout, $element.find fails to find the required
-    // rect in the state graph modal dialog.
-    setTimeout(() => {
-      var dimensions = this.getElementDimensions();
+    let dimensions = this.getElementDimensions();
+    d3.selectAll('#pannableRect')
+      .call(
+        d3.zoom().scaleExtent([1, 1]).on('zoom', () => {
+          console.error('called');
+          if (this.graphBounds.right + this.graphBounds.left < dimensions.w) {
+            (d3.event).transform.x = 0;
+          } else {
+            d3.event.transform.x = this.clamp(
+              d3.event.transform.x,
+              dimensions.w - this.graphBounds.right -
+              this.origTranslations[0],
+              -this.graphBounds.left - this.origTranslations[0]);
+          }
 
-      d3.select('#pannableRect')
-        .call(
-          d3.zoom().scaleExtent([1, 1]).on('zoom', () => {
-            if (this.graphBounds.right - this.graphBounds.left < dimensions.w) {
-              (d3.event).transform.x = 0;
-            } else {
-              d3.event.transform.x = this.clamp(
-                d3.event.transform.x,
-                dimensions.w - this.graphBounds.right -
-                this.origTranslations[0],
-                -this.graphBounds.left - this.origTranslations[0]);
-            }
+          if (this.graphBounds.bottom + this.graphBounds.top < dimensions.h) {
+            d3.event.transform.y = 0;
+          } else {
+            d3.event.transform.y = this.clamp(
+              d3.event.transform.y,
+              dimensions.h - this.graphBounds.bottom -
+              this.origTranslations[1],
+              -this.graphBounds.top - this.origTranslations[1]);
+          }
 
-            if (this.graphBounds.bottom - this.graphBounds.top < dimensions.h) {
-              d3.event.transform.y = 0;
-            } else {
-              d3.event.transform.y = this.clamp(
-                d3.event.transform.y,
-                dimensions.h - this.graphBounds.bottom -
-                this.origTranslations[1],
-                -this.graphBounds.top - this.origTranslations[1]);
-            }
-
-            // We need a separate layer here so that the translation
-            // does not influence the panning event receivers.
-            this.innerTransformStr = (
-              'translate(' + d3.event.transform.x +
-              ',' + d3.event.transform.y + ')'
-            );
-          })
-        );
-    }, 10);
+          // We need a separate layer here so that the translation
+          // does not influence the panning event receivers.
+          this.innerTransformStr = (
+            'translate(' + d3.event.transform.x +
+            ',' + d3.event.transform.y + ')'
+          );
+        })
+      );
   }
 
   // Returns the closest number to `value` in the range
   // [bound1, bound2].
-  clamp(value: any, bound1: any, bound2: any): any {
-    var minValue = Math.min(bound1, bound2);
-    var maxValue = Math.max(bound1, bound2);
+  clamp(value: number, bound1: number, bound2: number): number {
+    let minValue = Math.min(bound1, bound2);
+    let maxValue = Math.max(bound1, bound2);
+
     return Math.min(Math.max(value, minValue), maxValue);
   }
 
   isCheckpoint(nodeId: string): boolean {
-    var state = this.explorationStatesService.getState(nodeId);
+    let state = this.explorationStatesService.getState(nodeId);
     return !!state && state.cardIsCheckpoint;
   }
 
@@ -218,9 +198,15 @@ export class StateGraphVisualization
   }
 
   getElementDimensions(): ElementDimensions {
+    let height = this.mainScreen.nativeElement.height.baseVal;
+    let width = this.mainScreen.nativeElement.width.baseVal;
+
+    height.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PX);
+    width.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PX);
+
     return {
-      h: this.mainScreen.nativeElement.height.baseVal.value + 'px',
-      w: this.mainScreen.nativeElement.width.baseVal.value + 'px'
+      h: Number(height.valueInSpecifiedUnits),
+      w: Number(width.valueInSpecifiedUnits)
     };
   }
 
@@ -231,7 +217,7 @@ export class StateGraphVisualization
       }
 
       setTimeout(() => {
-        var dimensions = this.getElementDimensions();
+        let dimensions = this.getElementDimensions();
 
         // Center the graph at the node representing the current state.
         try {
@@ -278,7 +264,7 @@ export class StateGraphVisualization
   }
 
   getNodeStrokeWidth(nodeId: string): string {
-    var currentNodeIsTerminal = (
+    let currentNodeIsTerminal = (
       this.finalStateIds.indexOf(nodeId) !== -1);
     return (
       nodeId === this.currentStateId ? '3' :
@@ -286,7 +272,7 @@ export class StateGraphVisualization
         '2' : '1');
   }
 
-  getNodeFillOpacity(nodeId: string): any {
+  getNodeFillOpacity(nodeId: string): number {
     return this.opacityMap ? this.opacityMap[nodeId] : 0.5;
   }
 
@@ -295,7 +281,7 @@ export class StateGraphVisualization
   }
 
   getNodeTitle(node: any): string {
-    var warning = '';
+    let warning = '';
     if (node.reachable === false) {
       warning = 'Warning: this state is unreachable.';
     } else if (node.reachableFromEnd === false) {
@@ -304,7 +290,7 @@ export class StateGraphVisualization
       );
     }
 
-    var tooltip = node.label;
+    let tooltip = node.label;
 
     if (node.hasOwnProperty('secondaryLabel')) {
       tooltip += ' ' + node.secondaryLabel;
@@ -322,11 +308,11 @@ export class StateGraphVisualization
     }
   }
 
-  getHighlightTransform(x0: any, y0: any): string {
+  getHighlightTransform(x0: number, y0: number): string {
     return 'rotate(-10,' + (x0 - 10) + ',' + (y0 - 5) + ')';
   }
 
-  getHighlightTextTransform(x0: any, y0: any): string {
+  getHighlightTextTransform(x0: number, y0: number): string {
     return 'rotate(-10,' + x0 + ',' + (y0 - 4) + ')';
   }
 
@@ -345,7 +331,7 @@ export class StateGraphVisualization
       initStateId: any, finalStateIds: any): any {
     this.initStateId = initStateId;
     this.finalStateIds = finalStateIds;
-    var links = angular.copy(originalLinks);
+    let links = angular.copy(originalLinks);
 
     this.nodeData = this.stateGraphLayoutService.computeLayout(
       nodes, links, initStateId, angular.copy(finalStateIds));
@@ -363,10 +349,10 @@ export class StateGraphVisualization
     // and dragged, translates the graph. Its height, width, and x and
     // y offsets are set to arbitrary large values so that the
     // draggable area extends beyond the graph.
-    this.VIEWPORT_WIDTH = Math.max(10000, this.GRAPH_WIDTH * 5);
-    this.VIEWPORT_HEIGHT = Math.max(10000, this.GRAPH_HEIGHT * 5);
-    this.VIEWPORT_X = -Math.max(1000, this.GRAPH_WIDTH * 2);
-    this.VIEWPORT_Y = -Math.max(1000, this.GRAPH_HEIGHT * 2);
+    this.VIEWPORT_WIDTH = Math.max(10000, this.GRAPH_WIDTH * 5) + 'px';
+    this.VIEWPORT_HEIGHT = Math.max(10000, this.GRAPH_HEIGHT * 5) + 'px';
+    this.VIEWPORT_X = -Math.max(1000, this.GRAPH_WIDTH * 2) + 'px';
+    this.VIEWPORT_Y = -Math.max(1000, this.GRAPH_HEIGHT * 2) + 'px';
 
     this.graphBounds = this.stateGraphLayoutService.getGraphBoundaries(
       this.nodeData);
@@ -374,7 +360,7 @@ export class StateGraphVisualization
     this.augmentedLinks = this.stateGraphLayoutService.getAugmentedLinks(
       this.nodeData, links);
 
-    for (var i = 0; i < this.augmentedLinks.length; i++) {
+    for (let i = 0; i < this.augmentedLinks.length; i++) {
     // Style links if link properties and style mappings are
     // provided.
       if (links[i].hasOwnProperty('linkProperty') &&
@@ -389,7 +375,7 @@ export class StateGraphVisualization
 
     // Update the nodes.
     this.nodeList = [];
-    for (var nodeId in this.nodeData) {
+    for (let nodeId in this.nodeData) {
       this.nodeData[nodeId].style = (
         'stroke-width: ' + this.getNodeStrokeWidth(nodeId) + '; ' +
       'fill-opacity: ' + this.getNodeFillOpacity(nodeId) + ';');
@@ -399,7 +385,7 @@ export class StateGraphVisualization
       }
 
       // ---- Color nodes ----
-      var nodeColors = this.nodeColors;
+      let nodeColors = this.nodeColors;
       if (nodeColors) {
         this.nodeData[nodeId].style += (
           'fill: ' + nodeColors[nodeId] + '; ');
@@ -414,7 +400,7 @@ export class StateGraphVisualization
         }
       }
 
-      var currentNodeIsTerminal = (
+      let currentNodeIsTerminal = (
         this.finalStateIds.indexOf(nodeId) !== -1);
 
       this.nodeData[nodeId].nodeClass = (
@@ -442,7 +428,7 @@ export class StateGraphVisualization
   }
 
   getNodeErrorMessage(nodeLabel: string): string {
-    var warnings = null;
+    let warnings = null;
     if (this.showTranslationWarnings) {
       warnings =
       this.translationStatusService.getAllStatesNeedUpdatewarning();
@@ -468,21 +454,23 @@ export class StateGraphVisualization
       })
     );
 
-    let graphDataInterval = setInterval(() => {
-      this.graphData = this.graphDataService.getGraphData();
-      if (this.graphData !== null) {
-        clearInterval(graphDataInterval);
-      }
+    this.directiveSubscriptions.add(
+      this.graphDataService.updateGraphData.subscribe(value => {
+        if (value !== null && value !== undefined && value) {
+          this.graphData = value;
+          this.redrawGraph();
+          this.centerGraph();
+        }
+      })
+    );
 
-      this.centerGraph();
+    if (this.graphDataService.getGraphData() !== null) {
+      this.graphData = this.graphDataService.getGraphData();
       this.redrawGraph();
+      this.centerGraph();
       this.switch = true;
       this.changeDetectorRef.detectChanges();
-    }, 300);
-  }
-
-  shivam(value): void {
-    console.error(this.getNodeErrorMessage(value));
+    }
   }
 
   ngOnDestroy(): void {

@@ -76,6 +76,8 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
             stateData.writtenTranslations);
           StateEditorService.onRefreshStateTranslation.emit();
         }
+
+        $scope.$apply();
       };
     }
   ]
